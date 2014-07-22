@@ -1,0 +1,169 @@
+{"expand": "renderedFields,names,schema,transitions,operations,editmeta,changelog", "id": "95490", "self": "https://jira-mvp.eng.vmware.com/rest/api/2/issue/95490", "key": "HW-33012", "fields": {
+    "progress": {
+        "progress": 0,
+        "total": 0
+    },
+    "summary": "Add support for producing Series reports so charts can show more than one set of data",
+    "timetracking": {},
+    "customfield_10081": null,
+    "issuetype": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/issuetype/8",
+        "id": "8",
+        "description": "",
+        "iconUrl": "https://jira-mvp.eng.vmware.com/download/resources/com.pyxis.greenhopper.jira:greenhopper-webactions/images/ico_story.png",
+        "name": "Story",
+        "subtask": false
+    },
+    "customfield_10080": null,
+    "customfield_10233": null,
+    "customfield_10232": null,
+    "customfield_10235": null,
+    "customfield_10234": null,
+    "timespent": null,
+    "customfield_10231": null,
+    "customfield_10230": null,
+    "reporter": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/user?username=malmond",
+        "name": "malmond",
+        "emailAddress": "malmond@vmware.com",
+        "avatarUrls": {
+            "16x16": "https://jira-mvp.eng.vmware.com/secure/useravatar?size=xsmall&ownerId=malmond&avatarId=11711",
+            "24x24": "https://jira-mvp.eng.vmware.com/secure/useravatar?size=small&ownerId=malmond&avatarId=11711",
+            "32x32": "https://jira-mvp.eng.vmware.com/secure/useravatar?size=medium&ownerId=malmond&avatarId=11711",
+            "48x48": "https://jira-mvp.eng.vmware.com/secure/useravatar?ownerId=malmond&avatarId=11711"
+        },
+        "displayName": "Michael Almond",
+        "active": true
+    },
+    "customfield_10430": null,
+    "customfield_10330": null,
+    "customfield_10237": null,
+    "created": "2014-02-09T22:06:10.780-0800",
+    "updated": "2014-03-20T11:22:12.182-0700",
+    "customfield_10331": null,
+    "priority": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/priority/2",
+        "iconUrl": "https://jira-mvp.eng.vmware.com/images/icons/priorities/critical.png",
+        "name": "Critical - P1",
+        "id": "2"
+    },
+    "description": "Use the new aggregation query type to produce multiple aggregations in one query.\r\n\r\nFor example, 3 separate counts for users added, deleted and updated, aggregated over time.",
+    "customfield_10238": null,
+    "customfield_10040": null,
+    "issuelinks": [],
+    "subtasks": [],
+    "status": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/status/3",
+        "description": "This issue is being actively worked on at the moment by the assignee.",
+        "iconUrl": "https://jira-mvp.eng.vmware.com/images/icons/statuses/inprogress.png",
+        "name": "In Progress",
+        "id": "3"
+    },
+    "customfield_10730": ["com.atlassian.greenhopper.service.sprint.Sprint@6127642e[rapidViewId=134,state=ACTIVE,name=Platform: S38,startDate=2014-03-19T10:17:02.433-07:00,endDate=2014-04-02T10:17:00.000-07:00,completeDate=<null>,id=593]"],
+    "customfield_10930": null,
+    "labels": ["triaged"],
+    "workratio": -1,
+    "customfield_10532": null,
+    "project": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/project/11415",
+        "id": "11415",
+        "key": "HW",
+        "name": "Horizon Workspace",
+        "avatarUrls": {
+            "16x16": "https://jira-mvp.eng.vmware.com/secure/projectavatar?size=xsmall&pid=11415&avatarId=12012",
+            "24x24": "https://jira-mvp.eng.vmware.com/secure/projectavatar?size=small&pid=11415&avatarId=12012",
+            "32x32": "https://jira-mvp.eng.vmware.com/secure/projectavatar?size=medium&pid=11415&avatarId=12012",
+            "48x48": "https://jira-mvp.eng.vmware.com/secure/projectavatar?pid=11415&avatarId=12012"
+        },
+        "projectCategory": {
+            "self": "https://jira-mvp.eng.vmware.com/rest/api/2/projectCategory/10000",
+            "id": "10000",
+            "description": "Collection for all MVP projects",
+            "name": "MVP"
+        }
+    },
+    "environment": null,
+    "customfield_10051": null,
+    "aggregateprogress": {
+        "progress": 0,
+        "total": 0
+    },
+    "lastViewed": "2014-03-24T10:50:41.954-0700",
+    "customfield_10631": null,
+    "components": [
+        {
+            "self": "https://jira-mvp.eng.vmware.com/rest/api/2/component/12324",
+            "id": "12324",
+            "name": "Horizon Management Platform - Backend",
+            "description": "Horizon Management Platform - Backend"
+        }
+    ],
+    "comment": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "comments": []
+    },
+    "timeoriginalestimate": null,
+    "votes": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/issue/HW-33012/votes",
+        "votes": 0,
+        "hasVoted": false
+    },
+    "fixVersions": [
+        {
+            "self": "https://jira-mvp.eng.vmware.com/rest/api/2/version/13415",
+            "id": "13415",
+            "description": "Horizon Workspace Davenport Release",
+            "name": "D Release",
+            "archived": false,
+            "released": false,
+            "releaseDate": "2014-08-29"
+        }
+    ],
+    "resolution": null,
+    "resolutiondate": null,
+    "aggregatetimeoriginalestimate": null,
+    "customfield_10063": null,
+    "customfield_10830": "HW-32997",
+    "duedate": null,
+    "customfield_10634": null,
+    "customfield_10635": null,
+    "customfield_10633": null,
+    "customfield_10060": null,
+    "customfield_10638": null,
+    "watches": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/issue/HW-33012/watchers",
+        "watchCount": 2,
+        "isWatching": false
+    },
+    "customfield_10639": null,
+    "worklog": {
+        "startAt": 0,
+        "maxResults": 20,
+        "total": 0,
+        "worklogs": []
+    },
+    "customfield_10062": 5.0,
+    "customfield_10637": null,
+    "customfield_10100": "Produce a report showing the users added, deleted, updated counts over a time range",
+    "assignee": {
+        "self": "https://jira-mvp.eng.vmware.com/rest/api/2/user?username=malmond",
+        "name": "malmond",
+        "emailAddress": "malmond@vmware.com",
+        "avatarUrls": {
+            "16x16": "https://jira-mvp.eng.vmware.com/secure/useravatar?size=xsmall&ownerId=malmond&avatarId=11711",
+            "24x24": "https://jira-mvp.eng.vmware.com/secure/useravatar?size=small&ownerId=malmond&avatarId=11711",
+            "32x32": "https://jira-mvp.eng.vmware.com/secure/useravatar?size=medium&ownerId=malmond&avatarId=11711",
+            "48x48": "https://jira-mvp.eng.vmware.com/secure/useravatar?ownerId=malmond&avatarId=11711"
+        },
+        "displayName": "Michael Almond",
+        "active": true
+    },
+    "attachment": [],
+    "aggregatetimeestimate": null,
+    "timeestimate": null,
+    "customfield_10130": "17",
+    "aggregatetimespent": null,
+    "customfield_10070": null
+}}

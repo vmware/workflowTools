@@ -1,0 +1,128 @@
+{
+  "ReadLastCommit": [
+    "--branch"
+  ],
+  "AbstractBatchJiraAction": [
+    "--jira-url"
+  ],
+  "PreloadAssignedIssues": [
+    "--username",
+    "--jira-url"
+  ],
+  "CreateReviewIfNeeded": [
+    "--review-board-repo"
+  ],
+  "ConvertTrelloBoardToJiraIssues": [
+    "--jira-url",
+    "--trello-url"
+  ],
+  "GenerateReviewStats": [
+    "--file-count-ranges",
+    "--groups"
+  ],
+  "DisplayReviewUrl": [
+    "--reviewboard-url"
+  ],
+  "SetBugNumbers": [
+    "--bug-prefix",
+    "--username",
+    "--jira-url"
+  ],
+  "AbstractCommitWithBuildsAction": [
+    "--username",
+    "--jenkins-url"
+  ],
+  "SetCommitDetailsFromReview": [
+    "--jenkins-url",
+    "--max-description",
+    "--max-summary"
+  ],
+  "PublishReview": [
+    "--reviewboard-url"
+  ],
+  "HardSubmitOldShipItReviews": [
+    "--old-ship-it"
+  ],
+  "FormatCommitText": [
+    "--max-description",
+    "--max-summary"
+  ],
+  "LoadBacklogStories": [
+    "--include-estimated",
+    "--use-label"
+  ],
+  "ApplyReviewPatch": [
+    "--latest-diff",
+    "--patch"
+  ],
+  "PushToPrecommitBranch": [
+    "--username"
+  ],
+  "AbortJenkinsJobs": [
+    "--jenkins-url",
+    "--jenkins-jobs"
+  ],
+  "UpdateTaskEstimates": [
+    "--username",
+    "--estimate",
+    "--jira-url"
+  ],
+  "UploadReviewDiff": [
+    "--parent"
+  ],
+  "CreateReview": [
+    "--review-board-repo"
+  ],
+  "SetBugNumbersOffline": [
+    "--bug-prefix"
+  ],
+  "HardSubmitOldSoftSubmittedReviews": [
+    "--old-submit"
+  ],
+  "CopyReviewUrlToClipboard": [
+    "--reviewboard-url"
+  ],
+  "PushToRemoteBranch": [
+    "--username",
+    " --staging-branch"
+  ],
+  "InvokeJenkinsJobs": [
+    "--username",
+    "--jenkins-url",
+    "--jenkins-jobs"
+  ],
+  "AuthenticateAllApis": [
+    "--trello-url",
+    "--jenkins-url",
+    "--username",
+    "--reviewboard-url",
+    "--jira-url"
+  ],
+  "AbstractReadMultiLine": [
+    "--max-description"
+  ],
+  "CreateTrelloBoardFromJiraIssues": [
+    "--jira-url",
+    "--trello-url"
+  ],
+  "AbstractCommitReadAction": [
+    "--set-empty-only"
+  ],
+  "AbstractTransitionJiraIssue": [
+    "--username",
+    "--jira-url"
+  ],
+  "SetSummary": [
+    "--max-summary",
+    "--set-empty-only"
+  ],
+  "UpdateReviewDetails": [
+    "--groups"
+  ],
+  "AbstractBatchCloseReviews": [
+    "--username"
+  ],
+  "AbstractSetReviewerList": [
+    "--username"
+  ]
+}

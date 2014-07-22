@@ -1,0 +1,24 @@
+{
+    "jiraUrl": "https://jiraUrl",
+    "jenkinsUrl": "https://jenkinsUrl",
+    "reviewboardUrl": "https://reviewboardUrl",
+    "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
+    "bugPrefix": "VM",
+    "targetGroups": [
+        "vmware-dev"
+    ],
+    "targetReviewers": [
+        "dbiggs", "auser"
+    ],
+    "reviewerGroups": {
+        "all": [
+            "dbiggs", "anotherUser"
+        ]
+    },
+    "topicTemplates": [
+        "Server", "Build", "Tests", "Chef"
+    ],
+    "testingDoneTemplates": [
+        "Ran server tests.", "mvn clean package", "Manual testing."
+    ]
+}

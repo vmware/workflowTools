@@ -1,0 +1,12 @@
+<project>
+  <groupId>com.vmware</groupId>
+  <artifactId>workflow</artifactId>
+  <packaging>pom</packaging>
+  <modelVersion>4.0.0</modelVersion>
+  <version>1.0</version>
+  <modules>
+    <module>core</module>
+    <module>restApis</module>
+    <module>utils</module>
+  </modules>
+</project>

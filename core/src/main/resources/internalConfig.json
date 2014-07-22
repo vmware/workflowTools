@@ -1,0 +1,176 @@
+{
+  "defaultTopic": "Server",
+  "reviewboardUrl": "https://reviewboard.eng.vmware.com",
+  "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
+  "jiraUrl": "https://jira-hzn.eng.vmware.com",
+  "trelloUrl": "https://trello.com",
+  "jenkinsUrl": "https://jenkins-hzn.eng.vmware.com/jenkins",
+  "remoteBranches": {
+    "precommit" : "topic/:username/pre-commit",
+    "update" : "topic/:username/update"
+  },
+  "remoteBranchToUse": "precommit",
+  "parentBranch": "origin/master",
+  "storyPointValues": [
+    1,2,3,5,8,13
+  ],
+  "bugPrefix": "HW",
+  "topicTemplates": [
+      "Server", "Testing", "UI"
+  ],
+  "testingDoneTemplates": [
+      "Ran Unit Tests.", "Ran server tests.", "Manual testing."
+  ],
+  "testingDoneLabel": "Testing Done:",
+  "bugNumberLabel": "Bug Number:",
+  "reviewedByLabel": "Reviewed by:",
+  "reviewUrlLabel": "Review URL:",
+  "noBugNumberLabel": "none",
+  "trivialReviewerLabel": "trivial",
+  "logLevel": "INFO",
+  "maxSummaryLength": 60,
+  "maxDescriptionLength": 80,
+  "closeOldSubmittedReviewsAfter": 2,
+  "closeOldShipItReviewsAfter": 7,
+  "jiraTaskEstimateInHours": 1,
+  "fileCountRanges": [5,10,20,50,100],
+  "workflows": {
+       "readNonTrivialCommit": [
+          "ReadLastCommit", "ExitIfTrivialCommit"
+       ],
+       "setCommitDetailsWithoutConfirmation": [
+          "PreloadAssignedIssues", "SetSummary", "SetDescription", "SetTestingDone",
+          "SetReviewedBy", "SetBugNumbers"
+       ],
+       "setCommitDetails": [
+          "setCommitDetailsWithoutConfirmation", "ExitIfConfirmationNotGiven"
+       ],
+       "setCommitDetailsOffline": [
+          "SetSummary", "SetDescription", "SetTestingDone",
+                      "SetReviewedBy", "SetBugNumbersOffline", "ExitIfConfirmationNotGiven"
+       ],
+       "setCommitDetailsFromReview": [
+          "ReadLastCommit", "SetCommitDetailsFromReview", "DisplayCommit",
+          "ExitIfConfirmationNotGiven", "AmendCommit"
+       ],
+       "commitAll": [
+          "ExitIfNoChangesDetectedByGit", "setCommitDetails", "CommitAll", "MarkIssueAsInProgress", "DisplayLastCommit"
+       ],
+       "commitAllOffline": [
+          "ExitIfNoChangesDetectedByGit", "setCommitDetailsOffline", "CommitAll", "DisplayLastCommit"
+       ],
+       "commit": [
+          "ExitIfNoStagedChangesDetectedByGit", "setCommitDetails", "Commit", "MarkIssueAsInProgress", "DisplayLastCommit"
+       ],
+       "commitOffline": [
+          "ExitIfNoStagedChangesDetectedByGit", "setCommitDetailsOffline", "Commit", "DisplayLastCommit"
+       ],
+       "amendCommit": [
+          "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"
+       ],
+       "setReviewDetails": [
+          "UpdateReviewDetails", "UploadReviewDiff"
+       ],
+       "forceNewReview": [
+          "readNonTrivialCommit", "CreateReview", "setReviewDetails", "AmendCommit", "DisplayReviewUrl"
+       ],
+       "review": [
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "DisplayReviewUrl"
+       ],
+       "reviewPlusCopyUrl": [
+          "review", "CopyReviewUrlToClipboard"
+       ],
+       "diffUploadOnly": [
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "UploadReviewDiff", "AmendCommit"
+       ],
+       "detailsUpdateOnly": [
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "UpdateReviewDetails", "AmendCommit"
+       ],
+       "publishReview": [
+          "readNonTrivialCommit", "PublishReview", "ExitIfReviewIsNotPublic", "MarkIssueAsInReview"
+       ],
+       "submitReview": [
+          "readNonTrivialCommit", "SoftSubmitReview"
+       ],
+       "applyPatch": [
+          "ApplyReviewPatch"
+       ],
+       "prepareCommitForPush": [
+          "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsJobs",
+          "FormatCommitText", "AmendCommit"
+       ],
+       "pushIt": [
+          "prepareCommitForPush", "PushToMaster", "SoftSubmitReview"
+       ],
+       "pushItHarder": [
+          "prepareCommitForPush", "PushToMaster", "HardSubmitReview"
+       ],
+       "closeOldReviews": [
+          "HardSubmitOldSoftSubmittedReviews", "HardSubmitOldShipItReviews"
+       ],
+       "startJobs": [
+          "PushToPrecommitBranch", "ReadLastCommit", "InvokeJenkinsJobs", "AmendCommit"
+       ],
+       "restartJobs": [
+          "PushToPrecommitBranch", "ReadLastCommit", "AbortJenkinsJobs", "InvokeJenkinsJobs", "AmendCommit"
+       ],
+       "stopJobs": [
+          "ReadLastCommit", "AbortJenkinsJobs", "AmendCommit"
+       ],
+       "pushable": [
+          "ReadLastCommit", "CheckStatusOfJenkinsJobs", "CheckStatusOfReviewShipIts", "AmendCommit"
+       ],
+       "resolveIssue": [
+          "ReadLastCommit", "ExitIfCommitHasNoBugNumber", "MarkIssueAsResolved"
+       ],
+       "setMissingCommitValues": [
+          "ReadLastCommit", "setCommitDetailsWithoutConfirmation", "ExitIfCommitUnchanged",
+           "ExitIfConfirmationNotGiven", "AmendCommit", "--set-empty-only"
+       ],
+       "setSummary": [
+          "ReadLastCommit", "SetSummary", "AmendCommit"
+       ],
+       "setDescription": [
+          "ReadLastCommit", "SetDescription", "AmendCommit"
+       ],
+       "setTestingDone": [
+          "ReadLastCommit", "SetTestingDone", "AmendCommit"
+       ],
+       "setBugNumber": [
+          "ReadLastCommit", "SetBugNumbers", "AmendCommit"
+       ],
+       "setReviewedBy": [
+          "ReadLastCommit", "SetReviewedBy", "AmendCommit"
+       ],
+       "setReviewNumber": [
+          "ReadLastCommit", "SetReviewId", "AmendCommit"
+       ],
+       "addToDescription": [
+          "ReadLastCommit", "AddToDescription", "AmendCommit"
+       ],
+       "addToTestingDone": [
+          "ReadLastCommit", "AddToTestingDone", "AmendCommit"
+       ],
+       "addToReviewedBy": [
+          "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
+       ],
+       "createTrelloBoard": [
+          "LoadBacklogStories", "CreateTrelloBoardFromJiraIssues"
+       ],
+       "createTrelloBoardFromLabel": [
+          "createTrelloBoard", "--use-label"
+       ],
+       "setStoryPoints": [
+          "ConvertTrelloBoardToJiraIssues", "UpdateStoryPointsOnly"
+       ],
+       "createUpdateIssuesFromTrello": [
+          "ConvertTrelloBoardToJiraIssues", "UpdateIssues", "CreateMissingStories"
+       ],
+       "intro": [
+         "GettingStarted", "DisplayMainWorkflows"
+       ],
+       "help": [
+          "DisplayConfig", "DisplayConfigOptions", "DisplayWorkflowActions", "DisplayWorkflows"
+       ]
+   }
+}

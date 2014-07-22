@@ -1,0 +1,46 @@
+# useful commands to add to your bash profile script
+
+# change this to the directory that your workflow jar is in
+export WORKFLOW_DIR=~/flow
+export WORKFLOW_JAR=$WORKFLOW_DIR/workflow.jar
+
+alias workflow='java -jar $WORKFLOW_JAR'
+
+editCommit() {
+	workflow -w ReadLastCommit,Set$1,AmendCommit,DisplayLastCommit $2
+}
+
+addToCommit() {
+	workflow -w ReadLastCommit,AddTo$1,AmendCommit,DisplayLastCommit
+}
+
+alias amendReview='workflow -w amendReview'
+alias jenkins='workflow -w restartJobs -j '
+
+alias commit='workflow -w commit'
+alias commitOffline='workflow -w commitOffline'
+alias amend='workflow -w amendCommit'
+
+alias review='workflow review'
+alias forceNewReview='workflow -w newReview'
+alias diffUploadOnly='workflow -w diffUploadOnly'
+alias detailsUpdateOnly='workflow -w detailsUpdateOnly'
+alias setCommitDetailsFromReview='workflow -w setCommitDetailsFromReview'
+alias publishReview='workflow -w publishReview'
+
+alias unitTestPostgres='workflow -w restartJobs -j postgres'
+alias unitTestH2='workflow -w restartJobs -j h2'
+alias unitTestOracle='workflow -w restartJobs -j oracle'
+alias unitTestAll='workflow -w restartJobs -j allUnitTests'
+
+alias serverTests='workflow -w restartJobs -j serverTests'
+alias serverTestsWithInitialConfig='workflow -w restartJobs -j serverTestsWithInitialConfig'
+
+alias unitTestsAndServerTests='workflow -w restartJobs -j postgres,serverTests'
+alias everyTest='workflow -w restartJobs -j unitTestAll,serverTests'
+
+alias pushable='workflow -w pushable'
+alias pushIt='workflow pushIt'
+alias pushItHarder='workflow -w pushItHarder'
+
+alias closeOldReviews='workflow -w closeOldReviews'

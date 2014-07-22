@@ -1,0 +1,9 @@
+*~
+.DS_Store
+*.reviewboardrc
+.metadata
+.idea
+atlassian-ide-plugin.xml
+*.iml
+target
+.repository
