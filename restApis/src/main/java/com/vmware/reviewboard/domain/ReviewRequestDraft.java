@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.vmware.utils.StringUtils.addToCsvValue;
+import static com.vmware.utils.StringUtils.isNotBlank;
 import static com.vmware.utils.UrlUtils.addTrailingSlash;
 
 public class ReviewRequestDraft extends BaseEntity{
@@ -228,9 +229,16 @@ public class ReviewRequestDraft extends BaseEntity{
         if (StringUtils.isNotBlank(description)) {
             builder.append(description).append("\n\n");
         }
-        builder.append(commitConfig.getTestingDoneLabel()).append(fullTestingDoneSection()).append("\n");
-        builder.append(commitConfig.getBugNumberLabel()).append(bugNumbers).append("\n");
-        builder.append(commitConfig.getReviewedByLabel()).append(reviewedBy);
+
+        if (isNotBlank(fullTestingDoneSection())) {
+            builder.append(commitConfig.getTestingDoneLabel()).append(fullTestingDoneSection()).append("\n");
+        }
+        if (isNotBlank(bugNumbers)) {
+            builder.append(commitConfig.getBugNumberLabel()).append(bugNumbers).append("\n");
+        }
+        if (isNotBlank(reviewedBy)) {
+            builder.append(commitConfig.getReviewedByLabel()).append(reviewedBy);
+        }
         if (hasReviewNumber()) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
                     .append(addTrailingSlash(commitConfig.getReviewboardUrl())).append("r/").append(id);

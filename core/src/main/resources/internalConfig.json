@@ -65,6 +65,12 @@
        "commitOffline": [
           "ExitIfNoStagedChangesDetectedByGit", "setCommitDetailsOffline", "Commit", "DisplayLastCommit"
        ],
+       "quickCommitAll": [
+          "ExitIfNoChangesDetectedByGit", "SetSummary", "SetDescription", "CommitAll", "DisplayLastCommit"
+       ],
+       "quickCommit": [
+          "ExitIfNoChangesDetectedByGit", "SetSummary", "SetDescription", "Commit", "DisplayLastCommit"
+       ],
        "amendCommit": [
           "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"
        ],

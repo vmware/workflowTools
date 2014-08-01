@@ -118,7 +118,7 @@ public class Workflow {
     private static void askForWorkflow(WorkflowConfig config) throws IOException, IllegalAccessException {
         log.info("Press tab to see a list of available workflows");
         log.info("Press up to see previously entered workflows");
-        log.info("Type {} for .... exiting", EXIT_WORKFLOW);
+        log.info("Type {} to exit without running a workflow", EXIT_WORKFLOW);
 
         ArgumentCompleter argumentsCompleter = createWorkflowCompleter(config);
 
