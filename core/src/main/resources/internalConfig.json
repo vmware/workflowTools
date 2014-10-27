@@ -86,6 +86,9 @@
        "reviewPlusCopyUrl": [
           "review", "CopyReviewUrlToClipboard"
        ],
+       "amendReview": [
+          "amendCommit", "review"
+       ],
        "diffUploadOnly": [
           "readNonTrivialCommit", "CreateReviewIfNeeded", "UploadReviewDiff", "AmendCommit"
        ],
