@@ -24,7 +24,7 @@ public class AuthenticateAllApis extends AbstractAction{
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
         checkAuthentication(new Jira(config.jiraUrl));
         checkAuthentication(new ReviewBoard(config.reviewboardUrl, config.username));
-        checkAuthentication(new Jenkins(config.jenkinsUrl, config.username));
+        checkAuthentication(new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf));
         checkAuthentication(new Trello(config.trelloUrl));
     }
 

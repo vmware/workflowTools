@@ -27,6 +27,6 @@ public abstract class AbstractCommitWithBuildsAction extends AbstractCommitActio
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jenkins = ServiceLocator.getJenkins(config.jenkinsUrl, config.username);
+        this.jenkins = ServiceLocator.getJenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf);
     }
 }

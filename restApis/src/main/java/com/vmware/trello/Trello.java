@@ -100,7 +100,7 @@ public class Trello extends AbstractRestService {
         connection.setAuthQueryString(null);
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(ApiAuthentication.trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        connection.post(loginUrl, new LoginInfo(credentials), "https://trello.com/login");
+        connection.post(loginUrl, new LoginInfo(credentials), new NameValuePair("Referer", "https://trello.com/login"));
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
 
         connection.setUseSessionCookies(true);

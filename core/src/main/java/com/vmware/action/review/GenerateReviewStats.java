@@ -40,7 +40,7 @@ public class GenerateReviewStats extends AbstractAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        reviewBoard = ServiceLocator.getReviewBoard(config);
+        reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
         String groupsToUse = "";
         if (config.targetGroups == null || config.targetGroups.length == 0) {
             log.info("No target groups selected");

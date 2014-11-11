@@ -82,7 +82,7 @@ public class RestConnection {
     public <T> T get(String url, Class<T> responseConversionClass, String acceptMediaType, NameValuePair... params)
             throws IOException, URISyntaxException {
         String fullUrl = UriUtils.buildUrl(url, params);
-        setupConnection(fullUrl, GET, acceptMediaType, null);
+        setupConnection(fullUrl, GET, acceptMediaType);
         return handleServerResponse(responseConversionClass);
     }
 
@@ -95,12 +95,12 @@ public class RestConnection {
 
     public <T> T post(String url, Class<T> responseConversionClass, Object requestObject)
             throws IllegalAccessException, IOException, URISyntaxException {
-        return post(url, responseConversionClass, requestObject, null);
+        return post(url, responseConversionClass, requestObject);
     }
 
-    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, String referer)
+    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, NameValuePair... requestHeaders)
             throws URISyntaxException, IOException, IllegalAccessException {
-        setupConnection(url, POST, "application/json", referer);
+        setupConnection(url, POST, "application/json", requestHeaders);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass);
     }
@@ -112,12 +112,12 @@ public class RestConnection {
 
     public <T> T post(String url, Object requestObject)
             throws IllegalAccessException, IOException, URISyntaxException {
-        return post(url, null, requestObject, null);
+        return post(url, null, requestObject);
     }
 
-    public <T> T post(String url, Object requestObject, String referer)
+    public <T> T post(String url, Object requestObject, NameValuePair... headers)
             throws URISyntaxException, IOException, IllegalAccessException {
-        return post(url, null, requestObject, referer);
+        return post(url, null, requestObject, headers);
     }
 
     public <T> T delete(String url)
@@ -160,10 +160,10 @@ public class RestConnection {
     }
 
     private void setupConnection(String url, HttpMethodType methodType) throws IOException, URISyntaxException {
-        setupConnection(url, methodType, "application/json", null);
+        setupConnection(url, methodType, "application/json");
     }
 
-    private void setupConnection(String url, HttpMethodType methodType, String acceptMediaType, String referer) throws IOException, URISyntaxException {
+    private void setupConnection(String url, HttpMethodType methodType, String acceptMediaType, NameValuePair... headers) throws IOException, URISyntaxException {
         if (authQueryString != null) {
             url += !url.contains("?") ? "?" : "&";
             url += authQueryString;
@@ -176,8 +176,9 @@ public class RestConnection {
         activeConnection.setInstanceFollowRedirects(false);
         activeConnection.setRequestMethod(methodType.name());
         activeConnection.setRequestProperty("Accept", acceptMediaType);
-        if (referer != null) {
-            activeConnection.setRequestProperty("Referer", referer);
+        for (NameValuePair header : headers) {
+            log.debug("Adding request header {}:{}", header.getName(), header.getValue());
+            activeConnection.setRequestProperty(header.getName(), header.getValue());
         }
         addAuthorizationHeaderIfNotNull();
         addCookiesHeader(uri.getHost());

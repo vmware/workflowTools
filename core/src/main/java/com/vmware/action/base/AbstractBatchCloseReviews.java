@@ -29,7 +29,7 @@ public abstract class AbstractBatchCloseReviews extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.reviewBoard = ServiceLocator.getReviewBoard(config);
+        this.reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
     }
 
     public void closeReviews(ReviewRequest[] openRequests) throws IOException, IllegalAccessException, URISyntaxException, ParseException {

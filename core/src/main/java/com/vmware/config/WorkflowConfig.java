@@ -72,11 +72,14 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-reviewRepo,--review-board-repo", help = "Review board repository")
     public String reviewBoardRepository;
 
-    @ConfigurableProperty(commandLine = "-date", help = "Date format used by review board. Can change between review board versions")
+    @ConfigurableProperty(commandLine = "-rbDateFormat,--review-board-date-format", help = "Date format used by review board. Can change between review board versions")
     public String reviewBoardDateFormat;
 
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
+
+    @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
+    public boolean jenkinsUsesCsrf;
 
     @ConfigurableProperty(commandLine = "-jiraUrl,--jira-url", help = "Url for jira server")
     public String jiraUrl;

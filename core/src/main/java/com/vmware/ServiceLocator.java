@@ -33,18 +33,18 @@ public class ServiceLocator {
         return jira;
     }
 
-    public static ReviewBoard getReviewBoard(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public static ReviewBoard getReviewBoard(String reviewboardUrl, String username, String reviewBoardDateFormat) throws IOException, URISyntaxException, IllegalAccessException {
         if (reviewBoard == null) {
-            reviewBoard = new ReviewBoard(config.reviewboardUrl, config.username);
+            reviewBoard = new ReviewBoard(reviewboardUrl, username);
             reviewBoard.setupAuthenticatedConnection();
-            reviewBoard.updateServerTimeZone(config.reviewBoardDateFormat);
+            reviewBoard.updateServerTimeZone(reviewBoardDateFormat);
         }
         return reviewBoard;
     }
 
-    public static Jenkins getJenkins(String jenkinsUrl, String username) throws IOException, URISyntaxException, IllegalAccessException {
+    public static Jenkins getJenkins(String jenkinsUrl, String username, boolean jenkinsUsesCsrf) throws IOException, URISyntaxException, IllegalAccessException {
         if (jenkins == null) {
-            jenkins = new Jenkins(jenkinsUrl, username);
+            jenkins = new Jenkins(jenkinsUrl, username, jenkinsUsesCsrf);
             jenkins.setupAuthenticatedConnection();
         }
         return jenkins;

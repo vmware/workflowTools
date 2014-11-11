@@ -23,7 +23,7 @@ public class SetReviewId extends AbstractCommitAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        reviewBoard = ServiceLocator.getReviewBoard(config);
+        reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
     }
 
     @Override

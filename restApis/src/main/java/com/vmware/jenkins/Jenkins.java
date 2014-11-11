@@ -1,14 +1,9 @@
 package com.vmware.jenkins;
 
 import com.vmware.AbstractRestService;
-import com.vmware.jenkins.domain.Job;
-import com.vmware.jenkins.domain.JobBuild;
-import com.vmware.jenkins.domain.JobBuildDetails;
-import com.vmware.jenkins.domain.JobBuildResult;
-import com.vmware.jenkins.domain.JobDetails;
-import com.vmware.jenkins.domain.JobParameters;
-import com.vmware.jenkins.domain.JobsList;
+import com.vmware.jenkins.domain.*;
 import com.vmware.rest.ApiAuthentication;
+import com.vmware.rest.NameValuePair;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
@@ -26,14 +21,16 @@ import java.util.regex.Pattern;
 
 public class Jenkins extends AbstractRestService {
 
+    private final boolean usesCsrf;
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private String configureUrl;
     private JobsList jobsList = null;
 
-    public Jenkins(String serverUrl, final String username)
+    public Jenkins(String serverUrl, final String username, boolean usesCsrf)
             throws IOException, URISyntaxException, IllegalAccessException {
         super(serverUrl, "api/json", ApiAuthentication.jenkins, username);
         this.configureUrl = baseUrl + "me/configure";
+        this.usesCsrf = usesCsrf;
         connection = new RestConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
 
         String apiToken = readExistingApiToken();
@@ -109,6 +106,16 @@ public class Jenkins extends AbstractRestService {
 
     private JobBuildDetails getJobBuildDetails(String jobBuildUrl) throws IOException, URISyntaxException, IllegalAccessException {
         return optimisticGet(jobBuildUrl, JobBuildDetails.class);
+    }
+
+    @Override
+    protected void optimisticPost(String url, Object params, NameValuePair... headers) throws IllegalAccessException, IOException, URISyntaxException {
+        if (usesCsrf) {
+            CsrfCrumb csrfCrumb = super.optimisticGet(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
+            super.optimisticPost(url, params, new NameValuePair(csrfCrumb.crumbRequestField, csrfCrumb.crumb));
+        } else {
+            super.optimisticPost(url, params);
+        }
     }
 
     private String scrapeUIForToken() throws IOException, URISyntaxException {

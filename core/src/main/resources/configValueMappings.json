@@ -1,24 +1,35 @@
 {
-  "ReadLastCommit": [
-    "--branch"
-  ],
   "AbstractBatchJiraAction": [
     "--jira-url"
+  ],
+  "ReadLastCommit": [
+    "--branch"
   ],
   "PreloadAssignedIssues": [
     "--username",
     "--jira-url"
   ],
   "CreateReviewIfNeeded": [
-    "--review-board-repo"
+    "--review-board-repo",
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
   ],
   "ConvertTrelloBoardToJiraIssues": [
     "--jira-url",
     "--trello-url"
   ],
+  "AbstractCommitWithReviewAction": [
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
+  ],
   "GenerateReviewStats": [
     "--file-count-ranges",
-    "--groups"
+    "--groups",
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
   ],
   "DisplayReviewUrl": [
     "--reviewboard-url"
@@ -29,6 +40,7 @@
     "--jira-url"
   ],
   "AbstractCommitWithBuildsAction": [
+    "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url"
   ],
@@ -43,6 +55,13 @@
   "HardSubmitOldShipItReviews": [
     "--old-ship-it"
   ],
+  "ApplyReviewPatch": [
+    "--latest-diff",
+    "--patch",
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
+  ],
   "FormatCommitText": [
     "--max-description",
     "--max-summary"
@@ -50,10 +69,6 @@
   "LoadBacklogStories": [
     "--include-estimated",
     "--use-label"
-  ],
-  "ApplyReviewPatch": [
-    "--latest-diff",
-    "--patch"
   ],
   "PushToPrecommitBranch": [
     "--username"
@@ -71,7 +86,10 @@
     "--parent"
   ],
   "CreateReview": [
-    "--review-board-repo"
+    "--review-board-repo",
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
   ],
   "SetBugNumbersOffline": [
     "--bug-prefix"
@@ -80,6 +98,11 @@
     "--old-submit"
   ],
   "CopyReviewUrlToClipboard": [
+    "--reviewboard-url"
+  ],
+  "SetReviewId": [
+    "--review-board-date-format",
+    "--username",
     "--reviewboard-url"
   ],
   "PushToRemoteBranch": [
@@ -93,6 +116,7 @@
   ],
   "AuthenticateAllApis": [
     "--trello-url",
+    "--jenkins-uses-csrf",
     "--jenkins-url",
     "--username",
     "--reviewboard-url",
@@ -120,7 +144,9 @@
     "--groups"
   ],
   "AbstractBatchCloseReviews": [
-    "--username"
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
   ],
   "AbstractSetReviewerList": [
     "--username"

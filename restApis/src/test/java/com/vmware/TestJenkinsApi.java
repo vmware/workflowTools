@@ -29,7 +29,7 @@ public class TestJenkinsApi extends AbstractTestRestApi{
     public void init() throws IOException, URISyntaxException, IllegalAccessException {
         String jenkinsUrl = testProperties.getProperty("jenkins.url");
         jenkinsUsername = testProperties.getProperty("jenkins.username");
-        jenkins = new Jenkins(jenkinsUrl, jenkinsUsername);
+        jenkins = new Jenkins(jenkinsUrl, jenkinsUsername, true);
         jenkins.setupAuthenticatedConnection();
     }
 

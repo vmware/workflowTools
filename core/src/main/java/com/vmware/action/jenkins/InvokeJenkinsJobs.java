@@ -19,6 +19,7 @@ import java.util.List;
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobKeys config property. Adds or replaces jenkins job urls to testing done section.")
 public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
     private static final String USERNAME_PARAM = "USERNAME";
+    private static final String NO_USERNAME = "NONE";
 
     public InvokeJenkinsJobs(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
@@ -87,15 +88,22 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
         boolean foundUsernameParam = false;
         for (int i = 1; i < jenkinsJobDetails.length; i++) {
             String jenkinsParam = jenkinsJobDetails[i];
-            if (jenkinsParam.equals(USERNAME_PARAM)) {
-                foundUsernameParam = true;
-            }
             String[] paramPieces = jenkinsParam.split("=");
             if (paramPieces.length != 2) {
                 throw new IllegalArgumentException("Jenkins param " + jenkinsParam + " should be of the format name=value");
             }
-            log.info("Setting job param {} to {}", paramPieces[0], paramPieces[1]);
-            parameters.add(new JobParameter(paramPieces[0], paramPieces[1]));
+            String paramName = paramPieces[0];
+            String paramValue = paramPieces[1];
+            if (paramName.equals(USERNAME_PARAM)) {
+                foundUsernameParam = true;
+            }
+
+            if (paramName.equals(USERNAME_PARAM) && paramValue.equals(NO_USERNAME)) {
+                log.info("Ignoring {} parameter for this job", USERNAME_PARAM);
+            } else {
+                log.info("Setting job param {} to {}", paramName, paramValue);
+                parameters.add(new JobParameter(paramName, paramValue));
+            }
         }
 
         if (!foundUsernameParam) {
