@@ -96,6 +96,15 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Map of jenkins jobs to select from when invoking a jenkins job")
     public Map<String, String> jenkinsJobs;
 
+    @ConfigurableProperty(commandLine = "-waitForJenkins,--wait-for-jenkins", help = "Waits for jenkins job to complete, when running multiple jobs, waits for previous one to complete before starting next one")
+    public boolean waitForJenkinsJobCompletion;
+
+    @ConfigurableProperty(commandLine = "-ignoreJobFailure,--ignore-jenkins-job-failure", help = "If wait for Jenkins job result is set, then ignore job failure and run the next build")
+    public boolean ignoreJenkinsJobFailure;
+
+    @ConfigurableProperty(help = "Max number of jenkins jobs to iterate over when checking for latest status of jenkins job")
+    public int maxJenkinsBuildsToCheck;
+
     @ConfigurableProperty(help = "Array of reviewers to select from for reviewed by section")
     public SortedSet<String> targetReviewers;
 

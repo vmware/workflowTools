@@ -3,13 +3,11 @@ package com.vmware.action.jenkins;
 import com.vmware.action.base.AbstractCommitWithBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jenkins.domain.Job;
-import com.vmware.jenkins.domain.JobBuild;
-import com.vmware.jenkins.domain.JobParameter;
-import com.vmware.jenkins.domain.JobParameters;
+import com.vmware.jenkins.domain.*;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.InputUtils;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.ThreadUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,6 +18,7 @@ import java.util.List;
 public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
     private static final String USERNAME_PARAM = "USERNAME";
     private static final String NO_USERNAME = "NONE";
+    private static final String ASK_FOR_PARAM = "$ASK";
 
     public InvokeJenkinsJobs(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
@@ -54,8 +53,31 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
             if (i > 0) {
                 log.info("");
             }
-            invokeJenkinsJob(draft, jenkinsJobText);
+            JobBuild newBuild = invokeJenkinsJob(draft, jenkinsJobText);
+            boolean success = waitForJobToCompleteIfNecessary(newBuild);
+            if (!success && i < jenkinsJobTexts.size() - 1 && !config.ignoreJenkinsJobFailure) {
+                log.warn("Job did not complete successfully, aborting running of jobs");
+                break;
+            }
         }
+    }
+
+    private boolean waitForJobToCompleteIfNecessary(JobBuild newBuild) throws IOException, URISyntaxException, IllegalAccessException {
+        if (!config.waitForJenkinsJobCompletion) {
+            return true;
+        }
+
+        log.info("Waiting for job to complete");
+        boolean jobBuilding = true;
+        JobBuildDetails updatedDetails = null;
+        while (jobBuilding) {
+            ThreadUtils.sleep(20000);
+            updatedDetails = jenkins.getJobBuildDetails(newBuild);
+            jobBuilding = updatedDetails.building;
+            log.debug("Current status {}", updatedDetails.realResult());
+        }
+        log.info("Job status {}", updatedDetails.realResult());
+        return updatedDetails.realResult() == JobBuildResult.SUCCESS;
     }
 
     private void askForJenkinsJobKeysIfBlank() throws IOException {
@@ -66,7 +88,7 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
         config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());
     }
 
-    private void invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
+    private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
         String[] jenkinsJobDetails = jenkinsJobText.split(",");
         String jenkinsJobName = jenkinsJobDetails[0];
         log.info("Invoking job " + jenkinsJobName);
@@ -78,12 +100,14 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
 
         JobBuild expectedNewBuild = new JobBuild(buildNumber, jobToInvoke.url);
 
+        log.info("Invoking job {}", expectedNewBuild.url);
         jenkins.invokeJob(jobToInvoke, params);
 
         updateTestingDone(jobToInvoke, expectedNewBuild, draft);
+        return expectedNewBuild;
     }
 
-    private JobParameters generateJobParameters(String[] jenkinsJobDetails) {
+    private JobParameters generateJobParameters(String[] jenkinsJobDetails) throws IOException {
         List<JobParameter> parameters = new ArrayList<JobParameter>();
         boolean foundUsernameParam = false;
         for (int i = 1; i < jenkinsJobDetails.length; i++) {
@@ -96,6 +120,10 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
             String paramValue = paramPieces[1];
             if (paramName.equals(USERNAME_PARAM)) {
                 foundUsernameParam = true;
+            }
+
+            if (paramValue.equals(ASK_FOR_PARAM)) {
+                paramValue = InputUtils.readValueUntilNotBlank("Enter " + paramName);
             }
 
             if (paramName.equals(USERNAME_PARAM) && paramValue.equals(NO_USERNAME)) {
@@ -115,11 +143,11 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
     private void updateTestingDone(Job jobToInvoke, JobBuild expectedNewBuild, ReviewRequestDraft draft) {
         JobBuild existingBuild = draft.getMatchingJobBuild(jobToInvoke.url);
         if (existingBuild == null ) {
-            log.info("Appending {} to testing done", expectedNewBuild.url);
+            log.debug("Appending {} to testing done", expectedNewBuild.url);
             draft.jobBuilds.add(expectedNewBuild);
         } else {
-            log.info("Replacing existing build url {} in testing done ", existingBuild.url);
-            log.info("New build url {}", expectedNewBuild.url);
+            log.debug("Replacing existing build url {} in testing done ", existingBuild.url);
+            log.debug("New build url {}", expectedNewBuild.url);
             existingBuild.url = expectedNewBuild.url;
             existingBuild.result = expectedNewBuild.result;
         }

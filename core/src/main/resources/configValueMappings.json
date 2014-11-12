@@ -52,6 +52,12 @@
   "PublishReview": [
     "--reviewboard-url"
   ],
+  "CheckStatusOfLatestJobs": [
+    "--jenkins-jobs",
+    "--jenkins-uses-csrf",
+    "--username",
+    "--jenkins-url"
+  ],
   "HardSubmitOldShipItReviews": [
     "--old-ship-it"
   ],
@@ -73,14 +79,14 @@
   "PushToPrecommitBranch": [
     "--username"
   ],
-  "AbortJenkinsJobs": [
-    "--jenkins-url",
-    "--jenkins-jobs"
-  ],
   "UpdateTaskEstimates": [
     "--username",
     "--estimate",
     "--jira-url"
+  ],
+  "AbortJenkinsJobs": [
+    "--jenkins-url",
+    "--jenkins-jobs"
   ],
   "UploadReviewDiff": [
     "--parent"
@@ -112,6 +118,8 @@
   "InvokeJenkinsJobs": [
     "--username",
     "--jenkins-url",
+    "--wait-for-jenkins",
+    "--ignore-jenkins-job-failure",
     "--jenkins-jobs"
   ],
   "AuthenticateAllApis": [

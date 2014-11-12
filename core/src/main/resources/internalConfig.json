@@ -5,6 +5,10 @@
   "jiraUrl": "https://jira-hzn.eng.vmware.com",
   "trelloUrl": "https://trello.com",
   "jenkinsUrl": "https://jenkins-hzn.eng.vmware.com/jenkins",
+  "jenkinsUsesCsrf": false,
+  "waitForJenkinsJobCompletion": false,
+  "ignoreJenkinsJobFailure": false,
+  "maxJenkinsBuildsToCheck": 10,
   "remoteBranches": {
     "precommit" : "topic/:username/pre-commit",
     "update" : "topic/:username/update"
@@ -69,7 +73,7 @@
           "ExitIfNoChangesDetectedByGit", "SetSummary", "SetDescription", "CommitAll", "DisplayLastCommit"
        ],
        "quickCommit": [
-          "ExitIfNoChangesDetectedByGit", "SetSummary", "SetDescription", "Commit", "DisplayLastCommit"
+          "ExitIfNoStagedChangesDetectedByGit", "SetSummary", "SetDescription", "Commit", "DisplayLastCommit"
        ],
        "amendCommit": [
           "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"

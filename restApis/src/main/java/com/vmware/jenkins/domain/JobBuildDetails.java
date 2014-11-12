@@ -2,6 +2,8 @@ package com.vmware.jenkins.domain;
 
 public class JobBuildDetails {
 
+   public String url;
+
    public JobBuildDetail[] actions;
 
    public boolean building;
@@ -24,5 +26,9 @@ public class JobBuildDetails {
             }
         }
         throw new RuntimeException("Could not get username for job starter");
+    }
+
+    public JobBuildResult realResult() {
+        return building ? JobBuildResult.BUILDING : result;
     }
 }

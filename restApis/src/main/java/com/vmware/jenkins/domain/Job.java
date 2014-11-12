@@ -1,5 +1,7 @@
 package com.vmware.jenkins.domain;
 
+import com.vmware.utils.UrlUtils;
+
 public class Job {
     public String name;
     public String url;
@@ -9,6 +11,11 @@ public class Job {
 
     public Job(String url) {
         this.url = url;
+    }
+
+    public Job(String baseUrl, String jobName) {
+        baseUrl = UrlUtils.addTrailingSlash(baseUrl);
+        this.url = baseUrl + "job/" + jobName + "/";
     }
 
     public String getBuildUrl() {
