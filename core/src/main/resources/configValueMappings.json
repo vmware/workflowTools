@@ -89,7 +89,8 @@
     "--jenkins-jobs"
   ],
   "UploadReviewDiff": [
-    "--parent"
+    "--parent",
+    "--merge-parent"
   ],
   "CreateReview": [
     "--review-board-repo",

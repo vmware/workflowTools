@@ -14,6 +14,7 @@
     "update" : "topic/:username/update"
   },
   "remoteBranchToUse": "precommit",
+  "mergeParent": "origin/master",
   "parentBranch": "origin/master",
   "storyPointValues": [
     1,2,3,5,8,13
