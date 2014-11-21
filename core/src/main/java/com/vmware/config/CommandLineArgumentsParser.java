@@ -27,13 +27,20 @@ public class CommandLineArgumentsParser {
         argumentMap.clear();
 
         for (int i = 0; i < args.length; i ++) {
-            if (args[i].startsWith("-")) {
-                String paramValue = i < args.length - 1 && !args[i+1].startsWith("-") ? args[i+1] : null;
-                argumentMap.put(args[i], paramValue);
-                if (paramValue != null) {
-                    i++;
-                }
+            if (!args[i].startsWith("-")) {
+                continue;
             }
+            String[] paramPieces = args[i].split("=");
+            String paramName = paramPieces[0];
+            String paramValue = null;
+
+            if (paramPieces.length == 2) {
+                paramValue = paramPieces[1];
+            } else if (i < args.length - 1 && !args[i+1].startsWith("-")) {
+                paramValue = args[++i];
+            }
+
+            argumentMap.put(paramName, paramValue);
         }
         // add first variable as a possible workflow value if it does not start with -
         if (args.length > 0 && !args[0].startsWith("-")) {
