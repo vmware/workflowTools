@@ -32,7 +32,7 @@ public class UploadReviewDiff extends AbstractCommitWithReviewAction {
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
 
         DiffToUpload diff = new DiffToUpload();
-        String mergeBase = git.mergeBase(config.mergeParent, "HEAD");
+        String mergeBase = git.mergeBase(config.trackingBranch, "HEAD");
         diff.path = git.diff(config.parentBranch, "HEAD", supportsDiffWithRenames);
         diff.parent_diff_path = git.diff(mergeBase, config.parentBranch, supportsDiffWithRenames);
         return diff;

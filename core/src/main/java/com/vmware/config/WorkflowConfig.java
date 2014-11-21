@@ -123,8 +123,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-g,--groups", help = "Groups to set for the review request or for generating stats")
     public String[] targetGroups;
 
-    @ConfigurableProperty(commandLine = "-mp,--merge-parent", help = "Parent remote branch to calculate reviewboard diffs against")
-    public String mergeParent;
+    @ConfigurableProperty(commandLine = "-tb,--tracking-branch", help = "Tracking branch to use as base for reviews")
+    public String trackingBranch;
 
     @ConfigurableProperty(commandLine = "-p,--parent", help = "Parent branch to use for the git diff to upload to review board")
     public String parentBranch;

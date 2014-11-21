@@ -90,7 +90,7 @@
   ],
   "UploadReviewDiff": [
     "--parent",
-    "--merge-parent"
+    "--tracking-branch"
   ],
   "CreateReview": [
     "--review-board-repo",
