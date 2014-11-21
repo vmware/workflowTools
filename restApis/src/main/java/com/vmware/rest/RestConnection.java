@@ -34,6 +34,8 @@ import static com.vmware.rest.HttpMethodType.DELETE;
  * Using Java's HttpURLConnection instead of Apache HttpClient to cut down on jar size
  */
 public class RestConnection {
+    private static final String APPLICATION_JSON = "application/json";
+
     private static Logger log = LoggerFactory.getLogger(RestConnection.class.getName());
     private static int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
 
@@ -76,7 +78,7 @@ public class RestConnection {
 
     public <T> T get(String url, Class<T> responseConversionClass, NameValuePair... params)
             throws IOException, URISyntaxException {
-        return get(url,responseConversionClass, "application/json", params);
+        return get(url,responseConversionClass,  APPLICATION_JSON, params);
     }
 
     public <T> T get(String url, Class<T> responseConversionClass, String acceptMediaType, NameValuePair... params)
@@ -86,16 +88,11 @@ public class RestConnection {
         return handleServerResponse(responseConversionClass);
     }
 
-    public <T> T put(String url, Object requestObject, Class<T> responseConversionClass)
+    public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, NameValuePair... requestHeaders)
             throws URISyntaxException, IOException, IllegalAccessException {
-        setupConnection(url, PUT);
+        setupConnection(url, PUT, APPLICATION_JSON, requestHeaders);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass);
-    }
-
-    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject)
-            throws IllegalAccessException, IOException, URISyntaxException {
-        return post(url, responseConversionClass, requestObject);
     }
 
     public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, NameValuePair... requestHeaders)
@@ -107,7 +104,7 @@ public class RestConnection {
 
     public <T> T put(String url, Object requestObject)
             throws URISyntaxException, IOException, IllegalAccessException {
-        return put(url, requestObject, null);
+        return put(url, null, requestObject);
     }
 
     public <T> T post(String url, Object requestObject)
@@ -122,7 +119,7 @@ public class RestConnection {
 
     public <T> T delete(String url)
             throws URISyntaxException, IOException, IllegalAccessException {
-        setupConnection(url, DELETE);
+        setupConnection(url, DELETE, APPLICATION_JSON);
         return handleServerResponse(null);
     }
 
@@ -157,10 +154,6 @@ public class RestConnection {
 
     public String toJson(Object value) {
         return gson.toJson(value);
-    }
-
-    private void setupConnection(String url, HttpMethodType methodType) throws IOException, URISyntaxException {
-        setupConnection(url, methodType, "application/json");
     }
 
     private void setupConnection(String url, HttpMethodType methodType, String acceptMediaType, NameValuePair... headers) throws IOException, URISyntaxException {
@@ -257,13 +250,14 @@ public class RestConnection {
 
     private String parseResponseText() throws IOException {
         String responseText;
+        String currentUrl = activeConnection.getURL().toExternalForm();
         int responseCode = activeConnection.getResponseCode();
         if (ExceptionChecker.isStatusValid(responseCode)) {
             responseText = IOUtils.read(activeConnection.getInputStream());
         } else {
             responseText = IOUtils.read(activeConnection.getErrorStream());
         }
-        ExceptionChecker.throwExceptionIfStatusIsNotValid(responseCode, responseText);
+        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, responseText);
         return responseText;
     }
 

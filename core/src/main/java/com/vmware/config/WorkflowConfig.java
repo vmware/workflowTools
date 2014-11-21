@@ -162,7 +162,7 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Map of staging branches, :username is substituted for the real username.")
     public TreeMap<String, String> remoteBranches;
 
-    @ConfigurableProperty(commandLine = "-sb, --staging-branch", help = "Staging branch name to use")
+    @ConfigurableProperty(commandLine = "-rb, --remote-branch", help = "Remote branch name to use")
     public String remoteBranchToUse;
 
     @ConfigurableProperty(help = "A map of workflows that can be configured. A workflow comprises a list of workflow actions.")

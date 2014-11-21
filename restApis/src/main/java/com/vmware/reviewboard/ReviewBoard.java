@@ -128,7 +128,7 @@ public class ReviewBoard extends AbstractRestService {
         String existingTestingDone = draft.testingDone;
         draft.testingDone = draft.fullTestingDoneSectionWithoutJobResults();
 
-        ReviewRequestDraft updatedDraft = connection.put(draftLink.getHref(), draft, ReviewRequestDraftResponse.class).draft;
+        ReviewRequestDraft updatedDraft = connection.put(draftLink.getHref(), ReviewRequestDraftResponse.class, draft).draft;
         draft.testingDone = existingTestingDone;
         return updatedDraft;
     }
@@ -139,7 +139,7 @@ public class ReviewBoard extends AbstractRestService {
 
     public void updateReviewRequest(ReviewRequest reviewRequest)
             throws IllegalAccessException, IOException, URISyntaxException {
-        connection.put(reviewRequest.getUpdateLink().getHref(), reviewRequest, ReviewRequestResponse.class);
+        connection.put(reviewRequest.getUpdateLink().getHref(), ReviewRequestResponse.class, reviewRequest);
     }
 
     public void createReviewRequestDiff(Link diffLink, DiffToUpload diffToCreate)

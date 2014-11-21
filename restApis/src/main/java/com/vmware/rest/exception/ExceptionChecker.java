@@ -5,14 +5,17 @@
  */
 package com.vmware.rest.exception;
 
+import org.slf4j.LoggerFactory;
+
 import java.net.HttpURLConnection;
 
 public class ExceptionChecker {
 
-    public static void throwExceptionIfStatusIsNotValid(final int statusCode, final String responseText) {
+    public static void throwExceptionIfStatusIsNotValid(String currentUrl, final int statusCode, final String responseText) {
         if (isStatusValid(statusCode)) {
             return;
         }
+        LoggerFactory.getLogger(ExceptionChecker.class).error("Encountered error with {}", currentUrl);
         switch (statusCode) {
             case DoesNotExistException.STATUS_CODE:
                 throw new DoesNotExistException(responseText);

@@ -113,7 +113,7 @@
   ],
   "PushToRemoteBranch": [
     "--username",
-    " --staging-branch"
+    " --remote-branch"
   ],
   "InvokeJenkinsJobs": [
     "--username",
