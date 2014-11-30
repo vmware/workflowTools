@@ -15,7 +15,7 @@ public class ExceptionChecker {
         if (isStatusValid(statusCode)) {
             return;
         }
-        LoggerFactory.getLogger(ExceptionChecker.class).error("Encountered error with {}", currentUrl);
+        
         switch (statusCode) {
             case DoesNotExistException.STATUS_CODE:
                 throw new DoesNotExistException(responseText);
