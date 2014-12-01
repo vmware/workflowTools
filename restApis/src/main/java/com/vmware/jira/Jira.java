@@ -92,7 +92,7 @@ public class Jira extends AbstractRestService {
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee in (%s)",
-                issueTypesToGet, allowedStatuses, username);
+                issueTypesToGet, allowedStatuses, escapeUsername(username));
         return connection.get(searchUrl, IssuesResponse.class, new NameValuePair("jql", jql));
     }
 
@@ -101,7 +101,7 @@ public class Jira extends AbstractRestService {
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND reporter in (%s)",
-                issueTypesToGet, allowedStatuses, username);
+                issueTypesToGet, allowedStatuses, escapeUsername(username));
         return connection.get(searchUrl, IssuesResponse.class, new NameValuePair("jql", jql));
     }
 
@@ -172,6 +172,10 @@ public class Jira extends AbstractRestService {
             statusText += enumValue.getCode();
         }
         return statusText;
+    }
+
+    private String escapeUsername(String username) {
+        return username.replace(".", "\\\\u002e");
     }
 
 
