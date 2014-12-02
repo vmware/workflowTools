@@ -145,7 +145,7 @@ public class RestConnection {
         return gson.toJson(value);
     }
 
-    private void setupConnection(String url, HttpMethodType methodType, RequestParam... paramValues) throws IOException, URISyntaxException {
+    private void setupConnection(String url, HttpMethodType methodType, RequestParam... params) throws IOException, URISyntaxException {
         if (authQueryString != null) {
             url += !url.contains("?") ? "?" : "&";
             url += authQueryString;
@@ -158,31 +158,41 @@ public class RestConnection {
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
         activeConnection.setRequestMethod(methodType.name());
-        boolean hasAcceptHeader = false;
-        for (RequestParam paramValue : paramValues) {
-            if (!(paramValue instanceof RequestHeader)) {
-                continue;
-            }
-            RequestHeader header = (RequestHeader) paramValue;
-            if (header.getName().equals("Accept")) {
-                hasAcceptHeader = true;
-            }
-            log.debug("Adding request header {}:{}", header.getName(), header.getValue());
-            activeConnection.setRequestProperty(header.getName(), header.getValue());
-        }
-        addDefaultAcceptHeaderIfNeeded(hasAcceptHeader);
+        addRequestHeaders(params);
+        addDefaultAcceptHeaderIfNeeded(params);
         addAuthorizationHeaderIfNotNull();
         addCookiesHeader(uri.getHost());
     }
 
-    private void addDefaultAcceptHeaderIfNeeded(boolean hasAcceptHeader) {
-        if (hasAcceptHeader) {
+    private void addRequestHeaders(RequestParam[] params) {
+        for (RequestParam param : params) {
+            if (!(param instanceof RequestHeader)) {
+                continue;
+            }
+            RequestHeader header = (RequestHeader) param;
+            log.debug("Adding request header {}:{}", header.getName(), header.getValue());
+            activeConnection.setRequestProperty(header.getName(), header.getValue());
+        }
+
+    }
+
+    private void addDefaultAcceptHeaderIfNeeded(RequestParam... params) {
+        if (isAcceptHeaderPresent(params)) {
             return;
         }
 
         RequestHeader header = new AcceptRequestHeader("application/json");
         log.debug("Adding default accept request header {}:{}", header.getName(), header.getValue());
         activeConnection.setRequestProperty(header.getName(), header.getValue());
+    }
+
+    private boolean isAcceptHeaderPresent(RequestParam... params) {
+        for (RequestParam param : params) {
+            if (param instanceof RequestHeader && "Accept".equals(param.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private <T> T handleServerResponse(final Class<T> responseConversionClass) throws IOException {

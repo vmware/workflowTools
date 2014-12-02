@@ -64,7 +64,7 @@ public class ReviewBoard extends AbstractRestService {
                 new UrlParam("from-user", username), new UrlParam("status", status.name()));
     }
 
-    public ReviewRequest[] getOpenReviewRequestsWithSubmitedComment() throws IOException, URISyntaxException {
+    public ReviewRequest[] getOpenReviewRequestsWithSubmittedComment() throws IOException, URISyntaxException {
         List<ReviewRequest> reviewRequestsWithSubmittedComments = new ArrayList<ReviewRequest>();
         for (ReviewRequest reviewRequest : getOpenReviewRequestsWithShipIts().review_requests) {
             UserReview softSubmitReview = getSoftSubmitReview(reviewRequest);
