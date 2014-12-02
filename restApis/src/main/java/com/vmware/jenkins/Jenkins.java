@@ -3,7 +3,8 @@ package com.vmware.jenkins;
 import com.vmware.AbstractRestService;
 import com.vmware.jenkins.domain.*;
 import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.NameValuePair;
+import com.vmware.rest.RequestParam;
+import com.vmware.rest.RequestHeader;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,12 +113,15 @@ public class Jenkins extends AbstractRestService {
     }
 
     @Override
-    protected void optimisticPost(String url, Object params, NameValuePair... headers) throws IllegalAccessException, IOException, URISyntaxException {
+    protected void optimisticPost(String url, Object param, RequestParam... params) throws IllegalAccessException, IOException, URISyntaxException {
         if (usesCsrf) {
             CsrfCrumb csrfCrumb = super.optimisticGet(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
-            super.optimisticPost(url, params, new NameValuePair(csrfCrumb.crumbRequestField, csrfCrumb.crumb));
+            RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
+            List<RequestParam> paramList = new ArrayList<RequestParam>(Arrays.asList(params));
+            paramList.add(csrfHeader);
+            super.optimisticPost(url, param, paramList.toArray(new RequestParam[paramList.size()]));
         } else {
-            super.optimisticPost(url, params);
+            super.optimisticPost(url, param, params);
         }
     }
 

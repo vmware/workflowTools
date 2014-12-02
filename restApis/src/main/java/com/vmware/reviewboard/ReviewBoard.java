@@ -1,9 +1,10 @@
 package com.vmware.reviewboard;
 
 import com.vmware.AbstractRestService;
+import com.vmware.rest.AcceptRequestHeader;
 import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.NameValuePair;
 import com.vmware.rest.RestConnection;
+import com.vmware.rest.UrlParam;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.request.RequestBodyHandling;
@@ -60,7 +61,7 @@ public class ReviewBoard extends AbstractRestService {
     public ReviewRequests getReviewRequests(ReviewRequestStatus status) throws IOException, URISyntaxException {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         return connection.get(reviewRequestLink.getHref(), ReviewRequests.class,
-                new NameValuePair("from-user", username), new NameValuePair("status", status.name()));
+                new UrlParam("from-user", username), new UrlParam("status", status.name()));
     }
 
     public ReviewRequest[] getOpenReviewRequestsWithSubmitedComment() throws IOException, URISyntaxException {
@@ -76,12 +77,12 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewRequests getOpenReviewRequestsWithShipIts() throws IOException, URISyntaxException {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
-        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new NameValuePair("from-user", username),
-                new NameValuePair("status", pending.name()), new NameValuePair("ship-it", "1"));
+        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", username),
+                new UrlParam("status", pending.name()), new UrlParam("ship-it", "1"));
     }
 
     public int getFilesCountForReviewRequestDiff(Link filesLink) throws IOException, URISyntaxException {
-        return connection.get(filesLink.getHref(), ResultsCount.class, new NameValuePair("counts-only", "1")).count;
+        return connection.get(filesLink.getHref(), ResultsCount.class, new UrlParam("counts-only", "1")).count;
     }
 
     public ReviewRequests getReviewRequestsWithShipItsForGroups(String groupNames, Date fromDate) throws IOException, URISyntaxException {
@@ -89,9 +90,9 @@ public class ReviewBoard extends AbstractRestService {
         String formattedDate = formatter.format(fromDate);
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         return connection.get(reviewRequestLink.getHref(), ReviewRequests.class,
-                new NameValuePair("to-groups", groupNames), new NameValuePair("max-results", "200"),
-                new NameValuePair("time-added-from", formattedDate),
-                new NameValuePair("ship-it", "1"), new NameValuePair("status", all.name()));
+                new UrlParam("to-groups", groupNames), new UrlParam("max-results", "200"),
+                new UrlParam("time-added-from", formattedDate),
+                new UrlParam("ship-it", "1"), new UrlParam("status", all.name()));
     }
 
     public ReviewRequest getReviewRequestById(Integer id) throws IOException, URISyntaxException {
@@ -160,7 +161,7 @@ public class ReviewBoard extends AbstractRestService {
     }
 
     public String getDiffData(Link diffLink) throws IOException, URISyntaxException {
-        String diffData = connection.get(diffLink.getHref(), String.class, "text/x-patch");
+        String diffData = connection.get(diffLink.getHref(), String.class, new AcceptRequestHeader("text/x-patch"));
         // need to add in a trailing newline for git apply to work correctly
         diffData += "\n";
         return diffData;

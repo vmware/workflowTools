@@ -5,12 +5,16 @@
  */
 package com.vmware.rest;
 
-public class NameValuePair {
+/**
+ * Used as a base class for UrlParam and RequestHeader.
+ * The RestConnection class will handle params correctly depending on class type.
+ */
+public class RequestParam {
     private String name;
 
     private String value;
 
-    public NameValuePair(String name, String value) {
+    protected RequestParam(String name, String value) {
         this.name = name;
         this.value = value;
     }

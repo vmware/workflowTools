@@ -34,10 +34,10 @@ import static com.vmware.rest.HttpMethodType.DELETE;
  * Using Java's HttpURLConnection instead of Apache HttpClient to cut down on jar size
  */
 public class RestConnection {
-    private static final String APPLICATION_JSON = "application/json";
 
     private static Logger log = LoggerFactory.getLogger(RestConnection.class.getName());
     private static int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
+    private static final int MAX_REQUEST_RETRIES = 3;
 
     private final CookieFile cookieFile;
     private Gson gson;
@@ -68,58 +68,47 @@ public class RestConnection {
         this.authQueryString = authQueryString;
     }
 
-    public <T> T get(String url, Class<T> responseConversionClass, List<NameValuePair> params) throws IOException, URISyntaxException {
-        return get(url, responseConversionClass, params.toArray(new NameValuePair[params.size()]));
+    public <T> T get(String url, Class<T> responseConversionClass, List<RequestParam> params) throws IOException, URISyntaxException {
+        return get(url, responseConversionClass, params.toArray(new RequestParam[params.size()]));
     }
 
-    public <T> T get(String url, Class<T> responseConversionClass, String acceptMediaType, List<NameValuePair> params) throws IOException, URISyntaxException {
-        return get(url, responseConversionClass, acceptMediaType, params.toArray(new NameValuePair[params.size()]));
-    }
-
-    public <T> T get(String url, Class<T> responseConversionClass, NameValuePair... params)
-            throws IOException, URISyntaxException {
-        return get(url,responseConversionClass,  APPLICATION_JSON, params);
-    }
-
-    public <T> T get(String url, Class<T> responseConversionClass, String acceptMediaType, NameValuePair... params)
+    public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params)
             throws IOException, URISyntaxException {
         String fullUrl = UriUtils.buildUrl(url, params);
-        setupConnection(fullUrl, GET, acceptMediaType);
+        setupConnection(fullUrl, GET, params);
         return handleServerResponse(responseConversionClass);
     }
 
-    public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, NameValuePair... requestHeaders)
+    public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        setupConnection(url, PUT, APPLICATION_JSON, requestHeaders);
+        String fullUrl = UriUtils.buildUrl(url, params);
+        setupConnection(fullUrl, PUT, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass);
     }
 
-    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, NameValuePair... requestHeaders)
+    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        setupConnection(url, POST, "application/json", requestHeaders);
+        String fullUrl = UriUtils.buildUrl(url, params);
+        setupConnection(fullUrl, POST, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass);
     }
 
-    public <T> T put(String url, Object requestObject)
+    public <T> T put(String url, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        return put(url, null, requestObject);
+        return put(url, null, requestObject, params);
     }
 
-    public <T> T post(String url, Object requestObject)
-            throws IllegalAccessException, IOException, URISyntaxException {
-        return post(url, null, requestObject);
+    public <T> T post(String url, Object requestObject, RequestParam... params)
+            throws URISyntaxException, IOException, IllegalAccessException {
+        return post(url, null, requestObject, params);
     }
 
-    public <T> T post(String url, Object requestObject, NameValuePair... headers)
+    public <T> T delete(String url, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        return post(url, null, requestObject, headers);
-    }
-
-    public <T> T delete(String url)
-            throws URISyntaxException, IOException, IllegalAccessException {
-        setupConnection(url, DELETE, APPLICATION_JSON);
+        String fullUrl = UriUtils.buildUrl(url, params);
+        setupConnection(fullUrl, DELETE, params);
         return handleServerResponse(null);
     }
 
@@ -156,25 +145,44 @@ public class RestConnection {
         return gson.toJson(value);
     }
 
-    private void setupConnection(String url, HttpMethodType methodType, String acceptMediaType, NameValuePair... headers) throws IOException, URISyntaxException {
+    private void setupConnection(String url, HttpMethodType methodType, RequestParam... paramValues) throws IOException, URISyntaxException {
         if (authQueryString != null) {
             url += !url.contains("?") ? "?" : "&";
             url += authQueryString;
         }
         URI uri = new URI(url);
+        log.trace("{}: {}", methodType.name(), url);
         activeConnection = (HttpURLConnection) uri.toURL().openConnection();
         activeConnection.setDoInput(true);
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
         activeConnection.setRequestMethod(methodType.name());
-        activeConnection.setRequestProperty("Accept", acceptMediaType);
-        for (NameValuePair header : headers) {
+        boolean hasAcceptHeader = false;
+        for (RequestParam paramValue : paramValues) {
+            if (!(paramValue instanceof RequestHeader)) {
+                continue;
+            }
+            RequestHeader header = (RequestHeader) paramValue;
+            if (header.getName().equals("Accept")) {
+                hasAcceptHeader = true;
+            }
             log.debug("Adding request header {}:{}", header.getName(), header.getValue());
             activeConnection.setRequestProperty(header.getName(), header.getValue());
         }
+        addDefaultAcceptHeaderIfNeeded(hasAcceptHeader);
         addAuthorizationHeaderIfNotNull();
         addCookiesHeader(uri.getHost());
+    }
+
+    private void addDefaultAcceptHeaderIfNeeded(boolean hasAcceptHeader) {
+        if (hasAcceptHeader) {
+            return;
+        }
+
+        RequestHeader header = new JsonAcceptRequestHeader();
+        log.debug("Adding default accept request header {}:{}", header.getName(), header.getValue());
+        activeConnection.setRequestProperty(header.getName(), header.getValue());
     }
 
     private <T> T handleServerResponse(final Class<T> responseConversionClass) throws IOException {
@@ -208,20 +216,15 @@ public class RestConnection {
 
     private String getResponseText(int retryCount) throws IOException {
         String responseText = "";
-        int MAX_RETRIES = 3;
         try {
             responseText = parseResponseText();
             cookieFile.addCookiesFromResponse(activeConnection);
         } catch (SSLException e) {
-            String urlText = activeConnection.getURL().toString();
-            log.error("Ssl error for {} {}", activeConnection.getRequestMethod(), urlText);
-            log.error("Error [{}]" ,e.getMessage());
-            if (retryCount >= MAX_RETRIES) {
-                exitDueToSslExceptions(urlText);
-            }
+            exitIfMaxRetriesReached(retryCount, e);
+
             ThreadUtils.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
             log.info("");
-            log.info("Retrying request {} of {}", ++retryCount, MAX_RETRIES);
+            log.info("Retrying request {} of {}", ++retryCount, MAX_REQUEST_RETRIES);
             responseText = getResponseText(retryCount);
         } catch (UnknownHostException e) {
             handleNetworkException(e);
@@ -231,12 +234,13 @@ public class RestConnection {
         return responseText;
     }
 
-    private void handleNetworkException(IOException e) {
-        log.info("");
-        log.error("Unknown host exception thrown: {}", e.getMessage());
-        log.error("Are you connected to the corporate network?");
-        log.error("Failed to access host {}", activeConnection.getURL().getHost());
-        System.exit(1);
+    private void exitIfMaxRetriesReached(int retryCount, SSLException e) {
+        String urlText = activeConnection.getURL().toString();
+        log.error("Ssl error for {} {}", activeConnection.getRequestMethod(), urlText);
+        log.error("Error [{}]" ,e.getMessage());
+        if (retryCount >= MAX_REQUEST_RETRIES) {
+            exitDueToSslExceptions(urlText);
+        }
     }
 
     private void exitDueToSslExceptions(String urlText) {
@@ -245,6 +249,14 @@ public class RestConnection {
         if (urlText.contains("reviewboard")) {
             log.info("Sometimes there are one off ssl exceptions with the reviewboard api, try rerunning your workflow");
         }
+        System.exit(1);
+    }
+
+    private void handleNetworkException(IOException e) {
+        log.info("");
+        log.error("Unknown host exception thrown: {}", e.getMessage());
+        log.error("Are you connected to the corporate network?");
+        log.error("Failed to access host {}", activeConnection.getURL().getHost());
         System.exit(1);
     }
 

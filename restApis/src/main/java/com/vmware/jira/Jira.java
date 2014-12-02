@@ -14,9 +14,9 @@ import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.NameValuePair;
 import com.vmware.rest.NumericalEnum;
 import com.vmware.rest.RestConnection;
+import com.vmware.rest.UrlParam;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.request.RequestBodyHandling;
@@ -75,7 +75,7 @@ public class Jira extends AbstractRestService {
 
     public RapidView getRapidView(String viewId) throws IOException, URISyntaxException {
         String url = greenhopperUrl + "xboard/plan/backlog/data.json";
-        RapidView rapidView = connection.get(url, RapidView.class, new NameValuePair("rapidViewId", viewId));
+        RapidView rapidView = connection.get(url, RapidView.class, new UrlParam("rapidViewId", viewId));
         return rapidView;
     }
 
@@ -93,7 +93,7 @@ public class Jira extends AbstractRestService {
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee in (%s)",
                 issueTypesToGet, allowedStatuses, escapeUsername(username));
-        return connection.get(searchUrl, IssuesResponse.class, new NameValuePair("jql", jql));
+        return connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
     }
 
     public IssuesResponse getCreatedTasksForUser(String username) throws IOException, URISyntaxException {
@@ -102,7 +102,7 @@ public class Jira extends AbstractRestService {
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND reporter in (%s)",
                 issueTypesToGet, allowedStatuses, escapeUsername(username));
-        return connection.get(searchUrl, IssuesResponse.class, new NameValuePair("jql", jql));
+        return connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
     }
 
     public IssueTransitions getAllowedTransitions(String key) throws IOException, URISyntaxException {

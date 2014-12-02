@@ -6,9 +6,7 @@
 package com.vmware.trello;
 
 import com.vmware.AbstractRestService;
-import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.NameValuePair;
-import com.vmware.rest.RestConnection;
+import com.vmware.rest.*;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.exception.BadRequestException;
 import com.vmware.rest.exception.NotAuthorizedException;
@@ -72,7 +70,7 @@ public class Trello extends AbstractRestService {
 
     public Board[] getOpenBoardsForUser() throws IOException, URISyntaxException {
         return connection.get(apiUrl + "members/me/boards", Board[].class,
-                    new NameValuePair("filter", "open"));
+                    new UrlParam("filter", "open"));
     }
 
     public Swimlane[] getSwimlanesForBoard(Board board) throws IOException, URISyntaxException {
@@ -100,7 +98,7 @@ public class Trello extends AbstractRestService {
         connection.setAuthQueryString(null);
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(ApiAuthentication.trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        connection.post(loginUrl, new LoginInfo(credentials), new NameValuePair("Referer", "https://trello.com/login"));
+        connection.post(loginUrl, new LoginInfo(credentials), new RequestHeader("Referer", "https://trello.com/login"));
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
 
         connection.setUseSessionCookies(true);
@@ -116,14 +114,14 @@ public class Trello extends AbstractRestService {
         String apiKey = findMatchForPattern(apiTokenPage, "id=\"key\" type=\"text\" value=\"(\\w+)\"");
 
         String authorizeUrl = webUrl + "1/authorize";
-        List<NameValuePair> authorizeParams = new ArrayList<NameValuePair>();
-        authorizeParams.add(new NameValuePair("response_type", "token"));
-        authorizeParams.add(new NameValuePair("key", apiKey));
-        authorizeParams.add(new NameValuePair("return_url", "https://trello.com"));
-        authorizeParams.add(new NameValuePair("callback_method", "postMessage"));
-        authorizeParams.add(new NameValuePair("scope", "read,write"));
-        authorizeParams.add(new NameValuePair("expiration", "30days"));
-        authorizeParams.add(new NameValuePair("name", "Workflow Tools"));
+        List<RequestParam> authorizeParams = new ArrayList<RequestParam>();
+        authorizeParams.add(new UrlParam("response_type", "token"));
+        authorizeParams.add(new UrlParam("key", apiKey));
+        authorizeParams.add(new UrlParam("return_url", "https://trello.com"));
+        authorizeParams.add(new UrlParam("callback_method", "postMessage"));
+        authorizeParams.add(new UrlParam("scope", "read,write"));
+        authorizeParams.add(new UrlParam("expiration", "30days"));
+        authorizeParams.add(new UrlParam("name", "Workflow Tools"));
         String authorizeResponseText = connection.get(authorizeUrl, String.class, authorizeParams);
 
         String requestKey = findMatchForPattern(authorizeResponseText, "name=\"requestKey\" value=\"(\\w+)\"");

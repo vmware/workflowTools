@@ -1,7 +1,7 @@
 package com.vmware;
 
 import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.NameValuePair;
+import com.vmware.rest.RequestParam;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.exception.ForbiddenException;
 import com.vmware.rest.exception.NotAuthorizedException;
@@ -104,17 +104,17 @@ public abstract class AbstractRestService {
      * WIll try first to post the request.
      * If that fails, will then try to authenticate and re post the request.
      */
-    protected void optimisticPost(String url, Object params, NameValuePair... headers) throws IllegalAccessException, IOException, URISyntaxException {
+    protected void optimisticPost(String url, Object requestBody, RequestParam... params) throws IllegalAccessException, IOException, URISyntaxException {
         try {
-            connection.post(url, params, headers);
+            connection.post(url, requestBody, params);
         } catch (NotAuthorizedException e) {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
-            connection.post(url, params, headers);
+            connection.post(url, requestBody, params);
         } catch (ForbiddenException e) {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
-            connection.post(url, params, headers);
+            connection.post(url, requestBody, params);
         }
     }
 
@@ -122,17 +122,17 @@ public abstract class AbstractRestService {
      * WIll try first to get the request.
      * If that fails, will then try to authenticate and re get the request.
      */
-    protected <T> T optimisticGet(String url, Class<T> responseConversionClass) throws IOException, URISyntaxException, IllegalAccessException {
+    protected <T> T optimisticGet(String url, Class<T> responseConversionClass, RequestParam... params) throws IOException, URISyntaxException, IllegalAccessException {
         try {
-            return connection.get(url, responseConversionClass);
+            return connection.get(url, responseConversionClass, params);
         } catch (NotAuthorizedException e) {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
-            return connection.get(url, responseConversionClass);
+            return connection.get(url, responseConversionClass, params);
         } catch (ForbiddenException e) {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
-            return connection.get(url, responseConversionClass);
+            return connection.get(url, responseConversionClass, params);
         }
     }
 
