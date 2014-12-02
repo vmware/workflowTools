@@ -180,7 +180,7 @@ public class RestConnection {
             return;
         }
 
-        RequestHeader header = new JsonAcceptRequestHeader();
+        RequestHeader header = new AcceptRequestHeader("application/json");
         log.debug("Adding default accept request header {}:{}", header.getName(), header.getValue());
         activeConnection.setRequestProperty(header.getName(), header.getValue());
     }
