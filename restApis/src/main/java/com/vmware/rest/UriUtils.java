@@ -38,6 +38,7 @@ public class UriUtils {
                 url += "&";
             }
         }
+
         return url;
     }
 
@@ -49,6 +50,7 @@ public class UriUtils {
                 urlParams.add((UrlParam) param);
             }
         }
+
         return urlParams;
     }
 }

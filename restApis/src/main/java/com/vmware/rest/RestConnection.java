@@ -173,7 +173,6 @@ public class RestConnection {
             log.debug("Adding request header {}:{}", header.getName(), header.getValue());
             activeConnection.setRequestProperty(header.getName(), header.getValue());
         }
-
     }
 
     private void addDefaultAcceptHeaderIfNeeded(RequestParam... params) {
