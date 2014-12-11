@@ -44,12 +44,16 @@ public class StringUtils {
             int maxLengthToUse = newValue.isEmpty() && labelLength > 0 ? maxLineLength - labelLength: maxLineLength;
             String newLine = "";
             String[] words = line.split(" ");
+            boolean onFirstWord = true;
             for (String word : words) {
-                if (!word.equals("\n") && word.length() + newLine.length() <= maxLengthToUse) {
-                    newLine += word;
-                    if (newLine.length() < maxLengthToUse) {
+                int lengthOfSpaceBetweenWords = onFirstWord ? 0 : 1;
+                if (!word.equals("\n") && (word.length() + lengthOfSpaceBetweenWords) + newLine.length() <= maxLengthToUse) {
+                    if (onFirstWord) {
+                        onFirstWord = false;
+                    } else {
                         newLine += " ";
                     }
+                    newLine += word;
                 } else {
                     if (newLine.length() > maxLineLength) {
                         log.warn("Probable Bug: line \n{}\n was greater than the max line length of {}", newLine, maxLineLength);
