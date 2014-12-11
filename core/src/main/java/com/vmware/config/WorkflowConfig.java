@@ -162,7 +162,7 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--old-ship-it", help = "Number of days after which to close old reviews that have ship its")
     public int closeOldShipItReviewsAfter;
 
-    @ConfigurableProperty(help = "Map of staging branches, :username is substituted for the real username.")
+    @ConfigurableProperty(help = "Map of remote branches, :username is substituted for the real username.")
     public TreeMap<String, String> remoteBranches;
 
     @ConfigurableProperty(commandLine = "-rb, --remote-branch", help = "Remote branch name to use")

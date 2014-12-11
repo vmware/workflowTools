@@ -20,8 +20,8 @@ public class PushToRemoteBranch extends AbstractAction {
         String remoteBranchName = config.remoteBranchToUse;
         String remoteBranchPath = config.remoteBranches.get(remoteBranchName);
         if (StringUtils.isBlank(remoteBranchPath)) {
-            log.info("{} did not match any predefined staging branch names {}.", remoteBranchName, config.remoteBranches.keySet().toString());
-            log.info("Assuming that it is a valid staging branch path.");
+            log.info("{} did not match any predefined remote branch names {}.", remoteBranchName, config.remoteBranches.keySet().toString());
+            log.info("Assuming that it is a valid remote branch path.");
             remoteBranchPath = remoteBranchName;
         }
 
