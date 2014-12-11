@@ -1,7 +1,7 @@
 package com.vmware;
 
 import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.CookieFile;
+import com.vmware.rest.CookieFileStore;
 import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.json.ConfiguredGsonBuilder;
 import com.vmware.reviewboard.ReviewBoard;
@@ -69,8 +69,8 @@ public class TestReviewBoardApi extends AbstractTestRestApi {
     @Test
     public void retrieveUserSessionToken() throws IOException {
         String userHome = System.getProperty( "user.home" );
-        CookieFile cookieFile = new CookieFile(userHome);
-        assertNotNull("SessionId should not be null", cookieFile.getCookie(ApiAuthentication.reviewBoard));
+        CookieFileStore cookieFileStore = new CookieFileStore(userHome);
+        assertNotNull("SessionId should not be null", cookieFileStore.getCookie(ApiAuthentication.reviewBoard));
     }
 
     @Test

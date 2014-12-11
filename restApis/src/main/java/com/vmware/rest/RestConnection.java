@@ -39,10 +39,10 @@ public class RestConnection {
     private static int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
     private static final int MAX_REQUEST_RETRIES = 3;
 
-    private final CookieFile cookieFile;
+    private final CookieFileStore cookieFileStore;
     private Gson gson;
     private RequestBodyHandling requestBodyHandling;
-    private String authorizationHeader = null;
+    private RequestHeader authorizationHeader = null;
     private String authQueryString;
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
@@ -52,7 +52,7 @@ public class RestConnection {
         this.gson = new ConfiguredGsonBuilder().build();
 
         String homeFolder = System.getProperty("user.home");
-        cookieFile = new CookieFile(homeFolder);
+        cookieFileStore = new CookieFileStore(homeFolder);
     }
 
     public void updateServerTimeZone(TimeZone serverTimezone, String serverDateFormat) {
@@ -61,7 +61,7 @@ public class RestConnection {
 
     public void setupBasicAuthHeader(final UsernamePasswordCredentials credentials) {
         String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
-        authorizationHeader = "Basic " + basicCredentials;
+        authorizationHeader = new RequestHeader("Authorization", "Basic " + basicCredentials);
     }
 
     public void setAuthQueryString(String authQueryString) {
@@ -117,7 +117,7 @@ public class RestConnection {
     }
 
     public boolean hasCookie(ApiAuthentication ApiAuthentication) {
-        Cookie cookie = cookieFile.getCookieByName(ApiAuthentication.getCookieName());
+        Cookie cookie = cookieFileStore.getCookieByName(ApiAuthentication.getCookieName());
         return cookie != null;
     }
 
@@ -187,7 +187,7 @@ public class RestConnection {
 
     private boolean isAcceptHeaderPresent(RequestParam... params) {
         for (RequestParam param : params) {
-            if (param instanceof RequestHeader && "Accept".equals(param.getName())) {
+            if (param instanceof RequestHeader && AcceptRequestHeader.HEADER_NAME.equals(param.getName())) {
                 return true;
             }
         }
@@ -203,6 +203,7 @@ public class RestConnection {
             try {
                 return gson.fromJson(responseText, responseConversionClass);
             } catch (JsonSyntaxException e) {
+                // allow a parsing attempt as it could be a json string primitive
                 if (responseConversionClass.equals(String.class)) {
                     return (T) responseText;
                 } else {
@@ -214,12 +215,12 @@ public class RestConnection {
     }
 
     private void addCookiesHeader(String host) {
-        activeConnection.setRequestProperty("Cookie", cookieFile.toCookieRequestText(host, useSessionCookies));
+        activeConnection.setRequestProperty("Cookie", cookieFileStore.toCookieRequestText(host, useSessionCookies));
     }
 
     private void addAuthorizationHeaderIfNotNull() {
         if (authorizationHeader != null) {
-            activeConnection.setRequestProperty("Authorization", authorizationHeader);
+            activeConnection.setRequestProperty(authorizationHeader.getName(), authorizationHeader.getValue());
         }
     }
 
@@ -227,7 +228,7 @@ public class RestConnection {
         String responseText = "";
         try {
             responseText = parseResponseText();
-            cookieFile.addCookiesFromResponse(activeConnection);
+            cookieFileStore.addCookiesFromResponse(activeConnection);
         } catch (SSLException e) {
             exitIfMaxRetriesReached(retryCount, e);
 

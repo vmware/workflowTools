@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CookieFile {
+public class CookieFileStore {
     private final String homeFolder;
     private List<Cookie> authCookies = new ArrayList<Cookie>();
     private List<Cookie> sessionCookies = new ArrayList<Cookie>();
 
-    public CookieFile(String homeFolder) throws IOException {
+    public CookieFileStore(String homeFolder) throws IOException {
         this.homeFolder = homeFolder;
         for (ApiAuthentication apiAuthentication : ApiAuthentication.values()) {
             readCookieFile(new File(homeFolder + "/" + apiAuthentication.getFileName()));

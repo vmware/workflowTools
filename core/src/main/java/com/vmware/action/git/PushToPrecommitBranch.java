@@ -24,7 +24,7 @@ public class PushToPrecommitBranch extends AbstractAction {
         }
 
         remoteBranchPath = remoteBranchPath.replace(":username", config.username);
-        log.info("Updating staging branch " + remoteBranchPath);
+        log.info("Updating remote branch " + remoteBranchPath);
 
         git.pushToRemoteBranch(remoteBranchPath, true);
     }
