@@ -162,7 +162,7 @@ public class Git {
             System.exit(1);
         }
 
-        String updatedRemoteHeadRef = MatcherUtils.singleMatch(pushOutput, "\\w\\.+(\\w+)");
+        String updatedRemoteHeadRef = MatcherUtils.singleMatch(pushOutput, "\\w\\.\\.\\.*(\\w+)");
         if (updatedRemoteHeadRef == null) {
             log.error("Could not parse updated remote branch ref from push output, assuming failure");
             System.exit(1);
