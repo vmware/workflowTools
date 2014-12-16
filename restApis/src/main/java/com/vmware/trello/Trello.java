@@ -102,7 +102,7 @@ public class Trello extends AbstractRestService {
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
 
         connection.setUseSessionCookies(true);
-        String apiTokenPage = connection.get(webUrl + "1/appKey/generate", String.class);
+        String apiTokenPage = connection.get(webUrl + "app-key", String.class);
         fullApiAuthQueryString = scrapeAuthInfoFromUI(apiTokenPage);
         connection.setUseSessionCookies(false);
 

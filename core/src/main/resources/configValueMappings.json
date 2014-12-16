@@ -124,12 +124,12 @@
     "--jenkins-jobs"
   ],
   "AuthenticateAllApis": [
-    "--trello-url",
     "--jenkins-uses-csrf",
     "--jenkins-url",
     "--username",
     "--reviewboard-url",
-    "--jira-url"
+    "--jira-url",
+    "--trello-url"
   ],
   "AbstractReadMultiLine": [
     "--max-description"
