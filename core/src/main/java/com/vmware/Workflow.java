@@ -3,10 +3,12 @@ package com.vmware;
 import com.vmware.action.AbstractAction;
 import com.vmware.action.base.AbstractBatchIssuesAction;
 import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CommandLineArgumentsParser;
 import com.vmware.config.LogLevel;
 import com.vmware.config.UnknownWorkflowValueException;
+import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.ProjectIssues;
 import com.vmware.mapping.ConfigMappings;
@@ -38,6 +40,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +53,10 @@ import java.util.logging.LogManager;
  * Main class for running the workflow application.
  */
 public class Workflow {
+    public static final List<String> MAIN_WORKFLOWS = Collections.unmodifiableList(
+            Arrays.asList("commit", "review", "pushable", "pushIt", "createTrelloBoardFromLabel"
+                    , "commitAll", "amendCommit", "commitOffline", "closeOldReviews", "restartJobs", "review"));
+
     private static final String EXIT_WORKFLOW = "exit";
 
     private static final Logger log = LoggerFactory.getLogger(Workflow.class.getName());
@@ -134,7 +142,10 @@ public class Workflow {
     }
 
     private static ArgumentCompleter createWorkflowCompleter(WorkflowConfig config) {
-        List<String> autocompleteList = new ArrayList<String>(config.workflows.keySet());
+        List<String> autocompleteList = new ArrayList<String>();
+
+        autocompleteList.addAll(config.workflows.keySet());
+
         for (Class workflowAction : config.workFlowActions) {
             // ! means that it won't show up if nothing is entered
             autocompleteList.add("!" + workflowAction.getSimpleName());
@@ -174,7 +185,7 @@ public class Workflow {
             if (workflowConfig.dryRun) {
                 dryRunActions(workflowActions, workflowConfig);
             } else {
-                runActions(workflowActions, workflowConfig, new ReviewRequestDraft(), new ProjectIssues());
+                runActions(workflowActions, workflowConfig, new WorkflowActionValues());
             }
         } catch (UnknownWorkflowValueException e) {
             log.error(e.getMessage());
@@ -236,23 +247,26 @@ public class Workflow {
         configPadder.infoTitle();
     }
 
-    private static void runActions(List<Class<? extends AbstractAction>> actions, WorkflowConfig config, ReviewRequestDraft draft,
-                                   ProjectIssues projectIssues) throws IllegalAccessException, URISyntaxException,
+    private static void runActions(List<Class<? extends AbstractAction>> actions, WorkflowConfig config, WorkflowActionValues values) throws IllegalAccessException, URISyntaxException,
             InstantiationException, NoSuchMethodException, InvocationTargetException, IOException, ParseException {
         for (Class<? extends AbstractAction> action : actions) {
-            runAction(config, draft, action, projectIssues);
+            runAction(config, action, values);
         }
     }
 
-    private static void runAction(WorkflowConfig config, ReviewRequestDraft draft, Class<? extends AbstractAction> actionClass, ProjectIssues projectIssues) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException, ParseException {
+    private static void runAction(WorkflowConfig config, Class<? extends AbstractAction> actionClass, WorkflowActionValues values) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException, ParseException {
         AbstractAction action = actionClass.getConstructor(WorkflowConfig.class).newInstance(config);
         log.debug("Executing workflow action {}", actionClass.getSimpleName());
         if (action instanceof AbstractCommitAction) {
-            ((AbstractCommitAction) action).setDraft(draft);
+            ((AbstractCommitAction) action).setDraft(values.getDraft());
         }
         if (action instanceof AbstractBatchIssuesAction) {
-            ((AbstractBatchIssuesAction) action).setProjectIssues(projectIssues);
+            ((AbstractBatchIssuesAction) action).setProjectIssues(values.getProjectIssues());
         }
+        if (action instanceof AbstractTrelloAction) {
+            ((AbstractTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
+        }
+
         boolean canRunAction = action.canRunAction();
 
         if (canRunAction) {

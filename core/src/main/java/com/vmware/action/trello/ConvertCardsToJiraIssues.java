@@ -2,6 +2,7 @@ package com.vmware.action.trello;
 
 import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractBatchIssuesAction;
+import com.vmware.action.base.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -17,11 +18,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Converts a Trello board into a list of jira issues. Only story point values are set in created issues.")
-public class ConvertTrelloBoardToJiraIssues extends AbstractBatchIssuesAction {
+@ActionDescription("Converts the selected board's cards into a list of jira issues.")
+public class ConvertCardsToJiraIssues extends AbstractTrelloAction {
     private Trello trello;
 
-    public ConvertTrelloBoardToJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public ConvertCardsToJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);
     }
 
@@ -32,19 +33,13 @@ public class ConvertTrelloBoardToJiraIssues extends AbstractBatchIssuesAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        Board[] openBoards = trello.getOpenBoardsForUser();
-
-        if (openBoards.length == 0) {
-            log.info("You have no open Trello boards");
+        if (!selectedBoard.hasId()) {
+            log.info("No trello board is selected");
             return;
         }
 
         projectIssues.reset();
 
-        log.info("Enter trello board to convert to jira issues");
-        Integer selection = InputUtils.readSelection(openBoards, "Trello Boards");
-
-        Board selectedBoard = openBoards[selection];
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
 
         Padder padder = new Padder("{} Swimlanes", selectedBoard.name);
@@ -65,17 +60,22 @@ public class ConvertTrelloBoardToJiraIssues extends AbstractBatchIssuesAction {
             log.info("{} cards to process for swimlane {}", cardsToUpdate.length, swimlane.name);
 
             for (Card cardToUpdate : cardsToUpdate) {
-                Issue issueToUpdate = new Issue(cardToUpdate.getIssueKey());
-                issueToUpdate.fields.storyPoints = storyPointValue;
-                issueToUpdate.fields.summary = cardToUpdate.name;
-                String urlForIssue =
-                        UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.key;
-                issueToUpdate.fields.description = cardToUpdate.getDescriptionWithoutJiraUrl(urlForIssue);
-                issueToUpdate.fields.acceptanceCriteria = cardToUpdate.getAcceptanceCriteria();
+                Issue issueToUpdate = convertCardToIssue(storyPointValue, cardToUpdate);
                 projectIssues.add(issueToUpdate);
             }
         }
         padder.infoTitle();
+    }
+
+    private Issue convertCardToIssue(Integer storyPointValue, Card cardToUpdate) {
+        Issue issueToUpdate = new Issue(cardToUpdate.getIssueKey());
+        issueToUpdate.fields.storyPoints = storyPointValue;
+        issueToUpdate.fields.summary = cardToUpdate.name;
+        String urlForIssue =
+                UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.key;
+        issueToUpdate.fields.description = cardToUpdate.getDescriptionWithoutJiraUrl(urlForIssue);
+        issueToUpdate.fields.acceptanceCriteria = cardToUpdate.getAcceptanceCriteria();
+        return issueToUpdate;
     }
 
 }

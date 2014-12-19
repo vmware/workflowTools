@@ -169,16 +169,25 @@
           "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
        ],
        "createTrelloBoard": [
-          "LoadBacklogStories", "CreateTrelloBoardFromJiraIssues"
+          "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "CreateCardsFromJiraIssues"
+       ],
+       "forceCreateTrelloBoard": [
+          "LoadBacklogStories", "CreateTrelloBoard", "CreateCardsFromJiraIssues"
        ],
        "createTrelloBoardFromLabel": [
           "createTrelloBoard", "--use-label"
        ],
+       "forceCreateTrelloBoardFromLabel": [
+          "forceCreateTrelloBoard", "--use-label"
+       ],
+       "selectAndConvertBoard": [
+           "SelectTrelloBoard", "ExitIfNoTrelloBoardSelected", "ConvertCardsToJiraIssues"
+       ],
        "setStoryPoints": [
-          "ConvertTrelloBoardToJiraIssues", "UpdateStoryPointsOnly"
+          "selectAndConvertBoard", "UpdateStoryPointsOnly"
        ],
        "createUpdateIssuesFromTrello": [
-          "ConvertTrelloBoardToJiraIssues", "UpdateIssues", "CreateMissingStories"
+          "selectAndConvertBoard", "UpdateIssues", "CreateMissingStories"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"

@@ -98,6 +98,10 @@
     "--username",
     "--reviewboard-url"
   ],
+  "CreateCardsFromJiraIssues": [
+    "--jira-url",
+    "--trello-url"
+  ],
   "SetBugNumbersOffline": [
     "--bug-prefix"
   ],
@@ -134,8 +138,7 @@
   "AbstractReadMultiLine": [
     "--max-description"
   ],
-  "CreateTrelloBoardFromJiraIssues": [
-    "--jira-url",
+  "AbstractTrelloAction": [
     "--trello-url"
   ],
   "AbstractCommitReadAction": [

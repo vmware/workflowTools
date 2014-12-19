@@ -83,6 +83,11 @@ public class Trello extends AbstractRestService {
         return connection.get(url, Card[].class);
     }
 
+    public Card[] getCardsForBoard(Board board) throws IOException, URISyntaxException {
+        String url = String.format("%slists/%s/cards", apiUrl, board .id);
+        return connection.get(url, Card[].class);
+    }
+
     @Override
     protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
         try {

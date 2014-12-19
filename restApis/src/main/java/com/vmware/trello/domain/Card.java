@@ -7,6 +7,7 @@ import com.vmware.utils.MatcherUtils;
 import com.vmware.utils.StringUtils;
 import com.vmware.utils.UrlUtils;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class Card {
@@ -31,8 +32,12 @@ public class Card {
         this.name = name;
     }
 
+    public Card(Issue issue, String jiraUrl) {
+        this(null, issue, jiraUrl);
+    }
+
     public Card(Swimlane swimlane, Issue issue, String jiraUrl) {
-        this.idList = swimlane.id;
+        this.idList = swimlane != null ? swimlane.id : null;
 
         IssueFields details = issue.fields;
         this.name = details.summary;
@@ -66,5 +71,39 @@ public class Card {
         String value = MatcherUtils.singleMatch(desc,
                 "\\*\\*\\s*Acceptance Criteria\\s*\\*\\*(.+)\\*\\*\\s*Description\\s*\\*\\*", Pattern.DOTALL);
         return value != null ? value.trim() : "to do";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Card card = (Card) o;
+        if (id != null && id.equals(card.id)) {
+            return true;
+        }
+
+        if (name == null || desc == null) {
+            return false;
+        }
+
+        if (name.equals(card.name) && desc.equals(card.desc)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = idList != null ? idList.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (idBoard != null ? idBoard.hashCode() : 0);
+        result = 31 * result + (labels != null ? Arrays.hashCode(labels) : 0);
+        result = 31 * result + (shortUrl != null ? shortUrl.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        return result;
     }
 }
