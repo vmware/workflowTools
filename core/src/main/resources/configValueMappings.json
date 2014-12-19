@@ -15,10 +15,6 @@
     "--username",
     "--reviewboard-url"
   ],
-  "ConvertTrelloBoardToJiraIssues": [
-    "--jira-url",
-    "--trello-url"
-  ],
   "AbstractCommitWithReviewAction": [
     "--review-board-date-format",
     "--username",
@@ -115,6 +111,10 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
+  ],
+  "ConvertCardsToJiraIssues": [
+    "--jira-url",
+    "--trello-url"
   ],
   "PushToRemoteBranch": [
     "--username",

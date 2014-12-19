@@ -144,7 +144,14 @@ public class Workflow {
     private static ArgumentCompleter createWorkflowCompleter(WorkflowConfig config) {
         List<String> autocompleteList = new ArrayList<String>();
 
-        autocompleteList.addAll(config.workflows.keySet());
+        for (String workflow : config.workflows.keySet()) {
+            if (config.supportingWorkflows.contains(workflow)) {
+                // ! means that it won't show up if nothing is entered
+                autocompleteList.add("!" + workflow);
+            } else {
+                autocompleteList.add(workflow);
+            }
+        }
 
         for (Class workflowAction : config.workFlowActions) {
             // ! means that it won't show up if nothing is entered

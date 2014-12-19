@@ -195,5 +195,10 @@
        "help": [
           "DisplayConfig", "DisplayConfigOptions", "DisplayWorkflowActions", "DisplayWorkflows"
        ]
-   }
+   },
+  "supportingWorkflows": [
+     "readNonTrivialCommit", "setCommitDetailsWithoutConfirmation", "selectAndConvertBoard",
+      "prepareCommitForPush", "setCommitDetails", "setCommitDetailsOffline", "setReviewDetails"
+  ]
+
 }

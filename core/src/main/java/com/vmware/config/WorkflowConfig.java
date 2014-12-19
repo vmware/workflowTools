@@ -171,6 +171,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "A map of workflows that can be configured. A workflow comprises a list of workflow actions.")
     public TreeMap<String, String[]> workflows;
 
+    @ConfigurableProperty(help = "A list of workflows that are only created for supporting other workflows. Adding them here hides them on initial auto complete")
+    public List<String> supportingWorkflows;
+
     @ConfigurableProperty(commandLine = "-w,--workflow", help = "Workflows / Actions to run")
     public String workflowsToRun;
 
