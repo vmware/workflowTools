@@ -39,6 +39,7 @@
   "closeOldShipItReviewsAfter": 7,
   "jiraTaskEstimateInHours": 1,
   "fileCountRanges": [5,10,20,50,100],
+  "keepMissingCards": false,
   "workflows": {
        "readNonTrivialCommit": [
           "ReadLastCommit", "ExitIfTrivialCommit"
@@ -169,10 +170,10 @@
           "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
        ],
        "createTrelloBoard": [
-          "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "CreateCardsFromJiraIssues"
+          "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"
        ],
        "forceCreateTrelloBoard": [
-          "LoadBacklogStories", "CreateTrelloBoard", "CreateCardsFromJiraIssues"
+          "LoadBacklogStories", "CreateTrelloBoard", "SyncCardsWithJiraIssues"
        ],
        "createTrelloBoardFromLabel": [
           "createTrelloBoard", "--use-label"

@@ -1,6 +1,7 @@
-package com.vmware.action.base;
+package com.vmware.action.trello;
 
 import com.vmware.ServiceLocator;
+import com.vmware.action.base.AbstractBatchIssuesAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Board;

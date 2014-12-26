@@ -1,6 +1,5 @@
 package com.vmware.action.trello;
 
-import com.vmware.action.base.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.domain.Board;
@@ -31,16 +30,22 @@ public class CreateTrelloBoardIfNeeded extends AbstractTrelloAction {
 
         Board[] openBoards = trello.getOpenBoardsForUser();
         List<Board> existingBoards = Arrays.asList(openBoards);
-        int boardIndex = existingBoards.indexOf(boardName);
-        if (boardIndex != -1) {
+        Board matchingBoard = getBoardByName(existingBoards, boardName);
+        if (matchingBoard != null) {
             log.info("Found matching trello board {}", boardName);
-            selectedBoard.readValues(existingBoards.get(boardIndex));
+            selectedBoard.readValues(matchingBoard);
         } else {
             log.info("No matching trello board found, using name {} for new board", boardName);
             createTrelloBoard(boardName);
         }
+    }
 
-
-
+    private Board getBoardByName(List<Board> boards, String nameToCheck) {
+        for (Board board : boards) {
+            if (board.name.equals(nameToCheck)) {
+                return board;
+            }
+        }
+        return null;
     }
 }

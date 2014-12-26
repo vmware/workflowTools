@@ -42,6 +42,14 @@ public class TestTrelloApi extends AbstractTestRestApi {
     }
 
     @Test
+    public void canGetCards() throws IllegalAccessException, IOException, URISyntaxException {
+        Board[] boards = trello.getOpenBoardsForUser();
+        assertTrue("Expected user to have trello boards", boards.length > 0);
+        Card[] cards = trello.getCardsForBoard(boards[0]);
+        assertTrue("Expected board " + boards[0].name + " to have cards", cards.length > 0);
+    }
+
+    @Test
     public void testBoardIsPartOfUserBoards() throws IllegalAccessException, IOException, URISyntaxException {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
@@ -56,7 +64,7 @@ public class TestTrelloApi extends AbstractTestRestApi {
     }
 
     @Test
-    public void canCreateCard() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canCreateAndDeleteCard() throws IllegalAccessException, IOException, URISyntaxException {
         Swimlane swimlaneToCreate = new Swimlane(testBoard, "2 Story points");
         Swimlane createdSwimlane = trello.createSwimlane(swimlaneToCreate);
 
@@ -69,6 +77,11 @@ public class TestTrelloApi extends AbstractTestRestApi {
         assertEquals("Swimlane cards count mismatch", 1, cards.length);
 
         assertEquals(cards[0].id, createdCard.id);
+
+        trello.deleteCard(cards[0]);
+
+        cards = trello.getCardsForSwimlane(createdSwimlane);
+        assertEquals("Swimlane cards count mismatch", 0, cards.length);
     }
 
     @Test

@@ -78,7 +78,7 @@ public class LoadBacklogStories extends AbstractBatchJiraAction {
         }
 
         List<Issue> issuesForProcessing = projectIssues.getIssuesForProcessing();
-        log.info("Added {} issues for processing", issuesForProcessing.size());
+        log.debug("Added {} issues for processing", issuesForProcessing.size());
         log.debug("Added issues\n{}", issuesForProcessing.toString());
     }
 

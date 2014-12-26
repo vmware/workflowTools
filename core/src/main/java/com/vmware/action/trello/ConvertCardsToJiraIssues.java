@@ -1,16 +1,12 @@
 package com.vmware.action.trello;
 
 import com.vmware.ServiceLocator;
-import com.vmware.action.base.AbstractBatchIssuesAction;
-import com.vmware.action.base.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.trello.Trello;
-import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
-import com.vmware.utils.InputUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.UrlUtils;
 
@@ -33,7 +29,7 @@ public class ConvertCardsToJiraIssues extends AbstractTrelloAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (!selectedBoard.hasId()) {
+        if (selectedBoard.hasNoId()) {
             log.info("No trello board is selected");
             return;
         }

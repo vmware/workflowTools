@@ -35,6 +35,11 @@
     "--username",
     "--jira-url"
   ],
+  "SyncCardsWithJiraIssues": [
+    "--jira-url",
+    "--keep-missing-cards",
+    "--trello-url"
+  ],
   "AbstractCommitWithBuildsAction": [
     "--jenkins-uses-csrf",
     "--username",
@@ -93,10 +98,6 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
-  ],
-  "CreateCardsFromJiraIssues": [
-    "--jira-url",
-    "--trello-url"
   ],
   "SetBugNumbersOffline": [
     "--bug-prefix"

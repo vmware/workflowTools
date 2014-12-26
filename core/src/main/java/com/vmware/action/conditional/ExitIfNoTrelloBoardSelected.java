@@ -1,6 +1,6 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.base.AbstractTrelloAction;
+import com.vmware.action.trello.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
@@ -17,7 +17,7 @@ public class ExitIfNoTrelloBoardSelected extends AbstractTrelloAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (!selectedBoard.hasId()) {
+        if (selectedBoard.hasNoId()) {
             log.info("");
             log.info("Exiting as no trello board has been selected or created.");
             System.exit(0);

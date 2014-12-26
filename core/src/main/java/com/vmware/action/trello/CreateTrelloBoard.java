@@ -1,6 +1,5 @@
 package com.vmware.action.trello;
 
-import com.vmware.action.base.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.domain.Board;

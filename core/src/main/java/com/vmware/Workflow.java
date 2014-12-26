@@ -3,7 +3,7 @@ package com.vmware;
 import com.vmware.action.AbstractAction;
 import com.vmware.action.base.AbstractBatchIssuesAction;
 import com.vmware.action.base.AbstractCommitAction;
-import com.vmware.action.base.AbstractTrelloAction;
+import com.vmware.action.trello.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CommandLineArgumentsParser;
 import com.vmware.config.LogLevel;

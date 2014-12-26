@@ -43,7 +43,7 @@ public class Board implements InputListSelection {
         this.permissionLevel = input.permissionLevel;
     }
 
-    public boolean hasId() {
+    public boolean hasNoId() {
         return StringUtils.isBlank(id);
     }
 

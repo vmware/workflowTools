@@ -192,6 +192,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--use-label", help = "Whether to use a jira label when creating a trello board")
     public boolean useJiraLabel;
 
+    @ConfigurableProperty(commandLine = "-kmc,--keep-missing-cards", help = "Whether to not delete existing cards in Trello that do not match a loaded Jira issue")
+    public boolean keepMissingCards;
+
     @ConfigurableProperty(commandLine = "--file-count-ranges", help = "File count ranges for grouping reviews when generating stats")
     public int[] fileCountRanges;
 

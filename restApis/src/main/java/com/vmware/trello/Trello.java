@@ -68,6 +68,11 @@ public class Trello extends AbstractRestService {
         return connection.post(apiUrl + "cards", Card.class, cardToCreate);
     }
 
+    public void deleteCard(Card cardToDelete) throws IllegalAccessException, IOException, URISyntaxException {
+        String url = String.format(apiUrl + "cards/%s", cardToDelete.id);
+        connection.delete(url);
+    }
+
     public Board[] getOpenBoardsForUser() throws IOException, URISyntaxException {
         return connection.get(apiUrl + "members/me/boards", Board[].class,
                     new UrlParam("filter", "open"));
@@ -84,7 +89,7 @@ public class Trello extends AbstractRestService {
     }
 
     public Card[] getCardsForBoard(Board board) throws IOException, URISyntaxException {
-        String url = String.format("%slists/%s/cards", apiUrl, board .id);
+        String url = String.format("%sboards/%s/cards", apiUrl, board.id);
         return connection.get(url, Card[].class);
     }
 

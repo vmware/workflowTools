@@ -74,23 +74,20 @@ public class RestConnection {
 
     public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params)
             throws IOException, URISyntaxException {
-        String fullUrl = UriUtils.buildUrl(url, params);
-        setupConnection(fullUrl, GET, params);
+        setupConnection(url, GET, params);
         return handleServerResponse(responseConversionClass);
     }
 
     public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        String fullUrl = UriUtils.buildUrl(url, params);
-        setupConnection(fullUrl, PUT, params);
+        setupConnection(url, PUT, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass);
     }
 
     public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        String fullUrl = UriUtils.buildUrl(url, params);
-        setupConnection(fullUrl, POST, params);
+        setupConnection(url, POST, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass);
     }
@@ -107,8 +104,7 @@ public class RestConnection {
 
     public <T> T delete(String url, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
-        String fullUrl = UriUtils.buildUrl(url, params);
-        setupConnection(fullUrl, DELETE, params);
+        setupConnection(url, DELETE, params);
         return handleServerResponse(null);
     }
 
@@ -145,13 +141,14 @@ public class RestConnection {
         return gson.toJson(value);
     }
 
-    private void setupConnection(String url, HttpMethodType methodType, RequestParam... params) throws IOException, URISyntaxException {
+    private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... params) throws IOException, URISyntaxException {
+        String fullUrl = UriUtils.buildUrl(requestUrl, params);
         if (authQueryString != null) {
-            url += !url.contains("?") ? "?" : "&";
-            url += authQueryString;
+            fullUrl += !fullUrl.contains("?") ? "?" : "&";
+            fullUrl += authQueryString;
         }
-        URI uri = new URI(url);
-        log.trace("{}: {}", methodType.name(), url);
+        URI uri = new URI(fullUrl);
+        log.trace("{}: {}", methodType.name(), fullUrl);
         activeConnection = (HttpURLConnection) uri.toURL().openConnection();
         activeConnection.setDoInput(true);
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);

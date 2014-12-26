@@ -1,7 +1,6 @@
 package com.vmware.action.trello;
 
 import com.vmware.ServiceLocator;
-import com.vmware.action.base.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -18,11 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ActionDescription("Creates trello cards for a list of previously loaded jira issues." +
-        "Cards are only created for issues not already in Trello.")
-public class CreateCardsFromJiraIssues extends AbstractTrelloAction {
+@ActionDescription("Syncs trello cards with list of loaded jira issues. " +
+        "Adds / Deletes trello cards to ensure board matches loaded list.")
+public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
-    public CreateCardsFromJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public SyncCardsWithJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);
     }
 
@@ -38,7 +37,7 @@ public class CreateCardsFromJiraIssues extends AbstractTrelloAction {
             return;
         }
 
-        if (!selectedBoard.hasId()) {
+        if (selectedBoard.hasNoId()) {
             throw new IllegalArgumentException
                     ("No trello board has been loaded or created. Add a CreateTrelloBoard or SelectTrelloBoard actions.");
 
@@ -46,21 +45,56 @@ public class CreateCardsFromJiraIssues extends AbstractTrelloAction {
 
         Padder padder = new Padder("Adding cards for board {}", selectedBoard.name);
 
+        padder.infoTitle();
         List<Issue> issuesForProcessing = new ArrayList<Issue>(projectIssues.getIssuesForProcessing());
-        log.info("Processing {} cards", issuesForProcessing.size());
+        log.info("Processing {} issues", issuesForProcessing.size());
 
-        filterOutExistingIssues(issuesForProcessing);
+        List<Card> existingCards = new ArrayList<Card>(Arrays.asList(trello.getCardsForBoard(selectedBoard)));
+        if (!config.keepMissingCards) {
+            deleteMissingCards(issuesForProcessing, existingCards);
+        }
+        filterOutExistingIssues(issuesForProcessing, existingCards);
 
         addCardsForIssues(issuesForProcessing);
 
-        log.info("Finished adding cards to board");
+        padder.infoTitle();
         log.info("Workflow setStoryPoints can be used to update jira issues " +
                 "with story point values after estimating in trello is finished");
-        padder.infoTitle();
+    }
 
+    private void deleteMissingCards(List<Issue> issuesForProcessing, List<Card> existingCards) throws IllegalAccessException, IOException, URISyntaxException {
+        int cardRemovalCount = 0;
+        for (int i = existingCards.size() - 1; i >= 0; i--) {
+            Card cardToCheck = existingCards.get(i);
+            if (findIssueByKey(issuesForProcessing, cardToCheck.getIssueKey()) == null) {
+                log.debug("Card with key {} is not in issues list, deleting", cardToCheck.getIssueKey());
+                trello.deleteCard(cardToCheck);
+                existingCards.remove(i);
+                cardRemovalCount++;
+            }
+        }
+
+        if (cardRemovalCount > 0) {
+            log.info("Deleted {} cards that did not have a matching jira issue", cardRemovalCount);
+        }
+    }
+
+    private Issue findIssueByKey(List<Issue> issues, String key) {
+        for (Issue issue : issues) {
+            if (issue.key.equals(key)) {
+                return issue;
+            }
+        }
+        return null;
     }
 
     private void addCardsForIssues(List<Issue> issuesForProcessing) throws IOException, URISyntaxException, IllegalAccessException {
+        if (issuesForProcessing.isEmpty()) {
+            log.info("No cards need to be added to Trello as issue list is now empty");
+            return;
+        }
+
+        log.info("Adding {} cards to Trello for remaining issues");
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
         Map<Integer, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
 
@@ -89,9 +123,8 @@ public class CreateCardsFromJiraIssues extends AbstractTrelloAction {
         return storyPointSwimlanes;
     }
 
-    private void filterOutExistingIssues(List<Issue> issuesForProcessing) throws IOException, URISyntaxException {
+    private void filterOutExistingIssues(List<Issue> issuesForProcessing, List<Card> existingCards) throws IOException, URISyntaxException {
         int issueRemovalCount = 0;
-        List<Card> existingCards = Arrays.asList(trello.getCardsForBoard(selectedBoard));
         for (int i = issuesForProcessing.size() - 1; i >= 0; i--) {
             Issue issueToCheck = issuesForProcessing.get(i);
             Card matchingCard = new Card(issueToCheck, config.jiraUrl);
@@ -103,7 +136,7 @@ public class CreateCardsFromJiraIssues extends AbstractTrelloAction {
         }
 
         if (issueRemovalCount > 0) {
-            log.info("Filtered out {} issues that already exists in Trello", issueRemovalCount);
+            log.info("Filtered out {} issues that already existed in Trello", issueRemovalCount);
         }
     }
 }
