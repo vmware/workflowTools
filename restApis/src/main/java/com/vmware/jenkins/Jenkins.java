@@ -6,12 +6,12 @@ import com.vmware.rest.ApiAuthentication;
 import com.vmware.rest.RequestParam;
 import com.vmware.rest.RequestHeader;
 import com.vmware.rest.RestConnection;
+import com.vmware.rest.UrlUtils;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.request.RequestBodyHandling;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

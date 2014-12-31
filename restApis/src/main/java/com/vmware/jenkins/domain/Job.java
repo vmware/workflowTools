@@ -1,6 +1,6 @@
 package com.vmware.jenkins.domain;
 
-import com.vmware.utils.UrlUtils;
+import com.vmware.rest.UrlUtils;
 
 public class Job {
     public String name;

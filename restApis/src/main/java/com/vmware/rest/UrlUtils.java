@@ -1,8 +1,3 @@
-/*
- * Project Horizon
- * (c) 2013 VMware, Inc. All rights reserved.
- * VMware Confidential.
- */
 package com.vmware.rest;
 
 import com.vmware.utils.StringUtils;
@@ -14,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class UriUtils {
+public class UrlUtils {
 
     public static String buildUrl(String url, final Collection<? extends RequestParam> params) throws URISyntaxException, UnsupportedEncodingException {
         if (params == null) {
@@ -80,5 +75,12 @@ public class UriUtils {
         }
 
         return paramText;
+    }
+
+    public static String addTrailingSlash(String url) {
+        if (url == null) {
+            return null;
+        }
+        return url.endsWith("/") ? url : url + "/";
     }
 }

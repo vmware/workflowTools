@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import static com.vmware.utils.StringUtils.addToCsvValue;
 import static com.vmware.utils.StringUtils.isNotBlank;
-import static com.vmware.utils.UrlUtils.addTrailingSlash;
+import static com.vmware.rest.UrlUtils.addTrailingSlash;
 
 public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)

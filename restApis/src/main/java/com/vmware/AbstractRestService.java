@@ -3,10 +3,10 @@ package com.vmware;
 import com.vmware.rest.ApiAuthentication;
 import com.vmware.rest.RequestParam;
 import com.vmware.rest.RestConnection;
+import com.vmware.rest.UrlUtils;
 import com.vmware.rest.exception.ForbiddenException;
 import com.vmware.rest.exception.NotAuthorizedException;
 import com.vmware.utils.IOUtils;
-import com.vmware.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,7 @@ import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueFields;
 import com.vmware.utils.MatcherUtils;
 import com.vmware.utils.StringUtils;
-import com.vmware.utils.UrlUtils;
+import com.vmware.rest.UrlUtils;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;

@@ -3,7 +3,7 @@ package com.vmware.action.review;
 import com.vmware.action.base.AbstractCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.UrlUtils;
+import com.vmware.rest.UrlUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,6 +18,6 @@ public class DisplayReviewUrl extends AbstractCommitWithReviewAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        log.info("{}r/{}/",UrlUtils.addTrailingSlash(config.reviewboardUrl), draft.id);
+        log.info("{}r/{}/", UrlUtils.addTrailingSlash(config.reviewboardUrl), draft.id);
     }
 }

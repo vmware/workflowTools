@@ -21,7 +21,6 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -159,7 +158,7 @@ public class RestConnection {
         List<RequestParam> statelessParamsList = Arrays.asList(statelessParams);
         allParams.removeAll(statelessParamsList);
         allParams.addAll(statelessParamsList);
-        String fullUrl = UriUtils.buildUrl(requestUrl, allParams);
+        String fullUrl = UrlUtils.buildUrl(requestUrl, allParams);
         URI uri = new URI(fullUrl);
         log.trace("{}: {}", methodType.name(), uri.toString());
 
