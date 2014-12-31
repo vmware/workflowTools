@@ -1,7 +1,6 @@
 package com.vmware.reviewboard;
 
 import com.vmware.AbstractRestService;
-import com.vmware.rest.AcceptRequestHeader;
 import com.vmware.rest.ApiAuthentication;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.UrlParam;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static com.vmware.rest.ApiAuthentication.reviewBoard;
+import static com.vmware.rest.RequestHeader.anAcceptHeader;
 import static com.vmware.reviewboard.domain.ReviewRequestDraft.anEmptyDraftForPublishingAReview;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.all;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.pending;
@@ -161,7 +161,7 @@ public class ReviewBoard extends AbstractRestService {
     }
 
     public String getDiffData(Link diffLink) throws IOException, URISyntaxException {
-        String diffData = connection.get(diffLink.getHref(), String.class, new AcceptRequestHeader("text/x-patch"));
+        String diffData = connection.get(diffLink.getHref(), String.class, anAcceptHeader("text/x-patch"));
         // need to add in a trailing newline for git apply to work correctly
         diffData += "\n";
         return diffData;

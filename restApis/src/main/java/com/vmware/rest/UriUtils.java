@@ -5,15 +5,18 @@
  */
 package com.vmware.rest;
 
+import com.vmware.utils.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class UriUtils {
 
-    public static String buildUrl(String url, final RequestParam[] params) throws URISyntaxException, UnsupportedEncodingException {
+    public static String buildUrl(String url, final Collection<? extends RequestParam> params) throws URISyntaxException, UnsupportedEncodingException {
         if (params == null) {
             return url;
         }
@@ -42,7 +45,7 @@ public class UriUtils {
         return url;
     }
 
-    private static List<UrlParam> selectUrlParamsFromParams(RequestParam[] params) {
+    private static List<UrlParam> selectUrlParamsFromParams(Collection<? extends RequestParam> params) {
         List<UrlParam> urlParams = new ArrayList<UrlParam>();
 
         for (RequestParam param : params) {
@@ -52,5 +55,30 @@ public class UriUtils {
         }
 
         return urlParams;
+    }
+
+    public static List<UrlParam> parseParamsFromText(String apiText) {
+        List<UrlParam> params = new ArrayList<UrlParam>();
+        if (StringUtils.isBlank(apiText)) {
+            return params;
+        }
+
+        for (String paramText : apiText.split("&")) {
+           params.add(UrlParam.fromText(paramText));
+        }
+        return params;
+    }
+
+    public static String convertParamsToText(List<UrlParam> params) {
+        String paramText = "";
+
+        for (UrlParam param : params) {
+            if (!paramText.isEmpty()) {
+                paramText += "&";
+            }
+            paramText += param.toString();
+        }
+
+        return paramText;
     }
 }

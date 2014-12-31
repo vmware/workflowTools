@@ -21,7 +21,12 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +34,7 @@ import static com.vmware.rest.HttpMethodType.GET;
 import static com.vmware.rest.HttpMethodType.POST;
 import static com.vmware.rest.HttpMethodType.PUT;
 import static com.vmware.rest.HttpMethodType.DELETE;
+import static com.vmware.rest.RequestHeader.anAcceptHeader;
 
 /**
  * Using Java's HttpURLConnection instead of Apache HttpClient to cut down on jar size
@@ -42,8 +48,7 @@ public class RestConnection {
     private final CookieFileStore cookieFileStore;
     private Gson gson;
     private RequestBodyHandling requestBodyHandling;
-    private RequestHeader authorizationHeader = null;
-    private String authQueryString;
+    private Set<RequestParam> statefulParams = new HashSet<RequestParam>();
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
 
@@ -61,11 +66,16 @@ public class RestConnection {
 
     public void setupBasicAuthHeader(final UsernamePasswordCredentials credentials) {
         String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
-        authorizationHeader = new RequestHeader("Authorization", "Basic " + basicCredentials);
+        RequestHeader authorizationHeader = new RequestHeader("Authorization", "Basic " + basicCredentials);
+        statefulParams.add(authorizationHeader);
     }
 
-    public void setAuthQueryString(String authQueryString) {
-        this.authQueryString = authQueryString;
+    public void addStatefulParams(List<? extends RequestParam> params) {
+        statefulParams.addAll(params);
+    }
+
+    public void clearStatefulParams() {
+        statefulParams.clear();
     }
 
     public <T> T get(String url, Class<T> responseConversionClass, List<RequestParam> params) throws IOException, URISyntaxException {
@@ -141,27 +151,29 @@ public class RestConnection {
         return gson.toJson(value);
     }
 
-    private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... params) throws IOException, URISyntaxException {
-        String fullUrl = UriUtils.buildUrl(requestUrl, params);
-        if (authQueryString != null) {
-            fullUrl += !fullUrl.contains("?") ? "?" : "&";
-            fullUrl += authQueryString;
-        }
+    private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... statelessParams) throws IOException, URISyntaxException {
+        Set<RequestParam> allParams = new HashSet<RequestParam>(statefulParams);
+        // add default application json header, can be overridden by stateless headers
+        allParams.add(anAcceptHeader("application/json"));
+
+        List<RequestParam> statelessParamsList = Arrays.asList(statelessParams);
+        allParams.removeAll(statelessParamsList);
+        allParams.addAll(statelessParamsList);
+        String fullUrl = UriUtils.buildUrl(requestUrl, allParams);
         URI uri = new URI(fullUrl);
-        log.trace("{}: {}", methodType.name(), fullUrl);
+        log.trace("{}: {}", methodType.name(), uri.toString());
+
         activeConnection = (HttpURLConnection) uri.toURL().openConnection();
         activeConnection.setDoInput(true);
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
         activeConnection.setRequestMethod(methodType.name());
-        addRequestHeaders(params);
-        addDefaultAcceptHeaderIfNeeded(params);
-        addAuthorizationHeaderIfNotNull();
+        addRequestHeaders(allParams);
         addCookiesHeader(uri.getHost());
     }
 
-    private void addRequestHeaders(RequestParam[] params) {
+    private void addRequestHeaders(Collection<? extends RequestParam> params) {
         for (RequestParam param : params) {
             if (!(param instanceof RequestHeader)) {
                 continue;
@@ -170,25 +182,6 @@ public class RestConnection {
             log.debug("Adding request header {}:{}", header.getName(), header.getValue());
             activeConnection.setRequestProperty(header.getName(), header.getValue());
         }
-    }
-
-    private void addDefaultAcceptHeaderIfNeeded(RequestParam... params) {
-        if (isAcceptHeaderPresent(params)) {
-            return;
-        }
-
-        RequestHeader header = new AcceptRequestHeader("application/json");
-        log.debug("Adding default accept request header {}:{}", header.getName(), header.getValue());
-        activeConnection.setRequestProperty(header.getName(), header.getValue());
-    }
-
-    private boolean isAcceptHeaderPresent(RequestParam... params) {
-        for (RequestParam param : params) {
-            if (param instanceof RequestHeader && AcceptRequestHeader.HEADER_NAME.equals(param.getName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private <T> T handleServerResponse(final Class<T> responseConversionClass) throws IOException {
@@ -213,12 +206,6 @@ public class RestConnection {
 
     private void addCookiesHeader(String host) {
         activeConnection.setRequestProperty("Cookie", cookieFileStore.toCookieRequestText(host, useSessionCookies));
-    }
-
-    private void addAuthorizationHeaderIfNotNull() {
-        if (authorizationHeader != null) {
-            activeConnection.setRequestProperty(authorizationHeader.getName(), authorizationHeader.getValue());
-        }
     }
 
     private String getResponseText(int retryCount) throws IOException {

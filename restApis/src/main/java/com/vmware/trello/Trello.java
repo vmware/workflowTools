@@ -22,6 +22,7 @@ import com.vmware.utils.UrlUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +35,7 @@ public class Trello extends AbstractRestService {
 
     private final String loginUrl;
     private final String webUrl;
-    private String fullApiAuthQueryString;
+    private List<UrlParam> authQueryParams;
 
     public Trello(String trelloUrl) throws IOException, URISyntaxException, IllegalAccessException {
         super(createApiUrl(trelloUrl), "1/", ApiAuthentication.trello, null);
@@ -43,7 +44,8 @@ public class Trello extends AbstractRestService {
         this.connection = new RestConnection(RequestBodyHandling.AsStringJsonEntity);
 
         String apiToken = readExistingApiToken();
-        connection.setAuthQueryString(apiToken);
+
+        connection.addStatefulParams(UriUtils.parseParamsFromText(apiToken));
     }
 
     public Board createBoard(Board boardToCreate) throws IllegalAccessException, IOException, URISyntaxException {
@@ -105,7 +107,7 @@ public class Trello extends AbstractRestService {
 
     @Override
     protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
-        connection.setAuthQueryString(null);
+        connection.clearStatefulParams();
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(ApiAuthentication.trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
         connection.post(loginUrl, new LoginInfo(credentials), new RequestHeader("Referer", "https://trello.com/login"));
@@ -113,14 +115,15 @@ public class Trello extends AbstractRestService {
 
         connection.setUseSessionCookies(true);
         String apiTokenPage = connection.get(webUrl + "app-key", String.class);
-        fullApiAuthQueryString = scrapeAuthInfoFromUI(apiTokenPage);
+        authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
         connection.setUseSessionCookies(false);
 
-        connection.setAuthQueryString(fullApiAuthQueryString);
-        saveApiToken(fullApiAuthQueryString);
+        connection.addStatefulParams(authQueryParams);
+
+        saveApiToken(UriUtils.convertParamsToText(authQueryParams));
     }
 
-    private String scrapeAuthInfoFromUI(String apiTokenPage) throws IOException, URISyntaxException, IllegalAccessException {
+    private List<UrlParam> scrapeAuthInfoFromUI(String apiTokenPage) throws IOException, URISyntaxException, IllegalAccessException {
         String apiKey = findMatchForPattern(apiTokenPage, "id=\"key\" type=\"text\" value=\"(\\w+)\"");
 
         String authorizeUrl = webUrl + "1/authorize";
@@ -142,7 +145,7 @@ public class Trello extends AbstractRestService {
         String tokenApprovedText = connection.post(tokenApproveUrl, String.class, tokenApproval);
 
         String accessToken = findMatchForPattern(tokenApprovedText, "postMessage\\(\"(\\w+)\"");
-        return String.format("key=%s&token=%s", apiKey, accessToken);
+        return Arrays.asList(new UrlParam("key", apiKey), new UrlParam("token", accessToken));
     }
 
     private String findMatchForPattern(String text, String pattern) {

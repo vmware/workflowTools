@@ -8,4 +8,10 @@ public class RequestHeader extends RequestParam {
     public RequestHeader(String name, String value) {
         super(name, value);
     }
+
+    public static RequestHeader anAcceptHeader(String value) {
+        return new RequestHeader("Accept", value);
+    }
+
+
 }
