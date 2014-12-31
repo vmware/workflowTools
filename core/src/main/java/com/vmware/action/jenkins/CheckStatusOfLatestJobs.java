@@ -6,7 +6,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jenkins.domain.*;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.StringUtils;
 
 import java.io.IOException;

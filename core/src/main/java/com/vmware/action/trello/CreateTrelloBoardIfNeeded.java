@@ -3,7 +3,7 @@ package com.vmware.action.trello;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.domain.Board;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.StringUtils;
 
 import java.io.IOException;
@@ -29,8 +29,7 @@ public class CreateTrelloBoardIfNeeded extends AbstractTrelloAction {
         }
 
         Board[] openBoards = trello.getOpenBoardsForUser();
-        List<Board> existingBoards = Arrays.asList(openBoards);
-        Board matchingBoard = getBoardByName(existingBoards, boardName);
+        Board matchingBoard = getBoardByName(openBoards, boardName);
         if (matchingBoard != null) {
             log.info("Found matching trello board {}", boardName);
             selectedBoard.readValues(matchingBoard);
@@ -40,7 +39,7 @@ public class CreateTrelloBoardIfNeeded extends AbstractTrelloAction {
         }
     }
 
-    private Board getBoardByName(List<Board> boards, String nameToCheck) {
+    private Board getBoardByName(Board[] boards, String nameToCheck) {
         for (Board board : boards) {
             if (board.name.equals(nameToCheck)) {
                 return board;

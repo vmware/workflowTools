@@ -1,4 +1,4 @@
-package com.vmware.rest;
+package com.vmware.rest.json;
 
 public interface NumericalEnum<T> {
 

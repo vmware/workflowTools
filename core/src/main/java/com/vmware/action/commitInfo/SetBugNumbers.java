@@ -8,7 +8,7 @@ import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
 import com.vmware.rest.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
 import com.vmware.utils.ThreadUtils;

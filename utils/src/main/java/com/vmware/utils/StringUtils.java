@@ -10,9 +10,20 @@ public class StringUtils {
 
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
 
-    public static String addToCsvValue(String existingValue, String valueToAdd) {
+    public static String appendCsvValue(String existingValue, String valueToAdd) {
+        return appendWithDelimiter(existingValue, valueToAdd, ",");
+    }
+
+    public static String appendWithDelimiter(String existingValue, Collection valuesToAdd, String delimiter) {
+        for (Object valueToAdd : valuesToAdd) {
+            existingValue = appendWithDelimiter(existingValue, valueToAdd.toString(), delimiter);
+        }
+        return existingValue;
+    }
+
+    public static String appendWithDelimiter(String existingValue, String valueToAdd, String delimiter) {
         if (!existingValue.isEmpty()) {
-            existingValue += ",";
+            existingValue += delimiter;
         }
         existingValue += valueToAdd;
         return existingValue;

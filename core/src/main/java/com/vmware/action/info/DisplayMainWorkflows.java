@@ -19,12 +19,10 @@ public class DisplayMainWorkflows extends AbstractAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException {
-
-
         Padder mainWorkflowsPadder = new Padder("Main Workflows");
         mainWorkflowsPadder.infoTitle();
         for (String mainWorkflow : Workflow.MAIN_WORKFLOWS) {
-            log.info("{} Actions {}", mainWorkflow, Arrays.toString(config.workflows.get(mainWorkflow)));
+            log.info("{} -> {}", mainWorkflow, Arrays.toString(config.workflows.get(mainWorkflow)));
         }
         mainWorkflowsPadder.infoTitle();
     }

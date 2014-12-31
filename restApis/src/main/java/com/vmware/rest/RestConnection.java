@@ -2,11 +2,17 @@ package com.vmware.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.cookie.Cookie;
+import com.vmware.rest.cookie.CookieFileStore;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.exception.ExceptionChecker;
 import com.vmware.rest.json.ConfiguredGsonBuilder;
+import com.vmware.rest.request.OverwritableSet;
 import com.vmware.rest.request.RequestBodyFactory;
 import com.vmware.rest.request.RequestBodyHandling;
+import com.vmware.rest.request.RequestHeader;
+import com.vmware.rest.request.RequestParam;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.ThreadUtils;
 import org.slf4j.Logger;
@@ -33,7 +39,7 @@ import static com.vmware.rest.HttpMethodType.GET;
 import static com.vmware.rest.HttpMethodType.POST;
 import static com.vmware.rest.HttpMethodType.PUT;
 import static com.vmware.rest.HttpMethodType.DELETE;
-import static com.vmware.rest.RequestHeader.anAcceptHeader;
+import static com.vmware.rest.request.RequestHeader.anAcceptHeader;
 
 /**
  * Using Java's HttpURLConnection instead of Apache HttpClient to cut down on jar size
@@ -47,7 +53,7 @@ public class RestConnection {
     private final CookieFileStore cookieFileStore;
     private Gson gson;
     private RequestBodyHandling requestBodyHandling;
-    private Set<RequestParam> statefulParams = new HashSet<RequestParam>();
+    private Set<RequestParam> statefulParams = new OverwritableSet<RequestParam>();
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
 
@@ -151,12 +157,11 @@ public class RestConnection {
     }
 
     private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... statelessParams) throws IOException, URISyntaxException {
-        Set<RequestParam> allParams = new HashSet<RequestParam>(statefulParams);
+        Set<RequestParam> allParams = new OverwritableSet<RequestParam>(statefulParams);
         // add default application json header, can be overridden by stateless headers
         allParams.add(anAcceptHeader("application/json"));
 
         List<RequestParam> statelessParamsList = Arrays.asList(statelessParams);
-        allParams.removeAll(statelessParamsList);
         allParams.addAll(statelessParamsList);
         String fullUrl = UrlUtils.buildUrl(requestUrl, allParams);
         URI uri = new URI(fullUrl);

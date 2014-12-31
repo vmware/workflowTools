@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.utils.input;
 
 /**
  * Interface that choices in an input list must implement

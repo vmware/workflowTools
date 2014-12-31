@@ -1,7 +1,7 @@
 package com.vmware.rest.credentials;
 
-import com.vmware.rest.ApiAuthentication;
-import com.vmware.utils.InputUtils;
+import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.utils.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

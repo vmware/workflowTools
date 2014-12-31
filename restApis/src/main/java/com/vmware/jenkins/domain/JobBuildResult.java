@@ -1,5 +1,7 @@
 package com.vmware.jenkins.domain;
 
+import com.vmware.utils.StringUtils;
+
 import java.util.EnumSet;
 
 public enum JobBuildResult {
@@ -9,14 +11,8 @@ public enum JobBuildResult {
     BUILDING;
 
     public static String generateResultPattern() {
-        String values = "(";
-        for (Enum value : EnumSet.allOf(JobBuildResult.class)) {
-            if (values.length() > 1) {
-                values += "|";
-            }
-            values += value.name();
-        }
-        return values + ")";
+        String patternValues = StringUtils.appendWithDelimiter("", EnumSet.allOf(JobBuildResult.class), "|");
+        return "(" + patternValues + ")";
     }
 
 }

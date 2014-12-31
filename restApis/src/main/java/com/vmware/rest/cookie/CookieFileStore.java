@@ -1,7 +1,8 @@
-package com.vmware.rest;
+package com.vmware.rest.cookie;
 
 import com.vmware.utils.ClasspathResource;
 import com.vmware.utils.IOUtils;
+import com.vmware.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.vmware.utils.StringUtils.appendWithDelimiter;
 
 public class CookieFileStore {
     private final String homeFolder;
@@ -106,23 +109,12 @@ public class CookieFileStore {
 
     public String toCookieRequestText(String host, boolean useSessionCookies) {
         List<Cookie> matchingAuthCookies = getMatchingAuthCookiesForHost(host);
-        String cookieText = addCookiesToText(matchingAuthCookies, "");
+        String cookieText = appendWithDelimiter("", matchingAuthCookies, ";");
         if (useSessionCookies) {
-            cookieText = addCookiesToText(sessionCookies, cookieText);
+            cookieText = appendWithDelimiter(cookieText, sessionCookies, ";");
         }
         return cookieText;
     }
-
-    private String addCookiesToText(List<Cookie> cookies, String existingText) {
-        for (Cookie cookie : cookies) {
-            if (!existingText.isEmpty()) {
-                existingText += ";";
-            }
-            existingText += cookie.getName() + "=" + cookie.getValue();
-        }
-        return existingText;
-    }
-
 
     private void writeCookieToFile(Cookie existingCookie, Cookie updatedCookie, String cookieFileName) throws IOException {
 

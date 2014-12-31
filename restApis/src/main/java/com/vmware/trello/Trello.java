@@ -6,17 +6,23 @@
 package com.vmware.trello;
 
 import com.vmware.AbstractRestService;
-import com.vmware.rest.*;
+import com.vmware.rest.RestConnection;
+import com.vmware.rest.UrlUtils;
+import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.exception.BadRequestException;
 import com.vmware.rest.exception.NotAuthorizedException;
 import com.vmware.rest.request.RequestBodyHandling;
+import com.vmware.rest.request.RequestHeader;
+import com.vmware.rest.request.RequestParam;
+import com.vmware.rest.request.UrlParam;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.BooleanValue;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.LoginInfo;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
+import com.vmware.utils.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -117,7 +123,7 @@ public class Trello extends AbstractRestService {
 
         connection.addStatefulParams(authQueryParams);
 
-        saveApiToken(UrlUtils.convertParamsToText(authQueryParams));
+        saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"));
     }
 
     private List<UrlParam> scrapeAuthInfoFromUI(String apiTokenPage) throws IOException, URISyntaxException, IllegalAccessException {

@@ -13,8 +13,8 @@ import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
-import com.vmware.utils.InputListSelection;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputListSelection;
+import com.vmware.utils.input.InputUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

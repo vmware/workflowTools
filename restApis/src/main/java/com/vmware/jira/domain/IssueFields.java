@@ -66,7 +66,7 @@ public class IssueFields {
         }
         String text = "";
         for (Component component : components) {
-            StringUtils.addToCsvValue(text, component.name);
+            StringUtils.appendCsvValue(text, component.name);
         }
         return text;
     }

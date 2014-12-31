@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.utils.StringUtils.addToCsvValue;
+import static com.vmware.utils.StringUtils.appendCsvValue;
 import static com.vmware.utils.StringUtils.isNotBlank;
 import static com.vmware.rest.UrlUtils.addTrailingSlash;
 
@@ -169,9 +169,9 @@ public class ReviewRequestDraft extends BaseEntity{
         this.bugNumbers = "";
         for (Issue issue : jiraIssues) {
             if (issue == Issue.noBugNumber) {
-                bugNumbers = addToCsvValue(bugNumbers, noBugNumberLabel);
+                bugNumbers = appendCsvValue(bugNumbers, noBugNumberLabel);
             } else {
-                bugNumbers = addToCsvValue(bugNumbers, issue.key);
+                bugNumbers = appendCsvValue(bugNumbers, issue.key);
             }
         }
     }

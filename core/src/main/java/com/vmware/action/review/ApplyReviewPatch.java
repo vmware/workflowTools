@@ -8,7 +8,7 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.utils.IOUtils;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
 

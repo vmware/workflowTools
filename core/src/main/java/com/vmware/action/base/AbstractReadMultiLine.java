@@ -1,7 +1,7 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 
 import java.io.IOException;
 

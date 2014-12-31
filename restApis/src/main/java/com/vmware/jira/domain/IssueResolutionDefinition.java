@@ -1,6 +1,6 @@
 package com.vmware.jira.domain;
 
-import com.vmware.rest.NumericalEnum;
+import com.vmware.rest.json.NumericalEnum;
 
 public enum IssueResolutionDefinition implements NumericalEnum<IssueResolutionDefinition>{
 

@@ -1,6 +1,6 @@
 package com.vmware.jira.domain;
 
-import com.vmware.utils.InputListSelection;
+import com.vmware.utils.input.InputListSelection;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

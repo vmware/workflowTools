@@ -1,11 +1,9 @@
-package com.vmware.utils;
+package com.vmware.utils.input;
 
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.internal.Log;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.StringUtils;
 
 import java.io.IOException;

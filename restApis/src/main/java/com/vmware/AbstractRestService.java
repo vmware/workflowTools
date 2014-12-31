@@ -1,7 +1,7 @@
 package com.vmware;
 
-import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.RequestParam;
+import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.request.RequestParam;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.UrlUtils;
 import com.vmware.rest.exception.ForbiddenException;

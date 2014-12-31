@@ -1,4 +1,4 @@
-package com.vmware.rest;
+package com.vmware.rest.cookie;
 
 /**
  * Enum detailing the cookie names if applicable and the file system locations for each cookie / token.

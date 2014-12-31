@@ -1,5 +1,7 @@
 package com.vmware.rest;
 
+import com.vmware.rest.request.RequestParam;
+import com.vmware.rest.request.UrlParam;
 import com.vmware.utils.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -62,19 +64,6 @@ public class UrlUtils {
            params.add(UrlParam.fromText(paramText));
         }
         return params;
-    }
-
-    public static String convertParamsToText(List<UrlParam> params) {
-        String paramText = "";
-
-        for (UrlParam param : params) {
-            if (!paramText.isEmpty()) {
-                paramText += "&";
-            }
-            paramText += param.toString();
-        }
-
-        return paramText;
     }
 
     public static String addTrailingSlash(String url) {

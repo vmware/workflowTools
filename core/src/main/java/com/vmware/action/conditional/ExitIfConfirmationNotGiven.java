@@ -3,7 +3,7 @@ package com.vmware.action.conditional;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.InputUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

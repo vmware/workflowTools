@@ -16,11 +16,11 @@ import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.rest.json.ConfiguredGsonBuilder;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.ClasspathResource;
-import com.vmware.utils.CommaArgumentDelimeter;
+import com.vmware.utils.input.CommaArgumentDelimeter;
 import com.vmware.utils.IOUtils;
-import com.vmware.utils.ImprovedArgumentCompleter;
-import com.vmware.utils.ImprovedStringsCompleter;
-import com.vmware.utils.InputUtils;
+import com.vmware.utils.input.ImprovedArgumentCompleter;
+import com.vmware.utils.input.ImprovedStringsCompleter;
+import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
 

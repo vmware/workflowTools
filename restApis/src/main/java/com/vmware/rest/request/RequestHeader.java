@@ -1,4 +1,4 @@
-package com.vmware.rest;
+package com.vmware.rest.request;
 
 /**
  * Will be added as request headers to a request.

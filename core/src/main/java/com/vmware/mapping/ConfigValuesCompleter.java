@@ -3,8 +3,8 @@ package com.vmware.mapping;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.WorkflowValuesParser;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.ArgumentListAware;
-import com.vmware.utils.ImprovedStringsCompleter;
+import com.vmware.utils.input.ArgumentListAware;
+import com.vmware.utils.input.ImprovedStringsCompleter;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 

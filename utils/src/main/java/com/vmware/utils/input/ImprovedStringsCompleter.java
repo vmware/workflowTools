@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.utils.input;
 
 import jline.console.completer.Completer;
 
@@ -13,10 +13,8 @@ import java.util.regex.Pattern;
 import static jline.internal.Preconditions.checkNotNull;
 
 /**
- * Completer for a set of values.
- *
- * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
- * @since 2.3
+ * Based on existing StringsCompleter in JLine2.
+ * Adds support for not showing some values when no text entered.
  */
 public class ImprovedStringsCompleter
         implements Completer

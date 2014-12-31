@@ -7,14 +7,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.vmware.rest.NumericalEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.EnumSet;
 
-import static com.vmware.rest.NumericalEnum.UNKNOWN_VALUE_NAME;
+import static com.vmware.rest.json.NumericalEnum.UNKNOWN_VALUE_NAME;
 
 public class NumericalEnumMapper implements JsonDeserializer<NumericalEnum>, JsonSerializer<NumericalEnum> {
     private Logger log  = LoggerFactory.getLogger(this.getClass());

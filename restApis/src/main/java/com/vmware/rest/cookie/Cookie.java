@@ -3,7 +3,7 @@
  * (c) 2013 VMware, Inc. All rights reserved.
  * VMware Confidential.
  */
-package com.vmware.rest;
+package com.vmware.rest.cookie;
 
 import com.vmware.utils.StringUtils;
 import org.slf4j.Logger;
@@ -129,4 +129,8 @@ public class Cookie {
         return domain.equals(host);
     }
 
+    @Override
+    public String toString() {
+        return name + "=" + value;
+    }
 }

@@ -1,5 +1,7 @@
-package com.vmware.utils;
+package com.vmware.utils.input;
 
+import com.vmware.utils.Padder;
+import com.vmware.utils.StringUtils;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;

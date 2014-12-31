@@ -13,10 +13,10 @@ import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
-import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.NumericalEnum;
+import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.json.NumericalEnum;
 import com.vmware.rest.RestConnection;
-import com.vmware.rest.UrlParam;
+import com.vmware.rest.request.UrlParam;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.request.RequestBodyHandling;
@@ -36,7 +36,7 @@ import static com.vmware.jira.domain.IssueTypeDefinition.Bug;
 import static com.vmware.jira.domain.IssueTypeDefinition.Feature;
 import static com.vmware.jira.domain.IssueTypeDefinition.Improvement;
 import static com.vmware.jira.domain.IssueTypeDefinition.TechComm;
-import static com.vmware.rest.ApiAuthentication.jira;
+import static com.vmware.rest.cookie.ApiAuthentication.jira;
 
 public class Jira extends AbstractRestService {
 

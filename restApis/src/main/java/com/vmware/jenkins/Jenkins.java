@@ -2,9 +2,9 @@ package com.vmware.jenkins;
 
 import com.vmware.AbstractRestService;
 import com.vmware.jenkins.domain.*;
-import com.vmware.rest.ApiAuthentication;
-import com.vmware.rest.RequestParam;
-import com.vmware.rest.RequestHeader;
+import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.request.RequestParam;
+import com.vmware.rest.request.RequestHeader;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.UrlUtils;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
