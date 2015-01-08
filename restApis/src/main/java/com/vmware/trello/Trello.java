@@ -20,6 +20,7 @@ import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.BooleanValue;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.LoginInfo;
+import com.vmware.trello.domain.Member;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
 import com.vmware.utils.StringUtils;
@@ -49,6 +50,10 @@ public class Trello extends AbstractRestService {
         String apiToken = readExistingApiToken();
 
         connection.addStatefulParams(UrlUtils.parseParamsFromText(apiToken));
+    }
+
+    public Member getTrelloMember(String memberId) throws IOException, URISyntaxException {
+        return connection.get(apiUrl + "members/" + memberId, Member.class);
     }
 
     public Board createBoard(Board boardToCreate) throws IllegalAccessException, IOException, URISyntaxException {

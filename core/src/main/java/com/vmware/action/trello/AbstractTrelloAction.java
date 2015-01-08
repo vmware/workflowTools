@@ -30,6 +30,10 @@ public abstract class AbstractTrelloAction extends AbstractBatchIssuesAction {
         this.selectedBoard = selectedBoard;
     }
 
+    public Board getSelectedBoard() {
+        return selectedBoard;
+    }
+
     protected void createTrelloBoard(String boardName) throws IllegalAccessException, IOException, URISyntaxException {
         Board boardToCreate = new Board(boardName);
 
@@ -55,6 +59,6 @@ public abstract class AbstractTrelloAction extends AbstractBatchIssuesAction {
         trello.createSwimlane(new Swimlane(createdBoard, "Parking Lot"));
         padder.infoTitle();
 
-        selectedBoard.readValues(createdBoard);
+        selectedBoard = createdBoard;
     }
 }

@@ -20,6 +20,8 @@ public class Board implements InputListSelection {
     @SerializedName("prefs_permissionLevel")
     public String permissionLevel = "private";
 
+    public BoardMember[] memberships;
+
     private Board() {}
 
     public Board(String name) {
@@ -29,18 +31,6 @@ public class Board implements InputListSelection {
     @Override
     public String getLabel() {
         return name;
-    }
-
-    public void readValues(Board input) {
-        if (input == null) {
-            return;
-        }
-        this.name = input.name;
-        this.id = input.id;
-        this.idOrganization = input.idOrganization;
-        this.closed = input.closed;
-        this.url = input.url;
-        this.permissionLevel = input.permissionLevel;
     }
 
     public boolean hasNoId() {
@@ -76,5 +66,23 @@ public class Board implements InputListSelection {
         result = 31 * result + (idOrganization != null ? idOrganization.hashCode() : 0);
         result = 31 * result + (closed ? 1 : 0);
         return result;
+    }
+
+    public boolean hasOwner(String id) {
+        for (BoardMember boardMember : memberships) {
+            if ("admin".equals(boardMember.memberType) && boardMember.idMember.equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public BoardMember getFirstOwner() {
+        for (BoardMember boardMember : memberships) {
+            if ("admin".equals(boardMember.memberType)) {
+                return boardMember;
+            }
+        }
+        throw new IllegalArgumentException("No owner found for board " + name);
     }
 }

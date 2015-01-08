@@ -195,6 +195,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-kmc,--keep-missing-cards", help = "Whether to not delete existing cards in Trello that do not match a loaded Jira issue")
     public boolean keepMissingCards;
 
+    @ConfigurableProperty(commandLine = "-obo,--own-boards-only", help = "Disallow using a trello board owned by someone else")
+    public boolean ownBoardsOnly;
+
     @ConfigurableProperty(commandLine = "--file-count-ranges", help = "File count ranges for grouping reviews when generating stats")
     public int[] fileCountRanges;
 

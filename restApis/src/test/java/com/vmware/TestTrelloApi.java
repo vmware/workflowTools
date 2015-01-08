@@ -4,6 +4,7 @@ import com.vmware.jira.domain.Issue;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Card;
+import com.vmware.trello.domain.Member;
 import com.vmware.trello.domain.Swimlane;
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +34,12 @@ public class TestTrelloApi extends AbstractTestRestApi {
     @After
     public void cleanup() throws IllegalAccessException, IOException, URISyntaxException {
         trello.closeBoard(testBoard);
+    }
+
+    @Test
+    public void canGetTrelloMember() throws IOException, URISyntaxException {
+        Member member = trello.getTrelloMember("me");
+        assertNotNull(member);
     }
 
     @Test

@@ -165,7 +165,7 @@ public class RestConnection {
         allParams.addAll(statelessParamsList);
         String fullUrl = UrlUtils.buildUrl(requestUrl, allParams);
         URI uri = new URI(fullUrl);
-        log.trace("{}: {}", methodType.name(), uri.toString());
+        log.debug("{}: {}", methodType.name(), uri.toString());
 
         activeConnection = (HttpURLConnection) uri.toURL().openConnection();
         activeConnection.setDoInput(true);

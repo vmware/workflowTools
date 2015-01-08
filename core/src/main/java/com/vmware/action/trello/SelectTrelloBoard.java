@@ -25,7 +25,7 @@ public class SelectTrelloBoard  extends AbstractTrelloAction {
             return;
         }
 
-        int selectedBoard = InputUtils.readSelection(openBoards, "Trello Boards");
-        this.selectedBoard = openBoards[selectedBoard];
+        int boardToUse = InputUtils.readSelection(openBoards, "Trello Boards");
+        selectedBoard = openBoards[boardToUse];
     }
 }

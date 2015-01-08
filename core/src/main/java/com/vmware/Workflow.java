@@ -280,6 +280,10 @@ public class Workflow {
             action.preprocess();
             action.process();
         }
+
+        if (action instanceof AbstractTrelloAction) {
+            values.setTrelloBoard(((AbstractTrelloAction) action).getSelectedBoard());
+        }
     }
 
     private static WorkflowConfig parseWorkflowConfig(CommandLineArgumentsParser argsParser) throws IOException, IllegalAccessException {

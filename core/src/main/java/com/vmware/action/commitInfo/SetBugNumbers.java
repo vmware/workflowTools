@@ -58,7 +58,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
                 draft.bugNumbers = config.noBugNumberLabel;
             } else if (!allIssuesWereFound(jiraIssues)) {
                 String reenterBugNumber = InputUtils.readValue("One or more issues not found, reenter bug numbers? [y/n]");
-                waitingForBugNumbers = reenterBugNumber.equals("y");
+                waitingForBugNumbers = reenterBugNumber.equalsIgnoreCase("y");
             }
         }
         draft.setJiraIssues(jiraIssues, config.noBugNumberLabel);

@@ -62,6 +62,9 @@
   "HardSubmitOldShipItReviews": [
     "--old-ship-it"
   ],
+  "CreateTrelloBoardIfNeeded": [
+    "--own-boards-only"
+  ],
   "ApplyReviewPatch": [
     "--latest-diff",
     "--patch",

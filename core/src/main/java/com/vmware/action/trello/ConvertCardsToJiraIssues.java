@@ -29,7 +29,7 @@ public class ConvertCardsToJiraIssues extends AbstractTrelloAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (selectedBoard.hasNoId()) {
+        if (selectedBoard == null) {
             log.info("No trello board is selected");
             return;
         }

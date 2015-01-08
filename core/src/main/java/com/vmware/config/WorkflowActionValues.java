@@ -19,7 +19,6 @@ public class WorkflowActionValues {
     public WorkflowActionValues() {
         this.draft = new ReviewRequestDraft();
         this.projectIssues = new ProjectIssues();
-        this.trelloBoard = new Board("Place holder");
     }
 
     public ReviewRequestDraft getDraft() {
@@ -32,5 +31,9 @@ public class WorkflowActionValues {
 
     public Board getTrelloBoard() {
         return trelloBoard;
+    }
+
+    public void setTrelloBoard(Board trelloBoard) {
+        this.trelloBoard = trelloBoard;
     }
 }

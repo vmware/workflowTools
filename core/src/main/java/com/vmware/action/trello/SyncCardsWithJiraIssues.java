@@ -37,7 +37,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
             return;
         }
 
-        if (selectedBoard.hasNoId()) {
+        if (selectedBoard == null) {
             throw new IllegalArgumentException
                     ("No trello board has been loaded or created. Add a CreateTrelloBoard or SelectTrelloBoard actions.");
 
@@ -67,7 +67,13 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
         for (int i = existingCards.size() - 1; i >= 0; i--) {
             Card cardToCheck = existingCards.get(i);
             if (findIssueByKey(issuesForProcessing, cardToCheck.getIssueKey()) == null) {
-                log.debug("Card with key {} is not in issues list, deleting", cardToCheck.getIssueKey());
+                if (cardToCheck.getIssueKey() != null) {
+                    log.debug("Card with name {} and key {} is not in issues list, deleting",
+                            cardToCheck.name, cardToCheck.getIssueKey());
+                } else {
+                    log.debug("Card with name {} has no jira issue url, deleting", cardToCheck.name);
+                }
+
                 trello.deleteCard(cardToCheck);
                 existingCards.remove(i);
                 cardRemovalCount++;
@@ -76,6 +82,8 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
         if (cardRemovalCount > 0) {
             log.info("Deleted {} cards that did not have a matching jira issue", cardRemovalCount);
+        } else {
+            log.debug("Deleted {} cards that did not have a matching jira issue", cardRemovalCount);
         }
     }
 
@@ -90,11 +98,11 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
     private void addCardsForIssues(List<Issue> issuesForProcessing) throws IOException, URISyntaxException, IllegalAccessException {
         if (issuesForProcessing.isEmpty()) {
-            log.info("No cards need to be added to Trello as issue list is now empty");
+            log.info("No cards need to be added to trello as issue list is now empty");
             return;
         }
 
-        log.info("Adding {} cards to Trello for remaining issues");
+        log.info("Adding {} cards to trello", issuesForProcessing.size());
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
         Map<Integer, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
 
@@ -129,14 +137,16 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
             Issue issueToCheck = issuesForProcessing.get(i);
             Card matchingCard = new Card(issueToCheck, config.jiraUrl);
             if (existingCards.contains(matchingCard)) {
-                log.debug("Issue {} already exists in Trello, skipping.", issueToCheck.id);
+                log.debug("Issue {} already exists in trello, skipping.", issueToCheck.id);
                 issuesForProcessing.remove(i);
                 issueRemovalCount++;
             }
         }
 
         if (issueRemovalCount > 0) {
-            log.info("Filtered out {} issues that already existed in Trello", issueRemovalCount);
+            log.info("Filtered out {} issues that already existed in trello", issueRemovalCount);
+        } else {
+            log.debug("Filtered out {} issues that already existed in trello", issueRemovalCount);
         }
     }
 }
