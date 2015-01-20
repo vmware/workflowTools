@@ -3,6 +3,8 @@ package com.vmware.jenkins;
 import com.vmware.AbstractRestService;
 import com.vmware.jenkins.domain.*;
 import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.exception.InternalServerException;
+import com.vmware.rest.exception.NotAuthorizedException;
 import com.vmware.rest.request.RequestParam;
 import com.vmware.rest.request.RequestHeader;
 import com.vmware.rest.RestConnection;
@@ -26,15 +28,17 @@ import java.util.regex.Pattern;
 public class Jenkins extends AbstractRestService {
 
     private final boolean usesCsrf;
+    private final boolean disableLogin;
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private String configureUrl;
     private JobsList jobsList = null;
 
-    public Jenkins(String serverUrl, final String username, boolean usesCsrf)
+    public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin)
             throws IOException, URISyntaxException, IllegalAccessException {
         super(serverUrl, "api/json", ApiAuthentication.jenkins, username);
         this.configureUrl = baseUrl + "me/configure";
         this.usesCsrf = usesCsrf;
+        this.disableLogin = disableLogin;
         connection = new RestConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
 
         String apiToken = readExistingApiToken();
@@ -98,6 +102,10 @@ public class Jenkins extends AbstractRestService {
 
     @Override
     protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException{
+        if (disableLogin) {
+            log.info("Login is disabled for jenkins");
+            return;
+        }
         String apiToken = scrapeUIForToken();
         saveApiToken(apiToken);
     }
@@ -127,11 +135,19 @@ public class Jenkins extends AbstractRestService {
 
     private String scrapeUIForToken() throws IOException, URISyntaxException {
         log.debug("Scraping {} for api token", configureUrl);
-        String userConfigureWebPage = connection.get(configureUrl, String.class);
-        Matcher tokenMatcher = Pattern.compile("name=\"_\\.apiToken\"\\s+value=\"(\\w+)\"").matcher(userConfigureWebPage);
-        if (!tokenMatcher.find()) {
-            return "";
+        try {
+            String userConfigureWebPage = connection.get(configureUrl, String.class);
+            Matcher tokenMatcher = Pattern.compile("name=\"_\\.apiToken\"\\s+value=\"(\\w+)\"").matcher(userConfigureWebPage);
+            if (!tokenMatcher.find()) {
+                return "";
+            }
+            return tokenMatcher.group(1);
+        } catch (InternalServerException e) {
+            if (e.getMessage().contains("AccessDeniedException")) {
+                throw new NotAuthorizedException(e.getMessage());
+            } else {
+                throw e;
+            }
         }
-        return tokenMatcher.group(1);
     }
 }

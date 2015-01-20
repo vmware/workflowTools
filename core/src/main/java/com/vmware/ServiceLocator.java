@@ -42,9 +42,9 @@ public class ServiceLocator {
         return reviewBoard;
     }
 
-    public static Jenkins getJenkins(String jenkinsUrl, String username, boolean jenkinsUsesCsrf) throws IOException, URISyntaxException, IllegalAccessException {
+    public static Jenkins getJenkins(String jenkinsUrl, String username, boolean jenkinsUsesCsrf, boolean disableLogin) throws IOException, URISyntaxException, IllegalAccessException {
         if (jenkins == null) {
-            jenkins = new Jenkins(jenkinsUrl, username, jenkinsUsesCsrf);
+            jenkins = new Jenkins(jenkinsUrl, username, jenkinsUsesCsrf, disableLogin);
             jenkins.setupAuthenticatedConnection();
         }
         return jenkins;

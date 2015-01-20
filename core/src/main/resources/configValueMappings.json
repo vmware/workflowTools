@@ -41,6 +41,7 @@
     "--trello-url"
   ],
   "AbstractCommitWithBuildsAction": [
+    "--disable-jenkins-login",
     "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url"
@@ -55,6 +56,7 @@
   ],
   "CheckStatusOfLatestJobs": [
     "--jenkins-jobs",
+    "--disable-jenkins-login",
     "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url"
@@ -132,6 +134,7 @@
     "--jenkins-jobs"
   ],
   "AuthenticateAllApis": [
+    "--disable-jenkins-login",
     "--jenkins-uses-csrf",
     "--jenkins-url",
     "--username",

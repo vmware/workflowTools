@@ -162,6 +162,10 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--old-ship-it", help = "Number of days after which to close old reviews that have ship its")
     public int closeOldShipItReviewsAfter;
 
+    @ConfigurableProperty(commandLine = "--disable-jenkins-login", help = "Skips trying to log into jenkins if the server is not using user login module")
+    public boolean disableJenkinsLogin;
+
+
     @ConfigurableProperty(help = "Map of remote branches, :username is substituted for the real username.")
     public TreeMap<String, String> remoteBranches;
 

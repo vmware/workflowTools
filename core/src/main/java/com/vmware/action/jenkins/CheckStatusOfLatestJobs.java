@@ -24,7 +24,7 @@ public class CheckStatusOfLatestJobs extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        jenkins = ServiceLocator.getJenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf);
+        jenkins = ServiceLocator.getJenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
     }
 
     @Override
