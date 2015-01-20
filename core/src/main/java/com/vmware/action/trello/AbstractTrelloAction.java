@@ -53,6 +53,7 @@ public abstract class AbstractTrelloAction extends AbstractBatchIssuesAction {
         for (Integer storyPointValue : config.storyPointValues) {
             Swimlane swimlaneToCreate = new Swimlane(createdBoard, storyPointValue + Swimlane.STORY_POINTS_SUFFIX);
             log.info("Creating swimlane {}", swimlaneToCreate.name);
+            trello.createSwimlane(swimlaneToCreate);
         }
 
         log.info("Creating parking lot lane");
