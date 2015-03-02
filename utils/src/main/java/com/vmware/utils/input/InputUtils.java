@@ -129,6 +129,7 @@ public class InputUtils {
         boolean nextLine = true;
         String data = "";
         ConsoleReader consoleReader = new ConsoleReader();
+        consoleReader.setExpandEvents(false);
         addHistoryValues(consoleReader, historyValues);
         int numberOfTrailingCharsToDiscard = 0;
         while (nextLine) {
@@ -164,6 +165,7 @@ public class InputUtils {
 
     private static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues, Completer completer) throws IOException {
         ConsoleReader consoleReader = new ConsoleReader();
+        consoleReader.setExpandEvents(false);
         if (completer != null) {
             consoleReader.addCompleter(completer);
         }
