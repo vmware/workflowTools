@@ -13,6 +13,7 @@ import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
+import com.vmware.rest.SslUtils;
 import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.json.NumericalEnum;
 import com.vmware.rest.RestConnection;

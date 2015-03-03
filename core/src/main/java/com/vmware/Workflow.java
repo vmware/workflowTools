@@ -13,6 +13,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.ProjectIssues;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
+import com.vmware.rest.SslUtils;
 import com.vmware.rest.json.ConfiguredGsonBuilder;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.ClasspathResource;
@@ -173,6 +174,12 @@ public class Workflow {
     private static void runWorkflow(WorkflowConfig workflowConfig) throws ClassNotFoundException, IllegalAccessException,
             URISyntaxException, InstantiationException, NoSuchMethodException, InvocationTargetException,
             IOException, ParseException, UnknownWorkflowValueException {
+
+        if (workflowConfig.disableSslCertValidation) {
+            log.info("SSL Certificate validation is disabled");
+            SslUtils.trustAllHttpsCertificates();
+        }
+
         if (StringUtils.isBlank(workflowConfig.workflowsToRun)) {
             // default workflow
             workflowConfig.workflowsToRun = "intro";
