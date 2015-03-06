@@ -38,7 +38,7 @@ public class WorkflowValuesParser {
             if (workflowValue.startsWith("-")) {
                 String[] configPieces = workflowValue.split("=");
                 // assuming that the config value is boolean if no value specified
-                String fieldValue = configPieces.length < 2 ? Boolean.TRUE.toString() : configPieces[1];
+                String fieldValue = configPieces.length < 2 ? Boolean.TRUE.toString() : joinPieces(configPieces);
                 configValues.put(configPieces[0], fieldValue);
                 continue;
             }
@@ -74,5 +74,16 @@ public class WorkflowValuesParser {
 
     public List<String> getUnknownActions() {
         return unknownActions;
+    }
+
+    private String joinPieces(String[] configPieces) {
+        String configValue = "";
+        for (int i = 1; i < configPieces.length; i ++) {
+            if (!configValue.isEmpty()) {
+                configValue += "=";
+            }
+            configValue += configPieces[i];
+        }
+        return configValue;
     }
 }

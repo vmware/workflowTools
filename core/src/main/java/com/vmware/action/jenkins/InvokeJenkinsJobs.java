@@ -43,9 +43,11 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
         for (String jenkinsJobKey: jenkinsJobKeys) {
             String jenkinsJobText = config.jenkinsJobs.get(jenkinsJobKey);
             if (jenkinsJobText == null) {
-                throw new IllegalArgumentException("No job found for jenkins job key " + jenkinsJobKey);
+                log.info("Treating {} as job value", jenkinsJobKey);
+                jenkinsJobTexts.add(jenkinsJobKey);
+            } else {
+                jenkinsJobTexts.add(jenkinsJobText);
             }
-            jenkinsJobTexts.add(jenkinsJobText);
         }
 
         for (int i = 0; i < jenkinsJobTexts.size(); i ++) {
@@ -89,7 +91,7 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
     }
 
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
-        String[] jenkinsJobDetails = jenkinsJobText.split(",");
+        String[] jenkinsJobDetails = jenkinsJobText.split("&");
         String jenkinsJobName = jenkinsJobDetails[0];
         log.info("Invoking job " + jenkinsJobName);
         Job jobToInvoke = new Job(config.jenkinsUrl + "/job/" + jenkinsJobName + "/");
