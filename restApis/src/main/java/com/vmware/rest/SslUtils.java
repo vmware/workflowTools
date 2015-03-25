@@ -1,5 +1,8 @@
 package com.vmware.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -258,6 +261,8 @@ public final class SslUtils {
      */
     public static class FakeX509TrustManager implements X509TrustManager {
 
+        private Logger logger = LoggerFactory.getLogger(this.getClass());
+
         /**
          * Empty array of certificate authority certificates.
          */
@@ -282,6 +287,8 @@ public final class SslUtils {
          * @param authType the key exchange algorithm used.
          */
         public void checkServerTrusted(X509Certificate[] chain, String authType) {
+            logger.info("Checking server with auth type {}", authType);
+
         } // checkServerTrusted
 
         /**

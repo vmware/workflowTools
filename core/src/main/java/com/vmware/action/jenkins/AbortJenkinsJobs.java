@@ -31,9 +31,11 @@ public class AbortJenkinsJobs extends AbstractCommitWithBuildsAction {
         for (String jenkinsJobKey: jenkinsJobKeys) {
             String jenkinsJobText = config.jenkinsJobs.get(jenkinsJobKey);
             if (jenkinsJobText == null) {
-                throw new IllegalArgumentException("No job found for jenkins job key " + jenkinsJobKey);
+                log.info("No job found matching text {}, treating as job value", jenkinsJobKey);
+                jenkinsJobTexts.add(jenkinsJobKey);
+            } else {
+                jenkinsJobTexts.add(jenkinsJobText);
             }
-            jenkinsJobTexts.add(jenkinsJobText);
         }
         jenkins.checkStatusOfJenkinsJobs(draft);
         log.info("");
@@ -52,7 +54,7 @@ public class AbortJenkinsJobs extends AbstractCommitWithBuildsAction {
     }
 
     private void abortJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
-        String[] jenkinsJobDetails = jenkinsJobText.split(",");
+        String[] jenkinsJobDetails = jenkinsJobText.split("&");
         String jenkinsJobName = jenkinsJobDetails[0];
         String expectedUrlFormat = config.jenkinsUrl + "/job/" + jenkinsJobName + "/";
         JobBuild buildToAbort = draft.getMatchingJobBuild(expectedUrlFormat);
