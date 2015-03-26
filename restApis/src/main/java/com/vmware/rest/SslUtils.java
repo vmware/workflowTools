@@ -287,8 +287,6 @@ public final class SslUtils {
          * @param authType the key exchange algorithm used.
          */
         public void checkServerTrusted(X509Certificate[] chain, String authType) {
-            logger.info("Checking server with auth type {}", authType);
-
         } // checkServerTrusted
 
         /**
