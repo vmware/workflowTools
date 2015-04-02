@@ -26,11 +26,6 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
 
     @Override
     public boolean canRunAction() throws IOException, URISyntaxException {
-        if (config.jenkinsJobs == null || config.jenkinsJobs.isEmpty()) {
-            log.info("Ignoring action {} as there are no jenkins jobs configured", this.getClass().getSimpleName());
-            return false;
-        }
-
         return true;
     }
 
@@ -41,7 +36,7 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
         String[] jenkinsJobKeys = config.jenkinsJobKeys.split(",");
         List<String> jenkinsJobTexts = new ArrayList<String>();
         for (String jenkinsJobKey: jenkinsJobKeys) {
-            String jenkinsJobText = config.jenkinsJobs.get(jenkinsJobKey);
+            String jenkinsJobText = config.jenkinsJobs != null ? config.jenkinsJobs.get(jenkinsJobKey) : null;
             if (jenkinsJobText == null) {
                 log.info("Treating {} as job value", jenkinsJobKey);
                 jenkinsJobTexts.add(jenkinsJobKey);
@@ -87,7 +82,11 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());
+        if (config.jenkinsJobKeys == null || config.jenkinsJobKeys.isEmpty()) {
+            config.jenkinsJobKeys = InputUtils.readValue("Jenkins job keys");
+        } else {
+            config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());
+        }
     }
 
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
