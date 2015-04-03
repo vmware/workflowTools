@@ -36,7 +36,7 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
         String[] jenkinsJobKeys = config.jenkinsJobKeys.split(",");
         List<String> jenkinsJobTexts = new ArrayList<String>();
         for (String jenkinsJobKey: jenkinsJobKeys) {
-            String jenkinsJobText = config.jenkinsJobs != null ? config.jenkinsJobs.get(jenkinsJobKey) : null;
+            String jenkinsJobText = config.getJenkinsJobValue(jenkinsJobKey);
             if (jenkinsJobText == null) {
                 log.info("Treating {} as job value", jenkinsJobKey);
                 jenkinsJobTexts.add(jenkinsJobKey);
@@ -82,7 +82,7 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        if (config.jenkinsJobKeys == null || config.jenkinsJobKeys.isEmpty()) {
+        if (config.jenkinsJobs == null || config.jenkinsJobs.isEmpty()) {
             config.jenkinsJobKeys = InputUtils.readValue("Jenkins job keys");
         } else {
             config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());

@@ -375,6 +375,10 @@ public class WorkflowConfig {
                 noBugNumberLabel, trivialReviewerLabel);
     }
 
+    public String getJenkinsJobValue(String jenkinsJobKey) {
+        return jenkinsJobs != null ? jenkinsJobs.get(jenkinsJobKey) : null;
+    }
+
     private void setFieldValue(Field field, String value, String source) throws IllegalAccessException {
         Object validValue = new WorkflowField(field).determineValue(value);
         if (validValue != null) {

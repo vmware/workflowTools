@@ -43,7 +43,7 @@ public class CheckStatusOfLatestJobs extends AbstractAction {
 
     private void checkStatusOfLatestJob(String job) throws IOException, URISyntaxException, IllegalAccessException {
         JobBuildDetails matchedBuild = null;
-        if (config.jenkinsJobs.containsKey(job)) {
+        if (config.getJenkinsJobValue(job) != null) {
             job = config.jenkinsJobs.get(job).split(",")[0];
         } else {
             log.info("No match for jenkins job key {}, using as job name", job);

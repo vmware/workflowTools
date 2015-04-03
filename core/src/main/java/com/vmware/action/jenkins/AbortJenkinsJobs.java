@@ -29,7 +29,7 @@ public class AbortJenkinsJobs extends AbstractCommitWithBuildsAction {
         String[] jenkinsJobKeys = config.jenkinsJobKeys.split(",");
         List<String> jenkinsJobTexts = new ArrayList<String>();
         for (String jenkinsJobKey: jenkinsJobKeys) {
-            String jenkinsJobText = config.jenkinsJobs.get(jenkinsJobKey);
+            String jenkinsJobText = config.getJenkinsJobValue(jenkinsJobKey);
             if (jenkinsJobText == null) {
                 log.info("No job found matching text {}, treating as job value", jenkinsJobKey);
                 jenkinsJobTexts.add(jenkinsJobKey);
@@ -50,7 +50,11 @@ public class AbortJenkinsJobs extends AbstractCommitWithBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());
+        if (config.jenkinsJobs == null || config.jenkinsJobs.isEmpty()) {
+            config.jenkinsJobKeys = InputUtils.readValue("Jenkins job keys");
+        } else {
+            config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());
+        }
     }
 
     private void abortJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
