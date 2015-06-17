@@ -11,7 +11,7 @@ import java.util.Properties;
  * Unit tests assume that you already have a valid cookie / api token stored for the relevant api.
  * Run workflow AuthenticateAllApis to verify
  */
-public class AbstractTestRestApi {
+public class BaseTests {
 
     protected static Properties testProperties;
 

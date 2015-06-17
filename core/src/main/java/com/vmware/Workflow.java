@@ -175,11 +175,6 @@ public class Workflow {
             URISyntaxException, InstantiationException, NoSuchMethodException, InvocationTargetException,
             IOException, ParseException, UnknownWorkflowValueException {
 
-        if (workflowConfig.disableSslCertValidation) {
-            log.info("SSL Certificate validation is disabled");
-            SslUtils.trustAllHttpsCertificates();
-        }
-
         if (StringUtils.isBlank(workflowConfig.workflowsToRun)) {
             // default workflow
             workflowConfig.workflowsToRun = "intro";

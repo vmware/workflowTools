@@ -13,8 +13,10 @@ import com.vmware.rest.request.RequestBodyFactory;
 import com.vmware.rest.request.RequestBodyHandling;
 import com.vmware.rest.request.RequestHeader;
 import com.vmware.rest.request.RequestParam;
+import com.vmware.rest.ssl.WorkflowCertificateManager;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.ThreadUtils;
+import com.vmware.utils.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,6 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -51,6 +52,7 @@ public class RestConnection {
     private static final int MAX_REQUEST_RETRIES = 3;
 
     private final CookieFileStore cookieFileStore;
+    private WorkflowCertificateManager workflowCertificateManager = null;
     private Gson gson;
     private RequestBodyHandling requestBodyHandling;
     private Set<RequestParam> statefulParams = new OverwritableSet<RequestParam>();
@@ -63,6 +65,7 @@ public class RestConnection {
 
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);
+        workflowCertificateManager = new WorkflowCertificateManager(homeFolder + "/.workflowTool.keystore");
     }
 
     public void updateServerTimeZone(TimeZone serverTimezone, String serverDateFormat) {
@@ -90,21 +93,21 @@ public class RestConnection {
     public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params)
             throws IOException, URISyntaxException {
         setupConnection(url, GET, params);
-        return handleServerResponse(responseConversionClass);
+        return handleServerResponse(responseConversionClass, GET, params);
     }
 
     public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
         setupConnection(url, PUT, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
-        return handleServerResponse(responseConversionClass);
+        return handleServerResponse(responseConversionClass, PUT, params);
     }
 
     public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
         setupConnection(url, POST, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
-        return handleServerResponse(responseConversionClass);
+        return handleServerResponse(responseConversionClass, POST, params);
     }
 
     public <T> T put(String url, Object requestObject, RequestParam... params)
@@ -120,7 +123,7 @@ public class RestConnection {
     public <T> T delete(String url, RequestParam... params)
             throws URISyntaxException, IOException, IllegalAccessException {
         setupConnection(url, DELETE, params);
-        return handleServerResponse(null);
+        return handleServerResponse(null, DELETE, params);
     }
 
     public void setRequestBodyHandling(final RequestBodyHandling requestBodyHandling) {
@@ -188,8 +191,8 @@ public class RestConnection {
         }
     }
 
-    private <T> T handleServerResponse(final Class<T> responseConversionClass) throws IOException {
-        String responseText = getResponseText(0);
+    private <T> T handleServerResponse(final Class<T> responseConversionClass, HttpMethodType methodTypes, RequestParam[] params) throws IOException {
+        String responseText = getResponseText(0, methodTypes, params);
         activeConnection.disconnect();
         if (responseText.isEmpty() || responseConversionClass == null) {
             return null;
@@ -212,39 +215,73 @@ public class RestConnection {
         activeConnection.setRequestProperty("Cookie", cookieFileStore.toCookieRequestText(host, useSessionCookies));
     }
 
-    private String getResponseText(int retryCount) throws IOException {
+    private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) throws IOException {
         String responseText = "";
         try {
             responseText = parseResponseText();
             cookieFileStore.addCookiesFromResponse(activeConnection);
         } catch (SSLException e) {
-            exitIfMaxRetriesReached(retryCount, e);
+            String urlText = activeConnection.getURL().toString();
+            log.error("Ssl error for {} {}", activeConnection.getRequestMethod(), urlText);
+            log.error("Error [{}]" ,e.getMessage());
+            askIfSslCertShouldBeSaved();
+            exitIfMaxRetriesReached(retryCount);
 
             ThreadUtils.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
             log.info("");
             log.info("Retrying request {} of {}", ++retryCount, MAX_REQUEST_RETRIES);
-            responseText = getResponseText(retryCount);
-        } catch (UnknownHostException e) {
-            handleNetworkException(e);
-        } catch (SocketException e) {
+            reconnect(methodType, urlText, params);
+            responseText = getResponseText(retryCount, methodType, params);
+        } catch (UnknownHostException | SocketException e) {
             handleNetworkException(e);
         }
         return responseText;
     }
 
-    private void exitIfMaxRetriesReached(int retryCount, SSLException e) {
-        String urlText = activeConnection.getURL().toString();
-        log.error("Ssl error for {} {}", activeConnection.getRequestMethod(), urlText);
-        log.error("Error [{}]" ,e.getMessage());
-        if (retryCount >= MAX_REQUEST_RETRIES) {
-            exitDueToSslExceptions(urlText);
+    private void reconnect(HttpMethodType methodType, String urlText, RequestParam[] params) throws IOException {
+        activeConnection.disconnect();
+        try {
+            setupConnection(urlText, methodType, params);
+        } catch (URISyntaxException use) {
+            throw new IOException(use);
         }
     }
 
-    private void exitDueToSslExceptions(String urlText) {
+    private void askIfSslCertShouldBeSaved() throws IOException {
+        URI uri;
+        try {
+            uri = activeConnection.getURL().toURI();
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        if (workflowCertificateManager == null || workflowCertificateManager.urlAlreadyTrusted(uri)) {
+            log.info("Url {} is already trusted, no need to save cert to local keystore");
+            return;
+        }
+        log.info("Host {} is not trusted, do you want to save the cert for this to the local trust store {}",
+                uri.getHost(), workflowCertificateManager.getKeyStore());
+        log.warn("NB: ONLY save the certificate if you trust the host shown");
+        String response = InputUtils.readValue("Save certificate? [Y/N] ");
+        if ("Y".equalsIgnoreCase(response)) {
+            workflowCertificateManager.saveCertForUri(uri);
+        }
+    }
+
+    private void exitIfMaxRetriesReached(int retryCount) {
+        if (retryCount >= MAX_REQUEST_RETRIES) {
+            try {
+                exitDueToSslExceptions();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void exitDueToSslExceptions() throws URISyntaxException {
+        String url = activeConnection.getURL().toURI().toString();
         log.info("");
         log.info("Still getting ssl errors, can't proceed");
-        if (urlText.contains("reviewboard")) {
+        if (url.contains("reviewboard")) {
             log.info("Sometimes there are one off ssl exceptions with the reviewboard api, try rerunning your workflow");
         }
         System.exit(1);

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestJenkinsApi extends AbstractTestRestApi{
+public class TestJenkinsApi extends BaseTests {
 
     private String jenkinsUsername;
     private Jenkins jenkins;

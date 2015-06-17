@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestJiraApi extends AbstractTestRestApi{
+public class TestJiraApi extends BaseTests {
 
     private static Jira jira;
 

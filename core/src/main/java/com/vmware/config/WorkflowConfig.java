@@ -66,9 +66,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira and review board")
     public String username;
 
-    @ConfigurableProperty(commandLine = "--disable-ssl", help = "Whether SSL certificate checking is disable. Use with caution!")
-    public boolean disableSslCertValidation;
-
     @ConfigurableProperty(commandLine = "-reviewboardUrl,--reviewboard-url", help = "Url for review board server", gitConfigProperty = "reviewboard.url")
     public String reviewboardUrl;
 

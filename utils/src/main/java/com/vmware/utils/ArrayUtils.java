@@ -12,4 +12,12 @@ public class ArrayUtils {
 
         return false;
     }
+
+    public static String[] join(String[] cAliases, String[] jAliases) {
+        int length = cAliases.length + jAliases.length;
+        String[] result = new String[length];
+        System.arraycopy(cAliases, 0, result, 0, cAliases.length);
+        System.arraycopy(jAliases, 0, result, cAliases.length, jAliases.length);
+        return result;
+    }
 }
