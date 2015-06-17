@@ -84,12 +84,12 @@ public class Jenkins extends AbstractRestService {
                 try {
                     JobBuildDetails jobBuildDetails = this.getJobBuildDetails(jobApiUrl);
                     jobBuild.result = jobBuildDetails.building ? JobBuildResult.BUILDING : jobBuildDetails.result;
-                    log.info("Job: {} Result: {}", jobUrl, jobBuild.result.name());
+                    log.info("Job: {} Result: {}", jobUrl, jobBuild.result);
                 } catch (NotFoundException nfe) {
                     log.info("Job {} did not return a job, job might still be in Jenkins queue", jobUrl);
                 }
             } else {
-                log.info("Job: {} Result: {}", jobUrl, jobBuild.result.name());
+                log.info("Job: {} Result: {}", jobUrl, jobBuild.result);
             }
             isSuccess = isSuccess && jobBuild.result == JobBuildResult.SUCCESS;
         }
