@@ -148,7 +148,7 @@ public class Git {
         log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
 
         String forceUpdateString = forceUpdate ? " -f" : "";
-        String pushCommand = String.format("git push origin %s:%s%s --porcelain", currentHeadRef, remoteBranch, forceUpdateString);
+        String pushCommand = String.format("git push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
 
         String pushOutput = executeGitCommand(pushCommand, true);
 
