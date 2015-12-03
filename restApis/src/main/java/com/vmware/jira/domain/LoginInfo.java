@@ -15,7 +15,7 @@ public class LoginInfo {
     public String cookie;
 
     public LoginInfo(UsernamePasswordCredentials credentials) {
-        this.usernane = credentials.getUserName();
+        this.usernane = credentials.getUsername();
         this.password = credentials.getPassword();
         this.cookie = "true";
     }

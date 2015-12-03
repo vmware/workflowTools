@@ -84,6 +84,24 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-jiraUrl,--jira-url", help = "Url for jira server")
     public String jiraUrl;
 
+    @ConfigurableProperty(commandLine = "-jiraTestIssue,--jira-test-issue", help = "Issue key to fetch to test user is logged in")
+    public String jiraTestIssue;
+
+    @ConfigurableProperty(commandLine = "-disableJira,--disable-jira", help = "Don't use Jira when checking bug numbers")
+    public boolean disableJira;
+
+    @ConfigurableProperty(commandLine = "-bugzillaUrl,--bugzilla-url", help = "Url for Bugzilla server")
+    public String bugzillaUrl;
+
+    @ConfigurableProperty(commandLine = "-bugzillaTestBug,--bugzilla-test-bug", help = "Bug number to fetch to test user is logged in")
+    public int bugzillaTestBug;
+
+    @ConfigurableProperty(commandLine = "-disableBugzilla,--disable-bugzilla", help = "Don't use Bugzilla when checking bug numbers")
+    public boolean disableBugzilla;
+
+    @ConfigurableProperty(commandLine = "-bugzillaQuery,--bugzilla-query", help = "Named query in bugzilla to execute for loading assigned bugs")
+    public String bugzillaQuery;
+
     @ConfigurableProperty(commandLine = "-trelloUrl,--trello-url", help = "Url for trello server")
     public String trelloUrl;
 
@@ -379,9 +397,28 @@ public class WorkflowConfig {
         return jenkinsJobs != null ? jenkinsJobs.get(jenkinsJobKey) : null;
     }
 
-    public boolean isBugzillaBug(String bugNumber) {
-        return StringUtils.isNotBlank(bugzillaPrefix)
+    public Integer parseBugzillaBugNumber(String bugNumber) {
+        if (StringUtils.isInteger(bugNumber)) {
+            return Integer.parseInt(bugNumber);
+        }
+
+        boolean prefixMatches = StringUtils.isNotBlank(bugzillaPrefix)
                 && bugNumber.toUpperCase().startsWith(bugzillaPrefix.toUpperCase());
+        if (!prefixMatches) {
+            return null;
+        }
+
+        int lengthToStrip = bugzillaPrefix.length();
+        if (bugNumber.toUpperCase().startsWith(bugzillaPrefix.toUpperCase() + "-")) {
+            lengthToStrip++;
+        }
+
+        String numberPart = bugNumber.substring(lengthToStrip);
+        if (StringUtils.isInteger(numberPart)) {
+            return Integer.parseInt(numberPart);
+        } else {
+            return null;
+        }
     }
 
     private void setFieldValue(Field field, String value, String source) throws IllegalAccessException {

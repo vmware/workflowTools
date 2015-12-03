@@ -1,7 +1,9 @@
 package com.vmware.action.batch;
 
 import com.vmware.AbstractRestService;
+import com.vmware.AbstractService;
 import com.vmware.action.AbstractAction;
+import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
@@ -23,12 +25,13 @@ public class AuthenticateAllApis extends AbstractAction{
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
         checkAuthentication(new Trello(config.trelloUrl));
-        checkAuthentication(new Jira(config.jiraUrl));
+        checkAuthentication(new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug));
+        checkAuthentication(new Jira(config.jiraUrl, config.jiraTestIssue));
         checkAuthentication(new ReviewBoard(config.reviewboardUrl, config.username));
         checkAuthentication(new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin));
     }
 
-    private void checkAuthentication(AbstractRestService restService) throws IOException, URISyntaxException, IllegalAccessException {
+    private void checkAuthentication(AbstractService restService) throws IOException, URISyntaxException, IllegalAccessException {
         String serviceName = restService.getClass().getSimpleName();
         log.info("Checking authentication for service {}", serviceName);
         restService.setupAuthenticatedConnection();

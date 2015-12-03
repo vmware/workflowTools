@@ -1,5 +1,6 @@
 package com.vmware;
 
+import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
@@ -17,20 +18,32 @@ public class ServiceLocator {
 
     private static Jira jira;
 
+    private static Bugzilla bugzilla;
+
     private static ReviewBoard reviewBoard;
 
     private static Jenkins jenkins;
 
     private static Trello trello;
 
-    public static Jira getJira(String jiraUrl, boolean setupAuthenticatedConnection) throws IllegalAccessException, IOException, URISyntaxException {
+    public static Jira getJira(String jiraUrl, String testIssueKey, boolean setupAuthenticatedConnection) throws IllegalAccessException, IOException, URISyntaxException {
         if (jira == null) {
-            jira = new Jira(jiraUrl);
+            jira = new Jira(jiraUrl, testIssueKey);
         }
         if (setupAuthenticatedConnection) {
             jira.setupAuthenticatedConnection();
         }
         return jira;
+    }
+
+    public static Bugzilla getBugzilla(String bugzillaUrl, String username, int testBugNumber, boolean setupAuthenticatedConnection) throws IllegalAccessException, IOException, URISyntaxException {
+        if (bugzilla == null) {
+            bugzilla = new Bugzilla(bugzillaUrl, username, testBugNumber);
+        }
+        if (setupAuthenticatedConnection) {
+            bugzilla.setupAuthenticatedConnection();
+        }
+        return bugzilla;
     }
 
     public static ReviewBoard getReviewBoard(String reviewboardUrl, String username, String reviewBoardDateFormat) throws IOException, URISyntaxException, IllegalAccessException {

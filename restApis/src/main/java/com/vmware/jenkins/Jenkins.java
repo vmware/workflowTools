@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.rest.cookie.ApiAuthentication.*;
+
 public class Jenkins extends AbstractRestService {
 
     private final boolean usesCsrf;
@@ -35,13 +37,13 @@ public class Jenkins extends AbstractRestService {
 
     public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin)
             throws IOException, URISyntaxException, IllegalAccessException {
-        super(serverUrl, "api/json", ApiAuthentication.jenkins, username);
+        super(serverUrl, "api/json", jenkins, username);
         this.configureUrl = baseUrl + "me/configure";
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
         connection = new RestConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
 
-        String apiToken = readExistingApiToken();
+        String apiToken = readExistingApiToken(credentialsType);
         if (apiToken != null) {
             connection.setupBasicAuthHeader(new UsernamePasswordCredentials(username, apiToken));
         }
@@ -107,12 +109,12 @@ public class Jenkins extends AbstractRestService {
             return;
         }
         String apiToken = scrapeUIForToken();
-        saveApiToken(apiToken);
+        saveApiToken(apiToken, credentialsType);
     }
 
     @Override
     protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.jenkins);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType);
         connection.setupBasicAuthHeader(credentials);
     }
 

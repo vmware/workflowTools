@@ -67,6 +67,7 @@ public class Workflow {
     private static List<String> workflowHistory;
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("jsse.enableSNIExtension", "false");
         LogManager.getLogManager().reset();
         gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
 

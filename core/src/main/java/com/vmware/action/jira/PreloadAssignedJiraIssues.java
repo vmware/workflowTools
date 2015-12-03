@@ -5,17 +5,21 @@ import com.vmware.ServiceLocator;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
+import com.vmware.jira.domain.Issue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 @ActionDescription("Preloads the list of assigned jira issues. Loads asynchronously so that the list is already available when editing the bug number")
-public class PreloadAssignedIssues extends AbstractCommitAction {
+public class PreloadAssignedJiraIssues extends AbstractCommitAction {
 
     private Jira jira;
 
-    public PreloadAssignedIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public PreloadAssignedJiraIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
     }
 
@@ -25,17 +29,13 @@ public class PreloadAssignedIssues extends AbstractCommitAction {
             @Override
             public void run() {
                 try {
-                    jira = ServiceLocator.getJira(config.jiraUrl, false);
+                    jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, false);
                     if (jira.isConnectionAuthenticated()) {
                         draft.isPreloadingJiraIssues = true;
-                        draft.openIssues = jira.getOpenTasksForUser(config.username).issues;
+                        draft.addIssues(jira.getOpenTasksForUser(config.username).issues);
                         draft.isPreloadingJiraIssues = false;
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
+                } catch (IOException | URISyntaxException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }

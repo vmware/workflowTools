@@ -3,6 +3,7 @@ package com.vmware.action.commitInfo;
 import com.vmware.IssueInfo;
 import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitReadAction;
+import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @ActionDescription("Sets the bug number. A list of assigned jira bugs and tasks is shown for easy selection. Bug number can also be manually entered.")
@@ -28,7 +30,9 @@ public class SetBugNumbers extends AbstractCommitReadAction {
 
     private static Logger log = LoggerFactory.getLogger(SetBugNumbers.class.getName());
 
-    private Jira jira;
+    private Jira jira = null;
+
+    private Bugzilla bugzilla = null;
 
     public SetBugNumbers(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException, NoSuchFieldException {
         super(config, "bugNumbers");
@@ -36,13 +40,17 @@ public class SetBugNumbers extends AbstractCommitReadAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, false);
+        if (!config.disableJira) {
+            this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, false);
+        }
+        if (!config.disableBugzilla) {
+            this.bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, false);
+        }
     }
-
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException {
-        loadJiraIssuesList(draft);
+        loadIssuesList(draft);
         printIssuesList(draft.openIssues);
         boolean waitingForBugNumbers = true;
         List<IssueInfo> issues = null;
@@ -67,35 +75,49 @@ public class SetBugNumbers extends AbstractCommitReadAction {
         log.info("Bug numbers for commit: {}", draft.bugNumbers);
     }
 
-    private void loadJiraIssuesList(ReviewRequestDraft draft) throws IOException, URISyntaxException, IllegalAccessException {
-        if (!draft.isPreloadingJiraIssues && draft.openIssues == null) {
-            jira.setupAuthenticatedConnection();
-            draft.openIssues = jira.getOpenTasksForUser(config.username).issues;
+    private void loadIssuesList(ReviewRequestDraft draft) throws IOException, URISyntaxException, IllegalAccessException {
+        if (jira == null && bugzilla == null) {
+            log.info("Both Jira and Bugzilla are disabled, no issues can be loaded");
+            draft.openIssues = new ArrayList<>();
+            return;
+        }
+
+        if (!draft.isPreloadingJiraIssues && !draft.isPreloadingBugzillaBugs && draft.openIssues == null) {
+            if (jira != null) {
+                jira.setupAuthenticatedConnection();
+                draft.addIssues( jira.getOpenTasksForUser(config.username).issues);
+            }
+            if (bugzilla != null) {
+                bugzilla.setupAuthenticatedConnection();
+                draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
+            }
         } else if (draft.openIssues == null) {
-            log.info("Jira issue list not loaded yet, waiting 3 seconds");
+            log.info("Jira / Bugzilla lists not loaded yet, waiting 3 seconds");
             ThreadUtils.sleep(3000);
             if (draft.openIssues == null) {
-                log.info("Failed to load jira issues");
-                draft.openIssues = new Issue[0];
+                log.info("Failed to load Jira / Bugzilla items, Jira in progress {}, Bugzilla in progress",
+                        draft.isPreloadingJiraIssues, draft.isPreloadingBugzillaBugs);
+                draft.openIssues = new ArrayList<>();
             }
         }
     }
 
-    private void printIssuesList(IssueInfo[] issues) {
-        if (issues.length > 0) {
-            log.info("Assigned Jira Tasks, list number can be entered as shorthand for bug number\ne.g. 1 for " + issues[0].getKey());
+    private void printIssuesList(Collection<IssueInfo> issues) {
+        if (issues.size() > 0) {
+            IssueInfo firstIssue = issues.iterator().next();
+            log.info("Assigned Jira Tasks, list number can be entered as shorthand for bug number\ne.g. 1 for " + firstIssue.getKey());
             log.info("Alternatively, enter the full bug number (assuming bug starts with {} if only numeric part entered)", config.bugPrefix);
             log.info("");
-            for (int i = 0; i < issues.length; i ++) {
-                IssueInfo issue = issues[i];
-                log.info("[{}] {}: {}", (i + 1), issue.getKey(), issue.getSummary());
+            int counter = 0;
+            for (IssueInfo issue : issues) {
+                log.info("[{}] {}: {}", ++counter, issue.getKey(), issue.getSummary());
             }
         } else {
             log.info("Assuming bug starts with {} if only numeric part entered", config.bugPrefix);
         }
     }
 
-    private List<IssueInfo> getJiraIssues(String bugNumberText, IssueInfo[] preloadedIssues) throws IOException, URISyntaxException {
+    private List<IssueInfo> getJiraIssues(String bugNumberText, List<IssueInfo> preloadedIssues) throws IOException, URISyntaxException {
         if (bugNumberText == null || bugNumberText.isEmpty()) {
             bugNumberText = config.noBugNumberLabel;
         }
@@ -116,26 +138,26 @@ public class SetBugNumbers extends AbstractCommitReadAction {
         return issues;
     }
 
-    private IssueInfo getIssues(IssueInfo[] preloadedIssues, String bugNumber) throws IOException, URISyntaxException {
+    private IssueInfo getIssues(List<IssueInfo> preloadedIssues, String bugNumber) throws IOException, URISyntaxException {
         if (bugNumber.equals(config.noBugNumberLabel)) {
             return Issue.noBugNumber;
-        }
-        if (config.isBugzillaBug(bugNumber)) {
-            return Bug.aBug(config.bugzillaPrefix, bugNumber);
         } else if (StringUtils.isInteger(bugNumber)) {
             int number = Integer.parseInt(bugNumber);
-            if (number <= preloadedIssues.length) {
-                return preloadedIssues[number-1];
+            if (number <= preloadedIssues.size()) {
+                return preloadedIssues.get(number - 1);
             }
             bugNumber = config.bugPrefix + "-" + bugNumber;
         }
-        // test that bug number is a valid jira issue
-        try {
-            return jira.getIssueByKey(bugNumber);
-        } catch (NotFoundException e) {
-            log.debug(e.getMessage(), e);
-            return Issue.aNotFoundIssue(bugNumber);
+        // test that bug number is a valid jira issue or bugzilla bug
+        IssueInfo issueInfo = Issue.aNotFoundIssue(bugNumber);
+        Integer bugzillaBugNumber = config.parseBugzillaBugNumber(bugNumber);
+        if (bugzilla != null && bugzillaBugNumber != null) {
+            issueInfo = bugzilla.getBugById(bugzillaBugNumber);
         }
+        if (issueInfo.isNotFound() && jira != null) {
+            issueInfo = jira.getIssueWithoutException(bugNumber);
+        }
+        return issueInfo;
     }
 
     private boolean allIssuesWereFound(List<IssueInfo> issues) {
