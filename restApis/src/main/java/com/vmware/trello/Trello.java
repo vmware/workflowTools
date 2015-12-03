@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.rest.cookie.ApiAuthentication.trello;
 import static com.vmware.rest.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
 
 public class Trello extends AbstractRestService {
@@ -42,12 +43,12 @@ public class Trello extends AbstractRestService {
     private List<UrlParam> authQueryParams;
 
     public Trello(String trelloUrl) throws IOException, URISyntaxException, IllegalAccessException {
-        super(createApiUrl(trelloUrl), "1/", ApiAuthentication.trello, null);
+        super(createApiUrl(trelloUrl), "1/", trello, null);
         webUrl = UrlUtils.addTrailingSlash(trelloUrl);
         this.loginUrl = webUrl + "authenticate";
         this.connection = new RestConnection(RequestBodyHandling.AsStringJsonEntity);
 
-        String apiToken = readExistingApiToken();
+        String apiToken = readExistingApiToken(credentialsType);
 
         connection.addStatefulParams(UrlUtils.parseParamsFromText(apiToken));
     }
@@ -116,7 +117,7 @@ public class Trello extends AbstractRestService {
     @Override
     protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
         connection.clearStatefulParams();
-        UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(ApiAuthentication.trello);
+        UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
         connection.post(loginUrl, new LoginInfo(credentials), new RequestHeader("Referer", "https://trello.com/login"));
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
@@ -128,7 +129,7 @@ public class Trello extends AbstractRestService {
 
         connection.addStatefulParams(authQueryParams);
 
-        saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"));
+        saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello);
     }
 
     private List<UrlParam> scrapeAuthInfoFromUI(String apiTokenPage) throws IOException, URISyntaxException, IllegalAccessException {

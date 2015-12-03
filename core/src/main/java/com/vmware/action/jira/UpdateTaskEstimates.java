@@ -26,7 +26,7 @@ public class UpdateTaskEstimates extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, true);
+        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
     }
 
     @Override

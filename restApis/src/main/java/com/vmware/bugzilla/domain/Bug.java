@@ -3,6 +3,8 @@ package com.vmware.bugzilla.domain;
 import com.vmware.IssueInfo;
 import com.vmware.utils.StringUtils;
 
+import java.util.Map;
+
 /**
  * Represents a bug in Bugzilla.
  */
@@ -16,6 +18,11 @@ public class Bug implements IssueInfo {
         this.key = key;
     }
 
+    public Bug(Map values) {
+        this.key =  String.valueOf(values.get("bug_id"));
+        this.summary = (String) values.get("short_desc");
+    }
+
     @Override
     public String getKey() {
         return key;
@@ -23,7 +30,7 @@ public class Bug implements IssueInfo {
 
     @Override
     public String getSummary() {
-        return "Bugzilla bug retrieval not yet supported";
+        return summary;
     }
 
     @Override
@@ -54,17 +61,4 @@ public class Bug implements IssueInfo {
         return true;
     }
 
-    public static Bug aBug(String prefix, String bugNumber) {
-        int lengthToStrip = prefix.length();
-        if (bugNumber.toUpperCase().startsWith(prefix.toUpperCase() + "-")) {
-            lengthToStrip++;
-        }
-
-        String numberPart = bugNumber.substring(lengthToStrip);
-        if (StringUtils.isInteger(numberPart)) {
-            return new Bug(numberPart);
-        } else {
-            return new Bug(bugNumber);
-        }
-    }
 }

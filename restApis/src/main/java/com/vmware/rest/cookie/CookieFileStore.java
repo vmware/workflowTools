@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -88,7 +89,7 @@ public class CookieFileStore {
         }
     }
 
-    public void addCookiesFromResponse(HttpURLConnection connection) throws IOException {
+    public void addCookiesFromResponse(URLConnection connection) throws IOException {
         String key;
         for (int i = 1; (key = connection.getHeaderFieldKey(i)) != null; i++) {
             if (!key.equals("Set-Cookie")) {

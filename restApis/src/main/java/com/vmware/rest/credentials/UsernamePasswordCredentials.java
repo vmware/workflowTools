@@ -5,25 +5,36 @@
  */
 package com.vmware.rest.credentials;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UsernamePasswordCredentials {
-    private String userName;
+    private String username;
     private String password;
 
     public UsernamePasswordCredentials(String username, String password) {
-        this.userName = username;
+        this.username = username;
         this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public Map<String, String> toBugzillaLogin() {
+        Map<String, String> values = new HashMap<>();
+        values.put("login", username);
+        values.put("password", password);
+        values.put("rememberlogin", "Bugzilla_remember");
+        return values;
+    }
+
     @Override
     public String toString() {
-        return userName + ":" + password;
+        return username + ":" + password;
     }
 }

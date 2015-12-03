@@ -15,6 +15,7 @@ import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.rest.SslUtils;
 import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.json.NumericalEnum;
 import com.vmware.rest.RestConnection;
 import com.vmware.rest.request.UrlParam;
@@ -47,14 +48,16 @@ public class Jira extends AbstractRestService {
     private String searchUrl;
     private String legacyApiUrl;
     private String greenhopperUrl;
+    private String testIssueKey;
 
-    public Jira(String jiraUrl) throws IOException, URISyntaxException, IllegalAccessException {
+    public Jira(String jiraUrl, String testIssueKey) throws IOException, URISyntaxException, IllegalAccessException {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, null);
         this.connection = new RestConnection(RequestBodyHandling.AsStringJsonEntity);
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";
         this.greenhopperUrl = baseUrl + "rest/greenhopper/1.0/";
+        this.testIssueKey = testIssueKey;
     }
 
     public List<MenuItem> getRecentBoardItems() throws IOException, URISyntaxException {
@@ -82,6 +85,15 @@ public class Jira extends AbstractRestService {
 
     public Issue getIssueByKey(String key) throws IOException, URISyntaxException {
         return connection.get(urlBaseForKey(key), Issue.class);
+    }
+
+    public Issue getIssueWithoutException(String key) throws IOException, URISyntaxException {
+        try {
+            return getIssueByKey(key);
+        } catch (NotFoundException e) {
+            log.debug(e.getMessage(), e);
+            return Issue.aNotFoundIssue(key);
+        }
     }
 
     public IssuesResponse searchForIssues(SearchRequest searchRequest) throws IllegalAccessException, IOException, URISyntaxException {
@@ -154,7 +166,7 @@ public class Jira extends AbstractRestService {
 
     @Override
     protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
-        connection.get(apiUrl + "issue/HW-1001/editmeta",null);
+        connection.get(apiUrl + "issue/" + testIssueKey + "/editmeta",null);
         if (!connection.hasCookie(jira)) {
             log.warn("Cookie {} should have been retrieved from jira login!", jira.getCookieName());
         }

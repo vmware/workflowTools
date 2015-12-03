@@ -1,19 +1,27 @@
 {
+  "PreloadAssignedJiraIssues": [
+    "--username",
+    "--jira-test-issue",
+    "--jira-url"
+  ],
   "AbstractBatchJiraAction": [
+    "--jira-test-issue",
     "--jira-url"
   ],
   "ReadLastCommit": [
     "--branch"
-  ],
-  "PreloadAssignedIssues": [
-    "--username",
-    "--jira-url"
   ],
   "CreateReviewIfNeeded": [
     "--review-board-repo",
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
+  ],
+  "PreloadAssignedBugzillaBugs": [
+    "--bugzilla-query",
+    "--bugzilla-test-bug",
+    "--username",
+    "--bugzilla-url"
   ],
   "AbstractCommitWithReviewAction": [
     "--review-board-date-format",
@@ -31,10 +39,15 @@
     "--reviewboard-url"
   ],
   "SetBugNumbers": [
-    "--bugzilla-prefix",
     "--bug-prefix",
+    "--bugzilla-query",
+    "--bugzilla-test-bug",
     "--username",
-    "--jira-url"
+    "--bugzilla-url",
+    "--disable-bugzilla",
+    "--jira-test-issue",
+    "--jira-url",
+    "--disable-jira"
   ],
   "SyncCardsWithJiraIssues": [
     "--jira-url",
@@ -89,6 +102,7 @@
   "UpdateTaskEstimates": [
     "--username",
     "--estimate",
+    "--jira-test-issue",
     "--jira-url"
   ],
   "AbortJenkinsJobs": [
@@ -138,9 +152,12 @@
     "--disable-jenkins-login",
     "--jenkins-uses-csrf",
     "--jenkins-url",
-    "--username",
     "--reviewboard-url",
+    "--jira-test-issue",
     "--jira-url",
+    "--bugzilla-test-bug",
+    "--username",
+    "--bugzilla-url",
     "--trello-url"
   ],
   "AbstractReadMultiLine": [
@@ -154,6 +171,7 @@
   ],
   "AbstractTransitionJiraIssue": [
     "--username",
+    "--jira-test-issue",
     "--jira-url"
   ],
   "SetSummary": [

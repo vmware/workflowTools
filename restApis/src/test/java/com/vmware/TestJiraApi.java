@@ -38,7 +38,7 @@ public class TestJiraApi extends BaseTests {
     public static void createIssue() throws IllegalAccessException, IOException, URISyntaxException {
         jiraUsername = testProperties.getProperty("jira.username");
         String jiraUrl = testProperties.getProperty("jira.url");
-        jira = new Jira(jiraUrl);
+        jira = new Jira(jiraUrl, "HW-1001");
         jira.setupAuthenticatedConnection();
         Issue issueToCreate = new Issue(IssueTypeDefinition.Story, "HW", "Build and Infrastructure",
                 "Test Issue", "Test Description", "Test criteria");

@@ -1,6 +1,7 @@
 package com.vmware.reviewboard.domain;
 
 import com.vmware.IssueInfo;
+import com.vmware.bugzilla.domain.Bug;
 import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.JobBuildResult;
 import com.vmware.jira.domain.Issue;
@@ -64,10 +65,13 @@ public class ReviewRequestDraft extends BaseEntity{
     public boolean hasFileChanges;
 
     @Expose(serialize = false, deserialize = false)
-    public IssueInfo[] openIssues = null;
+    public List<IssueInfo> openIssues = null;
 
     @Expose(serialize = false, deserialize = false)
     public boolean isPreloadingJiraIssues;
+
+    @Expose(serialize = false, deserialize = false)
+    public boolean isPreloadingBugzillaBugs;
 
     public ReviewRequestDraft() {}
 
@@ -105,6 +109,30 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds = generateJobBuildsList(testingDoneSection, jenkinsUrl);
         this.bugNumbers = parseBugNumber(commitText, commitConfiguration.generateBugNumberPattern());
         this.reviewedBy = parseReviewedBy(commitText, commitConfiguration.generateReviewedByPattern());
+    }
+
+    public void addIssues(Issue[] issuesToAdd) {
+        if (openIssues == null) {
+            openIssues = new ArrayList<>();
+        }
+        for (Issue issueToAdd : issuesToAdd) {
+            addOpenIssueInfo(issueToAdd);
+        }
+    }
+
+    public void addBugs(List<Bug> bugsToAdd) {
+        if (openIssues == null) {
+            openIssues = new ArrayList<>();
+        }
+        for (Bug bugToAdd : bugsToAdd) {
+            addOpenIssueInfo(bugToAdd);
+        }
+    }
+
+    public void addOpenIssueInfo(IssueInfo issueInfo) {
+        if (!openIssues.contains(issueInfo)) {
+            openIssues.add(issueInfo);
+        }
     }
 
     public boolean hasReviewNumber() {

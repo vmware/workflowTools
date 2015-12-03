@@ -40,7 +40,7 @@ public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, true);
+        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
     }
 
     @Override
@@ -55,7 +55,7 @@ public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
     private void transitionIssue(String bugNumber) throws IOException, URISyntaxException, IllegalAccessException {
         IssueStatusDefinition lastStatusToTransitionTo = toStatuses[toStatuses.length - 1];
 
-        if (StringUtils.isInteger(bugNumber) || config.isBugzillaBug(bugNumber)) {
+        if (config.parseBugzillaBugNumber(bugNumber) != null) {
             log.info("Bug number {} appears to be a bugzilla bug, can't transition to {}",
                     lastStatusToTransitionTo.name());
             return;

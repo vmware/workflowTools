@@ -304,6 +304,7 @@ public class RestConnection {
         } else {
             responseText = IOUtils.read(activeConnection.getErrorStream());
         }
+        log.trace("Response\n{}", responseText);
         ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, responseText);
         return responseText;
     }

@@ -9,7 +9,7 @@ public class LoginInfo {
     public String password;
 
     public LoginInfo(UsernamePasswordCredentials credentials) {
-        this.username = credentials.getUserName();
+        this.username = credentials.getUsername();
         this.password = credentials.getPassword();
     }
 }

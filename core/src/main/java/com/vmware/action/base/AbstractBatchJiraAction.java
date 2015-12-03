@@ -17,6 +17,6 @@ public abstract class AbstractBatchJiraAction extends AbstractBatchIssuesAction 
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, true);
+        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
     }
 }
