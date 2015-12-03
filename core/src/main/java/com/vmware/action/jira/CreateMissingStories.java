@@ -36,7 +36,7 @@ public class CreateMissingStories extends AbstractBatchJiraAction {
         Issue issueToBaseProjectAndComponentOff = getBaselineIssue();
 
         String componentsText = issueToBaseProjectAndComponentOff.fields.getComponentsText();
-        log.info("Selected first existing issue {} as baseline issue", issueToBaseProjectAndComponentOff.key);
+        log.info("Selected first existing issue {} as baseline issue", issueToBaseProjectAndComponentOff.getKey());
         log.info("Derived project name {} and components {} from issue",
                 issueToBaseProjectAndComponentOff.fields.project.name, componentsText);
 
@@ -46,10 +46,10 @@ public class CreateMissingStories extends AbstractBatchJiraAction {
             potentialIssueToCreate.fields.components = issueToBaseProjectAndComponentOff.fields.components;
 
             Issue createdIssue = jira.createIssue(potentialIssueToCreate);
-            potentialIssueToCreate.key = createdIssue.key;
+            potentialIssueToCreate.setKey(createdIssue.getKey());
             potentialIssueToCreate.id = createdIssue.id;
             log.info("Created issue with key {} for new trello story {}",
-                    createdIssue.key, potentialIssueToCreate.fields.summary);
+                    createdIssue.getKey(), potentialIssueToCreate.fields.summary);
         }
     }
 
@@ -59,6 +59,6 @@ public class CreateMissingStories extends AbstractBatchJiraAction {
             throw new IllegalArgumentException("Expected to find issue in list that was already in Jira!");
         }
         Issue issueToUse = issuesFromJira.get(0);
-        return jira.getIssueByKey(issueToUse.key);
+        return jira.getIssueByKey(issueToUse.getKey());
     }
 }

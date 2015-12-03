@@ -40,14 +40,14 @@ public class UpdateTaskEstimates extends AbstractAction {
         log.info("Checking {}", title);
         for (Issue task : tasks.issues) {
             log.info("");
-            log.info("Checking issue {} ({})", task.key, task.fields.summary);
+            log.info("Checking issue {} ({})", task.getKey(), task.fields.summary);
             if (task.fields.originalEstimateInSeconds > 0) {
                 log.info("Issue already has an estimate value of {} hour(s) so skipping",
                         HOURS.convert(task.fields.originalEstimateInSeconds, SECONDS));
                 continue;
             }
             log.info("Updating issue's original estimate to {} hour(s)", config.jiraTaskEstimateInHours);
-            jira.updateIssueEstimate(task.key, config.jiraTaskEstimateInHours);
+            jira.updateIssueEstimate(task.getKey(), config.jiraTaskEstimateInHours);
             log.info("Successfully updated jira issue");
         }
         log.info("");

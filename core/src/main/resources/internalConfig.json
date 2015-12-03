@@ -21,6 +21,7 @@
     1,2,3,5,8,13
   ],
   "bugPrefix": "HW",
+  "bugzillaPrefix": "BZ",
   "topicTemplates": [
       "Server", "Testing", "UI"
   ],

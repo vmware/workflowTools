@@ -1,5 +1,6 @@
 package com.vmware.reviewboard.domain;
 
+import com.vmware.IssueInfo;
 import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.JobBuildResult;
 import com.vmware.jira.domain.Issue;
@@ -44,9 +45,9 @@ public class ReviewRequestDraft extends BaseEntity{
     @Expose(deserialize = false)
     public String target_groups = "";
     @Expose(serialize = false, deserialize = false)
-    public List<JobBuild> jobBuilds = new ArrayList<JobBuild>();
+    public List<JobBuild> jobBuilds = new ArrayList<>();
     @Expose(serialize = false, deserialize = false)
-    public List<Issue> jiraIssues = new ArrayList<Issue>();
+    public List<IssueInfo> issues = new ArrayList<>();
     public String branch = "";
 
     /**
@@ -63,7 +64,7 @@ public class ReviewRequestDraft extends BaseEntity{
     public boolean hasFileChanges;
 
     @Expose(serialize = false, deserialize = false)
-    public Issue[] openJiraIssues = null;
+    public IssueInfo[] openIssues = null;
 
     @Expose(serialize = false, deserialize = false)
     public boolean isPreloadingJiraIssues;
@@ -162,23 +163,23 @@ public class ReviewRequestDraft extends BaseEntity{
         return jobBuilds;
     }
 
-    public void setJiraIssues(List<Issue> jiraIssues, String noBugNumberLabel) {
-        this.jiraIssues.clear();
-        this.jiraIssues.addAll(jiraIssues);
+    public void setIssues(List<IssueInfo> issues, String noBugNumberLabel) {
+        this.issues.clear();
+        this.issues.addAll(issues);
 
         this.bugNumbers = "";
-        for (Issue issue : jiraIssues) {
+        for (IssueInfo issue : issues) {
             if (issue == Issue.noBugNumber) {
                 bugNumbers = appendCsvValue(bugNumbers, noBugNumberLabel);
             } else {
-                bugNumbers = appendCsvValue(bugNumbers, issue.key);
+                bugNumbers = appendCsvValue(bugNumbers, issue.getKey());
             }
         }
     }
 
-    public Issue getIssueForBugNumber(String bugNumber) {
-        for (Issue issue : jiraIssues) {
-            if (issue.key.equals(bugNumber)) {
+    public IssueInfo getIssueForBugNumber(String bugNumber) {
+        for (IssueInfo issue : issues) {
+            if (issue.getKey().equals(bugNumber)) {
                 return issue;
             }
         }

@@ -36,17 +36,17 @@ public class UpdateStoryPointsOnly extends AbstractBatchJiraAction {
             try {
                 Number updatedPointsValue = issueToUpdate.fields.storyPoints;
                 String pointsDisplayValue = updatedPointsValue != null ? String.valueOf(updatedPointsValue) : "no";
-                Issue existingIssue = jira.getIssueByKey(issueToUpdate.key);
+                Issue existingIssue = jira.getIssueByKey(issueToUpdate.getKey());
                 if (existingIssue.fields.storyPointsEqual(updatedPointsValue)) {
                     log.info("Issue {} is already set at {} story points, no need to update"
-                            , issueToUpdate.key, pointsDisplayValue);
+                            , issueToUpdate.getKey(), pointsDisplayValue);
                     continue;
                 }
                 jira.updateIssueStoryPointsOnly(issueToUpdate);
-                log.debug("Updated story points to {} for issue {}", pointsDisplayValue, issueToUpdate.key);
+                log.debug("Updated story points to {} for issue {}", pointsDisplayValue, issueToUpdate.getKey());
             } catch (NotFoundException e) {
                 // ignore if the issue does not exist anymore in JIRA
-                log.info("Ignoring missing issue '{}'", issueToUpdate.key);
+                log.info("Ignoring missing issue '{}'", issueToUpdate.getKey());
             }
         }
     }

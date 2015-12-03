@@ -89,7 +89,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
     private Issue findIssueByKey(List<Issue> issues, String key) {
         for (Issue issue : issues) {
-            if (issue.key.equals(key)) {
+            if (issue.getKey().equals(key)) {
                 return issue;
             }
         }
@@ -116,7 +116,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
             Card cardToAdd = new Card(swimlaneToUse, issueToAdd, config.jiraUrl);
 
-            log.debug("Adding card for issue {} to swimlane {}", issueToAdd.key, swimlaneToUse.name);
+            log.debug("Adding card for issue {} to swimlane {}", issueToAdd.getKey(), swimlaneToUse.name);
             trello.createCard(cardToAdd);
         }
     }

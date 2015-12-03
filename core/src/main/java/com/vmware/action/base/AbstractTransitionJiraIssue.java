@@ -1,5 +1,6 @@
 package com.vmware.action.base;
 
+import com.vmware.IssueInfo;
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
@@ -8,6 +9,7 @@ import com.vmware.jira.domain.IssueFields;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransitions;
 import com.vmware.jira.domain.JiraUser;
+import com.vmware.utils.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -51,11 +53,22 @@ public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
     }
 
     private void transitionIssue(String bugNumber) throws IOException, URISyntaxException, IllegalAccessException {
-        Issue issue = draft.getIssueForBugNumber(bugNumber);
+        IssueStatusDefinition lastStatusToTransitionTo = toStatuses[toStatuses.length - 1];
+
+        if (StringUtils.isInteger(bugNumber) || config.isBugzillaBug(bugNumber)) {
+            log.info("Bug number {} appears to be a bugzilla bug, can't transition to {}",
+                    lastStatusToTransitionTo.name());
+            return;
+        }
+        IssueInfo issue = draft.getIssueForBugNumber(bugNumber);
+        if (issue != null && !(issue instanceof Issue)) {
+            log.info("Issue is not a jira issue, can't transition issue of type {}", issue.getClass().getSimpleName());
+            return;
+        }
         if (issue == null || !issue.isReal()) {
             issue = jira.getIssueByKey(bugNumber);
         }
-        IssueFields issueFields = issue.fields;
+        IssueFields issueFields = ((Issue)issue).fields;
 
         JiraUser assignee = issueFields.assignee;
 
@@ -65,7 +78,6 @@ public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
             return;
         }
 
-        IssueStatusDefinition lastStatusToTransitionTo = toStatuses[toStatuses.length - 1];
         if (issueFields.status.def.equals(lastStatusToTransitionTo)) {
             log.info("No need to transition jira issue {} to {} as it is already {}", bugNumber,
                     lastStatusToTransitionTo.name(), issueFields.status.def.name());

@@ -135,6 +135,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-prefix,--bug-prefix", help = "Bug prefix to prepend to bug numbers that don't contain a prefix")
     public String bugPrefix;
 
+    @ConfigurableProperty(commandLine = "-bugzillaPrefix,--bugzilla-prefix", help = "Represents a bug in bugzilla, only the number part will be stored")
+    public String bugzillaPrefix;
+
     @ConfigurableProperty(commandLine = "-t,--trace", help = "Sets log level to FINEST level aka trace")
     public boolean traceLogLevel;
 
@@ -374,6 +377,11 @@ public class WorkflowConfig {
 
     public String getJenkinsJobValue(String jenkinsJobKey) {
         return jenkinsJobs != null ? jenkinsJobs.get(jenkinsJobKey) : null;
+    }
+
+    public boolean isBugzillaBug(String bugNumber) {
+        return StringUtils.isNotBlank(bugzillaPrefix)
+                && bugNumber.toUpperCase().startsWith(bugzillaPrefix.toUpperCase());
     }
 
     private void setFieldValue(Field field, String value, String source) throws IllegalAccessException {

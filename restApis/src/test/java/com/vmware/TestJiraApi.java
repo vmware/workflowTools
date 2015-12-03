@@ -45,7 +45,7 @@ public class TestJiraApi extends BaseTests {
         issueToCreate.fields.assignee = new JiraUser(jiraUsername);
         Issue createdIssue = jira.createIssue(issueToCreate);
         assertNotNull(createdIssue);
-        jiraIssueNumber = createdIssue.key;
+        jiraIssueNumber = createdIssue.getKey();
     }
 
     @AfterClass

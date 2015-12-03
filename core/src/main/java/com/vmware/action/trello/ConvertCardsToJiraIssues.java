@@ -68,7 +68,7 @@ public class ConvertCardsToJiraIssues extends AbstractTrelloAction {
         issueToUpdate.fields.storyPoints = storyPointValue;
         issueToUpdate.fields.summary = cardToUpdate.name;
         String urlForIssue =
-                UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.key;
+                UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.getKey();
         issueToUpdate.fields.description = cardToUpdate.getDescriptionWithoutJiraUrl(urlForIssue);
         issueToUpdate.fields.acceptanceCriteria = cardToUpdate.getAcceptanceCriteria();
         return issueToUpdate;

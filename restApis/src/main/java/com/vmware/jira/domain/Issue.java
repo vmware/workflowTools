@@ -1,11 +1,12 @@
 package com.vmware.jira.domain;
 
+import com.vmware.IssueInfo;
 import com.vmware.utils.ArrayUtils;
 import com.vmware.utils.StringUtils;
 
 import com.google.gson.annotations.Expose;
 
-public class Issue {
+public class Issue implements IssueInfo {
 
     public static Issue noBugNumber = Issue.noBugNumber();
 
@@ -18,7 +19,7 @@ public class Issue {
     @Expose(serialize = false, deserialize = false)
     public boolean hasNoBugNumber;
 
-    public String key;
+    private String key;
     public IssueFields fields;
 
     public Issue() {
@@ -97,4 +98,22 @@ public class Issue {
                 '}';
     }
 
+    @Override
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    @Override
+    public String getSummary() {
+        return fields.summary;
+    }
+
+    @Override
+    public boolean isNotFound() {
+        return isNotFound;
+    }
 }

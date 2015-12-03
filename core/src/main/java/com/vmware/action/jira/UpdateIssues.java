@@ -35,10 +35,10 @@ public class UpdateIssues extends AbstractBatchJiraAction {
         for (Issue issueToUpdate : issuesFromJira) {
             try {
                 jira.updateIssue(issueToUpdate);
-                log.debug("Updated issue {}", issueToUpdate.key);
+                log.debug("Updated issue {}", issueToUpdate.getKey());
             } catch (NotFoundException e) {
                 // ignore if the issue does not exist anymore in JIRA
-                log.info("Ignoring missing issue '{}'", issueToUpdate.key);
+                log.info("Ignoring missing issue '{}'", issueToUpdate.getKey());
             }
         }
     }

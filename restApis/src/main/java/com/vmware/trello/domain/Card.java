@@ -49,7 +49,7 @@ public class Card {
 
         this.desc += "**  Description  **\n" + details.description + "\n";
 
-        String urlForIssue = UrlUtils.addTrailingSlash(jiraUrl) + "browse/" + issue.key;
+        String urlForIssue = UrlUtils.addTrailingSlash(jiraUrl) + "browse/" + issue.getKey();
 
         this.desc += urlForIssue;
     }

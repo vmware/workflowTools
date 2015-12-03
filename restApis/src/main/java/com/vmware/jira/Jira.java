@@ -125,7 +125,7 @@ public class Jira extends AbstractRestService {
     }
 
     public void updateIssue(Issue issue) throws IllegalAccessException, IOException, URISyntaxException {
-        connection.put(urlBaseForKey(issue.key), issue);
+        connection.put(urlBaseForKey(issue.getKey()), issue);
     }
 
     public void updateIssueEstimate(String key, int estimateInHours) throws IllegalAccessException, IOException, URISyntaxException {
@@ -137,7 +137,7 @@ public class Jira extends AbstractRestService {
     public void updateIssueStoryPointsOnly(Issue issue) throws IllegalAccessException, IOException, URISyntaxException {
         IssueUpdate updateIssue = new IssueUpdate();
         updateIssue.fields.storyPoints = issue.fields.storyPoints;
-        connection.put(urlBaseForKey(issue.key), updateIssue);
+        connection.put(urlBaseForKey(issue.getKey()), updateIssue);
     }
 
     public void deleteIssue(String key) throws IllegalAccessException, IOException, URISyntaxException {

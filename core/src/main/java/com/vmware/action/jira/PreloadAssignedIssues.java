@@ -28,7 +28,7 @@ public class PreloadAssignedIssues extends AbstractCommitAction {
                     jira = ServiceLocator.getJira(config.jiraUrl, false);
                     if (jira.isConnectionAuthenticated()) {
                         draft.isPreloadingJiraIssues = true;
-                        draft.openJiraIssues = jira.getOpenTasksForUser(config.username).issues;
+                        draft.openIssues = jira.getOpenTasksForUser(config.username).issues;
                         draft.isPreloadingJiraIssues = false;
                     }
                 } catch (IOException e) {
