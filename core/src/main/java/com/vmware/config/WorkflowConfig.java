@@ -150,6 +150,12 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-b,--branch", help = "Optional value to set if using the local branch name for review board is not desired")
     public String targetBranch;
 
+    @ConfigurableProperty(commandLine = "-prefix,--jira-key-prefix", help = "Prefix to prepend to jira keys that don't contain a prefix")
+    public String jiraKeyPrefix;
+
+    @ConfigurableProperty(help = "Order of services to check against for bug number")
+    public String[] bugNumberSearchOrder;
+
     @ConfigurableProperty(commandLine = "-bugzillaPrefix,--bugzilla-prefix", help = "Represents a bug in bugzilla, only the number part will be stored")
     public String bugzillaPrefix;
 
@@ -289,6 +295,15 @@ public class WorkflowConfig {
             logLevel = LogLevel.DEBUG.name();
         }
         return LogLevel.valueOf(logLevel);
+    }
+
+    public int getSearchOrderForService(String serviceToCheckFor) {
+        for (int i = 0; i < bugNumberSearchOrder.length; i ++) {
+            if (bugNumberSearchOrder[i].equalsIgnoreCase(serviceToCheckFor)) {
+               return i;
+            }
+        }
+        return -1;
     }
 
 

@@ -147,16 +147,35 @@ public class SetBugNumbers extends AbstractCommitReadAction {
                 return preloadedIssues.get(number - 1);
             }
         }
+        // prepend with prefix if just a number was entered
+        String fullJiraKey = getFullJiraKey(bugNumber);
         // test that bug number is a valid jira issue or bugzilla bug
         IssueInfo issueInfo = Issue.aNotFoundIssue(bugNumber);
         Integer bugzillaBugNumber = config.parseBugzillaBugNumber(bugNumber);
-        if (bugzilla != null && bugzillaBugNumber != null) {
-            issueInfo = bugzilla.getBugById(bugzillaBugNumber);
-        }
-        if (issueInfo.isNotFound() && jira != null) {
-            issueInfo = jira.getIssueWithoutException(bugNumber);
+        if (config.getSearchOrderForService("Bugzilla") == 0) {
+            if (bugzilla != null && bugzillaBugNumber != null) {
+                issueInfo = bugzilla.getBugById(bugzillaBugNumber);
+            }
+            if (issueInfo.isNotFound() && jira != null) {
+                issueInfo = jira.getIssueWithoutException(fullJiraKey);
+            }
+        } else {
+            if (jira != null) {
+
+                issueInfo = jira.getIssueWithoutException(fullJiraKey);
+            }
+            if (issueInfo.isNotFound() && bugzilla != null && bugzillaBugNumber != null) {
+                issueInfo = bugzilla.getBugById(bugzillaBugNumber);
+            }
         }
         return issueInfo;
+    }
+
+    private String getFullJiraKey(String bugNumber) {
+        if (!StringUtils.isInteger(bugNumber)) {
+            return bugNumber;
+        }
+        return config.jiraKeyPrefix + "-" + bugNumber;
     }
 
     private boolean allIssuesWereFound(List<IssueInfo> issues) {
