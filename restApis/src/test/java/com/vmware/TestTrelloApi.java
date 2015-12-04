@@ -57,7 +57,7 @@ public class TestTrelloApi extends BaseTests {
     }
 
     @Test
-    public void testBoardIsPartOfUserBoards() throws IllegalAccessException, IOException, URISyntaxException {
+    public void boardIsPartOfUserBoards() throws IllegalAccessException, IOException, URISyntaxException {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
 

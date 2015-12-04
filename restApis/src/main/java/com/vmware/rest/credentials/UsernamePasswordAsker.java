@@ -5,7 +5,11 @@ import com.vmware.utils.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 
 public class UsernamePasswordAsker {
 
@@ -27,7 +31,16 @@ public class UsernamePasswordAsker {
         return new UsernamePasswordCredentials(username, password);
     }
 
-    public static void setTestCredentials(UsernamePasswordCredentials credentials) {
+    public static void setTestCredentials() throws IOException {
+        String userHome = System.getProperty( "user.home" );
+        File credentialsFile = new File(userHome + File.separator + ".credentials.properties");
+        if (!credentialsFile.exists()) {
+            return;
+        }
+        Properties credProps = new Properties();
+        credProps.load(new FileReader(credentialsFile));
+        UsernamePasswordCredentials credentials =
+                new UsernamePasswordCredentials(credProps.getProperty("username"), credProps.getProperty("password"));
         UsernamePasswordAsker.testCredentials = credentials;
     }
 }
