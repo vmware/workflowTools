@@ -23,25 +23,23 @@ public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, false);
-        List<String> queries = bugzilla.getSavedQueries();
-        if (!queries.contains(config.bugzillaQuery)) {
-            log.info("Can't load your bugzilla bug list as saved query {} not found in your bugzilla query list," +
-                    "\nPlease create if you want to select easily select the bugzilla bug number", config.bugzillaQuery);
-            log.debug("Bugzilla queries for user {}, {}", config.username, queries.toString());
-            return;
-        }
-
         Runnable loadJiraIssues = new Runnable() {
             @Override
             public void run() {
                 try {
+                    bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, false);
+                    List<String> queries = bugzilla.getSavedQueries();
+                    log.debug("Bugzilla queries for user {}, {}", config.username, queries.toString());
+                    if (!queries.contains(config.bugzillaQuery)) {
+                        return;
+                    }
+                    draft.userHasBugzillaQuery = true;
                     if (bugzilla.isConnectionAuthenticated()) {
                         draft.isPreloadingBugzillaBugs = true;
                         draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
                         draft.isPreloadingBugzillaBugs = false;
                     }
-                } catch (IOException | URISyntaxException e) {
+                } catch (IOException | URISyntaxException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }

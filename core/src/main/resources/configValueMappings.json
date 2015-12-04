@@ -39,7 +39,6 @@
     "--reviewboard-url"
   ],
   "SetBugNumbers": [
-    "--bug-prefix",
     "--bugzilla-query",
     "--bugzilla-test-bug",
     "--username",
@@ -118,9 +117,6 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
-  ],
-  "SetBugNumbersOffline": [
-    "--bug-prefix"
   ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
