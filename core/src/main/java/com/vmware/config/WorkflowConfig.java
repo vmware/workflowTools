@@ -150,9 +150,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-b,--branch", help = "Optional value to set if using the local branch name for review board is not desired")
     public String targetBranch;
 
-    @ConfigurableProperty(commandLine = "-prefix,--bug-prefix", help = "Bug prefix to prepend to bug numbers that don't contain a prefix")
-    public String bugPrefix;
-
     @ConfigurableProperty(commandLine = "-bugzillaPrefix,--bugzilla-prefix", help = "Represents a bug in bugzilla, only the number part will be stored")
     public String bugzillaPrefix;
 

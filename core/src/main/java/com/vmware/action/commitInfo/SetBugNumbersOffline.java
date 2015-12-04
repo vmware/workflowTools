@@ -24,15 +24,11 @@ public class SetBugNumbersOffline extends AbstractCommitReadAction {
             log.info("");
         }
 
-        log.info("Assuming bug starts with {} if only the number part is entered", config.bugPrefix);
         String[] bugNumbers = InputUtils.readData("Bug Numbers: (leave blank if no bug number)", true, 20).split(",");
 
         String bugNumberText = "";
 
         for (String bugNumber : bugNumbers) {
-            if (StringUtils.isInteger(bugNumber)) {
-                bugNumber = config.bugPrefix + "-" + bugNumber;
-            }
             bugNumberText = appendCsvValue(bugNumberText, bugNumber);
         }
         if (bugNumberText.isEmpty()) {

@@ -4,12 +4,10 @@ import com.vmware.IssueInfo;
 import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitReadAction;
 import com.vmware.bugzilla.Bugzilla;
-import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
-import com.vmware.rest.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.Padder;
@@ -62,7 +60,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
 
         while (waitingForBugNumbers) {
             String bugNumbers = InputUtils.readData("Bug Numbers: (leave blank if none)", true, 30);
-            issues = getJiraIssues(bugNumbers, draft.openIssues);
+            issues = getBugsAndIssues(bugNumbers, draft.openIssues);
             waitingForBugNumbers = false;
             if (listHasNoBugNumbers(issues)) {
                 draft.bugNumbers = config.noBugNumberLabel;
@@ -103,21 +101,23 @@ public class SetBugNumbers extends AbstractCommitReadAction {
     }
 
     private void printIssuesList(Collection<IssueInfo> issues) {
+        if (bugzilla != null && !draft.userHasBugzillaQuery) {
+            log.info("\n**  Can't load your Bugzilla bugs as saved query {} not found in your bugzilla query list  **" +
+                    "\nPlease create if you want to easily select a bugzilla bug", config.bugzillaQuery);
+        }
         if (issues.size() > 0) {
             IssueInfo firstIssue = issues.iterator().next();
             log.info("Assigned Jira Tasks, list number can be entered as shorthand for bug number\ne.g. 1 for " + firstIssue.getKey());
-            log.info("Alternatively, enter the full bug number (assuming bug starts with {} if only numeric part entered)", config.bugPrefix);
+            log.info("Alternatively, enter the full bug number");
             log.info("");
             int counter = 0;
             for (IssueInfo issue : issues) {
                 log.info("[{}] {}: {}", ++counter, issue.getKey(), issue.getSummary());
             }
-        } else {
-            log.info("Assuming bug starts with {} if only numeric part entered", config.bugPrefix);
         }
     }
 
-    private List<IssueInfo> getJiraIssues(String bugNumberText, List<IssueInfo> preloadedIssues) throws IOException, URISyntaxException {
+    private List<IssueInfo> getBugsAndIssues(String bugNumberText, List<IssueInfo> preloadedIssues) throws IOException, URISyntaxException {
         if (bugNumberText == null || bugNumberText.isEmpty()) {
             bugNumberText = config.noBugNumberLabel;
         }
@@ -146,7 +146,6 @@ public class SetBugNumbers extends AbstractCommitReadAction {
             if (number <= preloadedIssues.size()) {
                 return preloadedIssues.get(number - 1);
             }
-            bugNumber = config.bugPrefix + "-" + bugNumber;
         }
         // test that bug number is a valid jira issue or bugzilla bug
         IssueInfo issueInfo = Issue.aNotFoundIssue(bugNumber);
