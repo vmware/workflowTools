@@ -24,8 +24,11 @@
   "storyPointValues": [
     1,2,3,5,8,13
   ],
-  "bugPrefix": "HW",
+  "jiraKeyPrefix": "HW",
   "bugzillaPrefix": "BZ",
+  "bugNumberSearchOrder": [
+        "Bugzilla", "Jira"
+   ],
   "topicTemplates": [
       "Server", "Testing", "UI"
   ],

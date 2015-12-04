@@ -39,6 +39,7 @@
     "--reviewboard-url"
   ],
   "SetBugNumbers": [
+    "--jira-key-prefix",
     "--bugzilla-query",
     "--bugzilla-test-bug",
     "--username",
