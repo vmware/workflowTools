@@ -78,7 +78,6 @@ public class Bugzilla extends AbstractService {
 
     @Override
     protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
-        UsernamePasswordAsker.setTestCredentials(new UsernamePasswordCredentials("dbiggs", "Ch@rger3"));
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(bugzilla_cookie);
 
         Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());

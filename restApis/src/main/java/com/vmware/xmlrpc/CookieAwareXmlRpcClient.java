@@ -30,10 +30,6 @@ public class CookieAwareXmlRpcClient extends org.apache.xmlrpc.client.XmlRpcClie
 	private CookieFileStore cookieFileStore;
     private WorkflowCertificateManager workflowCertificateManager = null;
 
-	public CookieFileStore getCookieFileStore() {
-		return this.cookieFileStore;
-	}
-
 	public CookieAwareXmlRpcClient(final URL apiURL) throws IOException, URISyntaxException {
 		super();
         askIfSslCertShouldBeSaved(apiURL.toURI());
