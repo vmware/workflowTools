@@ -33,8 +33,10 @@ import java.util.zip.GZIPInputStream;
 /**
  * The implementation is to fix the Search.get_saved_query issue of Bugzilla web
  * service. See bug 902459 for more details.
+ *
+ * Added support for adding cookies to the requests so that authenticated requests can be called.
  * 
- * @author Chao William Zhang, VMware
+ * @author Chao William Zhang, Damien Biggs, VMware
  */
 public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
 
@@ -72,7 +74,7 @@ public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
         } catch (URISyntaxException e) {
             throw new XmlRpcClientException(e.getMessage(), e);
         }
-        setRequestHeader("Cookie", cookieFileStore.toCookieRequestText(requestUri.getHost(), true));
+        setRequestHeader("Cookie", cookieFileStore.toCookieRequestText(requestUri.getHost(), false));
     }
 
     @Override
