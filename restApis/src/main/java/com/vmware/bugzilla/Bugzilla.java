@@ -5,6 +5,7 @@ import com.vmware.bugzilla.domain.Bug;
 import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
+import com.vmware.rest.exception.NotFoundException;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 
 import java.io.IOException;
@@ -46,6 +47,14 @@ public class Bugzilla extends AbstractService {
     public Bug getBugById(int id) throws IOException {
         Map values = xmlRpcClient.executeCall("Bug.show_bug", id);
         return new Bug(values);
+    }
+
+    public Bug getBugByIdWithoutException(int id) throws IOException {
+        try {
+            return getBugById(id);
+        } catch (NotFoundException nfe) {
+            return new Bug(String.valueOf(id));
+        }
     }
 
     public List<String> getSavedQueries() throws IOException {

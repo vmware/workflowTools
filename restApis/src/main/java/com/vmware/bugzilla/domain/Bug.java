@@ -14,13 +14,17 @@ public class Bug implements IssueInfo {
 
     private String summary;
 
+    private boolean notFound;
+
     public Bug(String key) {
         this.key = key;
+        this.notFound = true;
     }
 
     public Bug(Map values) {
         this.key =  String.valueOf(values.get("bug_id"));
         this.summary = (String) values.get("short_desc");
+        this.notFound = false;
     }
 
     @Override
@@ -35,7 +39,7 @@ public class Bug implements IssueInfo {
 
     @Override
     public boolean isNotFound() {
-        return false;
+        return notFound;
     }
 
     @Override
