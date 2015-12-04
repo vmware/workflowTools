@@ -5,6 +5,7 @@ package com.vmware.xmlrpc;
 
 import com.vmware.rest.cookie.CookieFileStore;
 import com.vmware.rest.exception.NotAuthorizedException;
+import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.ssl.WorkflowCertificateManager;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -57,6 +58,8 @@ public class CookieAwareXmlRpcClient extends org.apache.xmlrpc.client.XmlRpcClie
             if (e.getMessage().contains("No profiles object could be found")
                     || e.getMessage().contains("Login Required")) {
                 throw new NotAuthorizedException(e.getMessage());
+            } else if (e.getMessage().contains("Bug #") && e.getMessage().contains("does not exist.")) {
+                throw new NotFoundException(e.getMessage());
             }
             throw new IOException(e);
         }

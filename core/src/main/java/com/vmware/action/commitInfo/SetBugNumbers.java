@@ -129,7 +129,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
             if (trimmedBugNumber.isEmpty()) {
                 continue;
             }
-            issues.add(getIssues(preloadedIssues, bugNumber.trim()));
+            issues.add(getIssue(preloadedIssues, bugNumber.trim()));
         }
         if (issues.contains(Issue.noBugNumber)) {
             issues.retainAll(Arrays.asList(Issue.noBugNumber));
@@ -138,7 +138,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
         return issues;
     }
 
-    private IssueInfo getIssues(List<IssueInfo> preloadedIssues, String bugNumber) throws IOException, URISyntaxException {
+    private IssueInfo getIssue(List<IssueInfo> preloadedIssues, String bugNumber) throws IOException, URISyntaxException {
         if (bugNumber.equals(config.noBugNumberLabel)) {
             return Issue.noBugNumber;
         } else if (StringUtils.isInteger(bugNumber)) {
@@ -154,7 +154,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
         Integer bugzillaBugNumber = config.parseBugzillaBugNumber(bugNumber);
         if (config.getSearchOrderForService("Bugzilla") == 0) {
             if (bugzilla != null && bugzillaBugNumber != null) {
-                issueInfo = bugzilla.getBugById(bugzillaBugNumber);
+                issueInfo = bugzilla.getBugByIdWithoutException(bugzillaBugNumber);
             }
             if (issueInfo.isNotFound() && jira != null) {
                 issueInfo = jira.getIssueWithoutException(fullJiraKey);
@@ -165,7 +165,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
                 issueInfo = jira.getIssueWithoutException(fullJiraKey);
             }
             if (issueInfo.isNotFound() && bugzilla != null && bugzillaBugNumber != null) {
-                issueInfo = bugzilla.getBugById(bugzillaBugNumber);
+                issueInfo = bugzilla.getBugByIdWithoutException(bugzillaBugNumber);
             }
         }
         return issueInfo;
