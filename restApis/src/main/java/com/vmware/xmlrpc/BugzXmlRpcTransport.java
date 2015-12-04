@@ -172,9 +172,9 @@ public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
             xp = new BugzParsingHandler(xr, pConfig, getClient()
                     .getTypeFactory());
             xr.setContentHandler(xp);
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 String content = IOUtils.read(pStream);
-                log.debug("Response text from server\n{}", content);
+                log.trace("Response text from server\n{}", content);
                 xr.parse(new InputSource(new StringReader(content)));
             } else {
                 xr.parse(new InputSource(pStream));
