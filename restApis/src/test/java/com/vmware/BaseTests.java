@@ -1,5 +1,6 @@
 package com.vmware;
 
+import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.utils.ClasspathResource;
 import org.junit.BeforeClass;
 
@@ -19,5 +20,6 @@ public class BaseTests {
     public static void initProperties() throws IOException, IllegalAccessException {
         testProperties = new Properties();
         testProperties.load(new ClasspathResource("/test.properties").getReader());
+        UsernamePasswordAsker.setTestCredentials();
     }
 }
