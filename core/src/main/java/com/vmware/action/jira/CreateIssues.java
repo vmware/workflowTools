@@ -12,10 +12,10 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
 
-@ActionDescription("Bulk create Jira stories that do not have a key")
-public class CreateMissingStories extends AbstractBatchJiraAction {
+@ActionDescription("Bulk create Jira issues.")
+public class CreateIssues extends AbstractBatchJiraAction {
 
-    public CreateMissingStories(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public CreateIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
     }
 
@@ -31,25 +31,25 @@ public class CreateMissingStories extends AbstractBatchJiraAction {
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
         List<Issue> issuesToCreate = projectIssues.getIssuesNotInJira();
-        log.info("Creating {} issues", issuesToCreate.size());
+        log.info("Creating {} issue[s]", issuesToCreate.size());
 
-        Issue issueToBaseProjectAndComponentOff = getBaselineIssue();
-
-        String componentsText = issueToBaseProjectAndComponentOff.fields.getComponentsText();
-        log.info("Selected first existing issue {} as baseline issue", issueToBaseProjectAndComponentOff.getKey());
-        log.info("Derived project name {} and components {} from issue",
-                issueToBaseProjectAndComponentOff.fields.project.name, componentsText);
+        Issue issueToBaseProjectAndComponentOff = null;
 
         for (Issue potentialIssueToCreate : issuesToCreate) {
-            potentialIssueToCreate.fields.issuetype = new IssueType(IssueTypeDefinition.Story);
-            potentialIssueToCreate.fields.project = issueToBaseProjectAndComponentOff.fields.project;
-            potentialIssueToCreate.fields.components = issueToBaseProjectAndComponentOff.fields.components;
+            if (potentialIssueToCreate.fields.project == null) {
+                if (issueToBaseProjectAndComponentOff == null) {
+                    issueToBaseProjectAndComponentOff = getBaselineIssue();
+                }
+
+                potentialIssueToCreate.fields.project = issueToBaseProjectAndComponentOff.fields.project;
+                potentialIssueToCreate.fields.components = issueToBaseProjectAndComponentOff.fields.components;
+            }
 
             Issue createdIssue = jira.createIssue(potentialIssueToCreate);
             potentialIssueToCreate.setKey(createdIssue.getKey());
             potentialIssueToCreate.id = createdIssue.id;
-            log.info("Created issue with key {} for new trello story {}",
-                    createdIssue.getKey(), potentialIssueToCreate.fields.summary);
+            log.info("Created issue with key {}, summary: {}",
+                    createdIssue.getKey(), potentialIssueToCreate.getSummary());
         }
     }
 
@@ -59,6 +59,13 @@ public class CreateMissingStories extends AbstractBatchJiraAction {
             throw new IllegalArgumentException("Expected to find issue in list that was already in Jira!");
         }
         Issue issueToUse = issuesFromJira.get(0);
-        return jira.getIssueByKey(issueToUse.getKey());
+        Issue baselineIssue = jira.getIssueByKey(issueToUse.getKey());
+
+        String componentsText = baselineIssue.fields.getComponentsText();
+        log.info("Selected first existing issue {} as baseline issue", baselineIssue.getKey());
+        log.info("Derived project name {} and components {} from issue",
+                baselineIssue.fields.project.name, componentsText);
+
+        return baselineIssue;
     }
 }

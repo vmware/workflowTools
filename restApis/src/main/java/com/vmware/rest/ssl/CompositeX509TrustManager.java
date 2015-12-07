@@ -36,7 +36,7 @@ public class CompositeX509TrustManager implements X509TrustManager {
                 // maybe someone else will trust them
             }
         }
-        throw new CertificateException("None of the TrustManagers trust this certificate chain");
+        throw new CertificateException("None of the TrustManagers trust this client certificate chain");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CompositeX509TrustManager implements X509TrustManager {
                 // maybe someone else will trust them
             }
         }
-        throw new CertificateException("None of the TrustManagers trust this certificate chain");
+        throw new CertificateException("None of the TrustManagers trust this server certificate chain");
     }
 
     @Override

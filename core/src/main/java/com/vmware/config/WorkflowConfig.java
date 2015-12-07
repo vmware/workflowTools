@@ -150,8 +150,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-b,--branch", help = "Optional value to set if using the local branch name for review board is not desired")
     public String targetBranch;
 
-    @ConfigurableProperty(commandLine = "-prefix,--jira-key-prefix", help = "Prefix to prepend to jira keys that don't contain a prefix")
-    public String jiraKeyPrefix;
+    @ConfigurableProperty(commandLine = "-defaultJiraProject,--default-jira-project", help = "Default Jira project to use if only a numeric value is entered")
+    public String defaultJiraProject;
 
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public String[] bugNumberSearchOrder;
