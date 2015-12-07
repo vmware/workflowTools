@@ -3,6 +3,7 @@ package com.vmware.action.bugzilla;
 import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.bugzilla.Bugzilla;
+import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 import java.io.IOException;
@@ -10,9 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
 
-/**
- * Executes the named query for loading bugzilla bugs. Only executed if the user has a matching named query.
- */
+@ActionDescription("Executes the named query for loading Bugzilla bugs. Only executed if the user has a matching named query.")
 public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
 
     private Bugzilla bugzilla;

@@ -7,6 +7,7 @@ import com.vmware.rest.cookie.CookieFileStore;
 import com.vmware.rest.exception.NotAuthorizedException;
 import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.ssl.WorkflowCertificateManager;
+import com.vmware.utils.input.InputUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
@@ -32,11 +33,11 @@ public class CookieAwareXmlRpcClient extends org.apache.xmlrpc.client.XmlRpcClie
 
 	public CookieAwareXmlRpcClient(final URL apiURL) throws IOException, URISyntaxException {
 		super();
-        askIfSslCertShouldBeSaved(apiURL.toURI());
 
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);
         workflowCertificateManager = new WorkflowCertificateManager(homeFolder + "/.workflowTool.keystore");
+        askIfSslCertShouldBeSaved(apiURL.toURI());
 
 		final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 		config.setServerURL(apiURL);
@@ -68,7 +69,7 @@ public class CookieAwareXmlRpcClient extends org.apache.xmlrpc.client.XmlRpcClie
         log.info("Host {} is not trusted, do you want to save the cert for this to the local trust store {}",
                 uri.getHost(), workflowCertificateManager.getKeyStore());
         log.warn("NB: ONLY save the certificate if you trust the host shown");
-        String response = "Y"; // InputUtils.readValue("Save certificate? [Y/N] ");
+        String response = InputUtils.readValue("Save certificate? [Y/N] ");
         if ("Y".equalsIgnoreCase(response)) {
             workflowCertificateManager.saveCertForUri(uri);
         }

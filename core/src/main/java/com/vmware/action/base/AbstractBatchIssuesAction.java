@@ -6,8 +6,12 @@
 package com.vmware.action.base;
 
 import com.vmware.action.AbstractAction;
+import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.jira.domain.ProjectIssues;
+import com.vmware.rest.UrlUtils;
 
 public abstract class AbstractBatchIssuesAction extends AbstractAction {
 
@@ -19,6 +23,15 @@ public abstract class AbstractBatchIssuesAction extends AbstractAction {
 
     public void setProjectIssues(ProjectIssues projectIssues) {
         this.projectIssues = projectIssues;
+    }
+
+    protected Issue createIssueFromBug(Bug bug) {
+        String summary = "[BZ-" + bug.getKey() + "] " + bug.getSummary();
+        String bugzillaBugUrl = UrlUtils.addTrailingSlash(config.bugzillaUrl) + "show_bug.cgi?id=" + bug.getKey();
+        String description = bugzillaBugUrl + "\n" + bug.getDescription();
+        Issue matchingIssue = new Issue(IssueTypeDefinition.Bug, config.defaultJiraProject,
+                null, summary, description, null);
+        return matchingIssue;
     }
 
 }

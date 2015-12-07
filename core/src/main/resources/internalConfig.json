@@ -24,7 +24,7 @@
   "storyPointValues": [
     1,2,3,5,8,13
   ],
-  "jiraKeyPrefix": "HW",
+  "defaultJiraProject": "HW",
   "bugzillaPrefix": "BZ",
   "bugNumberSearchOrder": [
         "Bugzilla", "Jira"
@@ -178,6 +178,9 @@
        "addToReviewedBy": [
           "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
        ],
+       "createMatchingIssueForBug": [
+          "ConvertBugToIssue", "ExitIfConfirmationNotGiven", "CreateIssues"
+       ],
        "createTrelloBoard": [
           "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"
        ],
@@ -197,7 +200,7 @@
           "selectAndConvertBoard", "UpdateStoryPointsOnly"
        ],
        "createUpdateIssuesFromTrello": [
-          "selectAndConvertBoard", "UpdateIssues", "CreateMissingStories"
+          "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"

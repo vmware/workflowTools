@@ -175,7 +175,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
         if (!StringUtils.isInteger(bugNumber)) {
             return bugNumber;
         }
-        return config.jiraKeyPrefix + "-" + bugNumber;
+        return config.defaultJiraProject + "-" + bugNumber;
     }
 
     private boolean allIssuesWereFound(List<IssueInfo> issues) {

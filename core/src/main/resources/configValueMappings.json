@@ -17,16 +17,16 @@
     "--username",
     "--reviewboard-url"
   ],
+  "AbstractCommitWithReviewAction": [
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
+  ],
   "PreloadAssignedBugzillaBugs": [
     "--bugzilla-query",
     "--bugzilla-test-bug",
     "--username",
     "--bugzilla-url"
-  ],
-  "AbstractCommitWithReviewAction": [
-    "--review-board-date-format",
-    "--username",
-    "--reviewboard-url"
   ],
   "GenerateReviewStats": [
     "--file-count-ranges",
@@ -39,7 +39,7 @@
     "--reviewboard-url"
   ],
   "SetBugNumbers": [
-    "--jira-key-prefix",
+    "--default-jira-project",
     "--bugzilla-query",
     "--bugzilla-test-bug",
     "--username",
@@ -88,13 +88,13 @@
     "--username",
     "--reviewboard-url"
   ],
-  "FormatCommitText": [
-    "--max-description",
-    "--max-summary"
-  ],
   "LoadBacklogStories": [
     "--include-estimated",
     "--use-label"
+  ],
+  "FormatCommitText": [
+    "--max-description",
+    "--max-summary"
   ],
   "PushToPrecommitBranch": [
     "--username"
@@ -118,6 +118,10 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
+  ],
+  "AbstractBatchIssuesAction": [
+    "--default-jira-project",
+    "--bugzilla-url"
   ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
@@ -182,6 +186,11 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
+  ],
+  "ConvertBugToIssue": [
+    "--bugzilla-test-bug",
+    "--username",
+    "--bugzilla-url"
   ],
   "AbstractSetReviewerList": [
     "--username"

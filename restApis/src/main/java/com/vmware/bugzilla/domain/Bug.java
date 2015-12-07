@@ -14,6 +14,8 @@ public class Bug implements IssueInfo {
 
     private String summary;
 
+    private String description;
+
     private boolean notFound;
 
     public Bug(String key) {
@@ -24,6 +26,7 @@ public class Bug implements IssueInfo {
     public Bug(Map values) {
         this.key =  String.valueOf(values.get("bug_id"));
         this.summary = (String) values.get("short_desc");
+        this.description = (String) values.get("description");
         this.notFound = false;
     }
 
@@ -35,6 +38,11 @@ public class Bug implements IssueInfo {
     @Override
     public String getSummary() {
         return summary;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

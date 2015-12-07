@@ -4,6 +4,8 @@ import com.vmware.ServiceLocator;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssueType;
+import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.rest.UrlUtils;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
@@ -66,6 +68,7 @@ public class ConvertCardsToJiraIssues extends AbstractTrelloAction {
     private Issue convertCardToIssue(Integer storyPointValue, Card cardToUpdate) {
         Issue issueToUpdate = new Issue(cardToUpdate.getIssueKey());
         issueToUpdate.fields.storyPoints = storyPointValue;
+        issueToUpdate.fields.issuetype = new IssueType(IssueTypeDefinition.Story);
         issueToUpdate.fields.summary = cardToUpdate.name;
         String urlForIssue =
                 UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.getKey();

@@ -2,9 +2,12 @@ package com.vmware.jira.domain;
 
 import com.vmware.IssueInfo;
 import com.vmware.utils.ArrayUtils;
+import com.vmware.utils.MatcherUtils;
 import com.vmware.utils.StringUtils;
 
 import com.google.gson.annotations.Expose;
+
+import java.util.regex.Matcher;
 
 public class Issue implements IssueInfo {
 
@@ -111,6 +114,17 @@ public class Issue implements IssueInfo {
     public String getSummary() {
         return fields.summary;
     }
+
+    @Override
+    public String getDescription() {
+        return fields.description;
+    }
+
+    public Integer matchingBugzillaNumber(String bugzillaUrl) {
+        String bugzillaNumber = MatcherUtils.singleMatch(fields.description, bugzillaUrl + "/*show_bug.cgi?id=(\\d+)");
+        return bugzillaNumber != null ? Integer.parseInt(bugzillaNumber) : null;
+    }
+
 
     @Override
     public boolean isNotFound() {

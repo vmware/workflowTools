@@ -9,6 +9,8 @@ public interface IssueInfo {
 
     public String getSummary();
 
+    public String getDescription();
+
     public boolean isNotFound();
 
     public boolean isReal();
