@@ -6,7 +6,7 @@
   <version>1.0</version>
   <modules>
     <module>core</module>
-    <module>restApis</module>
+    <module>serviceApis</module>
     <module>utils</module>
   </modules>
 
