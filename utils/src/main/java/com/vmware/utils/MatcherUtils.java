@@ -22,4 +22,10 @@ public class MatcherUtils {
             return null;
         }
     }
+
+    public static void main(String[] args) {
+        String bugzillaUrl = "https://bugzilla.eng.vmware.com/";
+        System.out.println(MatcherUtils.singleMatch("https://bugzilla.eng.vmware.com/show_bug.cgi?id=1567574\n" +
+                "Using for testing creating of matching bugs in Jira", bugzillaUrl + "/*show_bug\\.cgi\\?id=(\\d+)"));
+    }
 }

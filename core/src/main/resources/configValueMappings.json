@@ -4,6 +4,10 @@
     "--jira-test-issue",
     "--jira-url"
   ],
+  "AddTrackingIssueForBug": [
+    "--bugzilla-url",
+    "--default-jira-project"
+  ],
   "AbstractBatchJiraAction": [
     "--jira-test-issue",
     "--jira-url"
@@ -53,6 +57,11 @@
     "--jira-url",
     "--keep-missing-cards",
     "--trello-url"
+  ],
+  "AddTrackingIssuesForQuery": [
+    "--bugzilla-url",
+    "--default-jira-project",
+    "--bugzilla-query"
   ],
   "AbstractCommitWithBuildsAction": [
     "--disable-jenkins-login",
@@ -119,12 +128,15 @@
     "--username",
     "--reviewboard-url"
   ],
-  "AbstractBatchIssuesAction": [
-    "--default-jira-project",
-    "--bugzilla-url"
-  ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
+  ],
+  "AbstractBatchBugzillaAction": [
+    "--default-jira-component",
+    "--default-jira-project",
+    "--bugzilla-test-bug",
+    "--username",
+    "--bugzilla-url"
   ],
   "CopyReviewUrlToClipboard": [
     "--reviewboard-url"
@@ -138,16 +150,19 @@
     "--jira-url",
     "--trello-url"
   ],
-  "PushToRemoteBranch": [
-    "--username",
-    " --remote-branch"
-  ],
   "InvokeJenkinsJobs": [
     "--username",
     "--jenkins-url",
     "--wait-for-jenkins",
     "--ignore-jenkins-job-failure",
     "--jenkins-jobs"
+  ],
+  "PushToRemoteBranch": [
+    "--username",
+    " --remote-branch"
+  ],
+  "AddTrackingIssueCreatedComments": [
+    "--bugzilla-url"
   ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
@@ -186,11 +201,6 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
-  ],
-  "ConvertBugToIssue": [
-    "--bugzilla-test-bug",
-    "--username",
-    "--bugzilla-url"
   ],
   "AbstractSetReviewerList": [
     "--username"

@@ -11,7 +11,9 @@ import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,8 @@ public class Bugzilla extends AbstractService {
         Object[] bugs = (Object[]) values.get("bugs");
         List<Bug> bugList = new ArrayList<>();
         for (Object bug : bugs) {
+            Map bugValues = (Map) bug;
+            bugValues.put("web_url", constructFullBugUrl((Integer) bugValues.get("bug_id")));
             bugList.add(new Bug((Map) bug));
         }
         return bugList;
@@ -46,7 +50,13 @@ public class Bugzilla extends AbstractService {
 
     public Bug getBugById(int id) throws IOException {
         Map values = xmlRpcClient.executeCall("Bug.show_bug", id);
+        values.put("web_url", constructFullBugUrl(id));
         return new Bug(values);
+    }
+
+    public void addBugComment(int bugId, String comment) throws IOException {
+        SimpleDateFormat commentDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        xmlRpcClient.executeCall("Bug.add_comment", bugId, comment, commentDateFormat.format(new Date()), 1);
     }
 
     public Bug getBugByIdWithoutException(int id) throws IOException {
@@ -64,6 +74,10 @@ public class Bugzilla extends AbstractService {
             queries.add(String.valueOf(value));
         }
         return queries;
+    }
+
+    public String constructFullBugUrl(int bugNumber) {
+        return baseUrl + "show_bug.cgi?id=" + bugNumber;
     }
 
     @Override

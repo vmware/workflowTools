@@ -25,13 +25,4 @@ public abstract class AbstractBatchIssuesAction extends AbstractAction {
         this.projectIssues = projectIssues;
     }
 
-    protected Issue createIssueFromBug(Bug bug) {
-        String summary = "[BZ-" + bug.getKey() + "] " + bug.getSummary();
-        String bugzillaBugUrl = UrlUtils.addTrailingSlash(config.bugzillaUrl) + "show_bug.cgi?id=" + bug.getKey();
-        String description = bugzillaBugUrl + "\n" + bug.getDescription();
-        Issue matchingIssue = new Issue(IssueTypeDefinition.Bug, config.defaultJiraProject,
-                null, summary, description, null);
-        return matchingIssue;
-    }
-
 }

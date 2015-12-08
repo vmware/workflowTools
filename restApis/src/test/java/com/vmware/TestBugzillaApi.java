@@ -40,6 +40,11 @@ public class TestBugzillaApi extends BaseTests {
     }
 
     @Test
+    public void canAddBugComment() throws IOException {
+        bugzilla.addBugComment(1567574, "Test comment");
+    }
+
+    @Test
     public void canGetAssignedBugs() throws IOException, URISyntaxException, XmlRpcException {
         List<Bug> bugsList = bugzilla.getBugsForQuery("M31");
         assertTrue(bugsList.size() > 0);
