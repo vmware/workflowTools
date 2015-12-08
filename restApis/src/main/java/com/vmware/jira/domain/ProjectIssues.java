@@ -17,7 +17,7 @@ public class ProjectIssues {
     }
 
     public List<Issue> getIssuesFromJira() {
-        List<Issue> issuesFromJira = new ArrayList<Issue>();
+        List<Issue> issuesFromJira = new ArrayList<>();
         for (Issue issue : issuesForProcessing) {
             if (issue.isFromJira()) {
                 issuesFromJira.add(issue);
@@ -27,13 +27,23 @@ public class ProjectIssues {
     }
 
     public List<Issue> getIssuesNotInJira() {
-        List<Issue> issuesNotInJira = new ArrayList<Issue>();
+        List<Issue> issuesNotInJira = new ArrayList<>();
         for (Issue issue : issuesForProcessing) {
             if (!issue.isFromJira()) {
                 issuesNotInJira.add(issue);
             }
         }
         return Collections.unmodifiableList(issuesNotInJira);
+    }
+
+    public List<Issue> getIssuesRepresentingBugzillaBugs(String bugzillaUrl) {
+        List<Issue> issues = new ArrayList<Issue>();
+        for (Issue issue : issuesForProcessing) {
+            if (issue.matchingBugzillaNumber(bugzillaUrl) != null) {
+                issues.add(issue);
+            }
+        }
+        return Collections.unmodifiableList(issues);
     }
 
     public List<Issue> getIssuesForProcessing() {

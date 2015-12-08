@@ -7,6 +7,8 @@ public interface IssueInfo {
 
     public String getKey();
 
+    public String getWebUrl();
+
     public String getSummary();
 
     public String getDescription();

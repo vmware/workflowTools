@@ -178,8 +178,11 @@
        "addToReviewedBy": [
           "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
        ],
-       "createMatchingIssueForBug": [
-          "ConvertBugToIssue", "ExitIfConfirmationNotGiven", "CreateIssues"
+       "createTrackingIssueForBug": [
+          "AddTrackingIssueForBug", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
+       ],
+       "createTrackingIssuesForQuery": [
+          "AddTrackingIssuesForQuery", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
        ],
        "createTrelloBoard": [
           "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"

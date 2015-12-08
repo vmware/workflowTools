@@ -22,6 +22,9 @@ public class Issue implements IssueInfo {
     @Expose(serialize = false, deserialize = false)
     public boolean hasNoBugNumber;
 
+    @Expose(serialize = false)
+    public String self;
+
     private String key;
     public IssueFields fields;
 
@@ -106,6 +109,15 @@ public class Issue implements IssueInfo {
         return key;
     }
 
+    @Override
+    public String getWebUrl() {
+        if (self == null) {
+            return null;
+        }
+        String jiraUrl = MatcherUtils.singleMatch(self, "(.+?/)rest/api");
+        return jiraUrl == null ? null : jiraUrl + "browse/" + key;
+    }
+
     public void setKey(String key) {
         this.key = key;
     }
@@ -121,7 +133,7 @@ public class Issue implements IssueInfo {
     }
 
     public Integer matchingBugzillaNumber(String bugzillaUrl) {
-        String bugzillaNumber = MatcherUtils.singleMatch(fields.description, bugzillaUrl + "/*show_bug.cgi?id=(\\d+)");
+        String bugzillaNumber = MatcherUtils.singleMatch(fields.description, bugzillaUrl + "/*show_bug\\.cgi\\?id=(\\d+)");
         return bugzillaNumber != null ? Integer.parseInt(bugzillaNumber) : null;
     }
 

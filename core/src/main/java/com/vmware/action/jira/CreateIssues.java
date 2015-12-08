@@ -48,6 +48,7 @@ public class CreateIssues extends AbstractBatchJiraAction {
             Issue createdIssue = jira.createIssue(potentialIssueToCreate);
             potentialIssueToCreate.setKey(createdIssue.getKey());
             potentialIssueToCreate.id = createdIssue.id;
+            potentialIssueToCreate.self = createdIssue.self;
             log.info("Created issue with key {}, summary: {}",
                     createdIssue.getKey(), potentialIssueToCreate.getSummary());
         }
