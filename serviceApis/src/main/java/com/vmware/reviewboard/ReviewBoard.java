@@ -1,8 +1,8 @@
 package com.vmware.reviewboard;
 
 import com.vmware.AbstractRestService;
+import com.vmware.rest.HttpConnection;
 import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.RestConnection;
 import com.vmware.rest.request.UrlParam;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
@@ -48,7 +48,7 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewBoard(String reviewboardUrl, String username) throws IOException, URISyntaxException, IllegalAccessException {
         super(reviewboardUrl, "api/", ApiAuthentication.reviewBoard, username);
-        connection = new RestConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
+        connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
     }
 
     public RootList getRootLinkList() throws IOException, URISyntaxException {

@@ -45,9 +45,9 @@ import static com.vmware.rest.request.RequestHeader.anAcceptHeader;
 /**
  * Using Java's HttpURLConnection instead of Apache HttpClient to cut down on jar size
  */
-public class RestConnection {
+public class HttpConnection {
 
-    private static Logger log = LoggerFactory.getLogger(RestConnection.class.getName());
+    private static Logger log = LoggerFactory.getLogger(HttpConnection.class.getName());
     private static int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
     private static final int MAX_REQUEST_RETRIES = 3;
 
@@ -59,7 +59,7 @@ public class RestConnection {
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
 
-    public RestConnection(RequestBodyHandling requestBodyHandling) throws IOException {
+    public HttpConnection(RequestBodyHandling requestBodyHandling) throws IOException {
         this.requestBodyHandling = requestBodyHandling;
         this.gson = new ConfiguredGsonBuilder().build();
 

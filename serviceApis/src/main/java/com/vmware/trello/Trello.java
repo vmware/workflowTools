@@ -6,9 +6,8 @@
 package com.vmware.trello;
 
 import com.vmware.AbstractRestService;
-import com.vmware.rest.RestConnection;
+import com.vmware.rest.HttpConnection;
 import com.vmware.rest.UrlUtils;
-import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
 import com.vmware.rest.exception.BadRequestException;
 import com.vmware.rest.exception.NotAuthorizedException;
@@ -46,7 +45,7 @@ public class Trello extends AbstractRestService {
         super(createApiUrl(trelloUrl), "1/", trello, null);
         webUrl = UrlUtils.addTrailingSlash(trelloUrl);
         this.loginUrl = webUrl + "authenticate";
-        this.connection = new RestConnection(RequestBodyHandling.AsStringJsonEntity);
+        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
 
         String apiToken = readExistingApiToken(credentialsType);
 

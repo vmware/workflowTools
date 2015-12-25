@@ -16,13 +16,22 @@ import java.util.EnumSet;
 import static com.vmware.rest.json.NumericalEnum.UNKNOWN_VALUE_NAME;
 
 public class NumericalEnumMapper implements JsonDeserializer<NumericalEnum>, JsonSerializer<NumericalEnum> {
-    private Logger log  = LoggerFactory.getLogger(this.getClass());
+    private static Logger log  = LoggerFactory.getLogger(NumericalEnumMapper.class);
 
 
     @Override
     public NumericalEnum deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         int value = jsonElement.getAsInt();
         Class<Enum> enumType = (Class<Enum>) type;
+        return findByValue(value, enumType);
+    }
+
+    @Override
+    public JsonElement serialize(NumericalEnum numericalEnum, Type type, JsonSerializationContext jsonSerializationContext) {
+        return new JsonPrimitive(String.valueOf(numericalEnum.getCode()));
+    }
+
+    public static NumericalEnum findByValue(int value, Class<Enum> enumType) {
         for (Object enumValue : EnumSet.allOf(enumType)) {
             if (((NumericalEnum)enumValue).getCode() == value) {
                 return (NumericalEnum) enumValue;
@@ -35,10 +44,5 @@ public class NumericalEnumMapper implements JsonDeserializer<NumericalEnum>, Jso
             log.error("Enums implementing NumericalEnum must have an enum value named {}", UNKNOWN_VALUE_NAME);
             throw e;
         }
-    }
-
-    @Override
-    public JsonElement serialize(NumericalEnum numericalEnum, Type type, JsonSerializationContext jsonSerializationContext) {
-        return new JsonPrimitive(String.valueOf(numericalEnum.getCode()));
     }
 }

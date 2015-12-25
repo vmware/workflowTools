@@ -3,5 +3,6 @@ package com.vmware.rest.request;
 public enum RequestBodyHandling {
     AsUrlEncodedJsonEntity,
     AsStringJsonEntity,
-    AsUrlEncodedFormEntity
+    AsUrlEncodedFormEntity,
+    AsMultiPartFormEntity
 }

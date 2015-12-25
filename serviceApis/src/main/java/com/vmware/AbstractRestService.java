@@ -1,17 +1,11 @@
 package com.vmware;
 
+import com.vmware.rest.HttpConnection;
 import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.request.RequestParam;
-import com.vmware.rest.RestConnection;
-import com.vmware.rest.UrlUtils;
 import com.vmware.rest.exception.ForbiddenException;
 import com.vmware.rest.exception.NotAuthorizedException;
-import com.vmware.utils.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -21,7 +15,7 @@ import java.net.URISyntaxException;
  */
 public abstract class AbstractRestService extends AbstractService {
 
-    protected RestConnection connection;
+    protected HttpConnection connection;
 
     protected AbstractRestService(String baseUrl, String apiPath, ApiAuthentication credentialsType, String username) {
         super(baseUrl, apiPath, credentialsType, username);

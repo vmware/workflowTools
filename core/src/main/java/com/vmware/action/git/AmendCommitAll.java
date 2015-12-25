@@ -24,7 +24,7 @@ public class AmendCommitAll extends AbstractCommitAction {
         String existingCommitText = git.lastCommitText(true).trim();
         String updatedCommitText = draft.toGitText(config.getCommitConfiguration()).trim();
 
-        if (!draft.hasFileChanges && existingCommitText.equals(updatedCommitText)) {
+        if (git.getAllChanges().isEmpty() && existingCommitText.equals(updatedCommitText)) {
             log.info("Not amending commit as it does not have any changes");
             return;
         }

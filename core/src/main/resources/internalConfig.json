@@ -1,6 +1,5 @@
 {
   "defaultTopic": "Server",
-  "disableSslCertValidation" : false,
   "reviewboardUrl": "https://reviewboard.eng.vmware.com",
   "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
   "jiraUrl": "https://jira-hzn.eng.vmware.com",
@@ -123,10 +122,13 @@
           "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsJobs",
           "FormatCommitText", "AmendCommit"
        ],
-       "pushIt": [
+       "push": [
           "prepareCommitForPush", "PushToMaster", "SoftSubmitReview"
        ],
-       "pushItHarder": [
+       "pushIt" : [
+          "push"
+       ],
+       "pushHarder": [
           "prepareCommitForPush", "PushToMaster", "HardSubmitReview"
        ],
        "closeOldReviews": [

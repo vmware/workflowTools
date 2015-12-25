@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Strips jenkins build text from testing done section of commit")
+@ActionDescription("Strips jenkins build text from testing done section of commit.")
 public class StripJenkinsJobs extends AbstractCommitAction {
 
     public StripJenkinsJobs(WorkflowConfig config) {

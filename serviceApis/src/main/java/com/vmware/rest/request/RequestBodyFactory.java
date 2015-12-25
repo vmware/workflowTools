@@ -7,7 +7,7 @@ package com.vmware.rest.request;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.vmware.rest.RestConnection;
+import com.vmware.rest.HttpConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class RequestBodyFactory {
     private static final Logger log = LoggerFactory.getLogger(RequestBodyFactory.class);
     private static final String LINE_FEED = "\r\n";
 
-    public static void setRequestDataForConnection(RestConnection connection, final Object requestObject)
+    public static void setRequestDataForConnection(HttpConnection connection, final Object requestObject)
             throws IllegalAccessException, IOException {
         connection.setDoOutput(true);
         switch (connection.getRequestBodyHandling()) {
@@ -45,6 +45,9 @@ public class RequestBodyFactory {
                     writeObjectAsFormEncoded(connection, requestObject);
                 }
                 break;
+            case AsMultiPartFormEntity:
+                writeObjectAsMultipart(connection, requestObject);
+                break;
             default:
                 throw new RuntimeException("No handling available for request body type "
                         + connection.getRequestBodyHandling());
@@ -60,7 +63,7 @@ public class RequestBodyFactory {
         return false;
     }
 
-    private static void writeObjectAsMultipart(final RestConnection connection, final Object requestObject)
+    private static void writeObjectAsMultipart(final HttpConnection connection, final Object requestObject)
             throws IllegalAccessException, IOException {
         // creates a unique boundary based on time stamp
         String boundary = "===" + System.currentTimeMillis() + "===";
@@ -84,7 +87,7 @@ public class RequestBodyFactory {
         writer.close();
     }
 
-    private static void writeObjectAsUrlEncodedJson(final RestConnection connection, final Object requestObject)
+    private static void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject)
             throws IOException {
         String jsonText = connection.toJson(requestObject);
         log.trace("Request Json: {}", jsonText);
@@ -93,7 +96,7 @@ public class RequestBodyFactory {
         writeValuesAsFormEncoded(connection, values);
     }
 
-    private static void writeObjectAsJsonString(final RestConnection connection, final Object requestObject)
+    private static void writeObjectAsJsonString(final HttpConnection connection, final Object requestObject)
             throws IOException {
         String jsonText = connection.toJson(requestObject);
         log.trace("Request Json: {}", jsonText);
@@ -103,7 +106,7 @@ public class RequestBodyFactory {
         writer.close();
     }
 
-    private static void writeObjectAsFormEncoded(final RestConnection connection, final Object requestObject)
+    private static void writeObjectAsFormEncoded(final HttpConnection connection, final Object requestObject)
             throws IllegalAccessException, IOException {
         Map<String, Object> valuesToWrite = convertObjectToMap(requestObject);
         writeValuesAsFormEncoded(connection, valuesToWrite);
@@ -113,6 +116,9 @@ public class RequestBodyFactory {
         Map<String, Object> valuesToWrite = new HashMap<String, Object>();
         for (Field field : requestObject.getClass().getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            if (Modifier.isPrivate(field.getModifiers())) {
                 continue;
             }
             Expose expose = field.getAnnotation(Expose.class);
@@ -133,7 +139,7 @@ public class RequestBodyFactory {
         return valuesToWrite;
     }
 
-    private static void writeValuesAsFormEncoded(RestConnection connection, Map<String, Object> valuesToWrite) throws IOException {
+    private static void writeValuesAsFormEncoded(HttpConnection connection, Map<String, Object> valuesToWrite) throws IOException {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
         String contentToWrite = "";

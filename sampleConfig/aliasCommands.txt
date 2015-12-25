@@ -40,7 +40,7 @@ alias unitTestsAndServerTests='workflow -w restartJobs -j postgres,serverTests'
 alias everyTest='workflow -w restartJobs -j unitTestAll,serverTests'
 
 alias pushable='workflow -w pushable'
-alias pushIt='workflow pushIt'
-alias pushItHarder='workflow -w pushItHarder'
+alias push='workflow push'
+alias pushHarder='workflow -w pushHarder'
 
 alias closeOldReviews='workflow -w closeOldReviews'
