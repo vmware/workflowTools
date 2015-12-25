@@ -1,12 +1,20 @@
 package com.vmware.bugzilla.domain;
 
+import com.google.gson.annotations.SerializedName;
 import com.vmware.IssueInfo;
+import com.vmware.rest.json.StringEnumMapper;
+import com.vmware.utils.IOUtils;
 import com.vmware.utils.MatcherUtils;
+import com.vmware.utils.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static com.vmware.rest.json.StringEnumMapper.findByValue;
 
 /**
  * Represents a bug in Bugzilla.
@@ -15,7 +23,30 @@ public class Bug implements IssueInfo {
 
     public static final String TRACKING_ISSUE_TEXT = "Tracking this bug in Jira with issue ";
 
-    private String key;
+    @SerializedName("id")
+    public String key;
+
+    public String product;
+
+    public String category;
+
+    public String component;
+
+    public String knob;
+
+    public BugResolutionType resolution;
+
+    @SerializedName("comment")
+    public String resolutionComment;
+
+    @SerializedName("cc")
+    public String resolveCc;
+
+    private String status;
+
+    private boolean notFound;
+
+    private List<BugComment> comments;
 
     private String webUrl;
 
@@ -23,21 +54,22 @@ public class Bug implements IssueInfo {
 
     private String description;
 
-    private boolean notFound;
-
-    private List<BugComment> comments;
-
-    public Bug(String key) {
-        this.key = key;
+    public Bug(int key) {
+        this.key = String.valueOf(key);
         this.notFound = true;
     }
 
-    public Bug(Map values) {
+    public Bug(Map values) throws IOException {
         this.key =  String.valueOf(values.get("bug_id"));
+        this.product = (String) values.get("product");
+        this.category = (String) values.get("category");
+        this.component = (String) values.get("component");
         this.webUrl = String.valueOf(values.get("web_url"));
         this.summary = (String) values.get("short_desc");
-        this.description = (String) values.get("description");
+        this.description = StringUtils.convertObjectToString(values.get("description"));
         this.comments = parseComments((Object[]) values.get("comments"));
+        this.status = (String) values.get("bug_status");
+        this.resolution = (BugResolutionType) findByValue(BugResolutionType.class, (String) values.get("resolution"));
         this.notFound = false;
     }
 
@@ -108,7 +140,7 @@ public class Bug implements IssueInfo {
         return false;
     }
 
-    private List<BugComment> parseComments(Object[] commentObjects) {
+    private List<BugComment> parseComments(Object[] commentObjects) throws IOException {
         if (commentObjects == null || commentObjects.length == 0) {
             return Collections.EMPTY_LIST;
         }

@@ -8,7 +8,7 @@ import com.vmware.utils.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@ActionDescription("Exits if a non trivial review does not have review ship its or a review URL")
+@ActionDescription("Exits if a non trivial review does not have review ship its or a review URL.")
 public class ExitIfReviewHasNoShipIts extends AbstractSetShipItReviewersList {
 
     public ExitIfReviewHasNoShipIts(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {

@@ -2,6 +2,7 @@ package com.vmware;
 
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.Bug;
+import com.vmware.bugzilla.domain.BugResolutionType;
 import org.apache.xmlrpc.XmlRpcException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +38,11 @@ public class TestBugzillaApi extends BaseTests {
         Bug bugInfo = bugzilla.getBugById(BUG_ID_TO_CHECK_FOR);
         assertNotNull(bugInfo);
         assertEquals(String.valueOf(BUG_ID_TO_CHECK_FOR), bugInfo.getKey());
+    }
+
+    @Test
+    public void canResolveBug() throws IllegalAccessException, IOException, URISyntaxException {
+        bugzilla.resolveBug(1517191, BugResolutionType.NotABug);
     }
 
     @Test

@@ -1,5 +1,8 @@
 package com.vmware.bugzilla.domain;
 
+import com.vmware.utils.StringUtils;
+
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -22,9 +25,9 @@ public class BugComment {
         this.time = new Date();
     }
 
-    public BugComment(Map values) {
+    public BugComment(Map values) throws IOException {
         this.commentId = (Integer) values.get("comment_id");
-        this.comment = (String) values.get("body");
+        this.comment = StringUtils.convertObjectToString(values.get("body"));
         this.author = (String) values.get("name");
         this.time = (Date) values.get("time");
     }

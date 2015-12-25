@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@ActionDescription("Performs a git commit --amend if changes are detected")
+@ActionDescription("Performs a git commit --amend if changes are detected.")
 public class AmendCommit extends AbstractCommitAction {
 
     public AmendCommit(WorkflowConfig config) {
@@ -24,7 +24,7 @@ public class AmendCommit extends AbstractCommitAction {
         String existingCommitText = git.lastCommitText(true).trim();
         String updatedCommitText = draft.toGitText(config.getCommitConfiguration()).trim();
 
-        if (!draft.hasFileChanges && existingCommitText.equals(updatedCommitText)) {
+        if (git.getStagedChanges().isEmpty() && existingCommitText.equals(updatedCommitText)) {
             log.info("");
             log.info("Not amending commit as it does not have any changes");
             return;

@@ -13,11 +13,10 @@ import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
-import com.vmware.rest.SslUtils;
+import com.vmware.rest.HttpConnection;
 import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.json.NumericalEnum;
-import com.vmware.rest.RestConnection;
 import com.vmware.rest.request.UrlParam;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
@@ -52,7 +51,7 @@ public class Jira extends AbstractRestService {
 
     public Jira(String jiraUrl, String testIssueKey) throws IOException, URISyntaxException, IllegalAccessException {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, null);
-        this.connection = new RestConnection(RequestBodyHandling.AsStringJsonEntity);
+        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";

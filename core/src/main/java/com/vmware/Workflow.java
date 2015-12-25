@@ -6,6 +6,7 @@ import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.action.trello.AbstractTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CommandLineArgumentsParser;
+import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.LogLevel;
 import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
@@ -55,7 +56,7 @@ import java.util.logging.LogManager;
  */
 public class Workflow {
     public static final List<String> MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("commit", "review", "pushable", "pushIt", "createTrelloBoardFromLabel"
+            Arrays.asList("commit", "review", "pushable", "push", "createTrelloBoardFromLabel"
                     , "commitAll", "amendCommit", "commitOffline", "closeOldReviews", "restartJobs", "review"));
 
     private static final String EXIT_WORKFLOW = "exit";
@@ -252,7 +253,9 @@ public class Workflow {
         Padder configPadder = new Padder("Config Options");
         configPadder.infoTitle();
         for (String configOption : configOptions) {
-            log.info("{} - {}", configOption, config.getMatchingProperty(configOption).help());
+            ConfigurableProperty matchingProperty = config.getMatchingProperty(configOption);
+            String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
+            log.info("{} - {}", configOption, matchingPropertyText);
         }
         configPadder.infoTitle();
     }

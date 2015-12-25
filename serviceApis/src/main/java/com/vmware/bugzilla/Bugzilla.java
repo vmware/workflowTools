@@ -2,10 +2,14 @@ package com.vmware.bugzilla;
 
 import com.vmware.AbstractService;
 import com.vmware.bugzilla.domain.Bug;
+import com.vmware.bugzilla.domain.BugResolutionType;
+import com.vmware.rest.HttpConnection;
 import com.vmware.rest.cookie.ApiAuthentication;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
+import com.vmware.rest.exception.InternalServerException;
 import com.vmware.rest.exception.NotFoundException;
+import com.vmware.rest.request.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 
 import java.io.IOException;
@@ -18,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.vmware.rest.cookie.ApiAuthentication.bugzilla_cookie;
+import static java.lang.String.format;
 
 
 /**
@@ -26,7 +31,8 @@ import static com.vmware.rest.cookie.ApiAuthentication.bugzilla_cookie;
  */
 public class Bugzilla extends AbstractService {
 
-    CookieAwareXmlRpcClient xmlRpcClient;
+    private final HttpConnection connection;
+    private CookieAwareXmlRpcClient xmlRpcClient;
     private int testBugNumber;
 
     public Bugzilla(String bugzillaUrl, String username, int testBugNumber) throws IOException, URISyntaxException {
@@ -34,6 +40,7 @@ public class Bugzilla extends AbstractService {
         this.testBugNumber = testBugNumber;
         System.setProperty("jsse.enableSNIExtension", "false");
         xmlRpcClient = new CookieAwareXmlRpcClient(new URL(apiUrl));
+        connection = new HttpConnection(RequestBodyHandling.AsMultiPartFormEntity);
     }
 
     public List<Bug> getBugsForQuery(String savedQueryToRun) throws IOException {
@@ -54,16 +61,11 @@ public class Bugzilla extends AbstractService {
         return new Bug(values);
     }
 
-    public void addBugComment(int bugId, String comment) throws IOException {
-        SimpleDateFormat commentDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        xmlRpcClient.executeCall("Bug.add_comment", bugId, comment, commentDateFormat.format(new Date()), 1);
-    }
-
     public Bug getBugByIdWithoutException(int id) throws IOException {
         try {
             return getBugById(id);
         } catch (NotFoundException nfe) {
-            return new Bug(String.valueOf(id));
+            return new Bug(id);
         }
     }
 
@@ -76,6 +78,30 @@ public class Bugzilla extends AbstractService {
         return queries;
     }
 
+    public void resolveBug(int bugId, BugResolutionType resolution) throws IllegalAccessException, IOException, URISyntaxException {
+        Bug bugToResolve = getBugById(bugId);
+        if (bugToResolve.resolution == resolution) {
+            log.info("Bug with id {} already has resolution {}", bugId, resolution);
+            return;
+        }
+        bugToResolve.knob = "resolve";
+        bugToResolve.resolution = resolution;
+        bugToResolve.resolutionComment = "resolved";
+        bugToResolve.resolveCc = "dbiggs";
+        String response = connection.post(baseUrl + "process_bug.cgi", String.class, bugToResolve);
+
+        Bug updatedBug = getBugById(bugId);
+        if (updatedBug.resolution != resolution) {
+            throw new InternalServerException(
+                    format("Bug %s resolution was %s expected it to be %s after update\n%s", bugId, updatedBug.resolution, resolution, response));
+        }
+    }
+
+    public void addBugComment(int bugId, String comment) throws IOException {
+        SimpleDateFormat commentDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        xmlRpcClient.executeCall("Bug.add_comment", bugId, comment, commentDateFormat.format(new Date()), 1);
+    }
+
     public String constructFullBugUrl(int bugNumber) {
         return baseUrl + "show_bug.cgi?id=" + bugNumber;
     }
@@ -84,10 +110,6 @@ public class Bugzilla extends AbstractService {
     protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
         getBugById(testBugNumber);
 
-    }
-
-    public void login() throws IllegalAccessException, IOException, URISyntaxException {
-        loginManually();
     }
 
     @Override

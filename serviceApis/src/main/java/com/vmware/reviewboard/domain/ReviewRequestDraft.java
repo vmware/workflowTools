@@ -62,9 +62,6 @@ public class ReviewRequestDraft extends BaseEntity{
     public boolean jenkinsJobsAreSuccessful;
 
     @Expose(serialize = false, deserialize = false)
-    public boolean hasFileChanges;
-
-    @Expose(serialize = false, deserialize = false)
     public List<IssueInfo> openIssues = null;
 
     @Expose(serialize = false, deserialize = false)

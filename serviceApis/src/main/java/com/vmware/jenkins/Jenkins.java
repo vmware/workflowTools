@@ -2,12 +2,11 @@ package com.vmware.jenkins;
 
 import com.vmware.AbstractRestService;
 import com.vmware.jenkins.domain.*;
-import com.vmware.rest.cookie.ApiAuthentication;
+import com.vmware.rest.HttpConnection;
 import com.vmware.rest.exception.InternalServerException;
 import com.vmware.rest.exception.NotAuthorizedException;
 import com.vmware.rest.request.RequestParam;
 import com.vmware.rest.request.RequestHeader;
-import com.vmware.rest.RestConnection;
 import com.vmware.rest.UrlUtils;
 import com.vmware.rest.credentials.UsernamePasswordAsker;
 import com.vmware.rest.credentials.UsernamePasswordCredentials;
@@ -41,7 +40,7 @@ public class Jenkins extends AbstractRestService {
         this.configureUrl = baseUrl + "me/configure";
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
-        connection = new RestConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
+        connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
 
         String apiToken = readExistingApiToken(credentialsType);
         if (apiToken != null) {
