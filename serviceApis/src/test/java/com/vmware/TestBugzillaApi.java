@@ -34,7 +34,7 @@ public class TestBugzillaApi extends BaseTests {
 
     @Test
     public void canGetBug() throws IOException, URISyntaxException, IllegalAccessException {
-        final int BUG_ID_TO_CHECK_FOR = 1001;
+        final int BUG_ID_TO_CHECK_FOR = 1344104;
         Bug bugInfo = bugzilla.getBugById(BUG_ID_TO_CHECK_FOR);
         assertNotNull(bugInfo);
         assertEquals(String.valueOf(BUG_ID_TO_CHECK_FOR), bugInfo.getKey());
@@ -42,7 +42,7 @@ public class TestBugzillaApi extends BaseTests {
 
     @Test
     public void canResolveBug() throws IllegalAccessException, IOException, URISyntaxException {
-        bugzilla.resolveBug(1517191, BugResolutionType.NotABug);
+        bugzilla.resolveBug(1344104, BugResolutionType.WontFix);
     }
 
     @Test

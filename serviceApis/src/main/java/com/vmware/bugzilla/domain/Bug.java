@@ -1,13 +1,13 @@
 package com.vmware.bugzilla.domain;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.IssueInfo;
-import com.vmware.rest.json.StringEnumMapper;
-import com.vmware.utils.IOUtils;
+import com.vmware.rest.request.DeserializedName;
+import com.vmware.rest.request.PostDeserialization;
 import com.vmware.utils.MatcherUtils;
 import com.vmware.utils.StringUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,12 +23,29 @@ public class Bug implements IssueInfo {
 
     public static final String TRACKING_ISSUE_TEXT = "Tracking this bug in Jira with issue ";
 
+    @DeserializedName("bug_id")
     @SerializedName("id")
     public String key;
+
+    public String priority;
+
+    @SerializedName("bug_severity")
+    public String bugSeverity;
 
     public String product;
 
     public String category;
+
+    @DeserializedName("product")
+    @SerializedName("found_in_product_name")
+    public String foundInProductName;
+
+    @DeserializedName("found_in")
+    @SerializedName("found_in_version_name")
+    public String foundInVersionName = "";
+
+    @SerializedName("short_desc")
+    public String summary;
 
     public String component;
 
@@ -37,40 +54,41 @@ public class Bug implements IssueInfo {
     public BugResolutionType resolution;
 
     @SerializedName("comment")
-    public String resolutionComment;
+    public String resolutionComment = "";
 
     @SerializedName("cc")
     public String resolveCc;
 
-    private String status;
+    @SerializedName("longdesclength")
+    public int descriptionLength;
 
-    private boolean notFound;
+    public int changed;
 
-    private List<BugComment> comments;
+    public String delta_ts = "";
 
+    @DeserializedName("bug_status")
+    @Expose(serialize = false)
+    public String status;
+
+    public BugComment[] comments;
+
+    private boolean notFound = true;
+
+    @DeserializedName("web_url")
     private String webUrl;
-
-    private String summary;
 
     private String description;
 
+    public Bug() {}
+
     public Bug(int key) {
         this.key = String.valueOf(key);
-        this.notFound = true;
     }
 
-    public Bug(Map values) throws IOException {
-        this.key =  String.valueOf(values.get("bug_id"));
-        this.product = (String) values.get("product");
-        this.category = (String) values.get("category");
-        this.component = (String) values.get("component");
-        this.webUrl = String.valueOf(values.get("web_url"));
-        this.summary = (String) values.get("short_desc");
-        this.description = StringUtils.convertObjectToString(values.get("description"));
-        this.comments = parseComments((Object[]) values.get("comments"));
-        this.status = (String) values.get("bug_status");
-        this.resolution = (BugResolutionType) findByValue(BugResolutionType.class, (String) values.get("resolution"));
-        this.notFound = false;
+    @PostDeserialization
+    public void calculateDerivedValues() {
+        this.descriptionLength = description != null ? description.length() : 0;
+        this.notFound = webUrl == null;
     }
 
     @Override
@@ -138,17 +156,6 @@ public class Bug implements IssueInfo {
             }
         }
         return false;
-    }
-
-    private List<BugComment> parseComments(Object[] commentObjects) throws IOException {
-        if (commentObjects == null || commentObjects.length == 0) {
-            return Collections.EMPTY_LIST;
-        }
-        List<BugComment> comments = new ArrayList<>();
-        for (Object commentObject : commentObjects) {
-            comments.add(new BugComment((Map) commentObject));
-        }
-        return comments;
     }
 
 }
