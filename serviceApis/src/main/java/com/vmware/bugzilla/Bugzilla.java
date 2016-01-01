@@ -11,6 +11,7 @@ import com.vmware.rest.exception.InternalServerException;
 import com.vmware.rest.exception.NotFoundException;
 import com.vmware.rest.request.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
+import com.vmware.xmlrpc.MapToObjectConverter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -33,6 +34,7 @@ public class Bugzilla extends AbstractService {
 
     private final HttpConnection connection;
     private CookieAwareXmlRpcClient xmlRpcClient;
+    private MapToObjectConverter mapConverter;
     private int testBugNumber;
 
     public Bugzilla(String bugzillaUrl, String username, int testBugNumber) throws IOException, URISyntaxException {
@@ -40,7 +42,8 @@ public class Bugzilla extends AbstractService {
         this.testBugNumber = testBugNumber;
         System.setProperty("jsse.enableSNIExtension", "false");
         xmlRpcClient = new CookieAwareXmlRpcClient(new URL(apiUrl));
-        connection = new HttpConnection(RequestBodyHandling.AsMultiPartFormEntity);
+        connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
+        mapConverter = new MapToObjectConverter();
     }
 
     public List<Bug> getBugsForQuery(String savedQueryToRun) throws IOException {
@@ -50,7 +53,7 @@ public class Bugzilla extends AbstractService {
         for (Object bug : bugs) {
             Map bugValues = (Map) bug;
             bugValues.put("web_url", constructFullBugUrl((Integer) bugValues.get("bug_id")));
-            bugList.add(new Bug((Map) bug));
+            bugList.add(mapConverter.convert(bugValues, Bug.class));
         }
         return bugList;
     }
@@ -58,7 +61,7 @@ public class Bugzilla extends AbstractService {
     public Bug getBugById(int id) throws IOException {
         Map values = xmlRpcClient.executeCall("Bug.show_bug", id);
         values.put("web_url", constructFullBugUrl(id));
-        return new Bug(values);
+        return mapConverter.convert(values, Bug.class);
     }
 
     public Bug getBugByIdWithoutException(int id) throws IOException {
@@ -85,9 +88,8 @@ public class Bugzilla extends AbstractService {
             return;
         }
         bugToResolve.knob = "resolve";
+        bugToResolve.changed = 1;
         bugToResolve.resolution = resolution;
-        bugToResolve.resolutionComment = "resolved";
-        bugToResolve.resolveCc = "dbiggs";
         String response = connection.post(baseUrl + "process_bug.cgi", String.class, bugToResolve);
 
         Bug updatedBug = getBugById(bugId);

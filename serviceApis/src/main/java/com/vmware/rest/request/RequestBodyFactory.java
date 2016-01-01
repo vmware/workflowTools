@@ -27,6 +27,7 @@ import java.util.Map;
 public class RequestBodyFactory {
     private static final Logger log = LoggerFactory.getLogger(RequestBodyFactory.class);
     private static final String LINE_FEED = "\r\n";
+    private static final String TWO_HYPHENS = "--";
 
     public static void setRequestDataForConnection(HttpConnection connection, final Object requestObject)
             throws IllegalAccessException, IOException {
@@ -66,7 +67,7 @@ public class RequestBodyFactory {
     private static void writeObjectAsMultipart(final HttpConnection connection, final Object requestObject)
             throws IllegalAccessException, IOException {
         // creates a unique boundary based on time stamp
-        String boundary = "===" + System.currentTimeMillis() + "===";
+        String boundary = "**********" + System.currentTimeMillis();
         connection.setRequestProperty("Content-Type","multipart/form-data; boundary=" + boundary);
         OutputStream outputStream = connection.getOutputStream();
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"),
@@ -82,8 +83,9 @@ public class RequestBodyFactory {
                 addStringPart(writer, boundary, fieldName, String.valueOf(value));
             }
         }
-        writer.append(LINE_FEED).flush();
-        writer.append("--").append(boundary).append("--").append(LINE_FEED);
+        writer.append(LINE_FEED);
+        log.info(TWO_HYPHENS + boundary + TWO_HYPHENS);
+        writer.append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(LINE_FEED).flush();
         writer.close();
     }
 
@@ -152,6 +154,7 @@ public class RequestBodyFactory {
             String encodedValue = URLEncoder.encode(stringValue,  "UTF-8");
             contentToWrite += name + "=" + encodedValue;
         }
+        log.info("Form encoded request\n{}", contentToWrite);
         outputStream.writeBytes(contentToWrite);
         outputStream.flush();
         outputStream.close();
@@ -164,13 +167,18 @@ public class RequestBodyFactory {
      * @param value field value
      */
     public static void addStringPart(PrintWriter writer, String boundary, String name, String value) throws UnsupportedEncodingException {
-        writer.append("--").append(boundary).append(LINE_FEED);
-        writer.append("Content-Disposition: form-data; name=\"").append(name).append("\"")
+        StringBuilder contentToAdd = new StringBuilder();
+
+        contentToAdd.append(TWO_HYPHENS).append(boundary).append(LINE_FEED);
+        contentToAdd.append("Content-Disposition: form-data; name=\"").append(name).append("\"")
                 .append(LINE_FEED);
-        writer.append("Content-Type: text/plain; charset=UTF-8").append(
+        contentToAdd.append("Content-Type: text/plain; charset=UTF-8").append(
                 LINE_FEED);
-        writer.append(LINE_FEED);
-        writer.append(URLEncoder.encode(value, "UTF-8")).append(LINE_FEED);
+        contentToAdd.append(LINE_FEED);
+        contentToAdd.append(value).append(LINE_FEED);
+        String content = contentToAdd.toString();
+        writer.append(content);
+        log.info(content);
         writer.flush();
     }
 
@@ -184,7 +192,7 @@ public class RequestBodyFactory {
     public static void addFilePart(PrintWriter writer, String boundary, OutputStream outputStream, String fieldName, byte[] uploadFileData)
             throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(uploadFileData);
-        writer.append("--").append(boundary).append(LINE_FEED);
+        writer.append(TWO_HYPHENS).append(boundary).append(LINE_FEED);
         writer.append("Content-Disposition: form-data; name=\"").append(fieldName)
                 .append("\"; filename=\"").append(fieldName).append("\"")
                 .append(LINE_FEED);

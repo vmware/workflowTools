@@ -1,5 +1,6 @@
 package com.vmware.bugzilla.domain;
 
+import com.google.gson.annotations.SerializedName;
 import com.vmware.utils.StringUtils;
 
 import java.io.IOException;
@@ -11,25 +12,23 @@ import java.util.Map;
  */
 public class BugComment {
 
+    @SerializedName("comment_id")
     private Integer commentId;
 
+    @SerializedName("body")
     private String comment;
 
+    @SerializedName("name")
     private String author;
 
     private Date time;
+
+    public BugComment() {}
 
     public BugComment(String comment, String author) {
         this.comment = comment;
         this.author = author;
         this.time = new Date();
-    }
-
-    public BugComment(Map values) throws IOException {
-        this.commentId = (Integer) values.get("comment_id");
-        this.comment = StringUtils.convertObjectToString(values.get("body"));
-        this.author = (String) values.get("name");
-        this.time = (Date) values.get("time");
     }
 
     public Integer getCommentId() {
