@@ -84,7 +84,7 @@ public class RequestBodyFactory {
             }
         }
         writer.append(LINE_FEED);
-        log.info(TWO_HYPHENS + boundary + TWO_HYPHENS);
+        log.trace(TWO_HYPHENS + boundary + TWO_HYPHENS);
         writer.append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(LINE_FEED).flush();
         writer.close();
     }
@@ -154,7 +154,7 @@ public class RequestBodyFactory {
             String encodedValue = URLEncoder.encode(stringValue,  "UTF-8");
             contentToWrite += name + "=" + encodedValue;
         }
-        log.info("Form encoded request\n{}", contentToWrite);
+        log.trace("Form encoded request\n{}", contentToWrite);
         outputStream.writeBytes(contentToWrite);
         outputStream.flush();
         outputStream.close();
@@ -178,7 +178,7 @@ public class RequestBodyFactory {
         contentToAdd.append(value).append(LINE_FEED);
         String content = contentToAdd.toString();
         writer.append(content);
-        log.info(content);
+        log.trace(content);
         writer.flush();
     }
 
