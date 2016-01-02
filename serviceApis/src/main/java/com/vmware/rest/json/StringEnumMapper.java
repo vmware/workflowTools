@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.vmware.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,9 @@ public class StringEnumMapper implements JsonDeserializer<StringEnum>, JsonSeria
     }
 
     public static StringEnum findByValue(Class enumClass, String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
         Class<Enum> enumType = (Class<Enum>) enumClass;
         for (Object enumValue : EnumSet.allOf(enumType)) {
             if (((StringEnum) enumValue).getValue().equals(value)) {
