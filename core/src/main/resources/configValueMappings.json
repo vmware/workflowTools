@@ -10,7 +10,8 @@
   ],
   "AbstractBatchJiraAction": [
     "--jira-test-issue",
-    "--jira-url"
+    "--jira-url",
+    "--disable-jira"
   ],
   "ReadLastCommit": [
     "--branch"
@@ -20,6 +21,11 @@
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
+  ],
+  "MarkBugAsResolved": [
+    "--bugzilla-test-bug",
+    "--username",
+    "--bugzilla-url"
   ],
   "AbstractCommitWithReviewAction": [
     "--review-board-date-format",
@@ -128,12 +134,18 @@
     "--username",
     "--reviewboard-url"
   ],
+  "ResolveBugsWithResolvedTrackingIssues": [
+    "--disable-jira",
+    "--jira-test-issue",
+    "--jira-url"
+  ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
   ],
   "AbstractBatchBugzillaAction": [
     "--default-jira-component",
     "--default-jira-project",
+    "--disable-bugzilla",
     "--bugzilla-test-bug",
     "--username",
     "--bugzilla-url"
@@ -188,11 +200,15 @@
   "AbstractTransitionJiraIssue": [
     "--username",
     "--jira-test-issue",
-    "--jira-url"
+    "--jira-url",
+    "--disable-jira"
   ],
   "SetSummary": [
     "--max-summary",
     "--set-empty-only"
+  ],
+  "LoadBugsForQuery": [
+    "--bugzilla-query"
   ],
   "UpdateReviewDetails": [
     "--groups"

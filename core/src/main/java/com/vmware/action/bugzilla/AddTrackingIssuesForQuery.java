@@ -20,8 +20,7 @@ public class AddTrackingIssuesForQuery extends AbstractBatchBugzillaAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        log.info("Using named query {} for retrieving bugs, change by specifying --bugzilla-query=QueryName", config.bugzillaQuery);
-        List<Bug> bugList = bugzilla.getBugsForQuery(config.bugzillaQuery);
+        List<Bug> bugList = projectIssues.getBugs();
         if (bugList.isEmpty()) {
             log.info("No bugs found for named query {}", config.bugzillaQuery);
             return;
@@ -38,7 +37,7 @@ public class AddTrackingIssuesForQuery extends AbstractBatchBugzillaAction {
                     trackingIssue.matchingBugzillaNumber(config.bugzillaUrl), bug.getSummary());
         }
 
-        if (projectIssues.isEmpty()) {
+        if (projectIssues.noIssuesAdded()) {
             log.info("No issues added", config.bugzillaQuery);
         }
     }

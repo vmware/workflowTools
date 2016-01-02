@@ -32,7 +32,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (projectIssues.isEmpty()) {
+        if (projectIssues.noIssuesAdded()) {
             log.info("No jira issues loaded. No need to create trello cards.");
             return;
         }

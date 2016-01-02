@@ -147,7 +147,7 @@
           "ReadLastCommit", "CheckStatusOfJenkinsJobs", "CheckStatusOfReviewShipIts", "AmendCommit"
        ],
        "resolveIssue": [
-          "ReadLastCommit", "ExitIfCommitHasNoBugNumber", "MarkIssueAsResolved"
+          "ReadLastCommit", "ExitIfCommitHasNoBugNumber", "MarkBugAsResolved", "MarkIssueAsResolved"
        ],
        "setMissingCommitValues": [
           "ReadLastCommit", "setCommitDetailsWithoutConfirmation", "ExitIfCommitUnchanged",
@@ -184,7 +184,10 @@
           "AddTrackingIssueForBug", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
        ],
        "createTrackingIssuesForQuery": [
-          "AddTrackingIssuesForQuery", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
+          "LoadBugsForQuery", "AddTrackingIssuesForQuery", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
+       ],
+       "resolveBugsForQuery": [
+          "LoadBugsForQuery", "ExitIfThereAreNoBugsToProcess", "ResolveBugsWithResolvedTrackingIssues"
        ],
        "createTrelloBoard": [
           "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"

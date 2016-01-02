@@ -132,6 +132,10 @@ public class Issue implements IssueInfo {
         return fields.description;
     }
 
+    public IssueResolutionDefinition getResolution() {
+        return fields.resolution != null ? fields.resolution.definition : null;
+    }
+
     public Integer matchingBugzillaNumber(String bugzillaUrl) {
         String bugzillaNumber = MatcherUtils.singleMatch(fields.description, bugzillaUrl + "/*show_bug\\.cgi\\?id=(\\d+)");
         return bugzillaNumber != null ? Integer.parseInt(bugzillaNumber) : null;
