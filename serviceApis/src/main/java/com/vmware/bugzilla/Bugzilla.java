@@ -97,6 +97,7 @@ public class Bugzilla extends AbstractService {
             throw new InternalServerException(
                     format("Bug %s resolution was %s expected it to be %s after update\n%s", bugId, updatedBug.resolution, resolution, response));
         }
+        log.info("Resolved bug {} with resolution {}", bugId, resolution.getValue());
     }
 
     public void addBugComment(int bugId, String comment) throws IOException {

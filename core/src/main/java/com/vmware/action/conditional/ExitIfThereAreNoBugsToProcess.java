@@ -8,16 +8,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Helper action for exiting if there are no project issues to process.")
-public class ExitIfThereAreNoIssuesToProcess extends AbstractBatchIssuesAction {
+@ActionDescription("Helper action for exiting if there are no bugs to process.")
+public class ExitIfThereAreNoBugsToProcess extends AbstractBatchIssuesAction {
 
-    public ExitIfThereAreNoIssuesToProcess(WorkflowConfig config) {
+    public ExitIfThereAreNoBugsToProcess(WorkflowConfig config) {
         super(config);
     }
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (projectIssues.noIssuesAdded()) {
+        if (projectIssues.noBugsAdded()) {
             System.exit(0);
         }
     }

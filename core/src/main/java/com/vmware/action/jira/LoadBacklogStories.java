@@ -71,10 +71,10 @@ public class LoadBacklogStories extends AbstractBatchJiraAction {
             log.info("Please enter label to use");
             int selectedLabelIndex = InputUtils.readSelection(labels, "Jira Labels");
             String selectedLabel = labels.get(selectedLabelIndex);
-            projectIssues.addAll(filterByLabel(issues, selectedLabel));
+            projectIssues.addAllIssues(filterByLabel(issues, selectedLabel));
             projectIssues.projectName += " (" + selectedLabel + ")";
         } else {
-            projectIssues.addAll(Arrays.asList(issues));
+            projectIssues.addAllIssues(Arrays.asList(issues));
         }
 
         List<Issue> issuesForProcessing = projectIssues.getIssuesForProcessing();

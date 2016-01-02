@@ -1,5 +1,7 @@
 package com.vmware.jira.domain;
 
+import com.vmware.bugzilla.domain.Bug;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,11 +11,18 @@ public class ProjectIssues {
 
     public String projectName;
 
-    private List<Issue> issuesForProcessing = new ArrayList<Issue>();
+    private List<Issue> issuesForProcessing = new ArrayList<>();
+
+    private List<Bug> bugsForProcessing = new ArrayList<>();
 
     public void reset() {
         projectName = "";
         issuesForProcessing.clear();
+        bugsForProcessing.clear();
+    }
+
+    public List<Bug> getBugs() {
+        return Collections.unmodifiableList(bugsForProcessing);
     }
 
     public List<Issue> getIssuesFromJira() {
@@ -54,11 +63,23 @@ public class ProjectIssues {
         issuesForProcessing.add(issue);
     }
 
-    public void addAll(Collection<Issue> issues) {
+    public void add(Bug bug) {
+        bugsForProcessing.add(bug);
+    }
+
+    public void addAllBugs(Collection<Bug> bugs) {
+        bugsForProcessing.addAll(bugs);
+    }
+
+    public boolean noBugsAdded() {
+        return bugsForProcessing.isEmpty();
+    }
+
+    public void addAllIssues(Collection<Issue> issues) {
         issuesForProcessing.addAll(issues);
     }
 
-    public boolean isEmpty() {
+    public boolean noIssuesAdded() {
         return issuesForProcessing.isEmpty();
     }
 }

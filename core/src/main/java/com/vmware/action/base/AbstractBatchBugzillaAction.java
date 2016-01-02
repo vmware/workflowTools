@@ -23,6 +23,15 @@ public abstract class AbstractBatchBugzillaAction extends AbstractBatchIssuesAct
         this.bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, true);
     }
 
+    @Override
+    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+        if (config.disableBugzilla) {
+            log.warn("Bugzilla is disabled by config property disableBugzilla");
+            return false;
+        }
+        return super.canRunAction();
+    }
+
     protected Issue createIssueFromBug(Bug bug) {
         String summary = "[BZ-" + bug.getKey() + "] " + bug.getSummary();
         String description = bug.getWebUrl() + "\n" + bug.getDescription();

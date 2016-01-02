@@ -4,13 +4,14 @@ import com.vmware.rest.json.StringEnum;
 
 /**
  * Valid resolution values for a bug.
+ * The enum names must match the IssueResolutionDefinition enum names so that equivalent resolutions can be mapped to each other.
  */
 public enum BugResolutionType implements StringEnum {
     Fixed("fixed"),
-    UserError("user error"),
+    NotABug("user error"),
     WontFix("wont fix"),
-    UnableToDuplicate("unable to duplicate"),
-    NotABug("not a bug"),
+    CannotReproduce("unable to duplicate"),
+    AsDesigned("not a bug"),
     UnknownValue("Unknown value");
 
     private String value;
