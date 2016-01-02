@@ -13,14 +13,14 @@ import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
-import com.vmware.rest.HttpConnection;
-import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.exception.NotFoundException;
-import com.vmware.rest.json.NumericalEnum;
-import com.vmware.rest.request.UrlParam;
-import com.vmware.rest.credentials.UsernamePasswordAsker;
-import com.vmware.rest.credentials.UsernamePasswordCredentials;
-import com.vmware.rest.request.RequestBodyHandling;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.json.NumericalEnum;
+import com.vmware.http.request.UrlParam;
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.http.request.RequestBodyHandling;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ import static com.vmware.jira.domain.IssueTypeDefinition.Bug;
 import static com.vmware.jira.domain.IssueTypeDefinition.Feature;
 import static com.vmware.jira.domain.IssueTypeDefinition.Improvement;
 import static com.vmware.jira.domain.IssueTypeDefinition.TechComm;
-import static com.vmware.rest.cookie.ApiAuthentication.jira;
+import static com.vmware.http.cookie.ApiAuthentication.jira;
 
 public class Jira extends AbstractRestService {
 

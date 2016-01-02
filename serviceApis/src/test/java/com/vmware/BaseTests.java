@@ -1,6 +1,6 @@
 package com.vmware;
 
-import com.vmware.rest.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.utils.ClasspathResource;
 import org.junit.BeforeClass;
 

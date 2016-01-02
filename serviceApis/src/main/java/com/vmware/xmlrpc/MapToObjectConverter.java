@@ -1,12 +1,12 @@
 package com.vmware.xmlrpc;
 
 import com.google.gson.annotations.SerializedName;
-import com.vmware.rest.json.NumericalEnum;
-import com.vmware.rest.json.NumericalEnumMapper;
-import com.vmware.rest.json.StringEnum;
-import com.vmware.rest.json.StringEnumMapper;
-import com.vmware.rest.request.DeserializedName;
-import com.vmware.rest.request.PostDeserialization;
+import com.vmware.http.json.NumericalEnum;
+import com.vmware.http.json.NumericalEnumMapper;
+import com.vmware.http.json.StringEnum;
+import com.vmware.http.json.StringEnumMapper;
+import com.vmware.http.request.DeserializedName;
+import com.vmware.http.request.PostDeserialization;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import static com.vmware.utils.StringUtils.appendCsvValue;
 import static com.vmware.utils.StringUtils.isNotBlank;
-import static com.vmware.rest.UrlUtils.addTrailingSlash;
+import static com.vmware.http.UrlUtils.addTrailingSlash;
 
 public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)

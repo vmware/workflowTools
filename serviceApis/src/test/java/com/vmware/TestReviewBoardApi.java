@@ -1,9 +1,9 @@
 package com.vmware;
 
-import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.cookie.CookieFileStore;
-import com.vmware.rest.exception.NotFoundException;
-import com.vmware.rest.json.ConfiguredGsonBuilder;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.cookie.CookieFileStore;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;

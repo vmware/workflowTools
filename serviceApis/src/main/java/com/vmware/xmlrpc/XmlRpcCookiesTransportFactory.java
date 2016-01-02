@@ -1,19 +1,11 @@
 package com.vmware.xmlrpc;
 
-import com.vmware.rest.cookie.CookieFileStore;
-import org.apache.xmlrpc.XmlRpcRequest;
+import com.vmware.http.cookie.CookieFileStore;
 import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientException;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
-import org.apache.xmlrpc.client.XmlRpcSunHttpTransport;
 import org.apache.xmlrpc.client.XmlRpcTransport;
 
-import java.io.IOException;
 import java.net.CookieStore;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * A cookie-aware implementation of an

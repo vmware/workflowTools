@@ -1,12 +1,12 @@
 package com.vmware.reviewboard;
 
 import com.vmware.AbstractRestService;
-import com.vmware.rest.HttpConnection;
-import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.request.UrlParam;
-import com.vmware.rest.credentials.UsernamePasswordAsker;
-import com.vmware.rest.credentials.UsernamePasswordCredentials;
-import com.vmware.rest.request.RequestBodyHandling;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.request.UrlParam;
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.Link;
 import com.vmware.reviewboard.domain.ResultsCount;
@@ -34,8 +34,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import static com.vmware.rest.cookie.ApiAuthentication.reviewBoard;
-import static com.vmware.rest.request.RequestHeader.anAcceptHeader;
+import static com.vmware.http.cookie.ApiAuthentication.reviewBoard;
+import static com.vmware.http.request.RequestHeader.anAcceptHeader;
 import static com.vmware.reviewboard.domain.ReviewRequestDraft.anEmptyDraftForPublishingAReview;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.all;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.pending;

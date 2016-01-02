@@ -4,7 +4,7 @@ import com.vmware.action.base.AbstractBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
-import com.vmware.rest.exception.NotFoundException;
+import com.vmware.http.exception.NotFoundException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

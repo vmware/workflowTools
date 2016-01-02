@@ -1,7 +1,7 @@
 package com.vmware.trello.domain;
 
 import com.google.gson.annotations.SerializedName;
-import com.vmware.rest.credentials.UsernamePasswordCredentials;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
 
 public class LoginInfo {
     @SerializedName("user")

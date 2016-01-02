@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.JobBuildResult;
-import com.vmware.rest.exception.NotFoundException;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.StringUtils;

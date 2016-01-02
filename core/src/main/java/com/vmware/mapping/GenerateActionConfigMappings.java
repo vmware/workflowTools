@@ -3,7 +3,7 @@ package com.vmware.mapping;
 import com.vmware.SimpleLogFormatter;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.rest.json.ConfiguredGsonBuilder;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.utils.FileUtils;
 import com.vmware.utils.IOUtils;
 

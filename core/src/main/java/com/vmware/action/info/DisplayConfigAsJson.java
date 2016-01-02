@@ -4,10 +4,8 @@ import com.google.gson.Gson;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.rest.json.ConfiguredGsonBuilder;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.utils.Padder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

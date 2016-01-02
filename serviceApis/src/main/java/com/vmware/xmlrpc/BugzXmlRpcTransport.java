@@ -5,7 +5,7 @@
 
 package com.vmware.xmlrpc;
 
-import com.vmware.rest.cookie.CookieFileStore;
+import com.vmware.http.cookie.CookieFileStore;
 import com.vmware.utils.IOUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 

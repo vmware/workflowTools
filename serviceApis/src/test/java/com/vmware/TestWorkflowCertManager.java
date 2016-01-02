@@ -1,6 +1,6 @@
 package com.vmware;
 
-import com.vmware.rest.ssl.WorkflowCertificateManager;
+import com.vmware.http.ssl.WorkflowCertificateManager;
 import org.junit.Before;
 import org.junit.Test;
 

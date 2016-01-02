@@ -1,6 +1,6 @@
 package com.vmware.jira.domain;
 
-import com.vmware.rest.json.NumericalEnum;
+import com.vmware.http.json.NumericalEnum;
 
 public enum IssueTypeDefinition implements NumericalEnum<IssueTypeDefinition> {
     Bug(1),
