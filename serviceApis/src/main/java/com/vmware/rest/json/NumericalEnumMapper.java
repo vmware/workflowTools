@@ -23,7 +23,7 @@ public class NumericalEnumMapper implements JsonDeserializer<NumericalEnum>, Jso
     public NumericalEnum deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         int value = jsonElement.getAsInt();
         Class<Enum> enumType = (Class<Enum>) type;
-        return findByValue(value, enumType);
+        return findByValue(enumType, value);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class NumericalEnumMapper implements JsonDeserializer<NumericalEnum>, Jso
         return new JsonPrimitive(String.valueOf(numericalEnum.getCode()));
     }
 
-    public static NumericalEnum findByValue(int value, Class<Enum> enumType) {
+    public static NumericalEnum findByValue(Class<Enum> enumType, int value) {
         for (Object enumValue : EnumSet.allOf(enumType)) {
             if (((NumericalEnum)enumValue).getCode() == value) {
                 return (NumericalEnum) enumValue;
