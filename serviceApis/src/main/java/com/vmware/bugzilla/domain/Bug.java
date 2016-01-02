@@ -3,18 +3,9 @@ package com.vmware.bugzilla.domain;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.IssueInfo;
-import com.vmware.rest.request.DeserializedName;
-import com.vmware.rest.request.PostDeserialization;
+import com.vmware.http.request.DeserializedName;
+import com.vmware.http.request.PostDeserialization;
 import com.vmware.utils.MatcherUtils;
-import com.vmware.utils.StringUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static com.vmware.rest.json.StringEnumMapper.findByValue;
 
 /**
  * Represents a bug in Bugzilla.

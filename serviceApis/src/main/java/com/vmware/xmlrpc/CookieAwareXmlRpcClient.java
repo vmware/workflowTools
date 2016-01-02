@@ -3,10 +3,10 @@
  */
 package com.vmware.xmlrpc;
 
-import com.vmware.rest.cookie.CookieFileStore;
-import com.vmware.rest.exception.NotAuthorizedException;
-import com.vmware.rest.exception.NotFoundException;
-import com.vmware.rest.ssl.WorkflowCertificateManager;
+import com.vmware.http.cookie.CookieFileStore;
+import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.ssl.WorkflowCertificateManager;
 import com.vmware.utils.input.InputUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;

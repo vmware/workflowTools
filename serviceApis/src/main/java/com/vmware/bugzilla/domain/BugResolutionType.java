@@ -1,6 +1,6 @@
 package com.vmware.bugzilla.domain;
 
-import com.vmware.rest.json.StringEnum;
+import com.vmware.http.json.StringEnum;
 
 /**
  * Valid resolution values for a bug.

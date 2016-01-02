@@ -1,9 +1,9 @@
 package com.vmware;
 
-import com.vmware.rest.UrlUtils;
-import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.exception.ForbiddenException;
-import com.vmware.rest.exception.NotAuthorizedException;
+import com.vmware.http.UrlUtils;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.exception.ForbiddenException;
+import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

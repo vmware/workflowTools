@@ -3,7 +3,7 @@ package com.vmware.action.review;
 import com.vmware.action.base.AbstractCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.rest.exception.NotFoundException;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequest;
 
 import java.io.IOException;

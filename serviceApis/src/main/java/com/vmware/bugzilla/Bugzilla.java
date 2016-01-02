@@ -3,13 +3,13 @@ package com.vmware.bugzilla;
 import com.vmware.AbstractService;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugResolutionType;
-import com.vmware.rest.HttpConnection;
-import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.credentials.UsernamePasswordAsker;
-import com.vmware.rest.credentials.UsernamePasswordCredentials;
-import com.vmware.rest.exception.InternalServerException;
-import com.vmware.rest.exception.NotFoundException;
-import com.vmware.rest.request.RequestBodyHandling;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.http.exception.InternalServerException;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapToObjectConverter;
 
@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.vmware.rest.cookie.ApiAuthentication.bugzilla_cookie;
+import static com.vmware.http.cookie.ApiAuthentication.bugzilla_cookie;
 import static java.lang.String.format;
 
 

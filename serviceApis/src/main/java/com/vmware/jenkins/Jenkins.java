@@ -2,16 +2,16 @@ package com.vmware.jenkins;
 
 import com.vmware.AbstractRestService;
 import com.vmware.jenkins.domain.*;
-import com.vmware.rest.HttpConnection;
-import com.vmware.rest.exception.InternalServerException;
-import com.vmware.rest.exception.NotAuthorizedException;
-import com.vmware.rest.request.RequestParam;
-import com.vmware.rest.request.RequestHeader;
-import com.vmware.rest.UrlUtils;
-import com.vmware.rest.credentials.UsernamePasswordAsker;
-import com.vmware.rest.credentials.UsernamePasswordCredentials;
-import com.vmware.rest.exception.NotFoundException;
-import com.vmware.rest.request.RequestBodyHandling;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.exception.InternalServerException;
+import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.http.request.RequestParam;
+import com.vmware.http.request.RequestHeader;
+import com.vmware.http.UrlUtils;
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.rest.cookie.ApiAuthentication.*;
+import static com.vmware.http.cookie.ApiAuthentication.*;
 
 public class Jenkins extends AbstractRestService {
 

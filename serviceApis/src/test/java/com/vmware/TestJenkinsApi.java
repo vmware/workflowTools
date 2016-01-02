@@ -7,7 +7,7 @@ import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.JobsList;
-import com.vmware.rest.exception.NotFoundException;
+import com.vmware.http.exception.NotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 

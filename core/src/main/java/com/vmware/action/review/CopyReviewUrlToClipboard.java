@@ -3,7 +3,7 @@ package com.vmware.action.review;
 import com.vmware.action.base.AbstractCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.rest.UrlUtils;
+import com.vmware.http.UrlUtils;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;

@@ -1,10 +1,10 @@
 package com.vmware;
 
-import com.vmware.rest.HttpConnection;
-import com.vmware.rest.cookie.ApiAuthentication;
-import com.vmware.rest.request.RequestParam;
-import com.vmware.rest.exception.ForbiddenException;
-import com.vmware.rest.exception.NotAuthorizedException;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.request.RequestParam;
+import com.vmware.http.exception.ForbiddenException;
+import com.vmware.http.exception.NotAuthorizedException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

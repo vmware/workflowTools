@@ -6,12 +6,8 @@
 package com.vmware.action.base;
 
 import com.vmware.action.AbstractAction;
-import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jira.domain.Issue;
-import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.jira.domain.ProjectIssues;
-import com.vmware.rest.UrlUtils;
 
 public abstract class AbstractBatchIssuesAction extends AbstractAction {
 

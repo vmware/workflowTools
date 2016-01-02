@@ -6,7 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueType;
 import com.vmware.jira.domain.IssueTypeDefinition;
-import com.vmware.rest.UrlUtils;
+import com.vmware.http.UrlUtils;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;

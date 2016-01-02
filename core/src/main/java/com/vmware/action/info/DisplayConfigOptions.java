@@ -5,7 +5,7 @@ import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.rest.json.ConfiguredGsonBuilder;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.utils.ClasspathResource;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
