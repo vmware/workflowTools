@@ -92,10 +92,10 @@
           "UpdateReviewDetails", "UploadReviewDiff"
        ],
        "forceNewReview": [
-          "readNonTrivialCommit", "CreateReview", "setReviewDetails", "AmendCommit", "DisplayReviewUrl"
+          "readNonTrivialCommit", "CreateReview", "setReviewDetails", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "review": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "DisplayReviewUrl"
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "reviewPlusCopyUrl": [
           "review", "CopyReviewUrlToClipboard"
