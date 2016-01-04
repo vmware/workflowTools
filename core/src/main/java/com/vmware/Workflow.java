@@ -261,13 +261,26 @@ public class Workflow {
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 try {
                     Object matchingValue = matchingField.get(config);
-                    log.info("{}={} - {}", configOption, String.valueOf(matchingValue), matchingPropertyText);
+                    String matchingValueText = convertObjectToString(matchingValue);
+                    log.info("{}={} - {}", configOption, matchingValueText, matchingPropertyText);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
         configPadder.infoTitle();
+    }
+
+    private static String convertObjectToString(Object matchingValue) {
+        String matchingValueText = "";
+        if (matchingValue instanceof String[]) {
+            matchingValueText = Arrays.toString((Object[]) matchingValue);
+        } else if (matchingValue instanceof int[]) {
+            matchingValueText = Arrays.toString((int[]) matchingValue);
+        } else if (matchingValue != null) {
+            matchingValueText = String.valueOf(matchingValue);
+        }
+        return matchingValueText;
     }
 
     private static void runActions(List<Class<? extends AbstractAction>> actions, WorkflowConfig config, WorkflowActionValues values) throws IllegalAccessException, URISyntaxException,
