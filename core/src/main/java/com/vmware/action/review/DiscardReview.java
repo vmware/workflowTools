@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Discards the review associated with the commit")
+@ActionDescription("Discards the review associated with the commit.")
 public class DiscardReview extends AbstractCommitWithReviewAction {
 
     public DiscardReview(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {

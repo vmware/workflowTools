@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Exits if a review request has not been made public")
+@ActionDescription("Exits if a review request has not been made public.")
 public class ExitIfReviewIsNotPublic extends AbstractCommitWithReviewAction {
 
     public ExitIfReviewIsNotPublic(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {

@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Map;
 
-@ActionDescription("Displays the current workflow configuration")
+@ActionDescription("Displays the current workflow configuration.")
 public class DisplayConfig extends AbstractAction {
 
     public DisplayConfig(WorkflowConfig config) {

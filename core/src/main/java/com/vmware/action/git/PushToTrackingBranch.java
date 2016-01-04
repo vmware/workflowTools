@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Pushed to the remote branch that this local branch is tracking")
+@ActionDescription("Pushed to the remote branch that this local branch is tracking.")
 public class PushToTrackingBranch extends AbstractAction {
 
     public PushToTrackingBranch(WorkflowConfig config) {

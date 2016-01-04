@@ -4,7 +4,7 @@ import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-@ActionDescription("Exit if the current commit is reviewed by trivial")
+@ActionDescription("Exit if the current commit is reviewed by trivial.")
 public class ExitIfTrivialCommit extends AbstractCommitAction {
 
     public ExitIfTrivialCommit(WorkflowConfig config) {

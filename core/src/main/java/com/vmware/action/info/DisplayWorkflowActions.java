@@ -36,6 +36,9 @@ public class DisplayWorkflowActions extends AbstractAction {
                 }
                 String helpText = "- " + description.value();
                 log.info(action.getSimpleName() + " " + helpText);
+                if (!helpText.endsWith(".")) {
+                    log.warn("*** ADD ENDING FULL STOP FOR ABOVE DESCRIPTION");
+                }
             }
             packagePadder.infoTitle();
         }

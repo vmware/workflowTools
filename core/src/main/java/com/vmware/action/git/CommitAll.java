@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@ActionDescription("Performs a git commit --all, -all will automatically add tracked file changes to the commit")
+@ActionDescription("Performs a git commit --all, -all will automatically add tracked file changes to the commit.")
 public class CommitAll extends AbstractCommitAction {
 
     public CommitAll(WorkflowConfig config) {

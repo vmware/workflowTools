@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Applies a specified review request's diff against the local repository")
+@ActionDescription("Applies a specified review request's diff against the local repository.")
 public class ApplyReviewPatch extends AbstractAction {
 
     private ReviewBoard reviewBoard;

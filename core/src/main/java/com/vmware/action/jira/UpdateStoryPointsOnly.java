@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
 
-@ActionDescription("Bulk update the story points for jira issues")
+@ActionDescription("Bulk update the story points for jira issues.")
 public class UpdateStoryPointsOnly extends AbstractBatchJiraAction {
 
     public UpdateStoryPointsOnly(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {

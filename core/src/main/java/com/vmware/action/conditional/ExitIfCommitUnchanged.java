@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Exit if the commit details in memory are not different to the last commit")
+@ActionDescription("Exit if the commit details in memory are not different to the last commit.")
 public class ExitIfCommitUnchanged extends AbstractCommitAction {
     public ExitIfCommitUnchanged(WorkflowConfig config) {
         super(config);

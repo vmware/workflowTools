@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Displays initial info information")
+@ActionDescription("Displays initial info information.")
 public class GettingStarted extends AbstractAction {
 
     public GettingStarted(WorkflowConfig config) {

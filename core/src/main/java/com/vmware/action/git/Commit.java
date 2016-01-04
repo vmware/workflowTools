@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@ActionDescription("Performs a git commit")
+@ActionDescription("Performs a git commit.")
 public class Commit extends AbstractCommitAction {
 
     public Commit(WorkflowConfig config) {
