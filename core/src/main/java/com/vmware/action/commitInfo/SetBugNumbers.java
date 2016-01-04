@@ -13,8 +13,6 @@ import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
 import com.vmware.utils.ThreadUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,8 +23,6 @@ import java.util.List;
 
 @ActionDescription("Sets the bug number. A list of assigned jira bugs and tasks is shown for easy selection. Bug number can also be manually entered.")
 public class SetBugNumbers extends AbstractCommitReadAction {
-
-    private static Logger log = LoggerFactory.getLogger(SetBugNumbers.class.getName());
 
     private Jira jira = null;
 
