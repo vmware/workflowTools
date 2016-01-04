@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -252,9 +253,19 @@ public class Workflow {
         Padder configPadder = new Padder("Config Options");
         configPadder.infoTitle();
         for (String configOption : configOptions) {
-            ConfigurableProperty matchingProperty = config.getMatchingProperty(configOption);
-            String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
-            log.info("{} - {}", configOption, matchingPropertyText);
+            Field matchingField = config.getMatchingField(configOption);
+            if (matchingField == null) {
+                log.info("{} - {}", configOption, "Unknown config option");
+            } else {
+                ConfigurableProperty matchingProperty = matchingField.getAnnotation(ConfigurableProperty.class);
+                String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
+                try {
+                    Object matchingValue = matchingField.get(config);
+                    log.info("{}={} - {}", configOption, String.valueOf(matchingValue), matchingPropertyText);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         configPadder.infoTitle();
     }

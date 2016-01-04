@@ -389,7 +389,7 @@ public class WorkflowConfig {
         }
     }
 
-    public ConfigurableProperty getMatchingProperty(String commandLineProperty) {
+    public Field getMatchingField(String commandLineProperty) {
         for (Field field : configurableFields) {
             ConfigurableProperty property = field.getAnnotation(ConfigurableProperty.class);
             if (property.commandLine().equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
@@ -397,7 +397,7 @@ public class WorkflowConfig {
             }
 
             if (ArrayUtils.contains(property.commandLine().split(","), commandLineProperty)) {
-                return property;
+                return field;
             }
         }
         return null;
