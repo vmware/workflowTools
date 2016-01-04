@@ -1,6 +1,7 @@
 package com.vmware.jira;
 
 import com.vmware.AbstractRestService;
+import com.vmware.ComplexEnum;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueTimeTracking;
 import com.vmware.jira.domain.IssuesResponse;
@@ -16,7 +17,6 @@ import com.vmware.jira.domain.SearchRequest;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.NotFoundException;
-import com.vmware.http.json.NumericalEnum;
 import com.vmware.http.request.UrlParam;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
@@ -175,13 +175,13 @@ public class Jira extends AbstractRestService {
         return apiUrl + "issue/" + key + "/";
     }
 
-    private String generateNumericalEnumListAsInts(NumericalEnum... numericalEnums) {
+    private String generateNumericalEnumListAsInts(ComplexEnum... complexEnums) {
         String statusText = "";
-        for (NumericalEnum enumValue : numericalEnums) {
+        for (ComplexEnum enumValue : complexEnums) {
             if (!statusText.isEmpty()) {
                 statusText += ",";
             }
-            statusText += enumValue.getCode();
+            statusText += enumValue.getValue();
         }
         return statusText;
     }

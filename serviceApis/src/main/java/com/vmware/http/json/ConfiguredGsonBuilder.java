@@ -27,9 +27,9 @@ public class ConfiguredGsonBuilder {
                 .addSerializationExclusionStrategy(serializationExclusionStrategy)
                 .addDeserializationExclusionStrategy(deserializationExclusionStrategy)
                 .registerTypeAdapter(Date.class, new DateWithTimezoneMapper(dateFormat, serverTimezone))
-                .registerTypeAdapter(IssueStatusDefinition.class, new NumericalEnumMapper())
-                .registerTypeAdapter(IssueResolutionDefinition.class, new NumericalEnumMapper())
-                .registerTypeAdapter(IssueTypeDefinition.class, new NumericalEnumMapper());
+                .registerTypeAdapter(IssueStatusDefinition.class, new ComplexEnumMapper())
+                .registerTypeAdapter(IssueResolutionDefinition.class, new ComplexEnumMapper())
+                .registerTypeAdapter(IssueTypeDefinition.class, new ComplexEnumMapper());
     }
 
     public ConfiguredGsonBuilder setPrettyPrinting() {

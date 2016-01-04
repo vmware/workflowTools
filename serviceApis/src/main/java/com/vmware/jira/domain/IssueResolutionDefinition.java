@@ -1,8 +1,8 @@
 package com.vmware.jira.domain;
 
-import com.vmware.http.json.NumericalEnum;
+import com.vmware.ComplexEnum;
 
-public enum IssueResolutionDefinition implements NumericalEnum<IssueResolutionDefinition>{
+public enum IssueResolutionDefinition implements ComplexEnum<Integer> {
 
     Fixed(1),
     WontFix(2),
@@ -23,7 +23,7 @@ public enum IssueResolutionDefinition implements NumericalEnum<IssueResolutionDe
         this.code = code;
     }
 
-    public int getCode() {
+    public Integer getValue() {
         return code;
     }
 }

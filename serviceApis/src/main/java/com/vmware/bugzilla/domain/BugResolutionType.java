@@ -1,12 +1,12 @@
 package com.vmware.bugzilla.domain;
 
-import com.vmware.http.json.StringEnum;
+import com.vmware.ComplexEnum;
 
 /**
  * Valid resolution values for a bug.
  * The enum names must match the IssueResolutionDefinition enum names so that equivalent resolutions can be mapped to each other.
  */
-public enum BugResolutionType implements StringEnum {
+public enum BugResolutionType implements ComplexEnum<String> {
     Fixed("fixed"),
     NotABug("user error"),
     WontFix("wont fix"),
