@@ -1,8 +1,8 @@
 package com.vmware.jira.domain;
 
-import com.vmware.http.json.NumericalEnum;
+import com.vmware.ComplexEnum;
 
-public enum IssueStatusDefinition implements NumericalEnum<IssueStatusDefinition> {
+public enum IssueStatusDefinition implements ComplexEnum<Integer> {
 
     Open(1),
     InProgress(3),
@@ -22,7 +22,7 @@ public enum IssueStatusDefinition implements NumericalEnum<IssueStatusDefinition
         this.code = code;
     }
 
-    public int getCode() {
+    public Integer getValue() {
         return code;
     }
 }

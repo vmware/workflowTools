@@ -1,8 +1,8 @@
 package com.vmware.jira.domain;
 
-import com.vmware.http.json.NumericalEnum;
+import com.vmware.ComplexEnum;
 
-public enum IssueTypeDefinition implements NumericalEnum<IssueTypeDefinition> {
+public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     Bug(1),
     NewFeature(2),
     Task(3),
@@ -33,7 +33,7 @@ public enum IssueTypeDefinition implements NumericalEnum<IssueTypeDefinition> {
     }
 
     @Override
-    public int getCode() {
+    public Integer getValue() {
         return code;
     }
 }
