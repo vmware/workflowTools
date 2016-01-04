@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Copies the review board url to the clipboard. Handy for pasting it into a browser")
+@ActionDescription("Copies the review board url to the clipboard. Handy for pasting it into a browser.")
 public class CopyReviewUrlToClipboard extends AbstractCommitWithReviewAction {
     public CopyReviewUrlToClipboard(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);

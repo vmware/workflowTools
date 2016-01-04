@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 
-@ActionDescription("Generate review board statistics for specified groups")
+@ActionDescription("Generate review board statistics for specified groups.")
 public class GenerateReviewStats extends AbstractAction {
     private ReviewBoard reviewBoard;
 

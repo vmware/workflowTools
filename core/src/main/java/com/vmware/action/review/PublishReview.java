@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Publishes a review on the review board server")
+@ActionDescription("Publishes a review on the review board server.")
 public class PublishReview extends AbstractCommitWithReviewAction {
 
     public PublishReview(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {

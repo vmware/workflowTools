@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
 
-@ActionDescription("Bulk updates Jira issues")
+@ActionDescription("Bulk updates Jira issues.")
 public class UpdateIssues extends AbstractBatchJiraAction {
 
     public UpdateIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {

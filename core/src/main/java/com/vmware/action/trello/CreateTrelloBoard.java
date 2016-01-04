@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Creates a trello board. Uses the projectName if it is not blank. Otherwise asks user for name")
+@ActionDescription("Creates a trello board. Uses the projectName if it is not blank. Otherwise asks user for name.")
 public class CreateTrelloBoard  extends AbstractTrelloAction {
 
 

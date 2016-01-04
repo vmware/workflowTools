@@ -4,7 +4,7 @@ import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-@ActionDescription("Exit if the current commit has no bug number or a bug number value of 'none'")
+@ActionDescription("Exit if the current commit has no bug number or a bug number value of 'none'.")
 public class ExitIfCommitHasNoBugNumber extends AbstractCommitAction {
 
     public ExitIfCommitHasNoBugNumber(WorkflowConfig config) {

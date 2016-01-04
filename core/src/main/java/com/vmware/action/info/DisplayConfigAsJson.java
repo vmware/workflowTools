@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-@ActionDescription("Displays the current workflow configuration as json")
+@ActionDescription("Displays the current workflow configuration as json.")
 public class DisplayConfigAsJson extends AbstractAction {
 
     private final Gson gson;

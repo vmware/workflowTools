@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@ActionDescription("Reads the testing done section and checks the status for all jenkins jobs found. Exits if any are not successful")
+@ActionDescription("Reads the testing done section and checks the status for all jenkins jobs found. Exits if any are not successful.")
 public class ExitIfJenkinsJobsAreNotSuccessful extends AbstractCommitWithBuildsAction {
 
     public ExitIfJenkinsJobsAreNotSuccessful(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
