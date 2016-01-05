@@ -33,7 +33,7 @@ public class ComplexEnumMapper implements JsonDeserializer<ComplexEnum>, JsonSer
         return new JsonPrimitive(String.valueOf(complexEnum.getValue()));
     }
 
-    public static ComplexEnum findByValue(Class<Enum> enumType, String value) {
+    public static ComplexEnum findByValue(Class enumType, String value) {
         Integer valueAsInt = null;
         if (StringUtils.isBlank(value)) {
             return null;

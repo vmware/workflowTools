@@ -8,6 +8,8 @@ package com.vmware.xmlrpc;
 import org.apache.xmlrpc.common.TypeFactory;
 import org.apache.xmlrpc.common.XmlRpcStreamRequestConfig;
 import org.apache.xmlrpc.parser.XmlRpcResponseParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ErrorHandler;
@@ -27,8 +29,9 @@ import com.sun.org.apache.xerces.internal.util.NamespaceSupport;
  * 
  * @author Chao William Zhang, VMware
  */
-public class BugzParsingHandler extends XmlRpcResponseParser implements
-ContentHandler, ErrorHandler {
+public class BugzParsingHandler extends XmlRpcResponseParser implements ContentHandler, ErrorHandler {
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private XMLReader xr = null;
 
@@ -36,25 +39,6 @@ ContentHandler, ErrorHandler {
             TypeFactory pTypeFactory) {
         super(pConfig, pTypeFactory);
         this.xr = xr;
-    }
-
-    /**
-     * Receive notification of character data.
-     */
-    @Override
-    public void characters(char[] ch, int start, int length)
-            throws SAXException {
-        //System.out.println("characters()-" + new String(ch, start, length));
-        super.characters(ch, start, length);
-    }
-
-    /**
-     * Receive notification of the end of a document.
-     */
-    @Override
-    public void endDocument() throws SAXException {
-        // System.out.println("endDocument()");
-        super.endDocument();
     }
 
     /**
@@ -70,59 +54,10 @@ ContentHandler, ErrorHandler {
     }
 
     /**
-     * End the scope of a prefix-URI mapping.
-     */
-    @Override
-    public void endPrefixMapping(String prefix) throws SAXException {
-        // System.out.println("endPrefixMapping()-" + prefix);
-        super.endPrefixMapping(prefix);
-    }
-
-    /**
-     * Receive notification of ignorable whitespace in element content.
-     */
-    @Override
-    public void ignorableWhitespace(char[] ch, int start, int length)
-            throws SAXException {
-        // System.out.println("ignorableWhitespace()-" + ch);
-        super.ignorableWhitespace(ch, start, length);
-    }
-
-    /**
-     * Receive notification of a processing instruction.
-     */
-    @Override
-    public void processingInstruction(String target, String data)
-            throws SAXException {
-        // System.out.println("processingInstruction()-" + target + ":" + data);
-        super.processingInstruction(target, data);
-    }
-
-    /**
-     * Receive an object for locating the origin of SAX document events.
-     */
-    @Override
-    public void setDocumentLocator(Locator locator) {
-        // System.out.println("setDocumentLocator()-" + locator);
-        super.setDocumentLocator(locator);
-    }
-
-    /**
-     * Receive notification of a skipped entity.
-     */
-    @Override
-    public void skippedEntity(String name) throws SAXException {
-        // System.out.println("skippedEntity()-" + name);
-        super.skippedEntity(name);
-    }
-
-    /**
      * Receive notification of the beginning of a document.
      */
     @Override
     public void startDocument() throws SAXException {
-        // System.out.println("startDocument()");
-
         NamespaceSupport nc = null;
         Object o = xr.getProperty(
                 "http://apache.org/xml/properties/internal/namespace-context");
@@ -167,7 +102,7 @@ ContentHandler, ErrorHandler {
      */
     @Override
     public void error(SAXParseException exception) {
-        System.out.println(exception.getMessage());
+        log.error(exception.getMessage(), exception);
     }
 
     /**
@@ -177,7 +112,7 @@ ContentHandler, ErrorHandler {
      */
     @Override
     public void fatalError(SAXParseException exception) {
-        System.out.println(exception.getMessage());
+        log.error(exception.getMessage(), exception);
     }
 
     /**
@@ -187,7 +122,7 @@ ContentHandler, ErrorHandler {
      */
     @Override
     public void warning(SAXParseException exception) {
-        System.out.println(exception.getMessage());
+        log.warn(exception.getMessage(), exception);
     }
 
 }
