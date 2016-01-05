@@ -167,6 +167,11 @@ public class Workflow {
             log.error(e.getMessage());
             askForWorkflow();
             runWorkflow();
+        } catch (IllegalArgumentException iae) {
+            log.error(iae.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug(iae.getMessage(), iae);
+            }
         }
     }
 
@@ -270,16 +275,8 @@ public class Workflow {
         boolean canRunAction = action.canRunAction();
 
         if (canRunAction) {
-            try {
-                action.preprocess();
-                action.process();
-            } catch (IllegalArgumentException iae) {
-                log.error(iae.getMessage());
-                if (log.isDebugEnabled()) {
-                    log.debug(iae.getMessage(), iae);
-                }
-                System.exit(1);
-            }
+            action.preprocess();
+            action.process();
         }
 
         if (action instanceof AbstractTrelloAction) {
