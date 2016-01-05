@@ -1,6 +1,5 @@
 package com.vmware.action.jira;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -26,7 +25,7 @@ public class UpdateTaskEstimates extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
+        this.jira = serviceLocator.getAuthenticatedJira();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.vmware.action.bugzilla;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugResolutionType;
@@ -26,7 +25,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends AbstractBatchBugzilla
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
         super.preprocess();
-        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
+        this.jira = serviceLocator.getAuthenticatedJira();
     }
 
     @Override

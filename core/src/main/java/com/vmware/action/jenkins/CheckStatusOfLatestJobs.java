@@ -1,6 +1,5 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -24,7 +23,7 @@ public class CheckStatusOfLatestJobs extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        jenkins = ServiceLocator.getJenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
+        jenkins = serviceLocator.getJenkins();
     }
 
     @Override

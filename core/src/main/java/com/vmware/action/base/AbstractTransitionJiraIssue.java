@@ -1,7 +1,6 @@
 package com.vmware.action.base;
 
 import com.vmware.IssueInfo;
-import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
@@ -9,7 +8,6 @@ import com.vmware.jira.domain.IssueFields;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransitions;
 import com.vmware.jira.domain.JiraUser;
-import com.vmware.utils.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,7 +43,7 @@ public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
+        this.jira = serviceLocator.getAuthenticatedJira();
     }
 
     @Override

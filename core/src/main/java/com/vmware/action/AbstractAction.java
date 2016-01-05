@@ -1,6 +1,7 @@
 package com.vmware.action;
 
 import com.vmware.Git;
+import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +14,16 @@ public abstract class AbstractAction {
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected WorkflowConfig config;
+    protected final WorkflowConfig config;
 
-    protected Git git = new Git();
+    protected final ServiceLocator serviceLocator;
+
+    protected final Git git = new Git();
+
 
     public AbstractAction(WorkflowConfig config) {
         this.config = config;
+        this.serviceLocator = config.configuredServiceLocator();
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.vmware.action.base;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
@@ -29,7 +28,7 @@ public abstract class AbstractBatchCloseReviews extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
+        this.reviewBoard = serviceLocator.getReviewBoard();
     }
 
     public void closeReviews(ReviewRequest[] openRequests) throws IOException, IllegalAccessException, URISyntaxException, ParseException {

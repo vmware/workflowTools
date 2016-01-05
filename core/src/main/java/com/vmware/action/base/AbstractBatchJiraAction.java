@@ -1,6 +1,5 @@
 package com.vmware.action.base;
 
-import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 
@@ -26,6 +25,6 @@ public abstract class AbstractBatchJiraAction extends AbstractBatchIssuesAction 
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, true);
+        this.jira = serviceLocator.getAuthenticatedJira();
     }
 }

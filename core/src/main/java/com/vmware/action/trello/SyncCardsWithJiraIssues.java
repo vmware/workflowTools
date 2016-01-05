@@ -1,6 +1,5 @@
 package com.vmware.action.trello;
 
-import com.vmware.ServiceLocator;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -27,7 +26,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        trello = ServiceLocator.getTrello(config.trelloUrl);
+        trello = serviceLocator.getTrello();
     }
 
     @Override

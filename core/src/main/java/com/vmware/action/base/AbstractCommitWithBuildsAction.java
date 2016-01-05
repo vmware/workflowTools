@@ -1,6 +1,5 @@
 package com.vmware.action.base;
 
-import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
 
@@ -27,6 +26,6 @@ public abstract class AbstractCommitWithBuildsAction extends AbstractCommitActio
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.jenkins = ServiceLocator.getJenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
+        this.jenkins = serviceLocator.getJenkins();
     }
 }
