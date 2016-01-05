@@ -71,6 +71,16 @@ public class BugzParsingHandler extends XmlRpcResponseParser implements ContentH
     }
 
     /**
+     * Receive notification of character data.
+     */
+    @Override
+    public void characters(char[] ch, int start, int length)
+            throws SAXException {
+        log.trace(new String(ch, start, length));
+        super.characters(ch, start, length);
+    }
+
+    /**
      * Receive notification of the beginning of an element.
      */
     @Override

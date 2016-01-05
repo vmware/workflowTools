@@ -49,7 +49,7 @@
           <finalName>workflow</finalName>
           <archive>
             <manifest>
-              <mainClass>com.vmware.Workflow</mainClass>
+              <mainClass>com.vmware.WorkflowRunner</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
