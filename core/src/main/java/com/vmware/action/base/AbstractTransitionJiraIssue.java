@@ -34,10 +34,10 @@ public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
             return false;
         }
 
-        if (draft.hasBugNumber(config.noBugNumberLabel)) {
-            return true;
+        if (!draft.hasBugNumber(config.noBugNumberLabel)) {
+            log.info("Skipping action {} as the commit has no bug number", this.getClass().getSimpleName());
+            return false;
         }
-        log.info("Skipping action {} as the commit has no bug number", this.getClass().getSimpleName());
         return super.canRunAction();
     }
 
