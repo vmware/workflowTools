@@ -1,6 +1,5 @@
 package com.vmware.action.bugzilla;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
@@ -26,7 +25,7 @@ public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
             @Override
             public void run() {
                 try {
-                    bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, false);
+                    bugzilla = serviceLocator.getUnauthenticatedBugzilla();
                     List<String> queries = bugzilla.getSavedQueries();
                     log.debug("Bugzilla queries for user {}, {}", config.username, queries.toString());
                     if (!queries.contains(config.bugzillaQuery)) {

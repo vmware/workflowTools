@@ -1,6 +1,5 @@
 package com.vmware.action.base;
 
-import com.vmware.ServiceLocator;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.WorkflowConfig;
@@ -20,7 +19,7 @@ public abstract class AbstractBatchBugzillaAction extends AbstractBatchIssuesAct
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, true);
+        this.bugzilla = serviceLocator.getAuthenticatedBugzilla();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.vmware.action.review;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -40,7 +39,7 @@ public class GenerateReviewStats extends AbstractAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
+        reviewBoard = serviceLocator.getReviewBoard();
         String groupsToUse = "";
         if (config.targetGroups == null || config.targetGroups.length == 0) {
             log.info("No target groups selected");

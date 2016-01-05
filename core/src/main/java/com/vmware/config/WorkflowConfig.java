@@ -1,6 +1,7 @@
 package com.vmware.config;
 
 import com.vmware.Git;
+import com.vmware.ServiceLocator;
 import com.vmware.action.AbstractAction;
 import com.vmware.utils.ArrayUtils;
 import com.vmware.utils.CommitConfiguration;
@@ -232,7 +233,17 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--file-count-ranges", help = "File count ranges for grouping reviews when generating stats")
     public int[] fileCountRanges;
 
+    @Expose(serialize = false, deserialize = false)
+    private ServiceLocator serviceLocator = null;
+
     public WorkflowConfig() {}
+
+    public ServiceLocator configuredServiceLocator() {
+        if (serviceLocator == null) {
+            serviceLocator = new ServiceLocator(this);
+        }
+        return serviceLocator;
+    }
 
     public void generateConfigurablePropertyList() {
         List<String> usedParams = new ArrayList<String>();

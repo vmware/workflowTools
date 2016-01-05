@@ -1,6 +1,5 @@
 package com.vmware.action.review;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.AbstractAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -28,7 +27,7 @@ public class ApplyReviewPatch extends AbstractAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
+        reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.vmware.action.commitInfo;
 
 import com.vmware.IssueInfo;
-import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitReadAction;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
@@ -35,10 +34,10 @@ public class SetBugNumbers extends AbstractCommitReadAction {
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
         if (!config.disableJira) {
-            this.jira = ServiceLocator.getJira(config.jiraUrl, config.jiraTestIssue, false);
+            this.jira = serviceLocator.getUnauthenticatedJira();
         }
         if (!config.disableBugzilla) {
-            this.bugzilla = ServiceLocator.getBugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug, false);
+            this.bugzilla = serviceLocator.getUnauthenticatedBugzilla();
         }
     }
 
@@ -83,7 +82,12 @@ public class SetBugNumbers extends AbstractCommitReadAction {
             }
             if (bugzilla != null) {
                 bugzilla.setupAuthenticatedConnection();
-                draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
+                List<String> queries = bugzilla.getSavedQueries();
+                log.debug("Bugzilla queries for user {}, {}", config.username, queries.toString());
+                if (queries.contains(config.bugzillaQuery)) {
+                    draft.userHasBugzillaQuery = true;
+                    draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
+                }
             }
         } else if (draft.openIssues == null) {
             log.info("Jira / Bugzilla lists not loaded yet, waiting 3 seconds");
@@ -103,8 +107,8 @@ public class SetBugNumbers extends AbstractCommitReadAction {
         }
         if (issues.size() > 0) {
             IssueInfo firstIssue = issues.iterator().next();
-            log.info("Assigned Jira Tasks, list number can be entered as shorthand for bug number\ne.g. 1 for " + firstIssue.getKey());
-            log.info("Alternatively, enter the full bug number");
+            log.info("Assigned bugs / issues, list number can be entered as shorthand for id\ne.g. 1 for " + firstIssue.getKey());
+            log.info("Alternatively, enter the full id");
             log.info("");
             int counter = 0;
             for (IssueInfo issue : issues) {

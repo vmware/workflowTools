@@ -1,6 +1,5 @@
 package com.vmware.action.trello;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractBatchIssuesAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.Trello;
@@ -23,7 +22,7 @@ public abstract class AbstractTrelloAction extends AbstractBatchIssuesAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        this.trello = ServiceLocator.getTrello(config.trelloUrl);
+        this.trello = serviceLocator.getTrello();
     }
 
     public void setSelectedBoard(Board selectedBoard) {

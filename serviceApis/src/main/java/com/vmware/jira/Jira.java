@@ -41,8 +41,7 @@ import static com.vmware.http.cookie.ApiAuthentication.jira;
 
 public class Jira extends AbstractRestService {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private String loginUrl;
     private String searchUrl;
     private String legacyApiUrl;

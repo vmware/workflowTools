@@ -1,6 +1,5 @@
 package com.vmware.action.commitInfo;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -23,7 +22,7 @@ public class SetReviewId extends AbstractCommitAction {
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
+        reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override

@@ -8,11 +8,13 @@ import com.vmware.utils.FileUtils;
 import com.vmware.utils.IOUtils;
 
 import com.google.gson.Gson;
+import com.vmware.utils.MatcherUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -37,14 +39,21 @@ public class GenerateActionConfigMappings {
 
     private static final Pattern configValuePattern = Pattern.compile("[^\\.]config\\.(\\w+)");
 
+    private static final Pattern serviceLocatorMethodPattern = Pattern.compile("[^\\.]serviceLocator\\.(\\w+)");
+
     private Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
 
+    private Map<String, List<String>> locatorMethodArguments = new HashMap<>();
+
     private File actionDirectory;
+
+    private File serviceLocatorFile;
 
     private File outputFile;
 
 
-    public GenerateActionConfigMappings(String actionDirectory, String outputFile) {
+    public GenerateActionConfigMappings(String actionDirectory, String outputFile, File serviceLocatorFile) {
+        this.serviceLocatorFile = serviceLocatorFile;
         this.actionDirectory = new File(actionDirectory);
         this.outputFile = new File(outputFile);
     }
@@ -60,6 +69,7 @@ public class GenerateActionConfigMappings {
         config.generateConfigurablePropertyList();
 
         Map<String, String[]> mappings = new HashMap<String, String[]>();
+        populateLocatorMethodArguments();
         for (File javaActionFile : javaActionFiles) {
             String className = FileUtils.stripExtension(javaActionFile);
             List<String> foundConfigValues = parseFileForConfigValues(javaActionFile);
@@ -95,13 +105,29 @@ public class GenerateActionConfigMappings {
     private List<String> parseFileForConfigValues(File javaActionFile) throws IOException {
         String fileText = IOUtils.read(javaActionFile);
         Matcher configMatcher = configValuePattern.matcher(fileText);
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = new ArrayList<>();
         while (configMatcher.find()) {
             String foundValue = configMatcher.group(1);
             if (!matches.contains(foundValue)) {
-                matches.add(configMatcher.group(1));
+                matches.add(foundValue);
             }
         }
+
+        Matcher serviceLocatorMethodMatcher = serviceLocatorMethodPattern.matcher(fileText);
+        while (serviceLocatorMethodMatcher.find()) {
+            String foundValue = serviceLocatorMethodMatcher.group(1);
+            List<String> configValues = locatorMethodArguments.get(foundValue);
+            if (configValues == null) {
+                continue;
+            }
+
+            for (String configValue : configValues) {
+                if (!matches.contains(configValue)) {
+                    matches.add(configValue);
+                }
+            }
+        }
+
         return matches;
     }
 
@@ -126,22 +152,50 @@ public class GenerateActionConfigMappings {
 
         String moduleBaseDirectory = args[0];
         String actionsDirectory = moduleBaseDirectory + "/src/main/java/com/vmware/action";
+        String locatorFilePath = moduleBaseDirectory + "/src/main/java/com/vmware/ServiceLocator.java";
         String mappingsFile = moduleBaseDirectory + "/src/main/resources/configValueMappings.json";
         String targetDirectory = moduleBaseDirectory + "/target/classes";
 
         actionsDirectory = actionsDirectory.replaceAll("/", File.separator);
+        locatorFilePath = locatorFilePath.replaceAll("/", File.separator);
         mappingsFile = mappingsFile.replaceAll("/", File.separator);
         targetDirectory = targetDirectory.replaceAll("/", File.separator);
 
         log.info("Creating mappings file {} from folder {}", mappingsFile, actionsDirectory);
 
         GenerateActionConfigMappings generateActionConfigMappings =
-                new GenerateActionConfigMappings(actionsDirectory, mappingsFile);
+                new GenerateActionConfigMappings(actionsDirectory, mappingsFile, new File(locatorFilePath));
         generateActionConfigMappings.run();
         log.info("Created mappings file");
         log.info("Copying to target directory {}", targetDirectory);
         FileUtils.copyFile(new File(mappingsFile),
                 new File(targetDirectory + File.separator + "configValueMappings.json"));
+    }
+
+    private void populateLocatorMethodArguments() throws IOException {
+        List<String> lines = IOUtils.readLines(new FileInputStream(serviceLocatorFile));
+        String currentMethodName = null;
+        List<String> currentArguments = null;
+        for (String line : lines) {
+            String matchedMethodName = MatcherUtils.singleMatch(line, "public \\w+ (\\w+)\\(");
+            if (currentMethodName == null && matchedMethodName == null) {
+                continue;
+            } else if (matchedMethodName != null) {
+                if (currentMethodName != null) {
+                    locatorMethodArguments.put(currentMethodName, currentArguments);
+                }
+                currentMethodName = matchedMethodName;
+                currentArguments = new ArrayList<>();
+            } else {
+                Matcher configValueMatcher = configValuePattern.matcher(line);
+                while (configValueMatcher.find()) {
+                    currentArguments.add(configValueMatcher.group(1));
+                }
+            }
+        }
+        if (currentMethodName != null) {
+            locatorMethodArguments.put(currentMethodName, currentArguments);
+        }
     }
 
     private static ConsoleHandler createHandler() {

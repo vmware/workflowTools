@@ -5,7 +5,6 @@
  */
 package com.vmware.action.base;
 
-import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 
@@ -22,7 +21,7 @@ public abstract class AbstractCommitWithReviewAction extends AbstractCommitActio
 
     @Override
     public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
-        reviewBoard = ServiceLocator.getReviewBoard(config.reviewboardUrl, config.username, config.reviewBoardDateFormat);
+        reviewBoard = serviceLocator.getReviewBoard();
         if (draft != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(draft.id);
         }

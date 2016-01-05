@@ -16,56 +16,72 @@ import java.net.URISyntaxException;
  */
 public class ServiceLocator {
 
-    private static Jira jira;
+    private Jira jira;
 
-    private static Bugzilla bugzilla;
+    private Bugzilla bugzilla;
 
-    private static ReviewBoard reviewBoard;
+    private ReviewBoard reviewBoard;
 
-    private static Jenkins jenkins;
+    private Jenkins jenkins;
 
-    private static Trello trello;
+    private Trello trello;
 
-    public static Jira getJira(String jiraUrl, String testIssueKey, boolean setupAuthenticatedConnection) throws IllegalAccessException, IOException, URISyntaxException {
+    private WorkflowConfig config;
+
+    public ServiceLocator(WorkflowConfig config) {
+        this.config = config;
+    }
+
+    public Jira getUnauthenticatedJira() throws IllegalAccessException, IOException, URISyntaxException {
         if (jira == null) {
-            jira = new Jira(jiraUrl, testIssueKey);
-        }
-        if (setupAuthenticatedConnection) {
-            jira.setupAuthenticatedConnection();
+            jira = new Jira(config.jiraUrl, config.jiraTestIssue);
         }
         return jira;
     }
 
-    public static Bugzilla getBugzilla(String bugzillaUrl, String username, int testBugNumber, boolean setupAuthenticatedConnection) throws IllegalAccessException, IOException, URISyntaxException {
-        if (bugzilla == null) {
-            bugzilla = new Bugzilla(bugzillaUrl, username, testBugNumber);
+    public Jira getAuthenticatedJira() throws IllegalAccessException, IOException, URISyntaxException {
+        if (jira == null) {
+            jira = new Jira(config.jiraUrl, config.jiraTestIssue);
         }
-        if (setupAuthenticatedConnection) {
-            bugzilla.setupAuthenticatedConnection();
+        jira.setupAuthenticatedConnection();
+        return jira;
+    }
+
+    public Bugzilla getUnauthenticatedBugzilla() throws IllegalAccessException, IOException, URISyntaxException {
+        if (bugzilla == null) {
+            bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
         }
         return bugzilla;
     }
 
-    public static ReviewBoard getReviewBoard(String reviewboardUrl, String username, String reviewBoardDateFormat) throws IOException, URISyntaxException, IllegalAccessException {
+    public Bugzilla getAuthenticatedBugzilla() throws IllegalAccessException, IOException, URISyntaxException {
+        if (bugzilla == null) {
+            bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
+        }
+        bugzilla.setupAuthenticatedConnection();
+        return bugzilla;
+    }
+
+    public ReviewBoard getReviewBoard() throws IOException, URISyntaxException, IllegalAccessException {
         if (reviewBoard == null) {
-            reviewBoard = new ReviewBoard(reviewboardUrl, username);
+            reviewBoard = new ReviewBoard(config.reviewboardUrl, config.username);
             reviewBoard.setupAuthenticatedConnection();
-            reviewBoard.updateServerTimeZone(reviewBoardDateFormat);
+            reviewBoard.updateServerTimeZone(config.reviewBoardDateFormat);
         }
         return reviewBoard;
     }
 
-    public static Jenkins getJenkins(String jenkinsUrl, String username, boolean jenkinsUsesCsrf, boolean disableLogin) throws IOException, URISyntaxException, IllegalAccessException {
+    public Jenkins getJenkins() throws IOException, URISyntaxException, IllegalAccessException {
         if (jenkins == null) {
-            jenkins = new Jenkins(jenkinsUrl, username, jenkinsUsesCsrf, disableLogin);
+            jenkins = new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
             jenkins.setupAuthenticatedConnection();
         }
         return jenkins;
     }
 
-    public static Trello getTrello(String trelloUrl) throws IOException, URISyntaxException, IllegalAccessException {
+    public Trello getTrello() throws IOException, URISyntaxException, IllegalAccessException {
         if (trello == null) {
-            trello = new Trello(trelloUrl);
+            trello = new Trello(config.trelloUrl);
             trello.setupAuthenticatedConnection();
         }
         return trello;
