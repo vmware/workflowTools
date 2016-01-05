@@ -23,6 +23,8 @@ public class TestBugzillaApi extends BaseTests {
 
     private static String bugzillaUsername;
 
+    private static final int TEST_BUG_ID = 1567574;
+
     @BeforeClass
     public static void setupBugzilla() throws IllegalAccessException, IOException, URISyntaxException {
         bugzillaUsername = testProperties.getProperty("bugzilla.username");
@@ -34,20 +36,19 @@ public class TestBugzillaApi extends BaseTests {
 
     @Test
     public void canGetBug() throws IOException, URISyntaxException, IllegalAccessException {
-        final int BUG_ID_TO_CHECK_FOR = 1567574;
-        Bug bugInfo = bugzilla.getBugById(BUG_ID_TO_CHECK_FOR);
+        Bug bugInfo = bugzilla.getBugById(TEST_BUG_ID);
         assertNotNull(bugInfo);
-        assertEquals(String.valueOf(BUG_ID_TO_CHECK_FOR), bugInfo.getKey());
+        assertEquals(String.valueOf(TEST_BUG_ID), bugInfo.getKey());
     }
 
     @Test
     public void canResolveBug() throws IllegalAccessException, IOException, URISyntaxException {
-        bugzilla.resolveBug(1567574, BugResolutionType.WontFix);
+        bugzilla.resolveBug(TEST_BUG_ID, BugResolutionType.WontFix);
     }
 
     @Test
     public void canAddBugComment() throws IOException {
-        bugzilla.addBugComment(1567574, "Test comment");
+        bugzilla.addBugComment(TEST_BUG_ID, "Test comment");
     }
 
     @Test
