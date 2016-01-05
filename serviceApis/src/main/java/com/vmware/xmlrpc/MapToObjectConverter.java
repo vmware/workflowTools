@@ -1,5 +1,6 @@
 package com.vmware.xmlrpc;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.ComplexEnum;
 import com.vmware.http.json.ComplexEnumMapper;
@@ -28,6 +29,11 @@ public class MapToObjectConverter {
 
         for (Field field : objectClass.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
+                continue;
+            }
+
+            Expose exposeAnnotation = field.getAnnotation(Expose.class);
+            if (exposeAnnotation != null && !exposeAnnotation.deserialize()) {
                 continue;
             }
 
