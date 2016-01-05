@@ -227,7 +227,7 @@ public class HttpConnection {
             askIfSslCertShouldBeSaved();
             exitIfMaxRetriesReached(retryCount);
 
-            ThreadUtils.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
+            ThreadUtils.sleep(2, TimeUnit.SECONDS);
             log.info("");
             log.info("Retrying request {} of {}", ++retryCount, MAX_REQUEST_RETRIES);
             reconnect(methodType, urlText, params);

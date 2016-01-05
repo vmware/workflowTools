@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Sets the bug number. A list of assigned jira bugs and tasks is shown for easy selection. Bug number can also be manually entered.")
 public class SetBugNumbers extends AbstractCommitReadAction {
@@ -91,7 +92,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
             }
         } else if (draft.openIssues == null) {
             log.info("Jira / Bugzilla lists not loaded yet, waiting 3 seconds");
-            ThreadUtils.sleep(3000);
+            ThreadUtils.sleep(3, TimeUnit.SECONDS);
             if (draft.openIssues == null) {
                 log.info("Failed to load Jira / Bugzilla items, Jira in progress {}, Bugzilla in progress",
                         draft.isPreloadingJiraIssues, draft.isPreloadingBugzillaBugs);

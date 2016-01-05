@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobKeys config property. Adds or replaces jenkins job urls to testing done section.")
 public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
@@ -68,7 +69,7 @@ public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
         boolean jobBuilding = true;
         JobBuildDetails updatedDetails = null;
         while (jobBuilding) {
-            ThreadUtils.sleep(20000);
+            ThreadUtils.sleep(20, TimeUnit.SECONDS);
             updatedDetails = jenkins.getJobBuildDetails(newBuild);
             jobBuilding = updatedDetails.building;
             log.debug("Current status {}", updatedDetails.realResult());
