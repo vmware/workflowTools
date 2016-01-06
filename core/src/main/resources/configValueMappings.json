@@ -16,9 +16,9 @@
   ],
   "PreloadAssignedBugzillaBugs": [
     "--bugzilla-test-bug",
+    "--username",
     "--bugzilla-url",
-    "--bugzilla-query",
-    "--username"
+    "--bugzilla-query"
   ],
   "SetCommitDetailsFromReview": [
     "--jenkins-url",

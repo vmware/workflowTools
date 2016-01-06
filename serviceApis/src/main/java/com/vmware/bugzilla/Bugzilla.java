@@ -78,7 +78,13 @@ public class Bugzilla extends AbstractService {
         for (Object value : values) {
             queries.add(String.valueOf(value));
         }
+        log.debug("Bugzilla queries for user {}, {}", username, queries.toString());
         return queries;
+    }
+
+    public boolean containsSavedQuery(String queryName) throws IOException {
+        List<String> savedQueries = getSavedQueries();
+        return savedQueries.contains(queryName);
     }
 
     public void resolveBug(int bugId, BugResolutionType resolution) throws IllegalAccessException, IOException, URISyntaxException {

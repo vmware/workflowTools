@@ -26,15 +26,12 @@ public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
             public void run() {
                 try {
                     bugzilla = serviceLocator.getUnauthenticatedBugzilla();
-                    List<String> queries = bugzilla.getSavedQueries();
-                    log.debug("Bugzilla queries for user {}, {}", config.username, queries.toString());
-                    if (!queries.contains(config.bugzillaQuery)) {
-                        return;
-                    }
-                    draft.userHasBugzillaQuery = true;
                     if (bugzilla.isConnectionAuthenticated()) {
                         draft.isPreloadingBugzillaBugs = true;
-                        draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
+                        if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
+                            draft.userHasBugzillaQuery = true;
+                            draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
+                        }
                         draft.isPreloadingBugzillaBugs = false;
                     }
                 } catch (IOException | URISyntaxException | IllegalAccessException e) {
