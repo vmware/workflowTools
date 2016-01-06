@@ -17,7 +17,7 @@ public class ExitIfThereAreNoIssuesToProcess extends AbstractBatchIssuesAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (projectIssues.noIssuesAdded()) {
+        if (multiActionData.noIssuesAdded()) {
             System.exit(0);
         }
     }

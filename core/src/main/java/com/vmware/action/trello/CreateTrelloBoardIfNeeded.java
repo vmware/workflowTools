@@ -10,8 +10,6 @@ import com.vmware.utils.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
 
 @ActionDescription("Creates a trello board if the project name doesn't match an open trello board.")
 public class CreateTrelloBoardIfNeeded extends AbstractTrelloAction {
@@ -23,7 +21,7 @@ public class CreateTrelloBoardIfNeeded extends AbstractTrelloAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        String boardName = projectIssues.projectName;
+        String boardName = multiActionData.projectName;
 
         if (StringUtils.isBlank(boardName)) {
             boardName = InputUtils.readValueUntilNotBlank("Enter trello board name");

@@ -20,7 +20,7 @@ public class AddTrackingIssuesForQuery extends AbstractBatchBugzillaAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        List<Bug> bugList = projectIssues.getBugs();
+        List<Bug> bugList = multiActionData.getBugs();
         if (bugList.isEmpty()) {
             log.info("No bugs found for named query {}", config.bugzillaQuery);
             return;
@@ -32,12 +32,12 @@ public class AddTrackingIssuesForQuery extends AbstractBatchBugzillaAction {
                 continue;
             }
             Issue trackingIssue = createIssueFromBug(bug);
-            projectIssues.add(trackingIssue);
+            multiActionData.add(trackingIssue);
             log.info("\nA Jira Issue will be created in Jira Project {} to track bug {}\n{}", config.defaultJiraProject,
                     trackingIssue.matchingBugzillaNumber(config.bugzillaUrl), bug.getSummary());
         }
 
-        if (projectIssues.noIssuesAdded()) {
+        if (multiActionData.noIssuesAdded()) {
             log.info("No issues added", config.bugzillaQuery);
         }
     }

@@ -31,7 +31,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (projectIssues.noIssuesAdded()) {
+        if (multiActionData.noIssuesAdded()) {
             log.info("No jira issues loaded. No need to create trello cards.");
             return;
         }
@@ -45,7 +45,7 @@ public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
         Padder padder = new Padder("Adding cards for board {}", selectedBoard.name);
 
         padder.infoTitle();
-        List<Issue> issuesForProcessing = new ArrayList<Issue>(projectIssues.getIssuesForProcessing());
+        List<Issue> issuesForProcessing = new ArrayList<Issue>(multiActionData.getIssuesForProcessing());
         log.info("Processing {} issues", issuesForProcessing.size());
 
         List<Card> existingCards = new ArrayList<Card>(Arrays.asList(trello.getCardsForBoard(selectedBoard)));

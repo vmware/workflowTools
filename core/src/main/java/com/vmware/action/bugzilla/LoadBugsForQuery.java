@@ -21,6 +21,6 @@ public class LoadBugsForQuery extends AbstractBatchBugzillaAction {
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
         log.info("Using named query {} for retrieving bugs, change by specifying --bugzilla-query=QueryName", config.bugzillaQuery);
         List<Bug> bugList = bugzilla.getBugsForQuery(config.bugzillaQuery);
-        projectIssues.addAllBugs(bugList);
+        multiActionData.addAllBugs(bugList);
     }
 }
