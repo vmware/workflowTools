@@ -20,7 +20,7 @@ public class UpdateStoryPointsOnly extends AbstractBatchJiraAction {
 
     @Override
     public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
-        if (projectIssues.getIssuesFromJira().isEmpty()) {
+        if (multiActionData.getIssuesFromJira().isEmpty()) {
             log.info("Skipping {} as there are no issues loaded from Jira.", this.getClass().getSimpleName());
             return false;
         }
@@ -29,7 +29,7 @@ public class UpdateStoryPointsOnly extends AbstractBatchJiraAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        List<Issue> issuesFromJira = projectIssues.getIssuesFromJira();
+        List<Issue> issuesFromJira = multiActionData.getIssuesFromJira();
         log.info("Setting story points for {} issues", issuesFromJira.size());
 
         for (Issue issueToUpdate : issuesFromJira) {

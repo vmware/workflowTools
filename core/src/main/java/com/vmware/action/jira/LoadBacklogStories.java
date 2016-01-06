@@ -54,12 +54,12 @@ public class LoadBacklogStories extends AbstractBatchJiraAction {
             return;
         }
 
-        projectIssues.reset();
+        multiActionData.reset();
         SearchRequest searchRequest = createSearchRequestForFullIssueInformation(backlogStories);
 
         Issue[] issues = jira.searchForIssues(searchRequest).issues;
 
-        projectIssues.projectName = selectedItem.label;
+        multiActionData.projectName = selectedItem.label;
 
         List<String> labels = getLabelsFromIssues(issues);
 
@@ -71,13 +71,13 @@ public class LoadBacklogStories extends AbstractBatchJiraAction {
             log.info("Please enter label to use");
             int selectedLabelIndex = InputUtils.readSelection(labels, "Jira Labels");
             String selectedLabel = labels.get(selectedLabelIndex);
-            projectIssues.addAllIssues(filterByLabel(issues, selectedLabel));
-            projectIssues.projectName += " (" + selectedLabel + ")";
+            multiActionData.addAllIssues(filterByLabel(issues, selectedLabel));
+            multiActionData.projectName += " (" + selectedLabel + ")";
         } else {
-            projectIssues.addAllIssues(Arrays.asList(issues));
+            multiActionData.addAllIssues(Arrays.asList(issues));
         }
 
-        List<Issue> issuesForProcessing = projectIssues.getIssuesForProcessing();
+        List<Issue> issuesForProcessing = multiActionData.getIssuesForProcessing();
         log.debug("Added {} issues for processing", issuesForProcessing.size());
         log.debug("Added issues\n{}", issuesForProcessing.toString());
     }

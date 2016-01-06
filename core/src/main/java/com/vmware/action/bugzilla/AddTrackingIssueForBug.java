@@ -32,7 +32,7 @@ public class AddTrackingIssueForBug extends AbstractBatchBugzillaAction{
             }
         }
         Issue trackingIssue = createIssueFromBug(bug);
-        projectIssues.add(trackingIssue);
+        multiActionData.add(trackingIssue);
 
         log.info("A Jira Issue will be created in Jira Project {} to track bug {}: {}", config.defaultJiraProject,
                 trackingIssue.matchingBugzillaNumber(config.bugzillaUrl), bug.getSummary());

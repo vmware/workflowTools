@@ -35,7 +35,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends AbstractBatchBugzilla
             return false;
         }
 
-        if (projectIssues.noBugsAdded()) {
+        if (multiActionData.noBugsAdded()) {
             log.info("No bugs added");
             return false;
         }
@@ -45,7 +45,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends AbstractBatchBugzilla
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        for (Bug bug : projectIssues.getBugs()) {
+        for (Bug bug : multiActionData.getBugs()) {
             Integer bugId = Integer.parseInt(bug.getKey());
             Issue trackingIssue = getValidTrackingIssueForBug(bug);
 

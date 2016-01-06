@@ -1,6 +1,6 @@
 package com.vmware.config;
 
-import com.vmware.jira.domain.ProjectIssues;
+import com.vmware.jira.domain.MultiActionData;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.trello.domain.Board;
 
@@ -12,21 +12,21 @@ public class WorkflowActionValues {
 
     private ReviewRequestDraft draft;
 
-    private ProjectIssues projectIssues;
+    private MultiActionData multiActionData;
 
     private Board trelloBoard;
 
     public WorkflowActionValues() {
         this.draft = new ReviewRequestDraft();
-        this.projectIssues = new ProjectIssues();
+        this.multiActionData = new MultiActionData();
     }
 
     public ReviewRequestDraft getDraft() {
         return draft;
     }
 
-    public ProjectIssues getProjectIssues() {
-        return projectIssues;
+    public MultiActionData getMultiActionData() {
+        return multiActionData;
     }
 
     public Board getTrelloBoard() {

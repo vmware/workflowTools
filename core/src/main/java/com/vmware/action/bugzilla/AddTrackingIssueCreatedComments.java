@@ -20,7 +20,7 @@ public class AddTrackingIssueCreatedComments extends AbstractBatchBugzillaAction
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
+        List<Issue> issues = multiActionData.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
 
         if (issues.isEmpty()) {
             log.info("No matching issues found");

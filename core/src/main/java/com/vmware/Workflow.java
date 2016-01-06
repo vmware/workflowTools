@@ -10,7 +10,7 @@ import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowConfigParser;
-import com.vmware.jira.domain.ProjectIssues;
+import com.vmware.jira.domain.MultiActionData;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -180,7 +180,7 @@ public class Workflow {
             InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException {
         log.info("Checking that each action value in the workflows is valid");
         ReviewRequestDraft draft = new ReviewRequestDraft();
-        ProjectIssues projectIssues = new ProjectIssues();
+        MultiActionData multiActionData = new MultiActionData();
         for (Class<? extends AbstractAction> action : config.determineActions(StringUtils.join(config.workflows.keySet()))) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
             AbstractAction actionObject = action.getConstructor(WorkflowConfig.class).newInstance(config);
@@ -188,7 +188,7 @@ public class Workflow {
                 ((AbstractCommitAction) actionObject).setDraft(draft);
             }
             if (actionObject instanceof AbstractBatchIssuesAction) {
-                ((AbstractBatchIssuesAction) actionObject).setProjectIssues(projectIssues);
+                ((AbstractBatchIssuesAction) actionObject).setMultiActionData(multiActionData);
             }
             if (runAllHelperMethods) {
                 log.info("Running canRunAction method");
@@ -266,7 +266,7 @@ public class Workflow {
             ((AbstractCommitAction) action).setDraft(values.getDraft());
         }
         if (action instanceof AbstractBatchIssuesAction) {
-            ((AbstractBatchIssuesAction) action).setProjectIssues(values.getProjectIssues());
+            ((AbstractBatchIssuesAction) action).setMultiActionData(values.getMultiActionData());
         }
         if (action instanceof AbstractTrelloAction) {
             ((AbstractTrelloAction) action).setSelectedBoard(values.getTrelloBoard());

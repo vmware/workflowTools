@@ -7,7 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ProjectIssues {
+/**
+ * Represents data needed across multiple actions.
+ */
+public class MultiActionData {
 
     public String projectName;
 

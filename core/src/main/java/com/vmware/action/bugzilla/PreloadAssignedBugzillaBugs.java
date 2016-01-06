@@ -21,7 +21,7 @@ public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        Runnable loadJiraIssues = new Runnable() {
+        Runnable loadBugzillaBugs = new Runnable() {
             @Override
             public void run() {
                 try {
@@ -39,6 +39,6 @@ public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
                 }
             }
         };
-        new Thread(loadJiraIssues).start();
+        new Thread(loadBugzillaBugs).start();
     }
 }
