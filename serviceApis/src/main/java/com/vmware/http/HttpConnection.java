@@ -126,6 +126,10 @@ public class HttpConnection {
         return handleServerResponse(null, DELETE, params);
     }
 
+    public boolean isUriTrusted(URI uri) throws IOException {
+        return workflowCertificateManager.isUriTrusted(uri);
+    }
+
     public void setRequestBodyHandling(final RequestBodyHandling requestBodyHandling) {
         this.requestBodyHandling = requestBodyHandling;
     }
@@ -254,11 +258,11 @@ public class HttpConnection {
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-        if (workflowCertificateManager == null || workflowCertificateManager.urlAlreadyTrusted(uri)) {
+        if (workflowCertificateManager == null || workflowCertificateManager.isUriTrusted(uri)) {
             log.info("Url {} is already trusted, no need to save cert to local keystore");
             return;
         }
-        log.info("Host {} is not trusted, do you want to save the cert for this to the local trust store {}",
+        log.info("Host {} is not trusted, do you want to save the cert for this to the local workflow trust store {}",
                 uri.getHost(), workflowCertificateManager.getKeyStore());
         log.warn("NB: ONLY save the certificate if you trust the host shown");
         String response = InputUtils.readValue("Save certificate? [Y/N] ");

@@ -7,6 +7,7 @@ import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
@@ -19,6 +20,11 @@ public abstract class AbstractRestService extends AbstractService {
 
     protected AbstractRestService(String baseUrl, String apiPath, ApiAuthentication credentialsType, String username) {
         super(baseUrl, apiPath, credentialsType, username);
+    }
+
+    @Override
+    public boolean isBaseUriTrusted() throws IOException {
+        return connection.isUriTrusted(URI.create(baseUrl));
     }
 
     /**

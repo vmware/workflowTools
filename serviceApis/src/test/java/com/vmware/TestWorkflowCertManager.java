@@ -36,14 +36,14 @@ public class TestWorkflowCertManager extends BaseTests {
     @Test
     public void canTrustGoogleUri() throws IOException, NoSuchAlgorithmException {
         assertTrue("https://www.google.com was not trusted!",
-                workflowCertificateManager.urlAlreadyTrusted(URI.create("https://google.com")));
+                workflowCertificateManager.isUriTrusted(URI.create("https://google.com")));
     }
 
     @Test
     public void cannotTrustJiraUri() throws IOException, NoSuchAlgorithmException {
         String jiraUrl = testProperties.getProperty("jira.url");
         assertFalse(jiraUrl + " was trusted!",
-                workflowCertificateManager.urlAlreadyTrusted(URI.create(jiraUrl)));
+                workflowCertificateManager.isUriTrusted(URI.create(jiraUrl)));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class TestWorkflowCertManager extends BaseTests {
         String jiraUrl = testProperties.getProperty("jira.url");
         URI uriToTest = URI.create(jiraUrl);
         assertFalse(jiraUrl + " was trusted!",
-                workflowCertificateManager.urlAlreadyTrusted(uriToTest));
+                workflowCertificateManager.isUriTrusted(uriToTest));
         workflowCertificateManager.saveCertForUri(uriToTest);
     }
 }
