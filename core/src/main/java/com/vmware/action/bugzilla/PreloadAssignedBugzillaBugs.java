@@ -8,7 +8,6 @@ import com.vmware.config.WorkflowConfig;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.List;
 
 @ActionDescription("Executes the named query for loading Bugzilla bugs. Only executed if the user has a matching named query.")
 public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
@@ -26,7 +25,7 @@ public class PreloadAssignedBugzillaBugs extends AbstractCommitAction {
             public void run() {
                 try {
                     bugzilla = serviceLocator.getUnauthenticatedBugzilla();
-                    if (bugzilla.isConnectionAuthenticated()) {
+                    if (bugzilla.isBaseUriTrusted() && bugzilla.isConnectionAuthenticated()) {
                         draft.isPreloadingBugzillaBugs = true;
                         if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
                             draft.userHasBugzillaQuery = true;

@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -33,6 +34,10 @@ public class TestBugzillaApi extends BaseTests {
         bugzilla.setupAuthenticatedConnection();
     }
 
+    @Test
+    public void isUriTrusted() throws IOException {
+        assertTrue(bugzilla.isBaseUriTrusted());
+    }
 
     @Test
     public void canGetBug() throws IOException, URISyntaxException, IllegalAccessException {

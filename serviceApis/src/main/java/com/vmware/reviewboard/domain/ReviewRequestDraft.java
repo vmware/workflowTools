@@ -65,10 +65,10 @@ public class ReviewRequestDraft extends BaseEntity{
     public List<IssueInfo> openIssues = null;
 
     @Expose(serialize = false, deserialize = false)
-    public boolean isPreloadingJiraIssues;
+    public Boolean isPreloadingJiraIssues;
 
     @Expose(serialize = false, deserialize = false)
-    public boolean isPreloadingBugzillaBugs;
+    public Boolean isPreloadingBugzillaBugs;
 
     @Expose(serialize = false, deserialize = false)
     public boolean userHasBugzillaQuery;

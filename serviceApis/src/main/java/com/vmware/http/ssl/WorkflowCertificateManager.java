@@ -14,6 +14,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class used to add the server's certificate to the KeyStore
@@ -30,6 +32,8 @@ public class WorkflowCertificateManager {
     private SavingTrustManager workflowTrustManager;
     private SSLContext context;
 
+    private Set<String> trustedHosts = new HashSet<>();
+
     public WorkflowCertificateManager(String keyStoreFile) throws IOException {
         this.keyStoreFile = new File(keyStoreFile);
         try {
@@ -45,7 +49,7 @@ public class WorkflowCertificateManager {
             logger.info("Uri {} is not https so skipping cert check", uri.toString());
             return;
         }
-        if (urlAlreadyTrusted(uri)) {
+        if (isUriTrusted(uri)) {
             return;
         }
 
@@ -61,22 +65,26 @@ public class WorkflowCertificateManager {
         } catch (Exception e) {
             throw new IOException(e);
         }
-        if (!urlAlreadyTrusted(uri)) {
+        if (!isUriTrusted(uri)) {
             throw new RuntimeException("Expected host " + uri.getHost() + " to be trusted after saving cert!");
         }
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
 
-    public boolean urlAlreadyTrusted(URI uri) throws IOException {
+    public boolean isUriTrusted(URI uri) throws IOException {
+        if (trustedHosts.contains(uri.getHost())) {
+            return true;
+        }
         try {
             SSLSocketFactory sslFactory = context.getSocketFactory();
             int port = uri.getPort() == -1 ? 443 : uri.getPort();
             SSLSocket socket = (SSLSocket) sslFactory.createSocket(uri.getHost(), port);
             socket.setSoTimeout(10000);
-            logger.debug("Checking if host {} is already trusted", uri.getHost());
+            logger.debug("Checking if host {} is trusted", uri.getHost());
             socket.startHandshake();
             socket.close();
-            logger.debug("No errors, host {} is already trusted", uri.getHost());
+            logger.debug("No errors, host {} is trusted", uri.getHost());
+            trustedHosts.add(uri.getHost());
             return true;
         } catch (SSLException e) {
             logger.debug("Host " + uri.getHost() + " is not trusted", e);
@@ -108,21 +116,6 @@ public class WorkflowCertificateManager {
         }
     }
 
-    private void init() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, KeyManagementException {
-        createKeyStore();
-
-        context = SSLContext.getInstance("TLS");
-        TrustManagerFactory tmf =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-
-        tmf.init(workflowKeystore);
-
-        X509TrustManager defaultTrustManager = (X509TrustManager) tmf.getTrustManagers()[0];
-        workflowTrustManager = new SavingTrustManager(defaultTrustManager);
-        context.init(null, new TrustManager[]{workflowTrustManager}, null);
-
-    }
-
     private X509KeyManager getKeyManager(String algorithm, KeyStore keystore, char[] password) throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
         KeyManagerFactory factory = KeyManagerFactory.getInstance(algorithm);
         factory.init(keystore, password);
@@ -150,14 +143,6 @@ public class WorkflowCertificateManager {
         SSLContext context = SSLContext.getInstance("SSL");
         context.init(keyManagers, trustManagers, null);
         return context;
-    }
-
-    private X509TrustManager getDefaultTrustStoreForSystem() throws NoSuchAlgorithmException, KeyStoreException {
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-
-        trustManagerFactory.init((KeyStore)null);
-
-        return getFirstX509TrustManager(trustManagerFactory.getTrustManagers());
     }
 
     private X509KeyManager getFirstX509KeyManager(KeyManager[] keyManagers) {

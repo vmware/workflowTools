@@ -14,6 +14,7 @@ import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapToObjectConverter;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -113,6 +114,11 @@ public class Bugzilla extends AbstractService {
 
     public String constructFullBugUrl(int bugNumber) {
         return baseUrl + "show_bug.cgi?id=" + bugNumber;
+    }
+
+    @Override
+    public boolean isBaseUriTrusted() throws IOException {
+        return xmlRpcClient.isUriTrusted(URI.create(baseUrl));
     }
 
     @Override

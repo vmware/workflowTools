@@ -76,21 +76,23 @@ public class SetBugNumbers extends AbstractCommitReadAction {
             return;
         }
 
-        if (!draft.isPreloadingJiraIssues && !draft.isPreloadingBugzillaBugs && draft.openIssues == null) {
-            if (jira != null) {
-                jira.setupAuthenticatedConnection();
-                draft.addIssues( jira.getOpenTasksForUser(config.username).issues);
+        if (draft.isPreloadingJiraIssues == null && jira != null) {
+            jira.setupAuthenticatedConnection();
+            draft.addIssues( jira.getOpenTasksForUser(config.username).issues);
+        }
+
+        if (draft.isPreloadingBugzillaBugs == null && bugzilla != null) {
+            bugzilla.setupAuthenticatedConnection();
+            if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
+                draft.userHasBugzillaQuery = true;
+                draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
             }
-            if (bugzilla != null) {
-                bugzilla.setupAuthenticatedConnection();
-                if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
-                    draft.userHasBugzillaQuery = true;
-                    draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
-                }
-            }
-        } else if (draft.openIssues == null) {
-            log.info("Jira / Bugzilla lists not loaded yet, waiting 3 seconds");
-            ThreadUtils.sleep(3, TimeUnit.SECONDS);
+        }
+
+        if ((draft.isPreloadingBugzillaBugs != null && draft.isPreloadingBugzillaBugs)
+                || (draft.isPreloadingJiraIssues != null && draft.isPreloadingJiraIssues)) {
+            log.info("Jira / Bugzilla lists not loaded yet, waiting 5 seconds");
+            ThreadUtils.sleep(5, TimeUnit.SECONDS);
             if (draft.openIssues == null) {
                 log.info("Failed to load Jira / Bugzilla items, Jira in progress {}, Bugzilla in progress",
                         draft.isPreloadingJiraIssues, draft.isPreloadingBugzillaBugs);

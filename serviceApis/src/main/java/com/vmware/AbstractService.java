@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
@@ -65,6 +66,8 @@ public abstract class AbstractService {
             retryCount++;
         }
     }
+
+    public abstract boolean isBaseUriTrusted() throws IOException;
 
     private void displayInputMessage(int retryCount) {
         if (retryCount == 0) {
