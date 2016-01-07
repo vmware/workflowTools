@@ -10,6 +10,7 @@ import com.vmware.utils.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.utils.collections.UniqueArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,26 +114,16 @@ public class ReviewRequestDraft extends BaseEntity{
 
     public void addIssues(Issue[] issuesToAdd) {
         if (openIssues == null) {
-            openIssues = new ArrayList<>();
+            openIssues = new UniqueArrayList<>();
         }
-        for (Issue issueToAdd : issuesToAdd) {
-            addOpenIssueInfo(issueToAdd);
-        }
+        openIssues.addAll(Arrays.asList(issuesToAdd));
     }
 
     public void addBugs(List<Bug> bugsToAdd) {
         if (openIssues == null) {
-            openIssues = new ArrayList<>();
+            openIssues = new UniqueArrayList<>();
         }
-        for (Bug bugToAdd : bugsToAdd) {
-            addOpenIssueInfo(bugToAdd);
-        }
-    }
-
-    public void addOpenIssueInfo(IssueInfo issueInfo) {
-        if (!openIssues.contains(issueInfo)) {
-            openIssues.add(issueInfo);
-        }
+        openIssues.addAll(bugsToAdd);
     }
 
     public boolean hasReviewNumber() {

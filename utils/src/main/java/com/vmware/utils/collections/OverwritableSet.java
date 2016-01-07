@@ -1,4 +1,4 @@
-package com.vmware.http.request;
+package com.vmware.utils.collections;
 
 import java.util.Collection;
 import java.util.HashSet;

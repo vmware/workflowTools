@@ -8,7 +8,7 @@ import com.vmware.http.cookie.CookieFileStore;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.ExceptionChecker;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.http.request.OverwritableSet;
+import com.vmware.utils.collections.OverwritableSet;
 import com.vmware.http.request.RequestBodyFactory;
 import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.http.request.RequestHeader;

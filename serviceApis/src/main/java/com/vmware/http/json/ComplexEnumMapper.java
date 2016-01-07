@@ -43,7 +43,7 @@ public class ComplexEnumMapper implements JsonDeserializer<ComplexEnum>, JsonSer
         }
         for (Object enumValue : EnumSet.allOf(enumType)) {
             Object valueToCompare = ((ComplexEnum)enumValue).getValue();
-            if (valueToCompare instanceof Integer && valueToCompare == valueAsInt) {
+            if (valueToCompare instanceof Integer && valueToCompare.equals(valueAsInt)) {
                 return (ComplexEnum) enumValue;
             } else if (valueToCompare instanceof String && value.equals(valueToCompare)) {
                 return (ComplexEnum) enumValue;
