@@ -8,6 +8,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.utils.collections.UniqueArrayList;
 import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
@@ -72,7 +73,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
     private void loadIssuesList(ReviewRequestDraft draft) throws IOException, URISyntaxException, IllegalAccessException {
         if (jira == null && bugzilla == null) {
             log.info("Both Jira and Bugzilla are disabled, no issues can be loaded");
-            draft.openIssues = new ArrayList<>();
+            draft.openIssues = new UniqueArrayList<>();
             return;
         }
 
@@ -96,7 +97,7 @@ public class SetBugNumbers extends AbstractCommitReadAction {
             if (draft.openIssues == null) {
                 log.info("Failed to load Jira / Bugzilla items, Jira in progress {}, Bugzilla in progress",
                         draft.isPreloadingJiraIssues, draft.isPreloadingBugzillaBugs);
-                draft.openIssues = new ArrayList<>();
+                draft.openIssues = new UniqueArrayList<>();
             }
         }
     }

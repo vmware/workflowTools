@@ -104,7 +104,9 @@ public class Jira extends AbstractRestService {
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee in (%s)",
                 issueTypesToGet, allowedStatuses, escapeUsername(username));
-        return connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
+        IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
+        log.debug("{} tasks found", response.issues.length);
+        return response;
     }
 
     public IssuesResponse getCreatedTasksForUser(String username) throws IOException, URISyntaxException {

@@ -39,7 +39,6 @@ public class Trello extends AbstractRestService {
 
     private final String loginUrl;
     private final String webUrl;
-    private List<UrlParam> authQueryParams;
 
     public Trello(String trelloUrl) throws IOException, URISyntaxException, IllegalAccessException {
         super(createApiUrl(trelloUrl), "1/", trello, null);
@@ -123,7 +122,7 @@ public class Trello extends AbstractRestService {
 
         connection.setUseSessionCookies(true);
         String apiTokenPage = connection.get(webUrl + "app-key", String.class);
-        authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
+        List<UrlParam> authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
         connection.setUseSessionCookies(false);
 
         connection.addStatefulParams(authQueryParams);
