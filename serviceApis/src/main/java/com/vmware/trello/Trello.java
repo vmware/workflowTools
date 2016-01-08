@@ -7,7 +7,6 @@ package com.vmware.trello;
 
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
-import com.vmware.http.UrlUtils;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.BadRequestException;
 import com.vmware.http.exception.NotAuthorizedException;
@@ -23,6 +22,7 @@ import com.vmware.trello.domain.Member;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.UrlUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -48,7 +48,7 @@ public class Trello extends AbstractRestService {
 
         String apiToken = readExistingApiToken(credentialsType);
 
-        connection.addStatefulParams(UrlUtils.parseParamsFromText(apiToken));
+        connection.addStatefulParamsFromUrlFragment(apiToken);
     }
 
     public Member getTrelloMember(String memberId) throws IOException, URISyntaxException {
@@ -114,7 +114,7 @@ public class Trello extends AbstractRestService {
 
     @Override
     protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
-        connection.clearStatefulParams();
+        connection.resetParams();
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
         connection.post(loginUrl, new LoginInfo(credentials), new RequestHeader("Referer", "https://trello.com/login"));

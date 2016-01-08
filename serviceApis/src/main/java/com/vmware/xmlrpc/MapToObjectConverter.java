@@ -2,10 +2,11 @@ package com.vmware.xmlrpc;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.vmware.ComplexEnum;
+import com.vmware.utils.enums.ComplexEnum;
 import com.vmware.http.json.ComplexEnumMapper;
 import com.vmware.http.request.DeserializedName;
 import com.vmware.http.request.PostDeserialization;
+import com.vmware.utils.enums.EnumUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -76,7 +77,7 @@ public class MapToObjectConverter {
         } else if (fieldType == String.class) {
             field.set(createdObject, String.valueOf(valueToConvert));
         } else if (ComplexEnum.class.isAssignableFrom(fieldType)) {
-            field.set(createdObject, ComplexEnumMapper.findByValue(fieldType, String.valueOf(valueToConvert)));
+            field.set(createdObject, EnumUtils.findByValue(fieldType, String.valueOf(valueToConvert)));
         } else if (fieldType.isArray() && valueToConvert instanceof Object[]) {
             Class arrayObjectType = fieldType.getComponentType();
             Object[] valuesToConvert = (Object[]) valueToConvert;

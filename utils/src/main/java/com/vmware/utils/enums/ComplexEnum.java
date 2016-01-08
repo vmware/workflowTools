@@ -1,4 +1,4 @@
-package com.vmware;
+package com.vmware.utils.enums;
 
 /**
  * Represents enums where each enum value references an int or a text value.

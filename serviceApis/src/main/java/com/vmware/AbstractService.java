@@ -1,17 +1,17 @@
 package com.vmware;
 
-import com.vmware.http.UrlUtils;
+import com.vmware.http.RequestParams;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.utils.IOUtils;
+import com.vmware.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 /**

@@ -1,6 +1,6 @@
 package com.vmware.bugzilla.domain;
 
-import com.vmware.ComplexEnum;
+import com.vmware.utils.enums.ComplexEnum;
 
 /**
  * Valid resolution values for a bug.
