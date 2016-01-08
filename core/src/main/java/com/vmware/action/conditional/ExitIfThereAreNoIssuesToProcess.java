@@ -1,6 +1,6 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.base.AbstractBatchIssuesAction;
+import com.vmware.action.base.BaseMultiActionDataSupport;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Helper action for exiting if there are no project issues to process.")
-public class ExitIfThereAreNoIssuesToProcess extends AbstractBatchIssuesAction {
+public class ExitIfThereAreNoIssuesToProcess extends BaseMultiActionDataSupport {
 
     public ExitIfThereAreNoIssuesToProcess(WorkflowConfig config) {
         super(config);

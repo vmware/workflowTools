@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.DiffToUpload;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("Uploads a git diff for the review. The parent ref used is defined by the parentBranch config property.")
-public class UploadReviewDiff extends AbstractCommitWithReviewAction {
+public class UploadReviewDiff extends BaseCommitWithReviewAction {
     public UploadReviewDiff(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);
     }

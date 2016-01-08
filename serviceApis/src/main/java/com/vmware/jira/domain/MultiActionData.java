@@ -1,6 +1,7 @@
 package com.vmware.jira.domain;
 
 import com.vmware.bugzilla.domain.Bug;
+import com.vmware.utils.collections.UniqueArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,9 +15,9 @@ public class MultiActionData {
 
     public String projectName;
 
-    private List<Issue> issuesForProcessing = new ArrayList<>();
+    private List<Issue> issuesForProcessing = new UniqueArrayList<>();
 
-    private List<Bug> bugsForProcessing = new ArrayList<>();
+    private List<Bug> bugsForProcessing = new UniqueArrayList<>();
 
     public void reset() {
         projectName = "";
@@ -24,7 +25,7 @@ public class MultiActionData {
         bugsForProcessing.clear();
     }
 
-    public List<Bug> getBugs() {
+    public List<Bug> getBugsForProcessing() {
         return Collections.unmodifiableList(bugsForProcessing);
     }
 

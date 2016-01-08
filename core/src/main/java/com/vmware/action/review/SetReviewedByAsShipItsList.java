@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractSetShipItReviewersList;
+import com.vmware.action.base.BaseSetShipItReviewersList;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.StringUtils;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("Sets the reviewer list for the commit as the list of reviewers who have given the associated review a ship it.")
-public class SetReviewedByAsShipItsList extends AbstractSetShipItReviewersList {
+public class SetReviewedByAsShipItsList extends BaseSetShipItReviewersList {
     public SetReviewedByAsShipItsList(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);
     }

@@ -8,13 +8,13 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 
-public abstract class AbstractCommitReadAction extends AbstractCommitAction {
+public abstract class BaseCommitReadAction extends BaseCommitAction {
 
     protected String title;
 
     protected Field property;
 
-    public AbstractCommitReadAction(WorkflowConfig config, String propertyName) throws NoSuchFieldException {
+    public BaseCommitReadAction(WorkflowConfig config, String propertyName) throws NoSuchFieldException {
         super(config);
         this.title = StringUtils.splitOnCapitalization(propertyName);
         this.property = ReviewRequestDraft.class.getField(propertyName);

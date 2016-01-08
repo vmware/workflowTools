@@ -1,6 +1,6 @@
 package com.vmware.action.info;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @ActionDescription("Displays a list of workflow actions that can be executed.")
-public class DisplayWorkflowActions extends AbstractAction {
+public class DisplayWorkflowActions extends BaseAction {
 
     public DisplayWorkflowActions(WorkflowConfig config) {
         super(config);
@@ -24,12 +24,12 @@ public class DisplayWorkflowActions extends AbstractAction {
         Padder titlePadder = new Padder("Workflow Actions");
         titlePadder.infoTitle();
 
-        Map<String, List<Class<? extends AbstractAction>>> classMap = generateClassMap();
+        Map<String, List<Class<? extends BaseAction>>> classMap = generateClassMap();
         for (String packageName : classMap.keySet()) {
             Padder packagePadder = new Padder(convertToReadableText(packageName));
             packagePadder.infoTitle();
-            List<Class<? extends AbstractAction>> classes = classMap.get(packageName);
-            for (Class<? extends AbstractAction> action : classes) {
+            List<Class<? extends BaseAction>> classes = classMap.get(packageName);
+            for (Class<? extends BaseAction> action : classes) {
                 ActionDescription description = action.getAnnotation(ActionDescription.class);
                 if (description == null) {
                     throw new RuntimeException("Please add a action description annotation for " + action.getSimpleName());
@@ -45,14 +45,14 @@ public class DisplayWorkflowActions extends AbstractAction {
         titlePadder.infoTitle();
     }
 
-    private Map<String, List<Class<? extends AbstractAction>>> generateClassMap() {
-        Map<String, List<Class<? extends AbstractAction>>> classes = new TreeMap<String, List<Class<? extends AbstractAction>>>();
+    private Map<String, List<Class<? extends BaseAction>>> generateClassMap() {
+        Map<String, List<Class<? extends BaseAction>>> classes = new TreeMap<String, List<Class<? extends BaseAction>>>();
         for (int i = 0; i < config.workFlowActions.size(); i ++) {
-            Class<? extends AbstractAction> action = config.workFlowActions.get(i);
+            Class<? extends BaseAction> action = config.workFlowActions.get(i);
             String[] pieces = action.getName().split("\\.");
             String packageName = pieces[pieces.length - 2];
             if (!classes.containsKey(packageName)) {
-                classes.put(packageName, new ArrayList<Class<? extends AbstractAction>>());
+                classes.put(packageName, new ArrayList<Class<? extends BaseAction>>());
             }
             classes.get(packageName).add(action);
         }

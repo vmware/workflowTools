@@ -1,6 +1,6 @@
 package com.vmware.action.jira;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
@@ -15,7 +15,7 @@ import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @ActionDescription("Convenience operation for batch updating the estimate value for all jira tasks reported by or assigned to the configured user.")
-public class UpdateTaskEstimates extends AbstractAction {
+public class UpdateTaskEstimates extends BaseAction {
 
     private Jira jira;
 

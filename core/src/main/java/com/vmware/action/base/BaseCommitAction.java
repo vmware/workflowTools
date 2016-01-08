@@ -5,15 +5,15 @@
  */
 package com.vmware.action.base;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 
-public abstract class AbstractCommitAction extends AbstractAction {
+public abstract class BaseCommitAction extends BaseAction {
 
     protected ReviewRequestDraft draft;
 
-    public AbstractCommitAction(WorkflowConfig config) {
+    public BaseCommitAction(WorkflowConfig config) {
         super(config);
     }
 

@@ -1,12 +1,14 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
+import com.vmware.utils.collections.UniqueArrayList;
 import com.vmware.utils.input.InputUtils;
 import com.vmware.utils.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -14,11 +16,11 @@ import java.util.SortedSet;
 
 import static com.vmware.utils.StringUtils.isInteger;
 
-public abstract class AbstractSetReviewerList extends AbstractCommitReadAction {
+public abstract class BaseSetReviewerList extends BaseCommitReadAction {
     protected boolean addToReviewerList;
 
 
-    public AbstractSetReviewerList(WorkflowConfig config, boolean addToReviewerList) throws NoSuchFieldException {
+    public BaseSetReviewerList(WorkflowConfig config, boolean addToReviewerList) throws NoSuchFieldException {
         super(config, "reviewedBy");
         this.addToReviewerList = addToReviewerList;
     }
@@ -61,53 +63,63 @@ public abstract class AbstractSetReviewerList extends AbstractCommitReadAction {
             return config.trivialReviewerLabel;
         }
 
-        List<String> parsedReviewers = new ArrayList<String>();
+        Collection<String> parsedReviewers = new UniqueArrayList<>();
         String[] reviewers = reviewersText.split(",");
         for (String reviewer : reviewers) {
             String fragment = reviewer.trim();
             if (fragment.isEmpty()) {
                 continue;
             }
-            int possibleIndexNumber = isInteger(fragment) ? Integer.parseInt(fragment) : -1;
-            boolean foundGroup = false;
-            LinkedHashMap<String, SortedSet<String>> reviewerGroups = config.reviewerGroups;
-            if (reviewerGroups != null) {
-                int count = 1;
-                for (String groupName : reviewerGroups.keySet()) {
-                    if (groupName.startsWith(fragment) || possibleIndexNumber == count++) {
-                        foundGroup = true;
-                        Set<String> reviewersToAdd = reviewerGroups.get(groupName);
-                        for (String reviewerToAdd : reviewersToAdd) {
-                            addReviewer(parsedReviewers, reviewerToAdd);
-                        }
-                        break;
-                    }
-                }
-            }
-            if (foundGroup) {
+            Collection<String> reviewersInGroup = getReviewersInGroup(fragment);
+            if (reviewersInGroup != null) {
+                addReviewers(parsedReviewers, reviewersInGroup);
                 continue;
             }
 
-            if (config.targetReviewers != null) {
-                for (String existingReviewer : config.targetReviewers) {
-                    if (existingReviewer.startsWith(fragment)) {
-                        fragment = existingReviewer;
-                        break;
-                    }
-                }
-            }
+            fragment = matchFragmentAgainstTargetReviewers(fragment);
             addReviewer(parsedReviewers, fragment);
         }
         return StringUtils.join(parsedReviewers);
     }
 
-    private void addReviewer(List<String> parsedReviewers, String fragment) {
+    private String matchFragmentAgainstTargetReviewers(String fragment) {
+        if (config.targetReviewers == null) {
+            return fragment;
+        }
+
+        for (String existingReviewer : config.targetReviewers) {
+            if (existingReviewer.startsWith(fragment)) {
+                return existingReviewer;
+            }
+        }
+        return fragment;
+    }
+
+    private Set<String> getReviewersInGroup(String fragment) {
+        LinkedHashMap<String, SortedSet<String>> reviewerGroups = config.reviewerGroups;
+        if (reviewerGroups == null) {
+            return null;
+        }
+
+        int possibleIndexNumber = isInteger(fragment) ? Integer.parseInt(fragment) : -1;
+        int count = 1;
+        for (String groupName : reviewerGroups.keySet()) {
+            if (groupName.startsWith(fragment) || possibleIndexNumber == count++) {
+                return reviewerGroups.get(groupName);
+            }
+        }
+        return null;
+    }
+
+    private void addReviewers(Collection<String> parsedReviewers, Collection<String> reviewersToAdd) {
+        for (String reviewerToAdd : reviewersToAdd) {
+            addReviewer(parsedReviewers, reviewerToAdd);
+        }
+    }
+
+    private void addReviewer(Collection<String> parsedReviewers, String fragment) {
         if (fragment.equals(config.username)) {
             log.debug("Not adding myself ({}) to reviewer list", config.username);
-            return;
-        }
-        if (parsedReviewers.contains(fragment)) {
-            log.debug("Already have added {} as a reviewer so skipping", fragment);
             return;
         }
         parsedReviewers.add(fragment);

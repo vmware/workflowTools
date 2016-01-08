@@ -6,11 +6,11 @@ import com.vmware.jenkins.Jenkins;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class AbstractCommitWithBuildsAction extends AbstractCommitAction {
+public abstract class BaseCommitWithBuildsAction extends BaseCommitAction {
 
     protected Jenkins jenkins;
 
-    public AbstractCommitWithBuildsAction(WorkflowConfig config) {
+    public BaseCommitWithBuildsAction(WorkflowConfig config) {
         super(config);
     }
 

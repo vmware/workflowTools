@@ -1,6 +1,6 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.base.AbstractSetShipItReviewersList;
+import com.vmware.action.base.BaseSetShipItReviewersList;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.StringUtils;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("Exits if a non trivial review does not have review ship its or a review URL.")
-public class ExitIfReviewHasNoShipIts extends AbstractSetShipItReviewersList {
+public class ExitIfReviewHasNoShipIts extends BaseSetShipItReviewersList {
 
     public ExitIfReviewHasNoShipIts(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);

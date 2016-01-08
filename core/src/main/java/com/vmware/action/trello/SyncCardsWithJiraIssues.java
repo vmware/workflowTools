@@ -18,7 +18,7 @@ import java.util.Map;
 
 @ActionDescription("Syncs trello cards with list of loaded jira issues. " +
         "Adds / Deletes trello cards to ensure board matches loaded list.")
-public class SyncCardsWithJiraIssues extends AbstractTrelloAction {
+public class SyncCardsWithJiraIssues extends BaseTrelloAction {
 
     public SyncCardsWithJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);

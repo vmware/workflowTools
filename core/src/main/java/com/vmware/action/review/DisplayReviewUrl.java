@@ -1,9 +1,8 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.http.RequestParams;
 import com.vmware.utils.UrlUtils;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Displays the current commit's review url on the command line.")
-public class DisplayReviewUrl extends AbstractCommitWithReviewAction {
+public class DisplayReviewUrl extends BaseCommitWithReviewAction {
 
     public DisplayReviewUrl(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);

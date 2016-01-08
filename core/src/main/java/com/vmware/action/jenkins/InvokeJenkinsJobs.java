@@ -1,6 +1,6 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.action.base.AbstractCommitWithBuildsAction;
+import com.vmware.action.base.BaseCommitWithBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.*;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobKeys config property. Adds or replaces jenkins job urls to testing done section.")
-public class InvokeJenkinsJobs extends AbstractCommitWithBuildsAction {
+public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
     private static final String USERNAME_PARAM = "USERNAME";
     private static final String NO_USERNAME = "NONE";
     private static final String ASK_FOR_PARAM = "$ASK";

@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Applies a specified review request's diff against the local repository.")
-public class ApplyReviewPatch extends AbstractAction {
+public class ApplyReviewPatch extends BaseAction {
 
     private ReviewBoard reviewBoard;
 

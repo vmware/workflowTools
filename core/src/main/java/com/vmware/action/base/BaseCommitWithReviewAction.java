@@ -11,11 +11,11 @@ import com.vmware.reviewboard.ReviewBoard;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class AbstractCommitWithReviewAction extends AbstractCommitAction{
+public abstract class BaseCommitWithReviewAction extends BaseCommitAction {
     protected ReviewBoard reviewBoard;
 
 
-    public AbstractCommitWithReviewAction(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseCommitWithReviewAction(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
     }
 

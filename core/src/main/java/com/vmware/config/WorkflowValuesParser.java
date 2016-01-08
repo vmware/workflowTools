@@ -1,6 +1,6 @@
 package com.vmware.config;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +15,14 @@ import java.util.Map;
 public class WorkflowValuesParser {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-    private List<Class<? extends AbstractAction>> actionClasses = new ArrayList<Class<? extends AbstractAction>>();
+    private List<Class<? extends BaseAction>> actionClasses = new ArrayList<Class<? extends BaseAction>>();
     private Map<String, String> configValues = new HashMap<String, String>();
     private List<String> unknownActions = new ArrayList<String>();
 
     private Map<String, String[]> workflows;
-    private List<Class<? extends AbstractAction>> workFlowActions;
+    private List<Class<? extends BaseAction>> workFlowActions;
 
-    public WorkflowValuesParser(Map<String, String[]> workflows, List<Class<? extends AbstractAction>> workFlowActions) {
+    public WorkflowValuesParser(Map<String, String[]> workflows, List<Class<? extends BaseAction>> workFlowActions) {
         this.workflows = workflows;
         this.workFlowActions = workFlowActions;
     }
@@ -49,7 +49,7 @@ public class WorkflowValuesParser {
             }
             boolean found = false;
             List<String> allActionNames = new ArrayList<String>();
-            for (Class<? extends AbstractAction> action : workFlowActions) {
+            for (Class<? extends BaseAction> action : workFlowActions) {
                 allActionNames.add(action.getSimpleName());
                 if (action.getSimpleName().equals(workflowValue)) {
                     actionClasses.add(action);
@@ -64,7 +64,7 @@ public class WorkflowValuesParser {
         }
     }
 
-    public List<Class<? extends AbstractAction>> getActionClasses() {
+    public List<Class<? extends BaseAction>> getActionClasses() {
         return actionClasses;
     }
 

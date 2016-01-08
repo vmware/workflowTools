@@ -6,11 +6,11 @@ import com.vmware.jira.Jira;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class AbstractBatchJiraAction extends AbstractBatchIssuesAction {
+public abstract class BaseBatchJiraAction extends BaseMultiActionDataSupport {
 
     protected Jira jira;
 
-    public AbstractBatchJiraAction(WorkflowConfig config) {
+    public BaseBatchJiraAction(WorkflowConfig config) {
         super(config);
     }
 

@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("Only creates a new review if there is not an existing review url in the commit.")
-public class CreateReviewIfNeeded extends AbstractCommitAction {
+public class CreateReviewIfNeeded extends BaseCommitAction {
     private ReviewBoard reviewBoard;
 
     public CreateReviewIfNeeded(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {

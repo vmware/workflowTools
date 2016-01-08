@@ -1,6 +1,6 @@
 package com.vmware.action.bugzilla;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.BugResolutionType;
 import com.vmware.config.ActionDescription;
@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Resolves bugzilla bugs with a status of fixed.")
-public class MarkBugAsResolved extends AbstractCommitAction {
+public class MarkBugAsResolved extends BaseCommitAction {
 
     protected Bugzilla bugzilla;
 

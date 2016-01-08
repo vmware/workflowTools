@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Creates a trello board if the project name doesn't match an open trello board.")
-public class CreateTrelloBoardIfNeeded extends AbstractTrelloAction {
+public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
 
 
     public CreateTrelloBoardIfNeeded(WorkflowConfig config) {

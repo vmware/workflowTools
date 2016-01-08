@@ -1,6 +1,6 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Checks that status of the latest job specified for the specified user.")
-public class CheckStatusOfLatestJobs extends AbstractAction {
+public class CheckStatusOfLatestJobs extends BaseAction {
 
     Jenkins jenkins;
 

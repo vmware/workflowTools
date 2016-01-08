@@ -1,6 +1,6 @@
 package com.vmware.action.info;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Displays initial info information.")
-public class GettingStarted extends AbstractAction {
+public class GettingStarted extends BaseAction {
 
     public GettingStarted(WorkflowConfig config) {
         super(config);

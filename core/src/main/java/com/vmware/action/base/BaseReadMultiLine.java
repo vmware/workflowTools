@@ -7,13 +7,13 @@ import java.io.IOException;
 
 import static com.vmware.utils.StringUtils.NEW_LINE_CHAR;
 
-public abstract class AbstractReadMultiLine extends AbstractCommitReadAction {
+public abstract class BaseReadMultiLine extends BaseCommitReadAction {
 
     private final boolean append;
 
     private final String[] historyValues;
 
-    public AbstractReadMultiLine(WorkflowConfig config, String propertyName, boolean append, String... historyValues) throws NoSuchFieldException {
+    public BaseReadMultiLine(WorkflowConfig config, String propertyName, boolean append, String... historyValues) throws NoSuchFieldException {
         super(config, propertyName);
         this.append = append;
         this.historyValues = historyValues;

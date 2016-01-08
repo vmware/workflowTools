@@ -1,7 +1,7 @@
 package com.vmware.action.info;
 
 import com.google.gson.Gson;
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 @ActionDescription("Displays a list of configuration options that can be set.")
-public class DisplayConfigOptions extends AbstractAction {
+public class DisplayConfigOptions extends BaseAction {
 
     private final Gson gson;
 

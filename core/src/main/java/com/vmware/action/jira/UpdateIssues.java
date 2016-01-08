@@ -1,6 +1,6 @@
 package com.vmware.action.jira;
 
-import com.vmware.action.base.AbstractBatchJiraAction;
+import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Bulk updates Jira issues.")
-public class UpdateIssues extends AbstractBatchJiraAction {
+public class UpdateIssues extends BaseBatchJiraAction {
 
     public UpdateIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
