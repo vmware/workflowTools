@@ -1,6 +1,6 @@
 package com.vmware.mapping;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.utils.ClasspathResource;
 
 import com.google.gson.Gson;
@@ -33,7 +33,7 @@ public class ConfigMappings {
         return mappings.keySet();
     }
 
-    public Set<String> getConfigValuesForAction(Class<? extends AbstractAction> foundAction) {
+    public Set<String> getConfigValuesForAction(Class<? extends BaseAction> foundAction) {
         Set<String> configValues = new HashSet<String>();
         Class classToGetValuesFor = foundAction;
         while (classToGetValuesFor != Object.class) {

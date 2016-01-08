@@ -1,6 +1,6 @@
 package com.vmware.action.base;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
@@ -14,13 +14,13 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractBatchCloseReviews extends AbstractAction {
+public abstract class BaseBatchCloseReviews extends BaseAction {
 
     protected ReviewBoard reviewBoard;
     private String reason;
     private int daysElapsedBeforeClose;
 
-    public AbstractBatchCloseReviews(WorkflowConfig config, String reason, int daysElapsedBeforeClose) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseBatchCloseReviews(WorkflowConfig config, String reason, int daysElapsedBeforeClose) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
         this.reason = reason;
         this.daysElapsedBeforeClose = daysElapsedBeforeClose;

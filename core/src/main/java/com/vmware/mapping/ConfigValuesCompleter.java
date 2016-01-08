@@ -1,6 +1,6 @@
 package com.vmware.mapping;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowValuesParser;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.input.ArgumentListAware;
@@ -47,7 +47,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         }
         values.clear();
         valuesShownWhenNoBuffer.clear();
-        for (Class<? extends AbstractAction> foundAction : valuesParser.getActionClasses()) {
+        for (Class<? extends BaseAction> foundAction : valuesParser.getActionClasses()) {
             Set<String> matchingConfigValues = configMappings.getConfigValuesForAction(foundAction);
             values.addAll(matchingConfigValues);
         }

@@ -1,6 +1,6 @@
 package com.vmware.action.commitInfo;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("This MUST be used first to parse the last commit if intending to edit anything in the last commit.")
-public class ReadLastCommit extends AbstractCommitAction {
+public class ReadLastCommit extends BaseCommitAction {
 
     public ReadLastCommit(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);

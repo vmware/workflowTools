@@ -2,7 +2,7 @@ package com.vmware.config;
 
 import com.vmware.Git;
 import com.vmware.ServiceLocator;
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.utils.ArrayUtils;
 import com.vmware.utils.CommitConfiguration;
 import com.vmware.utils.StringUtils;
@@ -38,7 +38,7 @@ public class WorkflowConfig {
     public Map<String, String> overriddenConfigSources = new TreeMap<String, String>();
 
     @Expose(serialize = false, deserialize = false)
-    public List<Class<? extends AbstractAction>> workFlowActions;
+    public List<Class<? extends BaseAction>> workFlowActions;
 
     @Expose(serialize = false, deserialize = false)
     public List<Field> configurableFields = new ArrayList<Field>();
@@ -321,7 +321,7 @@ public class WorkflowConfig {
     }
 
 
-    public List<Class<? extends AbstractAction>> determineActions(String workflowString) throws ClassNotFoundException, IllegalAccessException, UnknownWorkflowValueException {
+    public List<Class<? extends BaseAction>> determineActions(String workflowString) throws ClassNotFoundException, IllegalAccessException, UnknownWorkflowValueException {
         String[] possibleActions = workflows.get(workflowString);
         if (possibleActions != null) {
             log.info("Using workflow {}", workflowString);

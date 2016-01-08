@@ -1,6 +1,6 @@
 package com.vmware.action.git;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.StringUtils;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("Performs a git push origin HEAD:[remote branch path] -f.")
-public class PushToRemoteBranch extends AbstractAction {
+public class PushToRemoteBranch extends BaseAction {
 
     public PushToRemoteBranch(WorkflowConfig config) {
         super(config);

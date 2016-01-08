@@ -1,6 +1,6 @@
 package com.vmware.action.commitInfo;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Displays the commit details in memory.")
-public class DisplayCommit extends AbstractCommitAction {
+public class DisplayCommit extends BaseCommitAction {
 
     public DisplayCommit(WorkflowConfig config) {
         super(config);

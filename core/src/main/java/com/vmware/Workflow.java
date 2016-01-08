@@ -1,9 +1,9 @@
 package com.vmware;
 
-import com.vmware.action.AbstractAction;
-import com.vmware.action.base.AbstractBatchIssuesAction;
-import com.vmware.action.base.AbstractCommitAction;
-import com.vmware.action.trello.AbstractTrelloAction;
+import com.vmware.action.BaseAction;
+import com.vmware.action.base.BaseMultiActionDataSupport;
+import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.UnknownWorkflowValueException;
@@ -155,7 +155,7 @@ public class Workflow {
         }
 
         try {
-            List<Class<? extends AbstractAction>> workflowActions = config.determineActions(workflowToRun);
+            List<Class<? extends BaseAction>> workflowActions = config.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
             if (config.dryRun) {
@@ -181,14 +181,14 @@ public class Workflow {
         log.info("Checking that each action value in the workflows is valid");
         ReviewRequestDraft draft = new ReviewRequestDraft();
         MultiActionData multiActionData = new MultiActionData();
-        for (Class<? extends AbstractAction> action : config.determineActions(StringUtils.join(config.workflows.keySet()))) {
+        for (Class<? extends BaseAction> action : config.determineActions(StringUtils.join(config.workflows.keySet()))) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
-            AbstractAction actionObject = action.getConstructor(WorkflowConfig.class).newInstance(config);
-            if (actionObject instanceof AbstractCommitAction) {
-                ((AbstractCommitAction) actionObject).setDraft(draft);
+            BaseAction actionObject = action.getConstructor(WorkflowConfig.class).newInstance(config);
+            if (actionObject instanceof BaseCommitAction) {
+                ((BaseCommitAction) actionObject).setDraft(draft);
             }
-            if (actionObject instanceof AbstractBatchIssuesAction) {
-                ((AbstractBatchIssuesAction) actionObject).setMultiActionData(multiActionData);
+            if (actionObject instanceof BaseMultiActionDataSupport) {
+                ((BaseMultiActionDataSupport) actionObject).setMultiActionData(multiActionData);
             }
             if (runAllHelperMethods) {
                 log.info("Running canRunAction method");
@@ -199,7 +199,7 @@ public class Workflow {
         }
     }
 
-    private void dryRunActions(List<Class<? extends AbstractAction>> actions) {
+    private void dryRunActions(List<Class<? extends BaseAction>> actions) {
         log.info("Executing in dry run mode");
         log.info("Showing workflow actions that would have run for workflow argument [{}]", config.workflowsToRun);
 
@@ -208,7 +208,7 @@ public class Workflow {
 
         ConfigMappings configMappings = new ConfigMappings();
         Set<String> configOptions = new HashSet<String>();
-        for (Class<? extends AbstractAction> action : actions) {
+        for (Class<? extends BaseAction> action : actions) {
             ActionDescription description = action.getAnnotation(ActionDescription.class);
             if (description == null) {
                 throw new RuntimeException("Please add a action description annotation for " + action.getSimpleName());
@@ -252,24 +252,24 @@ public class Workflow {
         return matchingValueText;
     }
 
-    private void runActions(List<Class<? extends AbstractAction>> actions, WorkflowActionValues values) throws IllegalAccessException, URISyntaxException,
+    private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) throws IllegalAccessException, URISyntaxException,
             InstantiationException, NoSuchMethodException, InvocationTargetException, IOException, ParseException {
-        for (Class<? extends AbstractAction> action : actions) {
+        for (Class<? extends BaseAction> action : actions) {
             runAction(action, values);
         }
     }
 
-    private void runAction(Class<? extends AbstractAction> actionClass, WorkflowActionValues values) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException, ParseException {
-        AbstractAction action = actionClass.getConstructor(WorkflowConfig.class).newInstance(config);
+    private void runAction(Class<? extends BaseAction> actionClass, WorkflowActionValues values) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException, ParseException {
+        BaseAction action = actionClass.getConstructor(WorkflowConfig.class).newInstance(config);
         log.debug("Executing workflow action {}", actionClass.getSimpleName());
-        if (action instanceof AbstractCommitAction) {
-            ((AbstractCommitAction) action).setDraft(values.getDraft());
+        if (action instanceof BaseCommitAction) {
+            ((BaseCommitAction) action).setDraft(values.getDraft());
         }
-        if (action instanceof AbstractBatchIssuesAction) {
-            ((AbstractBatchIssuesAction) action).setMultiActionData(values.getMultiActionData());
+        if (action instanceof BaseMultiActionDataSupport) {
+            ((BaseMultiActionDataSupport) action).setMultiActionData(values.getMultiActionData());
         }
-        if (action instanceof AbstractTrelloAction) {
-            ((AbstractTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
+        if (action instanceof BaseTrelloAction) {
+            ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
         }
 
         boolean canRunAction = action.canRunAction();
@@ -279,8 +279,8 @@ public class Workflow {
             action.process();
         }
 
-        if (action instanceof AbstractTrelloAction) {
-            values.setTrelloBoard(((AbstractTrelloAction) action).getSelectedBoard());
+        if (action instanceof BaseTrelloAction) {
+            values.setTrelloBoard(((BaseTrelloAction) action).getSelectedBoard());
         }
     }
 }

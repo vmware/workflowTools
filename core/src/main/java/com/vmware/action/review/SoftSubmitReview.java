@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("For the associated review, adds a comment to review board that the review has been submitted. Leaves the review open for further reviews.")
-public class SoftSubmitReview extends AbstractCommitWithReviewAction {
+public class SoftSubmitReview extends BaseCommitWithReviewAction {
     public SoftSubmitReview(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);
     }

@@ -1,6 +1,6 @@
 package com.vmware.action.bugzilla;
 
-import com.vmware.action.base.AbstractBatchBugzillaAction;
+import com.vmware.action.base.BaseBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Adds tracking issues for bugs in a Bugzilla named query. Bugs that already have a tracking issue are skipped.")
-public class AddTrackingIssuesForQuery extends AbstractBatchBugzillaAction {
+public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
 
     public AddTrackingIssuesForQuery(WorkflowConfig config) {
         super(config);
@@ -20,7 +20,7 @@ public class AddTrackingIssuesForQuery extends AbstractBatchBugzillaAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        List<Bug> bugList = multiActionData.getBugs();
+        List<Bug> bugList = multiActionData.getBugsForProcessing();
         if (bugList.isEmpty()) {
             log.info("No bugs found for named query {}", config.bugzillaQuery);
             return;

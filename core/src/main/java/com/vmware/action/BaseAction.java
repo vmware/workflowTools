@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-public abstract class AbstractAction {
+public abstract class BaseAction {
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -21,7 +21,7 @@ public abstract class AbstractAction {
     protected final Git git = new Git();
 
 
-    public AbstractAction(WorkflowConfig config) {
+    public BaseAction(WorkflowConfig config) {
         this.config = config;
         this.serviceLocator = config.configuredServiceLocator();
     }

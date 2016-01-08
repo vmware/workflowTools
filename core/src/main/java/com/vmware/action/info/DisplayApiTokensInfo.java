@@ -1,7 +1,7 @@
 package com.vmware.action.info;
 
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Displays information about how api tokens are gathered.")
-public class DisplayApiTokensInfo extends AbstractAction {
+public class DisplayApiTokensInfo extends BaseAction {
 
     public DisplayApiTokensInfo(WorkflowConfig config) {
         super(config);

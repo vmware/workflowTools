@@ -1,9 +1,4 @@
 {
-  "AbstractBatchJiraAction": [
-    "--jira-test-issue",
-    "--jira-url",
-    "--disable-jira"
-  ],
   "PushToRemoteBranch": [
     "--username",
     " --remote-branch"
@@ -41,12 +36,14 @@
     "--latest-diff",
     "--patch"
   ],
+  "BaseCommitWithReviewAction": [
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
+  ],
   "LoadBacklogStories": [
     "--include-estimated",
     "--use-label"
-  ],
-  "AbstractCommitReadAction": [
-    "--set-empty-only"
   ],
   "GenerateReviewStats": [
     "--review-board-date-format",
@@ -55,6 +52,14 @@
     "--file-count-ranges",
     "--groups"
   ],
+  "BaseBatchBugzillaAction": [
+    "--bugzilla-test-bug",
+    "--username",
+    "--bugzilla-url",
+    "--default-jira-component",
+    "--default-jira-project",
+    "--disable-bugzilla"
+  ],
   "InvokeJenkinsJobs": [
     "--username",
     "--jenkins-url",
@@ -62,8 +67,11 @@
     "--ignore-jenkins-job-failure",
     "--jenkins-jobs"
   ],
-  "AbstractTrelloAction": [
-    "--trello-url"
+  "BaseTransitionJiraIssue": [
+    "--jira-test-issue",
+    "--jira-url",
+    "--username",
+    "--disable-jira"
   ],
   "ConvertCardsToJiraIssues": [
     "--trello-url",
@@ -73,25 +81,20 @@
     "--max-summary",
     "--set-empty-only"
   ],
-  "AbstractBatchBugzillaAction": [
-    "--bugzilla-test-bug",
-    "--username",
-    "--bugzilla-url",
-    "--default-jira-component",
-    "--default-jira-project",
-    "--disable-bugzilla"
-  ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",
     "--default-jira-project"
+  ],
+  "BaseCommitWithBuildsAction": [
+    "--disable-jenkins-login",
+    "--jenkins-uses-csrf",
+    "--username",
+    "--jenkins-url"
   ],
   "MarkBugAsResolved": [
     "--bugzilla-test-bug",
     "--username",
     "--bugzilla-url"
-  ],
-  "AbstractSetReviewerList": [
-    "--username"
   ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
@@ -104,11 +107,6 @@
     "--username",
     "--bugzilla-url",
     "--trello-url"
-  ],
-  "AbstractCommitWithReviewAction": [
-    "--review-board-date-format",
-    "--username",
-    "--reviewboard-url"
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--jira-test-issue",
@@ -142,7 +140,10 @@
     "--jira-url",
     "--keep-missing-cards"
   ],
-  "AbstractReadMultiLine": [
+  "BaseCommitReadAction": [
+    "--set-empty-only"
+  ],
+  "BaseReadMultiLine": [
     "--max-description"
   ],
   "DisplayReviewUrl": [
@@ -165,20 +166,13 @@
   "UpdateReviewDetails": [
     "--groups"
   ],
-  "AbstractCommitWithBuildsAction": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--username",
-    "--jenkins-url"
-  ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
   ],
-  "AbstractTransitionJiraIssue": [
-    "--jira-test-issue",
-    "--jira-url",
-    "--username",
-    "--disable-jira"
+  "BaseBatchCloseReviews": [
+    "--review-board-date-format",
+    "--reviewboard-url",
+    "--username"
   ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
@@ -195,9 +189,12 @@
     "--username",
     "--estimate"
   ],
-  "AbstractBatchCloseReviews": [
-    "--review-board-date-format",
-    "--reviewboard-url",
+  "BaseBatchJiraAction": [
+    "--jira-test-issue",
+    "--jira-url",
+    "--disable-jira"
+  ],
+  "BaseSetReviewerList": [
     "--username"
   ],
   "ReadLastCommit": [
@@ -213,6 +210,9 @@
   "AbortJenkinsJobs": [
     "--jenkins-url",
     "--jenkins-jobs"
+  ],
+  "BaseTrelloAction": [
+    "--trello-url"
   ],
   "CheckStatusOfLatestJobs": [
     "--disable-jenkins-login",

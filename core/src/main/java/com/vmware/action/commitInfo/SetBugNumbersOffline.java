@@ -1,6 +1,6 @@
 package com.vmware.action.commitInfo;
 
-import com.vmware.action.base.AbstractCommitReadAction;
+import com.vmware.action.base.BaseCommitReadAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.input.InputUtils;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import static com.vmware.utils.StringUtils.appendCsvValue;
 
 @ActionDescription("Sets the bug number without showing assigned issues in Jira.")
-public class SetBugNumbersOffline extends AbstractCommitReadAction {
+public class SetBugNumbersOffline extends BaseCommitReadAction {
 
     public SetBugNumbersOffline(WorkflowConfig config) throws NoSuchFieldException {
         super(config, "bugNumbers");

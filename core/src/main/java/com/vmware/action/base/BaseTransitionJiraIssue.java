@@ -14,14 +14,14 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractTransitionJiraIssue extends AbstractCommitAction {
+public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
     private final List<IssueStatusDefinition> allowedFromStatuses;
 
     private final IssueStatusDefinition[] toStatuses;
     private Jira jira;
 
-    public AbstractTransitionJiraIssue(WorkflowConfig config, IssueStatusDefinition[] toStatuses, IssueStatusDefinition[] allowedFromStatuses) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseTransitionJiraIssue(WorkflowConfig config, IssueStatusDefinition[] toStatuses, IssueStatusDefinition[] allowedFromStatuses) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
         this.toStatuses = toStatuses;
         this.allowedFromStatuses = Arrays.asList(allowedFromStatuses);

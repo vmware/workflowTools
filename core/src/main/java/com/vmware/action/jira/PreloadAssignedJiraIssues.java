@@ -1,6 +1,6 @@
 package com.vmware.action.jira;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Preloads the list of assigned jira issues. Loads asynchronously so that the list is already available when editing the bug number.")
-public class PreloadAssignedJiraIssues extends AbstractCommitAction {
+public class PreloadAssignedJiraIssues extends BaseCommitAction {
 
     private Jira jira;
 

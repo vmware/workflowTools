@@ -5,15 +5,15 @@
  */
 package com.vmware.action.base;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.MultiActionData;
 
-public abstract class AbstractBatchIssuesAction extends AbstractAction {
+public abstract class BaseMultiActionDataSupport extends BaseAction {
 
     protected MultiActionData multiActionData;
 
-    public AbstractBatchIssuesAction(WorkflowConfig config) {
+    public BaseMultiActionDataSupport(WorkflowConfig config) {
         super(config);
     }
 

@@ -1,6 +1,6 @@
 package com.vmware.action.info;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 @ActionDescription("Displays the current workflow configuration.")
-public class DisplayConfig extends AbstractAction {
+public class DisplayConfig extends BaseAction {
 
     public DisplayConfig(WorkflowConfig config) {
         super(config);

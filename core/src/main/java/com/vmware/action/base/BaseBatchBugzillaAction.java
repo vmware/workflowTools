@@ -9,11 +9,11 @@ import com.vmware.jira.domain.IssueTypeDefinition;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class AbstractBatchBugzillaAction extends AbstractBatchIssuesAction {
+public abstract class BaseBatchBugzillaAction extends BaseMultiActionDataSupport {
 
     protected Bugzilla bugzilla;
 
-    public AbstractBatchBugzillaAction(WorkflowConfig config) {
+    public BaseBatchBugzillaAction(WorkflowConfig config) {
         super(config);
     }
 

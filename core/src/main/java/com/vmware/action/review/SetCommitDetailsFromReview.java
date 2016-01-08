@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @ActionDescription("Sets the git commit details from the associated review request. Uses published review info only.")
-public class SetCommitDetailsFromReview extends AbstractCommitWithReviewAction {
+public class SetCommitDetailsFromReview extends BaseCommitWithReviewAction {
     public SetCommitDetailsFromReview(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
         super(config);
     }

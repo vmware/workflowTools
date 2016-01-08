@@ -1,6 +1,6 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.action.base.AbstractCommitWithBuildsAction;
+import com.vmware.action.base.BaseCommitWithBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.JobBuild;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ActionDescription("Aborts the jenkins jobs specified by the jenkinsJobKeys config property. Updates status for jenkins job urls in testing done section.")
-public class AbortJenkinsJobs extends AbstractCommitWithBuildsAction {
+public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
 
     public AbortJenkinsJobs(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);

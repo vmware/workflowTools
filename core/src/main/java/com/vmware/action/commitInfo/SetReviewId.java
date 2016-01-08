@@ -1,6 +1,6 @@
 package com.vmware.action.commitInfo;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Read a review id from the user. Set that review id as the review id for the commit.")
-public class SetReviewId extends AbstractCommitAction {
+public class SetReviewId extends BaseCommitAction {
 
     private ReviewBoard reviewBoard;
 

@@ -1,6 +1,6 @@
 package com.vmware.action.bugzilla;
 
-import com.vmware.action.base.AbstractBatchBugzillaAction;
+import com.vmware.action.base.BaseBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Adds a Jira Issue to use for tracking a bugzill bug.")
-public class AddTrackingIssueForBug extends AbstractBatchBugzillaAction{
+public class AddTrackingIssueForBug extends BaseBatchBugzillaAction {
 
     public AddTrackingIssueForBug(WorkflowConfig config) {
         super(config);

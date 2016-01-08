@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.exception.NotFoundException;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Publishes a review on the review board server.")
-public class PublishReview extends AbstractCommitWithReviewAction {
+public class PublishReview extends BaseCommitWithReviewAction {
 
     public PublishReview(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);

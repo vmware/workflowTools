@@ -5,7 +5,7 @@
  */
 package com.vmware.action.jira;
 
-import com.vmware.action.base.AbstractBatchJiraAction;
+import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 @ActionDescription("Loads a list of jira stories for processing.")
-public class LoadBacklogStories extends AbstractBatchJiraAction {
+public class LoadBacklogStories extends BaseBatchJiraAction {
 
     public LoadBacklogStories(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);

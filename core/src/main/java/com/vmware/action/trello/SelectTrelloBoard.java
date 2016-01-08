@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Selects an existing open trello board.")
-public class SelectTrelloBoard  extends AbstractTrelloAction {
+public class SelectTrelloBoard  extends BaseTrelloAction {
 
 
     public SelectTrelloBoard(WorkflowConfig config) {

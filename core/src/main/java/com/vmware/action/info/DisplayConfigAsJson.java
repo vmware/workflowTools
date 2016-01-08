@@ -1,7 +1,7 @@
 package com.vmware.action.info;
 
 import com.google.gson.Gson;
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Displays the current workflow configuration as json.")
-public class DisplayConfigAsJson extends AbstractAction {
+public class DisplayConfigAsJson extends BaseAction {
 
     private final Gson gson;
 

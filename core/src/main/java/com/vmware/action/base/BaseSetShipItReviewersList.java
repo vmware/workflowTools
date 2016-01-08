@@ -7,10 +7,10 @@ import com.vmware.utils.StringUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class AbstractSetShipItReviewersList extends AbstractCommitWithReviewAction {
+public abstract class BaseSetShipItReviewersList extends BaseCommitWithReviewAction {
 
 
-    public AbstractSetShipItReviewersList(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseSetShipItReviewersList(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
     }
 

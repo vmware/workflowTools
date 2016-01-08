@@ -5,7 +5,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueType;
 import com.vmware.jira.domain.IssueTypeDefinition;
-import com.vmware.http.RequestParams;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
@@ -17,7 +16,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Converts the selected board's cards into a list of jira issues.")
-public class ConvertCardsToJiraIssues extends AbstractTrelloAction {
+public class ConvertCardsToJiraIssues extends BaseTrelloAction {
     private Trello trello;
 
     public ConvertCardsToJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {

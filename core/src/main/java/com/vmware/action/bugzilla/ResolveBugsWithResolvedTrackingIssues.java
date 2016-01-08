@@ -1,6 +1,6 @@
 package com.vmware.action.bugzilla;
 
-import com.vmware.action.base.AbstractBatchBugzillaAction;
+import com.vmware.action.base.BaseBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugResolutionType;
 import com.vmware.config.ActionDescription;
@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Resolves Bugzilla bugs whose tracking Jira issues are resolved.")
-public class ResolveBugsWithResolvedTrackingIssues extends AbstractBatchBugzillaAction {
+public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaAction {
 
     protected Jira jira;
 
@@ -45,7 +45,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends AbstractBatchBugzilla
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        for (Bug bug : multiActionData.getBugs()) {
+        for (Bug bug : multiActionData.getBugsForProcessing()) {
             Integer bugId = Integer.parseInt(bug.getKey());
             Issue trackingIssue = getValidTrackingIssueForBug(bug);
 

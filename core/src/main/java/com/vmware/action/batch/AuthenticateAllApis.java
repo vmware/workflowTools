@@ -1,8 +1,7 @@
 package com.vmware.action.batch;
 
-import com.vmware.AbstractRestService;
 import com.vmware.AbstractService;
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -16,7 +15,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Ensures that all apis have a valid token / cookie. Primarily for testing.")
-public class AuthenticateAllApis extends AbstractAction{
+public class AuthenticateAllApis extends BaseAction {
 
     public AuthenticateAllApis(WorkflowConfig config) {
         super(config);

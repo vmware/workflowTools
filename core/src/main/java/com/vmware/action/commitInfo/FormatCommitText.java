@@ -1,6 +1,6 @@
 package com.vmware.action.commitInfo;
 
-import com.vmware.action.base.AbstractCommitAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.StringUtils;
@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Formats commit lines to match max lengths.")
-public class FormatCommitText extends AbstractCommitAction {
+public class FormatCommitText extends BaseCommitAction {
 
     public FormatCommitText(WorkflowConfig config) {
         super(config);

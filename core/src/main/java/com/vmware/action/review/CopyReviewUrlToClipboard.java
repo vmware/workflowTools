@@ -1,9 +1,8 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.http.RequestParams;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.UrlUtils;
 
@@ -16,7 +15,7 @@ import java.text.ParseException;
 import java.util.Locale;
 
 @ActionDescription("Copies the review board url to the clipboard. Handy for pasting it into a browser.")
-public class CopyReviewUrlToClipboard extends AbstractCommitWithReviewAction {
+public class CopyReviewUrlToClipboard extends BaseCommitWithReviewAction {
     public CopyReviewUrlToClipboard(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
     }

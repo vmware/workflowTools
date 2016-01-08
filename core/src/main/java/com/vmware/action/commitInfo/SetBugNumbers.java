@@ -1,7 +1,7 @@
 package com.vmware.action.commitInfo;
 
 import com.vmware.IssueInfo;
-import com.vmware.action.base.AbstractCommitReadAction;
+import com.vmware.action.base.BaseCommitReadAction;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Sets the bug number. A list of assigned jira bugs and tasks is shown for easy selection. Bug number can also be manually entered.")
-public class SetBugNumbers extends AbstractCommitReadAction {
+public class SetBugNumbers extends BaseCommitReadAction {
 
     private Jira jira = null;
 

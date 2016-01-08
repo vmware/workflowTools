@@ -5,7 +5,7 @@
  */
 package com.vmware.config;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,11 +25,11 @@ import java.util.zip.ZipInputStream;
  */
 public class WorkflowActionLister {
 
-    public List<Class<? extends AbstractAction>> findWorkflowActions() {
+    public List<Class<? extends BaseAction>> findWorkflowActions() {
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             URL actionDirectoryUrl = classLoader.getResource("com/vmware/action");
-            List<Class<? extends AbstractAction>> actionsList = new ArrayList<Class<? extends AbstractAction>>();
+            List<Class<? extends BaseAction>> actionsList = new ArrayList<Class<? extends BaseAction>>();
             if (actionDirectoryUrl.getFile().contains(".jar!")) {
                 addClassesFromJar(actionDirectoryUrl, actionsList);
             } else {
@@ -37,9 +37,9 @@ public class WorkflowActionLister {
                 addClassesFromDirectory(directoryFile, actionsList, "com.vmware");
             }
 
-            Collections.sort(actionsList, new Comparator<Class<? extends AbstractAction>>() {
+            Collections.sort(actionsList, new Comparator<Class<? extends BaseAction>>() {
                 @Override
-                public int compare(Class<? extends AbstractAction> o1, Class<? extends AbstractAction> o2) {
+                public int compare(Class<? extends BaseAction> o1, Class<? extends BaseAction> o2) {
                     return o1.getSimpleName().compareTo(o2.getSimpleName());
                 }
             });
@@ -51,7 +51,7 @@ public class WorkflowActionLister {
         }
     }
 
-    private void addClassesFromJar(URL fileUrl, List<Class<? extends AbstractAction>> actionsList) throws IOException, ClassNotFoundException {
+    private void addClassesFromJar(URL fileUrl, List<Class<? extends BaseAction>> actionsList) throws IOException, ClassNotFoundException {
         String jarName = parseFilePath(fileUrl.getFile());
         ZipInputStream zip=new ZipInputStream(new FileInputStream(jarName));
         for(ZipEntry entry=zip.getNextEntry();entry!=null;entry=zip.getNextEntry()) {
@@ -62,7 +62,7 @@ public class WorkflowActionLister {
         }
     }
 
-    private void addClassesFromDirectory(File directoryFile, List<Class<? extends AbstractAction>> actionsList, String packagePrefix) throws ClassNotFoundException {
+    private void addClassesFromDirectory(File directoryFile, List<Class<? extends BaseAction>> actionsList, String packagePrefix) throws ClassNotFoundException {
         for (File actionFile : directoryFile.listFiles()) {
             if (actionFile.isDirectory()) {
                 String newPackagePrefix = packagePrefix + "." + directoryFile.getName();
@@ -97,14 +97,14 @@ public class WorkflowActionLister {
         return jarName;
     }
 
-    private void addClassIfActionClass(List<Class<? extends AbstractAction>> actionsList, String className) throws ClassNotFoundException {
+    private void addClassIfActionClass(List<Class<? extends BaseAction>> actionsList, String className) throws ClassNotFoundException {
         if (!className.startsWith("com.vmware")) {
             return;
         }
 
         Class actionClass = Class.forName(className);
         if (!Modifier.isAbstract(actionClass.getModifiers())
-                && AbstractAction.class.isAssignableFrom(actionClass)) {
+                && BaseAction.class.isAssignableFrom(actionClass)) {
             actionsList.add(actionClass);
         }
     }

@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.AbstractAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
@@ -30,7 +30,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 
 @ActionDescription("Generate review board statistics for specified groups.")
-public class GenerateReviewStats extends AbstractAction {
+public class GenerateReviewStats extends BaseAction {
     private ReviewBoard reviewBoard;
 
     public GenerateReviewStats(WorkflowConfig config) {

@@ -1,6 +1,6 @@
 package com.vmware.action.trello;
 
-import com.vmware.action.base.AbstractBatchIssuesAction;
+import com.vmware.action.base.BaseMultiActionDataSupport;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Board;
@@ -10,13 +10,13 @@ import com.vmware.utils.Padder;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class AbstractTrelloAction extends AbstractBatchIssuesAction {
+public abstract class BaseTrelloAction extends BaseMultiActionDataSupport {
 
     protected Trello trello;
 
     protected Board selectedBoard;
 
-    public AbstractTrelloAction(WorkflowConfig config) {
+    public BaseTrelloAction(WorkflowConfig config) {
         super(config);
     }
 

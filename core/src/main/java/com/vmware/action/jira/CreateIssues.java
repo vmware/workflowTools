@@ -1,6 +1,6 @@
 package com.vmware.action.jira;
 
-import com.vmware.action.base.AbstractBatchJiraAction;
+import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -11,7 +11,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Bulk create Jira issues.")
-public class CreateIssues extends AbstractBatchJiraAction {
+public class CreateIssues extends BaseBatchJiraAction {
 
     public CreateIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);

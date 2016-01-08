@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.AbstractCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 @ActionDescription("Discards the review associated with the commit.")
-public class DiscardReview extends AbstractCommitWithReviewAction {
+public class DiscardReview extends BaseCommitWithReviewAction {
 
     public DiscardReview(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
         super(config);
