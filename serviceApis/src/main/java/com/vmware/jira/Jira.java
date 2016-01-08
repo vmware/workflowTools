@@ -1,7 +1,7 @@
 package com.vmware.jira;
 
 import com.vmware.AbstractRestService;
-import com.vmware.ComplexEnum;
+import com.vmware.utils.enums.ComplexEnum;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueTimeTracking;
 import com.vmware.jira.domain.IssuesResponse;

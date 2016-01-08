@@ -9,7 +9,7 @@ package com.vmware.http.request;
  * Used as a base class for UrlParam and RequestHeader.
  * The RestConnection class will handle params correctly depending on class type.
  */
-public class RequestParam {
+public abstract class RequestParam {
     protected String name;
 
     protected String value;

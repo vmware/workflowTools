@@ -8,7 +8,6 @@ import com.vmware.http.cookie.CookieFileStore;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.ExceptionChecker;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.utils.collections.OverwritableSet;
 import com.vmware.http.request.RequestBodyFactory;
 import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.http.request.RequestHeader;
@@ -30,9 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +52,7 @@ public class HttpConnection {
     private WorkflowCertificateManager workflowCertificateManager = null;
     private Gson gson;
     private RequestBodyHandling requestBodyHandling;
-    private Set<RequestParam> statefulParams = new OverwritableSet<RequestParam>();
+    private RequestParams requestParams;
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
 
@@ -66,6 +63,7 @@ public class HttpConnection {
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);
         workflowCertificateManager = new WorkflowCertificateManager(homeFolder + "/.workflowTool.keystore");
+        requestParams = new RequestParams();
     }
 
     public void updateServerTimeZone(TimeZone serverTimezone, String serverDateFormat) {
@@ -75,15 +73,19 @@ public class HttpConnection {
     public void setupBasicAuthHeader(final UsernamePasswordCredentials credentials) {
         String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
         RequestHeader authorizationHeader = new RequestHeader("Authorization", "Basic " + basicCredentials);
-        statefulParams.add(authorizationHeader);
+        requestParams.addStatefulParam(authorizationHeader);
     }
 
     public void addStatefulParams(List<? extends RequestParam> params) {
-        statefulParams.addAll(params);
+        requestParams.addAllStatefulParams(params);
     }
 
-    public void clearStatefulParams() {
-        statefulParams.clear();
+    public void addStatefulParamsFromUrlFragment(String urlFragment) {
+        requestParams.addStatefulParamsFromUrlFragment(urlFragment);
+    }
+
+    public void resetParams() {
+        requestParams.reset();
     }
 
     public <T> T get(String url, Class<T> responseConversionClass, List<RequestParam> params) throws IOException, URISyntaxException {
@@ -164,13 +166,13 @@ public class HttpConnection {
     }
 
     private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... statelessParams) throws IOException, URISyntaxException {
-        Set<RequestParam> allParams = new OverwritableSet<RequestParam>(statefulParams);
+        requestParams.clearStatelessParams();
         // add default application json header, can be overridden by stateless headers
-        allParams.add(anAcceptHeader("application/json"));
+        requestParams.addStatelessParam(anAcceptHeader("application/json"));
 
         List<RequestParam> statelessParamsList = Arrays.asList(statelessParams);
-        allParams.addAll(statelessParamsList);
-        String fullUrl = UrlUtils.buildUrl(requestUrl, allParams);
+        requestParams.addAllStatelessParams(statelessParamsList);
+        String fullUrl = requestParams.buildUrl(requestUrl);
         URI uri = new URI(fullUrl);
         log.debug("{}: {}", methodType.name(), uri.toString());
 
@@ -180,16 +182,12 @@ public class HttpConnection {
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
         activeConnection.setRequestMethod(methodType.name());
-        addRequestHeaders(allParams);
+        addRequestHeaders();
         addCookiesHeader(uri.getHost());
     }
 
-    private void addRequestHeaders(Collection<? extends RequestParam> params) {
-        for (RequestParam param : params) {
-            if (!(param instanceof RequestHeader)) {
-                continue;
-            }
-            RequestHeader header = (RequestHeader) param;
+    private void addRequestHeaders() {
+        for (RequestHeader header : requestParams.requestHeaders()) {
             log.debug("Adding request header {}:{}", header.getName(), header.getValue());
             activeConnection.setRequestProperty(header.getName(), header.getValue());
         }

@@ -1,11 +1,11 @@
 package com.vmware.action.review;
 
-import com.vmware.ServiceLocator;
 import com.vmware.action.base.AbstractCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.http.UrlUtils;
+import com.vmware.http.RequestParams;
 import com.vmware.utils.IOUtils;
+import com.vmware.utils.UrlUtils;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
