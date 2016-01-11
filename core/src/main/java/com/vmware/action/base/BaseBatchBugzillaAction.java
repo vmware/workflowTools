@@ -23,12 +23,11 @@ public abstract class BaseBatchBugzillaAction extends BaseMultiActionDataSupport
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+    public String cannotRunAction() {
         if (config.disableBugzilla) {
-            log.warn("Bugzilla is disabled by config property disableBugzilla");
-            return false;
+            return "Bugzilla is disabled by config property disableBugzilla";
         }
-        return super.canRunAction();
+        return super.cannotRunAction();
     }
 
     protected Issue createIssueFromBug(Bug bug) {

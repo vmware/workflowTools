@@ -13,7 +13,7 @@ import java.text.ParseException;
 @ActionDescription("Discards the review associated with the commit.")
 public class DiscardReview extends BaseCommitWithReviewAction {
 
-    public DiscardReview(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public DiscardReview(WorkflowConfig config) {
         super(config);
     }
 

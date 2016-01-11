@@ -28,7 +28,7 @@ import java.util.Set;
 @ActionDescription("Loads a list of jira stories for processing.")
 public class LoadBacklogStories extends BaseBatchJiraAction {
 
-    public LoadBacklogStories(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public LoadBacklogStories(WorkflowConfig config) {
         super(config);
     }
 

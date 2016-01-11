@@ -61,7 +61,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
                 "with story point values after estimating in trello is finished");
     }
 
-    private void deleteMissingCards(List<Issue> issuesForProcessing, List<Card> existingCards) throws IllegalAccessException, IOException, URISyntaxException {
+    private void deleteMissingCards(List<Issue> issuesForProcessing, List<Card> existingCards) {
         int cardRemovalCount = 0;
         for (int i = existingCards.size() - 1; i >= 0; i--) {
             Card cardToCheck = existingCards.get(i);

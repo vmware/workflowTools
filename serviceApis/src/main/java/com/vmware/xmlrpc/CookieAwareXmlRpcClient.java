@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,10 +35,14 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
 	private CookieFileStore cookieFileStore;
     private WorkflowCertificateManager workflowCertificateManager = null;
 
-	public CookieAwareXmlRpcClient(final URL apiURL) throws IOException, URISyntaxException {
+	public CookieAwareXmlRpcClient(String url) {
 		super();
 
-        this.apiURL = apiURL;
+        try {
+            this.apiURL = new URL(url);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);
         workflowCertificateManager = new WorkflowCertificateManager(homeFolder + "/.workflowTool.keystore");
@@ -51,7 +56,7 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
 		this.setConfig(config);
 	}
 
-    public <T> T executeCall(String methodName, Object... params) throws IOException {
+    public <T> T executeCall(String methodName, Object... params) {
         try {
             askIfSslCertShouldBeSaved(apiURL.toURI());
             return (T) super.execute(methodName, params);
@@ -62,17 +67,17 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
             } else if (e.getMessage().contains("does not exist.")) {
                 throw new NotFoundException(e.getMessage());
             }
-            throw new IOException(e);
+            throw new RuntimeException(e);
         } catch (URISyntaxException e) {
             throw new InternalServerException(e.getMessage(), e);
         }
     }
 
-    public boolean isUriTrusted(URI uri) throws IOException {
+    public boolean isUriTrusted(URI uri) {
         return workflowCertificateManager.isUriTrusted(uri);
     }
 
-    private void askIfSslCertShouldBeSaved(URI uri) throws IOException {
+    private void askIfSslCertShouldBeSaved(URI uri) {
         if (workflowCertificateManager == null || workflowCertificateManager.isUriTrusted(uri)) {
             return;
         }

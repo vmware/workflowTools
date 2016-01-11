@@ -32,14 +32,14 @@ public class ServiceLocator {
         this.config = config;
     }
 
-    public Jira getUnauthenticatedJira() throws IllegalAccessException, IOException, URISyntaxException {
+    public Jira getUnauthenticatedJira() {
         if (jira == null) {
             jira = new Jira(config.jiraUrl, config.jiraTestIssue);
         }
         return jira;
     }
 
-    public Jira getAuthenticatedJira() throws IllegalAccessException, IOException, URISyntaxException {
+    public Jira getAuthenticatedJira() {
         if (jira == null) {
             jira = new Jira(config.jiraUrl, config.jiraTestIssue);
         }
@@ -47,14 +47,14 @@ public class ServiceLocator {
         return jira;
     }
 
-    public Bugzilla getUnauthenticatedBugzilla() throws IllegalAccessException, IOException, URISyntaxException {
+    public Bugzilla getUnauthenticatedBugzilla() {
         if (bugzilla == null) {
             bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
         }
         return bugzilla;
     }
 
-    public Bugzilla getAuthenticatedBugzilla() throws IllegalAccessException, IOException, URISyntaxException {
+    public Bugzilla getAuthenticatedBugzilla() {
         if (bugzilla == null) {
             bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
         }

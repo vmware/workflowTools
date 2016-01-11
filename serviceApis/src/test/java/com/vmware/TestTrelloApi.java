@@ -32,7 +32,7 @@ public class TestTrelloApi extends BaseTests {
     }
 
     @After
-    public void cleanup() throws IllegalAccessException, IOException, URISyntaxException {
+    public void cleanup() {
         trello.closeBoard(testBoard);
     }
 
@@ -43,13 +43,13 @@ public class TestTrelloApi extends BaseTests {
     }
 
     @Test
-    public void canGetUserBoards() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canGetUserBoards() {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
     }
 
     @Test
-    public void canGetCards() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canGetCards() {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
         Card[] cards = trello.getCardsForBoard(boards[0]);
@@ -57,7 +57,7 @@ public class TestTrelloApi extends BaseTests {
     }
 
     @Test
-    public void boardIsPartOfUserBoards() throws IllegalAccessException, IOException, URISyntaxException {
+    public void boardIsPartOfUserBoards() {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
 
@@ -71,7 +71,7 @@ public class TestTrelloApi extends BaseTests {
     }
 
     @Test
-    public void canCreateAndDeleteCard() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canCreateAndDeleteCard() {
         Swimlane swimlaneToCreate = new Swimlane(testBoard, "2 Story points");
         Swimlane createdSwimlane = trello.createSwimlane(swimlaneToCreate);
 

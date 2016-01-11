@@ -27,7 +27,7 @@ public class TestBugzillaApi extends BaseTests {
     private static final int TEST_BUG_ID = 1567574;
 
     @BeforeClass
-    public static void setupBugzilla() throws IllegalAccessException, IOException, URISyntaxException {
+    public static void setupBugzilla() {
         bugzillaUsername = testProperties.getProperty("bugzilla.username");
         String bugzillaUrl = testProperties.getProperty("bugzilla.url");
         bugzilla = new Bugzilla(bugzillaUrl, bugzillaUsername, 1001);
@@ -47,7 +47,7 @@ public class TestBugzillaApi extends BaseTests {
     }
 
     @Test
-    public void canResolveBug() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canResolveBug() {
         bugzilla.resolveBug(TEST_BUG_ID, BugResolutionType.WontFix);
     }
 

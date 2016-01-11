@@ -35,7 +35,7 @@ public class TestJiraApi extends BaseTests {
     private static String jiraIssueNumber;
 
     @BeforeClass
-    public static void createIssue() throws IllegalAccessException, IOException, URISyntaxException {
+    public static void createIssue() {
         jiraUsername = testProperties.getProperty("jira.username");
         String jiraUrl = testProperties.getProperty("jira.url");
         jira = new Jira(jiraUrl, "HW-1001");
@@ -49,12 +49,12 @@ public class TestJiraApi extends BaseTests {
     }
 
     @AfterClass
-    public static void deleteIssue() throws IllegalAccessException, IOException, URISyntaxException {
+    public static void deleteIssue() {
         jira.deleteIssue(jiraIssueNumber);
     }
 
     @Before
-    public void setIssueInProgress() throws IOException, URISyntaxException, IllegalAccessException {
+    public void setIssueInProgress() {
         IssueTransitions issueTransitions = jira.getAllowedTransitions(jiraIssueNumber);
         if (issueTransitions.canTransitionTo(IssueStatusDefinition.InProgress)) {
             jira.transitionIssue(issueTransitions.getTransitionForStatus(IssueStatusDefinition.InProgress));
@@ -62,13 +62,13 @@ public class TestJiraApi extends BaseTests {
     }
 
     @Test
-    public void canGetRecentBoardItems() throws IOException, URISyntaxException {
+    public void canGetRecentBoardItems() {
         List<MenuItem> boardItems = jira.getRecentBoardItems();
         assertTrue("Expected board items to be returned", boardItems.size() > 0);
     }
 
     @Test
-    public void canGetBacklogStories() throws IOException, URISyntaxException {
+    public void canGetBacklogStories() {
         List<MenuItem> boardItems = jira.getRecentBoardItems();
         assertTrue("Expected board items to be returned", boardItems.size() > 0);
 
@@ -78,32 +78,32 @@ public class TestJiraApi extends BaseTests {
     }
 
     @Test
-    public void canGetJiraIssue() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetJiraIssue() {
         IssueFields issue = jira.getIssueByKey(jiraIssueNumber).fields;
         assertEquals(IssueStatusDefinition.InProgress, issue.status.def);
     }
 
     @Test
-    public void canGetAssignedJiraIssues() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetAssignedJiraIssues() {
         IssuesResponse issues = jira.getOpenTasksForUser(jiraUsername);
         assertTrue("No issues found", issues.total > 0);
     }
 
     @Test
-    public void canGetCreatedJiraIssues() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetCreatedJiraIssues() {
         IssuesResponse issues = jira.getCreatedTasksForUser(jiraUsername);
         assertTrue("Expected to find created issue for user " + jiraUsername, issues.total > 0);
     }
 
     @Test
-    public void canGetAllowedTransitionsForJiraIssue() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetAllowedTransitionsForJiraIssue() {
         IssueTransitions transitionWrapper = jira.getAllowedTransitions(jiraIssueNumber);
         assertTrue(transitionWrapper.canTransitionTo(IssueStatusDefinition.InReview));
         assertFalse(transitionWrapper.canTransitionTo(IssueStatusDefinition.InProgress));
     }
 
     @Test
-    public void canMarkIssueAsInReview() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canMarkIssueAsInReview() {
         IssueTransitions transitionWrapper = jira.getAllowedTransitions(jiraIssueNumber);
         assertNotNull(transitionWrapper);
         IssueTransition inReviewTransition = transitionWrapper.getTransitionForStatus(IssueStatusDefinition.InReview);
@@ -114,7 +114,7 @@ public class TestJiraApi extends BaseTests {
     }
 
     @Test
-    public void canUpdateStoryPoints() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canUpdateStoryPoints() {
         Issue issue = new Issue(jiraIssueNumber);
         issue.fields.storyPoints = 5;
         jira.updateIssue(issue);
@@ -124,7 +124,7 @@ public class TestJiraApi extends BaseTests {
     }
 
     @Test
-    public void canUpdateEstimateForIssue() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canUpdateEstimateForIssue() {
         jira.updateIssueEstimate(jiraIssueNumber, 1);
     }
 

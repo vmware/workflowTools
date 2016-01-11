@@ -19,7 +19,7 @@ public class UpdateTaskEstimates extends BaseAction {
 
     private Jira jira;
 
-    public UpdateTaskEstimates(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public UpdateTaskEstimates(WorkflowConfig config) {
         super(config);
     }
 
@@ -35,7 +35,7 @@ public class UpdateTaskEstimates extends BaseAction {
         updateEstimatesIfNeeded(jira.getOpenTasksForUser(config.username), "Assigned Tasks");
     }
 
-    private void updateEstimatesIfNeeded(IssuesResponse tasks, String title) throws IllegalAccessException, IOException, URISyntaxException {
+    private void updateEstimatesIfNeeded(IssuesResponse tasks, String title) {
         log.info("Checking {}", title);
         for (Issue task : tasks.issues) {
             log.info("");

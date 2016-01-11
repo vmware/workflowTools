@@ -16,7 +16,7 @@ import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
 @ActionDescription("Marks the jira issue identified by the bug number as in progress if it has a status of open or reopened.")
 public class MarkIssueAsInProgress extends BaseTransitionJiraIssue {
 
-    public MarkIssueAsInProgress(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public MarkIssueAsInProgress(WorkflowConfig config) {
         super(config, new IssueStatusDefinition[] {InProgress}, new IssueStatusDefinition[] {Open, Reopened});
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 @ActionDescription("Aborts the jenkins jobs specified by the jenkinsJobKeys config property. Updates status for jenkins job urls in testing done section.")
 public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
 
-    public AbortJenkinsJobs(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public AbortJenkinsJobs(WorkflowConfig config) {
         super(config);
     }
 

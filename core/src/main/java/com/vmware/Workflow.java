@@ -191,8 +191,8 @@ public class Workflow {
                 ((BaseMultiActionDataSupport) actionObject).setMultiActionData(multiActionData);
             }
             if (runAllHelperMethods) {
-                log.info("Running canRunAction method");
-                actionObject.canRunAction();
+                log.info("Running cannotRunAction method");
+                actionObject.cannotRunAction();
                 log.info("Running preprocess method");
                 actionObject.preprocess();
             }
@@ -272,11 +272,13 @@ public class Workflow {
             ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
         }
 
-        boolean canRunAction = action.canRunAction();
+        String reasonForNotRunningAction = action.cannotRunAction();
 
-        if (canRunAction) {
+        if (reasonForNotRunningAction == null) {
             action.preprocess();
             action.process();
+        } else {
+            log.info("Skipping running of action {} as {}.", action.getClass().getSimpleName(), reasonForNotRunningAction);
         }
 
         if (action instanceof BaseTrelloAction) {

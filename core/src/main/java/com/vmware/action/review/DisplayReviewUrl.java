@@ -12,7 +12,7 @@ import java.text.ParseException;
 @ActionDescription("Displays the current commit's review url on the command line.")
 public class DisplayReviewUrl extends BaseCommitWithReviewAction {
 
-    public DisplayReviewUrl(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public DisplayReviewUrl(WorkflowConfig config) {
         super(config);
     }
 

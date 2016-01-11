@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 @ActionDescription("Reads the testing done section and checks the status for all jenkins jobs found.")
 public class CheckStatusOfJenkinsJobs extends BaseCommitWithBuildsAction {
 
-    public CheckStatusOfJenkinsJobs(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public CheckStatusOfJenkinsJobs(WorkflowConfig config) {
         super(config);
     }
 

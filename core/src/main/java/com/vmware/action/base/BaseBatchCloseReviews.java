@@ -20,7 +20,7 @@ public abstract class BaseBatchCloseReviews extends BaseAction {
     private String reason;
     private int daysElapsedBeforeClose;
 
-    public BaseBatchCloseReviews(WorkflowConfig config, String reason, int daysElapsedBeforeClose) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseBatchCloseReviews(WorkflowConfig config, String reason, int daysElapsedBeforeClose) {
         super(config);
         this.reason = reason;
         this.daysElapsedBeforeClose = daysElapsedBeforeClose;

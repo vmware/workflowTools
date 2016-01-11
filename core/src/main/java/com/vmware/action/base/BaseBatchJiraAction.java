@@ -15,12 +15,11 @@ public abstract class BaseBatchJiraAction extends BaseMultiActionDataSupport {
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+    public String cannotRunAction() {
         if (config.disableJira) {
-            log.warn("Jira is disabled by config property disableJira");
-            return false;
+            return "Jira is disabled by config property disableJira";
         }
-        return super.canRunAction();
+        return super.cannotRunAction();
     }
 
     @Override

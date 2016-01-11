@@ -21,13 +21,13 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
     private static final String NO_USERNAME = "NONE";
     private static final String ASK_FOR_PARAM = "$ASK";
 
-    public InvokeJenkinsJobs(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public InvokeJenkinsJobs(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException {
-        return true;
+    public String cannotRunAction() {
+        return null;
     }
 
     @Override

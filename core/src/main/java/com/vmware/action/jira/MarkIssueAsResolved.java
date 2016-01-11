@@ -17,7 +17,7 @@ import static com.vmware.jira.domain.IssueStatusDefinition.Resolved;
 @ActionDescription("Marks the jira issue identified by the bug number as resolved if it has a status of open, reopened, in progress or in review.")
 public class MarkIssueAsResolved extends BaseTransitionJiraIssue {
 
-    public MarkIssueAsResolved(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public MarkIssueAsResolved(WorkflowConfig config) {
         super(config, new IssueStatusDefinition[] {Resolved},
                 new IssueStatusDefinition[] {Open, Reopened, InProgress, InReview});
     }

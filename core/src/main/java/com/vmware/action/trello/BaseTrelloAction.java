@@ -33,7 +33,7 @@ public abstract class BaseTrelloAction extends BaseMultiActionDataSupport {
         return selectedBoard;
     }
 
-    protected void createTrelloBoard(String boardName) throws IllegalAccessException, IOException, URISyntaxException {
+    protected void createTrelloBoard(String boardName) {
         Board boardToCreate = new Board(boardName);
 
         Padder padder = new Padder("Trello Board {} creation", boardToCreate.name);

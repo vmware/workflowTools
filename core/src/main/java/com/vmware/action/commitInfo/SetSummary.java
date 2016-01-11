@@ -17,14 +17,12 @@ public class SetSummary extends BaseCommitAction {
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException {
+    public String cannotRunAction() {
         if (!config.setEmptyPropertiesOnly || StringUtils.isBlank(draft.summary)) {
-            return true;
+            return super.cannotRunAction();
         }
 
-        log.info("Skipping action {} as setEmptyPropertiesOnly is set to true and Summary has a value",
-                this.getClass().getSimpleName());
-        return false;
+        return "setEmptyPropertiesOnly is set to true and Summary has a value";
     }
 
     @Override

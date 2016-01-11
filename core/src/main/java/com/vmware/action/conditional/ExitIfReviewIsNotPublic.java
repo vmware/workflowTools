@@ -16,7 +16,7 @@ import java.text.ParseException;
 @ActionDescription("Exits if a review request has not been made public.")
 public class ExitIfReviewIsNotPublic extends BaseCommitWithReviewAction {
 
-    public ExitIfReviewIsNotPublic(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public ExitIfReviewIsNotPublic(WorkflowConfig config) {
         super(config);
     }
 

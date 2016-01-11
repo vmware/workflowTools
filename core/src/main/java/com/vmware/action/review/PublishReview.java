@@ -13,7 +13,7 @@ import java.text.ParseException;
 @ActionDescription("Publishes a review on the review board server.")
 public class PublishReview extends BaseCommitWithReviewAction {
 
-    public PublishReview(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public PublishReview(WorkflowConfig config) {
         super(config);
     }
 

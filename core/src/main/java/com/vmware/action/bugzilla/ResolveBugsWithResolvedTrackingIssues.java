@@ -29,18 +29,16 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+    public String cannotRunAction() {
         if (config.disableJira) {
-            log.warn("Jira is disabled by config property disableJira");
-            return false;
+            return "Jira is disabled by config property disableJira";
         }
 
         if (multiActionData.noBugsAdded()) {
-            log.info("No bugs added");
-            return false;
+            return "no bugs added";
         }
 
-        return super.canRunAction();
+        return super.cannotRunAction();
     }
 
     @Override
@@ -58,7 +56,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
         }
     }
 
-    private void resolveBug(Integer bugId, IssueResolutionDefinition resolutionDefinition) throws IllegalAccessException, IOException, URISyntaxException {
+    private void resolveBug(Integer bugId, IssueResolutionDefinition resolutionDefinition) {
         BugResolutionType resolutionType;
         try {
             resolutionType = BugResolutionType.valueOf(resolutionDefinition.name());

@@ -12,7 +12,7 @@ import java.text.ParseException;
         "\nReviews older in days than the config property value closeOldShipItReviewsAfter are marked as submitted.")
 public class HardSubmitOldShipItReviews extends BaseBatchCloseReviews {
 
-    public HardSubmitOldShipItReviews(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public HardSubmitOldShipItReviews(WorkflowConfig config) {
         super(config, "ship its", config.closeOldShipItReviewsAfter);
     }
 

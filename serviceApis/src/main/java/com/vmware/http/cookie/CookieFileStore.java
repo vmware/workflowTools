@@ -22,10 +22,14 @@ public class CookieFileStore {
     private List<Cookie> authCookies = new ArrayList<Cookie>();
     private List<Cookie> sessionCookies = new ArrayList<Cookie>();
 
-    public CookieFileStore(String homeFolder) throws IOException {
+    public CookieFileStore(String homeFolder) {
         this.homeFolder = homeFolder;
         for (ApiAuthentication apiAuthentication : ApiAuthentication.values()) {
-            readCookieFile(new File(homeFolder + "/" + apiAuthentication.getFileName()));
+            try {
+                readCookieFile(new File(homeFolder + "/" + apiAuthentication.getFileName()));
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
         }
     }
 
@@ -69,7 +73,7 @@ public class CookieFileStore {
         return null;
     }
 
-    public void addCookieIfUseful(Cookie cookieToCheck) throws IOException {
+    public void addCookieIfUseful(Cookie cookieToCheck) {
         ApiAuthentication apiAuthentication = ApiAuthentication.loadByName(cookieToCheck.getName());
         if (apiAuthentication == null) {
             sessionCookies.add(cookieToCheck);
@@ -83,11 +87,15 @@ public class CookieFileStore {
             if (existingCookie != null)
                 authCookies.remove(existingCookie);
             authCookies.add(cookieToCheck);
-            writeCookieToFile(existingCookie, cookieToCheck, apiAuthentication.getFileName());
+            try {
+                writeCookieToFile(existingCookie, cookieToCheck, apiAuthentication.getFileName());
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
         }
     }
 
-    public void addCookiesFromResponse(URLConnection connection) throws IOException {
+    public void addCookiesFromResponse(URLConnection connection) {
         String key;
         for (int i = 1; (key = connection.getHeaderFieldKey(i)) != null; i++) {
             if (!key.equals("Set-Cookie")) {

@@ -34,17 +34,17 @@ public class WorkflowCertificateManager {
 
     private Set<String> trustedHosts = new HashSet<>();
 
-    public WorkflowCertificateManager(String keyStoreFile) throws IOException {
+    public WorkflowCertificateManager(String keyStoreFile) {
         this.keyStoreFile = new File(keyStoreFile);
         try {
             context = initSslContext();
         } catch (Exception e) {
-            throw new IOException(e);
+            throw new RuntimeException(e);
         }
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
 
-    public void saveCertForUri(URI uri) throws IOException {
+    public void saveCertForUri(URI uri) {
         if (!uri.getScheme().equals("https")) {
             logger.info("Uri {} is not https so skipping cert check", uri.toString());
             return;
@@ -63,7 +63,7 @@ public class WorkflowCertificateManager {
         try {
             context = initSslContext();
         } catch (Exception e) {
-            throw new IOException(e);
+            throw new RuntimeException(e);
         }
         if (!isUriTrusted(uri)) {
             throw new RuntimeException("Expected host " + uri.getHost() + " to be trusted after saving cert!");
@@ -71,7 +71,7 @@ public class WorkflowCertificateManager {
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
 
-    public boolean isUriTrusted(URI uri) throws IOException {
+    public boolean isUriTrusted(URI uri) {
         if (trustedHosts.contains(uri.getHost())) {
             return true;
         }
@@ -89,6 +89,8 @@ public class WorkflowCertificateManager {
         } catch (SSLException e) {
             logger.debug("Host " + uri.getHost() + " is not trusted", e);
             return false;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -96,23 +98,23 @@ public class WorkflowCertificateManager {
         return keyStoreFile.getPath();
     }
 
-    private void storeCert(String host, X509Certificate certificate) throws IOException {
+    private void storeCert(String host, X509Certificate certificate) {
         String alias = host + "-1";
         try {
             workflowKeystore.setCertificateEntry(alias, certificate);
         } catch (KeyStoreException e) {
-            throw new IOException(e);
+            throw new RuntimeException(e);
         }
 
         storeKeystore();
     }
 
-    private void storeKeystore() throws IOException {
+    private void storeKeystore() {
         try (OutputStream out = new FileOutputStream(keyStoreFile)) {
             workflowKeystore.store(out, PASS_PHRASE);
             out.close();
-        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
-            throw new IOException(e);
+        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

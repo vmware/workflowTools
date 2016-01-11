@@ -14,17 +14,16 @@ import java.util.List;
 @ActionDescription("Bulk updates Jira issues.")
 public class UpdateIssues extends BaseBatchJiraAction {
 
-    public UpdateIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public UpdateIssues(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+    public String cannotRunAction() {
         if (multiActionData.getIssuesFromJira().isEmpty()) {
-            log.info("Skipping {} as there are no issues loaded from Jira.", this.getClass().getSimpleName());
-            return false;
+            return "there are no issues loaded from Jira";
         }
-        return true;
+        return super.cannotRunAction();
     }
 
     @Override
