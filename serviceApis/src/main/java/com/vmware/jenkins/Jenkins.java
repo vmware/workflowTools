@@ -69,7 +69,7 @@ public class Jenkins extends AbstractRestService {
         return optimisticGet(jobBuild.getInfoUrl(), JobBuildDetails.class);
     }
 
-    public void stopJobBuild(JobBuild jobBuildToStop) throws IllegalAccessException, IOException, URISyntaxException {
+    public void stopJobBuild(JobBuild jobBuildToStop) {
         optimisticPost(jobBuildToStop.getStopUrl(), null);
     }
 
@@ -103,7 +103,7 @@ public class Jenkins extends AbstractRestService {
     }
 
     @Override
-    protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException{
+    protected void checkAuthenticationAgainstServer() {
         if (disableLogin) {
             log.info("Login is disabled for jenkins");
             return;
@@ -113,7 +113,7 @@ public class Jenkins extends AbstractRestService {
     }
 
     @Override
-    protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
+    protected void loginManually() {
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType);
         connection.setupBasicAuthHeader(credentials);
     }
@@ -123,7 +123,7 @@ public class Jenkins extends AbstractRestService {
     }
 
     @Override
-    protected void optimisticPost(String url, Object param, RequestParam... params) throws IllegalAccessException, IOException, URISyntaxException {
+    protected void optimisticPost(String url, Object param, RequestParam... params) {
         if (usesCsrf) {
             CsrfCrumb csrfCrumb = super.optimisticGet(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
             RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
@@ -135,7 +135,7 @@ public class Jenkins extends AbstractRestService {
         }
     }
 
-    private String scrapeUIForToken() throws IOException, URISyntaxException {
+    private String scrapeUIForToken() {
         log.debug("Scraping {} for api token", configureUrl);
         try {
             String userConfigureWebPage = connection.get(configureUrl, String.class);

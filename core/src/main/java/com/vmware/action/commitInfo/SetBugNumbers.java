@@ -29,7 +29,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
 
     private Bugzilla bugzilla = null;
 
-    public SetBugNumbers(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException, NoSuchFieldException {
+    public SetBugNumbers(WorkflowConfig config) throws NoSuchFieldException{
         super(config, "bugNumbers");
     }
 

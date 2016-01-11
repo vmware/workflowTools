@@ -37,7 +37,7 @@ public abstract class AbstractService {
         this.username = username;
     }
 
-    public boolean isConnectionAuthenticated() throws IOException, URISyntaxException {
+    public boolean isConnectionAuthenticated() {
         if (connectionIsAuthenticated != null) {
             return connectionIsAuthenticated;
         }
@@ -50,7 +50,7 @@ public abstract class AbstractService {
         return connectionIsAuthenticated;
     }
 
-    public void setupAuthenticatedConnection() throws IOException, URISyntaxException, IllegalAccessException {
+    public void setupAuthenticatedConnection() {
         int retryCount = 0;
         while (!isConnectionAuthenticated()) {
             if (retryCount > MAX_LOGIN_RETRIES) {
@@ -90,17 +90,21 @@ public abstract class AbstractService {
      * Api tokens are stored in the user's home directly.
      * @see ApiAuthentication for file system locations
      */
-    protected String readExistingApiToken(ApiAuthentication credentialsType) throws IOException {
+    protected String readExistingApiToken(ApiAuthentication credentialsType) {
         String homeFolder = System.getProperty("user.home");
         File apiTokenFile = new File(homeFolder + "/" + credentialsType.getFileName());
         if (!apiTokenFile.exists()) {
             return null;
         }
         log.debug("Reading {} api token from file {}", credentialsType.name(), apiTokenFile.getPath());
-        return IOUtils.read(new FileInputStream(apiTokenFile));
+        try {
+            return IOUtils.read(new FileInputStream(apiTokenFile));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    protected void saveApiToken(String apiToken, ApiAuthentication credentialsType) throws IOException {
+    protected void saveApiToken(String apiToken, ApiAuthentication credentialsType) {
         String existingToken = readExistingApiToken(credentialsType);
         if (apiToken == null || apiToken.equals(existingToken)) {
             return;
@@ -109,17 +113,21 @@ public abstract class AbstractService {
         File apiTokenFile = new File(homeFolder + "/" + credentialsType.getFileName());
 
         log.info("Saving {} api token to {}", credentialsType.name(), apiTokenFile.getPath());
-        IOUtils.write(apiTokenFile, apiToken);
+        try {
+            IOUtils.write(apiTokenFile, apiToken);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Subclasses should implement this method as an authentication check.
      * An UnauthorizedException should be thrown if authentication fails
      */
-    protected abstract void checkAuthenticationAgainstServer() throws IOException, URISyntaxException;
+    protected abstract void checkAuthenticationAgainstServer();
 
     /**
      * Ask the user for credentials and retrieve a token / cookie for future authentication. This should be persisted.
      */
-    protected abstract void loginManually() throws IllegalAccessException, IOException, URISyntaxException;
+    protected abstract void loginManually();
 }

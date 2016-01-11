@@ -24,6 +24,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -56,7 +57,7 @@ public class HttpConnection {
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
 
-    public HttpConnection(RequestBodyHandling requestBodyHandling) throws IOException {
+    public HttpConnection(RequestBodyHandling requestBodyHandling) {
         this.requestBodyHandling = requestBodyHandling;
         this.gson = new ConfiguredGsonBuilder().build();
 
@@ -88,47 +89,41 @@ public class HttpConnection {
         requestParams.reset();
     }
 
-    public <T> T get(String url, Class<T> responseConversionClass, List<RequestParam> params) throws IOException, URISyntaxException {
+    public <T> T get(String url, Class<T> responseConversionClass, List<RequestParam> params) {
         return get(url, responseConversionClass, params.toArray(new RequestParam[params.size()]));
     }
 
-    public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params)
-            throws IOException, URISyntaxException {
+    public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params) {
         setupConnection(url, GET, params);
         return handleServerResponse(responseConversionClass, GET, params);
     }
 
-    public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
-            throws URISyntaxException, IOException, IllegalAccessException {
+    public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params) {
         setupConnection(url, PUT, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass, PUT, params);
     }
 
-    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params)
-            throws URISyntaxException, IOException, IllegalAccessException {
+    public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params) {
         setupConnection(url, POST, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
         return handleServerResponse(responseConversionClass, POST, params);
     }
 
-    public <T> T put(String url, Object requestObject, RequestParam... params)
-            throws URISyntaxException, IOException, IllegalAccessException {
+    public <T> T put(String url, Object requestObject, RequestParam... params) {
         return put(url, null, requestObject, params);
     }
 
-    public <T> T post(String url, Object requestObject, RequestParam... params)
-            throws URISyntaxException, IOException, IllegalAccessException {
+    public <T> T post(String url, Object requestObject, RequestParam... params) {
         return post(url, null, requestObject, params);
     }
 
-    public <T> T delete(String url, RequestParam... params)
-            throws URISyntaxException, IOException, IllegalAccessException {
+    public <T> T delete(String url, RequestParam... params) {
         setupConnection(url, DELETE, params);
         return handleServerResponse(null, DELETE, params);
     }
 
-    public boolean isUriTrusted(URI uri) throws IOException {
+    public boolean isUriTrusted(URI uri) {
         return workflowCertificateManager.isUriTrusted(uri);
     }
 
@@ -165,7 +160,7 @@ public class HttpConnection {
         return gson.toJson(value);
     }
 
-    private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... statelessParams) throws IOException, URISyntaxException {
+    private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... statelessParams) {
         requestParams.clearStatelessParams();
         // add default application json header, can be overridden by stateless headers
         requestParams.addStatelessParam(anAcceptHeader("application/json"));
@@ -173,15 +168,23 @@ public class HttpConnection {
         List<RequestParam> statelessParamsList = Arrays.asList(statelessParams);
         requestParams.addAllStatelessParams(statelessParamsList);
         String fullUrl = requestParams.buildUrl(requestUrl);
-        URI uri = new URI(fullUrl);
+        URI uri = URI.create(fullUrl);
         log.debug("{}: {}", methodType.name(), uri.toString());
 
-        activeConnection = (HttpURLConnection) uri.toURL().openConnection();
+        try {
+            activeConnection = (HttpURLConnection) uri.toURL().openConnection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         activeConnection.setDoInput(true);
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
-        activeConnection.setRequestMethod(methodType.name());
+        try {
+            activeConnection.setRequestMethod(methodType.name());
+        } catch (ProtocolException e) {
+            throw new RuntimeException(e);
+        }
         addRequestHeaders();
         addCookiesHeader(uri.getHost());
     }
@@ -193,7 +196,7 @@ public class HttpConnection {
         }
     }
 
-    private <T> T handleServerResponse(final Class<T> responseConversionClass, HttpMethodType methodTypes, RequestParam[] params) throws IOException {
+    private <T> T handleServerResponse(final Class<T> responseConversionClass, HttpMethodType methodTypes, RequestParam[] params) {
         String responseText = getResponseText(0, methodTypes, params);
         activeConnection.disconnect();
         if (responseText.isEmpty() || responseConversionClass == null) {
@@ -217,7 +220,7 @@ public class HttpConnection {
         activeConnection.setRequestProperty("Cookie", cookieFileStore.toCookieRequestText(host, useSessionCookies));
     }
 
-    private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) throws IOException {
+    private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) {
         String responseText = "";
         try {
             responseText = parseResponseText();
@@ -236,25 +239,23 @@ public class HttpConnection {
             responseText = getResponseText(retryCount, methodType, params);
         } catch (UnknownHostException | SocketException e) {
             handleNetworkException(e);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
         }
         return responseText;
     }
 
-    private void reconnect(HttpMethodType methodType, String urlText, RequestParam[] params) throws IOException {
+    private void reconnect(HttpMethodType methodType, String urlText, RequestParam[] params) {
         activeConnection.disconnect();
-        try {
-            setupConnection(urlText, methodType, params);
-        } catch (URISyntaxException use) {
-            throw new IOException(use);
-        }
+        setupConnection(urlText, methodType, params);
     }
 
-    private void askIfSslCertShouldBeSaved() throws IOException {
+    private void askIfSslCertShouldBeSaved() {
         URI uri;
         try {
             uri = activeConnection.getURL().toURI();
         } catch (URISyntaxException e) {
-            throw new IOException(e);
+            throw new RuntimeException(e);
         }
         if (workflowCertificateManager == null || workflowCertificateManager.isUriTrusted(uri)) {
             log.info("Url {} is already trusted, no need to save cert to local keystore");

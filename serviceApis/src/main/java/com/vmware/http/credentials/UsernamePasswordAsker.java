@@ -16,7 +16,7 @@ public class UsernamePasswordAsker {
     private static Logger log = LoggerFactory.getLogger(UsernamePasswordAsker.class.getName());
 
 
-    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingCookie) throws IOException {
+    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingCookie) {
         if (testCredentials != null) {
             log.info("Using test credentials");
             return testCredentials;

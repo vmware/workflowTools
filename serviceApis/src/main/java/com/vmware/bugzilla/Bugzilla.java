@@ -38,16 +38,16 @@ public class Bugzilla extends AbstractService {
     private MapToObjectConverter mapConverter;
     private int testBugNumber;
 
-    public Bugzilla(String bugzillaUrl, String username, int testBugNumber) throws IOException, URISyntaxException {
+    public Bugzilla(String bugzillaUrl, String username, int testBugNumber) {
         super(bugzillaUrl, "xmlrpc.cgi", ApiAuthentication.bugzilla_cookie, username);
         this.testBugNumber = testBugNumber;
         System.setProperty("jsse.enableSNIExtension", "false");
-        xmlRpcClient = new CookieAwareXmlRpcClient(new URL(apiUrl));
+        xmlRpcClient = new CookieAwareXmlRpcClient(apiUrl);
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
         mapConverter = new MapToObjectConverter();
     }
 
-    public List<Bug> getBugsForQuery(String savedQueryToRun) throws IOException {
+    public List<Bug> getBugsForQuery(String savedQueryToRun) {
         Map values = xmlRpcClient.executeCall("Search.run_saved_query", username, savedQueryToRun);
         Object[] bugs = (Object[]) values.get("bugs");
         List<Bug> bugList = new ArrayList<>();
@@ -59,13 +59,13 @@ public class Bugzilla extends AbstractService {
         return bugList;
     }
 
-    public Bug getBugById(int id) throws IOException {
+    public Bug getBugById(int id) {
         Map values = xmlRpcClient.executeCall("Bug.show_bug", id);
         values.put("web_url", constructFullBugUrl(id));
         return mapConverter.convert(values, Bug.class);
     }
 
-    public Bug getBugByIdWithoutException(int id) throws IOException {
+    public Bug getBugByIdWithoutException(int id) {
         try {
             return getBugById(id);
         } catch (NotFoundException nfe) {
@@ -73,7 +73,7 @@ public class Bugzilla extends AbstractService {
         }
     }
 
-    public List<String> getSavedQueries() throws IOException {
+    public List<String> getSavedQueries() {
         Object[] values = xmlRpcClient.executeCall("Search.get_all_saved_queries", username);
         List<String> queries = new ArrayList<>();
         for (Object value : values) {
@@ -83,12 +83,12 @@ public class Bugzilla extends AbstractService {
         return queries;
     }
 
-    public boolean containsSavedQuery(String queryName) throws IOException {
+    public boolean containsSavedQuery(String queryName) {
         List<String> savedQueries = getSavedQueries();
         return savedQueries.contains(queryName);
     }
 
-    public void resolveBug(int bugId, BugResolutionType resolution) throws IllegalAccessException, IOException, URISyntaxException {
+    public void resolveBug(int bugId, BugResolutionType resolution) {
         Bug bugToResolve = getBugById(bugId);
         if (bugToResolve.resolution == resolution) {
             log.info("Bug with id {} already has resolution {}", bugId, resolution);
@@ -117,18 +117,18 @@ public class Bugzilla extends AbstractService {
     }
 
     @Override
-    public boolean isBaseUriTrusted() throws IOException {
+    public boolean isBaseUriTrusted() {
         return xmlRpcClient.isUriTrusted(URI.create(baseUrl));
     }
 
     @Override
-    protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
+    protected void checkAuthenticationAgainstServer() {
         getBugById(testBugNumber);
 
     }
 
     @Override
-    protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
+    protected void loginManually() {
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(bugzilla_cookie);
 
         Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());

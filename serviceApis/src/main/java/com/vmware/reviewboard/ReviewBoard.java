@@ -51,14 +51,14 @@ public class ReviewBoard extends AbstractRestService {
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
     }
 
-    public RootList getRootLinkList() throws IOException, URISyntaxException {
+    public RootList getRootLinkList() {
         if (cachedRootList == null) {
             cachedRootList = connection.get(apiUrl, RootList.class);
         }
         return cachedRootList;
     }
 
-    public ReviewRequests getReviewRequests(ReviewRequestStatus status) throws IOException, URISyntaxException {
+    public ReviewRequests getReviewRequests(ReviewRequestStatus status) {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         return connection.get(reviewRequestLink.getHref(), ReviewRequests.class,
                 new UrlParam("from-user", username), new UrlParam("status", status.name()));
@@ -95,7 +95,7 @@ public class ReviewBoard extends AbstractRestService {
                 new UrlParam("ship-it", "1"), new UrlParam("status", all.name()));
     }
 
-    public ReviewRequest getReviewRequestById(Integer id) throws IOException, URISyntaxException {
+    public ReviewRequest getReviewRequestById(Integer id) {
         if (id == null) {
             return null;
         }
@@ -104,7 +104,7 @@ public class ReviewBoard extends AbstractRestService {
         return connection.get(reviewRequestLink.getHref(),ReviewRequestResponse.class).review_request;
     }
 
-    public ReviewRequest createReviewRequest(String repository) throws IllegalAccessException, IOException, URISyntaxException {
+    public ReviewRequest createReviewRequest(String repository) {
         Link createLink = getReviewRequests(pending).getCreateLink();
 
         ReviewRequest initialReviewRequest = new ReviewRequest();
@@ -113,8 +113,7 @@ public class ReviewBoard extends AbstractRestService {
         return connection.post(createLink.getHref(), ReviewRequestResponse.class, initialReviewRequest).review_request;
     }
 
-    public ReviewRequest createReviewRequestFromDraft(ReviewRequestDraft reviewRequestDraft, String repository)
-            throws IllegalAccessException, IOException, URISyntaxException {
+    public ReviewRequest createReviewRequestFromDraft(ReviewRequestDraft reviewRequestDraft, String repository) {
         ReviewRequest addedRequest = createReviewRequest(repository);
         updateReviewRequestDraft(addedRequest.getDraftLink(), reviewRequestDraft);
         return getReviewRequestById(addedRequest.id);
@@ -124,8 +123,7 @@ public class ReviewBoard extends AbstractRestService {
         return connection.get(draftLink.getHref(), ReviewRequestDraftResponse.class).draft;
     }
 
-    public ReviewRequestDraft updateReviewRequestDraft(Link draftLink, ReviewRequestDraft draft)
-            throws IOException, URISyntaxException, IllegalAccessException {
+    public ReviewRequestDraft updateReviewRequestDraft(Link draftLink, ReviewRequestDraft draft) {
         String existingTestingDone = draft.testingDone;
         draft.testingDone = draft.fullTestingDoneSectionWithoutJobResults();
 
@@ -134,21 +132,21 @@ public class ReviewBoard extends AbstractRestService {
         return updatedDraft;
     }
 
-    public void publishReview(Link draftLink) throws IllegalAccessException, IOException, URISyntaxException {
+    public void publishReview(Link draftLink) {
         connection.put(draftLink.getHref(), anEmptyDraftForPublishingAReview());
     }
 
     public void updateReviewRequest(ReviewRequest reviewRequest)
-            throws IllegalAccessException, IOException, URISyntaxException {
+            {
         connection.put(reviewRequest.getUpdateLink().getHref(), ReviewRequestResponse.class, reviewRequest);
     }
 
     public void createReviewRequestDiff(Link diffLink, DiffToUpload diffToCreate)
-            throws IllegalAccessException, IOException, URISyntaxException {
+            {
         connection.post(diffLink.getHref(), diffToCreate);
     }
 
-    public void createUserReview(ReviewRequest reviewRequest, UserReview review) throws IllegalAccessException, IOException, URISyntaxException {
+    public void createUserReview(ReviewRequest reviewRequest, UserReview review) {
         connection.post(reviewRequest.getReviewsLink().getHref(), review);
     }
 
@@ -196,7 +194,7 @@ public class ReviewBoard extends AbstractRestService {
         return null;
     }
 
-    public ServerInfo getServerInfo() throws IOException, URISyntaxException {
+    public ServerInfo getServerInfo() {
         if (cachedServerInfo == null) {
             cachedServerInfo = connection.get(getRootLinkList().getInfoLink().getHref(), ServerInfoResponse.class).info;
         }
@@ -213,18 +211,18 @@ public class ReviewBoard extends AbstractRestService {
     }
 
     @Override
-    public void setupAuthenticatedConnection() throws IOException, URISyntaxException, IllegalAccessException {
+    public void setupAuthenticatedConnection() {
         super.setupAuthenticatedConnection();
     }
 
     @Override
-    protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
+    protected void loginManually() {
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(reviewBoard);
         connection.setupBasicAuthHeader(credentials);
     }
 
     @Override
-    public void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
+    public void checkAuthenticationAgainstServer() {
         getServerInfo();
         if (!connection.hasCookie(reviewBoard)) {
             log.warn("Cookie {} should have been retrieved from reviewboard login!", reviewBoard.getCookieName());

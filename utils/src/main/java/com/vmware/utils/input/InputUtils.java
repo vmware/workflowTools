@@ -100,11 +100,11 @@ public class InputUtils {
         return readSingleLine(label, null, null, null, autocompleteOptions.toArray(new String[autocompleteOptions.size()]));
     }
 
-    public static String readValue(String label, String... autocompleteOptions) throws IOException {
+    public static String readValue(String label, String... autocompleteOptions) {
         return readSingleLine(label, null, null, null, autocompleteOptions);
     }
 
-    public static String readPassword(String label) throws IOException {
+    public static String readPassword(String label) {
         return readSingleLine(label, null, '*', null);
     }
 
@@ -158,13 +158,18 @@ public class InputUtils {
     }
 
     private static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues
-            , String... autocompleteOptions) throws IOException {
+            , String... autocompleteOptions) {
         Completer completer = createCompleterFromOptions(autocompleteOptions);
         return readSingleLine(label, maxLength, maskCharacter, historyValues, completer);
     }
 
-    private static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues, Completer completer) throws IOException {
-        ConsoleReader consoleReader = new ConsoleReader();
+    private static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues, Completer completer) {
+        ConsoleReader consoleReader = null;
+        try {
+            consoleReader = new ConsoleReader();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         consoleReader.setExpandEvents(false);
         if (completer != null) {
             consoleReader.addCompleter(completer);
@@ -179,7 +184,12 @@ public class InputUtils {
 
         addHistoryValues(consoleReader, historyValues);
 
-        String data = consoleReader.readLine(prompt, maskCharacter);
+        String data;
+        try {
+            data = consoleReader.readLine(prompt, maskCharacter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (maxLength != null && data.length() > maxLength) {
             log.error("Re-enter line. Line length of {} exceeded max of {}", data.length(), maxLength);
             data = readSingleLine(label, maxLength, maskCharacter, historyValues, completer);

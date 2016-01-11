@@ -21,15 +21,18 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
-        String propertyValue = (String) property.get(draft);
+    public String cannotRunAction() {
+        String propertyValue;
+        try {
+            propertyValue = (String) property.get(draft);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         if (!config.setEmptyPropertiesOnly || StringUtils.isBlank(propertyValue)) {
-            return true;
+            return super.cannotRunAction();
         }
 
-        log.info("Skipping action {} as setEmptyPropertiesOnly is set to true and {} has a value",
-                this.getClass().getSimpleName(), title);
-        return false;
+        return "setEmptyPropertiesOnly is set to true and " + title + " has a value";
     }
 
 

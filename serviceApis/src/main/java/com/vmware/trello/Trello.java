@@ -40,7 +40,7 @@ public class Trello extends AbstractRestService {
     private final String loginUrl;
     private final String webUrl;
 
-    public Trello(String trelloUrl) throws IOException, URISyntaxException, IllegalAccessException {
+    public Trello(String trelloUrl) {
         super(createApiUrl(trelloUrl), "1/", trello, null);
         webUrl = UrlUtils.addTrailingSlash(trelloUrl);
         this.loginUrl = webUrl + "authenticate";
@@ -51,59 +51,59 @@ public class Trello extends AbstractRestService {
         connection.addStatefulParamsFromUrlFragment(apiToken);
     }
 
-    public Member getTrelloMember(String memberId) throws IOException, URISyntaxException {
+    public Member getTrelloMember(String memberId) {
         return connection.get(apiUrl + "members/" + memberId, Member.class);
     }
 
-    public Board createBoard(Board boardToCreate) throws IllegalAccessException, IOException, URISyntaxException {
+    public Board createBoard(Board boardToCreate) {
         return connection.post(apiUrl + "boards", Board.class, boardToCreate);
     }
 
-    public void closeBoard(Board board) throws IllegalAccessException, IOException, URISyntaxException {
+    public void closeBoard(Board board) {
         String url = String.format("%sboards/%s/closed", apiUrl, board.id);
         connection.put(url, new BooleanValue(true));
     }
 
-    public Swimlane createSwimlane(Swimlane swimlaneToCreate) throws IllegalAccessException, IOException, URISyntaxException {
+    public Swimlane createSwimlane(Swimlane swimlaneToCreate) {
         return connection.post(apiUrl + "lists", Swimlane.class, swimlaneToCreate);
     }
 
-    public void closeSwimlane(Swimlane swimlane) throws IllegalAccessException, IOException, URISyntaxException {
+    public void closeSwimlane(Swimlane swimlane) {
         String url = String.format("%slists/%s/closed", apiUrl, swimlane.id);
         connection.put(url, new BooleanValue(true));
     }
 
-    public Card createCard(Card cardToCreate) throws IllegalAccessException, IOException, URISyntaxException {
+    public Card createCard(Card cardToCreate) {
         return connection.post(apiUrl + "cards", Card.class, cardToCreate);
     }
 
-    public void deleteCard(Card cardToDelete) throws IllegalAccessException, IOException, URISyntaxException {
+    public void deleteCard(Card cardToDelete) {
         String url = String.format(apiUrl + "cards/%s", cardToDelete.id);
         connection.delete(url);
     }
 
-    public Board[] getOpenBoardsForUser() throws IOException, URISyntaxException {
+    public Board[] getOpenBoardsForUser() {
         return connection.get(apiUrl + "members/me/boards", Board[].class,
                     new UrlParam("filter", "open"));
     }
 
-    public Swimlane[] getSwimlanesForBoard(Board board) throws IOException, URISyntaxException {
+    public Swimlane[] getSwimlanesForBoard(Board board) {
         String url = String.format("%sboards/%s/lists", apiUrl, board.id);
         return connection.get(url, Swimlane[].class);
     }
 
-    public Card[] getCardsForSwimlane(Swimlane swimlane) throws IOException, URISyntaxException {
+    public Card[] getCardsForSwimlane(Swimlane swimlane) {
         String url = String.format("%slists/%s/cards", apiUrl, swimlane.id);
         return connection.get(url, Card[].class);
     }
 
-    public Card[] getCardsForBoard(Board board) throws IOException, URISyntaxException {
+    public Card[] getCardsForBoard(Board board) {
         String url = String.format("%sboards/%s/cards", apiUrl, board.id);
         return connection.get(url, Card[].class);
     }
 
     @Override
-    protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
+    protected void checkAuthenticationAgainstServer() {
         try {
             getOpenBoardsForUser();
         } catch (BadRequestException e) {
@@ -113,7 +113,7 @@ public class Trello extends AbstractRestService {
     }
 
     @Override
-    protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
+    protected void loginManually() {
         connection.resetParams();
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
@@ -130,7 +130,7 @@ public class Trello extends AbstractRestService {
         saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello);
     }
 
-    private List<UrlParam> scrapeAuthInfoFromUI(String apiTokenPage) throws IOException, URISyntaxException, IllegalAccessException {
+    private List<UrlParam> scrapeAuthInfoFromUI(String apiTokenPage) {
         String apiKey = findMatchForPattern(apiTokenPage, "id=\"key\" type=\"text\" value=\"(\\w+)\"");
 
         String authorizeUrl = webUrl + "1/authorize";

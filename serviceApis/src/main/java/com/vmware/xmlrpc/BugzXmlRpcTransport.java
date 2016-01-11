@@ -55,12 +55,8 @@ public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
     private URLConnection connection;
 
     @Override
-    protected void close() throws XmlRpcClientException {
-        try {
-            cookieFileStore.addCookiesFromResponse(this.connection);
-        } catch (IOException e) {
-            throw new XmlRpcClientException(e.getMessage(), e);
-        }
+    protected void close() {
+         cookieFileStore.addCookiesFromResponse(this.connection);
     }
 
     @Override

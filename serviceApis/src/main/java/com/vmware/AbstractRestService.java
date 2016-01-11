@@ -23,7 +23,7 @@ public abstract class AbstractRestService extends AbstractService {
     }
 
     @Override
-    public boolean isBaseUriTrusted() throws IOException {
+    public boolean isBaseUriTrusted() {
         return connection.isUriTrusted(URI.create(baseUrl));
     }
 
@@ -31,7 +31,7 @@ public abstract class AbstractRestService extends AbstractService {
      * WIll try first to post the request.
      * If that fails, will then try to authenticate and re post the request.
      */
-    protected void optimisticPost(String url, Object requestBody, RequestParam... params) throws IllegalAccessException, IOException, URISyntaxException {
+    protected void optimisticPost(String url, Object requestBody, RequestParam... params) {
         try {
             connection.post(url, requestBody, params);
         } catch (NotAuthorizedException e) {
@@ -49,7 +49,7 @@ public abstract class AbstractRestService extends AbstractService {
      * WIll try first to get the request.
      * If that fails, will then try to authenticate and re get the request.
      */
-    protected <T> T optimisticGet(String url, Class<T> responseConversionClass, RequestParam... params) throws IOException, URISyntaxException, IllegalAccessException {
+    protected <T> T optimisticGet(String url, Class<T> responseConversionClass, RequestParam... params) {
         try {
             return connection.get(url, responseConversionClass, params);
         } catch (NotAuthorizedException e) {

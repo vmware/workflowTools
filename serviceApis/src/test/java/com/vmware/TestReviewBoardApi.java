@@ -53,7 +53,7 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @After
-    public void cleanup() throws IllegalAccessException, IOException, URISyntaxException {
+    public void cleanup() {
         if (createdRequest != null) {
             createdRequest.status = ReviewRequestStatus.discarded;
             reviewBoard.updateReviewRequest(createdRequest);
@@ -143,7 +143,7 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void canDiscardReviewRequest() throws IllegalAccessException, IOException, URISyntaxException {
+    public void canDiscardReviewRequest() {
         createdRequest = reviewBoard.createReviewRequestFromDraft(sampleRequest, repository);
         createdRequest.status = ReviewRequestStatus.discarded;
         reviewBoard.updateReviewRequest(createdRequest);

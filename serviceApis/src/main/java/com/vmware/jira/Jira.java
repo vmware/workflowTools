@@ -48,7 +48,7 @@ public class Jira extends AbstractRestService {
     private String greenhopperUrl;
     private String testIssueKey;
 
-    public Jira(String jiraUrl, String testIssueKey) throws IOException, URISyntaxException, IllegalAccessException {
+    public Jira(String jiraUrl, String testIssueKey) {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, null);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.loginUrl = baseUrl + "login.jsp";
@@ -58,7 +58,7 @@ public class Jira extends AbstractRestService {
         this.testIssueKey = testIssueKey;
     }
 
-    public List<MenuItem> getRecentBoardItems() throws IOException, URISyntaxException {
+    public List<MenuItem> getRecentBoardItems() {
         List<MenuItem> recentItems = new ArrayList<MenuItem>();
         String url = legacyApiUrl + "menus/greenhopper_menu?inAdminMode=false";
         MenuSection[] sections = connection.get(url, MenuSections.class).sections;
@@ -75,13 +75,13 @@ public class Jira extends AbstractRestService {
         return recentItems;
     }
 
-    public RapidView getRapidView(String viewId) throws IOException, URISyntaxException {
+    public RapidView getRapidView(String viewId) {
         String url = greenhopperUrl + "xboard/plan/backlog/data.json";
         RapidView rapidView = connection.get(url, RapidView.class, new UrlParam("rapidViewId", viewId));
         return rapidView;
     }
 
-    public Issue getIssueByKey(String key) throws IOException, URISyntaxException {
+    public Issue getIssueByKey(String key) {
         return connection.get(urlBaseForKey(key), Issue.class);
     }
 
@@ -94,11 +94,11 @@ public class Jira extends AbstractRestService {
         }
     }
 
-    public IssuesResponse searchForIssues(SearchRequest searchRequest) throws IllegalAccessException, IOException, URISyntaxException {
+    public IssuesResponse searchForIssues(SearchRequest searchRequest) {
         return connection.post(searchUrl, IssuesResponse.class, searchRequest);
     }
 
-    public IssuesResponse getOpenTasksForUser(String username) throws IOException, URISyntaxException {
+    public IssuesResponse getOpenTasksForUser(String username) {
         String allowedStatuses = generateNumericalEnumListAsInts(Open, Reopened, InProgress, InReview);
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
@@ -109,7 +109,7 @@ public class Jira extends AbstractRestService {
         return response;
     }
 
-    public IssuesResponse getCreatedTasksForUser(String username) throws IOException, URISyntaxException {
+    public IssuesResponse getCreatedTasksForUser(String username) {
         String allowedStatuses = generateNumericalEnumListAsInts(Open, Reopened, InProgress, InReview);
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
@@ -118,7 +118,7 @@ public class Jira extends AbstractRestService {
         return connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
     }
 
-    public IssueTransitions getAllowedTransitions(String key) throws IOException, URISyntaxException {
+    public IssueTransitions getAllowedTransitions(String key) {
         IssueTransitions transitions = connection.get(urlBaseForKey(key) + "transitions", IssueTransitions.class);
         if (transitions == null) {
             transitions = new IssueTransitions();
@@ -127,37 +127,37 @@ public class Jira extends AbstractRestService {
         return transitions;
     }
 
-    public void transitionIssue(IssueTransition transition) throws IOException, URISyntaxException, IllegalAccessException {
+    public void transitionIssue(IssueTransition transition) {
         IssueUpdate updateIssue = new IssueUpdate(transition);
         connection.post(urlBaseForKey(transition.issueId) + "transitions", updateIssue);
     }
 
-    public Issue createIssue(Issue issue) throws IllegalAccessException, IOException, URISyntaxException {
+    public Issue createIssue(Issue issue) {
         return connection.post(apiUrl + "issue", Issue.class, issue);
     }
 
-    public void updateIssue(Issue issue) throws IllegalAccessException, IOException, URISyntaxException {
+    public void updateIssue(Issue issue) {
         connection.put(urlBaseForKey(issue.getKey()), issue);
     }
 
-    public void updateIssueEstimate(String key, int estimateInHours) throws IllegalAccessException, IOException, URISyntaxException {
+    public void updateIssueEstimate(String key, int estimateInHours) {
         IssueUpdate updateIssue = new IssueUpdate();
         updateIssue.fields.timetracking = new IssueTimeTracking(estimateInHours + "h");
         connection.put(urlBaseForKey(key), updateIssue);
     }
 
-    public void updateIssueStoryPointsOnly(Issue issue) throws IllegalAccessException, IOException, URISyntaxException {
+    public void updateIssueStoryPointsOnly(Issue issue) {
         IssueUpdate updateIssue = new IssueUpdate();
         updateIssue.fields.storyPoints = issue.fields.storyPoints;
         connection.put(urlBaseForKey(issue.getKey()), updateIssue);
     }
 
-    public void deleteIssue(String key) throws IllegalAccessException, IOException, URISyntaxException {
+    public void deleteIssue(String key) {
         connection.delete(urlBaseForKey(key));
     }
 
     @Override
-    protected void loginManually() throws IllegalAccessException, IOException, URISyntaxException {
+    protected void loginManually() {
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(jira);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
         connection.post(loginUrl, new LoginInfo(credentials));
@@ -165,7 +165,7 @@ public class Jira extends AbstractRestService {
     }
 
     @Override
-    protected void checkAuthenticationAgainstServer() throws IOException, URISyntaxException {
+    protected void checkAuthenticationAgainstServer() {
         connection.get(apiUrl + "issue/" + testIssueKey + "/editmeta",null);
         if (!connection.hasCookie(jira)) {
             log.warn("Cookie {} should have been retrieved from jira login!", jira.getCookieName());

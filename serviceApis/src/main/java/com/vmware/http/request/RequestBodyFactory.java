@@ -29,8 +29,7 @@ public class RequestBodyFactory {
     private static final String LINE_FEED = "\r\n";
     private static final String TWO_HYPHENS = "--";
 
-    public static void setRequestDataForConnection(HttpConnection connection, final Object requestObject)
-            throws IllegalAccessException, IOException {
+    public static void setRequestDataForConnection(HttpConnection connection, final Object requestObject) {
         connection.setDoOutput(true);
         switch (connection.getRequestBodyHandling()) {
             case AsStringJsonEntity:
@@ -64,54 +63,69 @@ public class RequestBodyFactory {
         return false;
     }
 
-    private static void writeObjectAsMultipart(final HttpConnection connection, final Object requestObject)
-            throws IllegalAccessException, IOException {
+    private static void writeObjectAsMultipart(final HttpConnection connection, final Object requestObject) {
         // creates a unique boundary based on time stamp
         String boundary = "**********" + System.currentTimeMillis();
         connection.setRequestProperty("Content-Type","multipart/form-data; boundary=" + boundary);
-        OutputStream outputStream = connection.getOutputStream();
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"),
-                true);
-
-        Map<String, Object> valuesToWrite = convertObjectToMap(requestObject);
-        for (String fieldName : valuesToWrite.keySet()) {
-            Object value = valuesToWrite.get(fieldName);
-            if (value instanceof byte[]) {
-                byte[] binaryData = (byte[]) value;
-                addFilePart(writer, boundary, outputStream, fieldName, binaryData);
-            } else {
-                addStringPart(writer, boundary, fieldName, String.valueOf(value));
+        OutputStream outputStream = null;
+        try {
+            outputStream = connection.getOutputStream();
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"),
+                    true);
+            Map<String, Object> valuesToWrite = convertObjectToMap(requestObject);
+            for (String fieldName : valuesToWrite.keySet()) {
+                Object value = valuesToWrite.get(fieldName);
+                if (value instanceof byte[]) {
+                    byte[] binaryData = (byte[]) value;
+                    addFilePart(writer, boundary, outputStream, fieldName, binaryData);
+                } else {
+                    addStringPart(writer, boundary, fieldName, String.valueOf(value));
+                }
             }
+            writer.append(LINE_FEED);
+            log.trace(TWO_HYPHENS + boundary + TWO_HYPHENS);
+            writer.append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(LINE_FEED).flush();
+            writer.close();
+        } catch (IOException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
-        writer.append(LINE_FEED);
-        log.trace(TWO_HYPHENS + boundary + TWO_HYPHENS);
-        writer.append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(LINE_FEED).flush();
-        writer.close();
+
     }
 
-    private static void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject)
-            throws IOException {
+    private static void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject) {
         String jsonText = connection.toJson(requestObject);
         log.trace("Request Json: {}", jsonText);
         Map<String, Object> values = new HashMap<String, Object>();
         values.put("json", jsonText);
-        writeValuesAsFormEncoded(connection, values);
+        try {
+            writeValuesAsFormEncoded(connection, values);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private static void writeObjectAsJsonString(final HttpConnection connection, final Object requestObject)
-            throws IOException {
+    private static void writeObjectAsJsonString(final HttpConnection connection, final Object requestObject) {
         String jsonText = connection.toJson(requestObject);
         log.trace("Request Json: {}", jsonText);
         connection.setRequestProperty("Content-Type", "application/json");
-        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-        writer.write(jsonText);
-        writer.close();
+        OutputStreamWriter writer = null;
+        try {
+            writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
+            writer.write(jsonText);
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private static void writeObjectAsFormEncoded(final HttpConnection connection, final Object requestObject)
-            throws IllegalAccessException, IOException {
-        Map<String, Object> valuesToWrite = convertObjectToMap(requestObject);
-        writeValuesAsFormEncoded(connection, valuesToWrite);
+    private static void writeObjectAsFormEncoded(final HttpConnection connection, final Object requestObject) {
+        Map<String, Object> valuesToWrite = null;
+        try {
+            valuesToWrite = convertObjectToMap(requestObject);
+            writeValuesAsFormEncoded(connection, valuesToWrite);
+        } catch (IllegalAccessException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static Map<String, Object> convertObjectToMap(Object requestObject) throws IllegalAccessException {

@@ -27,10 +27,10 @@ public abstract class BaseAction {
     }
 
     /**
-     * @return Whether this action should be run
+     * @return Whether this action should not be run
      */
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
-        return true;
+    public String cannotRunAction() {
+        return null;
     }
 
     /**

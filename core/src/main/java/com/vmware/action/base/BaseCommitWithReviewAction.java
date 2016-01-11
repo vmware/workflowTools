@@ -15,7 +15,7 @@ public abstract class BaseCommitWithReviewAction extends BaseCommitAction {
     protected ReviewBoard reviewBoard;
 
 
-    public BaseCommitWithReviewAction(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseCommitWithReviewAction(WorkflowConfig config) {
         super(config);
     }
 
@@ -28,17 +28,15 @@ public abstract class BaseCommitWithReviewAction extends BaseCommitAction {
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException {
+    public String cannotRunAction() {
         if (draft.isTrivialCommit(config.trivialReviewerLabel)) {
-            log.info("Ignoring action {} as commit is trivial", this.getClass().getSimpleName());
-            return false;
+            return "commit is trivial";
         }
 
         if (!draft.hasReviewNumber()) {
-            log.info("Ignoring action {} as commit does not have a review url", this.getClass().getSimpleName());
-            return false;
+            return "commit does not have a review url";
         }
 
-        return true;
+        return super.cannotRunAction();
     }
 }

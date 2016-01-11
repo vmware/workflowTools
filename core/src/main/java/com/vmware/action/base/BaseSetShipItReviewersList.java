@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 public abstract class BaseSetShipItReviewersList extends BaseCommitWithReviewAction {
 
 
-    public BaseSetShipItReviewersList(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseSetShipItReviewersList(WorkflowConfig config) {
         super(config);
     }
 

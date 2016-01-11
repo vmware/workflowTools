@@ -21,24 +21,22 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
     private final IssueStatusDefinition[] toStatuses;
     private Jira jira;
 
-    public BaseTransitionJiraIssue(WorkflowConfig config, IssueStatusDefinition[] toStatuses, IssueStatusDefinition[] allowedFromStatuses) throws IllegalAccessException, IOException, URISyntaxException {
+    public BaseTransitionJiraIssue(WorkflowConfig config, IssueStatusDefinition[] toStatuses, IssueStatusDefinition[] allowedFromStatuses) {
         super(config);
         this.toStatuses = toStatuses;
         this.allowedFromStatuses = Arrays.asList(allowedFromStatuses);
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+    public String cannotRunAction() {
         if (config.disableJira) {
-            log.warn("Jira is disabled by config property disableJira");
-            return false;
+            return "Jira is disabled by config property disableJira";
         }
 
         if (!draft.hasBugNumber(config.noBugNumberLabel)) {
-            log.info("Skipping action {} as the commit has no bug number", this.getClass().getSimpleName());
-            return false;
+            return "the commit has no bug number";
         }
-        return super.canRunAction();
+        return super.cannotRunAction();
     }
 
     @Override

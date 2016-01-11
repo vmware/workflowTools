@@ -15,12 +15,11 @@ public abstract class BaseCommitWithBuildsAction extends BaseCommitAction {
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException {
+    public String cannotRunAction() {
         if (draft.jobBuilds.isEmpty()) {
-            log.info("Ignoring action {} as the commit has no job builds in the testing done section", this.getClass().getSimpleName());
-            return false;
+            return "the commit has no job builds in the testing done section";
         } else {
-            return true;
+            return super.cannotRunAction();
         }
     }
 

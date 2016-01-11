@@ -14,7 +14,7 @@ public class PreloadAssignedJiraIssues extends BaseCommitAction {
 
     private Jira jira;
 
-    public PreloadAssignedJiraIssues(WorkflowConfig config) throws IllegalAccessException, IOException, URISyntaxException {
+    public PreloadAssignedJiraIssues(WorkflowConfig config) {
         super(config);
     }
 
@@ -23,15 +23,11 @@ public class PreloadAssignedJiraIssues extends BaseCommitAction {
         Runnable loadJiraIssues = new Runnable() {
             @Override
             public void run() {
-                try {
-                    jira = serviceLocator.getUnauthenticatedJira();
-                    if (jira.isBaseUriTrusted() && jira.isConnectionAuthenticated()) {
-                        draft.isPreloadingJiraIssues = true;
-                        draft.addIssues(jira.getOpenTasksForUser(config.username).issues);
-                        draft.isPreloadingJiraIssues = false;
-                    }
-                } catch (IOException | URISyntaxException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                jira = serviceLocator.getUnauthenticatedJira();
+                if (jira.isBaseUriTrusted() && jira.isConnectionAuthenticated()) {
+                    draft.isPreloadingJiraIssues = true;
+                    draft.addIssues(jira.getOpenTasksForUser(config.username).issues);
+                    draft.isPreloadingJiraIssues = false;
                 }
             }
         };

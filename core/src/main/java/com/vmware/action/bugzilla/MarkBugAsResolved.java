@@ -26,12 +26,11 @@ public class MarkBugAsResolved extends BaseCommitAction {
     }
 
     @Override
-    public boolean canRunAction() throws IOException, URISyntaxException, IllegalAccessException {
+    public String cannotRunAction() {
         if (draft.hasBugNumber(config.noBugNumberLabel)) {
-            return true;
+            return super.cannotRunAction();
         }
-        log.info("Skipping action {} as the commit has no bug number", this.getClass().getSimpleName());
-        return false;
+        return "commit has no bug number";
     }
 
 

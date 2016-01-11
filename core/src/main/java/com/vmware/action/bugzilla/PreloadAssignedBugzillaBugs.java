@@ -23,18 +23,14 @@ public class PreloadAssignedBugzillaBugs extends BaseCommitAction {
         Runnable loadBugzillaBugs = new Runnable() {
             @Override
             public void run() {
-                try {
-                    bugzilla = serviceLocator.getUnauthenticatedBugzilla();
-                    if (bugzilla.isBaseUriTrusted() && bugzilla.isConnectionAuthenticated()) {
-                        draft.isPreloadingBugzillaBugs = true;
-                        if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
-                            draft.userHasBugzillaQuery = true;
-                            draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
-                        }
-                        draft.isPreloadingBugzillaBugs = false;
+                bugzilla = serviceLocator.getUnauthenticatedBugzilla();
+                if (bugzilla.isBaseUriTrusted() && bugzilla.isConnectionAuthenticated()) {
+                    draft.isPreloadingBugzillaBugs = true;
+                    if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
+                        draft.userHasBugzillaQuery = true;
+                        draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
                     }
-                } catch (IOException | URISyntaxException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    draft.isPreloadingBugzillaBugs = false;
                 }
             }
         };

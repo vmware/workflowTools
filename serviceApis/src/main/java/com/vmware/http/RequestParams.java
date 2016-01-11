@@ -24,7 +24,7 @@ public class RequestParams {
     private Collection<RequestParam> allParams = new OverwritableSet<>();
 
 
-    public String buildUrl(String url) throws URISyntaxException, UnsupportedEncodingException {
+    public String buildUrl(String url) {
         if (allParams.isEmpty()) {
             return url;
         }
@@ -101,12 +101,16 @@ public class RequestParams {
         return requestHeaders;
     }
 
-    private String constructUrlWithParams(String url, List<UrlParam> urlParams) throws UnsupportedEncodingException {
+    private String constructUrlWithParams(String url, List<UrlParam> urlParams)  {
         url += "?";
 
         for (int i = 0; i < urlParams.size(); i ++) {
             UrlParam urlParam = urlParams.get(i);
-            url += urlParam.getName() + "=" + URLEncoder.encode(urlParam.getValue(), "UTF-8");
+            try {
+                url += urlParam.getName() + "=" + URLEncoder.encode(urlParam.getValue(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
             if (i < urlParams.size() -1) {
                 url += "&";
             }
