@@ -37,15 +37,10 @@ public class MarkBugAsResolved extends BaseCommitAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
-        if (StringUtils.isBlank(draft.bugNumbers)) {
-            log.info("No bug numbers found in commit");
-            return;
-        }
-
-        for (String bugNumber : draft.bugNumbers.split(",")) {
+        for (String bugNumber : draft.bugNumbersAsArray()) {
             Integer bugId = config.parseBugzillaBugNumber(bugNumber.trim());
             if (bugId == null) {
-                log.info("{} is not a bugzilla id, assuming that it is a jira issue key, skipping", bugNumber);
+                log.info("{} is not a Bugzilla id, assuming that it is a Jira issue key, skipping", bugNumber);
                 return;
             }
             bugzilla.resolveBug(bugId, BugResolutionType.Fixed);

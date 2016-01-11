@@ -48,7 +48,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
     @Override
     public void process() throws IOException, IllegalAccessException, URISyntaxException {
-        String[] bugNumbers = draft.bugNumbers.split(",");
+        String[] bugNumbers = draft.bugNumbersAsArray();
         for (String bugNumber : bugNumbers) {
             transitionIssue(bugNumber.trim());
         }
