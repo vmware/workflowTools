@@ -310,4 +310,8 @@ public class ReviewRequestDraft extends BaseEntity{
         return Integer.valueOf(reviewMatcher.group(1));
     }
 
+    public String[] bugNumbersAsArray() {
+        return bugNumbers != null ? bugNumbers.split(",") : new String[0];
+    }
+
 }
