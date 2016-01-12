@@ -1,5 +1,7 @@
 package com.vmware.jenkins.domain;
 
+import java.util.NoSuchElementException;
+
 public class JobsList {
 
     public Job[] jobs;
@@ -19,7 +21,7 @@ public class JobsList {
                 return job;
             }
         }
-        throw new RuntimeException("No job found for name " + jobName);
+        throw new NoSuchElementException(jobName);
     }
 
 

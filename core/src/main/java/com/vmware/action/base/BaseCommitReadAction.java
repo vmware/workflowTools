@@ -3,11 +3,9 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
+import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URISyntaxException;
 
 public abstract class BaseCommitReadAction extends BaseCommitAction {
 
@@ -27,7 +25,7 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
         try {
             propertyValue = (String) property.get(draft);
         } catch (IllegalAccessException e) {
-            throw new RuntimeIllegalAccessException(e);
+            throw new RuntimeReflectiveOperationException(e);
         }
         if (!config.setEmptyPropertiesOnly || StringUtils.isBlank(propertyValue)) {
             return super.cannotRunAction();

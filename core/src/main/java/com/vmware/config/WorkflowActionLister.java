@@ -7,6 +7,7 @@ package com.vmware.config;
 
 import com.vmware.action.BaseAction;
 import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +49,7 @@ public class WorkflowActionLister {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeReflectiveOperationException(e);
         }
     }
 

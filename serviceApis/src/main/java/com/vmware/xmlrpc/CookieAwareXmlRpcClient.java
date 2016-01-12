@@ -9,6 +9,7 @@ import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.utils.exceptions.RuntimeURISyntaxException;
 import com.vmware.utils.input.InputUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -70,7 +71,7 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
             }
             throw new RuntimeException(e);
         } catch (URISyntaxException e) {
-            throw new InternalServerException(e.getMessage(), e);
+            throw new RuntimeURISyntaxException(e);
         }
     }
 

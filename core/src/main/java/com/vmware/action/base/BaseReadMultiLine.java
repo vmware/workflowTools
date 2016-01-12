@@ -1,10 +1,8 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
+import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
 import com.vmware.utils.input.InputUtils;
-
-import java.io.IOException;
 
 import static com.vmware.utils.StringUtils.NEW_LINE_CHAR;
 
@@ -26,7 +24,7 @@ public abstract class BaseReadMultiLine extends BaseCommitReadAction {
         try {
             propertyValue = (String) property.get(draft);
         } catch (IllegalAccessException e) {
-            throw new RuntimeIllegalAccessException(e);
+            throw new RuntimeReflectiveOperationException(e);
         }
 
         if (propertyValue == null) {
@@ -44,7 +42,7 @@ public abstract class BaseReadMultiLine extends BaseCommitReadAction {
         try {
             property.set(draft, propertyValue);
         } catch (IllegalAccessException e) {
-            throw new RuntimeIllegalAccessException(e);
+            throw new RuntimeReflectiveOperationException(e);
         }
     }
 }
