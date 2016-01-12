@@ -5,6 +5,7 @@ import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
 import com.vmware.utils.StringUtils;
 import com.vmware.utils.collections.OverwritableSet;
+import com.vmware.utils.exceptions.RuntimeIOException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -109,7 +110,7 @@ public class RequestParams {
             try {
                 url += urlParam.getName() + "=" + URLEncoder.encode(urlParam.getValue(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeIOException(e);
             }
             if (i < urlParams.size() -1) {
                 url += "&";

@@ -2,6 +2,7 @@ package com.vmware.http.cookie;
 
 import com.vmware.utils.ClasspathResource;
 import com.vmware.utils.IOUtils;
+import com.vmware.utils.exceptions.RuntimeIOException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,7 +29,7 @@ public class CookieFileStore {
             try {
                 readCookieFile(new File(homeFolder + "/" + apiAuthentication.getFileName()));
             } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
+                throw new RuntimeIOException(ioe);
             }
         }
     }
@@ -90,7 +91,7 @@ public class CookieFileStore {
             try {
                 writeCookieToFile(existingCookie, cookieToCheck, apiAuthentication.getFileName());
             } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
+                throw new RuntimeIOException(ioe);
             }
         }
     }

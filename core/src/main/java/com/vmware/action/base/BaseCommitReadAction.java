@@ -3,6 +3,7 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -26,7 +27,7 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
         try {
             propertyValue = (String) property.get(draft);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIllegalAccessException(e);
         }
         if (!config.setEmptyPropertiesOnly || StringUtils.isBlank(propertyValue)) {
             return super.cannotRunAction();

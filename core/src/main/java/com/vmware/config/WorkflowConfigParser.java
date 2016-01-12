@@ -7,6 +7,7 @@ import com.vmware.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.utils.ClasspathResource;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +87,7 @@ public class WorkflowConfigParser {
             log.error(iae.getMessage());
             System.exit(1);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIllegalAccessException(e);
         }
     }
 

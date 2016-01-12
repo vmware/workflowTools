@@ -8,6 +8,8 @@ package com.vmware.http.request;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.http.HttpConnection;
+import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +88,10 @@ public class RequestBodyFactory {
             log.trace(TWO_HYPHENS + boundary + TWO_HYPHENS);
             writer.append(TWO_HYPHENS).append(boundary).append(TWO_HYPHENS).append(LINE_FEED).flush();
             writer.close();
-        } catch (IOException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeIllegalAccessException(e);
         }
 
     }
@@ -100,7 +104,7 @@ public class RequestBodyFactory {
         try {
             writeValuesAsFormEncoded(connection, values);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -114,7 +118,7 @@ public class RequestBodyFactory {
             writer.write(jsonText);
             writer.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -123,8 +127,10 @@ public class RequestBodyFactory {
         try {
             valuesToWrite = convertObjectToMap(requestObject);
             writeValuesAsFormEncoded(connection, valuesToWrite);
-        } catch (IllegalAccessException | IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeIllegalAccessException(e);
         }
     }
 

@@ -17,6 +17,7 @@ import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
 import com.vmware.utils.input.CommaArgumentDelimeter;
 import com.vmware.utils.input.ImprovedArgumentCompleter;
 import com.vmware.utils.input.ImprovedStringsCompleter;
@@ -233,7 +234,7 @@ public class Workflow {
                     String matchingValueText = convertObjectToString(matchingValue);
                     log.info("{}={} - {}", configOption, matchingValueText, matchingPropertyText);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeIllegalAccessException(e);
                 }
             }
         }

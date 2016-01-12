@@ -8,6 +8,7 @@ import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.ssl.WorkflowCertificateManager;
+import com.vmware.utils.exceptions.RuntimeIOException;
 import com.vmware.utils.input.InputUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -41,7 +42,7 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
         try {
             this.apiURL = new URL(url);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);

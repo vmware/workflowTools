@@ -1,5 +1,6 @@
 package com.vmware.http.ssl;
 
+import com.vmware.utils.exceptions.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +91,7 @@ public class WorkflowCertificateManager {
             logger.debug("Host " + uri.getHost() + " is not trusted", e);
             return false;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -113,8 +114,10 @@ public class WorkflowCertificateManager {
         try (OutputStream out = new FileOutputStream(keyStoreFile)) {
             workflowKeystore.store(out, PASS_PHRASE);
             out.close();
-        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException | IOException e) {
+        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
         }
     }
 
