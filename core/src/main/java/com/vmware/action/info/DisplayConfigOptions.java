@@ -9,12 +9,10 @@ import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.utils.ClasspathResource;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
+import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Field;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -51,7 +49,7 @@ public class DisplayConfigOptions extends BaseAction {
             try {
                 defaultValue = field.get(defaultConfig);
             } catch (IllegalAccessException e) {
-                throw new RuntimeIllegalAccessException(e);
+                throw new RuntimeReflectiveOperationException(e);
             }
 
             String defaultDisplayValue;

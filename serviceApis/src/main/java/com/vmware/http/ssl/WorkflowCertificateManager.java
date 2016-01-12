@@ -40,7 +40,7 @@ public class WorkflowCertificateManager {
         try {
             context = initSslContext();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new WorkflowCertificateException(e);
         }
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
@@ -56,7 +56,7 @@ public class WorkflowCertificateManager {
 
         X509Certificate[] chain = workflowTrustManager.chain;
         if (chain == null) {
-            throw new RuntimeException("Could not obtain server certificate chain for host " + uri.getHost());
+            throw new WorkflowCertificateException("Could not obtain server certificate chain for host " + uri.getHost());
         }
 
         logger.info("Saving ssl cert for host {} to local keystore file", uri.getHost(), keyStoreFile.getPath());
@@ -64,10 +64,10 @@ public class WorkflowCertificateManager {
         try {
             context = initSslContext();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new WorkflowCertificateException(e);
         }
         if (!isUriTrusted(uri)) {
-            throw new RuntimeException("Expected host " + uri.getHost() + " to be trusted after saving cert!");
+            throw new WorkflowCertificateException("Expected host " + uri.getHost() + " to be trusted after saving cert!");
         }
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
@@ -104,7 +104,7 @@ public class WorkflowCertificateManager {
         try {
             workflowKeystore.setCertificateEntry(alias, certificate);
         } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
+            throw new WorkflowCertificateException(e);
         }
 
         storeKeystore();
@@ -115,7 +115,7 @@ public class WorkflowCertificateManager {
             workflowKeystore.store(out, PASS_PHRASE);
             out.close();
         } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new WorkflowCertificateException(e);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
@@ -156,7 +156,7 @@ public class WorkflowCertificateManager {
                 return (X509KeyManager) keyManager;
             }
         }
-        throw new RuntimeException("No key manager found");
+        throw new WorkflowCertificateException("No key manager found");
     }
 
     private X509TrustManager getFirstX509TrustManager(TrustManager[] trustManagers) {
@@ -165,7 +165,7 @@ public class WorkflowCertificateManager {
                 return (X509TrustManager) trustManager;
             }
         }
-        throw new RuntimeException("No trust manager found");
+        throw new WorkflowCertificateException("No trust manager found");
     }
 
     private void createKeyStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {

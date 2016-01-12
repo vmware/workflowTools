@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.http.HttpConnection;
 import com.vmware.utils.exceptions.RuntimeIOException;
-import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
+import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +91,7 @@ public class RequestBodyFactory {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeIllegalAccessException(e);
+            throw new RuntimeReflectiveOperationException(e);
         }
 
     }
@@ -130,7 +130,7 @@ public class RequestBodyFactory {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeIllegalAccessException(e);
+            throw new RuntimeReflectiveOperationException(e);
         }
     }
 

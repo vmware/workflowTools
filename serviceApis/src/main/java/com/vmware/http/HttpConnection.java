@@ -16,6 +16,7 @@ import com.vmware.http.ssl.WorkflowCertificateManager;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.ThreadUtils;
 import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.utils.exceptions.RuntimeURISyntaxException;
 import com.vmware.utils.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +185,7 @@ public class HttpConnection {
         try {
             activeConnection.setRequestMethod(methodType.name());
         } catch (ProtocolException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
         addRequestHeaders();
         addCookiesHeader(uri.getHost());
@@ -256,7 +257,7 @@ public class HttpConnection {
         try {
             uri = activeConnection.getURL().toURI();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeURISyntaxException(e);
         }
         if (workflowCertificateManager == null || workflowCertificateManager.isUriTrusted(uri)) {
             log.info("Url {} is already trusted, no need to save cert to local keystore");
@@ -276,7 +277,7 @@ public class HttpConnection {
             try {
                 exitDueToSslExceptions();
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeURISyntaxException(e);
             }
         }
     }

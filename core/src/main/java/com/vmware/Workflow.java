@@ -17,7 +17,7 @@ import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
+import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
 import com.vmware.utils.input.CommaArgumentDelimeter;
 import com.vmware.utils.input.ImprovedArgumentCompleter;
 import com.vmware.utils.input.ImprovedStringsCompleter;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -234,7 +233,7 @@ public class Workflow {
                     String matchingValueText = convertObjectToString(matchingValue);
                     log.info("{}={} - {}", configOption, matchingValueText, matchingPropertyText);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeIllegalAccessException(e);
+                    throw new RuntimeReflectiveOperationException(e);
                 }
             }
         }
