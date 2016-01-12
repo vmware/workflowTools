@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import static com.vmware.utils.StringUtils.NEW_LINE_CHAR;
+import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
 
 /**
  * JDK Logger formatter. Used to format all log output.

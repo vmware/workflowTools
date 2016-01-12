@@ -6,7 +6,7 @@
 package com.vmware.xmlrpc;
 
 import com.vmware.http.cookie.CookieFileStore;
-import com.vmware.utils.IOUtils;
+import com.vmware.util.IOUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.client.XmlRpcClient;

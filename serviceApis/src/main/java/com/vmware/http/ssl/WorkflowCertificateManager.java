@@ -1,6 +1,6 @@
 package com.vmware.http.ssl;
 
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.exception.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

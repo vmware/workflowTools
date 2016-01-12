@@ -1,6 +1,6 @@
 package com.vmware.jira.domain;
 
-import com.vmware.utils.enums.ComplexEnum;
+import com.vmware.util.complexenum.ComplexEnum;
 
 public enum IssueResolutionDefinition implements ComplexEnum<Integer> {
 

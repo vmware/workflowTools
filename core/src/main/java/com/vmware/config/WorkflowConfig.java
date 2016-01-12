@@ -3,9 +3,9 @@ package com.vmware.config;
 import com.vmware.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.action.BaseAction;
-import com.vmware.utils.ArrayUtils;
-import com.vmware.utils.CommitConfiguration;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.ArrayUtils;
+import com.vmware.util.CommitConfiguration;
+import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
-import static com.vmware.utils.ArrayUtils.contains;
+import static com.vmware.util.ArrayUtils.contains;
 
 /**
  * Workflow configuration.

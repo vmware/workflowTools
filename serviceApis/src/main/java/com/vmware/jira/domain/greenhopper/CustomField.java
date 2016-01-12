@@ -1,6 +1,6 @@
 package com.vmware.jira.domain.greenhopper;
 
-import com.vmware.utils.StringUtils;
+import com.vmware.util.StringUtils;
 
 public class CustomField {
 

@@ -1,12 +1,10 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.collections.UniqueArrayList;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.collection.OverwritableSet;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -14,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import static com.vmware.utils.StringUtils.isInteger;
+import static com.vmware.util.StringUtils.isInteger;
 
 public abstract class BaseSetReviewerList extends BaseCommitReadAction {
     protected boolean addToReviewerList;
@@ -63,7 +61,7 @@ public abstract class BaseSetReviewerList extends BaseCommitReadAction {
             return config.trivialReviewerLabel;
         }
 
-        Collection<String> parsedReviewers = new UniqueArrayList<>();
+        Collection<String> parsedReviewers = new OverwritableSet.UniqueArrayList<>();
         String[] reviewers = reviewersText.split(",");
         for (String reviewer : reviewers) {
             String fragment = reviewer.trim();

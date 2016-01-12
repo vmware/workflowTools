@@ -5,8 +5,8 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
-import com.vmware.utils.DateUtils;
-import com.vmware.utils.Padder;
+import com.vmware.util.DateUtils;
+import com.vmware.util.Padder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

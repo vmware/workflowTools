@@ -1,8 +1,8 @@
 import com.vmware.Git;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.CommitConfiguration;
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.CommitConfiguration;
+import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

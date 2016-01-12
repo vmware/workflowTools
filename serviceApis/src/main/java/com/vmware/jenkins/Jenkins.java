@@ -13,7 +13,7 @@ import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.UrlUtils;
+import com.vmware.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,12 +3,12 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.BaseCommitReadAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 
-import static com.vmware.utils.StringUtils.appendCsvValue;
+import static com.vmware.util.StringUtils.appendCsvValue;
 
 @ActionDescription("Sets the bug number without showing assigned issues in Jira.")
 public class SetBugNumbersOffline extends BaseCommitReadAction {

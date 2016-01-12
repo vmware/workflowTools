@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class Padder {
             title += " ";
         }
         int paddingCount = (PADDING_LENGTH - (title.length() + 4)) / 2;
-        this.padding = StringUtils.repeat(paddingCount, "*");
+        this.padding = com.vmware.util.StringUtils.repeat(paddingCount, "*");
         this.title = title.toUpperCase();
     }
 

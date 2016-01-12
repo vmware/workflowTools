@@ -8,14 +8,12 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.collections.UniqueArrayList;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.Padder;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.ThreadUtils;
+import com.vmware.util.collection.OverwritableSet;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.Padder;
+import com.vmware.util.StringUtils;
+import com.vmware.util.ThreadUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,7 +71,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
     private void loadIssuesList(ReviewRequestDraft draft) {
         if (jira == null && bugzilla == null) {
             log.info("Both Jira and Bugzilla are disabled, no issues can be loaded");
-            draft.openIssues = new UniqueArrayList<>();
+            draft.openIssues = new OverwritableSet.UniqueArrayList<>();
             return;
         }
 
@@ -97,7 +95,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
             if (draft.openIssues == null) {
                 log.info("Failed to load Jira / Bugzilla items, Jira in progress {}, Bugzilla in progress",
                         draft.isPreloadingJiraIssues, draft.isPreloadingBugzillaBugs);
-                draft.openIssues = new UniqueArrayList<>();
+                draft.openIssues = new OverwritableSet.UniqueArrayList<>();
             }
         }
     }

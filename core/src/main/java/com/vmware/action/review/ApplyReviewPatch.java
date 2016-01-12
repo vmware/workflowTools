@@ -6,10 +6,10 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.Padder;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.IOUtils;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.Padder;
+import com.vmware.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

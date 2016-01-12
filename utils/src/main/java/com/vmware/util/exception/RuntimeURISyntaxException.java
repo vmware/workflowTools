@@ -1,4 +1,4 @@
-package com.vmware.utils.exceptions;
+package com.vmware.util.exception;
 
 import java.net.URISyntaxException;
 

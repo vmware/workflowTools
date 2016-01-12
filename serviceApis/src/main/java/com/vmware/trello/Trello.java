@@ -21,8 +21,8 @@ import com.vmware.trello.domain.LoginInfo;
 import com.vmware.trello.domain.Member;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.UrlUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

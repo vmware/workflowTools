@@ -9,10 +9,10 @@ import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.reviewboard.domain.ReviewRequests;
 import com.vmware.reviewboard.domain.ReviewStatType;
 import com.vmware.reviewboard.domain.UserReview;
-import com.vmware.utils.DateUtils;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.Padder;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.DateUtils;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.Padder;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

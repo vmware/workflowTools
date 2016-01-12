@@ -13,11 +13,11 @@ import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.ssl.WorkflowCertificateManager;
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.ThreadUtils;
-import com.vmware.utils.exceptions.RuntimeIOException;
-import com.vmware.utils.exceptions.RuntimeURISyntaxException;
-import com.vmware.utils.input.InputUtils;
+import com.vmware.util.IOUtils;
+import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.exception.RuntimeURISyntaxException;
+import com.vmware.util.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

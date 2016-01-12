@@ -1,7 +1,7 @@
 package com.vmware.jenkins.domain;
 
 import com.vmware.http.RequestParams;
-import com.vmware.utils.UrlUtils;
+import com.vmware.util.UrlUtils;
 
 public class Job {
     public String name;

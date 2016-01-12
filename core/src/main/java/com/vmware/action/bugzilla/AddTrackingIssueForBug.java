@@ -5,7 +5,7 @@ import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
-import com.vmware.utils.input.InputUtils;
+import com.vmware.util.input.InputUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

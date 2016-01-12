@@ -1,6 +1,6 @@
 package com.vmware.jira.domain;
 
-import com.vmware.utils.StringUtils;
+import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

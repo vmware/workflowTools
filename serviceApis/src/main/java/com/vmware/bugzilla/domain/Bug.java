@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.IssueInfo;
 import com.vmware.http.request.DeserializedName;
 import com.vmware.http.request.PostDeserialization;
-import com.vmware.utils.MatcherUtils;
+import com.vmware.util.MatcherUtils;
 
 /**
  * Represents a bug in Bugzilla.

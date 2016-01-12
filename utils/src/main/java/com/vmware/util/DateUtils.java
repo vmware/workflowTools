@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 import java.util.Calendar;
 import java.util.Date;

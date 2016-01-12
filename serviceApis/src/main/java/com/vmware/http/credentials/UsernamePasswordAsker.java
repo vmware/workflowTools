@@ -1,7 +1,7 @@
 package com.vmware.http.credentials;
 
 import com.vmware.http.cookie.ApiAuthentication;
-import com.vmware.utils.input.InputUtils;
+import com.vmware.util.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

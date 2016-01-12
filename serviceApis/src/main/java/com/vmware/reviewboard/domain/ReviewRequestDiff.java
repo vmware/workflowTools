@@ -1,6 +1,6 @@
 package com.vmware.reviewboard.domain;
 
-import com.vmware.utils.input.InputListSelection;
+import com.vmware.util.input.InputListSelection;
 
 import java.util.Date;
 

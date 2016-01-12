@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 /**
  * Util methods for url functionality.

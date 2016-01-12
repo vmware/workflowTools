@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

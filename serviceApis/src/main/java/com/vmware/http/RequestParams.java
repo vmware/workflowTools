@@ -3,9 +3,9 @@ package com.vmware.http;
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.collections.OverwritableSet;
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.StringUtils;
+import com.vmware.util.collection.OverwritableSet;
+import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;

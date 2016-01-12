@@ -4,8 +4,8 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Member;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

@@ -1,6 +1,6 @@
-package com.vmware.utils;
+package com.vmware.util;
 
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
