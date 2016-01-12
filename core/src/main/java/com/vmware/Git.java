@@ -4,6 +4,7 @@ import com.vmware.utils.IOUtils;
 import com.vmware.utils.MatcherUtils;
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.exceptions.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,7 +314,7 @@ public class Git {
             }
             return readProcessOutput(statusProcess.getInputStream(), printLines);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 

@@ -15,6 +15,7 @@ import com.vmware.http.request.RequestParam;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.ThreadUtils;
+import com.vmware.utils.exceptions.RuntimeIOException;
 import com.vmware.utils.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +175,7 @@ public class HttpConnection {
         try {
             activeConnection = (HttpURLConnection) uri.toURL().openConnection();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
         activeConnection.setDoInput(true);
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);
@@ -240,7 +241,7 @@ public class HttpConnection {
         } catch (UnknownHostException | SocketException e) {
             handleNetworkException(e);
         } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            throw new RuntimeIOException(ioe);
         }
         return responseText;
     }

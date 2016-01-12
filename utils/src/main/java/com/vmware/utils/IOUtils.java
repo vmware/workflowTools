@@ -1,5 +1,7 @@
 package com.vmware.utils;
 
+import com.vmware.utils.exceptions.RuntimeIOException;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,7 +22,7 @@ public class IOUtils {
         try {
             write(new FileOutputStream(file), data);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -28,7 +30,7 @@ public class IOUtils {
         try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream)) {
             bufferedOutputStream.write(data.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -46,7 +48,7 @@ public class IOUtils {
         try {
             return read(new FileInputStream(file));
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -64,7 +66,7 @@ public class IOUtils {
             }
             return text;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
 
     }
@@ -80,7 +82,7 @@ public class IOUtils {
             reader.close();
             return lines;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
     }
 }

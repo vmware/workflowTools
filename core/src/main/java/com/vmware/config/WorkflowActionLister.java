@@ -6,6 +6,7 @@
 package com.vmware.config;
 
 import com.vmware.action.BaseAction;
+import com.vmware.utils.exceptions.RuntimeIOException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +45,9 @@ public class WorkflowActionLister {
                 }
             });
             return actionsList;
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

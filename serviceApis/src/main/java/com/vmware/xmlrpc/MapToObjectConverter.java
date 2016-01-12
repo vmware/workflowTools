@@ -7,6 +7,7 @@ import com.vmware.http.json.ComplexEnumMapper;
 import com.vmware.http.request.DeserializedName;
 import com.vmware.http.request.PostDeserialization;
 import com.vmware.utils.enums.EnumUtils;
+import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -24,8 +25,10 @@ public class MapToObjectConverter {
         Object createdObject;
         try {
             createdObject = objectClass.getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeIllegalAccessException(e);
         }
 
         for (Field field : objectClass.getDeclaredFields()) {
@@ -49,7 +52,7 @@ public class MapToObjectConverter {
             try {
                 setFieldValue(createdObject, field, valueToConvert);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeIllegalAccessException(e);
             }
         }
 
@@ -60,8 +63,10 @@ public class MapToObjectConverter {
 
             try {
                 method.invoke(createdObject);
-            } catch (InvocationTargetException | IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeIllegalAccessException(e);
             }
         }
 

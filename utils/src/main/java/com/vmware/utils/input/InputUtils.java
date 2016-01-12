@@ -2,6 +2,7 @@ package com.vmware.utils.input;
 
 import com.vmware.utils.Padder;
 import com.vmware.utils.StringUtils;
+import com.vmware.utils.exceptions.RuntimeIOException;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -132,7 +133,7 @@ public class InputUtils {
         try {
             consoleReader = new ConsoleReader();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
         consoleReader.setExpandEvents(false);
         addHistoryValues(consoleReader, historyValues);
@@ -142,7 +143,7 @@ public class InputUtils {
             try {
                 line = consoleReader.readLine();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeIOException(e);
             }
             int usableLineLength = determineLineLength(line);
 
@@ -178,7 +179,7 @@ public class InputUtils {
         try {
             consoleReader = new ConsoleReader();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
         consoleReader.setExpandEvents(false);
         if (completer != null) {
@@ -198,7 +199,7 @@ public class InputUtils {
         try {
             data = consoleReader.readLine(prompt, maskCharacter);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeIOException(e);
         }
         if (maxLength != null && data.length() > maxLength) {
             log.error("Re-enter line. Line length of {} exceeded max of {}", data.length(), maxLength);

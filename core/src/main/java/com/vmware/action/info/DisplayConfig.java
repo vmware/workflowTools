@@ -4,6 +4,7 @@ import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.Padder;
+import com.vmware.utils.exceptions.RuntimeIllegalAccessException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -33,7 +34,7 @@ public class DisplayConfig extends BaseAction {
             try {
                 displayValue = determineDisplayValue(configField.get(config));
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeIllegalAccessException(e);
             }
             log.info("{} ({}) - {}", configField.getName(), source, displayValue);
             if (i < config.configurableFields.size() - 1) {

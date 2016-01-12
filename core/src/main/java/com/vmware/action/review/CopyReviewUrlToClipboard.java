@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.utils.IOUtils;
 import com.vmware.utils.UrlUtils;
+import com.vmware.utils.exceptions.RuntimeIOException;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -37,7 +38,7 @@ public class CopyReviewUrlToClipboard extends BaseCommitWithReviewAction {
             try {
                 copyUsingPbcopyCommand(reviewUrl);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeIOException(e);
             }
         } else {
             StringSelection stringSelection = new StringSelection(reviewUrl);
