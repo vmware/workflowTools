@@ -8,8 +8,8 @@ package com.vmware.http.request;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.http.HttpConnection;
-import com.vmware.utils.exceptions.RuntimeIOException;
-import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,8 +1,8 @@
-package com.vmware.utils.input;
+package com.vmware.util.input;
 
-import com.vmware.utils.Padder;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.Padder;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;

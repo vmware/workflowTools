@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 import java.io.File;
 import java.io.FileFilter;

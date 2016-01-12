@@ -8,8 +8,8 @@ import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
-import com.vmware.utils.Padder;
-import com.vmware.utils.UrlUtils;
+import com.vmware.util.Padder;
+import com.vmware.util.UrlUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

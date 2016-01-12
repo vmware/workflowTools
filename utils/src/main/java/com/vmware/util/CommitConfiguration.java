@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 /**
  * Configuration information for a commit. Used as a transport class for a review request draft;

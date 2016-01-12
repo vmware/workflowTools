@@ -2,8 +2,8 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.lang.reflect.Field;
 

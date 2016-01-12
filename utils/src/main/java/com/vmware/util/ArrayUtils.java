@@ -1,4 +1,4 @@
-package com.vmware.utils;
+package com.vmware.util;
 
 public class ArrayUtils {
 

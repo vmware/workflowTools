@@ -6,8 +6,8 @@
 package com.vmware.config;
 
 import com.vmware.action.BaseAction;
-import com.vmware.utils.exceptions.RuntimeIOException;
-import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.io.File;
 import java.io.FileInputStream;

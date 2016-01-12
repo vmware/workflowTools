@@ -1,7 +1,7 @@
 package com.vmware;
 
 import com.vmware.http.credentials.UsernamePasswordAsker;
-import com.vmware.utils.ClasspathResource;
+import com.vmware.util.ClasspathResource;
 import org.junit.BeforeClass;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package com.vmware.mapping;
 
 import com.vmware.action.BaseAction;
-import com.vmware.utils.ClasspathResource;
+import com.vmware.util.ClasspathResource;
 
 import com.google.gson.Gson;
 

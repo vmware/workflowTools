@@ -4,11 +4,11 @@ import com.vmware.SimpleLogFormatter;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.utils.FileUtils;
-import com.vmware.utils.IOUtils;
+import com.vmware.util.FileUtils;
+import com.vmware.util.IOUtils;
 
 import com.google.gson.Gson;
-import com.vmware.utils.MatcherUtils;
+import com.vmware.util.MatcherUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

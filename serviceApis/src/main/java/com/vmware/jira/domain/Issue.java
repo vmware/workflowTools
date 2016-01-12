@@ -1,9 +1,9 @@
 package com.vmware.jira.domain;
 
 import com.vmware.IssueInfo;
-import com.vmware.utils.ArrayUtils;
-import com.vmware.utils.MatcherUtils;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.ArrayUtils;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 

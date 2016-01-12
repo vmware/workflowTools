@@ -5,9 +5,9 @@ import com.google.gson.JsonSyntaxException;
 import com.vmware.Git;
 import com.vmware.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.utils.ClasspathResource;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

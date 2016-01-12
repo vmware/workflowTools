@@ -1,34 +1,33 @@
 package com.vmware.jira;
 
 import com.vmware.AbstractRestService;
-import com.vmware.utils.enums.ComplexEnum;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.request.RequestBodyHandling;
+import com.vmware.http.request.UrlParam;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueTimeTracking;
-import com.vmware.jira.domain.IssuesResponse;
 import com.vmware.jira.domain.IssueTransition;
 import com.vmware.jira.domain.IssueTransitions;
 import com.vmware.jira.domain.IssueUpdate;
+import com.vmware.jira.domain.IssuesResponse;
 import com.vmware.jira.domain.LoginInfo;
 import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
-import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.jira.domain.SearchRequest;
-import com.vmware.http.HttpConnection;
-import com.vmware.http.cookie.ApiAuthentication;
-import com.vmware.http.exception.NotFoundException;
-import com.vmware.http.request.UrlParam;
-import com.vmware.http.credentials.UsernamePasswordAsker;
-import com.vmware.http.credentials.UsernamePasswordCredentials;
-import com.vmware.http.request.RequestBodyHandling;
+import com.vmware.jira.domain.greenhopper.RapidView;
+import com.vmware.util.complexenum.ComplexEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.vmware.http.cookie.ApiAuthentication.jira;
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
 import static com.vmware.jira.domain.IssueStatusDefinition.InReview;
 import static com.vmware.jira.domain.IssueStatusDefinition.Open;
@@ -37,7 +36,6 @@ import static com.vmware.jira.domain.IssueTypeDefinition.Bug;
 import static com.vmware.jira.domain.IssueTypeDefinition.Feature;
 import static com.vmware.jira.domain.IssueTypeDefinition.Improvement;
 import static com.vmware.jira.domain.IssueTypeDefinition.TechComm;
-import static com.vmware.http.cookie.ApiAuthentication.jira;
 
 public class Jira extends AbstractRestService {
 

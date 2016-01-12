@@ -3,7 +3,7 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.Padder;
+import com.vmware.util.Padder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

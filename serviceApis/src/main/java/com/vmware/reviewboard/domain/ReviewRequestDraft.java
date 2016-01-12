@@ -5,12 +5,12 @@ import com.vmware.bugzilla.domain.Bug;
 import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.JobBuildResult;
 import com.vmware.jira.domain.Issue;
-import com.vmware.utils.CommitConfiguration;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.collection.OverwritableSet;
+import com.vmware.util.CommitConfiguration;
+import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.vmware.utils.collections.UniqueArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.utils.StringUtils.appendCsvValue;
-import static com.vmware.utils.StringUtils.isNotBlank;
-import static com.vmware.utils.UrlUtils.addTrailingSlash;
+import static com.vmware.util.StringUtils.appendCsvValue;
+import static com.vmware.util.StringUtils.isNotBlank;
+import static com.vmware.util.UrlUtils.addTrailingSlash;
 
 public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
@@ -114,14 +114,14 @@ public class ReviewRequestDraft extends BaseEntity{
 
     public void addIssues(Issue[] issuesToAdd) {
         if (openIssues == null) {
-            openIssues = new UniqueArrayList<>();
+            openIssues = new OverwritableSet.UniqueArrayList<>();
         }
         openIssues.addAll(Arrays.asList(issuesToAdd));
     }
 
     public void addBugs(List<Bug> bugsToAdd) {
         if (openIssues == null) {
-            openIssues = new UniqueArrayList<>();
+            openIssues = new OverwritableSet.UniqueArrayList<>();
         }
         openIssues.addAll(bugsToAdd);
     }

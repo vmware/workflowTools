@@ -4,8 +4,8 @@ import com.vmware.http.RequestParams;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.UrlUtils;
+import com.vmware.util.IOUtils;
+import com.vmware.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

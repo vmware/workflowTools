@@ -7,16 +7,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.vmware.utils.enums.ComplexEnum;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.enums.EnumUtils;
+import com.vmware.util.complexenum.ComplexEnum;
+import com.vmware.util.complexenum.ComplexEnumSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.util.EnumSet;
-
-import static com.vmware.utils.enums.ComplexEnum.UNKNOWN_VALUE_NAME;
 
 public class ComplexEnumMapper implements JsonDeserializer<ComplexEnum>, JsonSerializer<ComplexEnum> {
     private static Logger log  = LoggerFactory.getLogger(ComplexEnumMapper.class);
@@ -26,7 +22,7 @@ public class ComplexEnumMapper implements JsonDeserializer<ComplexEnum>, JsonSer
     public ComplexEnum deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         String value = jsonElement.getAsString();
         Class<Enum> enumType = (Class<Enum>) type;
-        return EnumUtils.findByValue(enumType, value);
+        return ComplexEnumSelector.findByValue(enumType, value);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.vmware.jenkins.domain;
 
-import com.vmware.utils.StringUtils;
+import com.vmware.util.StringUtils;
 
 import java.util.EnumSet;
 

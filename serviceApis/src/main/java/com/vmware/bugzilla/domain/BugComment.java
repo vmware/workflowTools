@@ -1,7 +1,7 @@
 package com.vmware.bugzilla.domain;
 
 import com.google.gson.annotations.SerializedName;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Date;

@@ -6,10 +6,10 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.utils.ClasspathResource;
-import com.vmware.utils.Padder;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.Padder;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.io.Reader;
 import java.lang.reflect.Field;

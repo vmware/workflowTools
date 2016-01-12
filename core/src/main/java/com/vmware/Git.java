@@ -1,10 +1,10 @@
 package com.vmware;
 
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.MatcherUtils;
-import com.vmware.utils.Padder;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.IOUtils;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.Padder;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

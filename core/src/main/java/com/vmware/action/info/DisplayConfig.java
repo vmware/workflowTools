@@ -3,8 +3,8 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.Padder;
-import com.vmware.utils.exceptions.RuntimeReflectiveOperationException;
+import com.vmware.util.Padder;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

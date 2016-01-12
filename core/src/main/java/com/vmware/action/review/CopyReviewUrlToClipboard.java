@@ -3,9 +3,9 @@ package com.vmware.action.review;
 import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.UrlUtils;
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.IOUtils;
+import com.vmware.util.UrlUtils;
+import com.vmware.util.exception.RuntimeIOException;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;

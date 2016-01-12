@@ -1,7 +1,7 @@
 package com.vmware.config;
 
-import com.vmware.utils.ArrayUtils;
-import com.vmware.utils.StringUtils;
+import com.vmware.util.ArrayUtils;
+import com.vmware.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

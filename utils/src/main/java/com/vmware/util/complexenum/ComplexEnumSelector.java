@@ -1,19 +1,19 @@
-package com.vmware.utils.enums;
+package com.vmware.util.complexenum;
 
-import com.vmware.utils.StringUtils;
+import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 
-import static com.vmware.utils.enums.ComplexEnum.UNKNOWN_VALUE_NAME;
+import static com.vmware.util.complexenum.ComplexEnum.UNKNOWN_VALUE_NAME;
 
 /**
  * Util methods for enum classes.
  */
-public class EnumUtils {
+public class ComplexEnumSelector {
 
-    private static final Logger log = LoggerFactory.getLogger(EnumUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ComplexEnumSelector.class);
 
     public static ComplexEnum findByValue(Class enumType, String value) {
         Integer valueAsInt = null;

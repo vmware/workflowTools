@@ -1,4 +1,4 @@
-package com.vmware.utils.input;
+package com.vmware.util.input;
 
 import jline.console.completer.Completer;
 

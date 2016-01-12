@@ -1,8 +1,8 @@
 package com.vmware.http.cookie;
 
-import com.vmware.utils.ClasspathResource;
-import com.vmware.utils.IOUtils;
-import com.vmware.utils.exceptions.RuntimeIOException;
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.IOUtils;
+import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.utils.StringUtils.appendWithDelimiter;
+import static com.vmware.util.StringUtils.appendWithDelimiter;
 
 public class CookieFileStore {
     private final String homeFolder;

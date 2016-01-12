@@ -5,9 +5,9 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.*;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.utils.input.InputUtils;
-import com.vmware.utils.StringUtils;
-import com.vmware.utils.ThreadUtils;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.ThreadUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

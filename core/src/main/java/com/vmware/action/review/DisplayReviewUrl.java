@@ -3,7 +3,7 @@ package com.vmware.action.review;
 import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.utils.UrlUtils;
+import com.vmware.util.UrlUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
