@@ -24,7 +24,7 @@ public class TestTrelloApi extends BaseTests {
     private Board testBoard;
 
     @Before
-    public void init() throws IOException, URISyntaxException, IllegalAccessException {
+    public void init() {
         String trelloUrl = testProperties.getProperty("trello.url");
         trello = new Trello(trelloUrl);
         trello.setupAuthenticatedConnection();

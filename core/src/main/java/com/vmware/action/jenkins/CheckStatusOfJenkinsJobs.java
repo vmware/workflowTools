@@ -16,7 +16,7 @@ public class CheckStatusOfJenkinsJobs extends BaseCommitWithBuildsAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         jenkins.checkStatusOfJenkinsJobs(draft);
     }
 }

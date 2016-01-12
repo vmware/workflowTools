@@ -19,7 +19,7 @@ public class PreloadAssignedJiraIssues extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Runnable loadJiraIssues = new Runnable() {
             @Override
             public void run() {

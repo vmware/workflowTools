@@ -18,7 +18,7 @@ public class SelectTrelloBoard  extends BaseTrelloAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Board[] openBoards = trello.getOpenBoardsForUser();
         if (openBoards.length == 0) {
             log.info("No open boards available to select");

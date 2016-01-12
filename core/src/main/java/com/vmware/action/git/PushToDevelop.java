@@ -15,7 +15,7 @@ public class PushToDevelop extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         git.pushToRemoteBranch("develop");
     }
 }

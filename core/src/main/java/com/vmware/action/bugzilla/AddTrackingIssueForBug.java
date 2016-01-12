@@ -19,7 +19,7 @@ public class AddTrackingIssueForBug extends BaseBatchBugzillaAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         int bugNumber = InputUtils.readValueUntilValidInt("Enter bugzilla bug number");
 
         Bug bug = bugzilla.getBugById(bugNumber);

@@ -14,7 +14,7 @@ public abstract class BaseSetShipItReviewersList extends BaseCommitWithReviewAct
         super(config);
     }
 
-    protected void checkShipItsForReview(ReviewRequestDraft draft) throws IOException, URISyntaxException {
+    protected void checkShipItsForReview(ReviewRequestDraft draft) {
         // reuse the result from other actions like ExitIfReviewHasNoShipIts or CheckStatusOfReviewShipIts
         if (StringUtils.isNotBlank(draft.shipItReviewers)) {
             return;

@@ -20,7 +20,7 @@ public abstract class BaseCommitWithReviewAction extends BaseCommitAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         reviewBoard = serviceLocator.getReviewBoard();
         if (draft != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(draft.id);

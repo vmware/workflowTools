@@ -23,7 +23,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         super.preprocess();
         this.jira = serviceLocator.getAuthenticatedJira();
     }
@@ -42,7 +42,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         for (Bug bug : multiActionData.getBugsForProcessing()) {
             Integer bugId = Integer.parseInt(bug.getKey());
             Issue trackingIssue = getValidTrackingIssueForBug(bug);
@@ -69,7 +69,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
         bugzilla.resolveBug(bugId, resolutionType);
     }
 
-    private Issue getValidTrackingIssueForBug(Bug bug) throws IOException, URISyntaxException {
+    private Issue getValidTrackingIssueForBug(Bug bug) {
         Integer bugId = Integer.parseInt(bug.getKey());
         if (bug.resolution != null) {
             log.info("Bug {} already has a resolution of {}, skipping", bugId, bug.resolution.getValue());

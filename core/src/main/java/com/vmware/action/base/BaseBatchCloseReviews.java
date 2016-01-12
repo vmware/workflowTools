@@ -27,11 +27,11 @@ public abstract class BaseBatchCloseReviews extends BaseAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.reviewBoard = serviceLocator.getReviewBoard();
     }
 
-    public void closeReviews(ReviewRequest[] openRequests) throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void closeReviews(ReviewRequest[] openRequests) {
         Padder titlePadder = new Padder("Closing reviews with {} that are older than {} days", reason, String.valueOf(daysElapsedBeforeClose));
         titlePadder.infoTitle();
         if (openRequests.length == 0) {

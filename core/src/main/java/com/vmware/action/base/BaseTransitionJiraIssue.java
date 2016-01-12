@@ -40,12 +40,12 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.jira = serviceLocator.getAuthenticatedJira();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         String[] bugNumbers = draft.bugNumbersAsArray();
         for (String bugNumber : bugNumbers) {
             transitionIssue(bugNumber.trim());
@@ -53,7 +53,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
     }
 
-    private void transitionIssue(String bugNumber) throws IOException, URISyntaxException, IllegalAccessException {
+    private void transitionIssue(String bugNumber) {
         IssueStatusDefinition lastStatusToTransitionTo = toStatuses[toStatuses.length - 1];
 
         if (config.parseBugzillaBugNumber(bugNumber) != null) {
@@ -90,7 +90,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
         }
     }
 
-    private void transitionIssueToStatus(String bugNumber, IssueFields issueFields, IssueStatusDefinition toStatus, boolean isLast) throws IOException, URISyntaxException, IllegalAccessException {
+    private void transitionIssueToStatus(String bugNumber, IssueFields issueFields, IssueStatusDefinition toStatus, boolean isLast) {
 
         IssueStatusDefinition currentStatus = issueFields.status.def;
         if (currentStatus.equals(toStatus)) {

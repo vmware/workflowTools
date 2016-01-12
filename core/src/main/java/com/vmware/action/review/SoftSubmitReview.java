@@ -12,12 +12,12 @@ import java.net.URISyntaxException;
 
 @ActionDescription("For the associated review, adds a comment to review board that the review has been submitted. Leaves the review open for further reviews.")
 public class SoftSubmitReview extends BaseCommitWithReviewAction {
-    public SoftSubmitReview(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public SoftSubmitReview(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         ReviewRequest reviewRequest = draft.reviewRequest;
         if (reviewRequest.status == ReviewRequestStatus.submitted) {
             log.info("Review request already marked as submitted");

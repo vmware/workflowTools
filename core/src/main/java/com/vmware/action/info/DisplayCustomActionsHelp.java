@@ -18,7 +18,7 @@ public class DisplayCustomActionsHelp extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Padder padder = new Padder("Custom Actions List");
 
         padder.infoTitle();

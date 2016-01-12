@@ -16,7 +16,7 @@ public class StripJenkinsJobs extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (draft.jobBuilds.isEmpty()) {
             log.info("No need to strip jenkins jobs from commit as there are none");
         } else {

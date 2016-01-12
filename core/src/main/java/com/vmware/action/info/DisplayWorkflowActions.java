@@ -20,7 +20,7 @@ public class DisplayWorkflowActions extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         Padder titlePadder = new Padder("Workflow Actions");
         titlePadder.infoTitle();
 

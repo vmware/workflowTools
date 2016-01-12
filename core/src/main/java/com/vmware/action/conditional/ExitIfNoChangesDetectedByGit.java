@@ -17,7 +17,7 @@ public class ExitIfNoChangesDetectedByGit extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         List<String> changes = git.getAllChanges();
         if (changes.isEmpty()) {
             log.info("No changes detected by git!");

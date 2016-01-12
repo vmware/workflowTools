@@ -18,7 +18,7 @@ public class CreateTrelloBoard  extends BaseTrelloAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         String boardName = multiActionData.projectName;
 
         if (StringUtils.isBlank(boardName)) {

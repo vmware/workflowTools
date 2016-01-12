@@ -31,7 +31,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         askForJenkinsJobKeysIfBlank();
 
         String[] jenkinsJobKeys = config.jenkinsJobKeys.split(",");
@@ -60,7 +60,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
         }
     }
 
-    private boolean waitForJobToCompleteIfNecessary(JobBuild newBuild) throws IOException, URISyntaxException, IllegalAccessException {
+    private boolean waitForJobToCompleteIfNecessary(JobBuild newBuild) {
         if (!config.waitForJenkinsJobCompletion) {
             return true;
         }
@@ -78,7 +78,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
         return updatedDetails.realResult() == JobBuildResult.SUCCESS;
     }
 
-    private void askForJenkinsJobKeysIfBlank() throws IOException {
+    private void askForJenkinsJobKeysIfBlank() {
         if (StringUtils.isNotBlank(config.jenkinsJobKeys)) {
             return;
         }
@@ -90,7 +90,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
         }
     }
 
-    private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
+    private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) {
         String[] jenkinsJobDetails = jenkinsJobText.split("&");
         String jenkinsJobName = jenkinsJobDetails[0];
         log.info("Invoking job " + jenkinsJobName);
@@ -109,7 +109,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
         return expectedNewBuild;
     }
 
-    private JobParameters generateJobParameters(String[] jenkinsJobDetails) throws IOException {
+    private JobParameters generateJobParameters(String[] jenkinsJobDetails) {
         List<JobParameter> parameters = new ArrayList<JobParameter>();
         boolean foundUsernameParam = false;
         for (int i = 1; i < jenkinsJobDetails.length; i++) {

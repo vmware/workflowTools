@@ -23,7 +23,7 @@ public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         askForJenkinsJobKeysIfBlank();
 
         String[] jenkinsJobKeys = config.jenkinsJobKeys.split(",");
@@ -45,7 +45,7 @@ public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
         }
     }
 
-    private void askForJenkinsJobKeysIfBlank() throws IOException {
+    private void askForJenkinsJobKeysIfBlank() {
         if (StringUtils.isNotBlank(config.jenkinsJobKeys)) {
             return;
         }
@@ -57,7 +57,7 @@ public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
         }
     }
 
-    private void abortJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) throws IOException, URISyntaxException, IllegalAccessException {
+    private void abortJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) {
         String[] jenkinsJobDetails = jenkinsJobText.split("&");
         String jenkinsJobName = jenkinsJobDetails[0];
         String expectedUrlFormat = config.jenkinsUrl + "/job/" + jenkinsJobName + "/";

@@ -17,7 +17,7 @@ public class ExitIfNoStagedChangesDetectedByGit extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         List<String> changes = git.getStagedChanges();
         if (changes.isEmpty()) {
             log.info("No staged changes detected by git!");

@@ -17,7 +17,7 @@ public class GettingStarted extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Padder gettingStartedTitle = new Padder("Getting Started");
         gettingStartedTitle.infoTitle();
         log.info("This program utilizes the approach of workflows");

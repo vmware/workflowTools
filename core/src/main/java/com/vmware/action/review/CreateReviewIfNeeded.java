@@ -12,17 +12,17 @@ import java.net.URISyntaxException;
 public class CreateReviewIfNeeded extends BaseCommitAction {
     private ReviewBoard reviewBoard;
 
-    public CreateReviewIfNeeded(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public CreateReviewIfNeeded(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         if (draft.hasReviewNumber()) {
             return;
         }

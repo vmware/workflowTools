@@ -20,7 +20,7 @@ public class DisplayConfig extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         log.info("Loaded config file {}", config.loadedConfigFiles);
 
         Padder titlePadder = new Padder("Workflow Configuration");
@@ -29,7 +29,12 @@ public class DisplayConfig extends BaseAction {
             Field configField = config.configurableFields.get(i);
             String source = config.overriddenConfigSources.get(configField.getName());
             source = source == null ? "Internal Config" : source;
-            String displayValue = determineDisplayValue(configField.get(config));
+            String displayValue = null;
+            try {
+                displayValue = determineDisplayValue(configField.get(config));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
             log.info("{} ({}) - {}", configField.getName(), source, displayValue);
             if (i < config.configurableFields.size() - 1) {
                 log.info("");

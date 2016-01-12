@@ -34,7 +34,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         if (!config.disableJira) {
             this.jira = serviceLocator.getUnauthenticatedJira();
         }
@@ -44,7 +44,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         loadIssuesList(draft);
         printIssuesList(draft.openIssues);
         boolean waitingForBugNumbers = true;
@@ -70,7 +70,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         log.info("Bug numbers for commit: {}", draft.bugNumbers);
     }
 
-    private void loadIssuesList(ReviewRequestDraft draft) throws IOException, URISyntaxException, IllegalAccessException {
+    private void loadIssuesList(ReviewRequestDraft draft) {
         if (jira == null && bugzilla == null) {
             log.info("Both Jira and Bugzilla are disabled, no issues can be loaded");
             draft.openIssues = new UniqueArrayList<>();
@@ -119,7 +119,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         }
     }
 
-    private List<IssueInfo> getBugsAndIssues(String bugNumberText, List<IssueInfo> preloadedIssues) throws IOException, URISyntaxException {
+    private List<IssueInfo> getBugsAndIssues(String bugNumberText, List<IssueInfo> preloadedIssues) {
         if (bugNumberText == null || bugNumberText.isEmpty()) {
             bugNumberText = config.noBugNumberLabel;
         }
@@ -140,7 +140,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         return issues;
     }
 
-    private IssueInfo getIssue(List<IssueInfo> preloadedIssues, String bugNumber) throws IOException, URISyntaxException {
+    private IssueInfo getIssue(List<IssueInfo> preloadedIssues, String bugNumber) {
         if (bugNumber.equals(config.noBugNumberLabel)) {
             return Issue.noBugNumber;
         } else if (StringUtils.isInteger(bugNumber)) {

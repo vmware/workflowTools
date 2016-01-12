@@ -48,24 +48,24 @@ public class Git {
         return matchingDirectory;
     }
 
-    public String applyDiff(String diffData) throws IOException {
+    public String applyDiff(String diffData) {
         return executeGitCommand("git apply -3 --index", diffData, false);
     }
 
-    public String lastCommitText(boolean prettyPrint) throws IOException {
+    public String lastCommitText(boolean prettyPrint) {
         return commitText(0, prettyPrint);
     }
 
-    public String commitText(int skipCount, boolean prettyPrint) throws IOException {
+    public String commitText(int skipCount, boolean prettyPrint) {
         String prettyPrintCommand = prettyPrint ? " --pretty=%B\n" : "";
         return executeGitCommand("git log -1 --skip=" + skipCount + prettyPrintCommand);
     }
 
-    public String currentBranch() throws IOException {
+    public String currentBranch() {
         return executeGitCommand("git rev-parse --abbrev-ref HEAD");
     }
 
-    public String configValue(String propertyName) throws IOException {
+    public String configValue(String propertyName) {
         if (!isGitInstalled()) {
             log.debug("Returning empty string for git config value {} as git is not installed", propertyName);
             return "";
@@ -73,12 +73,12 @@ public class Git {
         return executeGitCommand("git config " + propertyName);
     }
 
-    public int totalCommitCount() throws IOException {
+    public int totalCommitCount() {
         String commitCount = executeGitCommand("git rev-list HEAD --count");
         return Integer.parseInt(commitCount);
     }
 
-    public Map<String, String> configValues() throws IOException {
+    public Map<String, String> configValues() {
         if (!isGitInstalled()) {
             log.debug("Returning empty maps for git config values as git is not installed");
             return new HashMap<String, String>();
@@ -98,23 +98,23 @@ public class Git {
         return values;
     }
 
-    public void commit(String msg) throws IOException {
+    public void commit(String msg) {
         executeCommitCommand("git commit", msg);
     }
 
-    public void commitWithAllFileChanges(String msg) throws IOException {
+    public void commitWithAllFileChanges(String msg) {
         executeCommitCommand("git commit --all", msg);
     }
 
-    public void amendCommit(String msg) throws IOException {
+    public void amendCommit(String msg) {
         executeCommitCommand("git commit --amend", msg);
     }
 
-    public void amendCommitWithAllFileChanges(String msg) throws IOException {
+    public void amendCommitWithAllFileChanges(String msg) {
         executeCommitCommand("git commit --amend --all", msg);
     }
 
-    public byte[] diff(String parentRef, String commitRef, boolean supportsRenames) throws IOException {
+    public byte[] diff(String parentRef, String commitRef, boolean supportsRenames) {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "git diff %s--no-color --full-index --no-ext-diff --ignore-submodules %s..%s";
         diffCommand = String.format(diffCommand, renamesFlag, parentRef, commitRef);
@@ -122,13 +122,13 @@ public class Git {
         return diffOutput.length > 0 ? diffOutput : null;
     }
 
-    public byte[] diff(String commitRef, boolean supportsRenames) throws IOException {
+    public byte[] diff(String commitRef, boolean supportsRenames) {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "git diff " + renamesFlag + "--no-color --full-index --no-ext-diff --ignore-submodules " + commitRef;
         return executeGitCommand(diffCommand).getBytes();
     }
 
-    public void push() throws IOException {
+    public void push() {
         String trackingBranch = getTrackingBranch();
 
         if (trackingBranch == null) {
@@ -140,11 +140,11 @@ public class Git {
         pushToRemoteBranch(remoteBranch);
     }
 
-    public void pushToRemoteBranch(String remoteBranch) throws IOException {
+    public void pushToRemoteBranch(String remoteBranch) {
         pushToRemoteBranch(remoteBranch, false);
     }
 
-    public void pushToRemoteBranch(String remoteBranch, boolean forceUpdate) throws IOException {
+    public void pushToRemoteBranch(String remoteBranch, boolean forceUpdate) {
         String currentHeadRef = revParse("HEAD");
         log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
 
@@ -177,15 +177,15 @@ public class Git {
         log.info("Remote branch was successfully updated");
     }
 
-    public String mergeBase(String upstreamBranch, String commitRef) throws IOException {
+    public String mergeBase(String upstreamBranch, String commitRef) {
         return executeGitCommand("git merge-base " + upstreamBranch + " " + commitRef);
     }
 
-    public String revParse(String commitRef) throws IOException {
+    public String revParse(String commitRef) {
         return executeGitCommand("git rev-parse " + commitRef);
     }
 
-    public String getTrackingBranch() throws IOException {
+    public String getTrackingBranch() {
         String branchName = currentBranch();
         String headRef = revParse("HEAD");
 
@@ -211,27 +211,27 @@ public class Git {
         return trackingBranch;
     }
 
-    public String initRepo() throws IOException {
+    public String initRepo() {
         return executeGitCommand("git init");
     }
 
-    public String addAllFiles() throws IOException {
+    public String addAllFiles() {
         return executeGitCommand("git add --all");
     }
 
-    public String reset(String ref) throws IOException {
+    public String reset(String ref) {
         return executeGitCommand("git reset --hard " + ref);
     }
 
-    public List<String> getStagedChanges() throws IOException {
+    public List<String> getStagedChanges() {
         return getChanges(false);
     }
 
-    public List<String> getAllChanges() throws IOException {
+    public List<String> getAllChanges() {
         return getChanges(true);
     }
 
-    private List<String> getChanges(boolean includeUnStagedChanges) throws IOException {
+    private List<String> getChanges(boolean includeUnStagedChanges) {
         List<String> changes = new ArrayList<String>();
         String gitStatusOutput = executeGitCommand("git status --porcelain" );
 
@@ -263,7 +263,7 @@ public class Git {
         return Collections.unmodifiableList(changes);
     }
 
-    private boolean isGitInstalled() throws IOException {
+    private boolean isGitInstalled() {
         if (gitInstalled != null) {
             return gitInstalled;
         }
@@ -284,36 +284,40 @@ public class Git {
         return gitInstalled;
     }
 
-    private void executeCommitCommand(String commitCommand, String msg) throws IOException {
+    private void executeCommitCommand(String commitCommand, String msg) {
         executeGitCommand(commitCommand + " --file=-", msg, false);
     }
 
-    private String executeGitCommand(String gitCommand) throws IOException {
+    private String executeGitCommand(String gitCommand) {
         return executeGitCommand(gitCommand, false);
     }
 
-    private String executeGitCommand(String gitCommand, boolean printLines) throws IOException {
+    private String executeGitCommand(String gitCommand, boolean printLines) {
         return executeGitCommand(gitCommand, null, printLines);
     }
 
-    private String executeGitCommand(String gitCommand, String inputText, boolean printLines) throws IOException {
+    private String executeGitCommand(String gitCommand, String inputText, boolean printLines) {
         log.debug("Git command {}", gitCommand);
         String gitOutput = executeCommand(gitCommand, inputText, printLines);
         exitIfGitCommandFailed(gitOutput);
         return gitOutput;
     }
 
-    private String executeCommand(String command, String inputText, boolean printLines) throws IOException {
+    private String executeCommand(String command, String inputText, boolean printLines) {
         ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
                 .redirectErrorStream(true);
-        Process statusProcess = builder.start();
-        if (inputText != null) {
-            IOUtils.write(statusProcess.getOutputStream(), inputText);
+        try {
+            Process statusProcess = builder.start();
+            if (inputText != null) {
+                IOUtils.write(statusProcess.getOutputStream(), inputText);
+            }
+            return readProcessOutput(statusProcess.getInputStream(), printLines);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return readProcessOutput(statusProcess.getInputStream(), printLines);
     }
 
-    private String readProcessOutput(InputStream input, boolean printLines) throws IOException {
+    private String readProcessOutput(InputStream input, boolean printLines) {
         Padder titlePadder = new Padder("Git Output");
         Level logLevel = printLines ? Level.INFO : Level.FINEST;
 

@@ -26,12 +26,12 @@ public class ApplyReviewPatch extends BaseAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (config.reviewRequestForPatching == 0) {
             log.info("No review request id specified as source for patch");
             config.reviewRequestForPatching = InputUtils.readValueUntilValidInt("Review request id for patch");

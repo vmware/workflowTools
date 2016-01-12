@@ -17,7 +17,7 @@ public class FormatCommitText extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (draft.summary.length() > config.maxSummaryLength) {
             throw new IllegalArgumentException("Commit summary is greater than max length " + config.maxSummaryLength);
         }

@@ -21,20 +21,24 @@ public class CopyReviewUrlToClipboard extends BaseCommitWithReviewAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         // don't need to load reviewboard for this action
     }
 
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         String reviewUrl = String.format("%sr/%s/", UrlUtils.addTrailingSlash(config.reviewboardUrl), draft.id);
 
         String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         boolean isOsx = osName.contains("mac") || osName.contains("darwin");
 
         if (isOsx) {
-            copyUsingPbcopyCommand(reviewUrl);
+            try {
+                copyUsingPbcopyCommand(reviewUrl);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             StringSelection stringSelection = new StringSelection(reviewUrl);
             Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();

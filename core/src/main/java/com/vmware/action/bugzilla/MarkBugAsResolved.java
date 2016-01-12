@@ -21,7 +21,7 @@ public class MarkBugAsResolved extends BaseCommitAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.bugzilla = serviceLocator.getAuthenticatedBugzilla();
     }
 
@@ -35,7 +35,7 @@ public class MarkBugAsResolved extends BaseCommitAction {
 
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         for (String bugNumber : draft.bugNumbersAsArray()) {
             Integer bugId = config.parseBugzillaBugNumber(bugNumber.trim());
             if (bugId == null) {

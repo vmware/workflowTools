@@ -38,7 +38,7 @@ public class GenerateReviewStats extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         reviewBoard = serviceLocator.getReviewBoard();
         String groupsToUse = "";
         if (config.targetGroups == null || config.targetGroups.length == 0) {
@@ -172,7 +172,7 @@ public class GenerateReviewStats extends BaseAction {
         return aggregateStatTypes;
     }
 
-    private void fetchReviewInfoForRequests(ReviewRequest[] recentReviews) throws IOException, URISyntaxException {
+    private void fetchReviewInfoForRequests(ReviewRequest[] recentReviews) {
         log.info("Retrieving user review information for review requests");
         for (ReviewRequest recentReview : recentReviews) {
             Map<ReviewStatType, Long> stats = recentReview.stats;
@@ -200,7 +200,7 @@ public class GenerateReviewStats extends BaseAction {
         }
     }
 
-    private void fetchFileCountsForReviewRequests(ReviewRequest[] reviewRequests) throws IOException, URISyntaxException {
+    private void fetchFileCountsForReviewRequests(ReviewRequest[] reviewRequests) {
         log.info("Retrieving diff file counts for review requests");
         for (ReviewRequest reviewRequest : reviewRequests) {
             ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());

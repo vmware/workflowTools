@@ -33,7 +33,7 @@ public class WorkflowValuesParser {
         unknownActions.clear();
     }
 
-    public void parse(String[] workflowValues) throws ClassNotFoundException, IllegalAccessException {
+    public void parse(String[] workflowValues) {
         for (String workflowValue : workflowValues) {
             if (workflowValue.startsWith("-")) {
                 String[] configPieces = workflowValue.split("=");

@@ -24,12 +24,12 @@ public class UpdateTaskEstimates extends BaseAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.jira = serviceLocator.getAuthenticatedJira();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         log.info("Updating open jira issues with no original estimate to {} hour(s)", config.jiraTaskEstimateInHours);
         updateEstimatesIfNeeded(jira.getCreatedTasksForUser(config.username), "Created Tasks");
         updateEstimatesIfNeeded(jira.getOpenTasksForUser(config.username), "Assigned Tasks");

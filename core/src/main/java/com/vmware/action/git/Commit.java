@@ -15,7 +15,7 @@ public class Commit extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         if (!draft.hasData()) {
             log.error("Not committing as there no information set for the commit message");
             return;

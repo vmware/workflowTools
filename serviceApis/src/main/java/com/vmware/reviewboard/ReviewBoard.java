@@ -46,7 +46,7 @@ public class ReviewBoard extends AbstractRestService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public ReviewBoard(String reviewboardUrl, String username) throws IOException, URISyntaxException, IllegalAccessException {
+    public ReviewBoard(String reviewboardUrl, String username) {
         super(reviewboardUrl, "api/", ApiAuthentication.reviewBoard, username);
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
     }
@@ -64,7 +64,7 @@ public class ReviewBoard extends AbstractRestService {
                 new UrlParam("from-user", username), new UrlParam("status", status.name()));
     }
 
-    public ReviewRequest[] getOpenReviewRequestsWithSubmittedComment() throws IOException, URISyntaxException {
+    public ReviewRequest[] getOpenReviewRequestsWithSubmittedComment() {
         List<ReviewRequest> reviewRequestsWithSubmittedComments = new ArrayList<ReviewRequest>();
         for (ReviewRequest reviewRequest : getOpenReviewRequestsWithShipIts().review_requests) {
             UserReview softSubmitReview = getSoftSubmitReview(reviewRequest);
@@ -75,17 +75,17 @@ public class ReviewBoard extends AbstractRestService {
         return reviewRequestsWithSubmittedComments.toArray(new ReviewRequest[reviewRequestsWithSubmittedComments.size()]);
     }
 
-    public ReviewRequests getOpenReviewRequestsWithShipIts() throws IOException, URISyntaxException {
+    public ReviewRequests getOpenReviewRequestsWithShipIts() {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", username),
                 new UrlParam("status", pending.name()), new UrlParam("ship-it", "1"));
     }
 
-    public int getFilesCountForReviewRequestDiff(Link filesLink) throws IOException, URISyntaxException {
+    public int getFilesCountForReviewRequestDiff(Link filesLink) {
         return connection.get(filesLink.getHref(), ResultsCount.class, new UrlParam("counts-only", "1")).count;
     }
 
-    public ReviewRequests getReviewRequestsWithShipItsForGroups(String groupNames, Date fromDate) throws IOException, URISyntaxException {
+    public ReviewRequests getReviewRequestsWithShipItsForGroups(String groupNames, Date fromDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
         String formattedDate = formatter.format(fromDate);
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
@@ -119,7 +119,7 @@ public class ReviewBoard extends AbstractRestService {
         return getReviewRequestById(addedRequest.id);
     }
 
-    public ReviewRequestDraft getReviewRequestDraft(Link draftLink) throws IOException, URISyntaxException {
+    public ReviewRequestDraft getReviewRequestDraft(Link draftLink) {
         return connection.get(draftLink.getHref(), ReviewRequestDraftResponse.class).draft;
     }
 
@@ -150,22 +150,22 @@ public class ReviewBoard extends AbstractRestService {
         connection.post(reviewRequest.getReviewsLink().getHref(), review);
     }
 
-    public UserReview[] getReviewsForReviewRequest(Link reviewsLink) throws IOException, URISyntaxException {
+    public UserReview[] getReviewsForReviewRequest(Link reviewsLink) {
         return connection.get(reviewsLink.getHref(), UserReviewsResponse.class).reviews;
     }
 
-    public ReviewRequestDiff[] getDiffsForReviewRequest(Link diffsLink) throws IOException, URISyntaxException {
+    public ReviewRequestDiff[] getDiffsForReviewRequest(Link diffsLink) {
         return connection.get(diffsLink.getHref(), ReviewRequestDiffsResponse.class).diffs;
     }
 
-    public String getDiffData(Link diffLink) throws IOException, URISyntaxException {
+    public String getDiffData(Link diffLink) {
         String diffData = connection.get(diffLink.getHref(), String.class, anAcceptHeader("text/x-patch"));
         // need to add in a trailing newline for git apply to work correctly
         diffData += "\n";
         return diffData;
     }
 
-    public String getShipItReviewerList(ReviewRequest reviewRequest) throws IOException, URISyntaxException {
+    public String getShipItReviewerList(ReviewRequest reviewRequest) {
         UserReview[] reviews = this.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
 
         String reviewerList = "";
@@ -182,7 +182,7 @@ public class ReviewBoard extends AbstractRestService {
         return reviewerList;
     }
 
-    public UserReview getSoftSubmitReview(ReviewRequest reviewRequest) throws IOException, URISyntaxException {
+    public UserReview getSoftSubmitReview(ReviewRequest reviewRequest) {
         UserReview[] reviews = this.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
         for (UserReview review : reviews) {
             if (review.getReviewUsername().equals(reviewRequest.getSubmitter())) {
@@ -201,11 +201,11 @@ public class ReviewBoard extends AbstractRestService {
         return cachedServerInfo;
     }
 
-    public String getVersion() throws IOException, URISyntaxException {
+    public String getVersion() {
         return getServerInfo().product.version;
     }
 
-    public void updateServerTimeZone(String serverDateFormat) throws IOException, URISyntaxException {
+    public void updateServerTimeZone(String serverDateFormat) {
         String serverTimeZone = getServerInfo().site.serverTimeZone;
         connection.updateServerTimeZone(TimeZone.getTimeZone(serverTimeZone), serverDateFormat);
     }

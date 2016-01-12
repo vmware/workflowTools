@@ -11,12 +11,12 @@ import java.net.URISyntaxException;
 
 @ActionDescription("Sets the git commit details from the associated review request. Uses published review info only.")
 public class SetCommitDetailsFromReview extends BaseCommitWithReviewAction {
-    public SetCommitDetailsFromReview(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public SetCommitDetailsFromReview(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         ReviewRequest associatedReview = draft.reviewRequest;
         draft.summary = StringUtils.truncateStringIfNeeded(associatedReview.summary, config.maxSummaryLength);
         draft.description = StringUtils.addNewLinesIfNeeded(associatedReview.description, config.maxDescriptionLength, 0);

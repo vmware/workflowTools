@@ -12,12 +12,12 @@ import java.net.URISyntaxException;
 @ActionDescription("This MUST be used first to parse the last commit if intending to edit anything in the last commit.")
 public class ReadLastCommit extends BaseCommitAction {
 
-    public ReadLastCommit(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public ReadLastCommit(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         draft.branch = determineBranchName();
         draft.fillValuesFromCommitText(git.lastCommitText(true), config.getCommitConfiguration());
 
@@ -27,7 +27,7 @@ public class ReadLastCommit extends BaseCommitAction {
         titlePadder.debugTitle();
     }
 
-    private String determineBranchName() throws IOException {
+    private String determineBranchName() {
         String targetBranch = git.currentBranch();
         log.debug("Using local git branch {}", targetBranch);
         if (StringUtils.isNotBlank(config.targetBranch)) {

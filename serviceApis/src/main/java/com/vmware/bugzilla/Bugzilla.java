@@ -107,7 +107,7 @@ public class Bugzilla extends AbstractService {
         log.info("Resolved bug {} with resolution {}", bugId, resolution.getValue());
     }
 
-    public void addBugComment(int bugId, String comment) throws IOException {
+    public void addBugComment(int bugId, String comment) {
         SimpleDateFormat commentDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         xmlRpcClient.executeCall("Bug.add_comment", bugId, comment, commentDateFormat.format(new Date()), 1);
     }

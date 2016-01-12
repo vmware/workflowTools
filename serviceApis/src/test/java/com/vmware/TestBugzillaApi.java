@@ -40,7 +40,7 @@ public class TestBugzillaApi extends BaseTests {
     }
 
     @Test
-    public void canGetBug() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetBug() {
         Bug bugInfo = bugzilla.getBugById(TEST_BUG_ID);
         assertNotNull(bugInfo);
         assertEquals(String.valueOf(TEST_BUG_ID), bugInfo.getKey());

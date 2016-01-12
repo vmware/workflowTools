@@ -19,17 +19,17 @@ import java.text.ParseException;
 public class ConvertCardsToJiraIssues extends BaseTrelloAction {
     private Trello trello;
 
-    public ConvertCardsToJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public ConvertCardsToJiraIssues(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         trello = serviceLocator.getTrello();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (selectedBoard == null) {
             log.info("No trello board is selected");
             return;

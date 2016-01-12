@@ -10,12 +10,12 @@ import java.net.URISyntaxException;
 
 @ActionDescription("Sets the reviewer list for the commit as the list of reviewers who have given the associated review a ship it.")
 public class SetReviewedByAsShipItsList extends BaseSetShipItReviewersList {
-    public SetReviewedByAsShipItsList(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public SetReviewedByAsShipItsList(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         // reuse the result from other actions like ExitIfReviewHasNoShipIts or CheckStatusOfReviewShipIts
         if (StringUtils.isNotBlank(draft.shipItReviewers)) {
             draft.reviewedBy = draft.shipItReviewers;
