@@ -18,11 +18,11 @@ public class InputUtils {
 
     private static final String MAX_LENGTH_INDICATOR = "*";
 
-    public static Integer readSelection(Collection<String> choices, String title) throws IOException {
+    public static Integer readSelection(Collection<String> choices, String title) {
         return readSelection(choices.toArray(new String[choices.size()]), title);
     }
 
-    public static Integer readSelection(InputListSelection[] choices, String title) throws IOException {
+    public static Integer readSelection(InputListSelection[] choices, String title) {
         String[] choiceTexts = new String[choices.length];
         for (int i = 0; i < choices.length; i++) {
             choiceTexts[i] = choices[i].getLabel();
@@ -30,7 +30,7 @@ public class InputUtils {
         return readSelection(choiceTexts, title);
     }
 
-    public static Integer readSelection(String[] choices, String title) throws IOException {
+    public static Integer readSelection(String[] choices, String title) {
         if (choices == null || choices.length == 0) {
             throw new IllegalArgumentException("No " + title + " to select from");
         }
@@ -59,11 +59,11 @@ public class InputUtils {
         return selection - 1;
     }
 
-    public static String readValueUntilNotBlank(String label, Collection<String> autoCompleteOptions) throws IOException {
+    public static String readValueUntilNotBlank(String label, Collection<String> autoCompleteOptions) {
         return readValueUntilNotBlank(label, autoCompleteOptions.toArray(new String[autoCompleteOptions.size()]));
     }
 
-    public static String readValueUntilNotBlank(String label, String... autoCompleteOptions) throws IOException {
+    public static String readValueUntilNotBlank(String label, String... autoCompleteOptions) {
         boolean valueEntered = false;
         String value = null;
         while (!valueEntered) {
@@ -77,7 +77,7 @@ public class InputUtils {
         return value;
     }
 
-    public static int readValueUntilValidInt(String label) throws IOException {
+    public static int readValueUntilValidInt(String label) {
         boolean valueEntered = false;
         int value = 0;
         while (!valueEntered) {
@@ -92,11 +92,11 @@ public class InputUtils {
         return value;
     }
 
-    public static String readValue(String label, Completer completer, List<String> historyValues) throws IOException {
+    public static String readValue(String label, Completer completer, List<String> historyValues) {
         return readSingleLine(label, null, null, historyValues.toArray(new String[historyValues.size()]), completer);
     }
 
-    public static String readValue(String label, Collection<String> autocompleteOptions) throws IOException {
+    public static String readValue(String label, Collection<String> autocompleteOptions) {
         return readSingleLine(label, null, null, null, autocompleteOptions.toArray(new String[autocompleteOptions.size()]));
     }
 
@@ -108,7 +108,7 @@ public class InputUtils {
         return readSingleLine(label, null, '*', null);
     }
 
-    public static String readData(String label, boolean singleLine, Integer maxLength, String... historyValues) throws IOException {
+    public static String readData(String label, boolean singleLine, Integer maxLength, String... historyValues) {
         String data;
         if (singleLine) {
             data = readSingleLine(label, maxLength, null, historyValues);
@@ -119,7 +119,7 @@ public class InputUtils {
         return data;
     }
 
-    private static String readMultipleLines(String label, Integer maxLength, String... historyValues) throws IOException {
+    private static String readMultipleLines(String label, Integer maxLength, String... historyValues) {
         String displayLabel = String.format("%s (Type / then press Enter to finish input): ", label);
         if (maxLength != null) {
             int paddingLength = maxLength - MAX_LENGTH_INDICATOR.length() - displayLabel.length();
@@ -128,12 +128,22 @@ public class InputUtils {
 
         boolean nextLine = true;
         String data = "";
-        ConsoleReader consoleReader = new ConsoleReader();
+        ConsoleReader consoleReader = null;
+        try {
+            consoleReader = new ConsoleReader();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         consoleReader.setExpandEvents(false);
         addHistoryValues(consoleReader, historyValues);
         int numberOfTrailingCharsToDiscard = 0;
         while (nextLine) {
-            String line = consoleReader.readLine();
+            String line = null;
+            try {
+                line = consoleReader.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             int usableLineLength = determineLineLength(line);
 
             // if they are not the same then an end of text character was entered

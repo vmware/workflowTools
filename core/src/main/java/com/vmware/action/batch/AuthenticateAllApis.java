@@ -22,7 +22,7 @@ public class AuthenticateAllApis extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         checkAuthentication(new Trello(config.trelloUrl));
         checkAuthentication(new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug));
         checkAuthentication(new Jira(config.jiraUrl, config.jiraTestIssue));
@@ -30,7 +30,7 @@ public class AuthenticateAllApis extends BaseAction {
         checkAuthentication(new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin));
     }
 
-    private void checkAuthentication(AbstractService restService) throws IOException, URISyntaxException, IllegalAccessException {
+    private void checkAuthentication(AbstractService restService) {
         String serviceName = restService.getClass().getSimpleName();
         log.info("Checking authentication for service {}", serviceName);
         restService.setupAuthenticatedConnection();

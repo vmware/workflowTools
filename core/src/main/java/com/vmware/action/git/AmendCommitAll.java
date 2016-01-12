@@ -15,7 +15,7 @@ public class AmendCommitAll extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         if (!draft.hasData()) {
             log.error("Not amending commit as there no information set for the commit message");
             return;

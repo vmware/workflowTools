@@ -16,7 +16,7 @@ public class ExitIfNoTrelloBoardSelected extends BaseTrelloAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (selectedBoard == null) {
             log.info("");
             log.info("Exiting as no trello board has been selected or created.");

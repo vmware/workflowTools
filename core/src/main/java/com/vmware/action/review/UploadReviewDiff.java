@@ -10,23 +10,24 @@ import java.net.URISyntaxException;
 
 @ActionDescription("Uploads a git diff for the review. The parent ref used is defined by the parentBranch config property.")
 public class UploadReviewDiff extends BaseCommitWithReviewAction {
-    public UploadReviewDiff(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public UploadReviewDiff(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         DiffToUpload diffToUpload = createReviewRequestDiff();
         if (diffToUpload.hasEmptyDiff()) {
             log.warn("The diff for this review was empty!");
             return;
         }
+
         log.info("Uploading review diff for review {}", draft.reviewRequest.id);
         reviewBoard.createReviewRequestDiff(draft.reviewRequest.getDiffsLink(), diffToUpload);
         log.info("Successfully uploaded review diff");
     }
 
-    private DiffToUpload createReviewRequestDiff() throws IOException, URISyntaxException {
+    private DiffToUpload createReviewRequestDiff() {
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);

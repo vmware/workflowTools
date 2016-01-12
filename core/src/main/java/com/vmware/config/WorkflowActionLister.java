@@ -44,9 +44,7 @@ public class WorkflowActionLister {
                 }
             });
             return actionsList;
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
     }

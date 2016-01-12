@@ -28,7 +28,7 @@ public class DisplayConfigOptions extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         Reader reader = new ClasspathResource("/internalConfig.json").getReader();
         WorkflowConfig defaultConfig = gson.fromJson(reader, WorkflowConfig.class);
         log.info("");
@@ -46,7 +46,12 @@ public class DisplayConfigOptions extends BaseAction {
         log.info("configFile, [-c,--config] Optional configuration file to use, file is in json format, Defaults to config file in jar");
         for (Field field : config.configurableFields) {
             ConfigurableProperty configProperty = field.getAnnotation(ConfigurableProperty.class);
-            Object defaultValue = field.get(defaultConfig);
+            Object defaultValue;
+            try {
+                defaultValue = field.get(defaultConfig);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
 
             String defaultDisplayValue;
             if (defaultValue == null) {

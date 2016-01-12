@@ -15,7 +15,7 @@ public class PushToMaster extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         git.pushToRemoteBranch("master");
     }
 }

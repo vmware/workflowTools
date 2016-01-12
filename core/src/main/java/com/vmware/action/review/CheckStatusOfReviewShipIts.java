@@ -9,12 +9,12 @@ import java.net.URISyntaxException;
 
 @ActionDescription("Checks if the review has ship its.")
 public class CheckStatusOfReviewShipIts extends BaseSetShipItReviewersList {
-    public CheckStatusOfReviewShipIts(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public CheckStatusOfReviewShipIts(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, URISyntaxException {
+    public void process() {
         checkShipItsForReview(draft);
     }
 

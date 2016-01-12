@@ -20,7 +20,7 @@ public class DisplayAdditionalWorkflows extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         Padder additionalWorkflowsPadder = new Padder("Additional Workflows");
         additionalWorkflowsPadder.infoTitle();
         Set<String> sortedWorkflows = new TreeSet<String>(config.workflows.keySet());

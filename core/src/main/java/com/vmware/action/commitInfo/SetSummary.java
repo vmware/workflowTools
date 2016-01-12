@@ -26,7 +26,7 @@ public class SetSummary extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException {
+    public void process() {
         if (StringUtils.isNotBlank(draft.summary)) {
             log.info("Existing Summary\n" + draft.summary);
         }

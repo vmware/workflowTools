@@ -18,7 +18,7 @@ public class PublishReview extends BaseCommitWithReviewAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         ReviewRequest reviewRequest = draft.reviewRequest;
 
         try {

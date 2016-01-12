@@ -22,7 +22,7 @@ public class DisplayConfigAsJson extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Padder titlePadder = new Padder("Workflow Configuration Json");
         titlePadder.infoTitle();
         log.info(gson.toJson(config));

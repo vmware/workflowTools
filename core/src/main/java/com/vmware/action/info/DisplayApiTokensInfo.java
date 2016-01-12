@@ -18,7 +18,7 @@ public class DisplayApiTokensInfo extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Padder apiUsageTitle = new Padder("API Cookies / Tokens");
 
         apiUsageTitle.infoTitle();

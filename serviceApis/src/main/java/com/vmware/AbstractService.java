@@ -97,11 +97,7 @@ public abstract class AbstractService {
             return null;
         }
         log.debug("Reading {} api token from file {}", credentialsType.name(), apiTokenFile.getPath());
-        try {
-            return IOUtils.read(new FileInputStream(apiTokenFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return IOUtils.read(apiTokenFile);
     }
 
     protected void saveApiToken(String apiToken, ApiAuthentication credentialsType) {
@@ -113,11 +109,7 @@ public abstract class AbstractService {
         File apiTokenFile = new File(homeFolder + "/" + credentialsType.getFileName());
 
         log.info("Saving {} api token to {}", credentialsType.name(), apiTokenFile.getPath());
-        try {
-            IOUtils.write(apiTokenFile, apiToken);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        IOUtils.write(apiTokenFile, apiToken);
     }
 
     /**

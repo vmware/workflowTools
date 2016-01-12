@@ -74,18 +74,18 @@ public class Workflow {
         IOUtils.write(workflowHistoryFile, workflowHistory);
     }
 
-    private void readWorkflowHistoryFile() throws IOException {
+    private void readWorkflowHistoryFile() {
         String userHome = System.getProperty( "user.home" );
         File workflowHistoryFile = new File(userHome + File.separator + ".workflowHistory.txt");
         if (!workflowHistoryFile.exists()) {
             workflowHistory = new ArrayList<>();
         } else {
-            workflowHistory = IOUtils.readLines(new FileInputStream(workflowHistoryFile));
+            workflowHistory = IOUtils.readLines(workflowHistoryFile);
         }
     }
 
 
-    private void askForWorkflowIfEmpty() throws IOException, IllegalAccessException {
+    private void askForWorkflowIfEmpty() {
         if (StringUtils.isNotBlank(config.workflowsToRun)) {
             return;
         }
@@ -94,7 +94,7 @@ public class Workflow {
         askForWorkflow();
     }
 
-    private void askForWorkflow() throws IOException, IllegalAccessException {
+    private void askForWorkflow() {
         log.info("Press tab to see a list of available workflows");
         log.info("Press up to see previously entered workflows");
         log.info("Type {} to exit without running a workflow", EXIT_WORKFLOW);

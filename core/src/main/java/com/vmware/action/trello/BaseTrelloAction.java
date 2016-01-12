@@ -21,7 +21,7 @@ public abstract class BaseTrelloAction extends BaseMultiActionDataSupport {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.trello = serviceLocator.getTrello();
     }
 

@@ -33,7 +33,7 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         List<MenuItem> recentBoards = jira.getRecentBoardItems();
         if (recentBoards.isEmpty()) {
             log.info("No recent boards in jira. Please use the web UI to select the board you want to use");

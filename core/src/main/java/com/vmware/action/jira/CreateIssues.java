@@ -26,7 +26,7 @@ public class CreateIssues extends BaseBatchJiraAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         List<Issue> issuesToCreate = multiActionData.getIssuesNotInJira();
         log.info("Creating {} issue[s]", issuesToCreate.size());
 
@@ -51,7 +51,7 @@ public class CreateIssues extends BaseBatchJiraAction {
         }
     }
 
-    private Issue getBaselineIssue() throws IOException, URISyntaxException {
+    private Issue getBaselineIssue() {
         List<Issue> issuesFromJira = multiActionData.getIssuesFromJira();
         if (issuesFromJira.isEmpty()) {
             throw new IllegalArgumentException("Expected to find issue in list that was already in Jira!");

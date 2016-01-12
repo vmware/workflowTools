@@ -16,7 +16,7 @@ public class DisplayLastCommit extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         Padder titlePadder = new Padder("Last Commit");
         titlePadder.infoTitle();
         log.info(git.lastCommitText(false));

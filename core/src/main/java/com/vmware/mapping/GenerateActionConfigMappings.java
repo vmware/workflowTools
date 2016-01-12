@@ -173,7 +173,7 @@ public class GenerateActionConfigMappings {
     }
 
     private void populateLocatorMethodArguments() throws IOException {
-        List<String> lines = IOUtils.readLines(new FileInputStream(serviceLocatorFile));
+        List<String> lines = IOUtils.readLines(serviceLocatorFile);
         String currentMethodName = null;
         List<String> currentArguments = null;
         for (String line : lines) {

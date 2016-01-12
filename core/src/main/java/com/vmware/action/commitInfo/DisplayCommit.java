@@ -17,7 +17,7 @@ public class DisplayCommit extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Padder titlePadder = new Padder("Commit Details");
         titlePadder.infoTitle();
         log.info(draft.toGitText(config.getCommitConfiguration()));

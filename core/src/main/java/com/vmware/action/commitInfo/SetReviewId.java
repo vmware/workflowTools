@@ -21,12 +21,12 @@ public class SetReviewId extends BaseCommitAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         log.info("Please enter review id for the commit");
         int reviewId = InputUtils.readValueUntilValidInt("Review ID");
         draft.id = reviewId;

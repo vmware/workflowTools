@@ -18,7 +18,7 @@ public class DisplayMainWorkflows extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         Padder mainWorkflowsPadder = new Padder("Main Workflows");
         mainWorkflowsPadder.infoTitle();
         for (String mainWorkflow : Workflow.MAIN_WORKFLOWS) {

@@ -16,7 +16,7 @@ public class ExitIfConfirmationNotGiven extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         log.info("");
         String confirmation = InputUtils.readValue("Confirm (press ENTER to confirm or type NO to cancel)");
         if (confirmation.equalsIgnoreCase("NO")) {

@@ -11,12 +11,12 @@ import java.net.URISyntaxException;
 @ActionDescription("Exits if a non trivial review does not have review ship its or a review URL.")
 public class ExitIfReviewHasNoShipIts extends BaseSetShipItReviewersList {
 
-    public ExitIfReviewHasNoShipIts(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public ExitIfReviewHasNoShipIts(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         checkShipItsForReview(draft);
 
         if (StringUtils.isNotBlank(draft.shipItReviewers)) {

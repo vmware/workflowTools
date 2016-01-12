@@ -19,7 +19,7 @@ public class PreloadAssignedBugzillaBugs extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         Runnable loadBugzillaBugs = new Runnable() {
             @Override
             public void run() {

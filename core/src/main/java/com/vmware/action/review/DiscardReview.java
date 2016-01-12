@@ -18,7 +18,7 @@ public class DiscardReview extends BaseCommitWithReviewAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         log.info("Discarding review request {}", draft.id);
         ReviewRequest reviewRequest = draft.reviewRequest;
         reviewRequest.status = ReviewRequestStatus.discarded;

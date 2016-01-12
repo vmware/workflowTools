@@ -17,7 +17,7 @@ public class DisplayReviewUrl extends BaseCommitWithReviewAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         log.info("{}r/{}/", UrlUtils.addTrailingSlash(config.reviewboardUrl), draft.id);
     }
 }

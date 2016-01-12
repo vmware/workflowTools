@@ -16,7 +16,7 @@ public class PushToPrecommitBranch extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         String remoteBranchName = "precommit";
         String remoteBranchPath = config.remoteBranches.get(remoteBranchName);
         if (StringUtils.isBlank(remoteBranchPath)) {

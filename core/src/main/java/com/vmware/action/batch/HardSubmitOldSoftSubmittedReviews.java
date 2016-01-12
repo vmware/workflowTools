@@ -17,7 +17,7 @@ public class HardSubmitOldSoftSubmittedReviews extends BaseBatchCloseReviews {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         super.closeReviews(reviewBoard.getOpenReviewRequestsWithSubmittedComment());
     }
 }

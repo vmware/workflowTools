@@ -22,12 +22,12 @@ public class CheckStatusOfLatestJobs extends BaseAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         jenkins = serviceLocator.getJenkins();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         String jenkinsJobKeys = config.jenkinsJobKeys;
         if (StringUtils.isBlank(jenkinsJobKeys)) {
             jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Enter job keys");
@@ -40,7 +40,7 @@ public class CheckStatusOfLatestJobs extends BaseAction {
         }
     }
 
-    private void checkStatusOfLatestJob(String job) throws IOException, URISyntaxException, IllegalAccessException {
+    private void checkStatusOfLatestJob(String job) {
         JobBuildDetails matchedBuild = null;
         if (config.getJenkinsJobValue(job) != null) {
             job = config.jenkinsJobs.get(job).split(",")[0];

@@ -16,7 +16,7 @@ public class PushToTrackingBranch extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         git.push();
     }
 }

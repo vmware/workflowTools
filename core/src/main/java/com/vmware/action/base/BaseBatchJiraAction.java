@@ -23,7 +23,7 @@ public abstract class BaseBatchJiraAction extends BaseMultiActionDataSupport {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.jira = serviceLocator.getAuthenticatedJira();
     }
 }

@@ -62,7 +62,7 @@ public class ServiceLocator {
         return bugzilla;
     }
 
-    public ReviewBoard getReviewBoard() throws IOException, URISyntaxException, IllegalAccessException {
+    public ReviewBoard getReviewBoard() {
         if (reviewBoard == null) {
             reviewBoard = new ReviewBoard(config.reviewboardUrl, config.username);
             reviewBoard.setupAuthenticatedConnection();
@@ -71,7 +71,7 @@ public class ServiceLocator {
         return reviewBoard;
     }
 
-    public Jenkins getJenkins() throws IOException, URISyntaxException, IllegalAccessException {
+    public Jenkins getJenkins() {
         if (jenkins == null) {
             jenkins = new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
             jenkins.setupAuthenticatedConnection();
@@ -79,7 +79,7 @@ public class ServiceLocator {
         return jenkins;
     }
 
-    public Trello getTrello() throws IOException, URISyntaxException, IllegalAccessException {
+    public Trello getTrello() {
         if (trello == null) {
             trello = new Trello(config.trelloUrl);
             trello.setupAuthenticatedConnection();

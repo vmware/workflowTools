@@ -15,7 +15,7 @@ public class ExitIfJenkinsJobsAreNotSuccessful extends BaseCommitWithBuildsActio
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         log.info("");
         jenkins.checkStatusOfJenkinsJobs(draft);
         if (!draft.jenkinsJobsAreSuccessful) {

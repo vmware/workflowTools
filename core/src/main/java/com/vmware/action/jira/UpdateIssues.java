@@ -27,7 +27,7 @@ public class UpdateIssues extends BaseBatchJiraAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         List<Issue> issuesFromJira = multiActionData.getIssuesFromJira();
         log.info("Updating {} issues", issuesFromJira.size());
 

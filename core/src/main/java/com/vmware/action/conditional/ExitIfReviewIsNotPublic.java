@@ -21,7 +21,7 @@ public class ExitIfReviewIsNotPublic extends BaseCommitWithReviewAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (draft.reviewRequest.isPublic) {
             return;
         }

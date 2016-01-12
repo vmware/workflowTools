@@ -19,7 +19,7 @@ public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         List<Bug> bugList = multiActionData.getBugsForProcessing();
         if (bugList.isEmpty()) {
             log.info("No bugs found for named query {}", config.bugzillaQuery);

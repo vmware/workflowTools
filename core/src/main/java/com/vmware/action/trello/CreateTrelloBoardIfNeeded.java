@@ -20,7 +20,7 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         String boardName = multiActionData.projectName;
 
         if (StringUtils.isBlank(boardName)) {
@@ -55,7 +55,7 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
         }
     }
 
-    private Board getBoardByName(Board[] boards, Member trelloMember, String nameToCheck) throws IOException, URISyntaxException {
+    private Board getBoardByName(Board[] boards, Member trelloMember, String nameToCheck) {
         Board firstNonOwnedBoard = null;
         for (Board board : boards) {
             if (board.name.equals(nameToCheck)) {

@@ -15,7 +15,7 @@ public class ExitIfCommitUnchanged extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         String existingCommitText = git.lastCommitText(true).trim();
         String updatedCommitText = draft.toGitText(config.getCommitConfiguration()).trim();
 

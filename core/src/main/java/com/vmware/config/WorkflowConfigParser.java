@@ -68,7 +68,7 @@ public class WorkflowConfigParser {
         return internalConfig;
     }
 
-    public void updateWithRuntimeArguments(WorkflowConfig config, String[] args) throws IllegalAccessException {
+    public void updateWithRuntimeArguments(WorkflowConfig config, String[] args) {
         argsParser.generateArgumentMap(args);
         applyRuntimeArguments(config);
         setLogLevel(config);
@@ -78,13 +78,15 @@ public class WorkflowConfigParser {
         return argsParser.getArgumentsText();
     }
 
-    private void applyRuntimeArguments(WorkflowConfig config) throws IllegalAccessException {
+    private void applyRuntimeArguments(WorkflowConfig config) {
         try {
             config.applyRuntimeArguments(argsParser);
         } catch (IllegalArgumentException iae) {
             // handle gracefully as they are validation type exceptions
             log.error(iae.getMessage());
             System.exit(1);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

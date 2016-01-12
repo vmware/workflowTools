@@ -20,17 +20,17 @@ import java.util.Map;
         "Adds / Deletes trello cards to ensure board matches loaded list.")
 public class SyncCardsWithJiraIssues extends BaseTrelloAction {
 
-    public SyncCardsWithJiraIssues(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public SyncCardsWithJiraIssues(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         trello = serviceLocator.getTrello();
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (multiActionData.noIssuesAdded()) {
             log.info("No jira issues loaded. No need to create trello cards.");
             return;
@@ -95,7 +95,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         return null;
     }
 
-    private void addCardsForIssues(List<Issue> issuesForProcessing) throws IOException, URISyntaxException, IllegalAccessException {
+    private void addCardsForIssues(List<Issue> issuesForProcessing) {
         if (issuesForProcessing.isEmpty()) {
             log.info("No cards need to be added to trello as issue list is now empty");
             return;
@@ -130,7 +130,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         return storyPointSwimlanes;
     }
 
-    private void filterOutExistingIssues(List<Issue> issuesForProcessing, List<Card> existingCards) throws IOException, URISyntaxException {
+    private void filterOutExistingIssues(List<Issue> issuesForProcessing, List<Card> existingCards) {
         int issueRemovalCount = 0;
         for (int i = issuesForProcessing.size() - 1; i >= 0; i--) {
             Issue issueToCheck = issuesForProcessing.get(i);

@@ -20,9 +20,14 @@ public abstract class BaseReadMultiLine extends BaseCommitReadAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException {
-        String propertyValue = (String) property.get(draft);
-        
+    public void process() {
+        String propertyValue;
+        try {
+            propertyValue = (String) property.get(draft);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         if (propertyValue == null) {
             propertyValue = "";
         }
@@ -35,6 +40,10 @@ public abstract class BaseReadMultiLine extends BaseCommitReadAction {
         } else {
             propertyValue = InputUtils.readData(titleToDisplay, false, config.maxDescriptionLength, historyValues);
         }
-        property.set(draft, propertyValue);
+        try {
+            property.set(draft, propertyValue);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

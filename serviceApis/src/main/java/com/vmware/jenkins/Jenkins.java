@@ -36,7 +36,7 @@ public class Jenkins extends AbstractRestService {
     private JobsList jobsList = null;
 
     public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin)
-            throws IOException, URISyntaxException, IllegalAccessException {
+            {
         super(serverUrl, "api/json", jenkins, username);
         this.configureUrl = baseUrl + "me/configure";
         this.usesCsrf = usesCsrf;
@@ -49,7 +49,7 @@ public class Jenkins extends AbstractRestService {
         }
     }
 
-    public JobsList getJobsListing() throws IOException, URISyntaxException {
+    public JobsList getJobsListing() {
         if (jobsList == null) {
             jobsList = connection.get(apiUrl, JobsList.class);
         }
@@ -57,15 +57,15 @@ public class Jenkins extends AbstractRestService {
         return jobsList;
     }
 
-    public void invokeJob(Job jobToInvoke, JobParameters params) throws IOException, URISyntaxException, IllegalAccessException {
+    public void invokeJob(Job jobToInvoke, JobParameters params) {
         optimisticPost(jobToInvoke.getBuildUrl(), params);
     }
 
-    public JobDetails getJobDetails(Job jobToInvoke) throws IOException, URISyntaxException, IllegalAccessException {
+    public JobDetails getJobDetails(Job jobToInvoke) {
         return optimisticGet(jobToInvoke.getInfoUrl(), JobDetails.class);
     }
 
-    public JobBuildDetails getJobBuildDetails(JobBuild jobBuild) throws IOException, URISyntaxException, IllegalAccessException {
+    public JobBuildDetails getJobBuildDetails(JobBuild jobBuild) {
         return optimisticGet(jobBuild.getInfoUrl(), JobBuildDetails.class);
     }
 
@@ -73,7 +73,7 @@ public class Jenkins extends AbstractRestService {
         optimisticPost(jobBuildToStop.getStopUrl(), null);
     }
 
-    public void checkStatusOfJenkinsJobs(ReviewRequestDraft draft) throws IOException, URISyntaxException, IllegalAccessException {
+    public void checkStatusOfJenkinsJobs(ReviewRequestDraft draft) {
         log.info("Checking status of jenkins jobs");
         boolean isSuccess = true;
 
@@ -118,7 +118,7 @@ public class Jenkins extends AbstractRestService {
         connection.setupBasicAuthHeader(credentials);
     }
 
-    private JobBuildDetails getJobBuildDetails(String jobBuildUrl) throws IOException, URISyntaxException, IllegalAccessException {
+    private JobBuildDetails getJobBuildDetails(String jobBuildUrl) {
         return optimisticGet(jobBuildUrl, JobBuildDetails.class);
     }
 

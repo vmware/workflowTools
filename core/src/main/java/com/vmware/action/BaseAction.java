@@ -36,10 +36,10 @@ public abstract class BaseAction {
     /**
      * Override if any pre process setup is needed
      */
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
 
     }
 
-    public abstract void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException;
+    public abstract void process();
 
 }

@@ -17,7 +17,7 @@ public class BaseTests {
     protected static Properties testProperties;
 
     @BeforeClass
-    public static void initProperties() throws IOException, IllegalAccessException {
+    public static void initProperties() throws IOException {
         testProperties = new Properties();
         testProperties.load(new ClasspathResource("/test.properties").getReader());
         UsernamePasswordAsker.setTestCredentials();

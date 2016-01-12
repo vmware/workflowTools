@@ -37,7 +37,7 @@ public class TestReviewBoardApi extends BaseTests {
     private String reviewGroup;
 
     @Before
-    public void setup() throws IOException, URISyntaxException, IllegalAccessException {
+    public void setup() {
         repository = testProperties.getProperty("reviewboard.repository");
         reviewGroup = testProperties.getProperty("reviewboard.reviewGroup");
         String reviewboardUrl = testProperties.getProperty("reviewboard.url");
@@ -94,7 +94,7 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void getReviewRequestById() throws IOException, URISyntaxException, IllegalAccessException {
+    public void getReviewRequestById() {
         String jsonText = new ConfiguredGsonBuilder().build().toJson(sampleRequest);
         System.out.println(jsonText);
         createdRequest = reviewBoard.createReviewRequestFromDraft(sampleRequest, repository);
@@ -123,12 +123,12 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void createReviewRequest() throws IOException, URISyntaxException, IllegalAccessException {
+    public void createReviewRequest() {
         createdRequest = reviewBoard.createReviewRequestFromDraft(sampleRequest, repository);
     }
 
     @Test
-    public void publishReview() throws IOException, URISyntaxException, IllegalAccessException {
+    public void publishReview() {
         createdRequest = reviewBoard.createReviewRequestFromDraft(sampleRequest, repository);
         assertFalse("Review should not be published", createdRequest.isPublic);
         reviewBoard.publishReview(createdRequest.getDraftLink());
@@ -159,7 +159,7 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void readDiffsForReviewRequest() throws IOException, URISyntaxException, IllegalAccessException {
+    public void readDiffsForReviewRequest() {
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(601612);
 
         ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());

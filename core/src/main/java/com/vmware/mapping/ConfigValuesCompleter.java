@@ -37,14 +37,8 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
 
         String workflowString = argumentList.getArguments()[0];
         WorkflowValuesParser valuesParser = null;
-        try {
-            valuesParser = new WorkflowValuesParser(config.workflows, config.workFlowActions);
-            valuesParser.parse(workflowString.split(","));
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        valuesParser = new WorkflowValuesParser(config.workflows, config.workFlowActions);
+        valuesParser.parse(workflowString.split(","));
         values.clear();
         valuesShownWhenNoBuffer.clear();
         for (Class<? extends BaseAction> foundAction : valuesParser.getActionClasses()) {

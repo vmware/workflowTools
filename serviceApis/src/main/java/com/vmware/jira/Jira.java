@@ -85,7 +85,7 @@ public class Jira extends AbstractRestService {
         return connection.get(urlBaseForKey(key), Issue.class);
     }
 
-    public Issue getIssueWithoutException(String key) throws IOException, URISyntaxException {
+    public Issue getIssueWithoutException(String key) {
         try {
             return getIssueByKey(key);
         } catch (NotFoundException e) {

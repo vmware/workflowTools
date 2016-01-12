@@ -15,7 +15,7 @@ public class AmendCommitFilesOnly extends BaseCommitAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         git.amendCommitWithAllFileChanges(git.lastCommitText(true));
     }
 

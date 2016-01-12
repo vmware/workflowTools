@@ -12,12 +12,12 @@ import java.net.URISyntaxException;
 @ActionDescription("Marks the associated review as submitted in review board.")
 public class HardSubmitReview extends BaseCommitWithReviewAction {
 
-    public HardSubmitReview(WorkflowConfig config) throws IOException, URISyntaxException, IllegalAccessException {
+    public HardSubmitReview(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         ReviewRequest reviewRequest = draft.reviewRequest;
 
         if (reviewRequest.status == ReviewRequestStatus.submitted) {

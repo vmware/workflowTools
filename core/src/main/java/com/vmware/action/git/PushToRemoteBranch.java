@@ -16,7 +16,7 @@ public class PushToRemoteBranch extends BaseAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         String remoteBranchName = config.remoteBranchToUse;
         String remoteBranchPath = config.remoteBranches.get(remoteBranchName);
         if (StringUtils.isBlank(remoteBranchPath)) {

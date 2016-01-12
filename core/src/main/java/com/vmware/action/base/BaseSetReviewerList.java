@@ -26,7 +26,7 @@ public abstract class BaseSetReviewerList extends BaseCommitReadAction {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException {
+    public void process() {
         List<String> autocompleteOptions = new ArrayList<String>();
         if (config.targetReviewers == null) {
             log.info("No targetReviewers configured, add to external config file if wanted");

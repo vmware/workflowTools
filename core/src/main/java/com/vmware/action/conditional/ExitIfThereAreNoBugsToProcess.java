@@ -16,7 +16,7 @@ public class ExitIfThereAreNoBugsToProcess extends BaseMultiActionDataSupport {
     }
 
     @Override
-    public void process() throws IOException, IllegalAccessException, URISyntaxException, ParseException {
+    public void process() {
         if (multiActionData.noBugsAdded()) {
             System.exit(0);
         }

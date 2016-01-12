@@ -26,7 +26,7 @@ public class TestJenkinsApi extends BaseTests {
     private Jenkins jenkins;
 
     @Before
-    public void init() throws IOException, URISyntaxException, IllegalAccessException {
+    public void init() {
         String jenkinsUrl = testProperties.getProperty("jenkins.url");
         jenkinsUsername = testProperties.getProperty("jenkins.username");
         jenkins = new Jenkins(jenkinsUrl, jenkinsUsername, true, false);
@@ -34,20 +34,20 @@ public class TestJenkinsApi extends BaseTests {
     }
 
     @Test
-    public void canGetJobsListing() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetJobsListing() {
         JobsList jobs = jenkins.getJobsListing();
         assertNotNull(jobs);
     }
 
     @Test
-    public void canGetPrecommitUnitTestsJob() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canGetPrecommitUnitTestsJob() {
         JobsList jobs = jenkins.getJobsListing();
         Job precommitUnitJob = jobs.getPrecommitUnitTestsJob();
         assertNotNull(precommitUnitJob);
     }
 
     @Test(expected = NotFoundException.class)
-    public void cannotInvokeJunkBuild() throws IOException, URISyntaxException, IllegalAccessException {
+    public void cannotInvokeJunkBuild() {
         Job precommitJob = jenkins.getJobsListing().getPrecommitUnitTestsPostgresJob();
 
         precommitJob.url = precommitJob.url.replace("postgres", "postgres1");
@@ -55,7 +55,7 @@ public class TestJenkinsApi extends BaseTests {
     }
 
     @Test
-    public void canInvokePrecommitUnitTestsJob() throws IOException, URISyntaxException, IllegalAccessException {
+    public void canInvokePrecommitUnitTestsJob() {
         Job precommitJob = jenkins.getJobsListing().getPrecommitUnitTestsPostgresJob();
 
         JobDetails jobDetails = jenkins.getJobDetails(precommitJob);

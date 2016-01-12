@@ -24,7 +24,7 @@ public abstract class BaseCommitWithBuildsAction extends BaseCommitAction {
     }
 
     @Override
-    public void preprocess() throws IOException, URISyntaxException, IllegalAccessException {
+    public void preprocess() {
         this.jenkins = serviceLocator.getJenkins();
     }
 }
