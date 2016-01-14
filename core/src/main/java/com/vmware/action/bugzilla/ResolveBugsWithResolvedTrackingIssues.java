@@ -9,10 +9,6 @@ import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueResolutionDefinition;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Resolves Bugzilla bugs whose tracking Jira issues are resolved.")
 public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaAction {
 
@@ -51,22 +47,21 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
                 continue;
             }
 
-            IssueResolutionDefinition resolutionDefinition = trackingIssue.getResolution();
-            resolveBug(bugId, resolutionDefinition);
+            BugResolutionType resolutionType = determinBugResolutionForIssueResolution(trackingIssue.getResolution());
+            bugzilla.resolveBug(bugId, resolutionType);
         }
     }
 
-    private void resolveBug(Integer bugId, IssueResolutionDefinition resolutionDefinition) {
+    private BugResolutionType determinBugResolutionForIssueResolution(IssueResolutionDefinition resolutionDefinition) {
         BugResolutionType resolutionType;
         try {
             resolutionType = BugResolutionType.valueOf(resolutionDefinition.name());
         } catch (IllegalArgumentException iae) {
-            log.warn("No matching bugzilla resolution for Jira resolution {}, defaulting to fixed resolution",
-                    resolutionDefinition.name());
+            log.warn("No matching bugzilla resolution for Jira resolution {}, defaulting to {} resolution",
+                    resolutionDefinition.name(), BugResolutionType.Fixed.name());
             resolutionType = BugResolutionType.Fixed;
         }
-
-        bugzilla.resolveBug(bugId, resolutionType);
+        return resolutionType;
     }
 
     private Issue getValidTrackingIssueForBug(Bug bug) {
