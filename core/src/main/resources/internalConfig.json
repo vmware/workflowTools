@@ -214,7 +214,7 @@
          "GettingStarted", "DisplayMainWorkflows"
        ],
        "help": [
-          "DisplayApiTokensInfo", "DisplayConfig", "DisplayConfigOptions", "DisplayWorkflowActions",
+          "DisplayApiTokensInfo", "DisplayConfig", "DisplayWorkflowActions",
            "DisplayCustomActionsHelp", "DisplayMainWorkflows", "DisplayAdditionalWorkflows"
        ]
    },

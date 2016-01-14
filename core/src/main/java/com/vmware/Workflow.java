@@ -44,8 +44,9 @@ import java.util.Set;
  */
 public class Workflow {
     public static final List<String> MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("commit", "review", "pushable", "push", "createTrelloBoardFromLabel"
-                    , "commitAll", "amendCommit", "commitOffline", "closeOldReviews", "restartJobs", "review"));
+            Arrays.asList("commit", "commitAll", "amendCommit", "review",
+                    "pushable", "push", "commitOffline", "commitAllOffline",
+                    "createTrelloBoardFromLabel" , "closeOldReviews", "restartJobs"));
 
     private static final String EXIT_WORKFLOW = "exit";
 
@@ -90,20 +91,20 @@ public class Workflow {
             return;
         }
 
-        log.info("No workflow entered. Please enter workflow");
         askForWorkflow();
     }
 
     private void askForWorkflow() {
-        log.info("Press tab to see a list of available workflows");
-        log.info("Press up to see previously entered workflows");
-        log.info("Type {} to exit without running a workflow", EXIT_WORKFLOW);
+        log.info("Press ENTER for getting started info");
+        log.info("");
+
+        log.info("Press tab to see a list of available workflows, up to see previously entered workflows");
 
         ArgumentCompleter argumentsCompleter = createWorkflowCompleter();
 
-        String workFlowText = InputUtils.readValue("Workflow (press ENTER for getting started info)",
-                argumentsCompleter, workflowHistory);
-        if (workFlowText.trim().equals(EXIT_WORKFLOW)) {
+        String workFlowText = InputUtils.readValue("Workflow(Type " + EXIT_WORKFLOW + " to exit)",
+                argumentsCompleter, workflowHistory).trim();
+        if (workFlowText.equals(EXIT_WORKFLOW)) {
             log.info("Exiting");
             System.exit(0);
         }
@@ -203,11 +204,11 @@ public class Workflow {
         log.info("Executing in dry run mode");
         log.info("Showing workflow actions that would have run for workflow argument [{}]", config.workflowsToRun);
 
-        Padder actionsPadder = new Padder("Workflow Actions");
+        Padder actionsPadder = new Padder("Workflow Actions for workflow");
         actionsPadder.infoTitle();
 
         ConfigMappings configMappings = new ConfigMappings();
-        Set<String> configOptions = new HashSet<String>();
+        Set<String> configOptions = new HashSet<>();
         for (Class<? extends BaseAction> action : actions) {
             ActionDescription description = action.getAnnotation(ActionDescription.class);
             if (description == null) {
@@ -219,7 +220,7 @@ public class Workflow {
         }
         actionsPadder.infoTitle();
 
-        Padder configPadder = new Padder("Config Options");
+        Padder configPadder = new Padder("Config Options for workflow");
         configPadder.infoTitle();
         for (String configOption : configOptions) {
             Field matchingField = config.getMatchingField(configOption);

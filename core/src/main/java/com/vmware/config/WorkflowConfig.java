@@ -163,10 +163,10 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-bugzillaPrefix,--bugzilla-prefix", help = "Represents a bug in bugzilla, only the number part will be stored")
     public String bugzillaPrefix;
 
-    @ConfigurableProperty(commandLine = "-t,--trace", help = "Sets log level to FINEST level aka trace")
+    @ConfigurableProperty(commandLine = "-t,--trace", help = "Sets log level to trace")
     public boolean traceLogLevel;
 
-    @ConfigurableProperty(commandLine = "-d,--debug", help = "Sets log level to FINER level aka debug")
+    @ConfigurableProperty(commandLine = "-d,--debug", help = "Sets log level to debug")
     public boolean debugLogLevel;
 
     @ConfigurableProperty(commandLine = "-l, ,--log, --log-level", help = "Sets log level to any of the following, SEVERE,INFO,FINE,FINER,FINEST")

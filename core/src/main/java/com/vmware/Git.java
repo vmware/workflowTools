@@ -145,37 +145,8 @@ public class Git {
         pushToRemoteBranch(remoteBranch, false);
     }
 
-    public void pushToRemoteBranch(String remoteBranch, boolean forceUpdate) {
-        String currentHeadRef = revParse("HEAD");
-        log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
-
-        String forceUpdateString = forceUpdate ? " -f" : "";
-        String pushCommand = String.format("git push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
-
-        String pushOutput = executeGitCommand(pushCommand, true);
-
-        if (pushOutput.contains("[up to date]")) {
-            log.info("Remote branch is already up to date");
-            return;
-        } else if (pushOutput.contains("[new branch]")) {
-            return;
-        } else if (pushOutput.contains("[rejected]")) {
-            log.error("Git push was rejected!");
-            System.exit(1);
-        }
-
-        String updatedRemoteHeadRef = MatcherUtils.singleMatch(pushOutput, "\\w\\.\\.\\.*(\\w+)");
-        if (updatedRemoteHeadRef == null) {
-            log.error("Could not parse updated remote branch ref from push output, assuming failure");
-            System.exit(1);
-        }
-
-        if (!currentHeadRef.startsWith(updatedRemoteHeadRef)) {
-            log.error("Git push failed, remote branch ref of {} does not match local head ref",
-                    updatedRemoteHeadRef, currentHeadRef);
-            System.exit(1);
-        }
-        log.info("Remote branch was successfully updated");
+    public void forcePushToRemoteBranch(String remoteBranch) {
+        pushToRemoteBranch(remoteBranch, true);
     }
 
     public String mergeBase(String upstreamBranch, String commitRef) {
@@ -230,6 +201,39 @@ public class Git {
 
     public List<String> getAllChanges() {
         return getChanges(true);
+    }
+
+    private void pushToRemoteBranch(String remoteBranch, boolean forceUpdate) {
+        String currentHeadRef = revParse("HEAD");
+        log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
+
+        String forceUpdateString = forceUpdate ? " -f" : "";
+        String pushCommand = String.format("git push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
+
+        String pushOutput = executeGitCommand(pushCommand, true);
+
+        if (pushOutput.contains("[up to date]")) {
+            log.info("Remote branch is already up to date");
+            return;
+        } else if (pushOutput.contains("[new branch]")) {
+            return;
+        } else if (pushOutput.contains("[rejected]")) {
+            log.error("Git push was rejected!");
+            System.exit(1);
+        }
+
+        String updatedRemoteHeadRef = MatcherUtils.singleMatch(pushOutput, "\\w\\.\\.\\.*(\\w+)");
+        if (updatedRemoteHeadRef == null) {
+            log.error("Could not parse updated remote branch ref from push output, assuming failure");
+            System.exit(1);
+        }
+
+        if (!currentHeadRef.startsWith(updatedRemoteHeadRef)) {
+            log.error("Git push failed, remote branch ref of {} does not match local head ref",
+                    updatedRemoteHeadRef, currentHeadRef);
+            System.exit(1);
+        }
+        log.info("Remote branch was successfully updated");
     }
 
     private List<String> getChanges(boolean includeUnStagedChanges) {
