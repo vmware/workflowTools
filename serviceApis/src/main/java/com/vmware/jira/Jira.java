@@ -9,6 +9,8 @@ import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.http.request.UrlParam;
 import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssueResolutionDefinition;
+import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTimeTracking;
 import com.vmware.jira.domain.IssueTransition;
 import com.vmware.jira.domain.IssueTransitions;
@@ -100,8 +102,16 @@ public class Jira extends AbstractRestService {
         String allowedStatuses = generateNumericalEnumListAsInts(Open, Reopened, InProgress, InReview);
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
-        String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee in (%s)",
+        String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee=%s",
                 issueTypesToGet, allowedStatuses, escapeUsername(username));
+        IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
+        log.debug("{} tasks found", response.issues.length);
+        return response;
+    }
+
+    public IssuesResponse getIssuesForUser(String username, IssueStatusDefinition status, IssueResolutionDefinition resolution) {
+        String jql = String.format("status=%s AND resolution=%s AND assignee=%s",
+                status.getValue(), resolution != null ? resolution.getValue() : null, escapeUsername(username));
         IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
         log.debug("{} tasks found", response.issues.length);
         return response;

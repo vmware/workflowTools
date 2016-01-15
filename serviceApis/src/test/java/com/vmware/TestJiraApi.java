@@ -18,8 +18,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -79,13 +77,19 @@ public class TestJiraApi extends BaseTests {
 
     @Test
     public void canGetJiraIssue() {
-        IssueFields issue = jira.getIssueByKey(jiraIssueNumber).fields;
-        assertEquals(IssueStatusDefinition.InProgress, issue.status.def);
+        Issue issue = jira.getIssueByKey(jiraIssueNumber);
+        assertEquals(IssueStatusDefinition.InProgress, issue.getStatus());
     }
 
     @Test
     public void canGetAssignedJiraIssues() {
         IssuesResponse issues = jira.getOpenTasksForUser(jiraUsername);
+        assertTrue("No issues found", issues.total > 0);
+    }
+
+    @Test
+    public void canGetClosedIssuesWithoutResolution() {
+        IssuesResponse issues = jira.getIssuesForUser(jiraUsername, IssueStatusDefinition.Closed, null);
         assertTrue("No issues found", issues.total > 0);
     }
 
@@ -109,8 +113,8 @@ public class TestJiraApi extends BaseTests {
         IssueTransition inReviewTransition = transitionWrapper.getTransitionForStatus(IssueStatusDefinition.InReview);
         jira.transitionIssue(inReviewTransition);
 
-        IssueFields updatedIssue = jira.getIssueByKey(jiraIssueNumber).fields;
-        assertEquals(IssueStatusDefinition.InReview, updatedIssue.status.def);
+        Issue updatedIssue = jira.getIssueByKey(jiraIssueNumber);
+        assertEquals(IssueStatusDefinition.InReview, updatedIssue.getStatus());
     }
 
     @Test
