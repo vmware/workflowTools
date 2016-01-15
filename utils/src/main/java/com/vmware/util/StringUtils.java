@@ -72,7 +72,7 @@ public class StringUtils {
                         log.warn("Probable Bug: line \n{}\n was greater than the max line length of {}", newLine, maxLineLength);
                     }
                     newValue += newLine + "\n";
-                    newLine = word.equals("\n") ? "" : word + " ";
+                    newLine = word.equals("\n") ? "" : word;
                     maxLengthToUse = maxLineLength;
                 }
             }
