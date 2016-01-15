@@ -2,12 +2,15 @@ package com.vmware.xmlrpc;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.IOUtils;
 import com.vmware.util.complexenum.ComplexEnum;
 import com.vmware.http.request.DeserializedName;
 import com.vmware.http.request.PostDeserialization;
 import com.vmware.util.complexenum.ComplexEnumSelector;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -75,7 +78,7 @@ public class MapToObjectConverter {
         if (valueToConvert.getClass() == fieldType) {
             field.set(createdObject, valueToConvert);
         } else if (fieldType == String.class) {
-            field.set(createdObject, String.valueOf(valueToConvert));
+            field.set(createdObject, convertObjectToString(valueToConvert));
         } else if (ComplexEnum.class.isAssignableFrom(fieldType)) {
             field.set(createdObject, ComplexEnumSelector.findByValue(fieldType, String.valueOf(valueToConvert)));
         } else if (fieldType.isArray() && valueToConvert instanceof Object[]) {
@@ -106,5 +109,17 @@ public class MapToObjectConverter {
             nameToUse = serializedNameAnnotation.value();
         }
         return nameToUse;
+    }
+
+    private String convertObjectToString(Object valueToConvert) {
+        if (valueToConvert instanceof String) {
+            return (String) valueToConvert;
+        } else if (valueToConvert instanceof byte[]) {
+            return IOUtils.read(new ByteArrayInputStream((byte[]) valueToConvert));
+        } else if (valueToConvert != null) {
+            return String.valueOf(valueToConvert);
+        } else {
+            return null;
+        }
     }
 }

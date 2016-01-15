@@ -141,16 +141,4 @@ public class StringUtils {
         return builder.toString();
     }
 
-    public static String convertObjectToString(Object description) throws IOException {
-        if (description instanceof String) {
-            return (String) description;
-        } else if (description instanceof byte[]) {
-            return IOUtils.read(new ByteArrayInputStream((byte[]) description));
-        } else if (description != null) {
-            return String.valueOf(description);
-        } else {
-            return null;
-        }
-    }
-
 }
