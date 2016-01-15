@@ -95,7 +95,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
         IssueStatusDefinition currentStatus = issueFields.status.def;
         if (currentStatus.equals(toStatus)) {
             if (isLast) {
-                log.info("No need to transition jira issue {} to {} as it is already {}", bugNumber, toStatus.name(), currentStatus.name());
+                log.info("No need to transition Jira issue {} to {} as it is already {}", bugNumber, toStatus.name(), currentStatus.name());
             }
             return;
         } else if (!allowedFromStatuses.contains(currentStatus)) {
@@ -110,7 +110,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
             log.info("Successfully transitioned jira issue to {}", toStatus.name());
             issueFields.status.def = toStatus;
         } else {
-            log.info("Cannot transition jira issue {} from {} to {}", bugNumber, issueFields.status.name, toStatus.name());
+            log.info("Cannot transition Jira issue {} from {} to {}", bugNumber, issueFields.status.name, toStatus.name());
         }
     }
 }

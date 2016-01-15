@@ -22,7 +22,6 @@ public class UsernamePasswordAsker {
             return testCredentials;
         }
 
-        log.info("Enter username and password to create {}", missingCookie.getDisplayType());
         log.info("Credentials are only used once for retrieving {}", missingCookie.getDisplayType());
 
         String username = InputUtils.readValue("Username");

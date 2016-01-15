@@ -47,8 +47,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         printIssuesList(draft.openIssues);
         boolean waitingForBugNumbers = true;
         List<IssueInfo> issues = null;
-        if (StringUtils.isNotBlank(draft.bugNumbers)) {
-            log.info("");
+        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(config.noBugNumberLabel)) {
             log.info("");
             log.info("Existing bug numbers: " + draft.bugNumbers);
         }

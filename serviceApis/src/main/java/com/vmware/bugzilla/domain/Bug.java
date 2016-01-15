@@ -40,7 +40,7 @@ public class Bug implements IssueInfo {
 
     public String component;
 
-    public String knob;
+    public BugKnobType knob;
 
     public BugResolutionType resolution;
 

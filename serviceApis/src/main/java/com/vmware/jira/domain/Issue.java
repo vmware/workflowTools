@@ -146,4 +146,8 @@ public class Issue implements IssueInfo {
     public boolean isNotFound() {
         return isNotFound;
     }
+
+    public IssueStatusDefinition getStatus() {
+        return fields.status != null ? fields.status.def : IssueStatusDefinition.UnknownValue;
+    }
 }

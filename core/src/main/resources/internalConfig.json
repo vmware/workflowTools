@@ -180,6 +180,9 @@
        "addToReviewedBy": [
           "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
        ],
+       "reopenAndResolveIssues": [
+          "LoadClosedIssuesWithoutResolution", "ExitIfThereAreNoIssuesToProcess", "ReopenAndResolveIssues"
+       ],
        "createTrackingIssueForBug": [
           "AddTrackingIssueForBug", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
        ],

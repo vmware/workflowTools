@@ -214,6 +214,9 @@
   "BaseTrelloAction": [
     "--trello-url"
   ],
+  "LoadClosedIssuesWithoutResolution": [
+    "--username"
+  ],
   "CheckStatusOfLatestJobs": [
     "--disable-jenkins-login",
     "--jenkins-uses-csrf",

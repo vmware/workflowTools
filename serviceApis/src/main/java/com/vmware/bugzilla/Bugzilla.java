@@ -2,6 +2,7 @@ package com.vmware.bugzilla;
 
 import com.vmware.AbstractService;
 import com.vmware.bugzilla.domain.Bug;
+import com.vmware.bugzilla.domain.BugKnobType;
 import com.vmware.bugzilla.domain.BugResolutionType;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
@@ -94,7 +95,7 @@ public class Bugzilla extends AbstractService {
             log.info("Bug with id {} already has resolution {}", bugId, resolution);
             return;
         }
-        bugToResolve.knob = "resolve";
+        bugToResolve.knob = BugKnobType.resolve;
         bugToResolve.changed = 1;
         bugToResolve.resolution = resolution;
         String response = connection.post(baseUrl + "process_bug.cgi", String.class, bugToResolve);
@@ -129,7 +130,7 @@ public class Bugzilla extends AbstractService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(bugzilla_cookie);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType);
 
         Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
         Integer sessionId = (Integer) result.get("id");

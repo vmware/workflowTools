@@ -19,9 +19,9 @@ public class SetBugNumbersOffline extends BaseCommitReadAction {
 
     @Override
     public void process() {
-        if (StringUtils.isNotBlank(draft.bugNumbers)) {
-            log.info("Existing Bug Numbers: {}", draft.bugNumbers);
+        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(config.noBugNumberLabel)) {
             log.info("");
+            log.info("Existing Bug Numbers: {}", draft.bugNumbers);
         }
 
         String[] bugNumbers = InputUtils.readData("Bug Numbers: (leave blank if no bug number)", true, 20).split(",");
