@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.IOUtils;
@@ -11,19 +11,12 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.Locale;
 
 @ActionDescription("Copies the review board url to the clipboard. Handy for pasting it into a browser.")
-public class CopyReviewUrlToClipboard extends BaseCommitWithReviewAction {
+public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {
     public CopyReviewUrlToClipboard(WorkflowConfig config) {
         super(config);
-    }
-
-    @Override
-    public void preprocess() {
-        // don't need to load reviewboard for this action
     }
 
 

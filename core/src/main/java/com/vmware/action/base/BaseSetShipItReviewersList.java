@@ -4,10 +4,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-public abstract class BaseSetShipItReviewersList extends BaseCommitWithReviewAction {
+public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBoardAction {
 
 
     public BaseSetShipItReviewersList(WorkflowConfig config) {

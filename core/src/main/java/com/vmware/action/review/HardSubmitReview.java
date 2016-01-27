@@ -1,16 +1,13 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Marks the associated review as submitted in review board.")
-public class HardSubmitReview extends BaseCommitWithReviewAction {
+public class HardSubmitReview extends BaseCommitUsingReviewBoardAction {
 
     public HardSubmitReview(WorkflowConfig config) {
         super(config);

@@ -279,7 +279,7 @@ public class Workflow {
             action.preprocess();
             action.process();
         } else {
-            log.info("Skipping running of action {} as {}.", action.getClass().getSimpleName(), reasonForNotRunningAction);
+            log.info("Skipping running of action {} as {}", action.getClass().getSimpleName(), reasonForNotRunningAction);
         }
 
         if (action instanceof BaseTrelloAction) {

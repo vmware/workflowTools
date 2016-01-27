@@ -1,17 +1,13 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequest;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Publishes a review on the review board server.")
-public class PublishReview extends BaseCommitWithReviewAction {
+public class PublishReview extends BaseCommitUsingReviewBoardAction {
 
     public PublishReview(WorkflowConfig config) {
         super(config);

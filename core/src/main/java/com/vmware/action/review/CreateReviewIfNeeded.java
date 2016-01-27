@@ -17,16 +17,20 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
     }
 
     @Override
+    public String cannotRunAction() {
+        if (draft.hasReviewNumber()) {
+            return "commit already has review " + draft.id;
+        }
+        return super.cannotRunAction();
+    }
+
+    @Override
     public void preprocess() {
         reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override
     public void process() {
-        if (draft.hasReviewNumber()) {
-            return;
-        }
-
         log.debug("Creating new review");
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         draft.id = draft.reviewRequest.id;

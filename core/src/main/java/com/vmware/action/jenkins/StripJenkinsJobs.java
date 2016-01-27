@@ -16,12 +16,16 @@ public class StripJenkinsJobs extends BaseCommitAction {
     }
 
     @Override
-    public void process() {
+    public String cannotRunAction() {
         if (draft.jobBuilds.isEmpty()) {
-            log.info("No need to strip jenkins jobs from commit as there are none");
-        } else {
-            log.info("Stripping jenkins jobs from commit");
-            draft.jobBuilds.clear();
+            return "commit has no jobs";
         }
+        return super.cannotRunAction();
+    }
+
+    @Override
+    public void process() {
+        log.info("Stripping jenkins jobs from commit");
+        draft.jobBuilds.clear();
     }
 }

@@ -1,17 +1,14 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
 import com.vmware.reviewboard.domain.UserReview;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("For the associated review, adds a comment to review board that the review has been submitted. Leaves the review open for further reviews.")
-public class SoftSubmitReview extends BaseCommitWithReviewAction {
+public class SoftSubmitReview extends BaseCommitUsingReviewBoardAction {
     public SoftSubmitReview(WorkflowConfig config) {
         super(config);
     }

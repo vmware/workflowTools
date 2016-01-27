@@ -5,7 +5,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * Will store numeric value as an int if it is too big for an integer.
+ * Will store numeric value as an long if it is too big for an integer.
  */
 public class TolerantI4Parser extends AtomicParser{
 

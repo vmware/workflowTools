@@ -27,14 +27,14 @@ public abstract class BaseAction {
     }
 
     /**
-     * @return Whether this action should not be run
+     * @return Reason for why this action should not be run, null if it should be run
      */
     public String cannotRunAction() {
         return null;
     }
 
     /**
-     * Override if any pre process setup is needed
+     * Override if any setup is needed before the process method is called
      */
     public void preprocess() {
 
