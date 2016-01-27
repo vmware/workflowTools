@@ -1,16 +1,13 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Sets the git commit details from the associated review request. Uses published review info only.")
-public class SetCommitDetailsFromReview extends BaseCommitWithReviewAction {
+public class SetCommitDetailsFromReview extends BaseCommitUsingReviewBoardAction {
     public SetCommitDetailsFromReview(WorkflowConfig config) {
         super(config);
     }

@@ -5,16 +5,12 @@
  */
 package com.vmware.action.conditional;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Exits if a review request has not been made public.")
-public class ExitIfReviewIsNotPublic extends BaseCommitWithReviewAction {
+public class ExitIfReviewIsNotPublic extends BaseCommitUsingReviewBoardAction {
 
     public ExitIfReviewIsNotPublic(WorkflowConfig config) {
         super(config);

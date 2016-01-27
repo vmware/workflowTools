@@ -15,6 +15,11 @@
     "--bugzilla-url",
     "--bugzilla-query"
   ],
+  "BaseCommitUsingReviewBoardAction": [
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
+  ],
   "SetCommitDetailsFromReview": [
     "--jenkins-url",
     "--max-description",
@@ -35,11 +40,6 @@
     "--reviewboard-url",
     "--latest-diff",
     "--patch"
-  ],
-  "BaseCommitWithReviewAction": [
-    "--review-board-date-format",
-    "--username",
-    "--reviewboard-url"
   ],
   "LoadBacklogStories": [
     "--include-estimated",
