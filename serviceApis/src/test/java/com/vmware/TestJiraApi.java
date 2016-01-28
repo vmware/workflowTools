@@ -84,13 +84,13 @@ public class TestJiraApi extends BaseTests {
     @Test
     public void canGetAssignedJiraIssues() {
         IssuesResponse issues = jira.getOpenTasksForUser(jiraUsername);
-        assertTrue("No issues found", issues.total > 0);
+        assertTrue("No assigned issues found", issues.total > 0);
     }
 
     @Test
     public void canGetClosedIssuesWithoutResolution() {
         IssuesResponse issues = jira.getIssuesForUser(jiraUsername, IssueStatusDefinition.Closed, null);
-        assertTrue("No issues found", issues.total > 0);
+        assertTrue("No closed issues without resolution found", issues.total > 0);
     }
 
     @Test
