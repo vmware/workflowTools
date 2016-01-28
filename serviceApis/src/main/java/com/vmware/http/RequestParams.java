@@ -46,7 +46,6 @@ public class RequestParams {
     }
 
     public void addStatelessParam(RequestParam requestParam) {
-        statefulParams.add(requestParam);
         allParams.add(requestParam);
     }
 
@@ -65,7 +64,7 @@ public class RequestParams {
         }
 
         for (String paramText : urlFragment.split("&")) {
-            allParams.add(UrlParam.fromText(paramText));
+            addStatefulParam(UrlParam.fromText(paramText));
         }
     }
 
