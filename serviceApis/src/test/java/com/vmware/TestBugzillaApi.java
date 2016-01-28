@@ -1,8 +1,12 @@
 package com.vmware;
 
+import com.google.gson.Gson;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugResolutionType;
+import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.IOUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,8 +15,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -60,5 +66,16 @@ public class TestBugzillaApi extends BaseTests {
     public void canGetAssignedBugs() throws IOException, URISyntaxException, XmlRpcException {
         List<Bug> bugsList = bugzilla.getBugsForQuery("M31");
         assertTrue(bugsList.size() > 0);
+    }
+
+    // more for future proofing, check that a bug could be properly deserialized from json
+    // if the switch to the bugzilla rest api ever happens
+    @Test
+    public void canDeserializeBugFromJson() throws IOException {
+        String bugJsonText = new ClasspathResource("/bugAsJson.json").getText();
+        Gson gson = new ConfiguredGsonBuilder().build();
+        Bug deserializedBug = gson.fromJson(bugJsonText, Bug.class);
+        assertFalse("Bug should be found", deserializedBug.isNotFound());
+        assertTrue("Description length should be greater than zero", deserializedBug.descriptionLength > 0);
     }
 }

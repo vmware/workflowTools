@@ -5,11 +5,10 @@
  */
 package com.vmware.http.request;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.vmware.http.HttpConnection;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
+import com.vmware.xmlrpc.MapObjectConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +72,7 @@ public class RequestBodyFactory {
             outputStream = connection.getOutputStream();
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"),
                     true);
-            Map<String, Object> valuesToWrite = convertObjectToMap(requestObject);
+            Map<String, Object> valuesToWrite = new MapObjectConverter().toMap(requestObject);
             for (String fieldName : valuesToWrite.keySet()) {
                 Object value = valuesToWrite.get(fieldName);
                 if (value instanceof byte[]) {
@@ -93,7 +91,6 @@ public class RequestBodyFactory {
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
         }
-
     }
 
     private static void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject) {
@@ -123,42 +120,15 @@ public class RequestBodyFactory {
     }
 
     private static void writeObjectAsFormEncoded(final HttpConnection connection, final Object requestObject) {
-        Map<String, Object> valuesToWrite = null;
+        Map<String, Object> valuesToWrite;
         try {
-            valuesToWrite = convertObjectToMap(requestObject);
+            valuesToWrite = new MapObjectConverter().toMap(requestObject);
             writeValuesAsFormEncoded(connection, valuesToWrite);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
         }
-    }
-
-    private static Map<String, Object> convertObjectToMap(Object requestObject) throws IllegalAccessException {
-        Map<String, Object> valuesToWrite = new HashMap<String, Object>();
-        for (Field field : requestObject.getClass().getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            if (Modifier.isPrivate(field.getModifiers())) {
-                continue;
-            }
-            Expose expose = field.getAnnotation(Expose.class);
-            if (expose != null && !expose.serialize()) {
-                continue;
-            }
-            Object value = field.get(requestObject);
-            if (value == null) {
-                continue;
-            }
-            SerializedName serializedName = field.getAnnotation(SerializedName.class);
-            String nameToUse = serializedName != null ? serializedName.value() : field.getName();
-            Object valueToUse = determineCorrectValue(value);
-            if (valueToUse != null) {
-                valuesToWrite.put(nameToUse, valueToUse);
-            }
-        }
-        return valuesToWrite;
     }
 
     private static void writeValuesAsFormEncoded(HttpConnection connection, Map<String, Object> valuesToWrite) throws IOException {
@@ -232,17 +202,6 @@ public class RequestBodyFactory {
 
         writer.append(LINE_FEED);
         writer.flush();
-    }
-
-    private static Object determineCorrectValue(Object objectToCheck)
-            throws IllegalAccessException {
-        if (objectToCheck instanceof byte[]) {
-            return objectToCheck;
-        } else if (objectToCheck instanceof Boolean) {
-            Boolean bool = (Boolean) objectToCheck;
-            return bool ? "1" : "0";
-        }
-        return objectToCheck.toString();
     }
 
 }
