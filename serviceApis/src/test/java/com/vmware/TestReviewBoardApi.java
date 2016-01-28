@@ -96,7 +96,6 @@ public class TestReviewBoardApi extends BaseTests {
     @Test
     public void getReviewRequestById() {
         String jsonText = new ConfiguredGsonBuilder().build().toJson(sampleRequest);
-        System.out.println(jsonText);
         createdRequest = reviewBoard.createReviewRequestFromDraft(sampleRequest, repository);
 
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(createdRequest.id);
