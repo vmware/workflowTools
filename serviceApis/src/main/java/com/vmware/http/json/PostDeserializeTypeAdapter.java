@@ -2,6 +2,7 @@ package com.vmware.http.json;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -39,7 +40,9 @@ public final class PostDeserializeTypeAdapter<T> extends TypeAdapter<T> {
 
         T result = originalTypeAdapter.fromJsonTree(json);
 
-        new PostDeserializeHandler().invokePostDeserializeMethods(result);
+        if (json instanceof JsonObject) {
+            new PostDeserializeHandler().invokePostDeserializeMethods(result);
+        }
 
         return result;
     }

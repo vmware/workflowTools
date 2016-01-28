@@ -10,7 +10,6 @@ public final class PostDeserializeTypeAdapterFactory implements TypeAdapterFacto
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
         TypeAdapter<T> originalTypeAdapter = gson.getDelegateAdapter(this, type);
-        PostDeserializeTypeAdapter<T> fireTypeAdapter = new PostDeserializeTypeAdapter<T>(originalTypeAdapter, gson);
-        return fireTypeAdapter;
+        return new PostDeserializeTypeAdapter<T>(originalTypeAdapter, gson);
     }
 }
