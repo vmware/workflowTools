@@ -119,6 +119,8 @@ public class MapObjectConverter {
                 Array.set(convertedValues, i, fromMap(listObjectValues, arrayObjectType));
             }
             field.set(createdObject, convertedValues);
+        } else if (valueToConvert instanceof Map) {
+            field.set(createdObject, fromMap((Map) valueToConvert, fieldType));
         } else {
             field.setAccessible(false);
             throw new RuntimeReflectiveOperationException("Cannot set value of type " + valueToConvert.getClass().getSimpleName()
