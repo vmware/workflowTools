@@ -274,16 +274,17 @@ public class HttpConnection {
 
     private void exitIfMaxRetriesReached(int retryCount) {
         if (retryCount >= MAX_REQUEST_RETRIES) {
-            try {
-                exitDueToSslExceptions();
-            } catch (URISyntaxException e) {
-                throw new RuntimeURISyntaxException(e);
-            }
+            exitDueToSslExceptions();
         }
     }
 
-    private void exitDueToSslExceptions() throws URISyntaxException {
-        String url = activeConnection.getURL().toURI().toString();
+    private void exitDueToSslExceptions() {
+        String url;
+        try {
+            url = activeConnection.getURL().toURI().toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeURISyntaxException(e);
+        }
         log.info("");
         log.info("Still getting ssl errors, can't proceed");
         if (url.contains("reviewboard")) {

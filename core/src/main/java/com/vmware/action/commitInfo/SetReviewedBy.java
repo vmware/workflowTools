@@ -8,7 +8,7 @@ import com.vmware.config.WorkflowConfig;
         "\nReviewer groups can also be specified by setting the reviewerGroups property in the config file.")
 public class SetReviewedBy extends BaseSetReviewerList {
 
-    public SetReviewedBy(WorkflowConfig config) throws NoSuchFieldException {
+    public SetReviewedBy(WorkflowConfig config) {
         super(config, false);
     }
 }

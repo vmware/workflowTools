@@ -6,7 +6,7 @@ import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Sets the testing done section. Replaces existing value if there is one.")
 public class SetTestingDone extends BaseReadMultiLine {
-    public SetTestingDone(WorkflowConfig config) throws NoSuchFieldException {
+    public SetTestingDone(WorkflowConfig config) {
         super(config, "testingDone", false, config.testingDoneTemplates);
     }
 }

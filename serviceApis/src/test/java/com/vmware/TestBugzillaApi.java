@@ -41,7 +41,7 @@ public class TestBugzillaApi extends BaseTests {
     }
 
     @Test
-    public void isUriTrusted() throws IOException {
+    public void isUriTrusted() {
         assertTrue(bugzilla.isBaseUriTrusted());
     }
 
@@ -58,12 +58,12 @@ public class TestBugzillaApi extends BaseTests {
     }
 
     @Test
-    public void canAddBugComment() throws IOException {
+    public void canAddBugComment() {
         bugzilla.addBugComment(TEST_BUG_ID, "Test comment");
     }
 
     @Test
-    public void canGetAssignedBugs() throws IOException, URISyntaxException, XmlRpcException {
+    public void canGetAssignedBugs() {
         List<Bug> bugsList = bugzilla.getBugsForQuery("M31");
         assertTrue(bugsList.size() > 0);
     }
@@ -71,7 +71,7 @@ public class TestBugzillaApi extends BaseTests {
     // more for future proofing, check that a bug could be properly deserialized from json
     // if the switch to the bugzilla rest api ever happens
     @Test
-    public void canDeserializeBugFromJson() throws IOException {
+    public void canDeserializeBugFromJson() {
         String bugJsonText = new ClasspathResource("/bugAsJson.json").getText();
         Gson gson = new ConfiguredGsonBuilder().build();
         Bug deserializedBug = gson.fromJson(bugJsonText, Bug.class);

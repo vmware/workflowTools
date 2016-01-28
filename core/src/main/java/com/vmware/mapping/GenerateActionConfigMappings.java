@@ -58,7 +58,7 @@ public class GenerateActionConfigMappings {
         this.outputFile = new File(outputFile);
     }
 
-    public void run() throws IOException {
+    public void run() {
         List<File> javaActionFiles = FileUtils.scanDirectorRecursivelyForFiles(actionDirectory, new JavaFileFilter());
         if (javaActionFiles.isEmpty()) {
             log.info("No action files found at {}", actionDirectory.getPath());
@@ -102,7 +102,7 @@ public class GenerateActionConfigMappings {
         return commandLineOptions;
     }
 
-    private List<String> parseFileForConfigValues(File javaActionFile) throws IOException {
+    private List<String> parseFileForConfigValues(File javaActionFile) {
         String fileText = IOUtils.read(javaActionFile);
         Matcher configMatcher = configValuePattern.matcher(fileText);
         List<String> matches = new ArrayList<>();
@@ -139,7 +139,7 @@ public class GenerateActionConfigMappings {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());
@@ -172,7 +172,7 @@ public class GenerateActionConfigMappings {
                 new File(targetDirectory + File.separator + "configValueMappings.json"));
     }
 
-    private void populateLocatorMethodArguments() throws IOException {
+    private void populateLocatorMethodArguments() {
         List<String> lines = IOUtils.readLines(serviceLocatorFile);
         String currentMethodName = null;
         List<String> currentArguments = null;

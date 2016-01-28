@@ -28,11 +28,7 @@ public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {
         boolean isOsx = osName.contains("mac") || osName.contains("darwin");
 
         if (isOsx) {
-            try {
-                copyUsingPbcopyCommand(reviewUrl);
-            } catch (IOException e) {
-                throw new RuntimeIOException(e);
-            }
+            copyUsingPbcopyCommand(reviewUrl);
         } else {
             StringSelection stringSelection = new StringSelection(reviewUrl);
             Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -41,10 +37,15 @@ public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {
         log.info("Copied review url to clipboard");
     }
 
-    private void copyUsingPbcopyCommand(String reviewUrl) throws IOException {
+    private void copyUsingPbcopyCommand(String reviewUrl) {
         log.debug("Using pbcopy command to copy review url to clipboard as it doesn't cause terminal in full screen mode to jump back to the desktop view");
         ProcessBuilder builder = new ProcessBuilder("pbcopy").redirectErrorStream(true);
-        Process statusProcess = builder.start();
+        Process statusProcess;
+        try {
+            statusProcess = builder.start();
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
         IOUtils.write(statusProcess.getOutputStream(), reviewUrl);
         String output = IOUtils.read(statusProcess.getInputStream());
         log.debug(output);

@@ -13,7 +13,7 @@ import static com.vmware.util.StringUtils.appendCsvValue;
 @ActionDescription("Sets the bug number without showing assigned issues in Jira.")
 public class SetBugNumbersOffline extends BaseCommitReadAction {
 
-    public SetBugNumbersOffline(WorkflowConfig config) throws NoSuchFieldException {
+    public SetBugNumbersOffline(WorkflowConfig config) {
         super(config, "bugNumbers");
     }
 

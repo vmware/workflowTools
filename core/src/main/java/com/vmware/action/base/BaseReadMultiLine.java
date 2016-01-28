@@ -12,7 +12,7 @@ public abstract class BaseReadMultiLine extends BaseCommitReadAction {
 
     private final String[] historyValues;
 
-    public BaseReadMultiLine(WorkflowConfig config, String propertyName, boolean append, String... historyValues) throws NoSuchFieldException {
+    public BaseReadMultiLine(WorkflowConfig config, String propertyName, boolean append, String... historyValues) {
         super(config, propertyName);
         this.append = append;
         this.historyValues = historyValues;

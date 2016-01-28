@@ -7,6 +7,7 @@ import com.vmware.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class WorkflowConfigParser {
     private final Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
     private final CommandLineArgumentsParser argsParser = new CommandLineArgumentsParser();
 
-    public WorkflowConfig parseWorkflowConfig(String[] args) throws IOException, IllegalAccessException {
+    public WorkflowConfig parseWorkflowConfig(String[] args) {
         argsParser.generateArgumentMap(args);
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());
@@ -86,8 +87,6 @@ public class WorkflowConfigParser {
             // handle gracefully as they are validation type exceptions
             log.error(iae.getMessage());
             System.exit(1);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeReflectiveOperationException(e);
         }
     }
 
@@ -102,7 +101,7 @@ public class WorkflowConfigParser {
      * Applies values from configuration files explicitly specified either via the git workflow.config value or
      * via the command line.
      */
-    private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig, List<String> loadedConfigFiles) throws IOException, IllegalAccessException {
+    private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
         String gitConfigFilePath = git.configValue("workflow.config");
         String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config");
         if (StringUtils.isNotBlank(configFilePaths)) {
@@ -116,7 +115,7 @@ public class WorkflowConfigParser {
         }
     }
 
-    private void applyRepoConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) throws FileNotFoundException, IllegalAccessException {
+    private void applyRepoConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
         File repoDirectory = git.getRootDirectory();
         if (repoDirectory != null) {
             File repoWorkflowFile = new File(repoDirectory.getAbsolutePath() + File.separator + ".workflow-config.json");
@@ -124,13 +123,13 @@ public class WorkflowConfigParser {
         }
     }
 
-    private void applyUserConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) throws FileNotFoundException, IllegalAccessException {
+    private void applyUserConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
         String homeFolder = System.getProperty("user.home");
         File userConfigFile = new File(homeFolder + File.separator + ".workflow-config.json");
         overrideConfigIfFileExists(internalConfig, userConfigFile, loadedConfigFiles);
     }
 
-    private void overrideConfigIfFileExists(WorkflowConfig internalConfig, File repoWorkflowFile, List<String> loadedConfigFiles) throws FileNotFoundException, IllegalAccessException {
+    private void overrideConfigIfFileExists(WorkflowConfig internalConfig, File repoWorkflowFile, List<String> loadedConfigFiles) {
         if (!repoWorkflowFile.exists()) {
             return;
         }
@@ -139,12 +138,17 @@ public class WorkflowConfigParser {
         loadedConfigFiles.add(repoWorkflowFile.getPath());
     }
 
-    private WorkflowConfig readExternalWorkflowConfig(File configFilePath) throws FileNotFoundException {
+    private WorkflowConfig readExternalWorkflowConfig(File configFilePath) {
         if (!configFilePath.exists()) {
             throw new IllegalArgumentException("Config file " + configFilePath.getPath() + " does not exist");
         }
 
-        Reader externalConfigReader = new FileReader(configFilePath);
+        Reader externalConfigReader = null;
+        try {
+            externalConfigReader = new FileReader(configFilePath);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeIOException(e);
+        }
         try {
             return gson.fromJson(externalConfigReader, WorkflowConfig.class);
         } catch (JsonSyntaxException e) {

@@ -13,10 +13,14 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
 
     protected Field property;
 
-    public BaseCommitReadAction(WorkflowConfig config, String propertyName) throws NoSuchFieldException {
+    public BaseCommitReadAction(WorkflowConfig config, String propertyName) {
         super(config);
         this.title = StringUtils.splitOnCapitalization(propertyName);
-        this.property = ReviewRequestDraft.class.getField(propertyName);
+        try {
+            this.property = ReviewRequestDraft.class.getField(propertyName);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
     }
 
     @Override

@@ -15,8 +15,7 @@ public class SetReviewId extends BaseCommitAction {
 
     private ReviewBoard reviewBoard;
 
-    public SetReviewId(WorkflowConfig config) throws IllegalAccessException, IOException,
-            URISyntaxException {
+    public SetReviewId(WorkflowConfig config) {
         super(config);
     }
 

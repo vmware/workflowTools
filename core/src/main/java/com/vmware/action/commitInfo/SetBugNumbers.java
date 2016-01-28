@@ -27,7 +27,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
 
     private Bugzilla bugzilla = null;
 
-    public SetBugNumbers(WorkflowConfig config) throws NoSuchFieldException{
+    public SetBugNumbers(WorkflowConfig config){
         super(config, "bugNumbers");
     }
 

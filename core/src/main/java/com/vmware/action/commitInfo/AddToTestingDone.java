@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 @ActionDescription("Append text to the existing testing done section.")
 public class AddToTestingDone extends BaseReadMultiLine {
 
-    public AddToTestingDone(WorkflowConfig config) throws NoSuchFieldException {
+    public AddToTestingDone(WorkflowConfig config) {
         super(config, "testingDone", true);
     }
 

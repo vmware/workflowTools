@@ -6,7 +6,7 @@ import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Sets the description section. Replaces existing value if there is one.")
 public class SetDescription extends BaseReadMultiLine {
-    public SetDescription(WorkflowConfig config) throws NoSuchFieldException {
+    public SetDescription(WorkflowConfig config) {
         super(config, "description", false);
     }
 }

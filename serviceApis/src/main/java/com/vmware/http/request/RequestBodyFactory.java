@@ -88,8 +88,6 @@ public class RequestBodyFactory {
             writer.close();
         } catch (IOException e) {
             throw new RuntimeIOException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeReflectiveOperationException(e);
         }
     }
 
@@ -126,8 +124,6 @@ public class RequestBodyFactory {
             writeValuesAsFormEncoded(connection, valuesToWrite);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeReflectiveOperationException(e);
         }
     }
 
@@ -177,7 +173,6 @@ public class RequestBodyFactory {
      *
      * @param fieldName  name attribute in <input type="file" name="..." />
      * @param uploadFileData data to be uploaded
-     * @throws IOException
      */
     public static void addFilePart(PrintWriter writer, String boundary, OutputStream outputStream, String fieldName, byte[] uploadFileData)
             throws IOException {

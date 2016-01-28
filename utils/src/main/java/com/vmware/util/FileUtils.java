@@ -1,8 +1,11 @@
 package com.vmware.util;
 
+import com.vmware.util.exception.RuntimeIOException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -30,32 +33,26 @@ public class FileUtils {
         return files;
     }
 
-    public static void copyFile(File src, File dst) throws IOException
-    {
+    public static void copyFile(File src, File dst) {
         long p = 0, dp, size;
-        FileChannel in = null, out = null;
 
-        try
+        if (!dst.exists()) try {
+            dst.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+
+        try (FileChannel in = new FileInputStream(src).getChannel();
+             FileChannel out = new FileOutputStream(dst).getChannel();)
         {
-            if (!dst.exists()) dst.createNewFile();
-
-            in = new FileInputStream(src).getChannel();
-            out = new FileOutputStream(dst).getChannel();
             size = in.size();
 
             while ((dp = out.transferFrom(in, p, size)) > 0)
             {
                 p += dp;
             }
-        }
-        finally {
-            try
-            {
-                if (out != null) out.close();
-            }
-            finally {
-                if (in != null) in.close();
-            }
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
         }
     }
 

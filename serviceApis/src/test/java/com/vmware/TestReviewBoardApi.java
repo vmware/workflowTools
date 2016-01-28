@@ -61,7 +61,7 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void reviewboardIs17OrGreater() throws IOException, URISyntaxException {
+    public void reviewboardIs17OrGreater() {
         String version = reviewBoard.getVersion();
         assertTrue("Expected review board version of 1.7 or greater", version.compareTo("1.7") >=0);
     }
@@ -74,19 +74,19 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void getRootLinkList() throws IOException, URISyntaxException {
+    public void getRootLinkList() {
         RootList rootLinkList = reviewBoard.getRootLinkList();
         assertNotNull(rootLinkList.getReviewRequestsLink());
     }
 
     @Test
-    public void getReviewRequests() throws IOException, URISyntaxException {
+    public void getReviewRequests() {
         ReviewRequests reviewRequests = reviewBoard.getReviewRequests(ReviewRequestStatus.all);
         assertTrue(reviewRequests.review_requests.length > 0);
     }
 
     @Test
-    public void getReviewRequestsForGroup() throws IOException, URISyntaxException {
+    public void getReviewRequestsForGroup() {
         long sevenDaysAgo = new Date().getTime() - TimeUnit.DAYS.toMillis(7);
         ReviewRequests reviewRequests =
                 reviewBoard.getReviewRequestsWithShipItsForGroups(reviewGroup, new Date(sevenDaysAgo));
@@ -105,13 +105,13 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void getReviewShipItComment() throws IOException, URISyntaxException {
+    public void getReviewShipItComment() {
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(520886);
         reviewBoard.getSoftSubmitReview(reviewRequest);
     }
 
     @Test
-    public void getUserReviewsForReviewRequest() throws IOException, URISyntaxException {
+    public void getUserReviewsForReviewRequest() {
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(478638);
         UserReview[] reviews = reviewBoard.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
         assertTrue(reviews.length == 1);
@@ -153,7 +153,7 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test(expected = NotFoundException.class)
-    public void cannotGetNonExistentReviewRequest() throws IOException, URISyntaxException {
+    public void cannotGetNonExistentReviewRequest() {
         reviewBoard.getReviewRequestById(-1);
     }
 

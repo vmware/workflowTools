@@ -8,6 +8,7 @@ import com.vmware.util.CommitConfiguration;
 import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -267,7 +268,7 @@ public class WorkflowConfig {
         }
     }
 
-    public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) throws IllegalAccessException {
+    public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
         workFlowActions = new WorkflowActionLister().findWorkflowActions();
         List<ConfigurableProperty> commandLineProperties = new ArrayList<ConfigurableProperty>();
         for (Field field : configurableFields) {
@@ -321,7 +322,7 @@ public class WorkflowConfig {
     }
 
 
-    public List<Class<? extends BaseAction>> determineActions(String workflowString) throws ClassNotFoundException, IllegalAccessException, UnknownWorkflowValueException {
+    public List<Class<? extends BaseAction>> determineActions(String workflowString) {
         String[] possibleActions = workflows.get(workflowString);
         if (possibleActions != null) {
             log.info("Using workflow {}", workflowString);
@@ -344,7 +345,7 @@ public class WorkflowConfig {
     /**
      * Set separate to other git config values as it shouldn't override a specific workflow file configuration.
      */
-    public void setGitOriginUrlAsReviewBoardRepo() throws IOException {
+    public void setGitOriginUrlAsReviewBoardRepo() {
         String gitOriginValue = git.configValue("remote.origin.url");
         if (StringUtils.isBlank(gitOriginValue)) {
             return;
@@ -354,7 +355,7 @@ public class WorkflowConfig {
         reviewBoardRepository = gitOriginValue;
     }
 
-    public void applyGitConfigValues() throws IllegalAccessException, IOException {
+    public void applyGitConfigValues() {
         Map<String, String> configValues = git.configValues();
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
@@ -365,10 +366,16 @@ public class WorkflowConfig {
         }
     }
 
-    public void overrideValues(WorkflowConfig overriddenConfig, String configFileName) throws IllegalAccessException {
+    public void overrideValues(WorkflowConfig overriddenConfig, String configFileName) {
         for (Field field : configurableFields) {
-            Object existingValue = field.get(this);
-            Object value = field.get(overriddenConfig);
+            Object existingValue;
+            Object value;
+            try {
+                existingValue = field.get(this);
+                value = field.get(overriddenConfig);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeReflectiveOperationException(e);
+            }
             if (value == null || String.valueOf(value).equals("0") || (value instanceof Boolean && !((Boolean) value))) {
                 continue;
             }
@@ -383,12 +390,16 @@ public class WorkflowConfig {
             } else {
                 overriddenConfigSources.put(field.getName(), configFileName);
                 // override for everything else
-                field.set(this, value);
+                try {
+                    field.set(this, value);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeReflectiveOperationException(e);
+                }
             }
         }
     }
 
-    public void parseUsernameFromGitEmailIfBlank() throws IOException {
+    public void parseUsernameFromGitEmailIfBlank() {
         if (StringUtils.isNotBlank(username)) {
             return;
         }
@@ -447,15 +458,19 @@ public class WorkflowConfig {
         }
     }
 
-    private void setFieldValue(Field field, String value, String source) throws IllegalAccessException {
+    private void setFieldValue(Field field, String value, String source) {
         Object validValue = new WorkflowField(field).determineValue(value);
         if (validValue != null) {
             overriddenConfigSources.put(field.getName(), source);
-            field.set(this, validValue);
+            try {
+                field.set(this, validValue);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeReflectiveOperationException(e);
+            }
         }
     }
 
-    private void applyConfigValues(Map<String, String> configValues, String source) throws IllegalAccessException {
+    private void applyConfigValues(Map<String, String> configValues, String source) {
         if (configValues.isEmpty()) {
             return;
         }
