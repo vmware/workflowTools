@@ -21,7 +21,7 @@ public class WorkflowField {
         this.field = field;
     }
 
-    public Object determineValue(String sourceValue) throws IllegalAccessException {
+    public Object determineValue(String sourceValue) {
         if (sourceValue == null) {
             return null;
         }

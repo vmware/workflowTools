@@ -2,11 +2,10 @@ package com.vmware.xmlrpc;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.http.request.DeserializedName;
 import com.vmware.http.request.PostDeserializeHandler;
 import com.vmware.util.IOUtils;
 import com.vmware.util.complexenum.ComplexEnum;
-import com.vmware.http.request.DeserializedName;
-import com.vmware.http.request.PostDeserialize;
 import com.vmware.util.complexenum.ComplexEnumSelector;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
@@ -14,18 +13,19 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * Constructs an object to and from a map of values.
  */
 public class MapObjectConverter {
 
-    public Map<String, Object> toMap(Object requestObject) throws IllegalAccessException {
-        Map<String, Object> valuesToWrite = new HashMap<String, Object>();
+    public Map<String, Object> toMap(Object requestObject) {
+        Map<String, Object> valuesToWrite = new HashMap<>();
         for (Field field : requestObject.getClass().getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
@@ -37,7 +37,12 @@ public class MapObjectConverter {
             if (expose != null && !expose.serialize()) {
                 continue;
             }
-            Object value = field.get(requestObject);
+            Object value;
+            try {
+                value = field.get(requestObject);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeReflectiveOperationException(e);
+            }
             if (value == null) {
                 continue;
             }
@@ -89,8 +94,7 @@ public class MapObjectConverter {
         return (T) createdObject;
     }
 
-    private Object determineCorrectValue(Object objectToCheck)
-            throws IllegalAccessException {
+    private Object determineCorrectValue(Object objectToCheck) {
         if (objectToCheck instanceof byte[]) {
             return objectToCheck;
         } else if (objectToCheck instanceof Boolean) {
@@ -123,8 +127,8 @@ public class MapObjectConverter {
             field.set(createdObject, fromMap((Map) valueToConvert, fieldType));
         } else {
             field.setAccessible(false);
-            throw new RuntimeReflectiveOperationException("Cannot set value of type " + valueToConvert.getClass().getSimpleName()
-                    + " for field of type " + fieldType.getSimpleName());
+            throw new RuntimeReflectiveOperationException(format("Cannot set value of type %s for field of type %s",
+                    valueToConvert.getClass().getSimpleName(), fieldType.getSimpleName()));
         }
         field.setAccessible(false);
     }

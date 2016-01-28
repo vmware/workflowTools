@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 @ActionDescription("Adds to the reviewed by section. Reads list of reviewers from the property targetReviewers in the config file.")
 public class AddToReviewedBy extends BaseSetReviewerList {
 
-    public AddToReviewedBy(WorkflowConfig config) throws NoSuchFieldException {
+    public AddToReviewedBy(WorkflowConfig config) {
         super(config, true);
     }
 }

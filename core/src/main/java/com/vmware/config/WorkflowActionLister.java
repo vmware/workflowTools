@@ -48,12 +48,10 @@ public class WorkflowActionLister {
             return actionsList;
         } catch (IOException e) {
             throw new RuntimeIOException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeReflectiveOperationException(e);
         }
     }
 
-    private void addClassesFromJar(URL fileUrl, List<Class<? extends BaseAction>> actionsList) throws IOException, ClassNotFoundException {
+    private void addClassesFromJar(URL fileUrl, List<Class<? extends BaseAction>> actionsList) throws IOException {
         String jarName = parseFilePath(fileUrl.getFile());
         ZipInputStream zip=new ZipInputStream(new FileInputStream(jarName));
         for(ZipEntry entry=zip.getNextEntry();entry!=null;entry=zip.getNextEntry()) {
@@ -64,7 +62,7 @@ public class WorkflowActionLister {
         }
     }
 
-    private void addClassesFromDirectory(File directoryFile, List<Class<? extends BaseAction>> actionsList, String packagePrefix) throws ClassNotFoundException {
+    private void addClassesFromDirectory(File directoryFile, List<Class<? extends BaseAction>> actionsList, String packagePrefix) {
         for (File actionFile : directoryFile.listFiles()) {
             if (actionFile.isDirectory()) {
                 String newPackagePrefix = packagePrefix + "." + directoryFile.getName();
@@ -99,12 +97,17 @@ public class WorkflowActionLister {
         return jarName;
     }
 
-    private void addClassIfActionClass(List<Class<? extends BaseAction>> actionsList, String className) throws ClassNotFoundException {
+    private void addClassIfActionClass(List<Class<? extends BaseAction>> actionsList, String className) {
         if (!className.startsWith("com.vmware")) {
             return;
         }
 
-        Class actionClass = Class.forName(className);
+        Class actionClass;
+        try {
+            actionClass = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
         if (!Modifier.isAbstract(actionClass.getModifiers())
                 && BaseAction.class.isAssignableFrom(actionClass)) {
             actionsList.add(actionClass);

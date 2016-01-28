@@ -73,8 +73,7 @@ public class BugzParsingHandler extends XmlRpcResponseParser implements ContentH
      * Receive notification of character data.
      */
     @Override
-    public void characters(char[] ch, int start, int length)
-            throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
         if (log.isTraceEnabled()) {
             log.trace(new String(ch, start, length));
         }

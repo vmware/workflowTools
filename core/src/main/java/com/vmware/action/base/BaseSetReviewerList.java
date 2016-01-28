@@ -18,7 +18,7 @@ public abstract class BaseSetReviewerList extends BaseCommitReadAction {
     protected boolean addToReviewerList;
 
 
-    public BaseSetReviewerList(WorkflowConfig config, boolean addToReviewerList) throws NoSuchFieldException {
+    public BaseSetReviewerList(WorkflowConfig config, boolean addToReviewerList) {
         super(config, "reviewedBy");
         this.addToReviewerList = addToReviewerList;
     }

@@ -11,11 +11,11 @@ public class ClasspathResource {
         this.fileName = fileName;
     }
 
-    public String getText() throws IOException {
+    public String getText() {
         return IOUtils.read(ClassLoader.class.getResourceAsStream(fileName));
     }
 
-    public byte[] getBytes() throws IOException {
+    public byte[] getBytes() {
         return getText().getBytes();
     }
 

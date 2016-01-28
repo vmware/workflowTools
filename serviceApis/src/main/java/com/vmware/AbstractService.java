@@ -67,7 +67,7 @@ public abstract class AbstractService {
         }
     }
 
-    public abstract boolean isBaseUriTrusted() throws IOException;
+    public abstract boolean isBaseUriTrusted();
 
     private void displayInputMessage(int retryCount) {
         if (retryCount == 0) {

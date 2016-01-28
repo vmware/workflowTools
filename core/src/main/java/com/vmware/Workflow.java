@@ -55,14 +55,14 @@ public class Workflow {
     private List<String> workflowHistory;
     private WorkflowConfig config;
 
-    public void init(String[] args) throws IOException, IllegalAccessException {
+    public void init(String[] args) {
         readWorkflowHistoryFile();
 
         config = configParser.parseWorkflowConfig(args);
         askForWorkflowIfEmpty();
     }
 
-    private void updateWorkflowHistoryFile() throws IOException {
+    private void updateWorkflowHistoryFile() {
         String argumentsText = configParser.getRuntimeArgumentsText();
         if (workflowHistory.isEmpty() || !workflowHistory.get(0).equals(argumentsText)) {
             workflowHistory.add(0, argumentsText);
@@ -140,9 +140,7 @@ public class Workflow {
         return argumentsCompleter;
     }
 
-    public void runWorkflow() throws ClassNotFoundException, IllegalAccessException,
-            URISyntaxException, InstantiationException, NoSuchMethodException, InvocationTargetException,
-            IOException, ParseException, UnknownWorkflowValueException {
+    public void runWorkflow() {
 
         if (StringUtils.isBlank(config.workflowsToRun)) {
             // default workflow
@@ -176,15 +174,14 @@ public class Workflow {
         }
     }
 
-    private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods)
-            throws ClassNotFoundException, IllegalAccessException, UnknownWorkflowValueException, InstantiationException,
-            InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException {
+    private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods) {
         log.info("Checking that each action value in the workflows is valid");
         ReviewRequestDraft draft = new ReviewRequestDraft();
         MultiActionData multiActionData = new MultiActionData();
         for (Class<? extends BaseAction> action : config.determineActions(StringUtils.join(config.workflows.keySet()))) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
-            BaseAction actionObject = action.getConstructor(WorkflowConfig.class).newInstance(config);
+            BaseAction actionObject = instantiateAction(action);
+
             if (actionObject instanceof BaseCommitAction) {
                 ((BaseCommitAction) actionObject).setDraft(draft);
             }
@@ -253,15 +250,15 @@ public class Workflow {
         return matchingValueText;
     }
 
-    private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) throws IllegalAccessException, URISyntaxException,
-            InstantiationException, NoSuchMethodException, InvocationTargetException, IOException, ParseException {
+    private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) {
         for (Class<? extends BaseAction> action : actions) {
             runAction(action, values);
         }
     }
 
-    private void runAction(Class<? extends BaseAction> actionClass, WorkflowActionValues values) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException, URISyntaxException, ParseException {
-        BaseAction action = actionClass.getConstructor(WorkflowConfig.class).newInstance(config);
+    private void runAction(Class<? extends BaseAction> actionClass, WorkflowActionValues values) {
+        BaseAction action = instantiateAction(actionClass);
+
         log.debug("Executing workflow action {}", actionClass.getSimpleName());
         if (action instanceof BaseCommitAction) {
             ((BaseCommitAction) action).setDraft(values.getDraft());
@@ -284,6 +281,14 @@ public class Workflow {
 
         if (action instanceof BaseTrelloAction) {
             values.setTrelloBoard(((BaseTrelloAction) action).getSelectedBoard());
+        }
+    }
+
+    private BaseAction instantiateAction(Class<? extends BaseAction> actionToInstantiate) {
+        try {
+            return actionToInstantiate.getConstructor(WorkflowConfig.class).newInstance(config);
+        } catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+            throw new RuntimeReflectiveOperationException(e);
         }
     }
 }

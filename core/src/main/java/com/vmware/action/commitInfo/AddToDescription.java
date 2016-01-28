@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 @ActionDescription("Append text to the existing description.")
 public class AddToDescription extends BaseReadMultiLine {
 
-    public AddToDescription(WorkflowConfig config) throws NoSuchFieldException {
+    public AddToDescription(WorkflowConfig config) {
         super(config, "description", true);
     }
 

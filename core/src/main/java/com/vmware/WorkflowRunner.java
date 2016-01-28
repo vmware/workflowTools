@@ -7,7 +7,7 @@ import java.util.logging.LogManager;
  */
 public class WorkflowRunner {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         System.setProperty("jsse.enableSNIExtension", "false");
         LogManager.getLogManager().reset();
 

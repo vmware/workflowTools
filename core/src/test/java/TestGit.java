@@ -3,6 +3,7 @@ import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,13 +29,17 @@ public class TestGit {
     Git git;
 
     @BeforeClass
-    public static void initGitRepo() throws IOException {
+    public static void initGitRepo() {
         workingDirectory = createTempDirectory();
         Git git = new Git(workingDirectory);
         git.initRepo();
 
         testFile = new File(workingDirectory.getAbsolutePath() + File.separator + "testFile.java");
-        testFile.createNewFile();
+        try {
+            testFile.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
 
         git.addAllFiles();
         git.commitWithAllFileChanges("Test commit");
@@ -44,41 +49,41 @@ public class TestGit {
     }
 
     @Before
-    public void setWorkingDirectory() throws IOException {
+    public void setWorkingDirectory() {
         git = new Git(workingDirectory);
     }
 
     @After
-    public void resetGitRepo() throws IOException {
+    public void resetGitRepo() {
         git.reset("HEAD");
     }
 
     @Test
-    public void diffBetweenLastCommit() throws IOException {
+    public void diffBetweenLastCommit() {
         byte[] diff = git.diff("HEAD~1", "HEAD", false);
         assertNotNull(diff);
     }
 
     @Test
-    public void unknownConfigValueIsEmpty() throws IOException {
+    public void unknownConfigValueIsEmpty() {
         String value = git.configValue("workflow.sdafddfdsffdsfd");
         assertTrue(StringUtils.isBlank(value));
     }
 
     @Test
-    public void listConfigValues() throws IOException {
+    public void listConfigValues() {
         Map<String, String> values = git.configValues();
         assertTrue(values.size() > 0);
     }
 
     @Test
-    public void diffWithParentRef() throws IOException {
+    public void diffWithParentRef() {
         byte[] diff = git.diff("HEAD~1", false);
         assertNotNull(diff);
     }
 
     @Test
-    public void detectModifyChange() throws IOException {
+    public void detectModifyChange() {
         IOUtils.write(testFile, "Changes to text");
 
         List<String> allChanges = git.getAllChanges();
@@ -90,7 +95,7 @@ public class TestGit {
     }
 
     @Test
-    public void detectDeleteChange() throws IOException {
+    public void detectDeleteChange() {
         testFile.delete();
 
         List<String> allChanges = git.getAllChanges();
@@ -102,7 +107,7 @@ public class TestGit {
     }
 
     @Test
-    public void detectRenameChange() throws IOException {
+    public void detectRenameChange() {
         File renamedFile = new File(workingDirectory.getAbsolutePath() + File.separator + "testFile1.java");
 
         testFile.renameTo(renamedFile);
@@ -113,7 +118,7 @@ public class TestGit {
     }
 
     @Test
-    public void printLast200Commits() throws IOException {
+    public void printLast200Commits() {
         int numberOfCommitsToCheck = Math.min(git.totalCommitCount(), 200);
         CommitConfiguration configuration = new CommitConfiguration("http://reviewboard", "http://jenkins",
                 "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "none", "trivial");
@@ -126,7 +131,7 @@ public class TestGit {
         }
     }
 
-    private List<String> expectStagedChangesAfterAddAll() throws IOException {
+    private List<String> expectStagedChangesAfterAddAll() {
         assertEquals("Expected no staged changes", 0, git.getStagedChanges().size());
 
         git.addAllFiles();
@@ -136,10 +141,14 @@ public class TestGit {
         return stagedChanges;
     }
 
-    private static File createTempDirectory() throws IOException {
+    private static File createTempDirectory() {
         final File tempFile;
 
-        tempFile = File.createTempFile("temp", "repo");
+        try {
+            tempFile = File.createTempFile("temp", "repo");
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
 
         tempFile.delete();
         File tempRepoDir = new File(tempFile.getAbsolutePath() + "dir");
