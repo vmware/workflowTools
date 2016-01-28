@@ -2,28 +2,56 @@ package com.vmware.xmlrpc;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.http.request.PostDeserializeHandler;
 import com.vmware.util.IOUtils;
 import com.vmware.util.complexenum.ComplexEnum;
 import com.vmware.http.request.DeserializedName;
-import com.vmware.http.request.PostDeserialization;
+import com.vmware.http.request.PostDeserialize;
 import com.vmware.util.complexenum.ComplexEnumSelector;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Constructs an object from a map of values.
+ * Constructs an object to and from a map of values.
  */
-public class MapToObjectConverter {
+public class MapObjectConverter {
 
-    public <T> T convert(Map values, Class<T> objectClass) {
+    public Map<String, Object> toMap(Object requestObject) throws IllegalAccessException {
+        Map<String, Object> valuesToWrite = new HashMap<String, Object>();
+        for (Field field : requestObject.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            if (Modifier.isPrivate(field.getModifiers())) {
+                continue;
+            }
+            Expose expose = field.getAnnotation(Expose.class);
+            if (expose != null && !expose.serialize()) {
+                continue;
+            }
+            Object value = field.get(requestObject);
+            if (value == null) {
+                continue;
+            }
+            SerializedName serializedName = field.getAnnotation(SerializedName.class);
+            String nameToUse = serializedName != null ? serializedName.value() : field.getName();
+            Object valueToUse = determineCorrectValue(value);
+            if (valueToUse != null) {
+                valuesToWrite.put(nameToUse, valueToUse);
+            }
+        }
+        return valuesToWrite;
+    }
+
+    public <T> T fromMap(Map values, Class<T> objectClass) {
         Object createdObject;
         try {
             createdObject = objectClass.getConstructor().newInstance();
@@ -56,19 +84,20 @@ public class MapToObjectConverter {
             }
         }
 
-        for (Method method : objectClass.getMethods()) {
-            if (method.getAnnotation(PostDeserialization.class) == null) {
-                continue;
-            }
-
-            try {
-                method.invoke(createdObject);
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
-        }
+        new PostDeserializeHandler().invokePostDeserializeMethods(createdObject);
 
         return (T) createdObject;
+    }
+
+    private Object determineCorrectValue(Object objectToCheck)
+            throws IllegalAccessException {
+        if (objectToCheck instanceof byte[]) {
+            return objectToCheck;
+        } else if (objectToCheck instanceof Boolean) {
+            Boolean bool = (Boolean) objectToCheck;
+            return bool ? "1" : "0";
+        }
+        return objectToCheck.toString();
     }
 
     private void setFieldValue(Object createdObject, Field field, Object valueToConvert) throws IllegalAccessException {
@@ -87,7 +116,7 @@ public class MapToObjectConverter {
             Object convertedValues = Array.newInstance(arrayObjectType, valuesToConvert.length);
             for (int i = 0; i < valuesToConvert.length; i++) {
                 Map listObjectValues = (Map) valuesToConvert[i];
-                Array.set(convertedValues, i, convert(listObjectValues, arrayObjectType));
+                Array.set(convertedValues, i, fromMap(listObjectValues, arrayObjectType));
             }
             field.set(createdObject, convertedValues);
         } else {

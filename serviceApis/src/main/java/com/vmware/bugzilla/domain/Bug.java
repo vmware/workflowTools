@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.IssueInfo;
 import com.vmware.http.request.DeserializedName;
-import com.vmware.http.request.PostDeserialization;
+import com.vmware.http.request.PostDeserialize;
 import com.vmware.util.MatcherUtils;
 
 /**
@@ -76,7 +76,7 @@ public class Bug implements IssueInfo {
         this.key = String.valueOf(key);
     }
 
-    @PostDeserialization
+    @PostDeserialize
     public void calculateDerivedValues() {
         this.descriptionLength = description != null ? description.length() : 0;
         this.notFound = webUrl == null;
@@ -97,10 +97,6 @@ public class Bug implements IssueInfo {
         return description;
     }
 
-    public String getWebUrl() {
-        return webUrl;
-    }
-
     @Override
     public boolean isNotFound() {
         return notFound;
@@ -109,6 +105,10 @@ public class Bug implements IssueInfo {
     @Override
     public boolean isReal() {
         return true;
+    }
+
+    public String getWebUrl() {
+        return webUrl;
     }
 
     @Override

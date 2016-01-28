@@ -12,19 +12,15 @@ import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
-import com.vmware.xmlrpc.MapToObjectConverter;
+import com.vmware.xmlrpc.MapObjectConverter;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.vmware.http.cookie.ApiAuthentication.bugzilla_cookie;
 import static java.lang.String.format;
 
 
@@ -36,7 +32,7 @@ public class Bugzilla extends AbstractService {
 
     private final HttpConnection connection;
     private CookieAwareXmlRpcClient xmlRpcClient;
-    private MapToObjectConverter mapConverter;
+    private MapObjectConverter mapConverter;
     private int testBugNumber;
 
     public Bugzilla(String bugzillaUrl, String username, int testBugNumber) {
@@ -45,7 +41,7 @@ public class Bugzilla extends AbstractService {
         System.setProperty("jsse.enableSNIExtension", "false");
         xmlRpcClient = new CookieAwareXmlRpcClient(apiUrl);
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
-        mapConverter = new MapToObjectConverter();
+        mapConverter = new MapObjectConverter();
     }
 
     public List<Bug> getBugsForQuery(String savedQueryToRun) {
@@ -55,7 +51,7 @@ public class Bugzilla extends AbstractService {
         for (Object bug : bugs) {
             Map bugValues = (Map) bug;
             bugValues.put("web_url", constructFullBugUrl((Integer) bugValues.get("bug_id")));
-            bugList.add(mapConverter.convert(bugValues, Bug.class));
+            bugList.add(mapConverter.fromMap(bugValues, Bug.class));
         }
         return bugList;
     }
@@ -63,7 +59,7 @@ public class Bugzilla extends AbstractService {
     public Bug getBugById(int id) {
         Map values = xmlRpcClient.executeCall("Bug.show_bug", id);
         values.put("web_url", constructFullBugUrl(id));
-        return mapConverter.convert(values, Bug.class);
+        return mapConverter.fromMap(values, Bug.class);
     }
 
     public Bug getBugByIdWithoutException(int id) {

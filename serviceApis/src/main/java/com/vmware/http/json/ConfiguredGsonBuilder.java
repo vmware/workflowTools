@@ -26,6 +26,7 @@ public class ConfiguredGsonBuilder {
         this.builder = new GsonBuilder()
                 .addSerializationExclusionStrategy(serializationExclusionStrategy)
                 .addDeserializationExclusionStrategy(deserializationExclusionStrategy)
+                .registerTypeAdapterFactory(new PostDeserializeTypeAdapterFactory())
                 .registerTypeAdapter(Date.class, new DateWithTimezoneMapper(dateFormat, serverTimezone))
                 .registerTypeAdapter(IssueStatusDefinition.class, new ComplexEnumMapper())
                 .registerTypeAdapter(IssueResolutionDefinition.class, new ComplexEnumMapper())
