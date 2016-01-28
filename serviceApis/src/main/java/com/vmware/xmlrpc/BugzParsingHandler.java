@@ -49,7 +49,6 @@ public class BugzParsingHandler extends XmlRpcResponseParser implements ContentH
             throws SAXException {
         if (localName.equals("Apache2__RequestRec"))
             return;
-        // System.out.println("endElement()-" + localName);
         super.endElement(uri, localName, qName);
     }
 
@@ -88,9 +87,6 @@ public class BugzParsingHandler extends XmlRpcResponseParser implements ContentH
     @Override
     public void startElement(String uri, String localName, String qName,
             Attributes atts) throws SAXException {
-        // System.out.println("      uri:[" + uri + ']');
-        // System.out.println("localName:[" + localName + ']');
-        // System.out.println("    qName:[" + qName + ']');
         if (localName.equals("Apache2__RequestRec"))
             return;
 
@@ -103,7 +99,6 @@ public class BugzParsingHandler extends XmlRpcResponseParser implements ContentH
     @Override
     public void startPrefixMapping(String prefix, String uri)
             throws SAXException {
-        // System.out.println("startPrefixMapping()-" + prefix + ":" + uri);
         super.startPrefixMapping(prefix, uri);
     }
 

@@ -108,8 +108,7 @@ public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
             String rpcMethod = pRequest.getMethodName();
             byte[] buf = new byte[1024000];
             if (rpcMethod.equals("Search.get_saved_query")) {
-                System.out.println(
-                        "Special handling for Search.get_saved_query...");
+                log.debug("Special handling for Search.get_saved_query...");
                 istream.read(buf);
                 String bufStr = new String(buf);
                 String resultStr = null;
@@ -121,7 +120,7 @@ public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
                     if (idx2 >= 0)
                         resultStr = bufStr.substring(idx1, idx2)
                         + " LIMIT 5000";
-                    // System.out.println(resultStr);
+                    log.debug(resultStr);
                 }
                 return resultStr;
             }
