@@ -6,7 +6,7 @@ import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.NotFoundException;
-import com.vmware.http.request.RequestBodyHandling;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.request.UrlParam;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueResolutionDefinition;
