@@ -40,6 +40,7 @@ import static com.vmware.http.HttpMethodType.GET;
 import static com.vmware.http.HttpMethodType.POST;
 import static com.vmware.http.HttpMethodType.PUT;
 import static com.vmware.http.HttpMethodType.DELETE;
+import static com.vmware.http.request.RequestHeader.aBasicAuthHeader;
 import static com.vmware.http.request.RequestHeader.anAcceptHeader;
 
 /**
@@ -75,8 +76,7 @@ public class HttpConnection {
 
     public void setupBasicAuthHeader(final UsernamePasswordCredentials credentials) {
         String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
-        RequestHeader authorizationHeader = new RequestHeader("Authorization", "Basic " + basicCredentials);
-        requestParams.addStatefulParam(authorizationHeader);
+        requestParams.addStatefulParam(aBasicAuthHeader(basicCredentials));
     }
 
     public void addStatefulParams(List<? extends RequestParam> params) {
