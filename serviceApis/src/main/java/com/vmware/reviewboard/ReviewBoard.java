@@ -6,7 +6,7 @@ import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.request.UrlParam;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
-import com.vmware.http.request.RequestBodyHandling;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.Link;
 import com.vmware.reviewboard.domain.ResultsCount;
@@ -26,8 +26,6 @@ import com.vmware.reviewboard.domain.UserReviewsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

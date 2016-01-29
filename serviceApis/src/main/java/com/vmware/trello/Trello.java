@@ -10,7 +10,7 @@ import com.vmware.http.HttpConnection;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.BadRequestException;
 import com.vmware.http.exception.NotAuthorizedException;
-import com.vmware.http.request.RequestBodyHandling;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
@@ -24,8 +24,6 @@ import com.vmware.trello.domain.TokenApproval;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

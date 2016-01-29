@@ -10,7 +10,7 @@ import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotFoundException;
-import com.vmware.http.request.RequestBodyHandling;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapObjectConverter;
 

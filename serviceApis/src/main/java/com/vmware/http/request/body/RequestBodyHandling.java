@@ -1,4 +1,4 @@
-package com.vmware.http.request;
+package com.vmware.http.request.body;
 
 public enum RequestBodyHandling {
     AsUrlEncodedJsonEntity,
