@@ -10,10 +10,9 @@ import com.vmware.http.HttpConnection;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.BadRequestException;
 import com.vmware.http.exception.NotAuthorizedException;
-import com.vmware.http.request.body.RequestBodyHandling;
-import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.BooleanValue;
 import com.vmware.trello.domain.Card;
@@ -32,6 +31,7 @@ import java.util.regex.Pattern;
 
 import static com.vmware.http.cookie.ApiAuthentication.trello;
 import static com.vmware.http.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
+import static com.vmware.http.request.RequestHeader.aRefererHeader;
 
 public class Trello extends AbstractRestService {
 
@@ -115,7 +115,7 @@ public class Trello extends AbstractRestService {
         connection.resetParams();
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        connection.post(loginUrl, new LoginInfo(credentials), new RequestHeader("Referer", "https://trello.com/login"));
+        connection.post(loginUrl, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
 
         connection.setUseSessionCookies(true);

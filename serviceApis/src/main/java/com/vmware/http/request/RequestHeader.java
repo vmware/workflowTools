@@ -13,5 +13,12 @@ public class RequestHeader extends RequestParam {
         return new RequestHeader("Accept", value);
     }
 
+    public static RequestHeader aBasicAuthHeader(String credentials) {
+        return new RequestHeader("Authorization", "Basic " + credentials);
+    }
+
+    public static RequestHeader aRefererHeader(String value) {
+        return new RequestHeader("Referer", value);
+    }
 
 }

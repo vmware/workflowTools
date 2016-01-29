@@ -124,7 +124,7 @@ public class Jenkins extends AbstractRestService {
         if (usesCsrf) {
             CsrfCrumb csrfCrumb = super.optimisticGet(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
             RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
-            List<RequestParam> paramList = new ArrayList<RequestParam>(Arrays.asList(params));
+            List<RequestParam> paramList = new ArrayList<>(Arrays.asList(params));
             paramList.add(csrfHeader);
             super.optimisticPost(url, param, paramList.toArray(new RequestParam[paramList.size()]));
         } else {
