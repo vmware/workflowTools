@@ -95,21 +95,21 @@ public class ReviewRequestDraft extends BaseEntity{
 
     public void fillValuesFromCommitText(String commitText, CommitConfiguration commitConfiguration) {
         String jenkinsUrl = commitConfiguration.getJenkinsUrl();
-        String description = parseDescription(commitText, commitConfiguration.generateDescriptionPattern());
+        String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         String summary = commitText.substring(0, commitText.indexOf("\n"));
         description = description.length() < summary.length() + 1 ? "" : description.substring(summary.length() + 1);
         if (description.length() > 0 && description.charAt(0) == '\n') {
             description = description.substring(1);
         }
-        String testingDoneSection = parseTestingDone(commitText, commitConfiguration.generateTestingDonePattern());
+        String testingDoneSection = parseMultilineFromText(commitText, commitConfiguration.generateTestingDonePattern(), "Testing Done");
 
-        this.id = parseReviewNumber(commitText);
+        this.id = parseReviewNumber(commitText, commitConfiguration.generateReviewUrlPattern());
         this.description = description;
         this.summary = summary;
         this.testingDone = stripJenkinsJobBuildsFromTestingDone(testingDoneSection, jenkinsUrl);
         this.jobBuilds = generateJobBuildsList(testingDoneSection, jenkinsUrl);
-        this.bugNumbers = parseBugNumber(commitText, commitConfiguration.generateBugNumberPattern());
-        this.reviewedBy = parseReviewedBy(commitText, commitConfiguration.generateReviewedByPattern());
+        this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
+        this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
     }
 
     public void addIssues(Issue[] issuesToAdd) {
@@ -247,17 +247,17 @@ public class ReviewRequestDraft extends BaseEntity{
         builder.append(summary).append("\n\n");
 
         if (StringUtils.isNotBlank(description)) {
-            builder.append(description).append("\n\n");
+            builder.append(description).append("\n");
         }
 
         if (isNotBlank(fullTestingDoneSection())) {
-            builder.append(commitConfig.getTestingDoneLabel()).append(fullTestingDoneSection()).append("\n");
+            builder.append("\n").append(commitConfig.getTestingDoneLabel()).append(fullTestingDoneSection());
         }
         if (isNotBlank(bugNumbers)) {
-            builder.append(commitConfig.getBugNumberLabel()).append(bugNumbers).append("\n");
+            builder.append("\n").append(commitConfig.getBugNumberLabel()).append(bugNumbers);
         }
         if (isNotBlank(reviewedBy)) {
-            builder.append(commitConfig.getReviewedByLabel()).append(reviewedBy);
+            builder.append("\n").append(commitConfig.getReviewedByLabel()).append(reviewedBy);
         }
         if (hasReviewNumber()) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
@@ -266,48 +266,27 @@ public class ReviewRequestDraft extends BaseEntity{
         return builder.toString();
     }
 
-    private String parseDescription(String text, String pattern) {
-        Matcher descriptionMatcher = Pattern.compile(pattern, Pattern.DOTALL).matcher(text);
-        if (!descriptionMatcher.find()) {
-            log.warn("Description not found");
-            return "";
-        }
-        return descriptionMatcher.group(1).trim();
+    private Integer parseReviewNumber(String text, String pattern) {
+        String reviewNumber = parseSingleLineFromText(text, pattern, "Review number");
+        return isNotBlank(reviewNumber) ? Integer.parseInt(reviewNumber) : null;
     }
 
-    private String parseBugNumber(String text, String pattern) {
-        Matcher matcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(text);
+    private String parseSingleLineFromText(String text, String pattern, String description) {
+        return parseStringFromText(text, pattern, Pattern.MULTILINE, description);
+    }
+
+    private String parseMultilineFromText(String text, String pattern, String description) {
+        return parseStringFromText(text, pattern, Pattern.DOTALL, description);
+    }
+
+    private String parseStringFromText(String text, String pattern, int patternFlags, String description) {
+        Matcher matcher = Pattern.compile(pattern, patternFlags).matcher(text);
         if (!matcher.find()) {
-            log.warn("Bug Number not found");
+            log.warn("{} not found in commit", description);
+            log.debug("Using pattern {} against text\n[{}]", pattern, text);
             return "";
         }
         return matcher.group(1).trim();
-    }
-
-    private String parseReviewedBy(String text, String pattern) {
-        Matcher matcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(text);
-        if (!matcher.find()) {
-            log.warn("No reviewers found in commit");
-            return "";
-        }
-        return matcher.group(1).trim();
-    }
-
-    private String parseTestingDone(String text, String pattern) {
-        Matcher matcher = Pattern.compile(pattern, Pattern.DOTALL).matcher(text);
-        if (!matcher.find()) {
-            log.warn("Testing Done section not found");
-            return "";
-        }
-        return matcher.group(1).trim();
-    }
-
-    private Integer parseReviewNumber(String text) {
-        Matcher reviewMatcher = Pattern.compile("com/r/(\\d+)/*\\s*$", Pattern.MULTILINE).matcher(text);
-        if (!reviewMatcher.find()) {
-            return null;
-        }
-        return Integer.valueOf(reviewMatcher.group(1));
     }
 
     public String[] bugNumbersAsArray() {

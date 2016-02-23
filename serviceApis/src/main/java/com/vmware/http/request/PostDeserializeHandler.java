@@ -9,7 +9,7 @@ public class PostDeserializeHandler {
 
     public void invokePostDeserializeMethods(Object createdObject) {
         for (Method method : createdObject.getClass().getMethods()) {
-            if (method.getAnnotation(PostDeserialize.class) == null) {
+            if (!method.isAnnotationPresent(PostDeserialize.class)) {
                 continue;
             }
 
