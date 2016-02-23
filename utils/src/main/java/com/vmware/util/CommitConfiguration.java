@@ -53,6 +53,10 @@ public class CommitConfiguration {
         return builder.toString();
     }
 
+    public String generateReviewUrlPattern() {
+        return reviewUrlLabel.trim() + "\\s*.+?com/r/(\\d+)/*\\s*$";
+    }
+
     public String generateReviewedByPattern() {
         return reviewedByLabel.trim() + "\\s*([\\w,\\s]+)$";
     }
