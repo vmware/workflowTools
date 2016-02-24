@@ -12,7 +12,6 @@ import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -426,8 +425,8 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, testingDoneLabel, bugNumberLabel, reviewedByLabel,reviewUrlLabel,
-                noBugNumberLabel, trivialReviewerLabel);
+        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, testingDoneLabel, bugNumberLabel, reviewedByLabel,
+                reviewUrlLabel);
     }
 
     public String getJenkinsJobValue(String jenkinsJobKey) {
