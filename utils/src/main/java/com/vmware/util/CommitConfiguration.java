@@ -16,20 +16,14 @@ public class CommitConfiguration {
 
     private String reviewUrlLabel;
 
-    private String noBugNumberLabel;
-
-    private String trivialReviewerLabel;
-
-    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl , String testingDoneLabel, String bugNumberLabel,
-                               String reviewedByLabel, String reviewUrlLabel, String noBugNumberLabel, String trivialReviewerLabel) {
+    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,
+                               String reviewedByLabel, String reviewUrlLabel) {
         this.reviewboardUrl = reviewboardUrl;
         this.jenkinsUrl = jenkinsUrl;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
         this.reviewUrlLabel = padLabel(reviewUrlLabel);
-        this.noBugNumberLabel = noBugNumberLabel;
-        this.trivialReviewerLabel = trivialReviewerLabel;
     }
 
     public String generateDescriptionPattern() {
@@ -54,7 +48,7 @@ public class CommitConfiguration {
     }
 
     public String generateReviewUrlPattern() {
-        return reviewUrlLabel.trim() + "\\s*.+?com/r/(\\d+)/*\\s*$";
+        return reviewUrlLabel.trim() + "\\s*.+?/r/(\\d+)/*\\s*$";
     }
 
     public String generateReviewedByPattern() {
@@ -87,14 +81,6 @@ public class CommitConfiguration {
 
     public String getReviewUrlLabel() {
         return reviewUrlLabel;
-    }
-
-    public String getNoBugNumberLabel() {
-        return noBugNumberLabel;
-    }
-
-    public String getTrivialReviewerLabel() {
-        return trivialReviewerLabel;
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {
