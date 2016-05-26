@@ -25,16 +25,15 @@ import java.util.regex.Pattern;
  * Wrapper class around the git command line command.
  * Exposes git functionality needed for workflows.
  */
-public class Git {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-    private File workingDirectory = null;
+public class Git extends AbstractScmWrapper {
     private Boolean gitInstalled;
 
     public Git() {
+        super(new File(System.getProperty("user.dir")));
     }
 
     public Git(File workingDirectory) {
-        this.workingDirectory = workingDirectory;
+        super(workingDirectory);
     }
 
     /**
@@ -42,7 +41,7 @@ public class Git {
      */
     public File getRootDirectory() {
         FileFilter gitDirectoryFilter = new GitDirectoryFilter();
-        File matchingDirectory = workingDirectory != null ? workingDirectory : new File(System.getProperty("user.dir"));
+        File matchingDirectory = workingDirectory;
         while (matchingDirectory != null && matchingDirectory.listFiles(gitDirectoryFilter).length != 1) {
             matchingDirectory = matchingDirectory.getParentFile();
         }
@@ -50,7 +49,7 @@ public class Git {
     }
 
     public String applyDiff(String diffData) {
-        return executeGitCommand("git apply -3 --index", diffData, false);
+        return executeScmCommand("git apply -3 --index", diffData, false);
     }
 
     public String lastCommitText(boolean prettyPrint) {
@@ -59,11 +58,11 @@ public class Git {
 
     public String commitText(int skipCount, boolean prettyPrint) {
         String prettyPrintCommand = prettyPrint ? " --pretty=%B\n" : "";
-        return executeGitCommand("git log -1 --skip=" + skipCount + prettyPrintCommand);
+        return executeScmCommand("git log -1 --skip=" + skipCount + prettyPrintCommand);
     }
 
     public String currentBranch() {
-        return executeGitCommand("git rev-parse --abbrev-ref HEAD");
+        return executeScmCommand("git rev-parse --abbrev-ref HEAD");
     }
 
     public String configValue(String propertyName) {
@@ -71,11 +70,11 @@ public class Git {
             log.debug("Returning empty string for git config value {} as git is not installed", propertyName);
             return "";
         }
-        return executeGitCommand("git config " + propertyName);
+        return executeScmCommand("git config " + propertyName);
     }
 
     public int totalCommitCount() {
-        String commitCount = executeGitCommand("git rev-list HEAD --count");
+        String commitCount = executeScmCommand("git rev-list HEAD --count");
         return Integer.parseInt(commitCount);
     }
 
@@ -85,7 +84,7 @@ public class Git {
             return new HashMap<String, String>();
         }
 
-        String configText = executeGitCommand("git config -l");
+        String configText = executeScmCommand("git config -l");
         String[] valuesAsText = configText.split("[\r\n]+");
         Map<String, String> values = new HashMap<String, String>();
         for (String valueAsText : valuesAsText) {
@@ -101,6 +100,10 @@ public class Git {
 
     public void commit(String msg) {
         executeCommitCommand("git commit", msg);
+    }
+
+    public void addChangesToDefaultChangelist() {
+        executeScmCommand("git p4 submit --prepare-p4-only", null, true);
     }
 
     public void commitWithAllFileChanges(String msg) {
@@ -119,14 +122,22 @@ public class Git {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "git diff %s--no-color --full-index --no-ext-diff --ignore-submodules %s..%s";
         diffCommand = String.format(diffCommand, renamesFlag, parentRef, commitRef);
-        byte[] diffOutput = executeGitCommand(diffCommand).getBytes();
+        byte[] diffOutput = executeScmCommand(diffCommand).getBytes();
         return diffOutput.length > 0 ? diffOutput : null;
     }
 
     public byte[] diff(String commitRef, boolean supportsRenames) {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "git diff " + renamesFlag + "--no-color --full-index --no-ext-diff --ignore-submodules " + commitRef;
-        return executeGitCommand(diffCommand).getBytes();
+        return executeScmCommand(diffCommand).getBytes();
+    }
+
+    public void submit() {
+        String output = executeScmCommand("git p4 submit");
+        if (!output.contains("All commits applied!")) {
+            log.error("git p4 submit failed!\n", output);
+            System.exit(1);
+        }
     }
 
     public void push() {
@@ -150,18 +161,18 @@ public class Git {
     }
 
     public String mergeBase(String upstreamBranch, String commitRef) {
-        return executeGitCommand("git merge-base " + upstreamBranch + " " + commitRef);
+        return executeScmCommand("git merge-base " + upstreamBranch + " " + commitRef);
     }
 
     public String revParse(String commitRef) {
-        return executeGitCommand("git rev-parse " + commitRef);
+        return executeScmCommand("git rev-parse " + commitRef);
     }
 
     public String getTrackingBranch() {
         String branchName = currentBranch();
         String headRef = revParse("HEAD");
 
-        String branchOutput = executeGitCommand("git branch -vv");
+        String branchOutput = executeScmCommand("git branch -vv");
 
         Matcher trackingBranchMatcher = Pattern.compile(branchName + "\\s*(\\w+)\\s*\\[(.+?)\\]").matcher(branchOutput);
         if (!trackingBranchMatcher.find()) {
@@ -184,15 +195,15 @@ public class Git {
     }
 
     public String initRepo() {
-        return executeGitCommand("git init");
+        return executeScmCommand("git init");
     }
 
     public String addAllFiles() {
-        return executeGitCommand("git add --all");
+        return executeScmCommand("git add --all");
     }
 
     public String reset(String ref) {
-        return executeGitCommand("git reset --hard " + ref);
+        return executeScmCommand("git reset --hard " + ref);
     }
 
     public List<String> getStagedChanges() {
@@ -203,6 +214,18 @@ public class Git {
         return getChanges(true);
     }
 
+    @Override
+    protected void exitIfCommandFailed(String gitOutput) {
+        if (StringUtils.isBlank(gitOutput)) {
+            return;
+        }
+
+        if (gitOutput.trim().startsWith("fatal: Not a git repository")) {
+            log.error("{} is not in a git repository", System.getProperty("user.dir"));
+            System.exit(1);
+        }
+    }
+
     private void pushToRemoteBranch(String remoteBranch, boolean forceUpdate) {
         String currentHeadRef = revParse("HEAD");
         log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
@@ -210,7 +233,7 @@ public class Git {
         String forceUpdateString = forceUpdate ? " -f" : "";
         String pushCommand = String.format("git push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
 
-        String pushOutput = executeGitCommand(pushCommand, true);
+        String pushOutput = executeScmCommand(pushCommand, true);
 
         if (pushOutput.contains("[up to date]")) {
             log.info("Remote branch is already up to date");
@@ -238,7 +261,7 @@ public class Git {
 
     private List<String> getChanges(boolean includeUnStagedChanges) {
         List<String> changes = new ArrayList<String>();
-        String gitStatusOutput = executeGitCommand("git status --porcelain" );
+        String gitStatusOutput = executeScmCommand("git status --porcelain" );
 
         String pattern = String.format("^(\\s*)(%s+)\\s+(.+)", FileChange.allValuesPattern());
         Matcher changesMatcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(gitStatusOutput);
@@ -290,63 +313,10 @@ public class Git {
     }
 
     private void executeCommitCommand(String commitCommand, String msg) {
-        executeGitCommand(commitCommand + " --file=-", msg, false);
+        executeScmCommand(commitCommand + " --file=-", msg, false);
     }
 
-    private String executeGitCommand(String gitCommand) {
-        return executeGitCommand(gitCommand, false);
-    }
 
-    private String executeGitCommand(String gitCommand, boolean printLines) {
-        return executeGitCommand(gitCommand, null, printLines);
-    }
-
-    private String executeGitCommand(String gitCommand, String inputText, boolean printLines) {
-        log.debug("Git command {}", gitCommand);
-        String gitOutput = executeCommand(gitCommand, inputText, printLines);
-        exitIfGitCommandFailed(gitOutput);
-        return gitOutput;
-    }
-
-    private String executeCommand(String command, String inputText, boolean printLines) {
-        ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
-                .redirectErrorStream(true);
-        try {
-            Process statusProcess = builder.start();
-            if (inputText != null) {
-                IOUtils.write(statusProcess.getOutputStream(), inputText);
-            }
-            return readProcessOutput(statusProcess.getInputStream(), printLines);
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
-    }
-
-    private String readProcessOutput(InputStream input, boolean printLines) {
-        Padder titlePadder = new Padder("Git Output");
-        Level logLevel = printLines ? Level.INFO : Level.FINEST;
-
-        titlePadder.logTitle(logLevel);
-        String output = IOUtils.read(input);
-        if (printLines) {
-            log.info(output);
-        } else {
-            log.trace(output);
-        }
-        titlePadder.logTitle(logLevel);
-        return output;
-    }
-
-    private void exitIfGitCommandFailed(String gitOutput) {
-        if (StringUtils.isBlank(gitOutput)) {
-            return;
-        }
-
-        if (gitOutput.trim().startsWith("fatal: Not a git repository")) {
-            log.error("{} is not in a git repository", System.getProperty("user.dir"));
-            System.exit(1);
-        }
-    }
 
     public enum FileChange {
         A("added"),
@@ -377,7 +347,6 @@ public class Git {
     }
 
     private class GitDirectoryFilter implements FileFilter {
-
         @Override
         public boolean accept(File file) {
             return file.isDirectory() && file.getName().equals(".git");

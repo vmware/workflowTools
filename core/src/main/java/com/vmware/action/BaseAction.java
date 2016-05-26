@@ -1,6 +1,7 @@
 package com.vmware.action;
 
 import com.vmware.Git;
+import com.vmware.Perforce;
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ public abstract class BaseAction {
     protected final ServiceLocator serviceLocator;
 
     protected final Git git = new Git();
+
+    protected final Perforce perforce = new Perforce(git.getRootDirectory());
 
 
     public BaseAction(WorkflowConfig config) {

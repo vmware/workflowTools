@@ -26,7 +26,19 @@ public class FormEncodedRequestBodyHandler {
         }
     }
 
-    public void writeValuesAsFormEncoded(HttpConnection connection, Map<String, Object> valuesToWrite) throws IOException {
+    public void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject) {
+        String jsonText = connection.toJson(requestObject);
+        log.trace("Request Json: {}", jsonText);
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("json", jsonText);
+        try {
+            writeValuesAsFormEncoded(connection, values);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
+    private void writeValuesAsFormEncoded(HttpConnection connection, Map<String, Object> valuesToWrite) throws IOException {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
         String contentToWrite = "";
@@ -43,17 +55,5 @@ public class FormEncodedRequestBodyHandler {
         outputStream.writeBytes(contentToWrite);
         outputStream.flush();
         outputStream.close();
-    }
-
-    public void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject) {
-        String jsonText = connection.toJson(requestObject);
-        log.trace("Request Json: {}", jsonText);
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put("json", jsonText);
-        try {
-            writeValuesAsFormEncoded(connection, values);
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
     }
 }
