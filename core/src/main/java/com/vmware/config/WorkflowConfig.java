@@ -106,6 +106,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-trelloUrl,--trello-url", help = "Url for trello server")
     public String trelloUrl;
 
+    @ConfigurableProperty(commandLine = "-p4Client,--perforce-client", gitConfigProperty = "git-p4.client", help = "Perforce client to use")
+    public String perforceClientName;
+
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
     public boolean includeStoriesWithEstimates;
 

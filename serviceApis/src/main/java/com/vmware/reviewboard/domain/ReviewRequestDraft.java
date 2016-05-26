@@ -74,6 +74,9 @@ public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
     public boolean userHasBugzillaQuery;
 
+    @Expose(serialize = false, deserialize = false)
+    public String matchingChangelistId;
+
     public ReviewRequestDraft() {}
 
     public ReviewRequestDraft(final String summary, final String description, final String testingDone,

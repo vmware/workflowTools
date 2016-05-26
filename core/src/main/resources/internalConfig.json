@@ -131,6 +131,12 @@
        "pushHarder": [
           "prepareCommitForPush", "PushToMaster", "HardSubmitReview"
        ],
+       "submit": [
+          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "SoftSubmitReview"
+       ],
+       "submitHarder": [
+          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "HardSubmitReview"
+       ],
        "closeOldReviews": [
           "HardSubmitOldSoftSubmittedReviews", "HardSubmitOldShipItReviews"
        ],
@@ -212,6 +218,9 @@
        ],
        "createUpdateIssuesFromTrello": [
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
+       ],
+       "createPendingChangelist": [
+         "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "ExitIfTrivialCommit", "RevertWorkspace", "CreateChangelistWithGitP4"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"
