@@ -1,31 +1,25 @@
 package com.vmware;
 
-import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
-import com.vmware.util.Padder;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.vmware.util.CommandLineUtils.isCommandAvailable;
 
 /**
  * Wrapper class around the git command line command.
  * Exposes git functionality needed for workflows.
  */
-public class Git extends AbstractScmWrapper {
+public class Git extends BaseScmWrapper {
     private Boolean gitInstalled;
 
     public Git() {
@@ -295,20 +289,8 @@ public class Git extends AbstractScmWrapper {
         if (gitInstalled != null) {
             return gitInstalled;
         }
+        gitInstalled = isCommandAvailable("git");
 
-        String osName = System.getProperty("os.name");
-        log.debug("Os name {}", osName);
-        if (osName == null) {
-            gitInstalled = false;
-        } else if (osName.startsWith("Windows")) {
-            String gitWhereCheck = executeCommand("where git", null, false);
-            log.debug("{} git where check [{}]", osName, gitWhereCheck);
-            gitInstalled = !gitWhereCheck.contains("Could not find files");
-        } else {
-            String gitWhichCheck = executeCommand("which git", null, false);
-            log.debug("{} git which check [{}]", osName, gitWhichCheck);
-            gitInstalled = !gitWhichCheck.trim().isEmpty();
-        }
         return gitInstalled;
     }
 

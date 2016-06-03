@@ -2,11 +2,8 @@ package com.vmware;
 
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +11,7 @@ import java.util.List;
 /**
  * Wrapper around p4 commands
  */
-public class Perforce extends AbstractScmWrapper {
+public class Perforce extends BaseScmWrapper {
     public Perforce() {
         super(new File(System.getProperty("user.dir")));
     }
