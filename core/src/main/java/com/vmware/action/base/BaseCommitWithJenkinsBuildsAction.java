@@ -6,18 +6,18 @@ import com.vmware.jenkins.Jenkins;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class BaseCommitWithBuildsAction extends BaseCommitAction {
+public abstract class BaseCommitWithJenkinsBuildsAction extends BaseCommitAction {
 
     protected Jenkins jenkins;
 
-    public BaseCommitWithBuildsAction(WorkflowConfig config) {
+    public BaseCommitWithJenkinsBuildsAction(WorkflowConfig config) {
         super(config);
     }
 
     @Override
     public String cannotRunAction() {
-        if (draft.jobBuilds.isEmpty()) {
-            return "the commit has no job builds in the testing done section";
+        if (draft.jobBuildsMatchingUrl(jenkins.baseUrl).isEmpty()) {
+            return "the commit has no Jenkins job builds in the testing done section";
         } else {
             return super.cannotRunAction();
         }

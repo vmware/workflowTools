@@ -49,7 +49,9 @@
     "--jira-url"
   ],
   "InvokeSandboxBuild": [
-    "--gobuild-bin-path"
+    "--gobuild-bin-path",
+    "--sandbox-branch",
+    "--buildweb-project"
   ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
@@ -113,6 +115,9 @@
   "BaseSetReviewerList": [
     "--username"
   ],
+  "StripJenkinsJobs": [
+    "--jenkins-url"
+  ],
   "PublishReview": [
     "--reviewboard-url"
   ],
@@ -154,6 +159,12 @@
     "--latest-diff",
     "--patch"
   ],
+  "BaseCommitWithJenkinsBuildsAction": [
+    "--disable-jenkins-login",
+    "--jenkins-uses-csrf",
+    "--username",
+    "--jenkins-url"
+  ],
   "BaseBatchBugzillaAction": [
     "--bugzilla-test-bug",
     "--username",
@@ -169,12 +180,6 @@
   "AddTrackingIssueForBug": [
     "--bugzilla-url",
     "--default-jira-project"
-  ],
-  "BaseCommitWithBuildsAction": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--username",
-    "--jenkins-url"
   ],
   "MarkBugAsResolved": [
     "--bugzilla-test-bug",

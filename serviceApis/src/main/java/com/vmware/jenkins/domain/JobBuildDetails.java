@@ -1,5 +1,7 @@
 package com.vmware.jenkins.domain;
 
+import com.vmware.BuildResult;
+
 public class JobBuildDetails {
 
    public String url;
@@ -8,7 +10,7 @@ public class JobBuildDetails {
 
    public boolean building;
 
-   public JobBuildResult result;
+   public BuildResult result;
 
    public String getJobBuildCommitId() {
        for (JobBuildDetail detail : actions) {
@@ -28,7 +30,7 @@ public class JobBuildDetails {
         throw new RuntimeException("Could not get username for job starter");
     }
 
-    public JobBuildResult realResult() {
-        return building ? JobBuildResult.BUILDING : result;
+    public BuildResult realResult() {
+        return building ? BuildResult.BUILDING : result;
     }
 }

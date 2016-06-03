@@ -1,6 +1,8 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.action.base.BaseCommitWithBuildsAction;
+import com.vmware.BuildResult;
+import com.vmware.JobBuild;
+import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.*;
@@ -9,14 +11,12 @@ import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobKeys config property. Adds or replaces jenkins job urls to testing done section.")
-public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
+public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     private static final String USERNAME_PARAM = "USERNAME";
     private static final String NO_USERNAME = "NONE";
     private static final String ASK_FOR_PARAM = "$ASK";
@@ -75,7 +75,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithBuildsAction {
             log.debug("Current status {}", updatedDetails.realResult());
         }
         log.info("Job status {}", updatedDetails.realResult());
-        return updatedDetails.realResult() == JobBuildResult.SUCCESS;
+        return updatedDetails.realResult() == BuildResult.SUCCESS;
     }
 
     private void askForJenkinsJobKeysIfBlank() {

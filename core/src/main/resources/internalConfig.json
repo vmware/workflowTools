@@ -9,11 +9,14 @@
   "bugzillaTestBug": 10001,
   "trelloUrl": "https://trello.com",
   "jenkinsUrl": "https://jenkins-hzn.eng.vmware.com/jenkins",
+  "buildwebUrl": " https://buildweb.eng.vmware.com",
   "jenkinsUsesCsrf": false,
   "waitForJenkinsJobCompletion": false,
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 10,
   "goBuildBinPath": "/build/apps/bin/gobuild",
+  "buildwebProject": "vcloud",
+  "buildwebBranch": "sp-main",
   "remoteBranches": {
     "precommit" : "topic/:username/pre-commit",
     "update" : "topic/:username/update"

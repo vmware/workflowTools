@@ -79,6 +79,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
 
+    @ConfigurableProperty(commandLine = "-buildwebUrl,--buildweb-url", help = "Url for gobuild server")
+    public String buildwebUrl;
+
     @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
     public boolean jenkinsUsesCsrf;
 
@@ -111,6 +114,12 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "-gobuildBinPath,--gobuild-bin-path", help = "Path to gobuild bin file, this is a VMware specific tool")
     public String goBuildBinPath;
+
+    @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox buikd, this is for a VMware specific tool")
+    public String buildwebProject;
+
+    @ConfigurableProperty(commandLine = "-buildwebBranch,--sandbox-branch", help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool")
+    public String buildwebBranch;
 
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
     public boolean includeStoriesWithEstimates;
@@ -430,8 +439,8 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, testingDoneLabel, bugNumberLabel, reviewedByLabel,
-                reviewUrlLabel);
+        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
+                reviewedByLabel, reviewUrlLabel);
     }
 
     public String getJenkinsJobValue(String jenkinsJobKey) {

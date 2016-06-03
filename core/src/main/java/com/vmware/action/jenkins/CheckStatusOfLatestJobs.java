@@ -1,5 +1,6 @@
 package com.vmware.action.jenkins;
 
+import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -7,10 +8,6 @@ import com.vmware.jenkins.Jenkins;
 import com.vmware.jenkins.domain.*;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 
 @ActionDescription("Checks that status of the latest job specified for the specified user.")
 public class CheckStatusOfLatestJobs extends BaseAction {

@@ -1,7 +1,7 @@
 package com.vmware;
 
 /**
- * Common Inteface for Jira issues and Bugzilla Issues
+ * Common Interface for Jira issues and Bugzilla Issues
  */
 public interface IssueInfo {
 
