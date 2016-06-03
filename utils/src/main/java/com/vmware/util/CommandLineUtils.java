@@ -72,7 +72,7 @@ public class CommandLineUtils {
                     if (matchedText && textsToWaitFor.length > i) {
                         dynamicLogger.log(logLevel, "Found {} in output, writing [{}]", textsToWaitFor[i], inputs[i]);
                         totalOutput += inputs[i];
-                        IOUtils.writeWithoutClosing(statusProcess.getOutputStream(), inputs[i]);
+                        IOUtils.writeWithoutClosing(statusProcess.getOutputStream(), inputs[i] + "\n");
                         sleepTime = 0;
                     } else if (matchedText) {
                         dynamicLogger.log(logLevel, "Found {} in output", textsToWaitFor[i]);

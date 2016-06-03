@@ -2,8 +2,8 @@ package com.vmware.reviewboard.domain;
 
 import com.vmware.IssueInfo;
 import com.vmware.bugzilla.domain.Bug;
-import com.vmware.jenkins.domain.JobBuild;
-import com.vmware.jenkins.domain.JobBuildResult;
+import com.vmware.JobBuild;
+import com.vmware.BuildResult;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.CommitConfiguration;
@@ -97,7 +97,6 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public void fillValuesFromCommitText(String commitText, CommitConfiguration commitConfiguration) {
-        String jenkinsUrl = commitConfiguration.getJenkinsUrl();
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
         String summary = commitText.substring(0, summaryIndex);
@@ -110,8 +109,9 @@ public class ReviewRequestDraft extends BaseEntity{
         this.id = parseReviewNumber(commitText, commitConfiguration.generateReviewUrlPattern());
         this.description = description;
         this.summary = summary;
-        this.testingDone = stripJenkinsJobBuildsFromTestingDone(testingDoneSection, jenkinsUrl);
-        this.jobBuilds = generateJobBuildsList(testingDoneSection, jenkinsUrl);
+        this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateJenkinsUrlPattern()));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateBuildwebUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
     }
@@ -170,18 +170,17 @@ public class ReviewRequestDraft extends BaseEntity{
         return null;
     }
 
-    private String stripJenkinsJobBuildsFromTestingDone(String testingDone, String jenkinsUrl) {
-        String patternToSearchFor = jenkinsUrl + "/job/[\\w-]+/\\d+/*\\s+" +
-                JobBuildResult.generateResultPattern();
+    private String stripJobBuildsFromTestingDone(String testingDone) {
+        String patternToSearchFor = "http.+?\\s+" + BuildResult.generateResultPattern();
         return testingDone.replaceAll(patternToSearchFor, "").trim();
     }
 
-    private List<JobBuild> generateJobBuildsList(String text, String jenkinsUrl) {
-        Matcher jobMatcher = Pattern.compile("(" + jenkinsUrl + "/job/[\\w-]+/\\d+/*)\\s+" +
-                JobBuildResult.generateResultPattern(), Pattern.MULTILINE).matcher(text);
-        List<JobBuild> jobBuilds = new ArrayList<JobBuild>();
+    private List<JobBuild> generateJobBuildsList(String text, String jobUrlPattern) {
+        Matcher jobMatcher = Pattern.compile(jobUrlPattern + "\\s+" +
+                BuildResult.generateResultPattern(), Pattern.MULTILINE).matcher(text);
+        List<JobBuild> jobBuilds = new ArrayList<>();
         while (jobMatcher.find()) {
-            jobBuilds.add(new JobBuild(jobMatcher.group(1), JobBuildResult.valueOf(jobMatcher.group(2))));
+            jobBuilds.add(new JobBuild(jobMatcher.group(1), BuildResult.valueOf(jobMatcher.group(2))));
         }
         return jobBuilds;
     }
@@ -207,6 +206,20 @@ public class ReviewRequestDraft extends BaseEntity{
             }
         }
         return null;
+    }
+
+    public String[] bugNumbersAsArray() {
+        return bugNumbers != null ? bugNumbers.split(",") : new String[0];
+    }
+
+    public List<JobBuild> jobBuildsMatchingUrl(String url) {
+        List<JobBuild> builds = new ArrayList<>();
+        for (JobBuild buildToCheck : jobBuilds) {
+            if (buildToCheck.containsUrl(url)) {
+                builds.add(buildToCheck);
+            }
+        }
+        return builds;
     }
 
     public void setTargetGroups(String[] targetGroupsArray) {
@@ -292,9 +305,4 @@ public class ReviewRequestDraft extends BaseEntity{
         }
         return matcher.group(1).trim();
     }
-
-    public String[] bugNumbersAsArray() {
-        return bugNumbers != null ? bugNumbers.split(",") : new String[0];
-    }
-
 }

@@ -1,22 +1,20 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.action.base.BaseCommitWithBuildsAction;
+import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jenkins.domain.JobBuild;
-import com.vmware.jenkins.domain.JobBuildResult;
+import com.vmware.JobBuild;
+import com.vmware.BuildResult;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 @ActionDescription("Aborts the jenkins jobs specified by the jenkinsJobKeys config property. Updates status for jenkins job urls in testing done section.")
-public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
+public class AbortJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
     public AbortJenkinsJobs(WorkflowConfig config) {
         super(config);
@@ -68,7 +66,7 @@ public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
             return;
         }
 
-        if (buildToAbort.result != JobBuildResult.BUILDING) {
+        if (buildToAbort.result != BuildResult.BUILDING) {
             return;
         }
 
@@ -81,6 +79,6 @@ public class AbortJenkinsJobs extends BaseCommitWithBuildsAction {
         }
 
         log.info("Marking build url {} as ABORTED", buildToAbort.url);
-        buildToAbort.result = JobBuildResult.ABORTED;
+        buildToAbort.result = BuildResult.ABORTED;
     }
 }

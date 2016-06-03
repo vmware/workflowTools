@@ -1,6 +1,8 @@
 package com.vmware.jenkins;
 
 import com.vmware.AbstractRestService;
+import com.vmware.BuildResult;
+import com.vmware.JobBuild;
 import com.vmware.jenkins.domain.*;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.exception.InternalServerException;
@@ -63,26 +65,32 @@ public class Jenkins extends AbstractRestService {
     }
 
     public JobBuildDetails getJobBuildDetails(JobBuild jobBuild) {
-        return optimisticGet(jobBuild.getInfoUrl(), JobBuildDetails.class);
+        return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
     }
 
     public void stopJobBuild(JobBuild jobBuildToStop) {
-        optimisticPost(jobBuildToStop.getStopUrl(), null);
+        optimisticPost(jobBuildToStop.getJenkinsStopUrl(), null);
     }
 
     public void checkStatusOfJenkinsJobs(ReviewRequestDraft draft) {
         log.info("Checking status of jenkins jobs");
+        List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(baseUrl);
+
+        if (jobsToCheck.isEmpty()) {
+            log.info("No jenkins jobs found in testing done text");
+            draft.jenkinsJobsAreSuccessful = true;
+            return;
+        }
         boolean isSuccess = true;
 
-        for (JobBuild jobBuild : draft.jobBuilds) {
-
+        for (JobBuild jobBuild : jobsToCheck) {
             String jobUrl = jobBuild.url;
             String jobApiUrl = UrlUtils.addTrailingSlash(jobUrl) + "api/json";
 
-            if (jobBuild.result == JobBuildResult.BUILDING) {
+            if (jobBuild.result == BuildResult.BUILDING) {
                 try {
                     JobBuildDetails jobBuildDetails = this.getJobBuildDetails(jobApiUrl);
-                    jobBuild.result = jobBuildDetails.building ? JobBuildResult.BUILDING : jobBuildDetails.result;
+                    jobBuild.result = jobBuildDetails.building ? BuildResult.BUILDING : jobBuildDetails.result;
                     log.info("Job: {} Result: {}", jobUrl, jobBuild.result);
                 } catch (NotFoundException nfe) {
                     log.info("Job {} did not return a job, job might still be in Jenkins queue", jobUrl);
@@ -90,10 +98,7 @@ public class Jenkins extends AbstractRestService {
             } else {
                 log.info("Job: {} Result: {}", jobUrl, jobBuild.result);
             }
-            isSuccess = isSuccess && jobBuild.result == JobBuildResult.SUCCESS;
-        }
-        if (draft.jobBuilds.isEmpty()) {
-            log.info("No jenkins jobs found in testing done text");
+            isSuccess = isSuccess && jobBuild.result == BuildResult.SUCCESS;
         }
 
         draft.jenkinsJobsAreSuccessful = isSuccess;

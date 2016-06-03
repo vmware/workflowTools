@@ -6,8 +6,8 @@ package com.vmware.util;
 public class CommitConfiguration {
 
     private final String jenkinsUrl;
-    private String reviewboardUrl;
-
+    private final String reviewboardUrl;
+    private final String buildwebUrl;
     private String testingDoneLabel;
 
     private String bugNumberLabel;
@@ -16,7 +16,7 @@ public class CommitConfiguration {
 
     private String reviewUrlLabel;
 
-    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,
+    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
                                String reviewedByLabel, String reviewUrlLabel) {
         this.reviewboardUrl = reviewboardUrl;
         this.jenkinsUrl = jenkinsUrl;
@@ -24,6 +24,7 @@ public class CommitConfiguration {
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
         this.reviewUrlLabel = padLabel(reviewUrlLabel);
+        this.buildwebUrl = buildwebUrl;
     }
 
     public String generateDescriptionPattern() {
@@ -59,12 +60,20 @@ public class CommitConfiguration {
         return bugNumberLabel.trim() + "([,\\w\\d\\s-]+)$";
     }
 
-    public String getJenkinsUrl() {
-        return jenkinsUrl;
+    public String generateJenkinsUrlPattern() {
+        return "(" + jenkinsUrl + "/job/[\\w-]+/\\d+/*)";
+    }
+
+    public String generateBuildwebUrlPattern() {
+        return "(" + buildwebUrl + "/sb/\\d+/*)";
     }
 
     public String getReviewboardUrl() {
         return reviewboardUrl;
+    }
+
+    public String getBuildwebUrl() {
+        return buildwebUrl;
     }
 
     public String getTestingDoneLabel() {
