@@ -132,6 +132,7 @@ public class Git extends BaseScmWrapper {
             log.error("git p4 submit failed!");
             System.exit(1);
         }
+        log.info("Successfully ran git p4 submit");
     }
 
     public void push() {
