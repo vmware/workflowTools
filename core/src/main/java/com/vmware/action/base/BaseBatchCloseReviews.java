@@ -6,11 +6,8 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
 import com.vmware.util.DateUtils;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 

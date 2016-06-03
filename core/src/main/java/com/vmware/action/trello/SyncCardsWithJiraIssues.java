@@ -5,11 +5,8 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

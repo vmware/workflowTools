@@ -99,7 +99,8 @@ public class ReviewRequestDraft extends BaseEntity{
     public void fillValuesFromCommitText(String commitText, CommitConfiguration commitConfiguration) {
         String jenkinsUrl = commitConfiguration.getJenkinsUrl();
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
-        String summary = commitText.substring(0, commitText.indexOf("\n"));
+        int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
+        String summary = commitText.substring(0, summaryIndex);
         description = description.length() < summary.length() + 1 ? "" : description.substring(summary.length() + 1);
         if (description.length() > 0 && description.charAt(0) == '\n') {
             description = description.substring(1);

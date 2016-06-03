@@ -1,6 +1,6 @@
 package com.vmware.util.input;
 
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
 import jline.console.ConsoleReader;

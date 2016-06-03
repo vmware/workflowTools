@@ -7,7 +7,7 @@ import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 

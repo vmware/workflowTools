@@ -8,13 +8,10 @@ import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.util.IOUtils;
 import com.vmware.util.input.InputUtils;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 
 @ActionDescription("Applies a specified review request's diff against the local repository.")
 public class ApplyReviewPatch extends BaseAction {

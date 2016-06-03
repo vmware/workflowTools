@@ -3,11 +3,7 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.Padder;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
+import com.vmware.util.logging.Padder;
 
 @ActionDescription("Displays the commit details in memory.")
 public class DisplayCommit extends BaseCommitAction {

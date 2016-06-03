@@ -3,10 +3,8 @@ package com.vmware.action.conditional;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @ActionDescription("Exits if git status does not detect any staged changes.")

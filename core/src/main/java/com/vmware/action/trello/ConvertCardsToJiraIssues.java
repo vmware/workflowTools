@@ -8,12 +8,8 @@ import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.UrlUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 
 @ActionDescription("Converts the selected board's cards into a list of jira issues.")
 public class ConvertCardsToJiraIssues extends BaseTrelloAction {

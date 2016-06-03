@@ -109,6 +109,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-p4Client,--perforce-client", gitConfigProperty = "git-p4.client", help = "Perforce client to use")
     public String perforceClientName;
 
+    @ConfigurableProperty(commandLine = "-gobuildBinPath,--gobuild-bin-path", help = "Path to gobuild bin file, this is a VMware specific tool")
+    public String goBuildBinPath;
+
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
     public boolean includeStoriesWithEstimates;
 
@@ -195,7 +198,6 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "--disable-jenkins-login", help = "Skips trying to log into jenkins if the server is not using user login module")
     public boolean disableJenkinsLogin;
-
 
     @ConfigurableProperty(help = "Map of remote branches, :username is substituted for the real username.")
     public TreeMap<String, String> remoteBranches;

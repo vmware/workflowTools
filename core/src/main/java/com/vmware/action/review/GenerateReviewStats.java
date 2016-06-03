@@ -11,13 +11,10 @@ import com.vmware.reviewboard.domain.ReviewStatType;
 import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.util.DateUtils;
 import com.vmware.util.input.InputUtils;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

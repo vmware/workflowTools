@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +44,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String applyDiff(String diffData) {
-        return executeScmCommand("git apply -3 --index", diffData, false);
+        return executeScmCommand("git apply -3 --index", diffData, Level.FINE);
     }
 
     public String lastCommitText(boolean prettyPrint) {
@@ -75,7 +76,7 @@ public class Git extends BaseScmWrapper {
     public Map<String, String> configValues() {
         if (!isGitInstalled()) {
             log.debug("Returning empty maps for git config values as git is not installed");
-            return new HashMap<String, String>();
+            return new HashMap<>();
         }
 
         String configText = executeScmCommand("git config -l");
@@ -97,7 +98,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void addChangesToDefaultChangelist() {
-        executeScmCommand("git p4 submit --prepare-p4-only", null, true);
+        executeScmCommand("git p4 submit --prepare-p4-only", null, Level.INFO);
     }
 
     public void commitWithAllFileChanges(String msg) {
@@ -127,7 +128,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void submit() {
-        String output = executeScmCommand("git p4 submit -M", true);
+        String output = executeScmCommand("git p4 submit -M", Level.INFO);
         if (!output.contains("All commits applied!")) {
             log.error("git p4 submit failed!");
             System.exit(1);
@@ -228,7 +229,7 @@ public class Git extends BaseScmWrapper {
         String forceUpdateString = forceUpdate ? " -f" : "";
         String pushCommand = String.format("git push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
 
-        String pushOutput = executeScmCommand(pushCommand, true);
+        String pushOutput = executeScmCommand(pushCommand, Level.INFO);
 
         if (pushOutput.contains("[up to date]")) {
             log.info("Remote branch is already up to date");
@@ -255,7 +256,7 @@ public class Git extends BaseScmWrapper {
     }
 
     private List<String> getChanges(boolean includeUnStagedChanges) {
-        List<String> changes = new ArrayList<String>();
+        List<String> changes = new ArrayList<>();
         String gitStatusOutput = executeScmCommand("git status --porcelain" );
 
         String pattern = String.format("^(\\s*)(%s+)\\s+(.+)", FileChange.allValuesPattern());
@@ -296,7 +297,7 @@ public class Git extends BaseScmWrapper {
     }
 
     private void executeCommitCommand(String commitCommand, String msg) {
-        executeScmCommand(commitCommand + " --file=-", msg, false);
+        executeScmCommand(commitCommand + " --file=-", msg, Level.FINE);
     }
 
 
@@ -309,7 +310,7 @@ public class Git extends BaseScmWrapper {
         C("copied");
         private String label;
 
-        private FileChange(String label) {
+        FileChange(String label) {
             this.label = label;
         }
 
