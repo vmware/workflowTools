@@ -127,9 +127,9 @@ public class Git extends BaseScmWrapper {
     }
 
     public void submit() {
-        String output = executeScmCommand("git p4 submit");
+        String output = executeScmCommand("git p4 submit", true);
         if (!output.contains("All commits applied!")) {
-            log.error("git p4 submit failed!\n", output);
+            log.error("git p4 submit failed!");
             System.exit(1);
         }
     }
