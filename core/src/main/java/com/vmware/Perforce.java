@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Wrapper around p4 commands
@@ -33,11 +34,11 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public void deletePendingChangelist(String changelistId) {
-        executeScmCommand("p4 change -d " + changelistId, true);
+        executeScmCommand("p4 change -d " + changelistId, Level.INFO);
     }
 
     public void revertChangesInPendingChangelist(String changelistId) {
-        executeScmCommand("p4 revert -c " + changelistId + " //...", true);
+        executeScmCommand("p4 revert -c " + changelistId + " //...", Level.INFO);
     }
 
     public String createPendingChangelist(String commitText) {
@@ -57,7 +58,7 @@ public class Perforce extends BaseScmWrapper {
                 perforceTemplate.substring(0, descriptionIndex), amendedCommitText, perforceTemplate.substring(filesIndex));
 
 
-        String output = executeScmCommand("p4 change -i", amendedTemplate, false);
+        String output = executeScmCommand("p4 change -i", amendedTemplate, Level.FINE);
         boolean success = !output.contains("Error in change specification.");
         if (!success) {
             log.error("Failed to create pending changelist\n{}\n", output);

@@ -3,11 +3,7 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.Padder;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
+import com.vmware.util.logging.Padder;
 
 @ActionDescription("Displays initial info information.")
 public class GettingStarted extends BaseAction {

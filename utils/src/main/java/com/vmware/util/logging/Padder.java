@@ -1,4 +1,4 @@
-package com.vmware.util;
+package com.vmware.util.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,7 @@ import java.util.logging.Level;
 public class Padder {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
+    private DynamicLogger dynamicLogger = new DynamicLogger(log);
     private static final int PADDING_LENGTH = 80;
 
     private final String title;
@@ -28,7 +29,7 @@ public class Padder {
         }
         int paddingCount = (PADDING_LENGTH - (title.length() + 4)) / 2;
         this.padding = com.vmware.util.StringUtils.repeat(paddingCount, "*");
-        this.title = title.toUpperCase();
+        this.title = title;
     }
 
     public void traceTitle() {
@@ -49,24 +50,13 @@ public class Padder {
 
     public void logTitle(Level logLevel) {
         if (isFirstExecution) {
-            log(logLevel, "");
+            dynamicLogger.log(logLevel, "");
         }
-        log(logLevel, "{}  {}  {}", padding, title, padding);
+        dynamicLogger.log(logLevel, "{}  {}  {}", padding, title, padding);
         if (!isFirstExecution) {
-            log(logLevel, "");
+            dynamicLogger.log(logLevel, "");
         }
         isFirstExecution = false;
     }
 
-    private void log(Level logLevel, String message, String... params) {
-        if (logLevel == Level.SEVERE) {
-            log.error(message, params);
-        } else if (logLevel == Level.INFO) {
-            log.info(message, params);
-        } else if (logLevel == Level.FINE) {
-            log.debug(message, params);
-        } else if (logLevel == Level.FINER || logLevel == Level.FINEST) {
-            log.trace(message, params);
-        }
-    }
 }

@@ -10,7 +10,7 @@ import com.vmware.jira.domain.Issue;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.input.InputUtils;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 

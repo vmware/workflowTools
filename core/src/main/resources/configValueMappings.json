@@ -48,6 +48,9 @@
     "--trello-url",
     "--jira-url"
   ],
+  "InvokeSandboxBuild": [
+    "--gobuild-bin-path"
+  ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
     "--jenkins-uses-csrf",

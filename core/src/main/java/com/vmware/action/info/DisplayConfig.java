@@ -3,7 +3,7 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.Padder;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.lang.reflect.Field;
