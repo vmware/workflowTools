@@ -134,13 +134,11 @@ public class ReviewBoard extends AbstractRestService {
         connection.put(draftLink.getHref(), anEmptyDraftForPublishingAReview());
     }
 
-    public void updateReviewRequest(ReviewRequest reviewRequest)
-            {
+    public void updateReviewRequest(ReviewRequest reviewRequest) {
         connection.put(reviewRequest.getUpdateLink().getHref(), ReviewRequestResponse.class, reviewRequest);
     }
 
-    public void createReviewRequestDiff(Link diffLink, DiffToUpload diffToCreate)
-            {
+    public void createReviewRequestDiff(Link diffLink, DiffToUpload diffToCreate) {
         connection.post(diffLink.getHref(), diffToCreate);
     }
 

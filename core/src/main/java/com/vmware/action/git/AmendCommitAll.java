@@ -1,34 +1,18 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BaseCommitAmendAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Performs a git commit --amend --all if changes are detected, --all will automatically add tracked file changes to the commit.")
-public class AmendCommitAll extends BaseCommitAction {
+public class AmendCommitAll extends BaseCommitAmendAction {
 
     public AmendCommitAll(WorkflowConfig config) {
-        super(config);
+        super(config, true, true);
     }
 
     @Override
     public void process() {
-        if (!draft.hasData()) {
-            log.error("Not amending commit as there no information set for the commit message");
-            return;
-        }
-
-        String existingCommitText = git.lastCommitText(true).trim();
-        String updatedCommitText = draft.toGitText(config.getCommitConfiguration()).trim();
-
-        if (git.getAllChanges().isEmpty() && existingCommitText.equals(updatedCommitText)) {
-            log.info("Not amending commit as it does not have any changes");
-            return;
-        }
-
-        git.amendCommitWithAllFileChanges(updatedCommitText);
+        git.amendCommitWithAllFileChanges(updatedCommitText());
     }
 }

@@ -9,7 +9,7 @@
   "bugzillaTestBug": 10001,
   "trelloUrl": "https://trello.com",
   "jenkinsUrl": "https://jenkins-hzn.eng.vmware.com/jenkins",
-  "buildwebUrl": " https://buildweb.eng.vmware.com",
+  "buildwebUrl": "https://buildweb.eng.vmware.com",
   "jenkinsUsesCsrf": false,
   "waitForJenkinsJobCompletion": false,
   "ignoreJenkinsJobFailure": false,
@@ -124,7 +124,7 @@
        ],
        "prepareCommitForPush": [
           "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsJobs",
-          "FormatCommitText", "AmendCommit"
+          "FormatCommitText", "AmendCommitWithoutJobResults"
        ],
        "push": [
           "prepareCommitForPush", "PushToMaster", "SoftSubmitReview"
@@ -227,7 +227,7 @@
          "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "ExitIfTrivialCommit", "RevertWorkspace", "CreateChangelistWithGitP4"
        ],
        "invokeSandboxBuild": [
-         "createPendingChangelist", "InvokeSandboxBuild"
+         "createPendingChangelist", "InvokeSandboxBuild", "AmendCommit"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"
