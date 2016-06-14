@@ -1,35 +1,18 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BaseCommitAmendAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Performs a git commit --amend if changes are detected.")
-public class AmendCommit extends BaseCommitAction {
+public class AmendCommit extends BaseCommitAmendAction {
 
     public AmendCommit(WorkflowConfig config) {
-        super(config);
+        super(config, false, true);
     }
 
     @Override
     public void process() {
-        if (!draft.hasData()) {
-            log.error("Not amending commit as there no information set for the commit message");
-            return;
-        }
-
-        String existingCommitText = git.lastCommitText(true).trim();
-        String updatedCommitText = draft.toGitText(config.getCommitConfiguration()).trim();
-
-        if (git.getStagedChanges().isEmpty() && existingCommitText.equals(updatedCommitText)) {
-            log.info("");
-            log.info("Not amending commit as it does not have any changes");
-            return;
-        }
-
-        git.amendCommit(updatedCommitText);
+        git.amendCommit(updatedCommitText());
     }
 }

@@ -105,7 +105,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         log.info("Invoking job {}", expectedNewBuild.url);
         jenkins.invokeJob(jobToInvoke, params);
 
-        updateTestingDone(jobToInvoke, expectedNewBuild, draft);
+        draft.updateTestingDoneWithJobBuild(jobToInvoke.url, expectedNewBuild);
         return expectedNewBuild;
     }
 
@@ -142,16 +142,5 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         return new JobParameters(parameters.toArray(new JobParameter[parameters.size()]));
     }
 
-    private void updateTestingDone(Job jobToInvoke, JobBuild expectedNewBuild, ReviewRequestDraft draft) {
-        JobBuild existingBuild = draft.getMatchingJobBuild(jobToInvoke.url);
-        if (existingBuild == null ) {
-            log.debug("Appending {} to testing done", expectedNewBuild.url);
-            draft.jobBuilds.add(expectedNewBuild);
-        } else {
-            log.debug("Replacing existing build url {} in testing done ", existingBuild.url);
-            log.debug("New build url {}", expectedNewBuild.url);
-            existingBuild.url = expectedNewBuild.url;
-            existingBuild.result = expectedNewBuild.result;
-        }
-    }
+
 }

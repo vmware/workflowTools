@@ -4,6 +4,7 @@ import com.vmware.IssueInfo;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.JobBuild;
 import com.vmware.BuildResult;
+import com.vmware.jenkins.domain.Job;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.CommitConfiguration;
@@ -240,6 +241,19 @@ public class ReviewRequestDraft extends BaseEntity{
         this.target_groups = StringUtils.join(targetGroups);
     }
 
+    public void updateTestingDoneWithJobBuild(String baseJobUrl, JobBuild expectedNewBuild) {
+        JobBuild existingBuild = getMatchingJobBuild(baseJobUrl);
+        if (existingBuild == null ) {
+            log.debug("Appending {} to testing done", expectedNewBuild.url);
+            jobBuilds.add(expectedNewBuild);
+        } else {
+            log.debug("Replacing existing build url {} in testing done ", existingBuild.url);
+            log.debug("New build url {}", expectedNewBuild.url);
+            existingBuild.url = expectedNewBuild.url;
+            existingBuild.result = expectedNewBuild.result;
+        }
+    }
+
     public boolean hasReviewers() {
         return StringUtils.isNotBlank(reviewedBy);
     }
@@ -260,15 +274,19 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public String toGitText(CommitConfiguration commitConfig) {
+        return toGitText(commitConfig, true);
+    }
+
+    public String toGitText(CommitConfiguration commitConfig, boolean includeJobResults) {
         StringBuilder builder = new StringBuilder();
         builder.append(summary).append("\n\n");
 
         if (StringUtils.isNotBlank(description)) {
             builder.append(description).append("\n");
         }
-
-        if (isNotBlank(fullTestingDoneSection())) {
-            builder.append("\n").append(commitConfig.getTestingDoneLabel()).append(fullTestingDoneSection());
+        String testingDoneSection = fullTestingDoneSection(includeJobResults);
+        if (isNotBlank(testingDoneSection)) {
+            builder.append("\n").append(commitConfig.getTestingDoneLabel()).append(testingDoneSection);
         }
         if (isNotBlank(bugNumbers)) {
             builder.append("\n").append(commitConfig.getBugNumberLabel()).append(bugNumbers);

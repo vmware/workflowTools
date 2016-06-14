@@ -65,7 +65,11 @@ public class CommitConfiguration {
     }
 
     public String generateBuildwebUrlPattern() {
-        return "(" + buildwebUrl + "/sb/\\d+/*)";
+        return "(" + sandboxBuildwebUrl() + "/\\d+/*)";
+    }
+
+    public String sandboxBuildwebUrl() {
+        return buildwebUrl + "/sb";
     }
 
     public String getReviewboardUrl() {

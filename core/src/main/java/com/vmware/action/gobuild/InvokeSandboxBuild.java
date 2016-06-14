@@ -6,6 +6,7 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
+import com.vmware.util.CommitConfiguration;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
@@ -36,12 +37,14 @@ public class InvokeSandboxBuild extends BaseCommitAction {
                 config.goBuildBinPath, config.buildwebProject, config.buildwebBranch, changelistId);
 
         String output = CommandLineUtils.executeScript(command, inputs, textsToWaitFor, Level.INFO);
-        String buildWebPattern = config.getCommitConfiguration().generateBuildwebUrlPattern();
+        CommitConfiguration commitConfig = config.getCommitConfiguration();
+        String buildWebPattern = commitConfig.generateBuildwebUrlPattern();
 
         String buildUrl = MatcherUtils.singleMatch(output, buildWebPattern);
         if (buildUrl != null) {
             log.info("Adding build {} to commit", buildUrl);
-            draft.jobBuilds.add(new JobBuild(buildUrl, BuildResult.BUILDING));
+            draft.updateTestingDoneWithJobBuild(commitConfig.sandboxBuildwebUrl(),
+                    new JobBuild(buildUrl, BuildResult.BUILDING));
         } else {
             log.warn("Unable to parse build url using pattern {}", buildWebPattern);
         }
