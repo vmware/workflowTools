@@ -102,6 +102,9 @@
        "review": [
           "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
+       "reviewWithPerforce": [
+          "createPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+       ],
        "reviewPlusCopyUrl": [
           "review", "CopyReviewUrlToClipboard"
        ],
@@ -228,7 +231,7 @@
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "createPendingChangelist": [
-         "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "ExitIfTrivialCommit", "RevertWorkspace", "CreateChangelistWithGitP4"
+         "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "RevertWorkspace", "CreateChangelistWithGitP4"
        ],
        "invokeSandboxBuild": [
          "createPendingChangelist", "InvokeSandboxBuild", "AmendCommit"

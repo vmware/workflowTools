@@ -33,6 +33,12 @@ public class Perforce extends BaseScmWrapper {
         return changeListIds;
     }
 
+    public File getClientDirectory() {
+        String info = executeScmCommand("p4 info", Level.FINE);
+        String clientDirectory = MatcherUtils.singleMatch(info, "Client root:\\s+(.+)");
+        return clientDirectory != null ? new File(clientDirectory) : null;
+    }
+
     public void deletePendingChangelist(String changelistId) {
         executeScmCommand("p4 change -d " + changelistId, Level.INFO);
     }

@@ -98,8 +98,8 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) {
         String[] jenkinsJobDetails = jenkinsJobText.split("&");
         String jenkinsJobName = jenkinsJobDetails[0];
-        log.info("Invoking job " + jenkinsJobName);
-        Job jobToInvoke = new Job(config.jenkinsUrl + "/job/" + jenkinsJobName + "/");
+        log.info("Invoking job {}", jenkinsJobName);
+        Job jobToInvoke = new Job(String.format("%s/job/%s/", config.jenkinsUrl, jenkinsJobName));
 
         JobParameters params = generateJobParameters(jenkinsJobDetails);
 
