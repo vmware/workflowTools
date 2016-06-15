@@ -113,6 +113,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.description = description;
         this.summary = summary;
         this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
+        this.jobBuilds.clear();
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateJenkinsUrlPattern()));
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebApiUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");

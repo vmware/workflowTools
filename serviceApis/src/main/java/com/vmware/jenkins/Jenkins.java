@@ -46,7 +46,7 @@ public class Jenkins extends AbstractRestBuildService {
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
 
         if (disableLogin) {
-            log.info("Not attempting to load api token for Jenkins as disableLogin is true");
+            log.info("Not attempting to read api token for Jenkins as disableLogin is true");
             return;
         }
 
