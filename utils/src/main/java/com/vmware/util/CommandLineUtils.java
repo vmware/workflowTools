@@ -69,7 +69,7 @@ public class CommandLineUtils {
                     }
                     totalOutput += output;
                     matchedText = output.trim().contains(textsToWaitFor[i]);
-                    if (matchedText && textsToWaitFor.length > i) {
+                    if (matchedText && inputs.length > i) {
                         dynamicLogger.log(logLevel, "Found {} in output, writing [{}]", textsToWaitFor[i], inputs[i]);
                         totalOutput += inputs[i];
                         IOUtils.writeWithoutClosing(statusProcess.getOutputStream(), inputs[i] + "\n");

@@ -22,7 +22,7 @@ public class SandboxBuild {
     public String buildState;
 
     public BuildResult getBuildResult() {
-        if ("running".equals(buildState) || "wait-for-resources".equals(buildState)) {
+        if ("queued".equals(buildState) || "wait-for-resources".equals(buildState) || "running".equals(buildState)) {
             return BuildResult.BUILDING;
         } else if ("succeeded".equals(buildState) || "storing".equals(buildState)) {
             return BuildResult.SUCCESS;

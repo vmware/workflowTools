@@ -38,7 +38,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public void revertChangesInPendingChangelist(String changelistId) {
-        executeScmCommand("p4 revert -c " + changelistId + " //...", Level.INFO);
+        executeScmCommand("p4 revert -w -c " + changelistId + " //...", Level.INFO);
     }
 
     public String createPendingChangelist(String commitText) {
