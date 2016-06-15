@@ -61,7 +61,7 @@ public class CommitConfiguration {
     }
 
     public String generateJenkinsUrlPattern() {
-        return "(" + jenkinsUrl + "/job/[\\w-]+/\\d+/*)";
+        return "(" + jenkinsUrl + "/job/.+?/\\d+/*)";
     }
 
     public String generateBuildWebNumberPattern() {
