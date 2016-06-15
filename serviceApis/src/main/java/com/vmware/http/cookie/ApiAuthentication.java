@@ -10,7 +10,8 @@ public enum ApiAuthentication {
     bugzilla_login_id("Bugzilla_login", ".bugzilla-login-id.txt"),
     bugzilla_cookie("Bugzilla_logincookie", ".bugzilla-cookies.txt"),
     jenkins(".jenkins-api-token.txt"),
-    trello(".trello-api-token.txt");
+    trello(".trello-api-token.txt"),
+    none("");
 
     private String cookieName;
     private String fileName;

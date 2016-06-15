@@ -4,7 +4,6 @@ import com.vmware.IssueInfo;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.JobBuild;
 import com.vmware.BuildResult;
-import com.vmware.jenkins.domain.Job;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.CommitConfiguration;
@@ -61,7 +60,10 @@ public class ReviewRequestDraft extends BaseEntity{
     public Boolean isPublic;
 
     @Expose(serialize = false, deserialize = false)
-    public boolean jenkinsJobsAreSuccessful;
+    public Boolean jenkinsBuildsAreSuccessful;
+
+    @Expose(serialize = false, deserialize = false)
+    public Boolean buildwebBuildsAreSuccessful;
 
     @Expose(serialize = false, deserialize = false)
     public List<IssueInfo> openIssues = null;
@@ -112,7 +114,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.summary = summary;
         this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateJenkinsUrlPattern()));
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateBuildwebUrlPattern()));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebApiUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
     }
@@ -221,6 +223,16 @@ public class ReviewRequestDraft extends BaseEntity{
             }
         }
         return builds;
+    }
+
+    public boolean allJobBuildsMatchingUrlAreComplete(String url) {
+        List<JobBuild> builds = jobBuildsMatchingUrl(url);
+        for (JobBuild buildToCheck : builds) {
+            if (buildToCheck.result == BuildResult.BUILDING) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void setTargetGroups(String[] targetGroupsArray) {

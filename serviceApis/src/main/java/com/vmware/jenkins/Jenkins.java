@@ -1,18 +1,22 @@
 package com.vmware.jenkins;
 
-import com.vmware.AbstractRestService;
+import com.vmware.AbstractRestBuildService;
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
-import com.vmware.jenkins.domain.*;
 import com.vmware.http.HttpConnection;
-import com.vmware.http.exception.InternalServerException;
-import com.vmware.http.exception.NotAuthorizedException;
-import com.vmware.http.request.RequestParam;
-import com.vmware.http.request.RequestHeader;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
-import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.exception.InternalServerException;
+import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.http.request.RequestHeader;
+import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.jenkins.domain.CsrfCrumb;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobBuildDetails;
+import com.vmware.jenkins.domain.JobDetails;
+import com.vmware.jenkins.domain.JobParameters;
+import com.vmware.jenkins.domain.JobsList;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.UrlUtils;
 import org.slf4j.Logger;
@@ -24,9 +28,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.http.cookie.ApiAuthentication.*;
+import static com.vmware.http.cookie.ApiAuthentication.jenkins;
 
-public class Jenkins extends AbstractRestService {
+public class Jenkins extends AbstractRestBuildService {
 
     private final boolean usesCsrf;
     private final boolean disableLogin;
@@ -34,13 +38,17 @@ public class Jenkins extends AbstractRestService {
     private String configureUrl;
     private JobsList jobsList = null;
 
-    public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin)
-            {
+    public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin) {
         super(serverUrl, "api/json", jenkins, username);
         this.configureUrl = baseUrl + "me/configure";
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
+
+        if (disableLogin) {
+            log.info("Not attempting to load api token for Jenkins as disableLogin is true");
+            return;
+        }
 
         String apiToken = readExistingApiToken(credentialsType);
         if (apiToken != null) {
@@ -72,36 +80,16 @@ public class Jenkins extends AbstractRestService {
         optimisticPost(jobBuildToStop.getJenkinsStopUrl(), null);
     }
 
-    public void checkStatusOfJenkinsJobs(ReviewRequestDraft draft) {
-        log.info("Checking status of jenkins jobs");
-        List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(baseUrl);
+    @Override
+    protected BuildResult getResultForBuild(String url) {
+        String jobApiUrl = UrlUtils.addTrailingSlash(url) + "api/json";
+        JobBuildDetails buildDetails = this.getJobBuildDetails(jobApiUrl);
+        return buildDetails.realResult();
+    }
 
-        if (jobsToCheck.isEmpty()) {
-            log.info("No jenkins jobs found in testing done text");
-            draft.jenkinsJobsAreSuccessful = true;
-            return;
-        }
-        boolean isSuccess = true;
-
-        for (JobBuild jobBuild : jobsToCheck) {
-            String jobUrl = jobBuild.url;
-            String jobApiUrl = UrlUtils.addTrailingSlash(jobUrl) + "api/json";
-
-            if (jobBuild.result == BuildResult.BUILDING) {
-                try {
-                    JobBuildDetails jobBuildDetails = this.getJobBuildDetails(jobApiUrl);
-                    jobBuild.result = jobBuildDetails.building ? BuildResult.BUILDING : jobBuildDetails.result;
-                    log.info("Job: {} Result: {}", jobUrl, jobBuild.result);
-                } catch (NotFoundException nfe) {
-                    log.info("Job {} did not return a job, job might still be in Jenkins queue", jobUrl);
-                }
-            } else {
-                log.info("Job: {} Result: {}", jobUrl, jobBuild.result);
-            }
-            isSuccess = isSuccess && jobBuild.result == BuildResult.SUCCESS;
-        }
-
-        draft.jenkinsJobsAreSuccessful = isSuccess;
+    @Override
+    protected void updateAllBuildsResultSuccessValue(ReviewRequestDraft draft, boolean result) {
+        draft.jenkinsBuildsAreSuccessful = result;
     }
 
     @Override

@@ -8,13 +8,14 @@
   "bugzillaQuery": "My Assigned",
   "bugzillaTestBug": 10001,
   "trelloUrl": "https://trello.com",
-  "jenkinsUrl": "https://jenkins-hzn.eng.vmware.com/jenkins",
-  "buildwebUrl": "https://buildweb.eng.vmware.com",
+  "jenkinsUrl": "https://sp-taas.eng.vmware.com/jenkins",
+  "buildwebApiUrl": "https://buildapi.eng.vmware.com",
   "jenkinsUsesCsrf": false,
   "waitForJenkinsJobCompletion": false,
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 10,
   "goBuildBinPath": "/build/apps/bin/gobuild",
+  "waitTimeForBlockingWorkflowAction": 1200,
   "buildwebProject": "vcloud",
   "buildwebBranch": "sp-main",
   "remoteBranches": {
@@ -123,7 +124,7 @@
           "ApplyReviewPatch"
        ],
        "prepareCommitForPush": [
-          "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsJobs",
+          "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsBuilds",
           "FormatCommitText", "AmendCommitWithoutJobResults"
        ],
        "push": [
@@ -148,13 +149,16 @@
           "PushToPrecommitBranch", "ReadLastCommit", "InvokeJenkinsJobs", "AmendCommit"
        ],
        "restartJobs": [
-          "PushToPrecommitBranch", "ReadLastCommit", "AbortJenkinsJobs", "InvokeJenkinsJobs", "AmendCommit"
+          "PushToPrecommitBranch", "restartJobsWithoutUpdate"
+       ],
+       "restartJobsWithoutUpdate": [
+          "ReadLastCommit", "AbortJenkinsBuilds", "InvokeJenkinsJobs", "AmendCommit"
        ],
        "stopJobs": [
-          "ReadLastCommit", "AbortJenkinsJobs", "AmendCommit"
+          "ReadLastCommit", "AbortJenkinsBuilds", "AmendCommit"
        ],
        "pushable": [
-          "ReadLastCommit", "CheckStatusOfJenkinsJobs", "CheckStatusOfReviewShipIts", "AmendCommit"
+          "ReadLastCommit", "CheckStatusOfJenkinsBuilds", "CheckStatusOfBuildwebBuilds", "CheckStatusOfReviewShipIts", "AmendCommit"
        ],
        "resolveIssue": [
           "ReadLastCommit", "ExitIfCommitHasNoBugNumber", "MarkBugAsResolved", "MarkIssueAsResolved"

@@ -13,10 +13,10 @@ import com.vmware.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@ActionDescription("Aborts the jenkins jobs specified by the jenkinsJobKeys config property. Updates status for jenkins job urls in testing done section.")
-public class AbortJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
+@ActionDescription("Aborts the jenkins builds specified by the jenkinsJobKeys config property. Updates status for jenkins build urls in testing done section.")
+public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
 
-    public AbortJenkinsJobs(WorkflowConfig config) {
+    public AbortJenkinsBuilds(WorkflowConfig config) {
         super(config);
     }
 
@@ -35,7 +35,7 @@ public class AbortJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
                 jenkinsJobTexts.add(jenkinsJobText);
             }
         }
-        jenkins.checkStatusOfJenkinsJobs(draft);
+        jenkins.checkStatusOfBuilds(draft);
         log.info("");
 
         for (String jenkinsJobText: jenkinsJobTexts) {

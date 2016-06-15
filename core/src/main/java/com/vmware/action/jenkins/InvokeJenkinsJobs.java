@@ -13,6 +13,7 @@ import com.vmware.util.ThreadUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobKeys config property. Adds or replaces jenkins job urls to testing done section.")
@@ -20,6 +21,8 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     private static final String USERNAME_PARAM = "USERNAME";
     private static final String NO_USERNAME = "NONE";
     private static final String ASK_FOR_PARAM = "$ASK";
+    private static final String SANDBOX_BUILD_NUMBER = "$SANDBOX_BUILD";
+    private static final String USERNAME_VALUE = "$USERNAME";
 
     public InvokeJenkinsJobs(WorkflowConfig config) {
         super(config);
@@ -60,20 +63,22 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         }
     }
 
-    private boolean waitForJobToCompleteIfNecessary(JobBuild newBuild) {
+    private boolean waitForJobToCompleteIfNecessary(final JobBuild newBuild) {
         if (!config.waitForJenkinsJobCompletion) {
             return true;
         }
 
         log.info("Waiting for job to complete");
-        boolean jobBuilding = true;
-        JobBuildDetails updatedDetails = null;
-        while (jobBuilding) {
-            ThreadUtils.sleep(20, TimeUnit.SECONDS);
-            updatedDetails = jenkins.getJobBuildDetails(newBuild);
-            jobBuilding = updatedDetails.building;
-            log.debug("Current status {}", updatedDetails.realResult());
-        }
+        Callable<Boolean> condition = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
+                return updatedDetails.building;
+            }
+        };
+        ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
+
+        JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
         log.info("Job status {}", updatedDetails.realResult());
         return updatedDetails.realResult() == BuildResult.SUCCESS;
     }
@@ -126,6 +131,22 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
             if (paramValue.equals(ASK_FOR_PARAM)) {
                 paramValue = InputUtils.readValueUntilNotBlank("Enter " + paramName);
+            }
+
+            if (paramValue.contains(USERNAME_VALUE)) {
+                paramValue = paramValue.replace(USERNAME_VALUE, config.username);
+            }
+
+            if (paramValue.contains(SANDBOX_BUILD_NUMBER)) {
+                JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebApiUrl);
+                if (sandboxBuild == null) {
+                    throw new IllegalArgumentException("No sandbox build found in commit!");
+                }
+                String buildId = sandboxBuild.id();
+                if (buildId == null) {
+                    throw new IllegalArgumentException("No build number found in url " + sandboxBuild.url);
+                }
+                paramValue = paramValue.replace(SANDBOX_BUILD_NUMBER, buildId);
             }
 
             if (paramName.equals(USERNAME_PARAM) && paramValue.equals(NO_USERNAME)) {
