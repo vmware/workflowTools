@@ -31,9 +31,18 @@
     "--file-count-ranges",
     "--groups"
   ],
-  "InvokeJenkinsJobs": [
+  "CheckStatusOfLatestBuilds": [
+    "--disable-jenkins-login",
+    "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url",
+    "--jenkins-jobs"
+  ],
+  "InvokeJenkinsJobs": [
+    "--buildweb-url",
+    "--username",
+    "--jenkins-url",
+    "--wait-time",
     "--wait-for-jenkins",
     "--ignore-jenkins-job-failure",
     "--jenkins-jobs"
@@ -64,6 +73,10 @@
     "--username",
     "--bugzilla-url",
     "--trello-url"
+  ],
+  "AbortJenkinsBuilds": [
+    "--jenkins-url",
+    "--jenkins-jobs"
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--jira-test-issue",
@@ -115,15 +128,11 @@
   "BaseSetReviewerList": [
     "--username"
   ],
-  "StripJenkinsJobs": [
+  "StripJenkinsBuilds": [
     "--jenkins-url"
   ],
   "PublishReview": [
     "--reviewboard-url"
-  ],
-  "AbortJenkinsJobs": [
-    "--jenkins-url",
-    "--jenkins-jobs"
   ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
@@ -131,12 +140,13 @@
   "BaseTrelloAction": [
     "--trello-url"
   ],
-  "CheckStatusOfLatestJobs": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
+  "BaseCommitWithBuildwebBuildsAction": [
     "--username",
-    "--jenkins-url",
-    "--jenkins-jobs"
+    "--buildweb-url"
+  ],
+  "WaitForJenkinsBuildsToComplete": [
+    "--wait-time",
+    "--jenkins-url"
   ],
   "BaseCommitUsingReviewBoardAction": [
     "--review-board-date-format",
@@ -176,6 +186,10 @@
   "SetSummary": [
     "--max-summary",
     "--set-empty-only"
+  ],
+  "WaitForBuildwebBuildsToComplete": [
+    "--wait-time",
+    "--buildweb-url"
   ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",

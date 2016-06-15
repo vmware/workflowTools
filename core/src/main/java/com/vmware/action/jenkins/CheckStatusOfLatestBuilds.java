@@ -9,12 +9,12 @@ import com.vmware.jenkins.domain.*;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Checks that status of the latest job specified for the specified user.")
-public class CheckStatusOfLatestJobs extends BaseAction {
+@ActionDescription("Checks the status of the latest job specified for the specified user.")
+public class CheckStatusOfLatestBuilds extends BaseAction {
 
     Jenkins jenkins;
 
-    public CheckStatusOfLatestJobs(WorkflowConfig config) {
+    public CheckStatusOfLatestBuilds(WorkflowConfig config) {
         super(config);
     }
 

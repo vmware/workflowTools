@@ -79,8 +79,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
 
-    @ConfigurableProperty(commandLine = "-buildwebUrl,--buildweb-url", help = "Url for gobuild server")
-    public String buildwebUrl;
+    @ConfigurableProperty(commandLine = "-buildwebApiUrl,--buildweb-url", help = "Api Url for buildweb server")
+    public String buildwebApiUrl;
 
     @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
     public boolean jenkinsUsesCsrf;
@@ -246,6 +246,9 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "--file-count-ranges", help = "File count ranges for grouping reviews when generating stats")
     public int[] fileCountRanges;
+
+    @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time for blocking workflow action to complete.")
+    public long waitTimeForBlockingWorkflowAction;
 
     @Expose(serialize = false, deserialize = false)
     private ServiceLocator serviceLocator = null;
@@ -439,7 +442,7 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
+        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, buildwebApiUrl, testingDoneLabel, bugNumberLabel,
                 reviewedByLabel, reviewUrlLabel);
     }
 

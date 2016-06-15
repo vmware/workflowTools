@@ -1,14 +1,12 @@
 package com.vmware;
 
 import com.vmware.bugzilla.Bugzilla;
+import com.vmware.buildweb.Buildweb;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.trello.Trello;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Centralized locator for jenkins, jira, reviewboard and trello instances.
@@ -23,6 +21,8 @@ public class ServiceLocator {
     private ReviewBoard reviewBoard;
 
     private Jenkins jenkins;
+
+    private Buildweb buildweb;
 
     private Trello trello;
 
@@ -77,6 +77,13 @@ public class ServiceLocator {
             jenkins.setupAuthenticatedConnection();
         }
         return jenkins;
+    }
+
+    public Buildweb getBuildweb() {
+        if (buildweb == null) {
+            buildweb = new Buildweb(config.buildwebApiUrl, config.username);
+        }
+        return buildweb;
     }
 
     public Trello getTrello() {

@@ -26,6 +26,9 @@ public class CookieFileStore {
     public CookieFileStore(String homeFolder) {
         this.homeFolder = homeFolder;
         for (ApiAuthentication apiAuthentication : ApiAuthentication.values()) {
+            if (apiAuthentication == ApiAuthentication.none) {
+                continue;
+            }
             try {
                 readCookieFile(new File(homeFolder + "/" + apiAuthentication.getFileName()));
             } catch (IOException ioe) {

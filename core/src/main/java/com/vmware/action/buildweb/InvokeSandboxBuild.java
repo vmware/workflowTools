@@ -1,4 +1,4 @@
-package com.vmware.action.gobuild;
+package com.vmware.action.buildweb;
 
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
@@ -15,7 +15,7 @@ import java.util.logging.Level;
 
 import static java.lang.String.format;
 
-@ActionDescription("Used to invoke a sandbox build")
+@ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
 public class InvokeSandboxBuild extends BaseCommitAction {
 
     public InvokeSandboxBuild(WorkflowConfig config) {
@@ -29,7 +29,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
 
-        String[] inputs = new String[] {"beta", "", "", ""};
+        String[] inputs = new String[] {"beta", "", ""};
         String[] textsToWaitFor = new String[] {
                 "Buildtype to use [beta]:", "top of this baseline)", config.buildwebProject + "?",
                 format("queued (%s/%s)", config.buildwebProject, config.buildwebBranch)};
@@ -38,15 +38,16 @@ public class InvokeSandboxBuild extends BaseCommitAction {
 
         String output = CommandLineUtils.executeScript(command, inputs, textsToWaitFor, Level.INFO);
         CommitConfiguration commitConfig = config.getCommitConfiguration();
-        String buildWebPattern = commitConfig.generateBuildwebUrlPattern();
+        String buildNumberPattern = commitConfig.generateBuildWebNumberPattern();
 
-        String buildUrl = MatcherUtils.singleMatch(output, buildWebPattern);
-        if (buildUrl != null) {
+        String buildNumber = MatcherUtils.singleMatch(output, buildNumberPattern);
+        if (buildNumber != null) {
+            String buildUrl = commitConfig.sandboxBuildwebUrl() + "/" + buildNumber;
             log.info("Adding build {} to commit", buildUrl);
             draft.updateTestingDoneWithJobBuild(commitConfig.sandboxBuildwebUrl(),
                     new JobBuild(buildUrl, BuildResult.BUILDING));
         } else {
-            log.warn("Unable to parse build url using pattern {}", buildWebPattern);
+            log.warn("Unable to parse build url using pattern {}", buildNumberPattern);
         }
 
 

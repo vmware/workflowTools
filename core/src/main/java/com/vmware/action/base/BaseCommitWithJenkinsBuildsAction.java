@@ -16,7 +16,7 @@ public abstract class BaseCommitWithJenkinsBuildsAction extends BaseCommitAction
 
     @Override
     public String cannotRunAction() {
-        if (draft.jobBuildsMatchingUrl(jenkins.baseUrl).isEmpty()) {
+        if (draft.jobBuildsMatchingUrl(config.jenkinsUrl).isEmpty()) {
             return "the commit has no Jenkins job builds in the testing done section";
         } else {
             return super.cannotRunAction();

@@ -11,23 +11,23 @@ import java.text.ParseException;
 import java.util.Iterator;
 
 @ActionDescription("Strips jenkins build text from testing done section of commit.")
-public class StripJenkinsJobs extends BaseCommitAction {
+public class StripJenkinsBuilds extends BaseCommitAction {
 
-    public StripJenkinsJobs(WorkflowConfig config) {
+    public StripJenkinsBuilds(WorkflowConfig config) {
         super(config);
     }
 
     @Override
     public String cannotRunAction() {
         if (draft.jobBuildsMatchingUrl(config.jenkinsUrl).isEmpty()) {
-            return "commit has no Jenkins jobs";
+            return "commit has no Jenkins builds";
         }
         return super.cannotRunAction();
     }
 
     @Override
     public void process() {
-        log.info("Stripping jenkins jobs from commit");
+        log.info("Stripping jenkins builds from commit");
         for (JobBuild jobBuild : draft.jobBuildsMatchingUrl(config.jenkinsUrl)) {
             draft.jobBuilds.remove(jobBuild);
         }

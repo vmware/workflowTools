@@ -1,6 +1,7 @@
 package com.vmware;
 
 import com.google.gson.annotations.Expose;
+import com.vmware.util.MatcherUtils;
 
 public class JobBuild {
     public int number;
@@ -31,6 +32,10 @@ public class JobBuild {
 
     public boolean containsUrl(String url) {
         return this.url != null && this.url.contains(url);
+    }
+
+    public String id() {
+        return MatcherUtils.singleMatch(url, "http.+?/(\\d+)/*.*?");
     }
 
     public String getJenkinsInfoUrl() {
