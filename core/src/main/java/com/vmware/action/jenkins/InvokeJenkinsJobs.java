@@ -139,12 +139,14 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
             if (paramValue.contains(SANDBOX_BUILD_NUMBER)) {
                 JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebApiUrl);
-                if (sandboxBuild == null) {
-                    throw new IllegalArgumentException("No sandbox build found in commit!");
-                }
-                String buildId = sandboxBuild.id();
-                if (buildId == null) {
-                    throw new IllegalArgumentException("No build number found in url " + sandboxBuild.url);
+                String buildId;
+                if (sandboxBuild != null) {
+                    buildId = sandboxBuild.id();
+                    if (buildId == null) {
+                        throw new IllegalArgumentException("No build number found in url " + sandboxBuild.url);
+                    }
+                } else {
+                    buildId = InputUtils.readValueUntilNotBlank("Sandbox build id");
                 }
                 paramValue = paramValue.replace(SANDBOX_BUILD_NUMBER, buildId);
             }

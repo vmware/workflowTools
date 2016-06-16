@@ -138,7 +138,6 @@ public class Workflow {
     }
 
     public void runWorkflow() {
-
         if (StringUtils.isBlank(config.workflowsToRun)) {
             // default workflow
             config.workflowsToRun = "intro";
@@ -225,7 +224,7 @@ public class Workflow {
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 try {
                     Object matchingValue = matchingField.get(config);
-                    String matchingValueText = convertObjectToString(matchingValue);
+                    String matchingValueText = StringUtils.convertObjectToString(matchingValue);
                     log.info("{}={} - {}", configOption, matchingValueText, matchingPropertyText);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeReflectiveOperationException(e);
@@ -233,18 +232,6 @@ public class Workflow {
             }
         }
         configPadder.infoTitle();
-    }
-
-    private static String convertObjectToString(Object matchingValue) {
-        String matchingValueText = "";
-        if (matchingValue instanceof String[]) {
-            matchingValueText = Arrays.toString((Object[]) matchingValue);
-        } else if (matchingValue instanceof int[]) {
-            matchingValueText = Arrays.toString((int[]) matchingValue);
-        } else if (matchingValue != null) {
-            matchingValueText = String.valueOf(matchingValue);
-        }
-        return matchingValueText;
     }
 
     private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) {
