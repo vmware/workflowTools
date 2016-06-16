@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class StringUtils {
@@ -139,6 +140,18 @@ public class StringUtils {
             builder.append(value);
         }
         return builder.toString();
+    }
+
+    public static String convertObjectToString(Object matchingValue) {
+        String matchingValueText = "";
+        if (matchingValue instanceof String[]) {
+            matchingValueText = Arrays.toString((Object[]) matchingValue);
+        } else if (matchingValue instanceof int[]) {
+            matchingValueText = Arrays.toString((int[]) matchingValue);
+        } else if (matchingValue != null) {
+            matchingValueText = String.valueOf(matchingValue);
+        }
+        return matchingValueText;
     }
 
 }

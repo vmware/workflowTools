@@ -105,9 +105,6 @@
        "reviewWithPerforce": [
           "createPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
-       "reviewPlusCopyUrl": [
-          "review", "CopyReviewUrlToClipboard"
-       ],
        "amendReview": [
           "amendCommit", "review"
        ],
