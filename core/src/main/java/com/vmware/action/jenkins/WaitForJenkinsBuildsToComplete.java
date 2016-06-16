@@ -1,4 +1,4 @@
-package com.vmware.action.conditional;
+package com.vmware.action.jenkins;
 
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;

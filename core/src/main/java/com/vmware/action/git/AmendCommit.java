@@ -8,7 +8,7 @@ import com.vmware.config.WorkflowConfig;
 public class AmendCommit extends BaseCommitAmendAction {
 
     public AmendCommit(WorkflowConfig config) {
-        super(config, false, true);
+        super(config, DONT_INCLUDE_ALL_CHANGES, INCLUDE_JOB_RESULTS);
     }
 
     @Override

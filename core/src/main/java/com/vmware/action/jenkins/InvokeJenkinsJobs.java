@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobKeys config property. Adds or replaces jenkins job urls to testing done section.")
 public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     private static final String USERNAME_PARAM = "USERNAME";
-    private static final String NO_USERNAME = "NONE";
+    private static final String NO_USERNAME_PARAMETER = "NO_USERNAME_PARAMETER";
     private static final String ASK_FOR_PARAM = "$ASK";
     private static final String SANDBOX_BUILD_NUMBER = "$SANDBOX_BUILD";
     private static final String USERNAME_VALUE = "$USERNAME";
@@ -55,20 +55,20 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
                 log.info("");
             }
             JobBuild newBuild = invokeJenkinsJob(draft, jenkinsJobText);
-            boolean success = waitForJobToCompleteIfNecessary(newBuild);
+            boolean success = waitForBuildToCompleteIfNecessary(newBuild);
             if (!success && i < jenkinsJobTexts.size() - 1 && !config.ignoreJenkinsJobFailure) {
-                log.warn("Job did not complete successfully, aborting running of jobs");
+                log.warn("Build did not complete successfully, aborting running of builds");
                 break;
             }
         }
     }
 
-    private boolean waitForJobToCompleteIfNecessary(final JobBuild newBuild) {
+    private boolean waitForBuildToCompleteIfNecessary(final JobBuild newBuild) {
         if (!config.waitForJenkinsJobCompletion) {
             return true;
         }
 
-        log.info("Waiting for job to complete");
+        log.info("Waiting for build to complete");
         Callable<Boolean> condition = new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
@@ -116,7 +116,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
     private JobParameters generateJobParameters(String[] jenkinsJobDetails) {
         List<JobParameter> parameters = new ArrayList<JobParameter>();
-        boolean foundUsernameParam = false;
+        boolean setDefaultUsernameParam = true;
         for (int i = 1; i < jenkinsJobDetails.length; i++) {
             String jenkinsParam = jenkinsJobDetails[i];
             String[] paramPieces = jenkinsParam.split("=");
@@ -126,7 +126,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             String paramName = paramPieces[0];
             String paramValue = paramPieces[1];
             if (paramName.equals(USERNAME_PARAM)) {
-                foundUsernameParam = true;
+                setDefaultUsernameParam = false;
             }
 
             if (paramValue.equals(ASK_FOR_PARAM)) {
@@ -138,31 +138,38 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             }
 
             if (paramValue.contains(SANDBOX_BUILD_NUMBER)) {
-                JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebApiUrl);
-                String buildId;
-                if (sandboxBuild != null) {
-                    buildId = sandboxBuild.id();
-                    if (buildId == null) {
-                        throw new IllegalArgumentException("No build number found in url " + sandboxBuild.url);
-                    }
-                } else {
-                    buildId = InputUtils.readValueUntilNotBlank("Sandbox build id");
-                }
-                paramValue = paramValue.replace(SANDBOX_BUILD_NUMBER, buildId);
+                String buildNumber = determineSandboxBuildNumber();
+                paramValue = paramValue.replace(SANDBOX_BUILD_NUMBER, buildNumber);
             }
 
-            if (paramName.equals(USERNAME_PARAM) && paramValue.equals(NO_USERNAME)) {
-                log.info("Ignoring {} parameter for this job", USERNAME_PARAM);
+            if (paramName.equals(NO_USERNAME_PARAMETER) && Boolean.valueOf(paramValue)) {
+                setDefaultUsernameParam = false;
+                log.info("Not setting default {} parameter for this job as {} is true", USERNAME_PARAM, NO_USERNAME_PARAMETER);
             } else {
                 log.info("Setting job param {} to {}", paramName, paramValue);
                 parameters.add(new JobParameter(paramName, paramValue));
             }
         }
 
-        if (!foundUsernameParam) {
+        if (setDefaultUsernameParam) {
+            log.debug("Adding default user parameter {} with value {}", USERNAME_PARAM, config.username);
             parameters.add(0, new JobParameter(USERNAME_PARAM, config.username));
         }
         return new JobParameters(parameters.toArray(new JobParameter[parameters.size()]));
+    }
+
+    private String determineSandboxBuildNumber() {
+        JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebApiUrl);
+        String buildId;
+        if (sandboxBuild != null) {
+            buildId = sandboxBuild.id();
+            if (buildId == null) {
+                throw new IllegalArgumentException("No build number found in url " + sandboxBuild.url);
+            }
+        } else {
+            buildId = InputUtils.readValueUntilNotBlank("Sandbox build number");
+        }
+        return buildId;
     }
 
 
