@@ -6,6 +6,11 @@ import com.vmware.config.WorkflowConfig;
  * Common functionality for actions that amend a git commit.
  */
 public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
+    protected static final boolean INCLUDE_ALL_CHANGES = true;
+    protected static final boolean DONT_INCLUDE_ALL_CHANGES = false;
+    protected static final boolean INCLUDE_JOB_RESULTS = true;
+    protected static final boolean EXCLUDE_JOB_RESULTS = false;
+
     private final boolean includeJobResultsInCommit;
     private final boolean includeAllChangesInCommit;
 

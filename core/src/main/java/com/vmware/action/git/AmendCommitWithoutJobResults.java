@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 @ActionDescription("Performs a git commit --amend if changes are detected. Strips job results from commit text.")
 public class AmendCommitWithoutJobResults extends BaseCommitAmendAction {
     public AmendCommitWithoutJobResults(WorkflowConfig config) {
-        super(config, false, false);
+        super(config, DONT_INCLUDE_ALL_CHANGES, EXCLUDE_JOB_RESULTS);
     }
 
     @Override
