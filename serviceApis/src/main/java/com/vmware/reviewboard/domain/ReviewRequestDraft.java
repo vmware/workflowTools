@@ -78,7 +78,7 @@ public class ReviewRequestDraft extends BaseEntity{
     public boolean userHasBugzillaQuery;
 
     @Expose(serialize = false, deserialize = false)
-    public String matchingChangelistId;
+    public String perforceChangelistId;
 
     public ReviewRequestDraft() {}
 
@@ -100,6 +100,10 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public void fillValuesFromCommitText(String commitText, CommitConfiguration commitConfiguration) {
+        if (StringUtils.isBlank(commitText)) {
+            log.warn("Text is blank, can't extract commit values!");
+            return;
+        }
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
         String summary = commitText.substring(0, summaryIndex);

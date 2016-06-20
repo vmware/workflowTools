@@ -39,6 +39,12 @@ public class Perforce extends BaseScmWrapper {
         return clientDirectory != null ? new File(clientDirectory) : null;
     }
 
+    public String readLastPendingChangelist(String username) {
+        String output = executeScmCommand("p4 changes -m 1 -s pending -l -u " + username);
+        output = output.replaceAll("\n\t", "\n");
+        return output;
+    }
+
     public void deletePendingChangelist(String changelistId) {
         executeScmCommand("p4 change -d " + changelistId, Level.INFO);
     }
@@ -47,31 +53,55 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("p4 revert -w -c " + changelistId + " //...", Level.INFO);
     }
 
-    public String createPendingChangelist(String commitText) {
+    public String createPendingChangelist(String description, boolean filesExpected) {
         String perforceTemplate = executeScmCommand("p4 change -o");
+        String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, filesExpected);
+        String output = executeScmCommand("p4 change -i", amendedTemplate, Level.FINE);
+        return changeSucceeded(output) ? MatcherUtils.singleMatch(output, "Change\\s+(\\d+)\\s+created") : null;
+    }
+
+    public void moveAllOpenFilesToChangelist(String changelistId) {
+        executeScmCommand("p4 reopen -c " + changelistId + " //...", Level.INFO);
+    }
+
+    public boolean updatePendingChangelist(String id, String description) {
+        String perforceTemplate = executeScmCommand("p4 change -o " + id);
+        String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, false);
+        String output = executeScmCommand("p4 change -i", amendedTemplate, Level.FINE);
+        return changeSucceeded(output);
+    }
+
+    public void submitChangelist(String id, String description) {
+        String perforceTemplate = executeScmCommand("p4 change -o " + id);
+        String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, true);
+        executeScmCommand("p4 submit -f revertunchanged -i", amendedTemplate, Level.INFO);
+    }
+
+    private boolean changeSucceeded(String output) {
+        if (output.contains("Error in change specification")) {
+            log.error("Failed to apply change\n{}\n", output);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private String updateTemplateWithDescription(String perforceTemplate, String commitText, boolean filesExpected) {
         int descriptionIndex = perforceTemplate.indexOf("Description:");
         if (descriptionIndex == -1) {
             throw new IllegalArgumentException("Failed to find Description: in perforce template:\n" + perforceTemplate);
         }
         int filesIndex = perforceTemplate.indexOf("Files:");
-        if (filesIndex == -1) {
+        if (filesIndex == -1 && filesExpected) {
             throw new IllegalArgumentException("Failed to find Files: in perforce template, does the git commit have file changes?:\n" + perforceTemplate);
+        } else if (filesIndex == -1) {
+            log.debug("No files detected");
+            filesIndex = perforceTemplate.length();
         }
 
         String amendedCommitText = "\t" + commitText.replaceAll("\n", "\n\t");
 
-        String amendedTemplate = String.format("%sDescription:\n%s\n%s",
+        return String.format("%sDescription:\n%s\n%s",
                 perforceTemplate.substring(0, descriptionIndex), amendedCommitText, perforceTemplate.substring(filesIndex));
-
-
-        String output = executeScmCommand("p4 change -i", amendedTemplate, Level.FINE);
-        boolean success = !output.contains("Error in change specification.");
-        if (!success) {
-            log.error("Failed to create pending changelist\n{}\n", output);
-            return null;
-        } else {
-            String changelistId = MatcherUtils.singleMatch(output, "Change\\s+(\\d+)\\s+created");
-            return changelistId;
-        }
     }
 }

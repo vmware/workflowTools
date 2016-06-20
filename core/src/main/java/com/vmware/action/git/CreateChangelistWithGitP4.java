@@ -12,16 +12,18 @@ public class CreateChangelistWithGitP4 extends BaseCommitAction {
 
     @Override
     public void process() {
-        log.info("Using git p4 to create default changelist with changes");
+        log.info("Using git p4 to add matching changes to default changelist in perforce");
         git.addChangesToDefaultChangelist();
         log.info("Using p4 to create new pending changelist with commit text");
-        String changelistId = perforce.createPendingChangelist(draft.toGitText(config.getCommitConfiguration()));
+        boolean FILES_EXPECTED = true;
+        String changelistId = perforce.createPendingChangelist(draft.toGitText(config.getCommitConfiguration()),
+                FILES_EXPECTED);
         if (changelistId == null) {
             log.warn("Reverting default changelist as create failed");
             perforce.revertChangesInPendingChangelist("default");
         } else {
             log.info("Created pending changelist with id {}", changelistId);
-            draft.matchingChangelistId = changelistId;
+            draft.perforceChangelistId = changelistId;
         }
     }
 }
