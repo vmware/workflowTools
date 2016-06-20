@@ -24,7 +24,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
 
     @Override
     public void process() {
-        String changelistId = draft.matchingChangelistId;
+        String changelistId = draft.perforceChangelistId;
         if (StringUtils.isBlank(changelistId)) {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }

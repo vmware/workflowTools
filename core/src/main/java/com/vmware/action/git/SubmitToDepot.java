@@ -14,7 +14,7 @@ public class SubmitToDepot extends BaseAction {
     @Override
     public void process() {
         if (StringUtils.isBlank(git.configValue("git-p4.skipsubmitedit"))) {
-            log.info("Run git command [git config git-p4.skipsubmitedit true] to skip opening a text editor while submitting");
+            throw new RuntimeException("Git config value git-p4.skipsubmitedit needs to be set to true, run [git config git-p4.skipsubmitedit true]");
         }
         git.submit();
     }

@@ -57,6 +57,9 @@
        "readNonTrivialCommit": [
           "ReadLastCommit", "ExitIfTrivialCommit"
        ],
+       "readPendingChangelist": [
+          "ReadPendingChangelist", "ExitIfCommitDoesNotHaveAChangelistId"
+       ],
        "setCommitDetailsWithoutConfirmation": [
           "PreloadAssignedJiraIssues", "PreloadAssignedBugzillaBugs", "SetSummary", "SetDescription", "SetTestingDone",
           "SetReviewedBy", "SetBugNumbers"
@@ -93,6 +96,12 @@
        "amendCommit": [
           "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"
        ],
+       "createPendingChangelist": [
+          "setCommitDetails", "CreatePendingChangelist"
+       ],
+       "moveOpenFilesToPendingChangelist": [
+          "readPendingChangelist", "MoveOpenFilesToPendingChangelist"
+       ],
        "setReviewDetails": [
           "UpdateReviewDetails", "UploadReviewDiff"
        ],
@@ -102,8 +111,11 @@
        "review": [
           "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
-       "reviewWithPerforce": [
-          "createPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+       "reviewPendingChangelist": [
+          "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "UpdateChangelistDescription", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+       ],
+       "reviewCommitWithMatchingChangelist": [
+          "createMatchingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "amendReview": [
           "amendCommit", "review"
@@ -141,6 +153,9 @@
        ],
        "submitHarder": [
           "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "HardSubmitReview"
+       ],
+       "submitChangelist": [
+          "readPendingChangelist", "SubmitPendingChangelist"
        ],
        "closeOldReviews": [
           "HardSubmitOldSoftSubmittedReviews", "HardSubmitOldShipItReviews"
@@ -227,11 +242,11 @@
        "createUpdateIssuesFromTrello": [
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
-       "createPendingChangelist": [
+       "createMatchingChangelist": [
          "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "RevertWorkspace", "CreateChangelistWithGitP4"
        ],
        "invokeSandboxBuild": [
-         "createPendingChangelist", "InvokeSandboxBuild", "AmendCommit"
+         "createMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"

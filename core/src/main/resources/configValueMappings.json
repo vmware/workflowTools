@@ -245,11 +245,17 @@
   "ReadLastCommit": [
     "--branch"
   ],
+  "UpdateChangelistDescription": [
+    "--username"
+  ],
   "FormatCommitText": [
     "--max-description",
     "--max-summary"
   ],
   "LoadClosedIssuesWithoutResolution": [
+    "--username"
+  ],
+  "ReadPendingChangelist": [
     "--username"
   ]
 }

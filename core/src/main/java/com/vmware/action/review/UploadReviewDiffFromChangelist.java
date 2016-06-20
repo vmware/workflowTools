@@ -24,7 +24,7 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
         if (!CommandLineUtils.isCommandAvailable("p4")) {
             return "p4 is not installed";
         }
-        if (StringUtils.isBlank(draft.matchingChangelistId)) {
+        if (StringUtils.isBlank(draft.perforceChangelistId)) {
             return "no matching changelist found, run createPendingChangelist as part of workflow";
         }
         return super.cannotRunAction();
@@ -37,7 +37,7 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
             throw new IllegalArgumentException("Client directory not found, is git-p4.client set?");
         }
         String output = CommandLineUtils.executeCommand(clientDirectory,
-                "rbt post -r " + draft.id + " " + draft.matchingChangelistId, null, Level.INFO);
+                "rbt post -r " + draft.id + " " + draft.perforceChangelistId, null, Level.INFO);
         if (!output.contains("Review request #" + draft.id + " posted")) {
             log.error("Failed to upload diff successfully\n{}", output);
         }
