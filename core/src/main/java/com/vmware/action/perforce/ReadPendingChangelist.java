@@ -7,7 +7,7 @@ import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 
-@ActionDescription("Reads the most recent pending changelist for the specified user")
+@ActionDescription("Reads the most recent pending changelist for the specified user.")
 public class ReadPendingChangelist extends BaseCommitAction {
 
     public ReadPendingChangelist(WorkflowConfig config) {

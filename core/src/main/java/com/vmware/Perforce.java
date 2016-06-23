@@ -13,10 +13,6 @@ import java.util.logging.Level;
  * Wrapper around p4 commands
  */
 public class Perforce extends BaseScmWrapper {
-    public Perforce() {
-        super(new File(System.getProperty("user.dir")));
-    }
-
     public Perforce(File workingDirectory) {
         super(workingDirectory);
     }
@@ -41,6 +37,12 @@ public class Perforce extends BaseScmWrapper {
 
     public String readLastPendingChangelist(String username) {
         String output = executeScmCommand("p4 changes -m 1 -s pending -l -u " + username);
+        output = output.replaceAll("\n\t", "\n");
+        return output;
+    }
+
+    public String readChangelist(String changelistId) {
+        String output = executeScmCommand("p4 describe -s " + changelistId);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }

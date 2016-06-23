@@ -7,7 +7,7 @@ import com.vmware.util.CommandLineUtils;
 
 import java.util.logging.Level;
 
-@ActionDescription("Uses rbt post to upload a diff to reviewboard, use for git p4 or perforce for example")
+@ActionDescription("Uses rbt post to upload a diff to reviewboard, use for git p4 or perforce for example.")
 public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
 
     public UploadReviewDiffWithRbt(WorkflowConfig config) {

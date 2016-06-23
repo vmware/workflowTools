@@ -9,7 +9,7 @@ import com.vmware.util.StringUtils;
 import java.io.File;
 import java.util.logging.Level;
 
-@ActionDescription("Uses rbt post to upload a changelist as a diff to reviewboard, only for perforce")
+@ActionDescription("Uses rbt post to upload a changelist as a diff to reviewboard, only for perforce.")
 public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
     public UploadReviewDiffFromChangelist(WorkflowConfig config) {
