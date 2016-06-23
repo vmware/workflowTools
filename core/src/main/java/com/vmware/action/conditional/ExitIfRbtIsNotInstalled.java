@@ -6,7 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Exit if rbt is not installed")
+@ActionDescription("Exit if rbt is not installed.")
 public class ExitIfRbtIsNotInstalled extends BaseAction {
     public ExitIfRbtIsNotInstalled(WorkflowConfig config) {
         super(config);

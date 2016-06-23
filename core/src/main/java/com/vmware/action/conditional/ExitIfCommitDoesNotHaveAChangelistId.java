@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Exits if no changelist id is set for the commit")
+@ActionDescription("Exits if no changelist id is set for the commit.")
 public class ExitIfCommitDoesNotHaveAChangelistId extends BaseCommitAction {
     public ExitIfCommitDoesNotHaveAChangelistId(WorkflowConfig config) {
         super(config);

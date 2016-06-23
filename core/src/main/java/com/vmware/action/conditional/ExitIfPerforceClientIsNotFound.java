@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Exit if perforce client name is not set")
+@ActionDescription("Exit if perforce client name is not set.")
 public class ExitIfPerforceClientIsNotFound extends BaseAction {
     public ExitIfPerforceClientIsNotFound(WorkflowConfig config) {
         super(config);

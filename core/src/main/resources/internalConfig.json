@@ -97,7 +97,7 @@
           "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"
        ],
        "createPendingChangelist": [
-          "setCommitDetails", "CreatePendingChangelist"
+          "setCommitDetails", "CreatePendingChangelistIfNeeded"
        ],
        "moveOpenFilesToPendingChangelist": [
           "readPendingChangelist", "MoveOpenFilesToPendingChangelist"
@@ -115,7 +115,7 @@
           "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "UpdateChangelistDescription", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "reviewCommitWithMatchingChangelist": [
-          "createMatchingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+          "updateMatchingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "amendReview": [
           "amendCommit", "review"
@@ -242,11 +242,11 @@
        "createUpdateIssuesFromTrello": [
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
-       "createMatchingChangelist": [
-         "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "RevertWorkspace", "CreateChangelistWithGitP4"
+       "updateMatchingChangelist": [
+         "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "SelectMatchingChangelist", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "AddGitChangesToChangelist", "UpdateChangelistDescription"
        ],
        "invokeSandboxBuild": [
-         "createMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
+         "updateMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"

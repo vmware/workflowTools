@@ -98,7 +98,11 @@ public class Git extends BaseScmWrapper {
     }
 
     public void addChangesToDefaultChangelist() {
-        executeScmCommand("git p4 submit --prepare-p4-only", null, Level.INFO);
+        String output = executeScmCommand("git p4 submit --prepare-p4-only", null, Level.FINE);
+        if (!output.contains("P4 workspace prepared for submission")) {
+            log.error("Failed to apply commit to perforce, expected text \"P4 workspace prepared for submission\" in output\n{}", output);
+            System.exit(1);
+        }
     }
 
     public void commitWithAllFileChanges(String msg) {
@@ -128,7 +132,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void submit() {
-        String output = executeScmCommand("git p4 submit -M", Level.INFO);
+        String output = executeScmCommand("git p4 submit -M --conflict=quit", Level.INFO);
         if (!output.contains("All commits applied!")) {
             log.error("git p4 submit failed!");
             System.exit(1);

@@ -126,6 +126,10 @@ public class StringUtils {
         return splitText;
     }
 
+    public static boolean equals(String arg1, String arg2) {
+        return arg1 == null ? arg2 == null : arg1.equals(arg2);
+    }
+
     public static boolean isNotBlank(String value) {
         return value != null && !value.isEmpty();
     }

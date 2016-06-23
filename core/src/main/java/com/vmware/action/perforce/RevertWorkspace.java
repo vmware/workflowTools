@@ -1,13 +1,15 @@
 package com.vmware.action.perforce;
 
 import com.vmware.action.BaseAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 
 import java.util.List;
 
-@ActionDescription("Used to revert all pending changelists in a perforce workspace")
-public class RevertWorkspace extends BaseAction {
+@ActionDescription("Used to revert all pending changelists in a perforce workspace.")
+public class RevertWorkspace extends BaseCommitAction {
     public RevertWorkspace(WorkflowConfig config) {
         super(config);
     }
@@ -17,18 +19,22 @@ public class RevertWorkspace extends BaseAction {
         List<String> changelistIds = perforce.getPendingChangelists(config.perforceClientName);
 
         for (String changelistId : changelistIds) {
-            revertAndDeleteChangelist(changelistId);
+            revertChangesInChangelist(changelistId);
         }
 
         log.info("Reverting open files in default changelist for client {}", config.perforceClientName);
         perforce.revertChangesInPendingChangelist("default");
     }
 
-    private void revertAndDeleteChangelist(String changelistId) {
+    private void revertChangesInChangelist(String changelistId) {
         log.info("Reverting open files in changelist {} for client {}", changelistId, config.perforceClientName);
         perforce.revertChangesInPendingChangelist(changelistId);
-        log.info("Deleting pending changelist {} in client {}", changelistId, config.perforceClientName);
-        perforce.deletePendingChangelist(changelistId);
+        if (changelistId.equals(draft.perforceChangelistId)) {
+            log.info("Not deleting changelist {} as it matches the current commit", changelistId);
+        } else {
+            log.info("Deleting pending changelist {} in client {}", changelistId, config.perforceClientName);
+            perforce.deletePendingChangelist(changelistId);
+        }
     }
 
 
