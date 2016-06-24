@@ -36,6 +36,7 @@ public class CommandLineUtils {
         }
     }
 
+
     public static String executeCommand(File workingDirectory, String command, String inputText, Level logLevel) {
         ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
                 .redirectErrorStream(true);

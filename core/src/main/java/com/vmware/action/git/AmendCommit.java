@@ -4,6 +4,8 @@ import com.vmware.action.base.BaseCommitAmendAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
+import java.util.logging.Level;
+
 @ActionDescription("Performs a git commit --amend if changes are detected.")
 public class AmendCommit extends BaseCommitAmendAction {
 
@@ -13,6 +15,8 @@ public class AmendCommit extends BaseCommitAmendAction {
 
     @Override
     public void process() {
+        String existingHeadRef = git.revParse("head");
         git.amendCommit(updatedCommitText());
+        git.updateGitChangesetTagsMatchingRevision(existingHeadRef, Level.INFO);
     }
 }
