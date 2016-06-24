@@ -30,8 +30,8 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public File getClientDirectory(String perforceClientName) {
-        String info = executeScmCommand("p4 -c " + perforceClientName + " info", Level.FINE);
-        String clientDirectory = MatcherUtils.singleMatch(info, "Client root:\\s+(.+)");
+        String info = executeScmCommand("p4 clients -e " + perforceClientName, Level.FINE);
+        String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + perforceClientName + "\\s+.+?(\\S+)\\s+'Created by");
         return clientDirectory != null ? new File(clientDirectory) : null;
     }
 
