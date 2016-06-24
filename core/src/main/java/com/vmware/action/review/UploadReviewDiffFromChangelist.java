@@ -9,6 +9,8 @@ import com.vmware.util.StringUtils;
 import java.io.File;
 import java.util.logging.Level;
 
+import static java.lang.String.format;
+
 @ActionDescription("Uses rbt post to upload a changelist as a diff to reviewboard, only for perforce.")
 public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
@@ -32,12 +34,12 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
     @Override
     public void process() {
-        File clientDirectory = perforce.getClientDirectory();
+        File clientDirectory = perforce.getClientDirectory(config.perforceClientName);
         if (clientDirectory == null) {
             throw new IllegalArgumentException("Client directory not found, is git-p4.client set?");
         }
-        String output = CommandLineUtils.executeCommand(clientDirectory,
-                "rbt post -r " + draft.id + " " + draft.perforceChangelistId, null, Level.INFO);
+        String command = format("rbt post -r %s %s", draft.id, draft.perforceChangelistId);
+        String output = CommandLineUtils.executeCommand(clientDirectory, command, null, Level.INFO);
         if (!output.contains("Review request #" + draft.id + " posted")) {
             log.error("Failed to upload diff successfully\n{}", output);
         }

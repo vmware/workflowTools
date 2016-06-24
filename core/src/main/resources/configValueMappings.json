@@ -108,6 +108,10 @@
   "UpdateReviewDetails": [
     "--groups"
   ],
+  "UploadReviewDiffWithRbt": [
+    "--parent",
+    "--tracking-branch"
+  ],
   "CreateReviewIfNeeded": [
     "--review-board-date-format",
     "--username",
@@ -186,6 +190,9 @@
     "--default-jira-project",
     "--disable-bugzilla"
   ],
+  "UploadReviewDiffFromChangelist": [
+    "--perforce-client"
+  ],
   "SetSummary": [
     "--max-summary",
     "--set-empty-only"
@@ -248,9 +255,6 @@
   "ReadLastCommit": [
     "--branch"
   ],
-  "UpdateChangelistDescription": [
-    "--username"
-  ],
   "FormatCommitText": [
     "--max-description",
     "--max-summary"
@@ -259,6 +263,7 @@
     "--username"
   ],
   "ReadPendingChangelist": [
-    "--username"
+    "--username",
+    "--perforce-client"
   ]
 }

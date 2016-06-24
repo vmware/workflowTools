@@ -29,14 +29,14 @@ public class Perforce extends BaseScmWrapper {
         return changeListIds;
     }
 
-    public File getClientDirectory() {
-        String info = executeScmCommand("p4 info", Level.FINE);
+    public File getClientDirectory(String perforceClientName) {
+        String info = executeScmCommand("p4 -c " + perforceClientName + " info", Level.FINE);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client root:\\s+(.+)");
         return clientDirectory != null ? new File(clientDirectory) : null;
     }
 
-    public String readLastPendingChangelist(String username) {
-        String output = executeScmCommand("p4 changes -m 1 -s pending -l -u " + username);
+    public String readLastPendingChangelist(String perforceClientName) {
+        String output = executeScmCommand("p4 changes -m 1 -s pending -l -c " + perforceClientName);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }

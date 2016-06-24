@@ -6,6 +6,7 @@ import com.vmware.util.StringUtils;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -166,6 +167,45 @@ public class Git extends BaseScmWrapper {
 
     public String revParse(String commitRef) {
         return executeScmCommand("git rev-parse " + commitRef);
+    }
+
+    /**
+     * Updates tags used by git changeset.
+     */
+    public void updateGitChangesetTagsMatchingRevision(String revision, Level logLevel) {
+        for (String tag : listTags()) {
+            if (!tag.startsWith("changeset-")) {
+                continue;
+            }
+            String tagRevision = revParse(tag);
+            if (tagRevision.equals(revision)) {
+                updateTag(tag, logLevel);
+            }
+        }
+    }
+
+    public String updateTag(String tagName, Level logLevel) {
+        if (StringUtils.isBlank(tagName)) {
+            log.debug("Ignoring empty tag");
+            return "no tag name specified";
+        }
+        if (tagName.equals("null")) {
+            throw new RuntimeException("tag name should not equal null");
+        }
+        return executeScmCommand("git tag -f " + tagName, logLevel);
+    }
+
+    public List<String> listTags() {
+        String output = executeScmCommand("git tag");
+        return Arrays.asList(output.split("\n"));
+    }
+
+    public String deleteTag(String tagName) {
+        return executeScmCommand("git tag -d " + tagName);
+    }
+
+    public String changesetCommand(String command, Level logLevel) {
+        return executeScmCommand("git changeset " + command, logLevel);
     }
 
     public String getTrackingBranch() {

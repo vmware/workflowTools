@@ -57,8 +57,14 @@
        "readNonTrivialCommit": [
           "ReadLastCommit", "ExitIfTrivialCommit"
        ],
+       "readNonTrivialPerforceCommit": [
+          "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "SelectLinkedChangelist", "SelectMatchingChangelist"
+       ],
        "readPendingChangelist": [
           "ReadPendingChangelist", "ExitIfCommitDoesNotHaveAChangelistId"
+       ],
+       "displayReviewUrl": [
+          "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "setCommitDetailsWithoutConfirmation": [
           "PreloadAssignedJiraIssues", "PreloadAssignedBugzillaBugs", "SetSummary", "SetDescription", "SetTestingDone",
@@ -106,16 +112,16 @@
           "UpdateReviewDetails", "UploadReviewDiff"
        ],
        "forceNewReview": [
-          "readNonTrivialCommit", "CreateReview", "setReviewDetails", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+          "readNonTrivialCommit", "CreateReview", "setReviewDetails", "AmendCommit", "displayReviewUrl"
        ],
        "review": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "displayReviewUrl"
        ],
        "reviewPendingChangelist": [
-          "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "UpdateChangelistDescription", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+          "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "UpdateChangelistDescription", "displayReviewUrl"
        ],
        "reviewCommitWithMatchingChangelist": [
-          "updateMatchingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "DisplayReviewUrl", "CopyReviewUrlToClipboard"
+          "updateMatchingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "displayReviewUrl"
        ],
        "amendReview": [
           "amendCommit", "review"
@@ -149,10 +155,10 @@
           "prepareCommitForPush", "PushToMaster", "HardSubmitReview"
        ],
        "submit": [
-          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "SoftSubmitReview"
+          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "DeleteChangelistTag", "SoftSubmitReview"
        ],
        "submitHarder": [
-          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "HardSubmitReview"
+          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "DeleteChangelistTag", "HardSubmitReview"
        ],
        "submitChangelist": [
           "readPendingChangelist", "SubmitPendingChangelist"
@@ -243,7 +249,19 @@
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "updateMatchingChangelist": [
-         "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "SelectMatchingChangelist", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "AddGitChangesToChangelist", "UpdateChangelistDescription"
+         "readNonTrivialPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "AddGitChangesToChangelist", "UpdateChangelistDescription"
+       ],
+       "updateWithGitChangeset": [
+         "readNonTrivialPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"
+       ],
+       "reviewWithGitChangeset": [
+         "updateWithGitChangeset", "CreateReviewIfNeeded", "UploadReviewDiffFromChangelist", "UpdateReviewDetails", "AmendCommit", "displayReviewUrl"
+       ],
+       "submitWithGitChangeset": [
+         "updateWithGitChangeset", "SubmitPendingChangelist", "HardSubmitReview"
+       ],
+       "invokeSandboxBuildWithGitChangeset": [
+        "updateWithGitChangeset", "InvokeSandboxBuild", "AmendCommit"
        ],
        "invokeSandboxBuild": [
          "updateMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"

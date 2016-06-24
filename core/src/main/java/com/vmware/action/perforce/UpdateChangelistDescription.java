@@ -13,7 +13,7 @@ public class UpdateChangelistDescription extends BasePerforceCommitAction {
     @Override
     public void process() {
         String description = draft.toGitText(config.getCommitConfiguration());
-        String existingDescription = perforce.readLastPendingChangelist(config.username);
+        String existingDescription = perforce.readChangelist(draft.perforceChangelistId);
         existingDescription = existingDescription.substring(existingDescription.indexOf('\n')).trim();
         if (description.equals(existingDescription)) {
             log.info("Not updating description for changelist {} as it hasn't changed", draft.perforceChangelistId);

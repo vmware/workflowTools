@@ -7,7 +7,9 @@ import com.vmware.util.CommandLineUtils;
 
 import java.util.logging.Level;
 
-@ActionDescription("Uses rbt post to upload a diff to reviewboard, use for git p4 or perforce for example.")
+import static java.lang.String.format;
+
+@ActionDescription("Uses rbt post to upload a diff for a git commit to reviewboard.")
 public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
 
     public UploadReviewDiffWithRbt(WorkflowConfig config) {
@@ -24,6 +26,7 @@ public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
 
     @Override
     public void process() {
-        CommandLineUtils.executeCommand(git.getRootDirectory(), "rbt post -r " + draft.id, null, Level.INFO);
+        String command = format("rbt post -r %s --tracking-branch=%s --parent=%s", draft.id, config.trackingBranch, config.parentBranch);
+        CommandLineUtils.executeCommand(git.getRootDirectory(), command, null, Level.INFO);
     }
 }
