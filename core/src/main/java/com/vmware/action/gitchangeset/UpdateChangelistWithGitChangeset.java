@@ -14,9 +14,7 @@ public class UpdateChangelistWithGitChangeset extends BasePerforceCommitAction {
 
     @Override
     public void process() {
-        log.info("Updating tag for changeset-{}", draft.perforceChangelistId);
         git.updateTag("changeset-" + draft.perforceChangelistId, Level.FINE);
-
         git.changesetCommand("update", Level.INFO);
     }
 }
