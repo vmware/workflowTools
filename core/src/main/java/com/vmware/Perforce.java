@@ -66,6 +66,11 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("p4 reopen -c " + changelistId + " //...", Level.INFO);
     }
 
+    public String getChangelistStatus(String id) {
+        String changelistText = executeScmCommand("p4 change -o -O " + id);
+        return MatcherUtils.singleMatch(changelistText, "Status:\\s+(pending|submitted)");
+    }
+
     public boolean updatePendingChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("p4 change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, false);
@@ -76,7 +81,13 @@ public class Perforce extends BaseScmWrapper {
     public void submitChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("p4 change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, true);
-        executeScmCommand("p4 submit -f revertunchanged -i", amendedTemplate, Level.INFO);
+        String submitOutput = executeScmCommand("p4 submit -f revertunchanged -i", amendedTemplate, Level.INFO);
+        String status = getChangelistStatus(id);
+        if (!"submitted".equals(status)) {
+            log.error("Changelist {} has status {}, expected submitted", id, status);
+            log.error("Submit output\n{}", submitOutput);
+            System.exit(1);
+        }
     }
 
     private boolean changeSucceeded(String output) {

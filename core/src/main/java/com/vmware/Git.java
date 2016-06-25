@@ -169,6 +169,18 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("git rev-parse " + commitRef);
     }
 
+    public String fetch() {
+        return executeScmCommand("git fetch");
+    }
+
+    public String rebase(String branch) {
+        return executeScmCommand("git rebase " + branch);
+    }
+
+    public String p4Rebase() {
+        return executeScmCommand("git p4 rebase");
+    }
+
     /**
      * Updates tags used by git changeset.
      */
