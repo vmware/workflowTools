@@ -2,6 +2,7 @@ package com.vmware;
 
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -11,7 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +45,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String applyDiff(String diffData) {
-        return executeScmCommand("git apply -3 --index", diffData, Level.FINE);
+        return executeScmCommand("git apply -3 --index", diffData, LogLevel.DEBUG);
     }
 
     public String lastCommitText(boolean prettyPrint) {
@@ -99,7 +99,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void addChangesToDefaultChangelist() {
-        String output = executeScmCommand("git p4 submit --prepare-p4-only", null, Level.FINE);
+        String output = executeScmCommand("git p4 submit --prepare-p4-only", null, LogLevel.DEBUG);
         if (!output.contains("P4 workspace prepared for submission")) {
             log.error("Failed to apply commit to perforce, expected text \"P4 workspace prepared for submission\" in output\n{}", output);
             System.exit(1);
@@ -133,7 +133,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void submit() {
-        String output = executeScmCommand("git p4 submit -M --conflict=quit", Level.INFO);
+        String output = executeScmCommand("git p4 submit -M --conflict=quit", LogLevel.INFO);
         if (!output.contains("All commits applied!")) {
             log.error("git p4 submit failed!");
             System.exit(1);
@@ -184,7 +184,7 @@ public class Git extends BaseScmWrapper {
     /**
      * Updates tags used by git changeset.
      */
-    public void updateGitChangesetTagsMatchingRevision(String revision, Level logLevel) {
+    public void updateGitChangesetTagsMatchingRevision(String revision, LogLevel logLevel) {
         for (String tag : listTags()) {
             if (!tag.startsWith("changeset-")) {
                 continue;
@@ -196,7 +196,7 @@ public class Git extends BaseScmWrapper {
         }
     }
 
-    public String updateTag(String tagName, Level logLevel) {
+    public String updateTag(String tagName, LogLevel logLevel) {
         if (StringUtils.isBlank(tagName)) {
             log.debug("Ignoring empty tag");
             return "no tag name specified";
@@ -216,7 +216,7 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("git tag -d " + tagName);
     }
 
-    public String changesetCommand(String command, Level logLevel) {
+    public String changesetCommand(String command, LogLevel logLevel) {
         return executeScmCommand("git changeset " + command, logLevel);
     }
 
@@ -285,7 +285,7 @@ public class Git extends BaseScmWrapper {
         String forceUpdateString = forceUpdate ? " -f" : "";
         String pushCommand = String.format("git push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
 
-        String pushOutput = executeScmCommand(pushCommand, Level.INFO);
+        String pushOutput = executeScmCommand(pushCommand, LogLevel.INFO);
 
         if (pushOutput.contains("[up to date]")) {
             log.info("Remote branch is already up to date");
@@ -353,7 +353,7 @@ public class Git extends BaseScmWrapper {
     }
 
     private void executeCommitCommand(String commitCommand, String msg) {
-        executeScmCommand(commitCommand + " --file=-", msg, Level.FINE);
+        executeScmCommand(commitCommand + " --file=-", msg, LogLevel.DEBUG);
     }
 
 

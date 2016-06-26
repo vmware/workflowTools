@@ -9,6 +9,7 @@ import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
+import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

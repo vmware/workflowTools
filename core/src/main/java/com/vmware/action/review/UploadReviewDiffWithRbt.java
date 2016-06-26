@@ -4,8 +4,7 @@ import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
-
-import java.util.logging.Level;
+import com.vmware.util.logging.LogLevel;
 
 import static java.lang.String.format;
 
@@ -27,6 +26,6 @@ public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
     @Override
     public void process() {
         String command = format("rbt post -r %s --tracking-branch=%s --parent=%s", draft.id, config.trackingBranch, config.parentBranch);
-        CommandLineUtils.executeCommand(git.getRootDirectory(), command, null, Level.INFO);
+        CommandLineUtils.executeCommand(git.getRootDirectory(), command, null, LogLevel.INFO);
     }
 }

@@ -2,6 +2,7 @@ package com.vmware.util;
 
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /**
  * Used for easy use of executing commands
@@ -26,18 +26,18 @@ public class CommandLineUtils {
         if (osName == null) {
             return false;
         } else if (osName.startsWith("Windows")) {
-            String whereCheck = executeCommand(null, "where " + command, null, Level.FINEST);
+            String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
             log.debug("{} {} where check [{}]", osName, command, whereCheck);
             return !whereCheck.contains("Could not find files");
         } else {
-            String whichCheck = executeCommand(null, "which " + command, null, Level.FINEST);
+            String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
             log.debug("{} {} which check [{}]", osName, command, whichCheck);
             return !whichCheck.trim().isEmpty();
         }
     }
 
 
-    public static String executeCommand(File workingDirectory, String command, String inputText, Level logLevel) {
+    public static String executeCommand(File workingDirectory, String command, String inputText, LogLevel logLevel) {
         ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
                 .redirectErrorStream(true);
         try {
@@ -51,7 +51,7 @@ public class CommandLineUtils {
         }
     }
 
-    public static String executeScript(String command, String[] inputs, String[] textsToWaitFor, Level logLevel) {
+    public static String executeScript(String command, String[] inputs, String[] textsToWaitFor, LogLevel logLevel) {
         log.info("Executing script {}", command);
         ProcessBuilder builder = new ProcessBuilder(command.split(" ")).redirectErrorStream(true);
         String totalOutput = "";
@@ -94,7 +94,7 @@ public class CommandLineUtils {
         }
     }
 
-    private static String readProcessOutput(String command, InputStream input, Level logLevel) {
+    private static String readProcessOutput(String command, InputStream input, LogLevel logLevel) {
         Padder titlePadder = new Padder(command);
         titlePadder.logTitle(logLevel);
         String output = IOUtils.read(input);

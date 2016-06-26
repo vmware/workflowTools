@@ -33,22 +33,22 @@ public class Padder {
     }
 
     public void traceTitle() {
-        logTitle(Level.FINEST);
+        logTitle(LogLevel.TRACE);
     }
 
     public void debugTitle() {
-        logTitle(Level.FINE);
+        logTitle(LogLevel.DEBUG);
     }
 
     public void infoTitle() {
-        logTitle(Level.INFO);
+        logTitle(LogLevel.INFO);
     }
 
     public void errorTitle() {
-        logTitle(Level.SEVERE);
+        logTitle(LogLevel.ERROR);
     }
 
-    public void logTitle(Level logLevel) {
+    public void logTitle(LogLevel logLevel) {
         if (isFirstExecution) {
             dynamicLogger.log(logLevel, "");
         }

@@ -1,10 +1,10 @@
 package com.vmware;
 
+import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import static com.vmware.util.CommandLineUtils.executeCommand;
 
@@ -22,14 +22,14 @@ public abstract class BaseScmWrapper {
     }
 
     protected String executeScmCommand(String command) {
-        return executeScmCommand(command, Level.FINE);
+        return executeScmCommand(command, LogLevel.DEBUG);
     }
 
-    protected String executeScmCommand(String command, Level logLevel) {
+    protected String executeScmCommand(String command, LogLevel logLevel) {
         return executeScmCommand(command, null, logLevel);
     }
 
-    protected String executeScmCommand(String command, String inputText, Level level) {
+    protected String executeScmCommand(String command, String inputText, LogLevel level) {
         log.debug("{} command {}", this.getClass().getSimpleName(), command);
         String output = executeCommand(workingDirectory, command, inputText, level);
         exitIfCommandFailed(output);

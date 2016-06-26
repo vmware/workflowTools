@@ -1,6 +1,6 @@
 package com.vmware;
 
-import com.vmware.config.LogLevel;
+import com.vmware.util.logging.LogLevel;
 
 import java.util.logging.Formatter;
 import java.util.logging.Level;

@@ -10,8 +10,7 @@ import com.vmware.util.CommitConfiguration;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
-
-import java.util.logging.Level;
+import com.vmware.util.logging.LogLevel;
 
 import static java.lang.String.format;
 
@@ -36,7 +35,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         String command = format("%s sandbox queue %s --branch=%s --changeset=%s",
                 config.goBuildBinPath, config.buildwebProject, config.buildwebBranch, changelistId);
 
-        String output = CommandLineUtils.executeScript(command, inputs, textsToWaitFor, Level.INFO);
+        String output = CommandLineUtils.executeScript(command, inputs, textsToWaitFor, LogLevel.INFO);
         CommitConfiguration commitConfig = config.getCommitConfiguration();
         String buildNumberPattern = commitConfig.generateBuildWebNumberPattern();
 
