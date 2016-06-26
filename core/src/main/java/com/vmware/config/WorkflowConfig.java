@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,8 +130,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Swimlanes to use for trello. A list of story point values as integers is expected")
     public SortedSet<Integer> storyPointValues;
 
-    @ConfigurableProperty(help = "Map of jenkins jobs to select from when invoking a jenkins job")
-    public Map<String, String> jenkinsJobs;
+    @ConfigurableProperty(help = "Map of user friendly names for jenkins jobs to select from")
+    public Map<String, String> jenkinsJobsMappings = new HashMap<>();
 
     @ConfigurableProperty(commandLine = "-waitForJenkins,--wait-for-jenkins", help = "Waits for jenkins job to complete, when running multiple jobs, waits for previous one to complete before starting next one")
     public boolean waitForJenkinsJobCompletion;
@@ -194,8 +196,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-md,--max-description", help = "Sets max line length for all other lines in the commit")
     public int maxDescriptionLength;
 
-    @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the keys of the jenkins jobs to invoke. Set as comma separated values.")
-    public String jenkinsJobKeys;
+    @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the names and parameters for the jenkins jobs to invoke. Separate jobs by commas and parameters by ampersands")
+    public String jenkinsJobsToUse;
 
     @ConfigurableProperty(commandLine = "--estimate", help = "Number of hours to set as the estimate for jira tasks.")
     public int jiraTaskEstimateInHours;
@@ -251,6 +253,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time for blocking workflow action to complete.")
     public long waitTimeForBlockingWorkflowAction;
 
+    @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. -JVAPP_NAME=test -JUSERNAME=dbiggs")
+    public Map<String, String> jenkinsJobParameters = new TreeMap<>();
+
     @Expose(serialize = false, deserialize = false)
     private ServiceLocator serviceLocator = null;
 
@@ -287,37 +292,12 @@ public class WorkflowConfig {
 
     public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
         workFlowActions = new WorkflowActionLister().findWorkflowActions();
-        List<ConfigurableProperty> commandLineProperties = new ArrayList<ConfigurableProperty>();
-        for (Field field : configurableFields) {
-            ConfigurableProperty property = field.getAnnotation(ConfigurableProperty.class);
-            if (property.commandLine().equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
-                continue;
-            }
-            commandLineProperties.add(property);
-            String[] commandLineArguments = property.commandLine().split(",");
-            if (!argsParser.containsArgument(commandLineArguments)) {
-                continue;
-            }
-
-            if (field.getType().equals(boolean.class)) {
-                setFieldValue(field, Boolean.TRUE.toString(), "Command Line");
-            } else {
-                setFieldValue(field, argsParser.getExpectedArgument(commandLineArguments), "Command Line");
-            }
-        }
+        List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), "Command Line");
         if (argsParser.containsArgument("--possible-workflow")) {
             overriddenConfigSources.put("workflowsToRun", "Command Line");
             this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
         }
-        List<UnrecognizedCommandLineArgument> unrecognizedArguments = argsParser.findUnrecognizedArguments(commandLineProperties);
-        if (!unrecognizedArguments.isEmpty()) {
-            String errorMessage = "Following arguments were unrecognized\n";
-            for (UnrecognizedCommandLineArgument unrecognizedArgument : unrecognizedArguments) {
-                errorMessage += "\n" + unrecognizedArgument.toString() + "\n";
-            }
-            throw new IllegalArgumentException(errorMessage);
-        }
-
+        argsParser.checkForUnrecognizedArguments(commandLineProperties);
     }
 
     public LogLevel determineLogLevel() {
@@ -398,12 +378,22 @@ public class WorkflowConfig {
             }
             // copy values to default config map if value is a map
             if (existingValue != null && value instanceof Map) {
-                String existingConfigValue = overriddenConfigSources.get(field.getName());
-                existingConfigValue = existingConfigValue == null ? "Internal Config" : existingConfigValue;
-                String updatedConfigValue = existingConfigValue + "," + configFileName;
-                overriddenConfigSources.put(field.getName(), updatedConfigValue);
+                Map valueMap = (Map) value;
+                if (valueMap.isEmpty()) {
+                    continue;
+                }
                 Map existingValues = (Map) existingValue;
-                existingValues.putAll((Map) value);
+                String existingConfigValue = overriddenConfigSources.get(field.getName());
+                String updatedConfigValue;
+                if (existingConfigValue == null && !existingValues.isEmpty()) {
+                    updatedConfigValue = "default, " + configFileName;
+                } else if (existingConfigValue == null) {
+                    updatedConfigValue = configFileName;
+                } else {
+                    updatedConfigValue = existingConfigValue + ", " + configFileName;
+                }
+                overriddenConfigSources.put(field.getName(), updatedConfigValue);
+                existingValues.putAll(valueMap);
             } else {
                 overriddenConfigSources.put(field.getName(), configFileName);
                 // override for everything else
@@ -447,8 +437,11 @@ public class WorkflowConfig {
                 reviewedByLabel, reviewUrlLabel);
     }
 
-    public String getJenkinsJobValue(String jenkinsJobKey) {
-        return jenkinsJobs != null ? jenkinsJobs.get(jenkinsJobKey) : null;
+    public JenkinsJobsConfig getJenkinsJobsConfig() {
+        jenkinsJobParameters.put(JenkinsJobsConfig.USERNAME_PARAM, username);
+        Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
+        Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
+        return new JenkinsJobsConfig(jenkinsJobsToUse, presetParams, jenkinsUrl, jobMappings);
     }
 
     public Integer parseBugzillaBugNumber(String bugNumber) {
@@ -487,19 +480,36 @@ public class WorkflowConfig {
         }
     }
 
-    private void applyConfigValues(Map<String, String> configValues, String source) {
+    private List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source) {
         if (configValues.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
+        for (String configValue : configValues.keySet()) {
+            if (!configValue.startsWith("-J")) {
+                continue;
+            }
+            String parameterName = configValue.substring(2);
+            String parameterValue = configValues.get(configValue);
+            jenkinsJobParameters.put(parameterName, parameterValue);
+        }
+        List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
+            if (configurableProperty.commandLine().equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
+                continue;
+            }
             for (String configValue : configValues.keySet()) {
                 String[] commandLineArguments = configurableProperty.commandLine().split(",");
                 if (contains(commandLineArguments, configValue)) {
+                    propertiesAffected.add(configurableProperty);
                     String value = configValues.get(configValue);
+                    if (value == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
+                        value = Boolean.TRUE.toString();
+                    }
                     setFieldValue(field, value, source);
                 }
             }
         }
+        return propertiesAffected;
     }
 }

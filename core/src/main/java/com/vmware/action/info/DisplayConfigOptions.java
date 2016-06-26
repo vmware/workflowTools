@@ -38,8 +38,8 @@ public class DisplayConfigOptions extends BaseAction {
         log.info("Each option can also be specified as a git config value, prepend workflow. to the name");
         log.info("E.g. workflow.configFile would be the git config value for configuring the configuration file");
         log.info("");
-        log.info("Overriding config option priority from lowest to highest: \n{}\n{}\n{}\n{}\n{}\n{}",
-                "Internal Config File", "Project Config file", "User Config file", "Git Config Value", "Specified Config Files", "Command Line Arguments");
+        log.info("Overriding config option priority from lowest to highest: \n{}\n{}\n{}\n{}\n{}",
+                "Project Config file", "User Config file", "Git Config Value", "Specified Config Files", "Command Line Arguments");
         Padder titlePadder = new Padder("Configuration Options");
         titlePadder.infoTitle();
         log.info("configFile, [-c,--config] Optional configuration file to use, file is in json format, Defaults to config file in jar");

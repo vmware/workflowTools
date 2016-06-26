@@ -26,7 +26,7 @@ public class DisplayConfig extends BaseAction {
         for (int i = 0; i < config.configurableFields.size(); i ++) {
             Field configField = config.configurableFields.get(i);
             String source = config.overriddenConfigSources.get(configField.getName());
-            source = source == null ? "Internal Config" : source;
+            source = source == null ? "default" : source;
             String displayValue = null;
             try {
                 displayValue = determineDisplayValue(configField.get(config));

@@ -3,6 +3,7 @@ package com.vmware.action.jenkins;
 import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
+import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jenkins.domain.*;
@@ -25,28 +26,21 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
 
     @Override
     public void process() {
-        String jenkinsJobKeys = config.jenkinsJobKeys;
-        if (StringUtils.isBlank(jenkinsJobKeys)) {
-            jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Enter job keys");
+        if (StringUtils.isBlank(config.jenkinsJobsToUse)) {
+            config.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Enter jobs");
         }
 
-        String[] jobs = jenkinsJobKeys.trim().split(",");
+        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
 
-        for (String job : jobs) {
+        for (Job job : jobsConfig.jobs()) {
             checkStatusOfLatestJob(job);
         }
     }
 
-    private void checkStatusOfLatestJob(String job) {
+    private void checkStatusOfLatestJob(Job jobToCheck) {
         JobBuildDetails matchedBuild = null;
-        if (config.getJenkinsJobValue(job) != null) {
-            job = config.jenkinsJobs.get(job).split(",")[0];
-        } else {
-            log.info("No match for jenkins job key {}, using as job name", job);
-        }
 
-        Job jobToCheck = new Job(config.jenkinsUrl, job);
-        log.info("Checking status of job {}", job);
+        log.info("Checking status of job {}", jobToCheck);
         log.debug("Using url {}", jobToCheck.url);
         JobDetails jobDetails = jenkins.getJobDetails(jobToCheck);
         int buildCounter = 0;

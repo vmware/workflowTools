@@ -5,9 +5,11 @@ import com.vmware.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Parsed command line arguments.
@@ -46,6 +48,10 @@ public class CommandLineArgumentsParser {
         if (args.length > 0 && !args[0].startsWith("-")) {
             argumentMap.put("--possible-workflow", args[0]);
         }
+    }
+
+    public Map<String, String> getArgumentMap() {
+        return Collections.unmodifiableMap(argumentMap);
     }
 
     public String getArgumentsText() {
@@ -94,11 +100,14 @@ public class CommandLineArgumentsParser {
         return argValue;
     }
 
-    public List<UnrecognizedCommandLineArgument> findUnrecognizedArguments(List<ConfigurableProperty> validProperties) {
-        List<UnrecognizedCommandLineArgument> unrecognizedArguments = new ArrayList<UnrecognizedCommandLineArgument>();
+    public void checkForUnrecognizedArguments(List<ConfigurableProperty> validProperties) {
+        List<UnrecognizedCommandLineArgument> unrecognizedArguments = new ArrayList<>();
 
         for (String argument : argumentMap.keySet()) {
             if (ArrayUtils.contains(ADDITIONAL_ARGUMENT_NAMES, argument)) {
+                continue;
+            }
+            if (argument.startsWith("-J")) {
                 continue;
             }
             UnrecognizedCommandLineArgument potentiallyUnrecognizedArgument = new UnrecognizedCommandLineArgument(argument);
@@ -121,7 +130,13 @@ public class CommandLineArgumentsParser {
                 unrecognizedArguments.add(potentiallyUnrecognizedArgument);
             }
         }
-        return unrecognizedArguments;
+        if (!unrecognizedArguments.isEmpty()) {
+            String errorMessage = "Following arguments were unrecognized\n";
+            for (UnrecognizedCommandLineArgument unrecognizedArgument : unrecognizedArguments) {
+                errorMessage += "\n" + unrecognizedArgument.toString() + "\n";
+            }
+            throw new IllegalArgumentException(errorMessage);
+        }
     }
 
     @Override
