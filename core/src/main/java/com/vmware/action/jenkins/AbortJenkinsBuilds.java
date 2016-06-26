@@ -2,10 +2,12 @@ package com.vmware.action.jenkins;
 
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
+import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.JobBuild;
 import com.vmware.BuildResult;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.jenkins.domain.Job;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
@@ -13,7 +15,7 @@ import com.vmware.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@ActionDescription("Aborts the jenkins builds specified by the jenkinsJobKeys config property. Updates status for jenkins build urls in testing done section.")
+@ActionDescription("Aborts the jenkins builds specified by the jenkinsJobsToUse config property. Updates status for jenkins build urls in testing done section.")
 public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
 
     public AbortJenkinsBuilds(WorkflowConfig config) {
@@ -23,46 +25,32 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
     @Override
     public void process() {
         askForJenkinsJobKeysIfBlank();
-
-        String[] jenkinsJobKeys = config.jenkinsJobKeys.split(",");
-        List<String> jenkinsJobTexts = new ArrayList<String>();
-        for (String jenkinsJobKey: jenkinsJobKeys) {
-            String jenkinsJobText = config.getJenkinsJobValue(jenkinsJobKey);
-            if (jenkinsJobText == null) {
-                log.info("No job found matching text {}, treating as job value", jenkinsJobKey);
-                jenkinsJobTexts.add(jenkinsJobKey);
-            } else {
-                jenkinsJobTexts.add(jenkinsJobText);
-            }
-        }
         jenkins.checkStatusOfBuilds(draft);
         log.info("");
 
-        for (String jenkinsJobText: jenkinsJobTexts) {
-            abortJenkinsJob(draft, jenkinsJobText);
+        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
+        for (Job jenkinsJob: jobsConfig.jobs()) {
+            abortJenkinsJob(draft, jenkinsJob);
         }
     }
 
     private void askForJenkinsJobKeysIfBlank() {
-        if (StringUtils.isNotBlank(config.jenkinsJobKeys)) {
+        if (StringUtils.isNotBlank(config.jenkinsJobsToUse)) {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        if (config.jenkinsJobs == null || config.jenkinsJobs.isEmpty()) {
-            config.jenkinsJobKeys = InputUtils.readValue("Jenkins job keys");
+        if (config.jenkinsJobsMappings == null || config.jenkinsJobsMappings.isEmpty()) {
+            config.jenkinsJobsToUse = InputUtils.readValue("Jenkins job keys");
         } else {
-            config.jenkinsJobKeys = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobs.keySet());
+            config.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobsMappings.keySet());
         }
     }
 
-    private void abortJenkinsJob(ReviewRequestDraft draft, String jenkinsJobText) {
-        String[] jenkinsJobDetails = jenkinsJobText.split("&");
-        String jenkinsJobName = jenkinsJobDetails[0];
-        String expectedUrlFormat = config.jenkinsUrl + "/job/" + jenkinsJobName + "/";
-        JobBuild buildToAbort = draft.getMatchingJobBuild(expectedUrlFormat);
+    private void abortJenkinsJob(ReviewRequestDraft draft, Job job) {
+        JobBuild buildToAbort = draft.getMatchingJobBuild(job.url);
 
         if (buildToAbort == null) {
-            log.debug("No build url found in testing done section for job {}", expectedUrlFormat);
+            log.debug("No build url found in testing done section for job {}", job.url);
             return;
         }
 

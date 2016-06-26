@@ -98,8 +98,8 @@ public class Git extends BaseScmWrapper {
         executeCommitCommand("git commit", msg);
     }
 
-    public void addChangesToDefaultChangelist() {
-        String output = executeScmCommand("git p4 submit --prepare-p4-only", null, LogLevel.DEBUG);
+    public void addChangesToDefaultChangelist(String origin) {
+        String output = executeScmCommand("git p4 submit --prepare-p4-only --origin=" + origin, null, LogLevel.DEBUG);
         if (!output.contains("P4 workspace prepared for submission")) {
             log.error("Failed to apply commit to perforce, expected text \"P4 workspace prepared for submission\" in output\n{}", output);
             System.exit(1);
@@ -132,8 +132,8 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand(diffCommand).getBytes();
     }
 
-    public void submit() {
-        String output = executeScmCommand("git p4 submit -M --conflict=quit", LogLevel.INFO);
+    public void submit(String origin) {
+        String output = executeScmCommand("git p4 submit -M --conflict=quit --origin=" + origin, LogLevel.INFO);
         if (!output.contains("All commits applied!")) {
             log.error("git p4 submit failed!");
             System.exit(1);

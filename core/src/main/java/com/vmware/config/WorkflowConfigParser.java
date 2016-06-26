@@ -8,7 +8,6 @@ import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class WorkflowConfigParser {
             for (String configFilePath : configFiles) {
                 File configFile = new File(configFilePath);
                 WorkflowConfig overriddenConfig = readExternalWorkflowConfig(configFile);
-                internalConfig.overrideValues(overriddenConfig, configFile.getName());
+                internalConfig.overrideValues(overriddenConfig, configFile.getPath());
                 loadedConfigFiles.add(configFile.getPath());
             }
         }
@@ -134,7 +133,7 @@ public class WorkflowConfigParser {
             return;
         }
         WorkflowConfig repoConfig = readExternalWorkflowConfig(repoWorkflowFile);
-        internalConfig.overrideValues(repoConfig, repoWorkflowFile.getName());
+        internalConfig.overrideValues(repoConfig, repoWorkflowFile.getPath());
         loadedConfigFiles.add(repoWorkflowFile.getPath());
     }
 

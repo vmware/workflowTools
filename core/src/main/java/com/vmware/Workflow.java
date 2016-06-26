@@ -6,6 +6,7 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowConfig;
@@ -223,8 +224,14 @@ public class Workflow {
                 ConfigurableProperty matchingProperty = matchingField.getAnnotation(ConfigurableProperty.class);
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 try {
-                    Object matchingValue = matchingField.get(config);
-                    String matchingValueText = StringUtils.convertObjectToString(matchingValue);
+                    String matchingValueText;
+                    if (configOption.equals("--jenkins-jobs")) {
+                        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
+                        matchingValueText = jobsConfig.toString();
+                    } else {
+                        Object matchingValue = matchingField.get(config);
+                        matchingValueText = StringUtils.convertObjectToString(matchingValue);
+                    }
                     log.info("{}={} - {}", configOption, matchingValueText, matchingPropertyText);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeReflectiveOperationException(e);

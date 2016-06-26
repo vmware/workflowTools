@@ -34,18 +34,16 @@
   "CheckStatusOfLatestBuilds": [
     "--disable-jenkins-login",
     "--jenkins-uses-csrf",
-    "--username",
     "--jenkins-url",
+    "--username",
     "--jenkins-jobs"
   ],
   "InvokeJenkinsJobs": [
     "--buildweb-url",
-    "--username",
-    "--jenkins-url",
+    "--jenkins-jobs",
     "--wait-time",
     "--wait-for-jenkins",
-    "--ignore-jenkins-job-failure",
-    "--jenkins-jobs"
+    "--ignore-jenkins-job-failure"
   ],
   "BaseTransitionJiraIssue": [
     "--jira-test-issue",
@@ -56,6 +54,9 @@
   "ConvertCardsToJiraIssues": [
     "--trello-url",
     "--jira-url"
+  ],
+  "AddGitChangesToChangelist": [
+    "--tracking-branch"
   ],
   "InvokeSandboxBuild": [
     "--gobuild-bin-path",
@@ -75,7 +76,6 @@
     "--trello-url"
   ],
   "AbortJenkinsBuilds": [
-    "--jenkins-url",
     "--jenkins-jobs"
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
@@ -209,6 +209,9 @@
     "--bugzilla-test-bug",
     "--username",
     "--bugzilla-url"
+  ],
+  "SubmitToDepot": [
+    "--tracking-branch"
   ],
   "CreateReview": [
     "--review-board-date-format",
