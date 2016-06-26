@@ -5,9 +5,9 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import static java.lang.String.format;
 
@@ -39,7 +39,7 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
             throw new IllegalArgumentException("Client directory not found, is git-p4.client set?");
         }
         String command = format("rbt post -r %s %s", draft.id, draft.perforceChangelistId);
-        String output = CommandLineUtils.executeCommand(clientDirectory, command, null, Level.INFO);
+        String output = CommandLineUtils.executeCommand(clientDirectory, command, null, LogLevel.INFO);
         if (!output.contains("Review request #" + draft.id + " posted")) {
             log.error("Failed to upload diff successfully\n{}", output);
         }

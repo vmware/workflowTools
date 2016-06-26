@@ -3,8 +3,7 @@ package com.vmware.action.perforce;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-
-import java.util.logging.Level;
+import com.vmware.util.logging.LogLevel;
 
 @ActionDescription("Creates a new pending changelist in perforce if needed.")
 public class CreatePendingChangelistIfNeeded extends BaseCommitAction {
@@ -28,6 +27,6 @@ public class CreatePendingChangelistIfNeeded extends BaseCommitAction {
         log.info("Created changelist with id {}", changelistId);
         draft.perforceChangelistId = changelistId;
         log.info("Adding tag changeset-{}", changelistId);
-        git.updateTag("changeset-" + changelistId, Level.FINE);
+        git.updateTag("changeset-" + changelistId, LogLevel.DEBUG);
     }
 }

@@ -2,12 +2,12 @@ package com.vmware;
 
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * Wrapper around p4 commands
@@ -30,7 +30,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public File getClientDirectory(String perforceClientName) {
-        String info = executeScmCommand("p4 clients -e " + perforceClientName, Level.FINE);
+        String info = executeScmCommand("p4 clients -e " + perforceClientName, LogLevel.DEBUG);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + perforceClientName + "\\s+.+?(\\S+)\\s+'Created by");
         return clientDirectory != null ? new File(clientDirectory) : null;
     }
@@ -48,22 +48,22 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public void deletePendingChangelist(String changelistId) {
-        executeScmCommand("p4 change -d " + changelistId, Level.INFO);
+        executeScmCommand("p4 change -d " + changelistId, LogLevel.INFO);
     }
 
     public void revertChangesInPendingChangelist(String changelistId) {
-        executeScmCommand("p4 revert -w -c " + changelistId + " //...", Level.INFO);
+        executeScmCommand("p4 revert -w -c " + changelistId + " //...", LogLevel.INFO);
     }
 
     public String createPendingChangelist(String description, boolean filesExpected) {
         String perforceTemplate = executeScmCommand("p4 change -o");
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, filesExpected);
-        String output = executeScmCommand("p4 change -i", amendedTemplate, Level.FINE);
+        String output = executeScmCommand("p4 change -i", amendedTemplate, LogLevel.DEBUG);
         return changeSucceeded(output) ? MatcherUtils.singleMatch(output, "Change\\s+(\\d+)\\s+created") : null;
     }
 
     public void moveAllOpenFilesToChangelist(String changelistId) {
-        executeScmCommand("p4 reopen -c " + changelistId + " //...", Level.INFO);
+        executeScmCommand("p4 reopen -c " + changelistId + " //...", LogLevel.INFO);
     }
 
     public String getChangelistStatus(String id) {
@@ -74,14 +74,14 @@ public class Perforce extends BaseScmWrapper {
     public boolean updatePendingChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("p4 change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, false);
-        String output = executeScmCommand("p4 change -i", amendedTemplate, Level.FINE);
+        String output = executeScmCommand("p4 change -i", amendedTemplate, LogLevel.DEBUG);
         return changeSucceeded(output);
     }
 
     public void submitChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("p4 change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, true);
-        String submitOutput = executeScmCommand("p4 submit -f revertunchanged -i", amendedTemplate, Level.INFO);
+        String submitOutput = executeScmCommand("p4 submit -f revertunchanged -i", amendedTemplate, LogLevel.INFO);
         String status = getChangelistStatus(id);
         if (!"submitted".equals(status)) {
             log.error("Changelist {} has status {}, expected submitted", id, status);

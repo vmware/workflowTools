@@ -2,8 +2,6 @@ package com.vmware.util.logging;
 
 import org.slf4j.Logger;
 
-import java.util.logging.Level;
-
 /**
  * Log based on log level.
  */
@@ -15,12 +13,12 @@ public class DynamicLogger {
         this.log = log;
     }
 
-    public void log(Level logLevel, String message, String... params) {
-        if (logLevel == Level.SEVERE) {
+    public void log(LogLevel logLevel, String message, String... params) {
+        if (logLevel == LogLevel.ERROR) {
             log.error(message, params);
-        } else if (logLevel == Level.INFO) {
+        } else if (logLevel == LogLevel.INFO) {
             log.info(message, params);
-        } else if (logLevel == Level.FINE) {
+        } else if (logLevel == LogLevel.DEBUG) {
             log.debug(message, params);
         } else {
             log.trace(message, params);

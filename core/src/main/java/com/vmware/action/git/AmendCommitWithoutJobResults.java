@@ -3,8 +3,7 @@ package com.vmware.action.git;
 import com.vmware.action.base.BaseCommitAmendAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-
-import java.util.logging.Level;
+import com.vmware.util.logging.LogLevel;
 
 @ActionDescription("Performs a git commit --amend if changes are detected. Strips job results from commit text.")
 public class AmendCommitWithoutJobResults extends BaseCommitAmendAction {
@@ -16,6 +15,6 @@ public class AmendCommitWithoutJobResults extends BaseCommitAmendAction {
     public void process() {
         String existingHeadRef = git.revParse("head");
         git.amendCommit(updatedCommitText());
-        git.updateGitChangesetTagsMatchingRevision(existingHeadRef, Level.INFO);
+        git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 }
