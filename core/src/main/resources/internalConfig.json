@@ -258,7 +258,7 @@
          "updateWithGitChangeset", "CreateReviewIfNeeded", "UploadReviewDiffFromChangelist", "UpdateReviewDetails", "AmendCommit", "displayReviewUrl"
        ],
        "submitWithGitChangeset": [
-         "prepareCommitForPush", "updateWithGitChangeset", "SubmitPendingChangelist", "RebaseAgainstMaster", "DeleteChangelistTag", "HardSubmitReview"
+         "prepareCommitForPush", "updateWithGitChangeset", "SubmitPendingChangelist", "RebaseAgainstMaster", "DeleteChangelistTag"
        ],
        "invokeSandboxBuildWithGitChangeset": [
         "updateWithGitChangeset", "InvokeSandboxBuild", "AmendCommit"
