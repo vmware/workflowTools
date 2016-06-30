@@ -9,6 +9,7 @@ import com.vmware.util.StringUtils;
 public class UpdateChangelistDescription extends BasePerforceCommitAction {
     public UpdateChangelistDescription(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

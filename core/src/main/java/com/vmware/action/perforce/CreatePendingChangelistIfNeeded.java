@@ -10,6 +10,7 @@ public class CreatePendingChangelistIfNeeded extends BaseCommitAction {
 
     public CreatePendingChangelistIfNeeded(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

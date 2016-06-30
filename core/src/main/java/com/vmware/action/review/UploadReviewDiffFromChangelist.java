@@ -16,20 +16,15 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
     public UploadReviewDiffFromChangelist(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("rbt", "p4");
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!CommandLineUtils.isCommandAvailable("rbt")) {
-            return "rbt is not installed";
-        }
-        if (!CommandLineUtils.isCommandAvailable("p4")) {
-            return "p4 is not installed";
-        }
+    public String failWorkflowIfConditionNotMet() {
         if (StringUtils.isBlank(draft.perforceChangelistId)) {
             return "no matching changelist found, run createPendingChangelist as part of workflow";
         }
-        return super.cannotRunAction();
+        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

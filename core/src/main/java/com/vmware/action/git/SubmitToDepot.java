@@ -13,10 +13,15 @@ public class SubmitToDepot extends BaseCommitAction {
     }
 
     @Override
-    public void process() {
+    public String failWorkflowIfConditionNotMet() {
         if (StringUtils.isBlank(git.configValue("git-p4.skipsubmitedit"))) {
-            throw new RuntimeException("Git config value git-p4.skipsubmitedit needs to be set to true, run [git config git-p4.skipsubmitedit true]");
+            return "git config value git-p4.skipsubmitedit needs to be set to true, run [git config git-p4.skipsubmitedit true]";
         }
+        return super.failWorkflowIfConditionNotMet();
+    }
+
+    @Override
+    public void process() {
         log.info("Submitting changes diffed against tracking branch {}", config.trackingBranch);
         git.submit(config.trackingBranch);
     }

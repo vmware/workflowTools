@@ -13,14 +13,7 @@ public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
 
     public UploadReviewDiffWithRbt(WorkflowConfig config) {
         super(config);
-    }
-
-    @Override
-    public String cannotRunAction() {
-        if (!CommandLineUtils.isCommandAvailable("rbt")) {
-            return "rbt is not installed";
-        }
-        return super.cannotRunAction();
+        super.setExpectedCommandsToBeAvailable("rbt");
     }
 
     @Override

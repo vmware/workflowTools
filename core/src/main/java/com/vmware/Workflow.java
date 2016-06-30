@@ -186,6 +186,8 @@ public class Workflow {
                 ((BaseMultiActionDataSupport) actionObject).setMultiActionData(multiActionData);
             }
             if (runAllHelperMethods) {
+                log.info("Running failWorkflowIfConditionNotMet");
+                actionObject.failWorkflowIfConditionNotMet();
                 log.info("Running cannotRunAction method");
                 actionObject.cannotRunAction();
                 log.info("Running preprocess method");
@@ -261,13 +263,21 @@ public class Workflow {
             ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
         }
 
+        String actionName = action.getClass().getSimpleName();
+        String reasonForFailingAction = action.failWorkflowIfConditionNotMet();
+
+        if (reasonForFailingAction != null) {
+            log.error("Workflow failed by action {} as {}", actionName, reasonForFailingAction);
+            System.exit(1);
+        }
+
         String reasonForNotRunningAction = action.cannotRunAction();
 
-        if (reasonForNotRunningAction == null) {
+        if (reasonForNotRunningAction != null) {
+            log.info("Skipping running of action {} as {}", actionName, reasonForNotRunningAction);
+        } else {
             action.preprocess();
             action.process();
-        } else {
-            log.info("Skipping running of action {} as {}", action.getClass().getSimpleName(), reasonForNotRunningAction);
         }
 
         if (action instanceof BaseTrelloAction) {
