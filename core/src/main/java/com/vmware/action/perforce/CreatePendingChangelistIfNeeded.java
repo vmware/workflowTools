@@ -3,6 +3,7 @@ package com.vmware.action.perforce;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
 @ActionDescription("Creates a new pending changelist in perforce if needed.")
@@ -15,7 +16,7 @@ public class CreatePendingChangelistIfNeeded extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (draft.perforceChangelistId != null) {
+        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return "commit already associated with changelist " + draft.perforceChangelistId;
         }
         return super.cannotRunAction();

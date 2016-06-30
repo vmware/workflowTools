@@ -115,7 +115,7 @@ public class ReviewRequestDraft extends BaseEntity{
             log.debug("Matched first line of perforce changelist, id was {}", changelistId);
             commitText = commitText.substring(commitText.indexOf('\n')).trim();
         } else {
-            this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Changelist Id");
+            this.perforceChangelistId = MatcherUtils.singleMatch(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]");
         }
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;

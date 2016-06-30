@@ -3,6 +3,7 @@ package com.vmware.action.git;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 
 @ActionDescription("Runs git p4 --prepare-p4-only, then moves changes to the specified changelist.")
 public class AddGitChangesToChangelist extends BaseCommitAction {
@@ -16,7 +17,7 @@ public class AddGitChangesToChangelist extends BaseCommitAction {
                 config.trackingBranch);
         git.addChangesToDefaultChangelist(config.trackingBranch);
 
-        if (draft.perforceChangelistId == null) {
+        if (StringUtils.isBlank(draft.perforceChangelistId)) {
             log.warn("No changelist associated with commit, leaving changes in default changelist");
             return;
         }
