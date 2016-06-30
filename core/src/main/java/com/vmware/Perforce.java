@@ -66,6 +66,11 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("p4 reopen -c " + changelistId + " //...", LogLevel.INFO);
     }
 
+    public String getCurrentChangelistId(String id) {
+        String changelistText = executeScmCommand("p4 change -o -O " + id);
+        return MatcherUtils.singleMatch(changelistText, "Change:\\s+(\\d+)");
+    }
+
     public String getChangelistStatus(String id) {
         String changelistText = executeScmCommand("p4 change -o -O " + id);
         return MatcherUtils.singleMatch(changelistText, "Status:\\s+(pending|submitted)");

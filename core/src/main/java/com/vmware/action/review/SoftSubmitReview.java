@@ -27,15 +27,16 @@ public class SoftSubmitReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        String headRef = git.revParse("HEAD");
-
+        String submittedRef = determineSubmittedRef();
         log.info("Adding submitted comment to review request. Leaving open for further reviews.");
 
         UserReview review = new UserReview();
-        review.body_top = String.format("Submitted as ref %s, left open for further reviews", headRef);
+        review.body_top = String.format("Submitted as %s, left open for further reviews", submittedRef);
         review.isPublic = true;
 
         reviewBoard.createUserReview(reviewRequest, review);
         log.info("Successfully added review request submitted comment");
     }
+
+
 }
