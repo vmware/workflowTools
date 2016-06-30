@@ -122,6 +122,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebApiUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
+        this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Changelist Id");
     }
 
     public void addIssues(Issue[] issuesToAdd) {

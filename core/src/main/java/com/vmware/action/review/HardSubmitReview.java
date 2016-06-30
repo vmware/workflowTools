@@ -22,11 +22,10 @@ public class HardSubmitReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        String headRef = git.revParse("HEAD");
-
+        String submittedRef = determineSubmittedRef();
         log.debug("Marking review request as submitted");
         reviewRequest.status = ReviewRequestStatus.submitted;
-        reviewRequest.description = "Submitted as ref " + headRef;
+        reviewRequest.description = "Submitted as " + submittedRef;
 
         reviewBoard.updateReviewRequest(reviewRequest);
         log.info("Successfully marked review request as submitted");
