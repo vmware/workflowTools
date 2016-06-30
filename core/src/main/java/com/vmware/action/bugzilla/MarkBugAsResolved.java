@@ -27,10 +27,10 @@ public class MarkBugAsResolved extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (draft.hasBugNumber(config.noBugNumberLabel)) {
-            return super.cannotRunAction();
+        if (!draft.hasBugNumber(config.noBugNumberLabel)) {
+            return "commit has no bug number";
         }
-        return "commit has no bug number";
+        return super.cannotRunAction();
     }
 
 

@@ -5,6 +5,7 @@ import com.vmware.bugzilla.domain.Bug;
 import com.vmware.JobBuild;
 import com.vmware.BuildResult;
 import com.vmware.jira.domain.Issue;
+import com.vmware.util.MatcherUtils;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.StringUtils;
@@ -93,6 +94,10 @@ public class ReviewRequestDraft extends BaseEntity{
         this.branch = branch;
     }
 
+    public ReviewRequestDraft(final String commitText, CommitConfiguration commitConfiguration) {
+        fillValuesFromCommitText(commitText, commitConfiguration);
+    }
+
     public static ReviewRequestDraft anEmptyDraftForPublishingAReview() {
         ReviewRequestDraft draft = new ReviewRequestDraft(null,null,null,null,null,null,null);
         draft.isPublic = true;
@@ -103,6 +108,14 @@ public class ReviewRequestDraft extends BaseEntity{
         if (StringUtils.isBlank(commitText)) {
             log.warn("Text is blank, can't extract commit values!");
             return;
+        }
+        String changelistId = MatcherUtils.singleMatch(commitText, "Change\\s+(\\d+)\\s+on");
+        if (changelistId != null) {
+            perforceChangelistId = changelistId;
+            log.debug("Matched first line of perforce changelist, id was {}", changelistId);
+            commitText = commitText.substring(commitText.indexOf('\n')).trim();
+        } else {
+            this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Changelist Id");
         }
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
@@ -122,7 +135,6 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebApiUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
-        this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Changelist Id");
     }
 
     public void addIssues(Issue[] issuesToAdd) {

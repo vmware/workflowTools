@@ -8,6 +8,7 @@ import com.vmware.config.WorkflowConfig;
 public class MoveOpenFilesToPendingChangelist extends BasePerforceCommitAction {
     public MoveOpenFilesToPendingChangelist(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

@@ -96,6 +96,9 @@
     "--username",
     "--reviewboard-url"
   ],
+  "BasePerforceCommitAction": [
+    "--perforce-client"
+  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
   ],

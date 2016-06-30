@@ -8,6 +8,7 @@ import com.vmware.config.WorkflowConfig;
 public class SubmitPendingChangelist extends BasePerforceCommitAction {
     public SubmitPendingChangelist(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

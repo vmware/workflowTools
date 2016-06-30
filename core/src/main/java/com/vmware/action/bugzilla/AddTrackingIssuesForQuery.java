@@ -19,12 +19,17 @@ public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
     }
 
     @Override
-    public void process() {
+    public String cannotRunAction() {
         List<Bug> bugList = multiActionData.getBugsForProcessing();
         if (bugList.isEmpty()) {
-            log.info("No bugs found for named query {}", config.bugzillaQuery);
-            return;
+            return " no bugs found for named query " + config.bugzillaQuery;
         }
+        return super.cannotRunAction();
+    }
+
+    @Override
+    public void process() {
+        List<Bug> bugList = multiActionData.getBugsForProcessing();
         for (Bug bug : bugList) {
             String trackingIssueKey = bug.getTrackingIssueKey();
             if (trackingIssueKey != null) {

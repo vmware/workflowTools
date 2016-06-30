@@ -10,6 +10,7 @@ import java.util.List;
 public class RevertWorkspace extends BaseCommitAction {
     public RevertWorkspace(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

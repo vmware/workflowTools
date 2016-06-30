@@ -12,6 +12,7 @@ import java.util.List;
 public class SelectMatchingChangelist extends BaseCommitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override
@@ -44,9 +45,7 @@ public class SelectMatchingChangelist extends BaseCommitAction {
 
     private boolean changelistDescriptionMatches(String changelist) {
         String description = perforce.readChangelist(changelist);
-        String descriptionWithoutChangelistLine = description.substring(description.indexOf('\n')).trim();
-        ReviewRequestDraft matchingDraft = new ReviewRequestDraft();
-        matchingDraft.fillValuesFromCommitText(descriptionWithoutChangelistLine, config.getCommitConfiguration());
+        ReviewRequestDraft matchingDraft = new ReviewRequestDraft(description, config.getCommitConfiguration());
         return StringUtils.equals(draft.summary, matchingDraft.summary);
     }
 }
