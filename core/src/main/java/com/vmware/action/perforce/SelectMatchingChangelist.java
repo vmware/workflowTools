@@ -17,7 +17,7 @@ public class SelectMatchingChangelist extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (draft.perforceChangelistId != null) {
+        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }
         return super.cannotRunAction();
