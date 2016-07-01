@@ -3,6 +3,7 @@ package com.vmware.action.perforce;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 
 @ActionDescription("Updates the description for the pending changelist.")
@@ -15,17 +16,13 @@ public class UpdateChangelistDescription extends BasePerforceCommitAction {
     @Override
     public void process() {
         String description = draft.toGitText(config.getCommitConfiguration());
-        String existingDescription = perforce.readChangelist(draft.perforceChangelistId);
-        if (StringUtils.isBlank(existingDescription)) {
+        String existingPerforceChangelistText = perforce.readChangelist(draft.perforceChangelistId);
+        ReviewRequestDraft existingDraft = new ReviewRequestDraft(existingPerforceChangelistText, config.getCommitConfiguration());
+        if (StringUtils.isBlank(existingDraft.description)) {
             log.error("No description read for changelist {}", draft.perforceChangelistId);
             return;
-        } else if (!existingDescription.contains("\n")) {
-            log.error("Not updating description for changelist {} as it has no new line characters\n{}",
-                    draft.perforceChangelistId, existingDescription);
-            return;
         }
-        existingDescription = existingDescription.substring(existingDescription.indexOf('\n')).trim();
-        if (description.equals(existingDescription)) {
+        if (description.equals(existingDraft.description)) {
             log.info("Not updating description for changelist {} as it hasn't changed", draft.perforceChangelistId);
             return;
         }
