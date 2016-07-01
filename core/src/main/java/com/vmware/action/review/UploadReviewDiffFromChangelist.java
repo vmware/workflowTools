@@ -21,6 +21,9 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
+        if (StringUtils.isBlank(config.perforceClientName)) {
+            return "config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName";
+        }
         if (StringUtils.isBlank(draft.perforceChangelistId)) {
             return "no matching changelist found, run createPendingChangelist as part of workflow";
         }
@@ -31,7 +34,7 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
     public void process() {
         File clientDirectory = perforce.getClientDirectory(config.perforceClientName);
         if (clientDirectory == null) {
-            throw new IllegalArgumentException("Client directory not found, is git-p4.client set?");
+            throw new IllegalArgumentException("No root directory found for client " + config.perforceClientName + ", run p4 clients and check your client is present");
         }
         String command = format("rbt post -r %s %s", draft.id, draft.perforceChangelistId);
         String output = CommandLineUtils.executeCommand(clientDirectory, command, null, LogLevel.INFO);

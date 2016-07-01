@@ -1,17 +1,17 @@
 package com.vmware.reviewboard.domain;
 
-import com.vmware.IssueInfo;
-import com.vmware.bugzilla.domain.Bug;
-import com.vmware.JobBuild;
-import com.vmware.BuildResult;
-import com.vmware.jira.domain.Issue;
-import com.vmware.util.MatcherUtils;
-import com.vmware.util.collection.OverwritableSet;
-import com.vmware.util.CommitConfiguration;
-import com.vmware.util.StringUtils;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.BuildResult;
+import com.vmware.IssueInfo;
+import com.vmware.JobBuild;
+import com.vmware.bugzilla.domain.Bug;
+import com.vmware.jira.domain.Issue;
+import com.vmware.util.CommitConfiguration;
+import com.vmware.util.StringUtils;
+import com.vmware.util.collection.OverwritableSet;
+import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +24,14 @@ import java.util.regex.Pattern;
 import static com.vmware.util.StringUtils.appendCsvValue;
 import static com.vmware.util.StringUtils.isNotBlank;
 import static com.vmware.util.UrlUtils.addTrailingSlash;
+import static com.vmware.util.logging.LogLevel.DEBUG;
+import static com.vmware.util.logging.LogLevel.WARN;
 
 public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
     private Logger log = LoggerFactory.getLogger(this.getClass());
+    @Expose(serialize = false, deserialize = false)
+    private DynamicLogger dynamicLog = new DynamicLogger(log);
 
     @Expose(serialize = false)
     public Integer id;
@@ -109,13 +113,13 @@ public class ReviewRequestDraft extends BaseEntity{
             log.warn("Text is blank, can't extract commit values!");
             return;
         }
-        String changelistId = MatcherUtils.singleMatch(commitText, "Change\\s+(\\d+)\\s+on");
-        if (changelistId != null) {
+        String changelistId = parseSingleLineFromText(commitText, "Change\\s+(\\d+)\\s+on", "Perforce Changelist Id", DEBUG);
+        if (StringUtils.isNotBlank(changelistId)) {
             perforceChangelistId = changelistId;
             log.debug("Matched first line of perforce changelist, id was {}", changelistId);
             commitText = commitText.substring(commitText.indexOf('\n')).trim();
         } else {
-            this.perforceChangelistId = MatcherUtils.singleMatch(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]");
+            this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Git P4 Changelist Id", DEBUG);
         }
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
@@ -293,7 +297,7 @@ public class ReviewRequestDraft extends BaseEntity{
      */
     public boolean hasData() {
         boolean hasData = false;
-        hasData = StringUtils.isNotBlank(summary) || hasData;
+        hasData = StringUtils.isNotBlank(summary);
         hasData = StringUtils.isNotBlank(description) || hasData;
         hasData = StringUtils.isNotBlank(testingDone) || hasData;
         hasData = !jobBuilds.isEmpty() || hasData;
@@ -337,7 +341,11 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description) {
-        return parseStringFromText(text, pattern, Pattern.MULTILINE, description);
+        return parseSingleLineFromText(text, pattern, description, WARN);
+    }
+
+    private String parseSingleLineFromText(String text, String pattern, String description, LogLevel logLevel) {
+        return parseStringFromText(text, pattern, Pattern.MULTILINE, description, logLevel);
     }
 
     private String parseMultilineFromText(String text, String pattern, String description) {
@@ -345,9 +353,13 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String parseStringFromText(String text, String pattern, int patternFlags, String description) {
+        return parseStringFromText(text, pattern, patternFlags, description, WARN);
+    }
+
+    private String parseStringFromText(String text, String pattern, int patternFlags, String description, LogLevel logLevel) {
         Matcher matcher = Pattern.compile(pattern, patternFlags).matcher(text);
         if (!matcher.find()) {
-            log.warn("{} not found in commit", description);
+            dynamicLog.log(logLevel, "{} not found in commit", description);
             log.debug("Using pattern {} against text\n[{}]", pattern, text);
             return "";
         }
