@@ -9,10 +9,14 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.trello.Trello;
 
 /**
- * Centralized locator for jenkins, jira, reviewboard and trello instances.
+ * Centralized locator for git, perforce, jenkins, jira, reviewboard and trello instances.
  * Ensures that the above classes are singletons.
  */
 public class ServiceLocator {
+
+    private Git git;
+
+    private Perforce perforce;
 
     private Jira jira;
 
@@ -94,4 +98,17 @@ public class ServiceLocator {
         return trello;
     }
 
+    public Git getGit() {
+        if (git == null) {
+            git = new Git();
+        }
+        return git;
+    }
+
+    public Perforce getPerforce() {
+        if (perforce == null) {
+            perforce = new Perforce(config.perforceClientName);
+        }
+        return perforce;
+    }
 }

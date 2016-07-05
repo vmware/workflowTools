@@ -8,11 +8,11 @@ import static org.junit.Assert.assertNotNull;
 
 public class TestPerforce {
 
-    private Perforce perforce = new Perforce(new File("/Users/dbiggs/vcd"));
+    private Perforce perforce = new Perforce("dbiggs-vcloud-sp-main");
 
     @Test
     public void canGetRootDirectory() {
-        File clientDirectory = perforce.getClientDirectory("dbiggs-vcloud-sp-main");
+        File clientDirectory = perforce.getWorkingDirectory();
         assertNotNull(clientDirectory);
         assertEquals("/Users/dbiggs/vcd", clientDirectory.getPath());
     }

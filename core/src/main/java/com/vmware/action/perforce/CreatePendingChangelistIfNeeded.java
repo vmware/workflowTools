@@ -1,5 +1,6 @@
 package com.vmware.action.perforce;
 
+import com.vmware.Perforce;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -9,9 +10,16 @@ import com.vmware.util.logging.LogLevel;
 @ActionDescription("Creates a new pending changelist in perforce if needed.")
 public class CreatePendingChangelistIfNeeded extends BaseCommitAction {
 
+    private Perforce perforce;
+
     public CreatePendingChangelistIfNeeded(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
+    }
+
+    @Override
+    public void preprocess() {
+        this.perforce = serviceLocator.getPerforce();
     }
 
     @Override

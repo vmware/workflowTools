@@ -13,11 +13,23 @@ import java.util.List;
  * Wrapper around p4 commands
  */
 public class Perforce extends BaseScmWrapper {
-    public Perforce(File workingDirectory) {
-        super(workingDirectory);
+
+    private String clientName;
+
+    public Perforce(String clientName) {
+        this.clientName = clientName;
+        if (StringUtils.isBlank(clientName)) {
+            log.debug("No perforce client name set");
+            return;
+        }
+        File workingDirectory = getClientDirectory();
+        if (workingDirectory == null) {
+            log.warn("Failed to find root directory for perforce client {}, perforce commands will likely not work as intended", clientName);
+        }
+        super.setWorkingDirectory(workingDirectory);
     }
 
-    public List<String> getPendingChangelists(String clientName) {
+    public List<String> getPendingChangelists() {
         String changeLists = executeScmCommand("p4 changes -c " + clientName + " -s pending");
         if (StringUtils.isBlank(changeLists)) {
             return Collections.emptyList();
@@ -29,14 +41,8 @@ public class Perforce extends BaseScmWrapper {
         return changeListIds;
     }
 
-    public File getClientDirectory(String perforceClientName) {
-        String info = executeScmCommand("p4 clients -e " + perforceClientName, LogLevel.DEBUG);
-        String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + perforceClientName + "\\s+.+?(\\S+)\\s+'Created by");
-        return clientDirectory != null ? new File(clientDirectory) : null;
-    }
-
-    public String readLastPendingChangelist(String perforceClientName) {
-        String output = executeScmCommand("p4 changes -m 1 -s pending -l -c " + perforceClientName);
+    public String readLastPendingChangelist() {
+        String output = executeScmCommand("p4 changes -m 1 -s pending -l -c " + clientName);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }
@@ -101,6 +107,17 @@ public class Perforce extends BaseScmWrapper {
             return false;
         } else {
             return true;
+        }
+    }
+
+    private File getClientDirectory() {
+        String info = executeScmCommand("p4 clients -e " + clientName, LogLevel.DEBUG);
+        String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + clientName + "\\s+.+?(\\S+)\\s+'Created by");
+        if (clientDirectory != null) {
+            return new File(clientDirectory);
+        } else {
+            log.warn("{} not found in clients list\n{}", clientName, info);
+            return null;
         }
     }
 
