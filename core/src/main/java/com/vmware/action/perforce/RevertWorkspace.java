@@ -1,13 +1,13 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 import java.util.List;
 
 @ActionDescription("Used to revert all pending changelists in a perforce workspace.")
-public class RevertWorkspace extends BaseCommitAction {
+public class RevertWorkspace extends BasePerforceCommitAction {
     public RevertWorkspace(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
@@ -15,7 +15,7 @@ public class RevertWorkspace extends BaseCommitAction {
 
     @Override
     public void process() {
-        List<String> changelistIds = perforce.getPendingChangelists(config.perforceClientName);
+        List<String> changelistIds = perforce.getPendingChangelists();
 
         for (String changelistId : changelistIds) {
             revertChangesInChangelist(changelistId);

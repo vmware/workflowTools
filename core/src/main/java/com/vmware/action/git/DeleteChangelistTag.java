@@ -1,11 +1,12 @@
 package com.vmware.action.git;
 
+import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Deletes matching changelist tag.")
-public class DeleteChangelistTag extends BasePerforceCommitAction {
+public class DeleteChangelistTag extends BaseLinkedPerforceCommitAction {
 
     @Override
     public String cannotRunAction() {

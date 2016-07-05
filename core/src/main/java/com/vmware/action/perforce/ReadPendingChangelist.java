@@ -1,14 +1,13 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 
 @ActionDescription("Reads the most recent pending changelist for the specified perforce client.")
-public class ReadPendingChangelist extends BaseCommitAction {
+public class ReadPendingChangelist extends BasePerforceCommitAction {
 
     public ReadPendingChangelist(WorkflowConfig config) {
         super(config);
@@ -17,7 +16,7 @@ public class ReadPendingChangelist extends BaseCommitAction {
 
     @Override
     public void process() {
-        String changelistText = perforce.readLastPendingChangelist(config.perforceClientName);
+        String changelistText = perforce.readLastPendingChangelist();
         if (StringUtils.isBlank(changelistText) || !changelistText.contains("\n")) {
             log.warn("No pending changelist exists for user {}", config.username);
             return;

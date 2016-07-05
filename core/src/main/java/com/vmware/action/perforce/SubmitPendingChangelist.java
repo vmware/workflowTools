@@ -1,11 +1,11 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BasePerforceCommitAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Submits the perforce changelist to the depot.")
-public class SubmitPendingChangelist extends BasePerforceCommitAction {
+public class SubmitPendingChangelist extends BaseLinkedPerforceCommitAction {
     public SubmitPendingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");

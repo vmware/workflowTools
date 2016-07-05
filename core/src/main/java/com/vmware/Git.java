@@ -25,11 +25,11 @@ public class Git extends BaseScmWrapper {
     private Boolean gitInstalled;
 
     public Git() {
-        super(new File(System.getProperty("user.dir")));
+        super.setWorkingDirectory(new File(System.getProperty("user.dir")));
     }
 
     public Git(File workingDirectory) {
-        super(workingDirectory);
+        super.setWorkingDirectory(workingDirectory);
     }
 
     /**

@@ -20,9 +20,7 @@ public abstract class BaseAction {
 
     protected final ServiceLocator serviceLocator;
 
-    protected final Git git = new Git();
-
-    protected final Perforce perforce = new Perforce(git.getRootDirectory());
+    protected final Git git;
 
     private String[] expectedCommandsToBeAvailable;
 
@@ -30,6 +28,7 @@ public abstract class BaseAction {
     public BaseAction(WorkflowConfig config) {
         this.config = config;
         this.serviceLocator = config.configuredServiceLocator();
+        this.git = serviceLocator.getGit();
     }
 
     /**

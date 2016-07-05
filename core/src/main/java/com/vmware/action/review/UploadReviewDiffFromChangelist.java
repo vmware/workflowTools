@@ -32,7 +32,7 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
     @Override
     public void process() {
-        File clientDirectory = perforce.getClientDirectory(config.perforceClientName);
+        File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
         if (clientDirectory == null) {
             throw new IllegalArgumentException("No root directory found for client " + config.perforceClientName + ", run p4 clients and check your client is present");
         }

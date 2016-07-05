@@ -23,6 +23,6 @@ public class AddGitChangesToChangelist extends BaseCommitAction {
         }
 
         log.info("Moving changes to changelist {}", draft.perforceChangelistId);
-        perforce.moveAllOpenFilesToChangelist(draft.perforceChangelistId);
+        serviceLocator.getPerforce().moveAllOpenFilesToChangelist(draft.perforceChangelistId);
     }
 }

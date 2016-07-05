@@ -56,12 +56,16 @@
     "--jira-url"
   ],
   "AddGitChangesToChangelist": [
+    "--perforce-client",
     "--tracking-branch"
   ],
   "InvokeSandboxBuild": [
     "--gobuild-bin-path",
     "--sandbox-branch",
     "--buildweb-project"
+  ],
+  "CreatePendingChangelistIfNeeded": [
+    "--perforce-client"
   ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
@@ -135,9 +139,6 @@
   "BaseSetReviewerList": [
     "--username"
   ],
-  "SelectMatchingChangelist": [
-    "--perforce-client"
-  ],
   "StripJenkinsBuilds": [
     "--jenkins-url"
   ],
@@ -159,6 +160,7 @@
     "--jenkins-url"
   ],
   "BaseCommitUsingReviewBoardAction": [
+    "--perforce-client",
     "--review-board-date-format",
     "--username",
     "--reviewboard-url"
@@ -269,7 +271,6 @@
     "--username"
   ],
   "ReadPendingChangelist": [
-    "--username",
-    "--perforce-client"
+    "--username"
   ]
 }

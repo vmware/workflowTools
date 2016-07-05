@@ -1,6 +1,6 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -9,7 +9,7 @@ import com.vmware.util.StringUtils;
 import java.util.List;
 
 @ActionDescription("Attempts based on summary to match the current commit to a perforce changelist.")
-public class SelectMatchingChangelist extends BaseCommitAction {
+public class SelectMatchingChangelist extends BasePerforceCommitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
@@ -26,7 +26,7 @@ public class SelectMatchingChangelist extends BaseCommitAction {
     @Override
     public void process() {
         draft.perforceChangelistId = null;
-        List<String> changelists = perforce.getPendingChangelists(config.perforceClientName);
+        List<String> changelists = perforce.getPendingChangelists();
         for (String changelist: changelists) {
             if (changelistDescriptionMatches(changelist)) {
                 log.info("Using changelist {} as summary matches commit summary", changelist);

@@ -33,7 +33,7 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
             return "ref " + git.revParse("head");
         }
 
-        String currentChangelistId = perforce.getCurrentChangelistId(draft.perforceChangelistId);
+        String currentChangelistId = serviceLocator.getPerforce().getCurrentChangelistId(draft.perforceChangelistId);
         return "changelist " + currentChangelistId;
     }
 

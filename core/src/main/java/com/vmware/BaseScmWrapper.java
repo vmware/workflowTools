@@ -15,10 +15,14 @@ public abstract class BaseScmWrapper {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected final File workingDirectory;
+    protected File workingDirectory;
 
-    public BaseScmWrapper(File workingDirectory) {
+    protected void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
+    }
+
+    public File getWorkingDirectory() {
+        return workingDirectory;
     }
 
     protected String executeScmCommand(String command) {
