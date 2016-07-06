@@ -33,9 +33,6 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
     @Override
     public void process() {
         File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
-        if (clientDirectory == null) {
-            throw new IllegalArgumentException("No root directory found for client " + config.perforceClientName + ", run p4 clients and check your client is present");
-        }
         String command = format("rbt post -r %s %s", draft.id, draft.perforceChangelistId);
         String output = CommandLineUtils.executeCommand(clientDirectory, command, null, LogLevel.INFO);
         if (!output.contains("Review request #" + draft.id + " posted")) {

@@ -10,6 +10,7 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
 
     public BasePerforceCommitAction(WorkflowConfig config) {
         super(config);
+        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override
@@ -17,11 +18,11 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
         if (StringUtils.isBlank(config.perforceClientName)) {
             return "config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName";
         }
-        this.perforce = serviceLocator.getPerforce();
-        if (perforce.getWorkingDirectory() == null) {
-            return "no root directory found for perforce client " + config.perforceClientName;
-        }
         return super.failWorkflowIfConditionNotMet();
     }
 
+    @Override
+    public void preprocess() {
+        this.perforce = serviceLocator.getPerforce();
+    }
 }

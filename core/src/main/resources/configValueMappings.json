@@ -56,16 +56,12 @@
     "--jira-url"
   ],
   "AddGitChangesToChangelist": [
-    "--perforce-client",
     "--tracking-branch"
   ],
   "InvokeSandboxBuild": [
     "--gobuild-bin-path",
     "--sandbox-branch",
     "--buildweb-project"
-  ],
-  "CreatePendingChangelistIfNeeded": [
-    "--perforce-client"
   ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
