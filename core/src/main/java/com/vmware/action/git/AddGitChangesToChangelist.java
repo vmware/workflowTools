@@ -1,12 +1,13 @@
 package com.vmware.action.git;
 
 import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
 @ActionDescription("Runs git p4 --prepare-p4-only, then moves changes to the specified changelist.")
-public class AddGitChangesToChangelist extends BaseCommitAction {
+public class AddGitChangesToChangelist extends BasePerforceCommitAction {
     public AddGitChangesToChangelist(WorkflowConfig config) {
         super(config);
     }
@@ -23,6 +24,6 @@ public class AddGitChangesToChangelist extends BaseCommitAction {
         }
 
         log.info("Moving changes to changelist {}", draft.perforceChangelistId);
-        serviceLocator.getPerforce().moveAllOpenFilesToChangelist(draft.perforceChangelistId);
+        perforce.moveAllOpenFilesToChangelist(draft.perforceChangelistId);
     }
 }

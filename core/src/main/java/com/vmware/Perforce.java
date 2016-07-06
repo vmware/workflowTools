@@ -19,12 +19,11 @@ public class Perforce extends BaseScmWrapper {
     public Perforce(String clientName) {
         this.clientName = clientName;
         if (StringUtils.isBlank(clientName)) {
-            log.debug("No perforce client name set");
-            return;
+            throw new IllegalArgumentException("perforceClientName config value is not set, can also be set by git-p4.client git config value");
         }
         File workingDirectory = getClientDirectory();
         if (workingDirectory == null) {
-            log.warn("Failed to find root directory for perforce client {}, perforce commands will likely not work as intended", clientName);
+            throw new IllegalArgumentException("Failed to find root directory for perforce client " + clientName);
         }
         super.setWorkingDirectory(workingDirectory);
     }
