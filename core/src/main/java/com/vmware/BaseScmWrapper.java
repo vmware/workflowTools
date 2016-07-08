@@ -25,22 +25,33 @@ public abstract class BaseScmWrapper {
         return workingDirectory;
     }
 
-    protected String executeScmCommand(String command) {
-        return executeScmCommand(command, LogLevel.DEBUG);
+    protected String executeScmCommand(String command, String... arguments) {
+        return executeScmCommand(command, LogLevel.DEBUG, arguments);
     }
 
-    protected String executeScmCommand(String command, LogLevel logLevel) {
-        return executeScmCommand(command, null, logLevel);
+    protected String executeScmCommand(String command, LogLevel logLevel, String... commandArguments) {
+        return executeScmCommand(command, null, logLevel, commandArguments);
     }
 
-    protected String executeScmCommand(String command, String inputText, LogLevel level) {
-        log.debug("{} command {}", this.getClass().getSimpleName(), command);
-        String output = executeCommand(workingDirectory, command, inputText, level);
+    protected String executeScmCommand(String command, String inputText, LogLevel level, String... commandArguments) {
+        String expandedCommand = expandCommand(command, commandArguments);
+        log.debug("{} command {}", this.getClass().getSimpleName(), expandedCommand);
+        String output = executeCommand(workingDirectory, expandedCommand, inputText, level);
         exitIfCommandFailed(output);
         return output;
     }
 
     protected void exitIfCommandFailed(String output) {
+    }
+
+    private String expandCommand(String command, String... arguments) {
+        if (arguments.length == 0) {
+            return command;
+        }
+        for (String argument : arguments) {
+            command = command.replaceFirst("\\{\\}", argument);
+        }
+        return command;
     }
 
 }

@@ -24,6 +24,9 @@
     "--include-estimated",
     "--use-label"
   ],
+  "AddGitChangesetConfigValueIfNeeded": [
+    "--perforce-client"
+  ],
   "GenerateReviewStats": [
     "--review-board-date-format",
     "--username",
@@ -113,7 +116,8 @@
   ],
   "UploadReviewDiffWithRbt": [
     "--parent",
-    "--tracking-branch"
+    "--tracking-branch",
+    "--review-board-repo"
   ],
   "CreateReviewIfNeeded": [
     "--review-board-date-format",
@@ -137,6 +141,11 @@
   ],
   "StripJenkinsBuilds": [
     "--jenkins-url"
+  ],
+  "UploadReviewDiffInPerforceFormat": [
+    "--perforce-client",
+    "--tracking-branch",
+    "--parent"
   ],
   "PublishReview": [
     "--reviewboard-url"
@@ -167,8 +176,8 @@
     "--max-summary"
   ],
   "UploadReviewDiff": [
-    "--parent",
-    "--tracking-branch"
+    "--tracking-branch",
+    "--parent"
   ],
   "ApplyReviewPatch": [
     "--review-board-date-format",

@@ -15,6 +15,14 @@ public class MatcherUtils {
         return getMatchedValue(matcher);
     }
 
+    public static String singleMatchExpected(String text, String pattern) {
+        String value = singleMatch(text, pattern);
+        if (value == null) {
+            throw new IllegalArgumentException("Pattern " + pattern + " not matched in text " + text);
+        }
+        return value;
+    }
+
     private static String getMatchedValue(Matcher matcher) {
         if (matcher.find()) {
             return matcher.group(1);

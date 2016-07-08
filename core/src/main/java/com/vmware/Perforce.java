@@ -29,7 +29,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public List<String> getPendingChangelists() {
-        String changeLists = executeScmCommand("p4 changes -c " + clientName + " -s pending");
+        String changeLists = executeScmCommand("p4 changes -c {} -s pending", clientName);
         if (StringUtils.isBlank(changeLists)) {
             return Collections.emptyList();
         }
@@ -41,13 +41,13 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public String readLastPendingChangelist() {
-        String output = executeScmCommand("p4 changes -m 1 -s pending -l -c " + clientName);
+        String output = executeScmCommand("p4 changes -m 1 -s pending -l -c {}", clientName);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }
 
     public String readChangelist(String changelistId) {
-        String output = executeScmCommand("p4 describe -s " + changelistId);
+        String output = executeScmCommand("p4 describe -s {}", changelistId);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }
@@ -69,6 +69,14 @@ public class Perforce extends BaseScmWrapper {
 
     public void moveAllOpenFilesToChangelist(String changelistId) {
         executeScmCommand("p4 reopen -c " + changelistId + " //...", LogLevel.INFO);
+    }
+
+    public String getFileInfo(String filePath) {
+        return executeScmCommand("p4 files " + filePath);
+    }
+
+    public String getWhereFileInfo(String filePath) {
+        return executeScmCommand("p4 where " + filePath);
     }
 
     public String getCurrentChangelistId(String id) {

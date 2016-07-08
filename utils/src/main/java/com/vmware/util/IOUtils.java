@@ -83,11 +83,18 @@ public class IOUtils {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
-
     }
 
     public static List<String> readLines(File file) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+        try {
+            return readLines(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
+    public static List<String> readLines(InputStream inputStream) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             List<String> lines = new ArrayList<>();
             String line = reader.readLine();
             while (line != null) {

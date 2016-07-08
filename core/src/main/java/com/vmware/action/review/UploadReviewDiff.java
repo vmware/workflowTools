@@ -24,7 +24,8 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         log.info("Successfully uploaded review diff");
     }
 
-    private DiffToUpload createReviewRequestDiff() {
+    protected DiffToUpload createReviewRequestDiff() {
+        log.info("Creating git diff against parent {}", config.parentBranch);
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);

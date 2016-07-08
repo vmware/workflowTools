@@ -117,6 +117,9 @@
        "review": [
           "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "displayReviewUrl"
        ],
+       "reviewWithPerforceDiff": [
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffInPerforceFormat", "AmendCommit", "displayReviewUrl"
+       ],
        "reviewPendingChangelist": [
           "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "UpdateChangelistDescription", "displayReviewUrl"
        ],
@@ -252,7 +255,7 @@
          "readNonTrivialPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "AddGitChangesToChangelist", "UpdateChangelistDescription"
        ],
        "updateWithGitChangeset": [
-         "readNonTrivialPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"
+         "readNonTrivialPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"
        ],
        "reviewWithGitChangeset": [
          "updateWithGitChangeset", "CreateReviewIfNeeded", "UploadReviewDiffFromChangelist", "UpdateReviewDetails", "AmendCommit", "displayReviewUrl"

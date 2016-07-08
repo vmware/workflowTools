@@ -18,7 +18,7 @@ public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
 
     @Override
     public void process() {
-        String command = format("rbt post -r %s --tracking-branch=%s --parent=%s", draft.id, config.trackingBranch, config.parentBranch);
+        String command = format("rbt post --repository '%s' -r %s --tracking-branch=%s --parent=%s", config.reviewBoardRepository, draft.id, config.trackingBranch, config.parentBranch);
         CommandLineUtils.executeCommand(git.getRootDirectory(), command, null, LogLevel.INFO);
     }
 }
