@@ -48,6 +48,20 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("git apply -3 --index", diffData, LogLevel.DEBUG);
     }
 
+    public String lastSubmittedChangelistId() {
+        Pattern gitP4Pattern = Pattern.compile("\\[git\\-p4:\\s+depot\\-paths.+change\\s+=\\s+(\\d+)\\]");
+        int counter = 0;
+        Matcher matcher = gitP4Pattern.matcher(commitText(counter++, false));
+        while (!matcher.find()) {
+            String text = commitText(counter++, false);
+            if (StringUtils.isBlank(text)) {
+                throw new IllegalArgumentException("Failed to find last submitted changelist");
+            }
+            matcher.reset(text);
+        }
+        return matcher.group(1);
+    }
+
     public String lastCommitText(boolean prettyPrint) {
         return commitText(0, prettyPrint);
     }

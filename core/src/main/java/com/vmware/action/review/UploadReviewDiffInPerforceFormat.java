@@ -180,7 +180,14 @@ public class UploadReviewDiffInPerforceFormat extends UploadReviewDiff {
 
     private void addPerforceDepotInfoForFiles() {
         if (!depotFilesToCheck.isEmpty()) {
-            String filesListToCheck = StringUtils.appendWithDelimiter(" ", depotFilesToCheck, " " + perforce.getWorkingDirectory() + "/").trim();
+            String lastSubmittedChangelist = git.lastSubmittedChangelistId();
+            String filesListToCheck = "";
+            for (String depotFileToCheck : depotFilesToCheck) {
+                if (!filesListToCheck.isEmpty()) {
+                    filesListToCheck += " ";
+                }
+                filesListToCheck += format("%s/%s@%s", perforce.getWorkingDirectory(), depotFileToCheck, lastSubmittedChangelist);
+            }
             String depotFilesInfo = perforce.getFileInfo(filesListToCheck);
             parsePerforceOutput(depotFilesInfo, depotFilesToCheck, depotFileInfoPattern, false);
         }
