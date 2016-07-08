@@ -356,7 +356,7 @@ public class WorkflowConfig {
         Map<String, String> configValues = git.configValues();
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
-            String configValueName = configurableProperty.gitConfigProperty().isEmpty() ? "workflow." + field.getName()
+            String configValueName = configurableProperty.gitConfigProperty().isEmpty() ? "workflow." + field.getName().toLowerCase()
                     : configurableProperty.gitConfigProperty();
             String value = configValues.get(configValueName);
             setFieldValue(field, value, "Git Config");

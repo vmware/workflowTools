@@ -159,7 +159,7 @@ public class TestReviewBoardApi extends BaseTests {
 
     @Test
     public void readDiffsForReviewRequest() {
-        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(601612);
+        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(994717);
 
         ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());
         assertTrue("Diffs length mismatch", diffs.length == 1);

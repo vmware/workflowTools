@@ -54,7 +54,7 @@ public class Git extends BaseScmWrapper {
 
     public String commitText(int skipCount, boolean prettyPrint) {
         String prettyPrintCommand = prettyPrint ? " --pretty=%B\n" : "";
-        return executeScmCommand("git log -1 --skip=" + skipCount + prettyPrintCommand);
+        return executeScmCommand("git log -1 --skip={}{}", String.valueOf(skipCount), prettyPrintCommand);
     }
 
     public String currentBranch() {
@@ -67,6 +67,10 @@ public class Git extends BaseScmWrapper {
             return "";
         }
         return executeScmCommand("git config " + propertyName);
+    }
+
+    public String addConfigValue(String propertyName, String propertyValue) {
+        return executeScmCommand("git config {} {}", propertyName, propertyValue);
     }
 
     public int totalCommitCount() {
@@ -99,7 +103,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void addChangesToDefaultChangelist(String origin) {
-        String output = executeScmCommand("git p4 submit --prepare-p4-only --origin=" + origin, null, LogLevel.DEBUG);
+        String output = executeScmCommand("git p4 submit -M --prepare-p4-only --origin={}", origin);
         if (!output.contains("P4 workspace prepared for submission")) {
             log.error("Failed to apply commit to perforce, expected text \"P4 workspace prepared for submission\" in output\n{}", output);
             System.exit(1);
