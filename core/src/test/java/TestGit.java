@@ -1,4 +1,6 @@
-import com.vmware.Git;
+import com.vmware.scm.FileChange;
+import com.vmware.scm.FileChangeType;
+import com.vmware.scm.Git;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.IOUtils;
@@ -14,10 +16,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static com.vmware.Git.FileChange.D;
-import static com.vmware.Git.FileChange.M;
-import static com.vmware.Git.FileChange.R;
+import static com.vmware.scm.FileChangeType.deleted;
+import static com.vmware.scm.FileChangeType.modified;
+import static com.vmware.scm.FileChangeType.renamed;
+import static java.lang.String.format;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
@@ -62,6 +66,8 @@ public class TestGit {
     public void diffBetweenLastCommit() {
         byte[] diff = git.diff("HEAD~1", "HEAD", false);
         assertNotNull(diff);
+        List<FileChange> changes = git.getChangesInDiff("HEAD~1", "HEAD");
+        assertFalse(changes.isEmpty());
     }
 
     @Test
@@ -86,24 +92,23 @@ public class TestGit {
     public void detectModifyChange() {
         IOUtils.write(testFile, "Changes to text");
 
-        List<String> allChanges = git.getAllChanges();
+        List<FileChange> allChanges = git.getAllChanges();
         assertEquals("Expected changes", 1, allChanges.size());
 
         expectStagedChangesAfterAddAll();
-
-        assertEquals(M.getLabel() + " " + testFile.getName(), allChanges.get(0));
+        assertEquals(format(modified.getDescription(), testFile.getName()), allChanges.get(0).toString());
     }
 
     @Test
     public void detectDeleteChange() {
         testFile.delete();
 
-        List<String> allChanges = git.getAllChanges();
+        List<FileChange> allChanges = git.getAllChanges();
         assertEquals("Expected changes", 1, allChanges.size());
 
         expectStagedChangesAfterAddAll();
 
-        assertEquals(D.getLabel() + " " + testFile.getName(), allChanges.get(0));
+        assertEquals(format(deleted.getDescription(), testFile.getName()), allChanges.get(0).toString());
     }
 
     @Test
@@ -112,9 +117,9 @@ public class TestGit {
 
         testFile.renameTo(renamedFile);
 
-        List<String> stagedChanges = expectStagedChangesAfterAddAll();
+        List<FileChange> stagedChanges = expectStagedChangesAfterAddAll();
 
-        assertEquals(R.getLabel() + " " + testFile.getName() + " -> " + renamedFile.getName(), stagedChanges.get(0));
+        assertEquals(format(renamed.getDescription(), testFile.getName(), renamedFile.getName()), stagedChanges.get(0).toString());
     }
 
     @Test
@@ -131,12 +136,12 @@ public class TestGit {
         }
     }
 
-    private List<String> expectStagedChangesAfterAddAll() {
+    private List<FileChange> expectStagedChangesAfterAddAll() {
         assertEquals("Expected no staged changes", 0, git.getStagedChanges().size());
 
         git.addAllFiles();
 
-        List<String> stagedChanges = git.getStagedChanges();
+        List<FileChange> stagedChanges = git.getStagedChanges();
         assertTrue("Expected staged changes after add all", stagedChanges.size() > 0);
         return stagedChanges;
     }

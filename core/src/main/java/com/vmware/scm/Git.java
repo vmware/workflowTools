@@ -1,11 +1,13 @@
-package com.vmware;
+package com.vmware.scm;
 
+import com.vmware.util.FileUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,10 +27,12 @@ public class Git extends BaseScmWrapper {
     private Boolean gitInstalled;
 
     public Git() {
+        super(ScmType.git);
         super.setWorkingDirectory(new File(System.getProperty("user.dir")));
     }
 
     public Git(File workingDirectory) {
+        super(ScmType.git);
         super.setWorkingDirectory(workingDirectory);
     }
 
@@ -48,18 +52,41 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("git apply -3 --index", diffData, LogLevel.DEBUG);
     }
 
-    public String lastSubmittedChangelistId() {
+    public String diffTree(String fromRef, String ref) {
+        return executeScmCommand("git diff-tree -M --binary --full-index -p {} {}", fromRef, ref) + "\n";
+    }
+
+    public String applyDiffToPerforce(String rootDirectory, String diffData, boolean check) {
+        String checkString = check ? " --check" : "";
+        String output = executeScmCommand("git apply --directory={}{}", diffData, LogLevel.DEBUG, rootDirectory, checkString);
+        if (StringUtils.isBlank(output)) {
+            return output;
+        }
+
+        try {
+            File tempFile = File.createTempFile("invalidDiff", ".patch");
+            log.warn("Diff did not apply cleanly, saving diff to temp File {}", tempFile.getPath());
+            FileUtils.saveToFile(tempFile, diffData);
+        } catch (IOException e) {
+            log.warn("Failed to create temp file to save invalid diff patch to: " + e.getMessage(), e);
+        }
+        return output;
+    }
+
+    public String[] lastSubmittedChangelistInfo() {
         Pattern gitP4Pattern = Pattern.compile("\\[git\\-p4:\\s+depot\\-paths.+change\\s+=\\s+(\\d+)\\]");
         int counter = 0;
         Matcher matcher = gitP4Pattern.matcher(commitText(counter++, false));
+        String lastCommitText = "";
         while (!matcher.find()) {
-            String text = commitText(counter++, false);
-            if (StringUtils.isBlank(text)) {
+            lastCommitText = commitText(counter++, false);
+            if (StringUtils.isBlank(lastCommitText)) {
                 throw new IllegalArgumentException("Failed to find last submitted changelist");
             }
-            matcher.reset(text);
+            matcher.reset(lastCommitText);
         }
-        return matcher.group(1);
+        String ref = MatcherUtils.singleMatchExpected(lastCommitText, "commit (\\w+)");
+        return new String[] {ref, matcher.group(1)};
     }
 
     public String lastCommitText(boolean prettyPrint) {
@@ -276,12 +303,30 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("git reset --hard " + ref);
     }
 
-    public List<String> getStagedChanges() {
+    public List<FileChange> getStagedChanges() {
         return getChanges(false);
     }
 
-    public List<String> getAllChanges() {
+    public List<FileChange> getAllChanges() {
         return getChanges(true);
+    }
+
+    public List<FileChange> getChangesInDiff(String fromRef, String toRef) {
+        String output = executeScmCommand("git diff-tree --full-index -r -M -C {} {}", fromRef, toRef);
+        Matcher lineMatcher = Pattern.compile(":\\d+\\s+\\d+\\s+\\w+\\s\\w+\\s+(\\w+)\\s+(.+)").matcher(output);
+        List<FileChange> fileChanges = new ArrayList<>();
+        while (lineMatcher.find()) {
+            String actionTypeText = lineMatcher.group(1);
+            String affectedFiles = lineMatcher.group(2);
+            if (actionTypeText.startsWith("R")) {
+                int similarityPercent = Integer.parseInt(actionTypeText.substring(1));
+                FileChangeType changeType = similarityPercent == 100 ? FileChangeType.renamed : FileChangeType.renamedAndModified;
+                fileChanges.add(new FileChange(scmType, changeType, affectedFiles.split("[\t\n]")));
+            } else {
+                fileChanges.add(new FileChange(scmType, FileChangeType.changeTypeFromGitValue(actionTypeText), affectedFiles));
+            }
+        }
+        return fileChanges;
     }
 
     @Override
@@ -329,11 +374,11 @@ public class Git extends BaseScmWrapper {
         log.info("Remote branch was successfully updated");
     }
 
-    private List<String> getChanges(boolean includeUnStagedChanges) {
-        List<String> changes = new ArrayList<>();
+    private List<FileChange> getChanges(boolean includeUnStagedChanges) {
+        List<FileChange> changes = new ArrayList<>();
         String gitStatusOutput = executeScmCommand("git status --porcelain" );
 
-        String pattern = String.format("^(\\s*)(%s+)\\s+(.+)", FileChange.allValuesPattern());
+        String pattern = String.format("^(\\s*)(%s+)\\s+(.+)", FileChangeType.allValuesAsGitPattern());
         Matcher changesMatcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(gitStatusOutput);
 
         while (changesMatcher.find()) {
@@ -341,20 +386,19 @@ public class Git extends BaseScmWrapper {
             String changesText = changesMatcher.group(2);
             String filePath = changesMatcher.group(3);
 
-            for (char changeLetter : changesText.toCharArray()) {
-                FileChange fileChange = FileChange.valueOf(String.valueOf(changeLetter));
-                // leading whitespace means that the change is unStaged
-                if (includeUnStagedChanges || leadingWhitespace.isEmpty()) {
-                    int arrowIndex = filePath.indexOf("->");
-                    String filePathToUse = filePath;
-                    // if you modify a renamed file, then the output will be RM old -> new
-                    // for the modify action we only want to show the new file name
-                    if (fileChange != FileChange.R && arrowIndex != -1) {
-                        filePathToUse = filePath.substring(arrowIndex + 3);
-                    }
-
-                    changes.add(fileChange.getLabel() + " " + filePathToUse);
+            FileChangeType fileChangeType = FileChangeType.changeTypeFromGitValue(changesText);
+            // leading whitespace means that the change is unStaged
+            if (includeUnStagedChanges || leadingWhitespace.isEmpty()) {
+                int arrowIndex = filePath.indexOf("->");
+                FileChange fileChange;
+                if (arrowIndex != -1) {
+                    String renamedFromFile = filePath.substring(0, arrowIndex).trim();
+                    String renamedToFile = filePath.substring(arrowIndex + 3).trim();
+                    fileChange = new FileChange(scmType, fileChangeType, renamedFromFile, renamedToFile);
+                } else {
+                    fileChange = new FileChange(scmType, fileChangeType, filePath);
                 }
+                changes.add(fileChange);
             }
         }
 
@@ -372,36 +416,6 @@ public class Git extends BaseScmWrapper {
 
     private void executeCommitCommand(String commitCommand, String msg) {
         executeScmCommand(commitCommand + " --file=-", msg, LogLevel.DEBUG);
-    }
-
-
-
-    public enum FileChange {
-        A("added"),
-        M("modified"),
-        D("deleted"),
-        R("renamed"),
-        C("copied");
-        private String label;
-
-        FileChange(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public static String allValuesPattern() {
-            String pattern = "[";
-
-            for (FileChange fileChange : FileChange.values()) {
-                pattern += fileChange.name();
-
-            }
-            pattern += "]";
-            return pattern;
-        }
     }
 
     private class GitDirectoryFilter implements FileFilter {

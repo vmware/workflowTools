@@ -2,6 +2,7 @@ package com.vmware.util;
 
 import com.vmware.util.exception.RuntimeIOException;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -9,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,14 @@ public class FileUtils {
         List<File> files = new ArrayList<File>();
         addDirectoryToList(files, directoryToScan, fileFilter);
         return files;
+    }
+
+    public static void saveToFile(File dst, String content) {
+        try {
+            Files.copy(new ByteArrayInputStream(content.getBytes()), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     public static void copyFile(File src, File dst) {

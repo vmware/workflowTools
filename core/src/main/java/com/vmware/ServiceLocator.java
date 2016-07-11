@@ -6,6 +6,8 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.scm.Git;
+import com.vmware.scm.Perforce;
 import com.vmware.trello.Trello;
 
 /**

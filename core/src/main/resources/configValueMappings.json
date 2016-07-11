@@ -147,6 +147,11 @@
     "--tracking-branch",
     "--parent"
   ],
+  "SyncChangelistWithGitDiff": [
+    "--tracking-branch",
+    "--sync-to-branch-latest",
+    "--parent"
+  ],
   "PublishReview": [
     "--reviewboard-url"
   ],
