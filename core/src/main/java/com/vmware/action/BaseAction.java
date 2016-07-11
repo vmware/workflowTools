@@ -1,16 +1,11 @@
 package com.vmware.action;
 
-import com.vmware.Git;
-import com.vmware.Perforce;
+import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 
 public abstract class BaseAction {
 

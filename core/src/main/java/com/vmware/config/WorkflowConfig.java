@@ -1,6 +1,6 @@
 package com.vmware.config;
 
-import com.vmware.Git;
+import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.action.BaseAction;
 import com.vmware.util.ArrayUtils;
@@ -114,6 +114,9 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "-p4Client,--perforce-client", gitConfigProperty = "git-p4.client", help = "Perforce client to use")
     public String perforceClientName;
+
+    @ConfigurableProperty(commandLine = "-syncToBranchLatest,--sync-to-branch-latest", help = "By default, files to be synced to the latest in perforce, this flag syncs them to the latest changelist known to the git branch")
+    public boolean syncChangelistToLatestInBranch;
 
     @ConfigurableProperty(commandLine = "-gobuildBinPath,--gobuild-bin-path", help = "Path to gobuild bin file, this is a VMware specific tool")
     public String goBuildBinPath;

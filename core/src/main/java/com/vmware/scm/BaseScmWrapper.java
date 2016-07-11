@@ -1,4 +1,4 @@
-package com.vmware;
+package com.vmware.scm;
 
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
@@ -17,12 +17,22 @@ public abstract class BaseScmWrapper {
 
     protected File workingDirectory;
 
+    protected ScmType scmType;
+
+    protected BaseScmWrapper(ScmType scmType) {
+        this.scmType = scmType;
+    }
+
     protected void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
     }
 
     public File getWorkingDirectory() {
         return workingDirectory;
+    }
+
+    public String fullPath(String pathWithinScm) {
+        return workingDirectory + File.separator + pathWithinScm;
     }
 
     protected String executeScmCommand(String command, String... arguments) {
@@ -42,6 +52,13 @@ public abstract class BaseScmWrapper {
     }
 
     protected void exitIfCommandFailed(String output) {
+    }
+
+    protected String failOutputIfMissingText(String output, String expectedText) {
+        if (!output.contains(expectedText)) {
+            throw new RuntimeException("Expcted to find text " + expectedText + " in output " + output);
+        }
+        return output;
     }
 
     private String expandCommand(String command, String... arguments) {

@@ -3,6 +3,7 @@ package com.vmware.action.conditional;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.scm.FileChange;
 import com.vmware.util.logging.Padder;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ExitIfNoStagedChangesDetectedByGit extends BaseCommitAction {
 
     @Override
     public void process() {
-        List<String> changes = git.getStagedChanges();
+        List<FileChange> changes = git.getStagedChanges();
         if (changes.isEmpty()) {
             log.info("No staged changes detected by git!");
             System.exit(0);
@@ -24,8 +25,8 @@ public class ExitIfNoStagedChangesDetectedByGit extends BaseCommitAction {
 
         Padder titlePadder = new Padder("Staged Changes");
         titlePadder.infoTitle();
-        for (String change : changes) {
-            log.info(change);
+        for (FileChange change : changes) {
+            log.info(change.toString());
         }
         titlePadder.infoTitle();
     }

@@ -2,7 +2,7 @@ package com.vmware.config;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.vmware.Git;
+import com.vmware.scm.Git;
 import com.vmware.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;

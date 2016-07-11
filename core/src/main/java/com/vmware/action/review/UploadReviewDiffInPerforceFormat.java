@@ -1,6 +1,6 @@
 package com.vmware.action.review;
 
-import com.vmware.Perforce;
+import com.vmware.scm.Perforce;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.DiffToUpload;
@@ -180,7 +180,7 @@ public class UploadReviewDiffInPerforceFormat extends UploadReviewDiff {
 
     private void addPerforceDepotInfoForFiles() {
         if (!depotFilesToCheck.isEmpty()) {
-            String lastSubmittedChangelist = git.lastSubmittedChangelistId();
+            String lastSubmittedChangelist = git.lastSubmittedChangelistInfo()[1];
             String filesListToCheck = "";
             for (String depotFileToCheck : depotFilesToCheck) {
                 if (!filesListToCheck.isEmpty()) {

@@ -1,6 +1,6 @@
 package com.vmware.action.base;
 
-import com.vmware.Perforce;
+import com.vmware.scm.Perforce;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
