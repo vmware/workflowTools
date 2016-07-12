@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static java.lang.String.format;
 
@@ -94,6 +95,10 @@ public class Bugzilla extends AbstractService {
         bugToResolve.knob = BugKnobType.resolve;
         bugToResolve.changed = 1;
         bugToResolve.resolution = resolution;
+        SimpleDateFormat deltaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZZ");
+        bugToResolve.delta_ts = deltaDateFormat.format(new Date());
+
+        stripProductNameFromVersionIfPresent(bugToResolve);
         String response = connection.post(baseUrl + "process_bug.cgi", String.class, bugToResolve);
 
         Bug updatedBug = getBugById(bugId);
@@ -131,6 +136,14 @@ public class Bugzilla extends AbstractService {
         Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
         Integer sessionId = (Integer) result.get("id");
         log.info(String.valueOf(sessionId));
+    }
+
+    private void stripProductNameFromVersionIfPresent(Bug bugToResolve) {
+        String foundInVersionName = bugToResolve.foundInVersionName;
+        if (bugToResolve.foundInProductName != null && foundInVersionName != null && foundInVersionName.startsWith(bugToResolve.foundInProductName)) {
+            log.info("Stripping product name from version {}", foundInVersionName);
+            bugToResolve.foundInVersionName = foundInVersionName.substring(bugToResolve.foundInProductName.length()).trim();
+        }
     }
 
 }
