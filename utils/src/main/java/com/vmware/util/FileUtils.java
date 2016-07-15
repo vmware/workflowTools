@@ -1,7 +1,10 @@
 package com.vmware.util;
 
 import com.vmware.util.exception.RuntimeIOException;
+import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -9,13 +12,26 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class FileUtils {
+
+    public static File createTempFile(String prefix, String suffix) {
+        try {
+            return File.createTempFile(prefix, suffix);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
 
     public static String stripExtension(File file) {
         String nameWithExtension = file.getName();
@@ -34,6 +50,18 @@ public class FileUtils {
         List<File> files = new ArrayList<File>();
         addDirectoryToList(files, directoryToScan, fileFilter);
         return files;
+    }
+
+    public static String readFileAsString(File fileToRead) {
+        return new String(readFile(fileToRead), Charset.forName("utf8"));
+    }
+
+    public static byte[] readFile(File fileToRead) {
+        try {
+            return Files.readAllBytes(fileToRead.toPath());
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     public static void saveToFile(File dst, String content) {

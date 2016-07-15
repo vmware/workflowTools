@@ -118,6 +118,12 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-syncToBranchLatest,--sync-to-branch-latest", help = "By default, files to be synced to the latest in perforce, this flag syncs them to the latest changelist known to the git branch")
     public boolean syncChangelistToLatestInBranch;
 
+    @ConfigurableProperty(commandLine = "-O,--output-file", help = "File to save output to")
+    public String outputFileForContent;
+
+    @ConfigurableProperty(commandLine = "-cId,--changelist-id", help = "ID of changelist to use")
+    public String changelistId;
+
     @ConfigurableProperty(commandLine = "-gobuildBinPath,--gobuild-bin-path", help = "Path to gobuild bin file, this is a VMware specific tool")
     public String goBuildBinPath;
 

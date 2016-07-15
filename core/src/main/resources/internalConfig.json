@@ -158,9 +158,12 @@
           "prepareCommitForPush", "PushToMaster", "HardSubmitReview"
        ],
        "submit": [
-          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "DeleteChangelistTag", "SoftSubmitReview"
+         "prepareCommitForPush", "updateMatchingChangelist", "SubmitPendingChangelist", "DeleteChangelistTag", "SoftSubmitReview"
        ],
        "submitHarder": [
+         "prepareCommitForPush", "updateMatchingChangelist", "SubmitPendingChangelist", "DeleteChangelistTag", "HardSubmitReview"
+       ],
+       "submitWithGitP4": [
           "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "DeleteChangelistTag", "HardSubmitReview"
        ],
        "submitChangelist": [
@@ -252,7 +255,7 @@
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "updateMatchingChangelist": [
-         "readNonTrivialPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "SyncChangelistWithGitDiff", "UpdateChangelistDescription"
+         "readNonTrivialPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateWithGitChangeset": [
          "readNonTrivialPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"

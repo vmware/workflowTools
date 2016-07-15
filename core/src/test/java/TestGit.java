@@ -84,7 +84,7 @@ public class TestGit {
 
     @Test
     public void diffWithParentRef() {
-        byte[] diff = git.diff("HEAD~1", false);
+        String diff = git.diff("HEAD~1", false);
         assertNotNull(diff);
     }
 

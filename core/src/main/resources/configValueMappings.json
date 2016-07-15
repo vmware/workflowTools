@@ -94,6 +94,11 @@
   "RevertWorkspace": [
     "--perforce-client"
   ],
+  "SaveChangelistDiffToFile": [
+    "--perforce-client",
+    "--changelist-id",
+    "--output-file"
+  ],
   "SetReviewId": [
     "--review-board-date-format",
     "--username",
@@ -191,6 +196,10 @@
     "--latest-diff",
     "--patch"
   ],
+  "ExitIfChangelistDoesNotMatchGitBranch": [
+    "--tracking-branch",
+    "--sync-to-branch-latest"
+  ],
   "BaseCommitWithJenkinsBuildsAction": [
     "--disable-jenkins-login",
     "--jenkins-uses-csrf",
@@ -258,6 +267,9 @@
     "--username",
     "--disable-bugzilla",
     "--disable-jira"
+  ],
+  "ApplyChangelistToSeparateGitBranch": [
+    "--tracking-branch"
   ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
