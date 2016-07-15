@@ -35,11 +35,12 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
         } else {
             log.info("Syncing files to be modified to latest");
         }
-        String diffData = git.diffTree(fromRef, "head");
+        String diffData = git.diffTree(fromRef, "head", true);
 
         String checkOutput = git.applyDiffToPerforce(perforce.getWorkingDirectory() + File.separator, diffData, true);
 
         if (StringUtils.isNotBlank(checkOutput)) {
+            log.debug("Failed diff\n{}", diffData);
             throw new IllegalArgumentException("Check of git diff failed!\n" + checkOutput);
         }
 
@@ -60,7 +61,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
     private void syncPerforceFiles(List<FileChange> gitDiffChanges, String lastSubmittedChangelistId) {
         List<String> filesToSync = new ArrayList<>();
         for (FileChange diffChange : gitDiffChanges) {
-            filesToSync.add(perforce.fullPath(diffChange.getFileAffected(0)));
+            filesToSync.add(perforce.fullPath(diffChange.getFirstFileAffected()));
         }
 
         String syncVersion = ""; // empty means latest
@@ -79,20 +80,22 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
 
         for (FileChange diffChange : gitDiffChanges) {
             if (FileChangeType.isEditChangeType(diffChange.getChangeType())) {
-                String fullPath = perforce.fullPath(diffChange.getFileAffected(0));
+                String fullPath = perforce.fullPath(diffChange.getFirstFileAffected());
                 filesToOpenForEdit.add(fullPath);
             }
         }
-        perforce.openForEdit(draft.perforceChangelistId, StringUtils.appendWithDelimiter("", filesToOpenForEdit, " "));
+        if (!filesToOpenForEdit.isEmpty()) {
+            perforce.openForEdit(draft.perforceChangelistId, StringUtils.appendWithDelimiter("", filesToOpenForEdit, " "));
+        }
     }
 
     private void makePerforceAwareOfDiffChanges(List<FileChange> gitDiffChanges) {
         for (FileChange diffChange : gitDiffChanges) {
             FileChangeType changeType = diffChange.getChangeType();
-            String fullPathForFirstFileAffected = perforce.fullPath(diffChange.getFileAffected(0));
+            String fullPathForFirstFileAffected = perforce.fullPath(diffChange.getFirstFileAffected());
             String fullPathForLastFileAffected = perforce.fullPath(diffChange.getLastFileAffected());
             if (changeType == FileChangeType.renamed || changeType == FileChangeType.renamedAndModified) {
-                log.info("Renaming file {} to {}", diffChange.getFileAffected(0), diffChange.getLastFileAffected());
+                log.info("Renaming file {} to {}", diffChange.getFirstFileAffected(), diffChange.getLastFileAffected());
                 perforce.move(draft.perforceChangelistId, fullPathForFirstFileAffected, fullPathForLastFileAffected, "-k");
             } else if (changeType == FileChangeType.added || changeType == FileChangeType.addedAndModified) {
                 log.info("Adding file {} to perforce", diffChange.getLastFileAffected());

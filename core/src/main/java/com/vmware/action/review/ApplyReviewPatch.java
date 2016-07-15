@@ -54,7 +54,7 @@ public class ApplyReviewPatch extends BaseAction {
         IOUtils.write(new File(currentDir.getPath() + "/workflow.patch"), diffData);
 
         log.info("Applying diff {}", diffSelection + 1);
-        String result = git.applyDiff(diffData);
+        String result = git.applyDiff(diffData, false);
 
         if (StringUtils.isBlank(result.trim())) {
             log.info("Diff successfully applied");

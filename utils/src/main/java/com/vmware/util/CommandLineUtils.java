@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,10 +37,17 @@ public class CommandLineUtils {
         }
     }
 
-
     public static String executeCommand(File workingDirectory, String command, String inputText, LogLevel logLevel) {
+        return executeCommand(workingDirectory, null, command, inputText, logLevel);
+    }
+
+    public static String executeCommand(File workingDirectory, Map<String, String> environmentVariables,
+                                        String command, String inputText, LogLevel logLevel) {
         ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
                 .redirectErrorStream(true);
+        if (environmentVariables != null) {
+            builder.environment().putAll(environmentVariables);
+        }
         try {
             Process statusProcess = builder.start();
             if (inputText != null) {

@@ -48,12 +48,18 @@ public class Git extends BaseScmWrapper {
         return matchingDirectory;
     }
 
-    public String applyDiff(String diffData) {
-        return executeScmCommand("git apply -3 --index", diffData, LogLevel.DEBUG);
+    public String newTrackingBranch(String branchName, String trackingBranch) {
+        return executeScmCommand("git checkout -b {} {}", branchName, trackingBranch);
     }
 
-    public String diffTree(String fromRef, String ref) {
-        return executeScmCommand("git diff-tree -M --binary --full-index -p {} {}", fromRef, ref) + "\n";
+    public String applyDiff(String diffData, boolean check) {
+        String checkString = check ? " --check" : "";
+        return executeScmCommand("git apply -3 --index{}", diffData, LogLevel.DEBUG, checkString);
+    }
+
+    public String diffTree(String fromRef, String ref, boolean binaryPatch) {
+        String binaryFlag = binaryPatch ? " --binary" : "";
+        return executeScmCommand("git diff-tree -M{} --full-index -U3 -p {} {}", binaryFlag, fromRef, ref) + "\n";
     }
 
     public String applyDiffToPerforce(String rootDirectory, String diffData, boolean check) {
@@ -76,8 +82,8 @@ public class Git extends BaseScmWrapper {
     public String[] lastSubmittedChangelistInfo() {
         Pattern gitP4Pattern = Pattern.compile("\\[git\\-p4:\\s+depot\\-paths.+change\\s+=\\s+(\\d+)\\]");
         int counter = 0;
-        Matcher matcher = gitP4Pattern.matcher(commitText(counter++, false));
-        String lastCommitText = "";
+        String lastCommitText = commitText(counter++, false);
+        Matcher matcher = gitP4Pattern.matcher(lastCommitText);
         while (!matcher.find()) {
             lastCommitText = commitText(counter++, false);
             if (StringUtils.isBlank(lastCommitText)) {
@@ -85,7 +91,7 @@ public class Git extends BaseScmWrapper {
             }
             matcher.reset(lastCommitText);
         }
-        String ref = MatcherUtils.singleMatchExpected(lastCommitText, "commit (\\w+)");
+        String ref = MatcherUtils.singleMatchExpected(lastCommitText, "commit\\s+(\\w+)");
         return new String[] {ref, matcher.group(1)};
     }
 
@@ -171,10 +177,10 @@ public class Git extends BaseScmWrapper {
         return diffOutput.length > 0 ? diffOutput : null;
     }
 
-    public byte[] diff(String commitRef, boolean supportsRenames) {
+    public String diff(String commitRef, boolean supportsRenames) {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "git diff " + renamesFlag + "--no-color --full-index --no-ext-diff --ignore-submodules " + commitRef;
-        return executeScmCommand(diffCommand).getBytes();
+        return executeScmCommand(diffCommand);
     }
 
     public void submit(String origin) {
@@ -313,17 +319,24 @@ public class Git extends BaseScmWrapper {
 
     public List<FileChange> getChangesInDiff(String fromRef, String toRef) {
         String output = executeScmCommand("git diff-tree --full-index -r -M -C {} {}", fromRef, toRef);
-        Matcher lineMatcher = Pattern.compile(":\\d+\\s+\\d+\\s+\\w+\\s\\w+\\s+(\\w+)\\s+(.+)").matcher(output);
+        Matcher lineMatcher = Pattern.compile(":(\\d+)\\s+(\\d+)\\s+\\w+\\s\\w+\\s+(\\w+)\\s+(.+)").matcher(output);
         List<FileChange> fileChanges = new ArrayList<>();
         while (lineMatcher.find()) {
-            String actionTypeText = lineMatcher.group(1);
-            String affectedFiles = lineMatcher.group(2);
+            String oldFileMode = lineMatcher.group(1);
+            String fileMode = lineMatcher.group(2);
+            String actionTypeText = lineMatcher.group(3);
+            String affectedFiles = lineMatcher.group(4);
             if (actionTypeText.startsWith("R")) {
                 int similarityPercent = Integer.parseInt(actionTypeText.substring(1));
                 FileChangeType changeType = similarityPercent == 100 ? FileChangeType.renamed : FileChangeType.renamedAndModified;
-                fileChanges.add(new FileChange(scmType, changeType, affectedFiles.split("[\t\n]")));
+                fileChanges.add(new FileChange(scmType, fileMode, changeType, affectedFiles.split("[\t\n]")));
             } else {
-                fileChanges.add(new FileChange(scmType, FileChangeType.changeTypeFromGitValue(actionTypeText), affectedFiles));
+                FileChangeType changeType = FileChangeType.changeTypeFromGitValue(actionTypeText);
+                if (changeType == FileChangeType.deleted) {
+                    fileChanges.add(new FileChange(scmType, oldFileMode, changeType, affectedFiles));
+                } else {
+                    fileChanges.add(new FileChange(scmType, fileMode, changeType, affectedFiles));
+                }
             }
         }
         return fileChanges;
@@ -391,12 +404,13 @@ public class Git extends BaseScmWrapper {
             if (includeUnStagedChanges || leadingWhitespace.isEmpty()) {
                 int arrowIndex = filePath.indexOf("->");
                 FileChange fileChange;
+                final String FILE_MODE_UNKNOWN = "";
                 if (arrowIndex != -1) {
                     String renamedFromFile = filePath.substring(0, arrowIndex).trim();
                     String renamedToFile = filePath.substring(arrowIndex + 3).trim();
-                    fileChange = new FileChange(scmType, fileChangeType, renamedFromFile, renamedToFile);
+                    fileChange = new FileChange(scmType, FILE_MODE_UNKNOWN, fileChangeType, renamedFromFile, renamedToFile);
                 } else {
-                    fileChange = new FileChange(scmType, fileChangeType, filePath);
+                    fileChange = new FileChange(scmType, FILE_MODE_UNKNOWN, fileChangeType, filePath);
                 }
                 changes.add(fileChange);
             }

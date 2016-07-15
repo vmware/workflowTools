@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
 
 import static com.vmware.util.CommandLineUtils.executeCommand;
 
@@ -13,17 +14,19 @@ import static com.vmware.util.CommandLineUtils.executeCommand;
  */
 public abstract class BaseScmWrapper {
 
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    static final String NON_EXISTENT_INDEX_IN_GIT = "0000000000000000000000000000000000000000";
 
-    protected File workingDirectory;
+    final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected ScmType scmType;
+    File workingDirectory;
 
-    protected BaseScmWrapper(ScmType scmType) {
+    ScmType scmType;
+
+    BaseScmWrapper(ScmType scmType) {
         this.scmType = scmType;
     }
 
-    protected void setWorkingDirectory(File workingDirectory) {
+    void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
     }
 
@@ -35,26 +38,30 @@ public abstract class BaseScmWrapper {
         return workingDirectory + File.separator + pathWithinScm;
     }
 
-    protected String executeScmCommand(String command, String... arguments) {
+    String executeScmCommand(String command, String... arguments) {
         return executeScmCommand(command, LogLevel.DEBUG, arguments);
     }
 
-    protected String executeScmCommand(String command, LogLevel logLevel, String... commandArguments) {
+    String executeScmCommand(String command, LogLevel logLevel, String... commandArguments) {
         return executeScmCommand(command, null, logLevel, commandArguments);
     }
 
-    protected String executeScmCommand(String command, String inputText, LogLevel level, String... commandArguments) {
+    String executeScmCommand(String command, String inputText, LogLevel level, String... commandArguments) {
+        return executeScmCommand(null, command, inputText, level, commandArguments);
+    }
+
+    String executeScmCommand(Map<String, String> environmentVariables, String command, String inputText, LogLevel level, String... commandArguments) {
         String expandedCommand = expandCommand(command, commandArguments);
         log.debug("{} command {}", this.getClass().getSimpleName(), expandedCommand);
-        String output = executeCommand(workingDirectory, expandedCommand, inputText, level);
+        String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, level);
         exitIfCommandFailed(output);
         return output;
     }
 
-    protected void exitIfCommandFailed(String output) {
+    void exitIfCommandFailed(String output) {
     }
 
-    protected String failOutputIfMissingText(String output, String expectedText) {
+    String failOutputIfMissingText(String output, String expectedText) {
         if (!output.contains(expectedText)) {
             throw new RuntimeException("Expcted to find text " + expectedText + " in output " + output);
         }

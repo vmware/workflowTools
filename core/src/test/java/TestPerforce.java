@@ -28,8 +28,9 @@ public class TestPerforce {
 
     @Test
     public void canGetFileChangesInChangelist() {
-        List<FileChange> changes = perforce.getFileChangesForChangelist("451007");
+        List<String> openChangelists = perforce.getPendingChangelists();
+        assertFalse("Need a pending changelist to run this test", openChangelists.isEmpty());
+        List<FileChange> changes = perforce.getFileChangesForPendingChangelist(openChangelists.get(0));
         assertFalse("Should not be empty", changes.isEmpty());
-        assertEquals(98, Integer.parseInt("098"));
     }
 }
