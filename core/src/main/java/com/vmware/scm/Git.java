@@ -8,6 +8,7 @@ import com.vmware.util.logging.LogLevel;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public class Git extends BaseScmWrapper {
 
     public String applyDiff(String diffData, boolean check) {
         String checkString = check ? " --check" : "";
-        return executeScmCommand("git apply -3 --index{}", diffData, LogLevel.DEBUG, checkString);
+        return executeScmCommand("git apply -3 {}", diffData, LogLevel.DEBUG, checkString);
     }
 
     public String diffTree(String fromRef, String ref, boolean binaryPatch) {
@@ -91,8 +92,9 @@ public class Git extends BaseScmWrapper {
             }
             matcher.reset(lastCommitText);
         }
+        String changelistId = matcher.group(1);
         String ref = MatcherUtils.singleMatchExpected(lastCommitText, "commit\\s+(\\w+)");
-        return new String[] {ref, matcher.group(1)};
+        return new String[] {ref, changelistId};
     }
 
     public String lastCommitText(boolean prettyPrint) {
@@ -169,12 +171,17 @@ public class Git extends BaseScmWrapper {
         executeCommitCommand("git commit --amend --all", msg);
     }
 
-    public byte[] diff(String parentRef, String commitRef, boolean supportsRenames) {
+    public byte[] diffAsByteArray(String parentRef, String commitRef, boolean supportsRenames) {
+        String output = diff(parentRef, commitRef, supportsRenames);
+        return output != null ? output.getBytes(Charset.forName("UTF8")) : null;
+    }
+
+    public String diff(String parentRef, String commitRef, boolean supportsRenames) {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "git diff %s--no-color --full-index --no-ext-diff --ignore-submodules %s..%s";
         diffCommand = String.format(diffCommand, renamesFlag, parentRef, commitRef);
-        byte[] diffOutput = executeScmCommand(diffCommand).getBytes();
-        return diffOutput.length > 0 ? diffOutput : null;
+        String diffOutput = executeScmCommand(diffCommand);
+        return diffOutput.length() > 0 ? diffOutput : null;
     }
 
     public String diff(String commitRef, boolean supportsRenames) {

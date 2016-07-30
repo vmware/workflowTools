@@ -16,6 +16,8 @@ public class DynamicLogger {
     public void log(LogLevel logLevel, String message, String... params) {
         if (logLevel == LogLevel.ERROR) {
             log.error(message, params);
+        } else if (logLevel == LogLevel.WARN) {
+            log.warn(message, params);
         } else if (logLevel == LogLevel.INFO) {
             log.info(message, params);
         } else if (logLevel == LogLevel.DEBUG) {

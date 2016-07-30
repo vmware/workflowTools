@@ -14,8 +14,6 @@ import static com.vmware.util.CommandLineUtils.executeCommand;
  */
 public abstract class BaseScmWrapper {
 
-    static final String NON_EXISTENT_INDEX_IN_GIT = "0000000000000000000000000000000000000000";
-
     final Logger log = LoggerFactory.getLogger(this.getClass());
 
     File workingDirectory;

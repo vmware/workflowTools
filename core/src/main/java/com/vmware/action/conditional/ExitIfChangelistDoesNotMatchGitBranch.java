@@ -5,7 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
-import com.vmware.scm.Git;
 import com.vmware.util.StringUtils;
 
 import java.util.Arrays;
@@ -16,6 +15,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.scm.FileChangeType.added;
+import static com.vmware.scm.FileChangeType.addedAndModified;
+import static com.vmware.scm.FileChangeType.deleted;
+
 @ActionDescription("Creates a diff for the changelist and compares it to a diff of the current git branch.")
 public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCommitAction {
 
@@ -25,6 +28,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
     @Override
     public void process() {
+        log.info("Checking if changelist {} matches current git branch", draft.perforceChangelistId);
         String[] lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
         String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo[0] : config.trackingBranch;
         if (config.syncChangelistToLatestInBranch) {
@@ -36,12 +40,12 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         List<FileChange> fileChanges = perforce.getFileChangesForPendingChangelist(draft.perforceChangelistId);
         String rawGitDiff = git.diffTree(fromRef, "head", true);
         String gitDiff = rawGitDiff;
-        if (containsChangeOfType(fileChanges, FileChangeType.renamed)) {
+        if (containsChangesOfType(fileChanges, FileChangeType.renamed)) {
             gitDiff = stripLinesStartingWith(rawGitDiff.split("\n"), "similarity index");
         }
         log.info("Creating perforce diff for changelist {} in git format", draft.perforceChangelistId);
         String perforceDiff = perforce.diffChangelistInGitFormat(fileChanges, draft.perforceChangelistId, true);
-        if (!containsChangeOfType(fileChanges, FileChangeType.modified)) {
+        if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
             perforceDiff = stripLinesStartingWith(perforceDiff.split("\n"), "File(s) not opened for edit");
         }
         log.info("Checking if perforce diff matches git diff");
@@ -56,8 +60,10 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         if (reasonForMotMatching != null) {
             log.error("Perforce diff didn't match git diff\n{}", reasonForMotMatching);
             System.exit(0);
+        } else if (containsChangesOfType(fileChanges, added, addedAndModified, deleted)) {
+            log.info("Perforce diff matches git diff in terms of content, adding or deleting file causes diff ordering to be different for perforce.");
         } else {
-            log.info("Perforce diff matches git diff in terms of content, might be file ordering or whitespace differences");
+            log.info("Perforce diff matches git diff in terms of content");
         }
     }
 
@@ -125,10 +131,12 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         return null;
     }
 
-    private boolean containsChangeOfType(List<FileChange> changes, FileChangeType changeType) {
+    private boolean containsChangesOfType(List<FileChange> changes, FileChangeType... changeTypes) {
         for (FileChange change : changes) {
-            if (change.getChangeType() == changeType) {
-                return true;
+            for (FileChangeType changeType : changeTypes) {
+                if (change.getChangeType() == changeType) {
+                    return true;
+                }
             }
         }
         return false;

@@ -4,8 +4,11 @@ import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.reviewboard.domain.Repository;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
+import com.vmware.scm.Perforce;
+import com.vmware.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.IOUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
@@ -35,6 +38,7 @@ public class ApplyReviewPatch extends BaseAction {
         }
 
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(config.reviewRequestForPatching);
+        Repository repository = reviewBoard.getRepository(reviewRequest.getRepositoryLink());
         ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());
         log.info("Using review request {} ({})", reviewRequest.id, reviewRequest.summary);
 
@@ -50,8 +54,22 @@ public class ApplyReviewPatch extends BaseAction {
 
         String diffData = reviewBoard.getDiffData(diffs[diffSelection].getSelfLink());
 
+        if (repository.tool.toLowerCase().contains("perforce")) {
+            Perforce perforce = serviceLocator.getPerforce();
+            diffData = new PerforceDiffToGitConverter(perforce).convert(diffData);
+        }
+
+        log.debug("Patch to apply\n{}", diffData);
+
         File currentDir = new File(System.getProperty("user.dir"));
         IOUtils.write(new File(currentDir.getPath() + "/workflow.patch"), diffData);
+
+        log.info("Checking if diff {} applies", diffSelection + 1);
+        String checkResult = git.applyDiff(diffData, false);
+        if (StringUtils.isNotBlank(checkResult)) {
+            log.error("Checking of diff failed!\n{}", checkResult);
+            return;
+        }
 
         log.info("Applying diff {}", diffSelection + 1);
         String result = git.applyDiff(diffData, false);
@@ -64,10 +82,10 @@ public class ApplyReviewPatch extends BaseAction {
     }
 
     private void printDiffResult(String result) {
-        log.info("Potential issues with applying diff");
+        log.warn("Potential issues with applying diff");
         Padder padder = new Padder("Patch Output");
-        padder.infoTitle();
+        padder.warnTitle();
         log.info(result);
-        padder.infoTitle();
+        padder.warnTitle();
     }
 }

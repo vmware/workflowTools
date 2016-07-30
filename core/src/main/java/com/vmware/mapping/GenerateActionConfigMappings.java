@@ -1,6 +1,6 @@
 package com.vmware.mapping;
 
-import com.vmware.SimpleLogFormatter;
+import com.vmware.util.logging.SimpleLogFormatter;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;

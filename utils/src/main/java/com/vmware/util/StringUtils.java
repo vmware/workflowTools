@@ -13,6 +13,15 @@ public class StringUtils {
 
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
 
+    public static boolean textStartsWithValue(String text, String... valuesToCheck) {
+        for (String value : valuesToCheck) {
+            if (text.startsWith(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String appendCsvValue(String existingValue, String valueToAdd) {
         return appendWithDelimiter(existingValue, valueToAdd, ",");
     }

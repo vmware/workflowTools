@@ -9,6 +9,8 @@ import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.Link;
+import com.vmware.reviewboard.domain.Repository;
+import com.vmware.reviewboard.domain.RepositoryResponse;
 import com.vmware.reviewboard.domain.ResultsCount;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
@@ -152,6 +154,10 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewRequestDiff[] getDiffsForReviewRequest(Link diffsLink) {
         return connection.get(diffsLink.getHref(), ReviewRequestDiffsResponse.class).diffs;
+    }
+
+    public Repository getRepository(Link repositoryLink) {
+        return connection.get(repositoryLink.getHref(), RepositoryResponse.class).repository;
     }
 
     public String getDiffData(Link diffLink) {

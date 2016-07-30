@@ -72,6 +72,10 @@ public class ReviewRequest extends BaseEntity {
         return getLink("reviews");
     }
 
+    public Link getRepositoryLink() {
+        return getLink("repository");
+    }
+
     public String getSubmitter() {
         return getLink("submitter").getTitle();
     }

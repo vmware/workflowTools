@@ -64,7 +64,7 @@ public class TestGit {
 
     @Test
     public void diffBetweenLastCommit() {
-        byte[] diff = git.diff("HEAD~1", "HEAD", false);
+        byte[] diff = git.diffAsByteArray("HEAD~1", "HEAD", false);
         assertNotNull(diff);
         List<FileChange> changes = git.getChangesInDiff("HEAD~1", "HEAD");
         assertFalse(changes.isEmpty());

@@ -44,6 +44,10 @@ public class Padder {
         logTitle(LogLevel.INFO);
     }
 
+    public void warnTitle() {
+        logTitle(LogLevel.WARN);
+    }
+
     public void errorTitle() {
         logTitle(LogLevel.ERROR);
     }
