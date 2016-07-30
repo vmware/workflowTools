@@ -28,13 +28,15 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
         log.debug("Git diff change count {}", gitDiffChanges.size());
 
         String[] lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
-        syncPerforceFiles(gitDiffChanges, lastSubmittedChangelistInfo[1]);
-        String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo[0] : config.trackingBranch;
+        String fromRef;
         if (config.syncChangelistToLatestInBranch) {
             log.info("Syncing files to be modified to changelist {} and applying diff", lastSubmittedChangelistInfo[1]);
+            fromRef = lastSubmittedChangelistInfo[0];
         } else {
             log.info("Syncing files to be modified to latest");
+            fromRef = config.trackingBranch;
         }
+        syncPerforceFiles(gitDiffChanges, lastSubmittedChangelistInfo[1]);
         String diffData = git.diffTree(fromRef, "head", true);
 
         String checkOutput = git.applyDiffToPerforce(perforce.getWorkingDirectory() + File.separator, diffData, true);
@@ -70,7 +72,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
         }
 
         if (!filesToSync.isEmpty()) {
-            log.info("Syncing existing perforce files {}", filesToSync.toString());
+            log.debug("Syncing existing perforce files {}", filesToSync.toString());
             perforce.sync(StringUtils.appendWithDelimiter("", filesToSync, syncVersion +" ") + syncVersion);
         }
     }

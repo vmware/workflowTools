@@ -190,6 +190,7 @@
     "--parent"
   ],
   "ApplyReviewPatch": [
+    "--perforce-client",
     "--review-board-date-format",
     "--username",
     "--reviewboard-url",

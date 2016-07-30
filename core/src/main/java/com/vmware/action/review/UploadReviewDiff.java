@@ -32,8 +32,8 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
         DiffToUpload diff = new DiffToUpload();
         String mergeBase = git.mergeBase(config.trackingBranch, "HEAD");
-        diff.path = git.diff(config.parentBranch, "HEAD", supportsDiffWithRenames);
-        diff.parent_diff_path = git.diff(mergeBase, config.parentBranch, supportsDiffWithRenames);
+        diff.path = git.diffAsByteArray(config.parentBranch, "HEAD", supportsDiffWithRenames);
+        diff.parent_diff_path = git.diffAsByteArray(mergeBase, config.parentBranch, supportsDiffWithRenames);
         return diff;
     }
 

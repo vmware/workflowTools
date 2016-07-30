@@ -1,4 +1,4 @@
-package com.vmware;
+package com.vmware.util.logging;
 
 import com.vmware.util.logging.LogLevel;
 
@@ -27,15 +27,15 @@ public class SimpleLogFormatter extends Formatter {
         // Create a StringBuilder to contain the formatted record
         StringBuilder sb = new StringBuilder();
 
-        String className = record.getSourceClassName();
-        if (className.contains(".")) {
-            className = className.substring(className.lastIndexOf(".") + 1);
-        }
         if (logLevel == Level.FINER || logLevel == Level.FINEST) {
+            String className = record.getSourceClassName();
+            if (className.contains(".")) {
+                className = className.substring(className.lastIndexOf(".") + 1);
+            }
             sb.append(className).append(".").append(record.getSourceMethodName()).append(" ");
         }
 
-        if (logLevel != Level.INFO || record.getLevel() == Level.SEVERE) {
+        if (logLevel != Level.INFO || (record.getLevel() == Level.WARNING || record.getLevel() == Level.SEVERE)) {
             // Get the level name and add it to the buffer
             String levelString = LogLevel.fromLevel(record.getLevel()).name();
             sb.append(levelString);
