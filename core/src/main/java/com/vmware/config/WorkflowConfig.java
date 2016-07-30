@@ -21,8 +21,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import static com.vmware.util.ArrayUtils.contains;
 
@@ -151,9 +153,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Max number of jenkins jobs to iterate over when checking for latest status of jenkins job")
     public int maxJenkinsBuildsToCheck;
 
-    @ConfigurableProperty(help = "Array of reviewers to select from for reviewed by section")
-    public SortedSet<String> targetReviewers;
-
     @ConfigurableProperty(help = "Map of reviewer groups to select from for reviewed by section. E.g. create a techDebt group and list relevant reviewers")
     public LinkedHashMap<String, SortedSet<String>> reviewerGroups;
 
@@ -255,6 +254,9 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "-obo,--own-boards-only", help = "Disallow using a trello board owned by someone else")
     public boolean ownBoardsOnly;
+
+    @ConfigurableProperty(commandLine = "--search-by-usernames-only", help = "Search reviewboard for users by username only")
+    public boolean searchByUsernamesOnly;
 
     @ConfigurableProperty(commandLine = "--file-count-ranges", help = "File count ranges for grouping reviews when generating stats")
     public int[] fileCountRanges;

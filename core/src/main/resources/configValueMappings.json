@@ -133,7 +133,10 @@
     "--disable-jira"
   ],
   "BaseSetReviewerList": [
-    "--username"
+    "--reviewboard-url",
+    "--search-by-usernames-only",
+    "--username",
+    "--review-board-date-format"
   ],
   "StripJenkinsBuilds": [
     "--jenkins-url"

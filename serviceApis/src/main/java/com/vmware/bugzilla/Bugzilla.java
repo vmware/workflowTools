@@ -9,10 +9,12 @@ import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.InternalServerException;
+import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapObjectConverter;
+import com.vmware.xmlrpc.RuntimeXmlRpcException;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -131,10 +133,17 @@ public class Bugzilla extends AbstractService {
     @Override
     protected void loginManually() {
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType);
-
-        Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
-        Integer sessionId = (Integer) result.get("id");
-        log.info(String.valueOf(sessionId));
+        try {
+            Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
+            Integer sessionId = (Integer) result.get("id");
+            log.debug("Session id {}", String.valueOf(sessionId));
+        } catch (RuntimeXmlRpcException e) {
+            if (e.getMessage() != null && e.getMessage().contains("The username or password you entered is not valid")) {
+                throw new NotAuthorizedException(e.getMessage(), e);
+            } else {
+                throw e;
+            }
+        }
     }
 
     private void stripProductNameFromVersionIfPresent(Bug bugToResolve) {

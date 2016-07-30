@@ -10,6 +10,7 @@ import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
 import com.vmware.reviewboard.domain.ReviewRequests;
+import com.vmware.reviewboard.domain.ReviewUser;
 import com.vmware.reviewboard.domain.RootList;
 import com.vmware.reviewboard.domain.UserReview;
 
@@ -20,6 +21,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -77,6 +79,16 @@ public class TestReviewBoardApi extends BaseTests {
     public void getRootLinkList() {
         RootList rootLinkList = reviewBoard.getRootLinkList();
         assertNotNull(rootLinkList.getReviewRequestsLink());
+    }
+
+    @Test
+    public void getReviewersFromApi() {
+        RootList rootLinkList = reviewBoard.getRootLinkList();
+        List<ReviewUser> users = reviewBoard.searchUsersMatchingText(rootLinkList.getUsersLink(), "brad", false);
+        assertFalse("Expected to find users for text brad", users.isEmpty());
+
+        List<ReviewUser> usersForUsernameOnly = reviewBoard.searchUsersMatchingText(rootLinkList.getUsersLink(), "brad", true);
+        assertTrue("Expected to find no users for username text brad", usersForUsernameOnly.isEmpty());
     }
 
     @Test

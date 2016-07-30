@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static jline.internal.Preconditions.checkNotNull;
@@ -16,9 +15,9 @@ import static jline.internal.Preconditions.checkNotNull;
  * Based on existing StringsCompleter in JLine2.
  * Adds support for not showing some values when no text entered.
  */
-public class ImprovedStringsCompleter
-        implements Completer
-{
+public class ImprovedStringsCompleter implements Completer {
+
+    protected boolean caseInsensitiveMatching;
     protected final SortedSet<String> values = new TreeSet<String>();
 
     protected final SortedSet<String> valuesShownWhenNoBuffer = new TreeSet<String>();
@@ -58,17 +57,20 @@ public class ImprovedStringsCompleter
         this.delimeterText = delimeterText;
     }
 
+    public void setCaseInsensitiveMatching(boolean caseInsensitiveMatching) {
+        this.caseInsensitiveMatching = caseInsensitiveMatching;
+    }
+
     public int complete(final String buffer, final int cursor, final List<CharSequence> candidates) {
         // candidates could be null
         checkNotNull(candidates);
 
         if (buffer == null || buffer.isEmpty()) {
             candidates.addAll(valuesShownWhenNoBuffer);
-        }
-        else {
-            for (String value : values.tailSet(buffer)) {
+        } else {
+            for (String value : values) {
                 if (bufferMatchesValue(buffer, value)) {
-                    candidates.add(value);
+                    addMatchingValueToCandidates(candidates, value);
                 }
             }
         }
@@ -80,13 +82,20 @@ public class ImprovedStringsCompleter
         return candidates.isEmpty() ? -1 : 0;
     }
 
-    private boolean bufferMatchesValue(String buffer, String value) {
-        String pattenForBuffer = generatePatternForBuffer(buffer);
-        Matcher valueMatcher = Pattern.compile(pattenForBuffer).matcher(value);
-        return valueMatcher.find();
+    protected void addMatchingValueToCandidates(List<CharSequence> candidates, String value) {
+        candidates.add(value);
     }
 
-    private String generatePatternForBuffer(String buffer) {
+    protected boolean bufferMatchesValue(String buffer, String value) {
+        if (caseInsensitiveMatching) {
+            return value.toLowerCase().startsWith(buffer.toLowerCase());
+        }
+        Pattern caseSensitivePattern = createCaseSensitivePattern(buffer);
+        return caseSensitivePattern.matcher(value).find();
+
+    }
+
+    protected Pattern createCaseSensitivePattern(String buffer) {
         String pattern = "^";
         for (char character : buffer.toCharArray()) {
             if (Character.isUpperCase(character) && pattern.length() > 1) {
@@ -95,7 +104,6 @@ public class ImprovedStringsCompleter
                 pattern += character;
             }
         }
-
-        return pattern;
+        return Pattern.compile(pattern);
     }
 }
