@@ -10,6 +10,10 @@ public class RootList extends BaseEntity {
         return getLink("info");
     }
 
+    public Link getUsersLink() {
+        return getLink("users");
+    }
+
     public Link getSessionLink() {
         return getLink("session");
     }

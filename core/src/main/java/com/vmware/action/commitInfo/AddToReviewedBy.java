@@ -8,6 +8,6 @@ import com.vmware.config.WorkflowConfig;
 public class AddToReviewedBy extends BaseSetReviewerList {
 
     public AddToReviewedBy(WorkflowConfig config) {
-        super(config, true);
+        super(config, true, true);
     }
 }

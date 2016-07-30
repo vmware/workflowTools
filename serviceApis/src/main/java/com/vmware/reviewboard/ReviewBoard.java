@@ -3,6 +3,7 @@ package com.vmware.reviewboard;
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
@@ -20,6 +21,8 @@ import com.vmware.reviewboard.domain.ReviewRequestDraftResponse;
 import com.vmware.reviewboard.domain.ReviewRequestResponse;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
 import com.vmware.reviewboard.domain.ReviewRequests;
+import com.vmware.reviewboard.domain.ReviewUser;
+import com.vmware.reviewboard.domain.ReviewUsersResponse;
 import com.vmware.reviewboard.domain.RootList;
 import com.vmware.reviewboard.domain.ServerInfo;
 import com.vmware.reviewboard.domain.ServerInfoResponse;
@@ -79,6 +82,16 @@ public class ReviewBoard extends AbstractRestService {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", getUsername()),
                 new UrlParam("status", pending.name()), new UrlParam("ship-it", "1"));
+    }
+
+    public List<ReviewUser> searchUsersMatchingText(Link usersLink, String textToMatch, boolean searchByUsernameOnly) {
+        List<RequestParam> params = new ArrayList<>();
+        params.add(new UrlParam("limit", "15"));
+        params.add(new UrlParam("q", textToMatch));
+        if (!searchByUsernameOnly) {
+            params.add(new UrlParam("fullname", "1"));
+        }
+        return connection.get(usersLink.getHref(), ReviewUsersResponse.class, params).users;
     }
 
     public int getFilesCountForReviewRequestDiff(Link filesLink) {

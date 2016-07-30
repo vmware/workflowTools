@@ -93,6 +93,10 @@ public class InputUtils {
         return value;
     }
 
+    public static String readValue(String label, Completer completer) {
+        return readSingleLine(label, null, null, null, completer);
+    }
+
     public static String readValue(String label, Completer completer, List<String> historyValues) {
         return readSingleLine(label, null, null, historyValues.toArray(new String[historyValues.size()]), completer);
     }
@@ -116,6 +120,46 @@ public class InputUtils {
         } else {
             String fullText = readMultipleLines(label, maxLength, historyValues);
             data = maxLength != null ? StringUtils.addNewLinesIfNeeded(fullText, maxLength, 0) : fullText;
+        }
+        return data;
+    }
+
+    public static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues
+            , String... autocompleteOptions) {
+        Completer completer = createCompleterFromOptions(autocompleteOptions);
+        return readSingleLine(label, maxLength, maskCharacter, historyValues, completer);
+    }
+
+    public static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues, Completer completer) {
+        ConsoleReader consoleReader;
+        try {
+            consoleReader = new ConsoleReader();
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+        consoleReader.setExpandEvents(false);
+        if (completer != null) {
+            consoleReader.addCompleter(completer);
+        }
+
+        String prompt = String.format("%s: ", label);
+        if (maxLength != null) {
+            System.err.println(
+                    StringUtils.repeat(maxLength + prompt.length() - MAX_LENGTH_INDICATOR.length(), " ")
+                            + MAX_LENGTH_INDICATOR);
+        }
+
+        addHistoryValues(consoleReader, historyValues);
+
+        String data;
+        try {
+            data = consoleReader.readLine(prompt, maskCharacter);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+        if (maxLength != null && data.length() > maxLength) {
+            log.error("Re-enter line. Line length of {} exceeded max of {}", data.length(), maxLength);
+            data = readSingleLine(label, maxLength, maskCharacter, historyValues, completer);
         }
         return data;
     }
@@ -166,46 +210,6 @@ public class InputUtils {
         } else {
             return line.length();
         }
-    }
-
-    private static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues
-            , String... autocompleteOptions) {
-        Completer completer = createCompleterFromOptions(autocompleteOptions);
-        return readSingleLine(label, maxLength, maskCharacter, historyValues, completer);
-    }
-
-    private static String readSingleLine(String label, Integer maxLength, Character maskCharacter, String[] historyValues, Completer completer) {
-        ConsoleReader consoleReader = null;
-        try {
-            consoleReader = new ConsoleReader();
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
-        consoleReader.setExpandEvents(false);
-        if (completer != null) {
-            consoleReader.addCompleter(completer);
-        }
-
-        String prompt = String.format("%s: ", label);
-        if (maxLength != null) {
-            System.err.println(
-                    StringUtils.repeat(maxLength + prompt.length() - MAX_LENGTH_INDICATOR.length(), " ")
-                            + MAX_LENGTH_INDICATOR);
-        }
-
-        addHistoryValues(consoleReader, historyValues);
-
-        String data;
-        try {
-            data = consoleReader.readLine(prompt, maskCharacter);
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
-        if (maxLength != null && data.length() > maxLength) {
-            log.error("Re-enter line. Line length of {} exceeded max of {}", data.length(), maxLength);
-            data = readSingleLine(label, maxLength, maskCharacter, historyValues, completer);
-        }
-        return data;
     }
 
     private static Completer createCompleterFromOptions(String[] autocompleteOptions) {

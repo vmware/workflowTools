@@ -7,4 +7,8 @@ public class NotAuthorizedException extends ApiException {
     public NotAuthorizedException(String errorText) {
         super(HttpURLConnection.HTTP_UNAUTHORIZED, errorText);
     }
+
+    public NotAuthorizedException(String errorText, Throwable cause) {
+        super(HttpURLConnection.HTTP_UNAUTHORIZED, errorText, cause);
+    }
 }
