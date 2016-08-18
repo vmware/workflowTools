@@ -29,14 +29,13 @@ public class TestJiraApi extends BaseTests {
 
     private static Jira jira;
 
-    private static String jiraUsername;
     private static String jiraIssueNumber;
 
     @BeforeClass
     public static void createIssue() {
-        jiraUsername = testProperties.getProperty("jira.username");
+        String jiraUsername = testProperties.getProperty("jira.username");
         String jiraUrl = testProperties.getProperty("jira.url");
-        jira = new Jira(jiraUrl, "HW-1001");
+        jira = new Jira(jiraUrl, "HW-1001", jiraUsername);
         jira.setupAuthenticatedConnection();
         Issue issueToCreate = new Issue(IssueTypeDefinition.Story, "HW", "Build and Infrastructure",
                 "Test Issue", "Test Description", "Test criteria");
@@ -83,20 +82,20 @@ public class TestJiraApi extends BaseTests {
 
     @Test
     public void canGetAssignedJiraIssues() {
-        IssuesResponse issues = jira.getOpenTasksForUser(jiraUsername);
+        IssuesResponse issues = jira.getOpenTasksForUser();
         assertTrue("No assigned issues found", issues.total > 0);
     }
 
     @Test
     public void canGetClosedIssuesWithoutResolution() {
-        IssuesResponse issues = jira.getIssuesForUser(jiraUsername, IssueStatusDefinition.Closed, null);
+        IssuesResponse issues = jira.getIssuesForUser(IssueStatusDefinition.Closed, null);
         assertTrue("No closed issues without resolution found", issues.total > 0);
     }
 
     @Test
     public void canGetCreatedJiraIssues() {
-        IssuesResponse issues = jira.getCreatedTasksForUser(jiraUsername);
-        assertTrue("Expected to find created issue for user " + jiraUsername, issues.total > 0);
+        IssuesResponse issues = jira.getCreatedTasksForUser();
+        assertTrue("Expected to find created issue for user " + jira.getUsername(), issues.total > 0);
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public abstract class AbstractService {
     public String baseUrl;
     protected String apiUrl;
     protected ApiAuthentication credentialsType;
-    protected String username;
+    private String username;
 
     protected Boolean connectionIsAuthenticated = null;
 
@@ -69,21 +70,11 @@ public abstract class AbstractService {
 
     public abstract boolean isBaseUriTrusted();
 
-    private void displayInputMessage(int retryCount) {
-        if (retryCount == 0) {
-            String homeFolder = System.getProperty("user.home");
-            String filePath = homeFolder + "/" + credentialsType.getFileName();
-            if (credentialsType.getCookieName() != null) {
-                log.info("Valid {} cookie ({}) not found in file {}", credentialsType.name(),
-                        credentialsType.getCookieName(), filePath);
-            } else {
-                log.info("Valid {} token not found in file {}", credentialsType.name(), filePath);
-            }
-        } else  {
-            log.info("");
-            log.warn("Login failure");
-            log.info("Retrying login, attempt {} of {}", retryCount, MAX_LOGIN_RETRIES);
+    public String getUsername() {
+        if (StringUtils.isBlank(username)) {
+            throw new RuntimeException("Username is empty, please set workflow config value username or git config value user.email");
         }
+        return username;
     }
 
     /**
@@ -122,4 +113,21 @@ public abstract class AbstractService {
      * Ask the user for credentials and retrieve a token / cookie for future authentication. This should be persisted.
      */
     protected abstract void loginManually();
+
+    private void displayInputMessage(int retryCount) {
+        if (retryCount == 0) {
+            String homeFolder = System.getProperty("user.home");
+            String filePath = homeFolder + "/" + credentialsType.getFileName();
+            if (credentialsType.getCookieName() != null) {
+                log.info("Valid {} cookie ({}) not found in file {}", credentialsType.name(),
+                        credentialsType.getCookieName(), filePath);
+            } else {
+                log.info("Valid {} token not found in file {}", credentialsType.name(), filePath);
+            }
+        } else  {
+            log.info("");
+            log.warn("Login failure");
+            log.info("Retrying login, attempt {} of {}", retryCount, MAX_LOGIN_RETRIES);
+        }
+    }
 }

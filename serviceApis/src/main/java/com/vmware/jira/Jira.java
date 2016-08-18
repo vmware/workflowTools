@@ -48,8 +48,8 @@ public class Jira extends AbstractRestService {
     private String greenhopperUrl;
     private String testIssueKey;
 
-    public Jira(String jiraUrl, String testIssueKey) {
-        super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, null);
+    public Jira(String jiraUrl, String testIssueKey, String username) {
+        super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, username);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
@@ -98,31 +98,31 @@ public class Jira extends AbstractRestService {
         return connection.post(searchUrl, IssuesResponse.class, searchRequest);
     }
 
-    public IssuesResponse getOpenTasksForUser(String username) {
+    public IssuesResponse getOpenTasksForUser() {
         String allowedStatuses = generateNumericalEnumListAsInts(Open, Reopened, InProgress, InReview);
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee=%s",
-                issueTypesToGet, allowedStatuses, escapeUsername(username));
+                issueTypesToGet, allowedStatuses, escapeUsername(getUsername()));
         IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
         log.debug("{} tasks found", response.issues.length);
         return response;
     }
 
-    public IssuesResponse getIssuesForUser(String username, IssueStatusDefinition status, IssueResolutionDefinition resolution) {
+    public IssuesResponse getIssuesForUser(IssueStatusDefinition status, IssueResolutionDefinition resolution) {
         String jql = String.format("status=%s AND resolution=%s AND assignee=%s",
-                status.getValue(), resolution != null ? resolution.getValue() : null, escapeUsername(username));
+                status.getValue(), resolution != null ? resolution.getValue() : null, escapeUsername(getUsername()));
         IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
         log.debug("{} tasks found", response.issues.length);
         return response;
     }
 
-    public IssuesResponse getCreatedTasksForUser(String username) {
+    public IssuesResponse getCreatedTasksForUser() {
         String allowedStatuses = generateNumericalEnumListAsInts(Open, Reopened, InProgress, InReview);
         String issueTypesToGet = generateNumericalEnumListAsInts(Improvement, Feature, Bug, TechComm);
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND reporter in (%s)",
-                issueTypesToGet, allowedStatuses, escapeUsername(username));
+                issueTypesToGet, allowedStatuses, escapeUsername(getUsername()));
         return connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
     }
 
