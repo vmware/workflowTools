@@ -121,7 +121,7 @@ public class PendingChangelistToGitDiffCreator {
             }
             Matcher indexLineMatcher = Pattern.compile("index\\s+(\\w+)\\.\\.(\\w+)\\s+(\\d+)").matcher(fileDiff);
             if (!indexLineMatcher.find()) {
-                throw new RuntimeException("Failed to match index line in diff");
+                throw new RuntimeException("Failed to match index line in diff\n" + fileDiff);
             }
 
             String firstIndex = changeType == deleted ? indexLineMatcher.group(1) : NON_EXISTENT_INDEX_IN_GIT;

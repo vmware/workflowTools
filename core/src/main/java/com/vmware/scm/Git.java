@@ -54,6 +54,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String applyDiff(String diffData, boolean check) {
+        exitIfNotInRepoRootFolder("git apply must be run from the root folder " + getRootDirectory().getPath() + ", don't know why");
         String checkString = check ? " --check" : "";
         return executeScmCommand("git apply -3 {}", diffData, LogLevel.DEBUG, checkString);
     }
@@ -64,6 +65,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String applyDiffToPerforce(String rootDirectory, String diffData, boolean check) {
+        exitIfNotInRepoRootFolder("git apply must be run from the root folder " + getRootDirectory().getPath() + ", don't know why");
         String checkString = check ? " --check" : "";
         String output = executeScmCommand("git apply --directory={}{}", diffData, LogLevel.DEBUG, rootDirectory, checkString);
         if (StringUtils.isBlank(output)) {
@@ -433,6 +435,14 @@ public class Git extends BaseScmWrapper {
         gitInstalled = isCommandAvailable("git");
 
         return gitInstalled;
+    }
+
+    private void exitIfNotInRepoRootFolder(String reason) {
+        String rootDirectoryPath = getRootDirectory().getPath();
+        if (!workingDirectory.getPath().equals(rootDirectoryPath)) {
+            log.error("Working directory {} does not match root directory {}", workingDirectory.getPath(), rootDirectoryPath);
+            throw new RuntimeException(reason);
+        }
     }
 
     private void executeCommitCommand(String commitCommand, String msg) {
