@@ -54,7 +54,6 @@ public class Git extends BaseScmWrapper {
     }
 
     public String applyDiff(String diffData, boolean check) {
-        exitIfNotInRepoRootFolder("git apply must be run from the root folder " + getRootDirectory().getPath() + ", don't know why");
         String checkString = check ? " --check" : "";
         return executeScmCommand("git apply -3 {}", diffData, LogLevel.DEBUG, checkString);
     }
@@ -65,7 +64,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String applyDiffToPerforce(String rootDirectory, String diffData, boolean check) {
-        exitIfNotInRepoRootFolder("git apply must be run from the root folder " + getRootDirectory().getPath() + ", don't know why");
+        exitIfNotInRepoRootFolder("git apply must be run from the root folder " + getRootDirectory().getPath());
         String checkString = check ? " --check" : "";
         String output = executeScmCommand("git apply --directory={}{}", diffData, LogLevel.DEBUG, rootDirectory, checkString);
         if (StringUtils.isBlank(output)) {
