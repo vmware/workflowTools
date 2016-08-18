@@ -21,7 +21,7 @@ public class LoadClosedIssuesWithoutResolution extends BaseBatchJiraAction {
     @Override
     public void process() {
         IssuesResponse matchingIssues =
-                jira.getIssuesForUser(config.username, IssueStatusDefinition.Closed, NO_RESOLUTION);
+                jira.getIssuesForUser(IssueStatusDefinition.Closed, NO_RESOLUTION);
         if (matchingIssues.total == 0) {
             log.info("No issues retrieved for user {} that are closed with no resolution", config.username);
         } else {

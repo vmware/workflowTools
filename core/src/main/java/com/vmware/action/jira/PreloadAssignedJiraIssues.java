@@ -26,7 +26,7 @@ public class PreloadAssignedJiraIssues extends BaseCommitAction {
                 jira = serviceLocator.getUnauthenticatedJira();
                 if (jira.isBaseUriTrusted() && jira.isConnectionAuthenticated()) {
                     draft.isPreloadingJiraIssues = true;
-                    draft.addIssues(jira.getOpenTasksForUser(config.username).issues);
+                    draft.addIssues(jira.getOpenTasksForUser().issues);
                     draft.isPreloadingJiraIssues = false;
                 }
             }

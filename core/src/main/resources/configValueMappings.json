@@ -16,9 +16,9 @@
     "--bugzilla-query"
   ],
   "PreloadAssignedJiraIssues": [
+    "--username",
     "--jira-test-issue",
-    "--jira-url",
-    "--username"
+    "--jira-url"
   ],
   "LoadBacklogStories": [
     "--include-estimated",
@@ -82,6 +82,7 @@
     "--jenkins-jobs"
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
+    "--username",
     "--jira-test-issue",
     "--jira-url",
     "--disable-jira"
@@ -131,12 +132,13 @@
     "--review-board-repo"
   ],
   "UpdateTaskEstimates": [
+    "--username",
     "--jira-test-issue",
     "--jira-url",
-    "--username",
     "--estimate"
   ],
   "BaseBatchJiraAction": [
+    "--username",
     "--jira-test-issue",
     "--jira-url",
     "--disable-jira"
@@ -261,11 +263,11 @@
   "SetBugNumbers": [
     "--bugzilla-test-bug",
     "--bugzilla-url",
+    "--username",
     "--jira-test-issue",
     "--jira-url",
     "--default-jira-project",
     "--bugzilla-query",
-    "--username",
     "--disable-bugzilla",
     "--disable-jira"
   ],

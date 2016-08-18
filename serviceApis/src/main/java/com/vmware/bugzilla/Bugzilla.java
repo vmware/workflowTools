@@ -46,7 +46,7 @@ public class Bugzilla extends AbstractService {
     }
 
     public List<Bug> getBugsForQuery(String savedQueryToRun) {
-        Map values = xmlRpcClient.executeCall("Search.run_saved_query", username, savedQueryToRun);
+        Map values = xmlRpcClient.executeCall("Search.run_saved_query", getUsername(), savedQueryToRun);
         Object[] bugs = (Object[]) values.get("bugs");
         List<Bug> bugList = new ArrayList<>();
         for (Object bug : bugs) {
@@ -72,12 +72,12 @@ public class Bugzilla extends AbstractService {
     }
 
     public List<String> getSavedQueries() {
-        Object[] values = xmlRpcClient.executeCall("Search.get_all_saved_queries", username);
+        Object[] values = xmlRpcClient.executeCall("Search.get_all_saved_queries", getUsername());
         List<String> queries = new ArrayList<>();
         for (Object value : values) {
             queries.add(String.valueOf(value));
         }
-        log.debug("Bugzilla queries for user {}, {}", username, queries.toString());
+        log.debug("Bugzilla queries for user {}, {}", getUsername(), queries.toString());
         return queries;
     }
 

@@ -76,7 +76,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
 
         if (draft.isPreloadingJiraIssues == null && jira != null) {
             jira.setupAuthenticatedConnection();
-            draft.addIssues( jira.getOpenTasksForUser(config.username).issues);
+            draft.addIssues( jira.getOpenTasksForUser().issues);
         }
 
         if (draft.isPreloadingBugzillaBugs == null && bugzilla != null) {

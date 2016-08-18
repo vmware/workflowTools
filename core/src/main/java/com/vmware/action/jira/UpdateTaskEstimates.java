@@ -31,8 +31,8 @@ public class UpdateTaskEstimates extends BaseAction {
     @Override
     public void process() {
         log.info("Updating open jira issues with no original estimate to {} hour(s)", config.jiraTaskEstimateInHours);
-        updateEstimatesIfNeeded(jira.getCreatedTasksForUser(config.username), "Created Tasks");
-        updateEstimatesIfNeeded(jira.getOpenTasksForUser(config.username), "Assigned Tasks");
+        updateEstimatesIfNeeded(jira.getCreatedTasksForUser(), "Created Tasks");
+        updateEstimatesIfNeeded(jira.getOpenTasksForUser(), "Assigned Tasks");
     }
 
     private void updateEstimatesIfNeeded(IssuesResponse tasks, String title) {

@@ -40,14 +40,14 @@ public class ServiceLocator {
 
     public Jira getUnauthenticatedJira() {
         if (jira == null) {
-            jira = new Jira(config.jiraUrl, config.jiraTestIssue);
+            jira = new Jira(config.jiraUrl, config.jiraTestIssue, config.username);
         }
         return jira;
     }
 
     public Jira getAuthenticatedJira() {
         if (jira == null) {
-            jira = new Jira(config.jiraUrl, config.jiraTestIssue);
+            jira = new Jira(config.jiraUrl, config.jiraTestIssue, config.username);
         }
         jira.setupAuthenticatedConnection();
         return jira;

@@ -61,7 +61,7 @@ public class ReviewBoard extends AbstractRestService {
     public ReviewRequests getReviewRequests(ReviewRequestStatus status) {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         return connection.get(reviewRequestLink.getHref(), ReviewRequests.class,
-                new UrlParam("from-user", username), new UrlParam("status", status.name()));
+                new UrlParam("from-user", getUsername()), new UrlParam("status", status.name()));
     }
 
     public ReviewRequest[] getOpenReviewRequestsWithSubmittedComment() {
@@ -77,7 +77,7 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewRequests getOpenReviewRequestsWithShipIts() {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
-        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", username),
+        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", getUsername()),
                 new UrlParam("status", pending.name()), new UrlParam("ship-it", "1"));
     }
 
