@@ -67,8 +67,7 @@
           "DisplayReviewUrl", "CopyReviewUrlToClipboard"
        ],
        "setCommitDetailsWithoutConfirmation": [
-          "PreloadAssignedJiraIssues", "PreloadAssignedBugzillaBugs", "SetSummary", "SetDescription", "SetTestingDone",
-          "SetReviewedBy", "SetBugNumbers"
+          "SetSummary", "SetDescription", "SetTestingDone", "SetReviewedBy", "SetBugNumbers"
        ],
        "setCommitDetails": [
           "setCommitDetailsWithoutConfirmation", "ExitIfConfirmationNotGiven"

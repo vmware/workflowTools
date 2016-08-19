@@ -189,12 +189,17 @@ public class Workflow {
                 ((BaseMultiActionDataSupport) actionObject).setMultiActionData(multiActionData);
             }
             if (runAllHelperMethods) {
+                log.info("Running asyncSetup");
+                actionObject.asyncSetup();
                 log.info("Running failWorkflowIfConditionNotMet");
                 actionObject.failWorkflowIfConditionNotMet();
                 log.info("Running cannotRunAction method");
                 actionObject.cannotRunAction();
                 log.info("Running preprocess method");
                 actionObject.preprocess();
+            } else {
+                log.info("Running asyncSetup");
+                actionObject.asyncSetup();
             }
         }
     }
@@ -263,7 +268,7 @@ public class Workflow {
             while (!actionsRun.contains(action)) {
                 String actionName = action.getClass().getSimpleName();
                 if (waitTimeInMilliSeconds > 10000) {
-                    throw new RuntimeException(actionName + " failed to finish in 10 seconds");
+                    throw new RuntimeException(actionName + ".asyncSetup failed to finish in 10 seconds");
                 }
                 if (waitTimeInMilliSeconds > 0 && waitTimeInMilliSeconds % 1000 == 0) {
                     log.debug("Waiting for {}.asyncSetup to finish, waited {} seconds",
@@ -329,7 +334,7 @@ public class Workflow {
         private ConcurrentLinkedQueue<BaseAction> actionsRun;
         private List<BaseAction> actionsToRun;
 
-        public SetupActions(List<BaseAction> actionsToRun, ConcurrentLinkedQueue<BaseAction> actionsRun) {
+        SetupActions(List<BaseAction> actionsToRun, ConcurrentLinkedQueue<BaseAction> actionsRun) {
             this.actionsToRun = actionsToRun;
             this.actionsRun = actionsRun;
         }
@@ -338,7 +343,13 @@ public class Workflow {
         public void run() {
             for (BaseAction action : actionsToRun) {
                 log.debug("Preprocessing {}", action.getClass().getSimpleName());
-                action.asyncSetup();
+                try {
+                    action.asyncSetup();
+                } catch (Exception e) {
+                    log.error(e.getMessage() != null ? e.getMessage() : "", e);
+                    e.printStackTrace(); // log.error doesn't seem to include the stack trace
+                    System.exit(1);
+                }
                 actionsRun.add(action);
             }
             log.debug("Preprocessing finished");
