@@ -71,18 +71,6 @@ public class ReviewRequestDraft extends BaseEntity{
     public Boolean buildwebBuildsAreSuccessful;
 
     @Expose(serialize = false, deserialize = false)
-    public List<IssueInfo> openIssues = null;
-
-    @Expose(serialize = false, deserialize = false)
-    public Boolean isPreloadingJiraIssues;
-
-    @Expose(serialize = false, deserialize = false)
-    public Boolean isPreloadingBugzillaBugs;
-
-    @Expose(serialize = false, deserialize = false)
-    public boolean userHasBugzillaQuery;
-
-    @Expose(serialize = false, deserialize = false)
     public String perforceChangelistId;
 
     public ReviewRequestDraft() {}
@@ -139,20 +127,6 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebApiUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
-    }
-
-    public void addIssues(Issue[] issuesToAdd) {
-        if (openIssues == null) {
-            openIssues = new OverwritableSet.UniqueArrayList<>();
-        }
-        openIssues.addAll(Arrays.asList(issuesToAdd));
-    }
-
-    public void addBugs(List<Bug> bugsToAdd) {
-        if (openIssues == null) {
-            openIssues = new OverwritableSet.UniqueArrayList<>();
-        }
-        openIssues.addAll(bugsToAdd);
     }
 
     public boolean hasReviewNumber() {

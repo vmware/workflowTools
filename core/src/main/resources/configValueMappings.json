@@ -9,17 +9,6 @@
   "CopyReviewUrlToClipboard": [
     "--reviewboard-url"
   ],
-  "PreloadAssignedBugzillaBugs": [
-    "--bugzilla-test-bug",
-    "--username",
-    "--bugzilla-url",
-    "--bugzilla-query"
-  ],
-  "PreloadAssignedJiraIssues": [
-    "--username",
-    "--jira-test-issue",
-    "--jira-url"
-  ],
   "LoadBacklogStories": [
     "--include-estimated",
     "--use-label"

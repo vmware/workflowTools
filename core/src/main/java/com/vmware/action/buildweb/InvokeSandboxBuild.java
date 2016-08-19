@@ -28,11 +28,11 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
 
-        String[] inputs = new String[] {"opt", "latest", "yes", ""};
+        String[] inputs = new String[] {"opt", "latest", ""};
         String[] textsToWaitFor = new String[] {
-                "Buildtype to use [beta]:", "top of this baseline)", "Do you want to continue?", config.buildwebProject + "?",
+                "Buildtype to use [beta]:", config.buildwebProject + "?",
                 format("queued (%s/%s)", config.buildwebProject, config.buildwebBranch)};
-        String command = format("%s sandbox queue %s --branch=%s --changeset=%s",
+        String command = format("%s sandbox queue %s --syncto latest --branch=%s --changeset=%s",
                 config.goBuildBinPath, config.buildwebProject, config.buildwebBranch, changelistId);
 
         String output = CommandLineUtils.executeScript(command, inputs, textsToWaitFor, LogLevel.INFO);
@@ -48,8 +48,6 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         } else {
             log.warn("Unable to parse build url using pattern {}", buildNumberPattern);
         }
-
-
     }
 
 }

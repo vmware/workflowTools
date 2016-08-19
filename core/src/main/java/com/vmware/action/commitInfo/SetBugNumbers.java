@@ -27,34 +27,39 @@ public class SetBugNumbers extends BaseCommitReadAction {
 
     private Bugzilla bugzilla = null;
 
+    private boolean jiraIssuesLoaded, bugzillaBugsLoaded, userHasBugzillaQuery;;
+
+    private List<IssueInfo> loadedIssues = new ArrayList<>();
+
     public SetBugNumbers(WorkflowConfig config){
         super(config, "bugNumbers");
     }
 
     @Override
-    public void preprocess() {
+    public void asyncSetup() {
+        loadedIssues.clear();
         if (!config.disableJira) {
-            this.jira = serviceLocator.getJira();
+            loadJiraIssues();
         }
         if (!config.disableBugzilla) {
-            this.bugzilla = serviceLocator.getBugzilla();
+            loadBugzillaBugs();
         }
     }
 
     @Override
     public void process() {
         loadIssuesList(draft);
-        printIssuesList(draft.openIssues);
-        boolean waitingForBugNumbers = true;
+        printIssuesList();
         List<IssueInfo> issues = null;
         if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(config.noBugNumberLabel)) {
             log.info("");
             log.info("Existing bug numbers: " + draft.bugNumbers);
         }
 
+        boolean waitingForBugNumbers = true;
         while (waitingForBugNumbers) {
             String bugNumbers = InputUtils.readData("Bug Numbers: (leave blank if none)", true, 30);
-            issues = getBugsAndIssues(bugNumbers, draft.openIssues);
+            issues = getBugsAndIssues(bugNumbers);
             waitingForBugNumbers = false;
             if (listHasNoBugNumbers(issues)) {
                 draft.bugNumbers = config.noBugNumberLabel;
@@ -67,56 +72,63 @@ public class SetBugNumbers extends BaseCommitReadAction {
         log.info("Bug numbers for commit: {}", draft.bugNumbers);
     }
 
-    private void loadIssuesList(ReviewRequestDraft draft) {
-        if (jira == null && bugzilla == null) {
-            log.info("Both Jira and Bugzilla are disabled, no issues can be loaded");
-            draft.openIssues = new OverwritableSet.UniqueArrayList<>();
+    private void loadJiraIssues() {
+        this.jira = serviceLocator.getJira();
+        if (!jira.isBaseUriTrusted() || !jira.isConnectionAuthenticated()) {
             return;
         }
 
-        if (draft.isPreloadingJiraIssues == null && jira != null) {
+        loadedIssues.addAll(Arrays.asList(jira.getOpenTasksForUser().issues));
+        jiraIssuesLoaded = true;
+    }
+
+    private void loadBugzillaBugs() {
+        bugzilla = serviceLocator.getBugzilla();
+        if (!bugzilla.isBaseUriTrusted() || !bugzilla.isConnectionAuthenticated()) {
+            return;
+        }
+        if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
+            userHasBugzillaQuery = true;
+            loadedIssues.addAll(bugzilla.getBugsForQuery(config.bugzillaQuery));
+        }
+        bugzillaBugsLoaded = true;
+    }
+
+    private void loadIssuesList(ReviewRequestDraft draft) {
+        if (jira == null && bugzilla == null) {
+            log.info("Both Jira and Bugzilla are disabled, no issues can be loaded");
+            return;
+        }
+
+        if (jira != null && !jiraIssuesLoaded) {
             jira.setupAuthenticatedConnection();
-            draft.addIssues( jira.getOpenTasksForUser().issues);
+            loadJiraIssues();
         }
 
-        if (draft.isPreloadingBugzillaBugs == null && bugzilla != null) {
+        if (bugzilla != null && !bugzillaBugsLoaded) {
             bugzilla.setupAuthenticatedConnection();
-            if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
-                draft.userHasBugzillaQuery = true;
-                draft.addBugs(bugzilla.getBugsForQuery(config.bugzillaQuery));
-            }
-        }
-
-        if ((draft.isPreloadingBugzillaBugs != null && draft.isPreloadingBugzillaBugs)
-                || (draft.isPreloadingJiraIssues != null && draft.isPreloadingJiraIssues)) {
-            log.info("Jira / Bugzilla lists not loaded yet, waiting 5 seconds");
-            ThreadUtils.sleep(5, TimeUnit.SECONDS);
-            if (draft.openIssues == null) {
-                log.info("Failed to load Jira / Bugzilla items, Jira in progress {}, Bugzilla in progress",
-                        draft.isPreloadingJiraIssues, draft.isPreloadingBugzillaBugs);
-                draft.openIssues = new OverwritableSet.UniqueArrayList<>();
-            }
+            loadBugzillaBugs();
         }
     }
 
-    private void printIssuesList(Collection<IssueInfo> issues) {
-        if (bugzilla != null && !draft.userHasBugzillaQuery) {
+    private void printIssuesList() {
+        if (bugzilla != null && !userHasBugzillaQuery) {
             log.info("\n**  Can't load your Bugzilla bugs as saved query {} not found in your bugzilla query list  **" +
                     "\nPlease create if you want to easily select a bugzilla bug", config.bugzillaQuery);
         }
-        if (issues.size() > 0) {
-            IssueInfo firstIssue = issues.iterator().next();
+        if (loadedIssues.size() > 0) {
+            IssueInfo firstIssue = loadedIssues.iterator().next();
             log.info("Assigned bugs / issues, list number can be entered as shorthand for id\ne.g. 1 for " + firstIssue.getKey());
             log.info("Alternatively, enter the full id");
             log.info("");
             int counter = 0;
-            for (IssueInfo issue : issues) {
+            for (IssueInfo issue : loadedIssues) {
                 log.info("[{}] {}: {}", ++counter, issue.getKey(), issue.getSummary());
             }
         }
     }
 
-    private List<IssueInfo> getBugsAndIssues(String bugNumberText, List<IssueInfo> preloadedIssues) {
+    private List<IssueInfo> getBugsAndIssues(String bugNumberText) {
         if (bugNumberText == null || bugNumberText.isEmpty()) {
             bugNumberText = config.noBugNumberLabel;
         }
@@ -128,7 +140,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
             if (trimmedBugNumber.isEmpty()) {
                 continue;
             }
-            issues.add(getIssue(preloadedIssues, bugNumber.trim()));
+            issues.add(getIssue(bugNumber.trim()));
         }
         if (issues.contains(Issue.noBugNumber)) {
             issues.retainAll(Arrays.asList(Issue.noBugNumber));
@@ -137,13 +149,13 @@ public class SetBugNumbers extends BaseCommitReadAction {
         return issues;
     }
 
-    private IssueInfo getIssue(List<IssueInfo> preloadedIssues, String bugNumber) {
+    private IssueInfo getIssue(String bugNumber) {
         if (bugNumber.equals(config.noBugNumberLabel)) {
             return Issue.noBugNumber;
         } else if (StringUtils.isInteger(bugNumber)) {
             int number = Integer.parseInt(bugNumber);
-            if (number <= preloadedIssues.size()) {
-                return preloadedIssues.get(number - 1);
+            if (number <= loadedIssues.size()) {
+                return loadedIssues.get(number - 1);
             }
         }
         // prepend with prefix if just a number was entered
