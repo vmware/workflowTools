@@ -27,13 +27,6 @@ public abstract class BaseAction {
     }
 
     /**
-     * @return Reason for why this action should not be run, null if it should be run
-     */
-    public String cannotRunAction() {
-        return null;
-    }
-
-    /**
      * @return Reason why the workflow should fail, null if it should continue
      */
     public String failWorkflowIfConditionNotMet() {
@@ -49,10 +42,22 @@ public abstract class BaseAction {
     }
 
     /**
+     * Setup method that will run asynchonrously, useful for setting up rest services
+     */
+    public void asyncSetup() {
+    }
+
+    /**
+     * @return Reason for why this action should not be run, null if it should be run
+     */
+    public String cannotRunAction() {
+        return null;
+    }
+
+    /**
      * Override if any setup is needed before the process method is called
      */
     public void preprocess() {
-
     }
 
     public abstract void process();

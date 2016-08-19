@@ -212,9 +212,12 @@ public class ReviewBoard extends AbstractRestService {
         connection.updateServerTimeZone(TimeZone.getTimeZone(serverTimeZone), serverDateFormat);
     }
 
-    @Override
-    public void setupAuthenticatedConnection() {
+    public void setupAuthenticatedConnectionWithLocalTimezone(String reviewBoardDateFormat) {
+        if (isConnectionAuthenticated()) {
+            return;
+        }
         super.setupAuthenticatedConnection();
+        updateServerTimeZone(reviewBoardDateFormat);
     }
 
     @Override

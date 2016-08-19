@@ -21,8 +21,13 @@ public class MarkBugAsResolved extends BaseCommitAction {
     }
 
     @Override
+    public void asyncSetup() {
+        this.bugzilla = serviceLocator.getBugzilla();
+    }
+
+    @Override
     public void preprocess() {
-        this.bugzilla = serviceLocator.getAuthenticatedBugzilla();
+        this.bugzilla.setupAuthenticatedConnection();
     }
 
     @Override

@@ -20,8 +20,13 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
     }
 
     @Override
+    public void asyncSetup() {
+        this.trello = serviceLocator.getTrello();
+    }
+
+    @Override
     public void preprocess() {
-        trello = serviceLocator.getTrello();
+        this.trello.setupAuthenticatedConnection();
     }
 
     @Override

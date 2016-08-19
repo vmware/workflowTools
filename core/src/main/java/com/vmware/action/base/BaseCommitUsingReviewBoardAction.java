@@ -21,8 +21,13 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
     }
 
     @Override
-    public void preprocess() {
+    public void asyncSetup() {
         reviewBoard = serviceLocator.getReviewBoard();
+    }
+
+    @Override
+    public void preprocess() {
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
         if (draft != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(draft.id);
         }

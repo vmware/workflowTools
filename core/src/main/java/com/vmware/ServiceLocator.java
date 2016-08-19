@@ -38,41 +38,26 @@ public class ServiceLocator {
         this.config = config;
     }
 
-    public Jira getUnauthenticatedJira() {
+    public Jira getJira() {
         if (jira == null) {
             jira = new Jira(config.jiraUrl, config.jiraTestIssue, config.username);
         }
         return jira;
     }
 
-    public Jira getAuthenticatedJira() {
-        if (jira == null) {
-            jira = new Jira(config.jiraUrl, config.jiraTestIssue, config.username);
-        }
-        jira.setupAuthenticatedConnection();
-        return jira;
-    }
-
-    public Bugzilla getUnauthenticatedBugzilla() {
+    public Bugzilla getBugzilla() {
         if (bugzilla == null) {
             bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
         }
-        return bugzilla;
-    }
-
-    public Bugzilla getAuthenticatedBugzilla() {
-        if (bugzilla == null) {
-            bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
-        }
-        bugzilla.setupAuthenticatedConnection();
         return bugzilla;
     }
 
     public ReviewBoard getReviewBoard() {
         if (reviewBoard == null) {
             reviewBoard = new ReviewBoard(config.reviewboardUrl, config.username);
-            reviewBoard.setupAuthenticatedConnection();
-            reviewBoard.updateServerTimeZone(config.reviewBoardDateFormat);
+            if (reviewBoard.isConnectionAuthenticated()) {
+                reviewBoard.updateServerTimeZone(config.reviewBoardDateFormat);
+            }
         }
         return reviewBoard;
     }
@@ -80,7 +65,6 @@ public class ServiceLocator {
     public Jenkins getJenkins() {
         if (jenkins == null) {
             jenkins = new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
-            jenkins.setupAuthenticatedConnection();
         }
         return jenkins;
     }
@@ -95,7 +79,6 @@ public class ServiceLocator {
     public Trello getTrello() {
         if (trello == null) {
             trello = new Trello(config.trelloUrl);
-            trello.setupAuthenticatedConnection();
         }
         return trello;
     }

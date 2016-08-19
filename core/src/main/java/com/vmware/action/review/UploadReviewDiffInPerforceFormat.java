@@ -18,8 +18,8 @@ public class UploadReviewDiffInPerforceFormat extends UploadReviewDiff {
     }
 
     @Override
-    public void preprocess() {
-        super.preprocess();
+    public void asyncSetup() {
+        super.asyncSetup();
         this.perforce = serviceLocator.getPerforce();
     }
 

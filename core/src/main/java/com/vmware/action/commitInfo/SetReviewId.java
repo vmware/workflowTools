@@ -20,8 +20,13 @@ public class SetReviewId extends BaseCommitAction {
     }
 
     @Override
-    public void preprocess() {
+    public void asyncSetup() {
         reviewBoard = serviceLocator.getReviewBoard();
+    }
+
+    @Override
+    public void preprocess() {
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
     }
 
     @Override

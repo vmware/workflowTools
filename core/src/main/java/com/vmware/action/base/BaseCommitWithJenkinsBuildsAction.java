@@ -24,7 +24,12 @@ public abstract class BaseCommitWithJenkinsBuildsAction extends BaseCommitAction
     }
 
     @Override
-    public void preprocess() {
+    public void asyncSetup() {
         this.jenkins = serviceLocator.getJenkins();
+    }
+
+    @Override
+    public void preprocess() {
+        this.jenkins.setupAuthenticatedConnection();
     }
 }

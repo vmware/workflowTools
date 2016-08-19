@@ -16,6 +16,7 @@ import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
+import com.vmware.util.ThreadUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
@@ -36,6 +37,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main class for running the workflow application.
@@ -244,26 +247,42 @@ public class Workflow {
     }
 
     private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) {
+        List<BaseAction> actionsToRun = new ArrayList<>();
         for (Class<? extends BaseAction> action : actions) {
+            actionsToRun.add(instantiateAction(action));
+        }
+
+
+        ConcurrentLinkedQueue<BaseAction> actionsRun = new ConcurrentLinkedQueue<>();
+        SetupActions setupActions = new SetupActions(actionsToRun, actionsRun);
+        new Thread(setupActions).start();
+        ThreadUtils.sleep(10, TimeUnit.MILLISECONDS);
+
+        int waitTimeInMilliSeconds = 0;
+        for (BaseAction action : actionsToRun) {
+            while (!actionsRun.contains(action)) {
+                String actionName = action.getClass().getSimpleName();
+                if (waitTimeInMilliSeconds > 10000) {
+                    throw new RuntimeException(actionName + " failed to finish in 10 seconds");
+                }
+                if (waitTimeInMilliSeconds > 0 && waitTimeInMilliSeconds % 1000 == 0) {
+                    log.debug("Waiting for {}.asyncSetup to finish, waited {} seconds",
+                            actionName, TimeUnit.MILLISECONDS.toSeconds(waitTimeInMilliSeconds));
+                }
+                ThreadUtils.sleep(50, TimeUnit.MILLISECONDS);
+                waitTimeInMilliSeconds += 50;
+            }
             runAction(action, values);
         }
     }
 
-    private void runAction(Class<? extends BaseAction> actionClass, WorkflowActionValues values) {
-        BaseAction action = instantiateAction(actionClass);
 
-        log.debug("Executing workflow action {}", actionClass.getSimpleName());
-        if (action instanceof BaseCommitAction) {
-            ((BaseCommitAction) action).setDraft(values.getDraft());
-        }
-        if (action instanceof BaseMultiActionDataSupport) {
-            ((BaseMultiActionDataSupport) action).setMultiActionData(values.getMultiActionData());
-        }
-        if (action instanceof BaseTrelloAction) {
-            ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
-        }
 
+    private void runAction(BaseAction action, WorkflowActionValues values) {
         String actionName = action.getClass().getSimpleName();
+        log.debug("Executing workflow action {}", actionName);
+        setWorkflowValuesOnAction(action, values);
+
         String reasonForFailingAction = action.failWorkflowIfConditionNotMet();
 
         if (reasonForFailingAction != null) {
@@ -285,11 +304,44 @@ public class Workflow {
         }
     }
 
+    private void setWorkflowValuesOnAction(BaseAction action, WorkflowActionValues values) {
+        if (action instanceof BaseCommitAction) {
+            ((BaseCommitAction) action).setDraft(values.getDraft());
+        }
+        if (action instanceof BaseMultiActionDataSupport) {
+            ((BaseMultiActionDataSupport) action).setMultiActionData(values.getMultiActionData());
+        }
+        if (action instanceof BaseTrelloAction) {
+            ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
+        }
+    }
+
     private BaseAction instantiateAction(Class<? extends BaseAction> actionToInstantiate) {
         try {
             return actionToInstantiate.getConstructor(WorkflowConfig.class).newInstance(config);
         } catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeReflectiveOperationException(e);
+        }
+    }
+
+    private class SetupActions implements Runnable {
+
+        private ConcurrentLinkedQueue<BaseAction> actionsRun;
+        private List<BaseAction> actionsToRun;
+
+        public SetupActions(List<BaseAction> actionsToRun, ConcurrentLinkedQueue<BaseAction> actionsRun) {
+            this.actionsToRun = actionsToRun;
+            this.actionsRun = actionsRun;
+        }
+
+        @Override
+        public void run() {
+            for (BaseAction action : actionsToRun) {
+                log.debug("Preprocessing {}", action.getClass().getSimpleName());
+                action.asyncSetup();
+                actionsRun.add(action);
+            }
+            log.debug("Preprocessing finished");
         }
     }
 }
