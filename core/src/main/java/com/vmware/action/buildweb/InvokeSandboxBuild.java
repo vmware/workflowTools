@@ -28,9 +28,9 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
 
-        String[] inputs = new String[] {"opt", "", ""};
+        String[] inputs = new String[] {"opt", "latest", "yes", ""};
         String[] textsToWaitFor = new String[] {
-                "Buildtype to use [beta]:", "top of this baseline)", config.buildwebProject + "?",
+                "Buildtype to use [beta]:", "top of this baseline)", "Do you want to continue?", config.buildwebProject + "?",
                 format("queued (%s/%s)", config.buildwebProject, config.buildwebBranch)};
         String command = format("%s sandbox queue %s --branch=%s --changeset=%s",
                 config.goBuildBinPath, config.buildwebProject, config.buildwebBranch, changelistId);
