@@ -126,7 +126,6 @@ public class Bugzilla extends AbstractService {
     @Override
     protected void checkAuthenticationAgainstServer() {
         getBugById(testBugNumber);
-
     }
 
     @Override

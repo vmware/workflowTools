@@ -28,11 +28,11 @@
     "--perforce-client"
   ],
   "GenerateReviewStats": [
-    "--review-board-date-format",
     "--username",
     "--reviewboard-url",
     "--file-count-ranges",
-    "--groups"
+    "--groups",
+    "--review-board-date-format"
   ],
   "CheckStatusOfLatestBuilds": [
     "--disable-jenkins-login",
@@ -101,9 +101,9 @@
     "--output-file"
   ],
   "SetReviewId": [
-    "--review-board-date-format",
     "--username",
-    "--reviewboard-url"
+    "--reviewboard-url",
+    "--review-board-date-format"
   ],
   "BasePerforceCommitAction": [
     "--perforce-client"
@@ -126,10 +126,10 @@
     "--review-board-repo"
   ],
   "CreateReviewIfNeeded": [
-    "--review-board-date-format",
     "--username",
     "--reviewboard-url",
-    "--review-board-repo"
+    "--review-board-repo",
+    "--review-board-date-format"
   ],
   "UpdateTaskEstimates": [
     "--username",
@@ -178,9 +178,9 @@
   ],
   "BaseCommitUsingReviewBoardAction": [
     "--perforce-client",
-    "--review-board-date-format",
     "--username",
-    "--reviewboard-url"
+    "--reviewboard-url",
+    "--review-board-date-format"
   ],
   "SetCommitDetailsFromReview": [
     "--jenkins-url",
@@ -193,11 +193,11 @@
   ],
   "ApplyReviewPatch": [
     "--perforce-client",
-    "--review-board-date-format",
     "--username",
     "--reviewboard-url",
     "--latest-diff",
-    "--patch"
+    "--patch",
+    "--review-board-date-format"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",
@@ -241,10 +241,10 @@
     "--tracking-branch"
   ],
   "CreateReview": [
-    "--review-board-date-format",
     "--username",
     "--reviewboard-url",
-    "--review-board-repo"
+    "--review-board-repo",
+    "--review-board-date-format"
   ],
   "PushToPrecommitBranch": [
     "--username"
@@ -278,9 +278,9 @@
     "--own-boards-only"
   ],
   "BaseBatchCloseReviews": [
-    "--review-board-date-format",
     "--reviewboard-url",
-    "--username"
+    "--username",
+    "--review-board-date-format"
   ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"

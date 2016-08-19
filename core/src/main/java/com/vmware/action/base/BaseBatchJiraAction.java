@@ -23,7 +23,12 @@ public abstract class BaseBatchJiraAction extends BaseMultiActionDataSupport {
     }
 
     @Override
+    public void asyncSetup() {
+        this.jira = serviceLocator.getJira();
+    }
+
+    @Override
     public void preprocess() {
-        this.jira = serviceLocator.getAuthenticatedJira();
+        this.jira.setupAuthenticatedConnection();
     }
 }

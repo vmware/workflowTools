@@ -18,8 +18,13 @@ public abstract class BaseTrelloAction extends BaseMultiActionDataSupport {
     }
 
     @Override
-    public void preprocess() {
+    public void asyncSetup() {
         this.trello = serviceLocator.getTrello();
+    }
+
+    @Override
+    public void preprocess() {
+        this.trello.setupAuthenticatedConnection();
     }
 
     public void setSelectedBoard(Board selectedBoard) {

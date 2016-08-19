@@ -20,8 +20,13 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
     }
 
     @Override
+    public void asyncSetup() {
+        this.jenkins = serviceLocator.getJenkins();
+    }
+
+    @Override
     public void preprocess() {
-        jenkins = serviceLocator.getJenkins();
+        this.jenkins.setupAuthenticatedConnection();
     }
 
     @Override

@@ -35,8 +35,13 @@ public class GenerateReviewStats extends BaseAction {
     }
 
     @Override
-    public void process() {
+    public void asyncSetup() {
         reviewBoard = serviceLocator.getReviewBoard();
+    }
+
+    @Override
+    public void process() {
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
         String groupsToUse = "";
         if (config.targetGroups == null || config.targetGroups.length == 0) {
             log.info("No target groups selected");

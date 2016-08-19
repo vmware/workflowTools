@@ -34,10 +34,10 @@ public class SetBugNumbers extends BaseCommitReadAction {
     @Override
     public void preprocess() {
         if (!config.disableJira) {
-            this.jira = serviceLocator.getUnauthenticatedJira();
+            this.jira = serviceLocator.getJira();
         }
         if (!config.disableBugzilla) {
-            this.bugzilla = serviceLocator.getUnauthenticatedBugzilla();
+            this.bugzilla = serviceLocator.getBugzilla();
         }
     }
 

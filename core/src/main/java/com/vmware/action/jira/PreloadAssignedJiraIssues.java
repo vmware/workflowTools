@@ -5,10 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Preloads the list of assigned jira issues. Loads asynchronously so that the list is already available when editing the bug number.")
 public class PreloadAssignedJiraIssues extends BaseCommitAction {
 
@@ -23,7 +19,7 @@ public class PreloadAssignedJiraIssues extends BaseCommitAction {
         Runnable loadJiraIssues = new Runnable() {
             @Override
             public void run() {
-                jira = serviceLocator.getUnauthenticatedJira();
+                jira = serviceLocator.getJira();
                 if (jira.isBaseUriTrusted() && jira.isConnectionAuthenticated()) {
                     draft.isPreloadingJiraIssues = true;
                     draft.addIssues(jira.getOpenTasksForUser().issues);

@@ -19,9 +19,15 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
     }
 
     @Override
+    public void asyncSetup() {
+        super.asyncSetup();
+        this.jira = serviceLocator.getJira();
+    }
+
+    @Override
     public void preprocess() {
         super.preprocess();
-        this.jira = serviceLocator.getAuthenticatedJira();
+        this.jira.setupAuthenticatedConnection();
     }
 
     @Override

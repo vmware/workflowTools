@@ -9,8 +9,6 @@ import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransitions;
 import com.vmware.jira.domain.JiraUser;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,7 +39,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
     @Override
     public void preprocess() {
-        this.jira = serviceLocator.getAuthenticatedJira();
+        this.jira = serviceLocator.getJira();
     }
 
     @Override

@@ -18,8 +18,13 @@ public abstract class BaseBatchBugzillaAction extends BaseMultiActionDataSupport
     }
 
     @Override
+    public void asyncSetup() {
+        this.bugzilla = serviceLocator.getBugzilla();
+    }
+
+    @Override
     public void preprocess() {
-        this.bugzilla = serviceLocator.getAuthenticatedBugzilla();
+        this.bugzilla.setupAuthenticatedConnection();
     }
 
     @Override

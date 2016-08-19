@@ -24,8 +24,13 @@ public abstract class BaseBatchCloseReviews extends BaseAction {
     }
 
     @Override
-    public void preprocess() {
+    public void asyncSetup() {
         this.reviewBoard = serviceLocator.getReviewBoard();
+    }
+
+    @Override
+    public void preprocess() {
+        this.reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
     }
 
     public void closeReviews(ReviewRequest[] openRequests) {
