@@ -6,10 +6,12 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.logging.LogLevel;
 
+import java.io.File;
+
 import static java.lang.String.format;
 
-@ActionDescription("Uses rbt post to upload a diff for a git commit to reviewboard.")
-public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
+@ActionDescription("Uses rbt post to upload a diff to reviewboard.")
+public class UploadReviewDiffWithRbt extends UploadReviewDiff {
 
     public UploadReviewDiffWithRbt(WorkflowConfig config) {
         super(config);
@@ -17,8 +19,8 @@ public class UploadReviewDiffWithRbt extends BaseCommitWithReviewAction {
     }
 
     @Override
-    public void process() {
-        String command = format("rbt post --repository '%s' -r %s --tracking-branch=%s --parent=%s", config.reviewBoardRepository, draft.id, config.trackingBranch, config.parentBranch);
-        CommandLineUtils.executeCommand(git.getRootDirectory(), command, null, LogLevel.INFO);
+    protected void uploadReviewDiff() {
+        File workingDirectory = new File(System.getProperty("user.dir"));
+        uploadDiffUsingRbt(workingDirectory, null); // don't specify changelist id as working with git repo
     }
 }

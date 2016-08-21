@@ -114,7 +114,7 @@ public class ReviewBoard extends AbstractRestService {
         }
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         reviewRequestLink.addPathParam(String.valueOf(id));
-        return connection.get(reviewRequestLink.getHref(),ReviewRequestResponse.class).review_request;
+        return connection.get(reviewRequestLink.getHref(), ReviewRequestResponse.class).review_request;
     }
 
     public ReviewRequest createReviewRequest(String repository) {

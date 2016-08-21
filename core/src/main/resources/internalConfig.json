@@ -116,11 +116,8 @@
        "review": [
           "readNonTrivialCommit", "CreateReviewIfNeeded", "setReviewDetails", "AmendCommit", "displayReviewUrl"
        ],
-       "reviewWithPerforceDiff": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffInPerforceFormat", "AmendCommit", "displayReviewUrl"
-       ],
        "reviewPendingChangelist": [
-          "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "UpdateChangelistDescription", "displayReviewUrl"
+          "readPendingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiff", "UpdateChangelistDescription", "displayReviewUrl"
        ],
        "reviewCommitWithMatchingChangelist": [
           "updateMatchingChangelist", "CreateReviewIfNeeded", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "AmendCommit", "displayReviewUrl"

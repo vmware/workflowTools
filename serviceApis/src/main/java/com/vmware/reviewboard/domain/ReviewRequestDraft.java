@@ -37,6 +37,8 @@ public class ReviewRequestDraft extends BaseEntity{
     public Integer id;
     @Expose(serialize = false, deserialize = false)
     public ReviewRequest reviewRequest;
+    @Expose(serialize = false, deserialize = false)
+    public String reviewRepoType;
     public String summary = "";
     public String description = "";
     @SerializedName("testing_done")
