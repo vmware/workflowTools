@@ -109,11 +109,6 @@
   "UpdateReviewDetails": [
     "--groups"
   ],
-  "UploadReviewDiffWithRbt": [
-    "--parent",
-    "--tracking-branch",
-    "--review-board-repo"
-  ],
   "CreateReviewIfNeeded": [
     "--username",
     "--reviewboard-url",
@@ -140,11 +135,6 @@
   ],
   "StripJenkinsBuilds": [
     "--jenkins-url"
-  ],
-  "UploadReviewDiffInPerforceFormat": [
-    "--perforce-client",
-    "--tracking-branch",
-    "--parent"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -180,6 +170,7 @@
     "--max-summary"
   ],
   "UploadReviewDiff": [
+    "--perforce-client",
     "--tracking-branch",
     "--parent"
   ],

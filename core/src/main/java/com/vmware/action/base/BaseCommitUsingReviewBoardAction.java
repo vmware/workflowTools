@@ -7,6 +7,7 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 
 import java.io.IOException;
@@ -30,6 +31,8 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
         reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
         if (draft != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(draft.id);
+            Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
+            draft.reviewRepoType = repository.tool.toLowerCase();
         }
     }
 

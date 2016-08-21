@@ -3,7 +3,9 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
 import java.io.IOException;
@@ -31,10 +33,24 @@ public class SetReviewId extends BaseCommitAction {
 
     @Override
     public void process() {
+        if (draft.id != null && draft.id != 0) {
+            log.info("Existing review id {}", draft.id);
+        }
         log.info("Please enter review id for the commit");
         int reviewId = InputUtils.readValueUntilValidInt("Review ID");
         draft.id = reviewId;
         draft.reviewRequest = reviewBoard.getReviewRequestById(reviewId);
-        log.info("Using review {} ({})", reviewId, draft.reviewRequest.summary);
+        String summary = draft.reviewRequest.summary;
+        if (StringUtils.isBlank(summary)) {
+            try {
+                summary = reviewBoard.getReviewRequestDraft(draft.reviewRequest.getDraftLink()).summary;
+            } catch (NotFoundException nfe) {
+                log.warn("Summary was blank, and no draft was present");
+            }
+        }
+        if (StringUtils.isNotBlank(summary)) {
+            summary = " - " + summary;
+        }
+        log.info("Using review {}{}", reviewId, summary);
     }
 }
