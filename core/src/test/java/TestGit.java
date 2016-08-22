@@ -1,5 +1,4 @@
 import com.vmware.scm.FileChange;
-import com.vmware.scm.FileChangeType;
 import com.vmware.scm.Git;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.CommitConfiguration;
@@ -132,7 +131,7 @@ public class TestGit {
             String commitText = git.commitText(i, true);
             ReviewRequestDraft draft = new ReviewRequestDraft();
             draft.fillValuesFromCommitText(commitText, configuration);
-            System.out.println((i + 1) + "\n" + draft.toGitText(configuration));
+            System.out.println((i + 1) + "\n" + draft.toText(configuration));
         }
     }
 

@@ -1,9 +1,10 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.logging.LogLevel;
 
 /**
- * Common functionality for actions that amend a git commit.
+ * Common functionality for actions that amend a commit.
  */
 public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     protected static final boolean INCLUDE_ALL_CHANGES = true;
@@ -24,27 +25,38 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     @Override
     public String cannotRunAction() {
         if (commitHasNoChanges()) {
-            return "commit does not have any changes";
+            return "no changes detected";
         }
         return super.cannotRunAction();
     }
 
-    protected boolean commitHasNoChanges() {
-        String existingCommitText = git.lastCommitText(true).trim();
+    @Override
+    protected void commitUsingGit(String description) {
+        String existingHeadRef = git.revParse("head");
+        git.amendCommit(updatedCommitText());
+        git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
+    }
+
+    private boolean commitHasNoChanges() {
+        String existingCommitText = readLastChange();
         String updatedCommitText = updatedCommitText();
 
         if (!existingCommitText.equals(updatedCommitText)) {
             return false;
         }
 
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return true;
+        }
+
         if (git.getAllChanges().isEmpty()) {
             return true;
         }
 
-        return git.getStagedChanges().isEmpty() && includeAllChangesInCommit;
+        return !includeAllChangesInCommit || git.getStagedChanges().isEmpty();
     }
 
     protected String updatedCommitText() {
-        return draft.toGitText(config.getCommitConfiguration(), includeJobResultsInCommit).trim();
+        return draft.toText(config.getCommitConfiguration(), includeJobResultsInCommit).trim();
     }
 }

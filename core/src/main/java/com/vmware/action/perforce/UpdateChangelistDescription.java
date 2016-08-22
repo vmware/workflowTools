@@ -15,7 +15,7 @@ public class UpdateChangelistDescription extends BaseLinkedPerforceCommitAction 
 
     @Override
     public void process() {
-        String description = draft.toGitText(config.getCommitConfiguration());
+        String description = draft.toText(config.getCommitConfiguration());
         String existingPerforceChangelistText = perforce.readChangelist(draft.perforceChangelistId);
         ReviewRequestDraft existingDraft = new ReviewRequestDraft(existingPerforceChangelistText, config.getCommitConfiguration());
         if (StringUtils.isBlank(existingDraft.description)) {

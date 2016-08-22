@@ -18,8 +18,7 @@ public class ReadPendingChangelist extends BasePerforceCommitAction {
     public void process() {
         String changelistText = perforce.readLastPendingChangelist();
         if (StringUtils.isBlank(changelistText) || !changelistText.contains("\n")) {
-            log.warn("No pending changelist exists for user {}", config.username);
-            return;
+            throw new RuntimeException("No pending changelist exists for user " + config.username);
         }
 
         draft.fillValuesFromCommitText(changelistText, config.getCommitConfiguration());
@@ -29,7 +28,7 @@ public class ReadPendingChangelist extends BasePerforceCommitAction {
 
         Padder titlePadder = new Padder("Parsed Values");
         titlePadder.debugTitle();
-        log.debug(draft.toGitText(config.getCommitConfiguration()));
+        log.debug(draft.toText(config.getCommitConfiguration()));
         titlePadder.debugTitle();
     }
 }

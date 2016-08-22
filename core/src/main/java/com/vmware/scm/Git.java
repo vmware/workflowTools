@@ -37,6 +37,10 @@ public class Git extends BaseScmWrapper {
         super.setWorkingDirectory(workingDirectory);
     }
 
+    public boolean workingDirectoryIsInGitRepo() {
+        return getRootDirectory() != null;
+    }
+
     /**
      * @return The root directory for this repo. Null if this is not a repo
      */
