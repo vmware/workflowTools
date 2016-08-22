@@ -26,7 +26,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         String repoType = draft.reviewRepoType;
         if (repoType.contains("perforce")) {
             checkThatPerforceConfigIsValid();
-            if (git.getRootDirectory() == null) { // in non git repo, run rbt
+            if (!git.workingDirectoryIsInGitRepo()) { // in non git repo, run rbt
                 File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
                 uploadDiffUsingRbt(clientDirectory, draft.perforceChangelistId);
             } else {
@@ -92,7 +92,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
             throw new RuntimeException("config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName");
         }
         // if root directory is null, then assuming it should be a perforce client
-        if (git.getRootDirectory() == null && StringUtils.isBlank(draft.perforceChangelistId)) {
+        if (!git.workingDirectoryIsInGitRepo() && StringUtils.isBlank(draft.perforceChangelistId)) {
             throw new RuntimeException("no matching changelist found, run createPendingChangelist as part of workflow");
         }
     }

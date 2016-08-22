@@ -11,11 +11,4 @@ public class AmendCommit extends BaseCommitAmendAction {
     public AmendCommit(WorkflowConfig config) {
         super(config, DONT_INCLUDE_ALL_CHANGES, INCLUDE_JOB_RESULTS);
     }
-
-    @Override
-    public void process() {
-        String existingHeadRef = git.revParse("head");
-        git.amendCommit(updatedCommitText());
-        git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
-    }
 }

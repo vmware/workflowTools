@@ -10,11 +10,4 @@ public class AmendCommitWithoutJobResults extends BaseCommitAmendAction {
     public AmendCommitWithoutJobResults(WorkflowConfig config) {
         super(config, DONT_INCLUDE_ALL_CHANGES, EXCLUDE_JOB_RESULTS);
     }
-
-    @Override
-    public void process() {
-        String existingHeadRef = git.revParse("head");
-        git.amendCommit(updatedCommitText());
-        git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
-    }
 }

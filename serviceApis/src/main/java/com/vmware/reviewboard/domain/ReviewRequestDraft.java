@@ -5,11 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
 import com.vmware.IssueInfo;
 import com.vmware.JobBuild;
-import com.vmware.bugzilla.domain.Bug;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.StringUtils;
-import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
@@ -283,11 +281,11 @@ public class ReviewRequestDraft extends BaseEntity{
         return hasData;
     }
 
-    public String toGitText(CommitConfiguration commitConfig) {
-        return toGitText(commitConfig, true);
+    public String toText(CommitConfiguration commitConfig) {
+        return toText(commitConfig, true);
     }
 
-    public String toGitText(CommitConfiguration commitConfig, boolean includeJobResults) {
+    public String toText(CommitConfiguration commitConfig, boolean includeJobResults) {
         StringBuilder builder = new StringBuilder();
         builder.append(summary).append("\n\n");
 

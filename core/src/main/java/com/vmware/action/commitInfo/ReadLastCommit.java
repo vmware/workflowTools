@@ -14,13 +14,29 @@ public class ReadLastCommit extends BaseCommitAction {
     }
 
     @Override
+    public String failWorkflowIfConditionNotMet() {
+        if (!git.workingDirectoryIsInGitRepo() && StringUtils.isBlank(config.perforceClientName)) {
+            return "must be in git directory or have perforce config value perforceClientName set";
+        }
+        return super.failWorkflowIfConditionNotMet();
+    }
+
+    @Override
     public void process() {
-        draft.branch = determineBranchName();
-        draft.fillValuesFromCommitText(git.lastCommitText(true), config.getCommitConfiguration());
+        String commitText = readLastChange();
+        if (git.workingDirectoryIsInGitRepo()) {
+            draft.branch = determineBranchName();
+        }
+        draft.fillValuesFromCommitText(commitText, config.getCommitConfiguration());
+        if (git.workingDirectoryIsInGitRepo()) {
+            log.info("Read last commit from branch {}", draft.branch);
+        } else {
+            log.info("Read pending changelist {}", draft.perforceChangelistId);
+        }
 
         Padder titlePadder = new Padder("Parsed Values");
         titlePadder.debugTitle();
-        log.debug(draft.toGitText(config.getCommitConfiguration()));
+        log.debug(draft.toText(config.getCommitConfiguration()));
         titlePadder.debugTitle();
     }
 

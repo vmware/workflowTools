@@ -16,7 +16,7 @@ public class CommitAll extends BaseCommitCreateAction {
     }
 
     @Override
-    public void process() {
-        git.commitWithAllFileChanges(draft.toGitText(config.getCommitConfiguration()));
+    protected void commitUsingGit(String description) {
+        git.commitWithAllFileChanges(description);
     }
 }

@@ -144,6 +144,10 @@
   "PublishReview": [
     "--reviewboard-url"
   ],
+  "BaseCommitAction": [
+    "--username",
+    "--perforce-client"
+  ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
   ],
@@ -157,6 +161,9 @@
   "WaitForJenkinsBuildsToComplete": [
     "--wait-time",
     "--jenkins-url"
+  ],
+  "BaseCommitCreateAction": [
+    "--perforce-client"
   ],
   "BaseCommitUsingReviewBoardAction": [
     "--perforce-client",
@@ -269,7 +276,8 @@
     "--old-submit"
   ],
   "ReadLastCommit": [
-    "--branch"
+    "--branch",
+    "--perforce-client"
   ],
   "FormatCommitText": [
     "--max-description",

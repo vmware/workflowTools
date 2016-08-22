@@ -33,7 +33,7 @@ public class ApplyChangelistToSeparateGitBranch extends ApplyChangelistDiffToGit
         } else {
             log.info("Diff applied cleanly to branch {}!", newBranchName);
             log.info("Creating commit for changes");
-            git.commitWithAllFileChanges(draft.toGitText(config.getCommitConfiguration()));
+            git.commitWithAllFileChanges(draft.toText(config.getCommitConfiguration()));
         }
     }
 }

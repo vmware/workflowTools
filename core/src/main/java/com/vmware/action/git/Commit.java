@@ -14,9 +14,4 @@ public class Commit extends BaseCommitCreateAction {
     public Commit(WorkflowConfig config) {
         super(config);
     }
-
-    @Override
-    public void process() {
-        git.commit(draft.toGitText(config.getCommitConfiguration()));
-    }
 }
