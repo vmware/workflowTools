@@ -201,7 +201,7 @@ public class ReviewBoard extends AbstractRestService {
         UserReview[] reviews = this.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
         for (UserReview review : reviews) {
             if (review.getReviewUsername().equals(reviewRequest.getSubmitter())) {
-                if (review.body_top.startsWith("Submitted as ref ")) {
+                if (review.body_top.startsWith("Submitted as ")) {
                     return review;
                 }
             }
