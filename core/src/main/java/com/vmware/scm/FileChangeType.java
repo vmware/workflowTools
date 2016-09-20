@@ -14,6 +14,8 @@ public enum FileChangeType {
     deletedAfterRename("noGitVersion", "move/delete", "deleted %s after being renamed"),
     copied("C", "add", "copied %s to %s");
 
+    private static List<FileChangeType> addChangeTypes = Arrays.asList(added, addedAndModified);
+
     private static List<FileChangeType> editChangeTypes = Arrays.asList(modified, renamed, renamedAndModified, copied);
 
     private String gitValue;
@@ -40,6 +42,10 @@ public enum FileChangeType {
         return description;
     }
 
+    public static boolean isAddChangeType(FileChangeType changeType) {
+        return addChangeTypes.contains(changeType);
+    }
+
     public static boolean isEditChangeType(FileChangeType changeType) {
         return editChangeTypes.contains(changeType);
     }
@@ -55,6 +61,9 @@ public enum FileChangeType {
     }
 
     public static FileChangeType changeTypeFromGitValue(String gitValue) {
+        if ("MM".equals(gitValue)) {
+            return FileChangeType.modified;
+        }
         for (FileChangeType fileChangeType : FileChangeType.values()) {
             if (fileChangeType.getGitValue().equals(gitValue)) {
                 return fileChangeType;

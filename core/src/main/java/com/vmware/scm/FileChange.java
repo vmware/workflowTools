@@ -22,6 +22,7 @@ public class FileChange {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private String perforceChangelistId;
     private final ScmType scmType;
     private FileChangeType changeType;
 
@@ -92,12 +93,29 @@ public class FileChange {
         return fileMode;
     }
 
+    public String getPerforceChangelistId() {
+        return perforceChangelistId;
+    }
+
+    public void setPerforceChangelistId(String perforceChangelistId) {
+        this.perforceChangelistId = perforceChangelistId;
+    }
+
     public void setFileMode(String fileMode) {
         this.fileMode = fileMode;
     }
 
     public String getFileType() {
         return fileType;
+    }
+
+    public boolean matchesOneOf(FileChangeType... changeTypes) {
+        for (FileChangeType changeType : changeTypes) {
+            if (this.changeType == changeType) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setFileType(String fileType) {
@@ -128,6 +146,9 @@ public class FileChange {
                 String strippedPath = value.substring(clientNameToStrip.length());
                 addFileAffected(0, strippedPath);
                 break;
+            case "change":
+                setPerforceChangelistId(value);
+                break;
             case "action":
                 setChangeType(FileChangeType.changeTypeFromPerforceValue(value));
                 break;
@@ -143,7 +164,7 @@ public class FileChange {
         }
     }
 
-    public String diffGitLine() {
+    public String  diffGitLine() {
         String aFile = getFirstFileAffected();
         String bFile = getLastFileAffected();
         String header = format("diff --git a/%s b/%s", aFile, bFile);
@@ -155,8 +176,8 @@ public class FileChange {
             case added:
             case addedAndModified:
                 if (StringUtils.isBlank(fileMode)) {
-                throw new RuntimeException("Expected to find file mode for new file " + bFile);
-            }
+                    throw new RuntimeException("Expected to find file mode for new file " + bFile);
+                }
                 header += "\nnew file mode " + fileMode;
                 break;
             case deleted:

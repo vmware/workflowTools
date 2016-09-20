@@ -1,14 +1,19 @@
 package com.vmware.scm;
 
+import com.vmware.util.CommandLineUtils;
 import com.vmware.util.FileUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,6 +70,16 @@ public class Git extends BaseScmWrapper {
     public String diffTree(String fromRef, String ref, boolean binaryPatch) {
         String binaryFlag = binaryPatch ? " --binary" : "";
         return executeScmCommand("git diff-tree -M{} --full-index -U3 -p {} {}", binaryFlag, fromRef, ref) + "\n";
+    }
+
+    public void catFile(String fromRef, String filePath, String toFilePath) {
+        String command = String.format("git cat-file -p %s:%s", fromRef, filePath);
+        Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, command, (String) null);
+        try {
+            Files.copy(statusProcess.getInputStream(), Paths.get(toFilePath), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     public String applyDiffToPerforce(String rootDirectory, String diffData, boolean check) {

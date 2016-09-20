@@ -18,11 +18,8 @@ public class UpdateChangelistDescription extends BaseLinkedPerforceCommitAction 
         String description = draft.toText(config.getCommitConfiguration());
         String existingPerforceChangelistText = perforce.readChangelist(draft.perforceChangelistId);
         ReviewRequestDraft existingDraft = new ReviewRequestDraft(existingPerforceChangelistText, config.getCommitConfiguration());
-        if (StringUtils.isBlank(existingDraft.description)) {
-            log.error("No description read for changelist {}", draft.perforceChangelistId);
-            return;
-        }
-        if (description.equals(existingDraft.description)) {
+        String existingDescription = existingDraft.toText(config.getCommitConfiguration(), true);
+        if (description.equals(existingDescription)) {
             log.info("Not updating description for changelist {} as it hasn't changed", draft.perforceChangelistId);
             return;
         }

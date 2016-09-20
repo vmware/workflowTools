@@ -48,7 +48,6 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
             perforceDiff = stripLinesStartingWith(perforceDiff.split("\n"), "File(s) not opened for edit");
         }
-        log.info("Checking if perforce diff matches git diff");
         if (StringUtils.equals(gitDiff, perforceDiff)) {
             log.info("Perforce diff matches git diff exactly");
             return;

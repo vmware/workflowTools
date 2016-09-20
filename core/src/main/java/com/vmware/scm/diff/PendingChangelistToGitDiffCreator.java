@@ -5,6 +5,7 @@ import com.vmware.scm.FileChangeType;
 import com.vmware.scm.Perforce;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.FileUtils;
+import com.vmware.util.MatcherUtils;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,14 +120,19 @@ public class PendingChangelistToGitDiffCreator {
                 log.warn("Failed to delete temporary file created to diff delete for file {}: {}",
                         fileChange.getFirstFileAffected(), tempFileForDeleteComparison.getPath());
             }
-            Matcher indexLineMatcher = Pattern.compile("index\\s+(\\w+)\\.\\.(\\w+)\\s+(\\d+)").matcher(fileDiff);
+            String newFileMode = MatcherUtils.singleMatch(fileDiff, "new mode (\\d+)");
+            String indexPattern = "index\\s+(\\w+)\\.\\.(\\w+)";
+            if (newFileMode == null) {
+                indexPattern += "\\s+(\\d+)";
+            }
+            Matcher indexLineMatcher = Pattern.compile(indexPattern).matcher(fileDiff);
             if (!indexLineMatcher.find()) {
                 throw new RuntimeException("Failed to match index line in diff\n" + fileDiff);
             }
 
             String firstIndex = changeType == deleted ? indexLineMatcher.group(1) : NON_EXISTENT_INDEX_IN_GIT;
             String secondIndex = changeType == deleted ? NON_EXISTENT_INDEX_IN_GIT : indexLineMatcher.group(2);
-            String fileMode = indexLineMatcher.group(3);
+            String fileMode = newFileMode != null ? newFileMode : indexLineMatcher.group(3);
             fileChange.setFileMode(fileMode);
             gitCompatibleData.append("\n").append(fileChange.diffGitLine());
             gitCompatibleData.append("\n").append(format("index %s..%s", firstIndex, secondIndex));

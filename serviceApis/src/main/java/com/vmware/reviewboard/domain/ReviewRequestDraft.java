@@ -101,7 +101,7 @@ public class ReviewRequestDraft extends BaseEntity{
             log.warn("Text is blank, can't extract commit values!");
             return;
         }
-        String changelistId = parseSingleLineFromText(commitText, "Change\\s+(\\d+)\\s+on", "Perforce Changelist Id", DEBUG);
+        String changelistId = parseSingleLineFromText(commitText, "^Change\\s+(\\d+)", "Perforce Changelist Id", DEBUG);
         if (StringUtils.isNotBlank(changelistId)) {
             perforceChangelistId = changelistId;
             log.debug("Matched first line of perforce changelist, id was {}", changelistId);
