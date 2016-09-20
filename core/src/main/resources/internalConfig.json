@@ -251,6 +251,9 @@
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "updateMatchingChangelist": [
+          "readNonTrivialPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
+       ],
+       "updateMatchingChangelistWithGitDiff": [
          "readNonTrivialPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateWithGitChangeset": [

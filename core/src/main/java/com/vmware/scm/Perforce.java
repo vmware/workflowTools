@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import static com.vmware.scm.FileChangeType.deletedAfterRename;
 import static com.vmware.scm.FileChangeType.renamed;
+import static com.vmware.util.StringUtils.appendWithDelimiter;
 import static java.lang.String.format;
 
 /**
@@ -80,8 +81,8 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("p4 revert -w -c {} //...", LogLevel.INFO, changelistId);
     }
 
-    public void revertFile(String changelistId, String file) {
-        executeScmCommand("p4 revert -w -c {} {}", changelistId, file);
+    public void revertFiles(String changelistId, List<String> filePaths) {
+        executeScmCommand("p4 revert -w -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
     }
 
     public String createPendingChangelist(String description, boolean filesExpected) {
@@ -99,21 +100,49 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("p4 reopen -c " + changelistId + " //...", LogLevel.INFO);
     }
 
+    public String moveFilesToChangelist(String changelistId, List<String> filePaths) {
+        String output = executeScmCommand("p4 reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
+        exitIfExpectedTextNotPresent(output, "reopened; change " + changelistId, filePaths.size());
+        return output;
+    }
+
     public String getFileInfo(String filePath) {
         return executeScmCommand("p4 files " + filePath);
     }
 
     public Map<String, String> getWhereDepotFileInfoForRelativePaths(List<String> filePaths) {
         String fullPathPrefix = getWorkingDirectory().getPath() + File.separator;
-        String filePathTexts = fullPathPrefix + StringUtils.appendWithDelimiter("", filePaths, " " + fullPathPrefix);
+        String filePathTexts = fullPathPrefix + appendWithDelimiter("", filePaths, " " + fullPathPrefix);
         String[] whereFileOutput = executeScmCommand("p4 where " + filePathTexts).split("\n");
         return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereDepotFileInfoPattern);
     }
 
     public Map<String, String> getWhereLocalFileInfo(List<String> filePaths) {
-        String filePathTexts = StringUtils.appendWithDelimiter("", filePaths, " ");
+        String filePathTexts = appendWithDelimiter("", filePaths, " ");
         String[] whereFileOutput = executeScmCommand("p4 where " + filePathTexts).split("\n");
         return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereLocalFileInfoPattern);
+    }
+
+    public Map<String, List<FileChange>> getAllFileChangesInClient() {
+        String filesText = executeScmCommand("p4 -ztag opened");
+        List<FileChange> allChanges = parseFileChanges(filesText);
+        if (allChanges.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<String, List<FileChange>> changeMap = new HashMap<>();
+        for (FileChange change : allChanges) {
+            String changelistId = change.getPerforceChangelistId();
+            if (!changeMap.containsKey(changelistId)) {
+                changeMap.put(changelistId, new ArrayList<FileChange>());
+            }
+            changeMap.get(changelistId).add(change);
+        }
+        // make lists read only
+        for (String changelistId : changeMap.keySet()) {
+            List<FileChange> fileChanges = changeMap.get(changelistId);
+            changeMap.put(changelistId, Collections.unmodifiableList(fileChanges));
+        }
+        return Collections.unmodifiableMap(changeMap);
     }
 
     public String getCurrentChangelistId(String id) {
@@ -128,29 +157,7 @@ public class Perforce extends BaseScmWrapper {
 
     public List<FileChange> getFileChangesForPendingChangelist(String id) {
         String filesText = executeScmCommand("p4 -ztag opened -c {}", id);
-        Matcher lineMatcher = Pattern.compile("\\.\\.\\.\\s+(\\w+)\\s+(.+)").matcher(filesText);
-        FileChange fileChange = null;
-        List<FileChange> fileChanges = new ArrayList<>();
-        String clientNameToStrip = "//" + clientName + File.separator;
-        while (lineMatcher.find()) {
-            String valueName = lineMatcher.group(1);
-            String value = lineMatcher.group(2);
-            if (valueName.equals("depotFile")) {
-                if (fileChange != null) {
-                    fileChanges.add(fileChange);
-                }
-                fileChange = new FileChange(scmType);
-            }
-            if (fileChange != null) {
-                fileChange.parseValue(valueName, value, clientNameToStrip);
-            }
-        }
-        if (fileChange != null) {
-            fileChanges.add(fileChange);
-        }
-        mergeMoveDeleteAndAdds(fileChanges);
-
-        return fileChanges;
+        return parseFileChanges(filesText);
     }
 
     public String diffChangelistInGitFormat(String changelistId, boolean binaryPatch) {
@@ -173,6 +180,31 @@ public class Perforce extends BaseScmWrapper {
         String diffData = diffFilesUsingGit(filesToDiff, binaryPatch);
         PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(this);
         return diffCreator.create(diffData, fileChanges, binaryPatch);
+    }
+
+    private List<FileChange> parseFileChanges(String filesText) {
+        Matcher lineMatcher = Pattern.compile("\\.\\.\\.\\s+(\\w+)\\s+(.+)").matcher(filesText);
+        FileChange fileChange = null;
+        List<FileChange> fileChanges = new ArrayList<>();
+        String clientNameToStrip = "//" + clientName + File.separator;
+        while (lineMatcher.find()) {
+            String valueName = lineMatcher.group(1);
+            String value = lineMatcher.group(2);
+            if (valueName.equals("depotFile")) {
+                if (fileChange != null) {
+                    fileChanges.add(fileChange);
+                }
+                fileChange = new FileChange(scmType);
+            }
+            if (fileChange != null) {
+                fileChange.parseValue(valueName, value, clientNameToStrip);
+            }
+        }
+        if (fileChange != null) {
+            fileChanges.add(fileChange);
+        }
+        mergeMoveDeleteAndAdds(fileChanges);
+        return fileChanges;
     }
 
     private String diffFilesUsingGit(String filesToDiff, boolean binaryPatch) {
@@ -213,7 +245,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public String sync(String fileNames) {
-        return executeScmCommand("p4 sync {}", fileNames);
+        return executeScmCommand("p4 sync -f {}", fileNames);
     }
 
     public String move(String changelistId, String fromFileName, String toFileName, String extraFlags) {
@@ -236,6 +268,66 @@ public class Perforce extends BaseScmWrapper {
         return failOutputIfMissingText(output, "opened for delete");
     }
 
+    public void syncPerforceFiles(List<FileChange> fileChanges, String syncChangelistId) {
+        List<String> filesToSync = new ArrayList<>();
+        for (FileChange diffChange : fileChanges) {
+            filesToSync.add(fullPath(diffChange.getFirstFileAffected()));
+            if (!diffChange.getLastFileAffected().equals(diffChange.getFirstFileAffected())) {
+                filesToSync.add(fullPath(diffChange.getLastFileAffected()));
+            }
+        }
+
+        if (!filesToSync.isEmpty()) {
+            log.debug("Syncing existing perforce files {}", filesToSync.toString());
+            sync(appendWithDelimiter("", filesToSync, "@" + syncChangelistId + " ") + "@" + syncChangelistId);
+        }
+    }
+
+    public void openFilesForEditIfNeeded(String changelistId, List<FileChange> fileChanges) {
+        List<String> filesToOpenForEdit = new ArrayList<>();
+        List<String> filesToMoveToChangelist = new ArrayList<>();
+
+        for (FileChange diffChange : fileChanges) {
+            if (changelistId.equals(diffChange.getPerforceChangelistId())) {
+                continue;
+            }
+            if (!FileChangeType.isEditChangeType(diffChange.getChangeType())) {
+                continue;
+            }
+
+            String fullPath = fullPath(diffChange.getFirstFileAffected());
+            if (StringUtils.isNotBlank(diffChange.getPerforceChangelistId())) {
+                filesToMoveToChangelist.add(fullPath);
+            } else {
+                filesToOpenForEdit.add(fullPath);
+            }
+        }
+        if (!filesToMoveToChangelist.isEmpty()) {
+            moveFilesToChangelist(changelistId, filesToMoveToChangelist);
+        }
+        if (!filesToOpenForEdit.isEmpty()) {
+            openForEdit(changelistId, appendWithDelimiter("", filesToOpenForEdit, " "));
+        }
+    }
+
+    public void renameAddOrDeleteFiles(String changelistId, List<FileChange> fileChanges) {
+        for (FileChange diffChange : fileChanges) {
+            FileChangeType changeType = diffChange.getChangeType();
+            String fullPathForFirstFileAffected = fullPath(diffChange.getFirstFileAffected());
+            String fullPathForLastFileAffected = fullPath(diffChange.getLastFileAffected());
+            if (changeType == FileChangeType.renamed || changeType == FileChangeType.renamedAndModified) {
+                log.info("Renaming file {} to {}", diffChange.getFirstFileAffected(), diffChange.getLastFileAffected());
+                move(changelistId, fullPathForFirstFileAffected, fullPathForLastFileAffected, "-k");
+            } else if (changeType == FileChangeType.added || changeType == FileChangeType.addedAndModified) {
+                log.info("Adding file {} to perforce", diffChange.getLastFileAffected());
+                add(changelistId, fullPathForLastFileAffected);
+            } else if (changeType == FileChangeType.deleted) {
+                log.info("Deleting {}", diffChange.getLastFileAffected());
+                markForDelete(changelistId, fullPathForLastFileAffected);
+            }
+        }
+    }
+
     public boolean updatePendingChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("p4 change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, false);
@@ -252,6 +344,19 @@ public class Perforce extends BaseScmWrapper {
             log.error("Changelist {} has status {}, expected submitted", id, status);
             log.error("Submit output\n{}", submitOutput);
             System.exit(1);
+        }
+    }
+
+    private void exitIfExpectedTextNotPresent(String output, String expectedText, int expectedCount) {
+        int matches = 0;
+        int currentIndex = 0;
+        while (matches++ < expectedCount) {
+            int matchIndex = output.indexOf(expectedText, currentIndex);
+            if (matchIndex == -1) {
+                throw new RuntimeException("Unexpected output from reopen command,"
+                        + expectedText + " text was not present\n" + output);
+            }
+            currentIndex = matchIndex + expectedText.length();
         }
     }
 

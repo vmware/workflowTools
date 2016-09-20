@@ -48,16 +48,28 @@ public class CommandLineUtils {
         if (environmentVariables != null) {
             builder.environment().putAll(environmentVariables);
         }
+        Process statusProcess = executeCommand(workingDirectory, environmentVariables, command, inputText);
+        return readProcessOutput(command, statusProcess.getInputStream(), logLevel);
+    }
+
+    public static Process executeCommand(File workingDirectory, Map<String, String> environmentVariables,
+                                        String command, String inputText) {
+        ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
+                .redirectErrorStream(true);
+        if (environmentVariables != null) {
+            builder.environment().putAll(environmentVariables);
+        }
         try {
             Process statusProcess = builder.start();
             if (inputText != null) {
                 IOUtils.write(statusProcess.getOutputStream(), inputText);
             }
-            return readProcessOutput(command, statusProcess.getInputStream(), logLevel);
+            return statusProcess;
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
     }
+
 
     public static String executeScript(String command, String[] inputs, String[] textsToWaitFor, LogLevel logLevel) {
         log.info("Executing script {}", command);
