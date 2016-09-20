@@ -7,17 +7,20 @@ package com.vmware.trello;
 
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
+import com.vmware.http.cookie.Cookie;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.BadRequestException;
 import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
 import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.trello.domain.AuthCode;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.BooleanValue;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.LoginInfo;
 import com.vmware.trello.domain.Member;
+import com.vmware.trello.domain.SessionAuthentication;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
 import com.vmware.util.StringUtils;
@@ -26,6 +29,7 @@ import com.vmware.util.UrlUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,12 +40,14 @@ import static com.vmware.http.request.RequestHeader.aRefererHeader;
 public class Trello extends AbstractRestService {
 
     private final String loginUrl;
+    private final String sessionUrl;
     private final String webUrl;
 
     public Trello(String trelloUrl) {
         super(createApiUrl(trelloUrl), "1/", trello, null);
         webUrl = UrlUtils.addTrailingSlash(trelloUrl);
-        this.loginUrl = webUrl + "authenticate";
+        this.loginUrl = webUrl + "1/authentication";
+        this.sessionUrl = webUrl + "1/authorization/session";
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
 
         String apiToken = readExistingApiToken(credentialsType);
@@ -115,10 +121,13 @@ public class Trello extends AbstractRestService {
         connection.resetParams();
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        connection.post(loginUrl, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
-        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
-
         connection.setUseSessionCookies(true);
+        String dscValue = UUID.randomUUID().toString(); // used as a CSRF value
+        connection.addCookie(new Cookie("dsc", dscValue));
+        AuthCode authCode = connection.post(loginUrl, AuthCode.class, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
+        connection.post(sessionUrl, new SessionAuthentication(authCode.code, dscValue), aRefererHeader("https://trello.com/login?returnUrl=%2Flogged-out"));
+        log.info(authCode.code);
+        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
         String apiTokenPage = connection.get(webUrl + "app-key", String.class);
         List<UrlParam> authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
         connection.setUseSessionCookies(false);
