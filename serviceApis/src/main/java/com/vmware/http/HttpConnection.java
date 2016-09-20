@@ -87,6 +87,10 @@ public class HttpConnection {
         requestParams.addStatefulParamsFromUrlFragment(urlFragment);
     }
 
+    public void addCookie(Cookie cookie) {
+        cookieFileStore.addCookieIfUseful(cookie);
+    }
+
     public void resetParams() {
         requestParams.reset();
     }

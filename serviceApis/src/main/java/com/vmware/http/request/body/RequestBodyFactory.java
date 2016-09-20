@@ -18,6 +18,9 @@ public class RequestBodyFactory {
     private static final Logger log = LoggerFactory.getLogger(RequestBodyFactory.class);
 
     public static void setRequestDataForConnection(HttpConnection connection, final Object requestObject) {
+        if (requestObject == null) {
+            return;
+        }
         connection.setDoOutput(true);
         switch (connection.getRequestBodyHandling()) {
             case AsStringJsonEntity:
