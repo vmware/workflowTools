@@ -279,7 +279,8 @@ public class Perforce extends BaseScmWrapper {
 
         if (!filesToSync.isEmpty()) {
             log.debug("Syncing existing perforce files {}", filesToSync.toString());
-            sync(appendWithDelimiter("", filesToSync, "@" + syncChangelistId + " ") + "@" + syncChangelistId);
+            String syncVersion = StringUtils.isBlank(syncChangelistId) ? "" : "@" + syncChangelistId;
+            sync(appendWithDelimiter("", filesToSync, syncVersion + " ") + syncVersion);
         }
     }
 

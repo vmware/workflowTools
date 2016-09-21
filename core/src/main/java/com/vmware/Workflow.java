@@ -34,9 +34,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -160,7 +165,9 @@ public class Workflow {
             if (config.dryRun) {
                 dryRunActions(workflowActions);
             } else {
+                Date startingDate = new Date();
                 runActions(workflowActions, new WorkflowActionValues());
+                outputTotalExecutionTime(startingDate);
             }
         } catch (UnknownWorkflowValueException e) {
             log.error(e.getMessage());
@@ -171,6 +178,14 @@ public class Workflow {
             if (log.isDebugEnabled()) {
                 log.debug(iae.getMessage(), iae);
             }
+        }
+    }
+
+    private void outputTotalExecutionTime(Date startingDate) {
+        if (log.isDebugEnabled()) {
+            log.info("");
+            long totalElapsedTime = new Date().getTime() - startingDate.getTime();
+            log.debug("Workflow execution time {} ms", totalElapsedTime);
         }
     }
 
@@ -258,14 +273,15 @@ public class Workflow {
         }
 
 
-        ConcurrentLinkedQueue<BaseAction> actionsRun = new ConcurrentLinkedQueue<>();
-        SetupActions setupActions = new SetupActions(actionsToRun, actionsRun);
+        ConcurrentLinkedQueue<BaseAction> actionsSetup = new ConcurrentLinkedQueue<>();
+        SetupActions setupActions = new SetupActions(actionsToRun, actionsSetup);
         new Thread(setupActions).start();
         ThreadUtils.sleep(10, TimeUnit.MILLISECONDS);
 
         int waitTimeInMilliSeconds = 0;
+        Map<String, Long> executionTimesPerAction = new LinkedHashMap<>();
         for (BaseAction action : actionsToRun) {
-            while (!actionsRun.contains(action)) {
+            while (!actionsSetup.contains(action)) {
                 String actionName = action.getClass().getSimpleName();
                 if (waitTimeInMilliSeconds > 10000) {
                     throw new RuntimeException(actionName + ".asyncSetup failed to finish in 10 seconds");
@@ -277,10 +293,24 @@ public class Workflow {
                 ThreadUtils.sleep(50, TimeUnit.MILLISECONDS);
                 waitTimeInMilliSeconds += 50;
             }
+            Date startingDate = new Date();
             runAction(action, values);
+            long elapsedTime = new Date().getTime() - startingDate.getTime();
+            executionTimesPerAction.put(action.getClass().getSimpleName(), elapsedTime);
         }
+        outputExecutionTimes(executionTimesPerAction);
     }
 
+    private void outputExecutionTimes(Map<String, Long> executionTimesPerAction) {
+        if (!log.isDebugEnabled()) {
+            return;
+        }
+        log.info("");
+        log.debug("Execution time per action");
+        for (String actionName : executionTimesPerAction.keySet()) {
+            log.debug("{} - {} ms", actionName, executionTimesPerAction.get(actionName));
+        }
+    }
 
 
     private void runAction(BaseAction action, WorkflowActionValues values) {
