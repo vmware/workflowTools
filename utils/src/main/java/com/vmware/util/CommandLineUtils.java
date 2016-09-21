@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -48,8 +49,12 @@ public class CommandLineUtils {
         if (environmentVariables != null) {
             builder.environment().putAll(environmentVariables);
         }
+        Date startingDate = new Date();
         Process statusProcess = executeCommand(workingDirectory, environmentVariables, command, inputText);
-        return readProcessOutput(command, statusProcess.getInputStream(), logLevel);
+        String output = IOUtils.read(statusProcess.getInputStream());
+        long elapsedMilliseconds = new Date().getTime() - startingDate.getTime();
+        logProcessOutput(command + " " + elapsedMilliseconds + " ms", output, logLevel);
+        return output;
     }
 
     public static Process executeCommand(File workingDirectory, Map<String, String> environmentVariables,
@@ -114,12 +119,10 @@ public class CommandLineUtils {
         }
     }
 
-    private static String readProcessOutput(String command, InputStream input, LogLevel logLevel) {
-        Padder titlePadder = new Padder(command);
+    private static void logProcessOutput(String title, String output, LogLevel logLevel) {
+        Padder titlePadder = new Padder(title);
         titlePadder.logTitle(logLevel);
-        String output = IOUtils.read(input);
         dynamicLogger.log(logLevel, output);
         titlePadder.logTitle(logLevel);
-        return output;
     }
 }
