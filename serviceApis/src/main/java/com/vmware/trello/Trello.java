@@ -126,7 +126,6 @@ public class Trello extends AbstractRestService {
         connection.addCookie(new Cookie("dsc", dscValue));
         AuthCode authCode = connection.post(loginUrl, AuthCode.class, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
         connection.post(sessionUrl, new SessionAuthentication(authCode.code, dscValue), aRefererHeader("https://trello.com/login?returnUrl=%2Flogged-out"));
-        log.info(authCode.code);
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
         String apiTokenPage = connection.get(webUrl + "app-key", String.class);
         List<UrlParam> authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
