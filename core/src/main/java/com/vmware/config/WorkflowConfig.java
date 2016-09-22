@@ -117,6 +117,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-p4Client,--perforce-client", gitConfigProperty = "git-p4.client", help = "Perforce client to use")
     public String perforceClientName;
 
+    @ConfigurableProperty(gitConfigProperty = "changesetsync.checkoutdir", help = "Perforce client root directory can be explicitly specified if desired")
+    public String perforceClientDirectory;
+
     @ConfigurableProperty(commandLine = "-syncToBranchLatest,--sync-to-branch-latest", help = "By default, files to be synced to the latest in perforce, this flag syncs them to the latest changelist known to the git branch")
     public boolean syncChangelistToLatestInBranch;
 

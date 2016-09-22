@@ -25,6 +25,10 @@ public abstract class BaseScmWrapper {
     }
 
     void setWorkingDirectory(File workingDirectory) {
+        if (workingDirectory == null) {
+            throw new IllegalArgumentException("Cannot set null working directory for client "
+                    + this.getClass().getSimpleName());
+        }
         this.workingDirectory = workingDirectory;
     }
 

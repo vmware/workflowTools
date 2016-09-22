@@ -8,7 +8,6 @@ import com.vmware.util.logging.LogLevel;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,17 +31,20 @@ public class Perforce extends BaseScmWrapper {
 
     private String clientName;
 
-    public Perforce(String clientName) {
+    public Perforce(String username, String clientName, String clientDirectory) {
         super(ScmType.perforce);
-        this.clientName = clientName;
-        if (StringUtils.isBlank(clientName)) {
-            throw new IllegalArgumentException("perforceClientName config value is not set, can also be set by git-p4.client git config value");
+        if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {
+            this.clientName = clientName;
+            super.setWorkingDirectory(new File(clientDirectory));
+        } else if (StringUtils.isNotBlank(clientName)) {
+            this.clientName = clientName;
+            super.setWorkingDirectory(determineClientDirectoryForClientName());
+        } else if (StringUtils.isNotBlank(clientDirectory)) {
+            super.setWorkingDirectory(new File(clientDirectory));
+            this.clientName = determineClientNameForDirectory(username);
+        } else {
+            throw new IllegalArgumentException("one of perforceClientName or perforceClientDirectory config values must be set, can also set client name by git-p4.client git config value");
         }
-        File workingDirectory = getClientDirectory();
-        if (workingDirectory == null) {
-            throw new IllegalArgumentException("Failed to find root directory for perforce client " + clientName);
-        }
-        super.setWorkingDirectory(workingDirectory);
     }
 
     public List<String> getPendingChangelists() {
@@ -180,6 +182,10 @@ public class Perforce extends BaseScmWrapper {
         String diffData = diffFilesUsingGit(filesToDiff, binaryPatch);
         PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(this);
         return diffCreator.create(diffData, fileChanges, binaryPatch);
+    }
+
+    public String getClientName() {
+        return clientName;
     }
 
     private List<FileChange> parseFileChanges(String filesText) {
@@ -370,15 +376,25 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    private File getClientDirectory() {
+    private File determineClientDirectoryForClientName() {
         String info = executeScmCommand("p4 clients -e " + clientName, LogLevel.DEBUG);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + clientName + "\\s+.+?(\\S+)\\s+'Created by");
-        if (clientDirectory != null) {
-            return new File(clientDirectory);
-        } else {
-            log.warn("{} not found in clients list\n{}", clientName, info);
-            return null;
+        if (clientDirectory == null) {
+            throw new RuntimeException("Failed to parse client directory for client " + clientName + "\n" + info);
         }
+        return new File(clientDirectory);
+    }
+
+    private String determineClientNameForDirectory(String username) {
+        String clientRoot = super.getWorkingDirectory().getPath();
+        String quotedClientRoot = Pattern.quote(clientRoot);
+        String info = executeScmCommand("p4 clients -u " + username, LogLevel.DEBUG);
+        String clientName = MatcherUtils.singleMatch(info, "Client\\s+(\\S+)\\s+.+?" + quotedClientRoot + "\\s+'Created by");
+        if (clientName == null) {
+            throw new RuntimeException("Failed to parse client name for directory " + clientRoot
+                    + " in clients for user " + username + "\n" + info);
+        }
+        return clientName;
     }
 
     private String updateTemplateWithDescription(String perforceTemplate, String commitText, boolean filesExpected) {

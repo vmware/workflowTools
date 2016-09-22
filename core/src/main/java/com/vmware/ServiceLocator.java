@@ -92,7 +92,7 @@ public class ServiceLocator {
 
     public Perforce getPerforce() {
         if (perforce == null) {
-            perforce = new Perforce(config.perforceClientName);
+            perforce = new Perforce(config.username, config.perforceClientName, config.perforceClientDirectory);
         }
         return perforce;
     }

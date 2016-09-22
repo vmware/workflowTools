@@ -99,6 +99,7 @@
     "--review-board-date-format"
   ],
   "BasePerforceCommitAction": [
+    "--username",
     "--perforce-client"
   ],
   "BaseCommitReadAction": [
@@ -167,6 +168,7 @@
     "--jenkins-url"
   ],
   "BaseCommitCreateAction": [
+    "--username",
     "--perforce-client"
   ],
   "BaseCommitUsingReviewBoardAction": [
@@ -181,6 +183,7 @@
     "--max-summary"
   ],
   "UploadReviewDiff": [
+    "--username",
     "--perforce-client",
     "--tracking-branch",
     "--parent"
@@ -212,6 +215,7 @@
     "--disable-bugzilla"
   ],
   "UploadReviewDiffFromChangelist": [
+    "--username",
     "--perforce-client"
   ],
   "SetSummary": [
