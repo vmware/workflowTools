@@ -39,14 +39,16 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
         List<FileChange> fileChanges = perforce.getFileChangesForPendingChangelist(draft.perforceChangelistId);
         String rawGitDiff = git.diffTree(fromRef, "head", true);
-        String gitDiff = rawGitDiff;
+        String gitDiff;
         if (containsChangesOfType(fileChanges, FileChangeType.renamed)) {
-            gitDiff = stripLinesStartingWith(rawGitDiff.split("\n"), "similarity index");
+            gitDiff = stripLinesStartingWith(rawGitDiff, "similarity index");
+        } else {
+            gitDiff = rawGitDiff;
         }
         log.info("Creating perforce diff for changelist {} in git format", draft.perforceChangelistId);
         String perforceDiff = perforce.diffChangelistInGitFormat(fileChanges, draft.perforceChangelistId, true);
         if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
-            perforceDiff = stripLinesStartingWith(perforceDiff.split("\n"), "File(s) not opened for edit");
+            perforceDiff = stripLinesStartingWith(perforceDiff, "File(s) not opened for edit");
         }
         if (StringUtils.equals(gitDiff, perforceDiff)) {
             log.info("Perforce diff matches git diff exactly");
@@ -72,21 +74,12 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         return compareDiff(gitDiffAsMap, perforceDiffAsMap);
     }
 
-    private String stripLinesStartingWith(String[] lines, String... textsToCheckFor) {
-        StringBuilder builder = new StringBuilder();
-        for (String line : lines) {
-            boolean foundLineToStrip = false;
-            for (String textToCheckFor : textsToCheckFor) {
-                if (line.startsWith(textToCheckFor)) {
-                    foundLineToStrip = true;
-                    break;
-                }
-            }
-            if (!foundLineToStrip) {
-                builder.append(line).append("\n");
-            }
+    private String stripLinesStartingWith(String text, String... textsToCheckFor) {
+        String paddedText = "\n" + text + "\n"; // pad with new lines so that searches work for start and end lines
+        for (String textToCheckFor : textsToCheckFor) {
+            paddedText = paddedText.replaceAll("\n" + Pattern.quote(textToCheckFor) + ".+\n", "\n");
         }
-        return builder.toString();
+        return paddedText.substring(1, paddedText.length() - 1);
     }
 
     private Map<String, String> convertDiffToMap(String diff) {
