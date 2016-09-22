@@ -73,13 +73,18 @@ public class SyncChangelist extends BaseLinkedPerforceCommitAction {
     }
 
     private List<FileChange> makePerforceAwareOfMissingChanges(List<FileChange> gitDiffChanges, Map<String, List<FileChange>> allPerforceChanges) {
-        List<FileChange> changesToAddToPerforce = new ArrayList<>(gitDiffChanges);
-        for (FileChange fileChange : allChangesInMap(allPerforceChanges)) {
-            if (!gitDiffChanges.contains(fileChange)) {
+        List<FileChange> changesToAddToPerforce = new ArrayList<>();
+        List<FileChange> allPerforceChangesList = allChangesInMap(allPerforceChanges);
+        for (FileChange gitDiffChange : gitDiffChanges) {
+            if (!allPerforceChangesList.contains(gitDiffChange)) {
+                changesToAddToPerforce.add(gitDiffChange);
                 continue;
             }
-            FileChange gitFileChange = gitDiffChanges.get(gitDiffChanges.indexOf(fileChange));
-            gitFileChange.setPerforceChangelistId(fileChange.getPerforceChangelistId());
+            FileChange existingPerforceChange = allPerforceChangesList.get(allPerforceChangesList.indexOf(gitDiffChange));
+            gitDiffChange.setPerforceChangelistId(existingPerforceChange.getPerforceChangelistId());
+            if (!existingPerforceChange.getPerforceChangelistId().equals(draft.perforceChangelistId)) {
+                changesToAddToPerforce.add(gitDiffChange);
+            }
         }
 
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, changesToAddToPerforce);

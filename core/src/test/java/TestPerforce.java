@@ -12,13 +12,19 @@ import static org.junit.Assert.assertTrue;
 
 public class TestPerforce {
 
-    private Perforce perforce = new Perforce("dbiggs-vcloud-sp-main");
+    private Perforce perforce = new Perforce("dbiggs", "dbiggs-vcloud-sp-main", null);
 
     @Test
-    public void canGetRootDirectory() {
+    public void canDetermineRootDirectory() {
         File clientDirectory = perforce.getWorkingDirectory();
         assertNotNull(clientDirectory);
         assertEquals("/Users/dbiggs/vcd", clientDirectory.getPath());
+    }
+
+    @Test
+    public void canDetermineClientName() {
+        perforce = new Perforce("dbiggs", null, "/Users/dbiggs/vcd/");
+        assertEquals("dbiggs-vcloud-sp-main", perforce.getClientName());
     }
 
     @Test
