@@ -17,8 +17,9 @@ public class TestBuildwebApi extends BaseTests {
     @Before
     public void init() {
         String url = testProperties.getProperty("buildweb.url");
+        String apiUrl = testProperties.getProperty("buildweb.api.url");
         String username = testProperties.getProperty("buildweb.username");
-        buildweb = new Buildweb(url, username);
+        buildweb = new Buildweb(url, apiUrl, username);
     }
 
     @Test

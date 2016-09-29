@@ -10,6 +10,7 @@ import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.MatcherUtils;
 
 import java.util.List;
 
@@ -18,16 +19,17 @@ import java.util.List;
  */
 public class Buildweb extends AbstractRestBuildService {
 
-    public Buildweb(String buildwebUrl, String username) {
-        super(buildwebUrl, "/", ApiAuthentication.none, username);
+    private final String buildwebUrl;
+
+    public Buildweb(String buildwebUrl, String buildwebApiUrl, String username) {
+        super(buildwebApiUrl, "/", ApiAuthentication.none, username);
+        this.buildwebUrl = buildwebUrl;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
     }
 
     public SandboxBuild getSandboxBuild(String id) {
         return connection.get(baseUrl + "sb/build/" + id, SandboxBuild.class);
     }
-
-
 
     @Override
     protected void checkAuthenticationAgainstServer() {
@@ -39,8 +41,15 @@ public class Buildweb extends AbstractRestBuildService {
     }
 
     @Override
+    protected String urlUsedInBuilds() {
+        return buildwebUrl;
+    }
+
+    @Override
     protected BuildResult getResultForBuild(String url) {
-        SandboxBuild build = optimisticGet(url, SandboxBuild.class);
+        String buildNumber = MatcherUtils.singleMatchExpected(url, "/(\\d++)");
+        String buildApiUrl = baseUrl + "sb/build/" + buildNumber;
+        SandboxBuild build = optimisticGet(buildApiUrl, SandboxBuild.class);
         return build.getBuildResult();
     }
 

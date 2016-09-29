@@ -84,7 +84,10 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
 
-    @ConfigurableProperty(commandLine = "-buildwebApiUrl,--buildweb-url", help = "Api Url for buildweb server")
+    @ConfigurableProperty(commandLine = "-buildwebUrl,--buildweb-url", help = "Url for buildweb server")
+    public String buildwebUrl;
+
+    @ConfigurableProperty(commandLine = "-buildwebApiUrl,--buildweb-api-url", help = "Api Url for buildweb server")
     public String buildwebApiUrl;
 
     @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
@@ -135,7 +138,7 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox buikd, this is for a VMware specific tool")
     public String buildwebProject;
 
-    @ConfigurableProperty(commandLine = "-buildwebBranch,--sandbox-branch", help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool")
+    @ConfigurableProperty(commandLine = "-buildwebBranch,--buildweb-branch", help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool")
     public String buildwebBranch;
 
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
@@ -447,7 +450,7 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, buildwebApiUrl, testingDoneLabel, bugNumberLabel,
+        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
                 reviewedByLabel, reviewUrlLabel);
     }
 

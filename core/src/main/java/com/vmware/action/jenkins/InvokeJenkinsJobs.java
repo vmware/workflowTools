@@ -123,7 +123,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private String determineSandboxBuildNumber() {
-        JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebApiUrl);
+        JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebUrl);
         String buildId;
         if (sandboxBuild != null) {
             buildId = sandboxBuild.id();

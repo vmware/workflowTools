@@ -9,6 +9,7 @@
   "bugzillaTestBug": 10001,
   "trelloUrl": "https://trello.com",
   "jenkinsUrl": "https://sp-taas.eng.vmware.com/jenkins",
+  "buildwebUrl": "https://buildweb.eng.vmware.com",
   "buildwebApiUrl": "https://buildapi.eng.vmware.com",
   "jenkinsUsesCsrf": false,
   "waitForJenkinsJobCompletion": false,

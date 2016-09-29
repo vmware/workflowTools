@@ -41,9 +41,9 @@ public class InvokeSandboxBuild extends BaseCommitAction {
 
         String buildNumber = MatcherUtils.singleMatch(output, buildNumberPattern);
         if (buildNumber != null) {
-            String buildUrl = commitConfig.sandboxBuildwebUrl() + "/" + buildNumber;
+            String buildUrl = commitConfig.buildWebUrl() + "/" + buildNumber;
             log.info("Adding build {} to commit", buildUrl);
-            draft.updateTestingDoneWithJobBuild(commitConfig.sandboxBuildwebUrl(),
+            draft.updateTestingDoneWithJobBuild(commitConfig.buildWebUrl(),
                     new JobBuild(buildUrl, BuildResult.BUILDING));
         } else {
             log.warn("Unable to parse build url using pattern {}", buildNumberPattern);

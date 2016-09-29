@@ -71,7 +71,7 @@ public class ServiceLocator {
 
     public Buildweb getBuildweb() {
         if (buildweb == null) {
-            buildweb = new Buildweb(config.buildwebApiUrl, config.username);
+            buildweb = new Buildweb(config.buildwebUrl, config.buildwebApiUrl, config.username);
         }
         return buildweb;
     }

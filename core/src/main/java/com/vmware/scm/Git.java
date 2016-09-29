@@ -361,6 +361,8 @@ public class Git extends BaseScmWrapper {
                 FileChangeType changeType = FileChangeType.changeTypeFromGitValue(actionTypeText);
                 if (changeType == FileChangeType.deleted) {
                     fileChanges.add(new FileChange(scmType, oldFileMode, changeType, affectedFiles));
+                } else if (changeType == FileChangeType.copied) {
+                    fileChanges.add(new FileChange(scmType, oldFileMode, changeType, affectedFiles.split("[\t\n]")));
                 } else {
                     fileChanges.add(new FileChange(scmType, fileMode, changeType, affectedFiles));
                 }
@@ -436,6 +438,9 @@ public class Git extends BaseScmWrapper {
                     String renamedFromFile = filePath.substring(0, arrowIndex).trim();
                     String renamedToFile = filePath.substring(arrowIndex + 3).trim();
                     fileChange = new FileChange(scmType, FILE_MODE_UNKNOWN, fileChangeType, renamedFromFile, renamedToFile);
+                } else if (fileChangeType == FileChangeType.copied) {
+                    String[] affectedFiles = filePath.split("\t");
+                    fileChange = new FileChange(scmType, FILE_MODE_UNKNOWN, fileChangeType, affectedFiles[0], affectedFiles[1]);
                 } else {
                     fileChange = new FileChange(scmType, FILE_MODE_UNKNOWN, fileChangeType, filePath);
                 }

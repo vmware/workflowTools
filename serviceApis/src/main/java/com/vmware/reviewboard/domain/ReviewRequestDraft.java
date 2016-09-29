@@ -124,7 +124,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
         this.jobBuilds.clear();
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateJenkinsUrlPattern()));
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebApiUrlPattern()));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebUrlPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
     }
@@ -152,7 +152,7 @@ public class ReviewRequestDraft extends BaseEntity{
     private String fullTestingDoneSection(boolean includeResults) {
         String sectionText = this.testingDone;
         for (JobBuild build : jobBuilds) {
-            sectionText += "\n" + build.url;
+            sectionText += "\nBuild " + build.url;
             if (includeResults) {
                 sectionText += " " + build.result.name();
             }
@@ -170,7 +170,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String stripJobBuildsFromTestingDone(String testingDone) {
-        String patternToSearchFor = "http.+?\\s+" + BuildResult.generateResultPattern();
+        String patternToSearchFor = "Build\\s+http.+?\\s+" + BuildResult.generateResultPattern();
         return testingDone.replaceAll(patternToSearchFor, "").trim();
     }
 
