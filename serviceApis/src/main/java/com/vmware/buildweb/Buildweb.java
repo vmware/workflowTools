@@ -47,7 +47,7 @@ public class Buildweb extends AbstractRestBuildService {
 
     @Override
     protected BuildResult getResultForBuild(String url) {
-        String buildNumber = MatcherUtils.singleMatchExpected(url, "/(\\d++)");
+        String buildNumber = MatcherUtils.singleMatchExpected(url, "/sb/(\\d++)");
         String buildApiUrl = baseUrl + "sb/build/" + buildNumber;
         SandboxBuild build = optimisticGet(buildApiUrl, SandboxBuild.class);
         return build.getBuildResult();
