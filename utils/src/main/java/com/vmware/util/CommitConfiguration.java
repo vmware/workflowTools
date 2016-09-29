@@ -7,7 +7,7 @@ public class CommitConfiguration {
 
     private final String jenkinsUrl;
     private final String reviewboardUrl;
-    private final String buildwebApiUrl;
+    private final String buildwebUrl;
     private String testingDoneLabel;
 
     private String bugNumberLabel;
@@ -16,7 +16,7 @@ public class CommitConfiguration {
 
     private String reviewUrlLabel;
 
-    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl, String buildwebApiUrl, String testingDoneLabel, String bugNumberLabel,
+    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
                                String reviewedByLabel, String reviewUrlLabel) {
         this.reviewboardUrl = reviewboardUrl;
         this.jenkinsUrl = jenkinsUrl;
@@ -24,7 +24,7 @@ public class CommitConfiguration {
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
         this.reviewUrlLabel = padLabel(reviewUrlLabel);
-        this.buildwebApiUrl = buildwebApiUrl;
+        this.buildwebUrl = buildwebUrl;
     }
 
     public String generateDescriptionPattern() {
@@ -61,19 +61,19 @@ public class CommitConfiguration {
     }
 
     public String generateJenkinsUrlPattern() {
-        return "(" + jenkinsUrl + "/job/.+?/\\d+/*)";
+        return "Build\\s+(" + jenkinsUrl + "/job/.+?/\\d+/*)";
     }
 
     public String generateBuildWebNumberPattern() {
         return "http.+?/sb/(\\d+)/*";
     }
 
-    public String generateFullBuildwebApiUrlPattern() {
-        return "(" + sandboxBuildwebUrl() + "/\\d+/*)";
+    public String generateFullBuildwebUrlPattern() {
+        return "Build\\s+(" + buildWebUrl() + "/\\d+/*)";
     }
 
-    public String sandboxBuildwebUrl() {
-        return buildwebApiUrl + "/sb/build";
+    public String buildWebUrl() {
+        return buildwebUrl + "/sb";
     }
 
     public String getReviewboardUrl() {

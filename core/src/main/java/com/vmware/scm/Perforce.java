@@ -325,7 +325,7 @@ public class Perforce extends BaseScmWrapper {
             if (changeType == FileChangeType.renamed || changeType == FileChangeType.renamedAndModified) {
                 log.info("Renaming file {} to {}", diffChange.getFirstFileAffected(), diffChange.getLastFileAffected());
                 move(changelistId, fullPathForFirstFileAffected, fullPathForLastFileAffected, "-k");
-            } else if (changeType == FileChangeType.added || changeType == FileChangeType.addedAndModified) {
+            } else if (FileChangeType.isAddChangeType(changeType)) {
                 log.info("Adding file {} to perforce", diffChange.getLastFileAffected());
                 add(changelistId, fullPathForLastFileAffected);
             } else if (changeType == FileChangeType.deleted) {

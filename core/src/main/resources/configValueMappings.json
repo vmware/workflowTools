@@ -56,7 +56,7 @@
   ],
   "InvokeSandboxBuild": [
     "--gobuild-bin-path",
-    "--sandbox-branch",
+    "--buildweb-branch",
     "--buildweb-project"
   ],
   "AuthenticateAllApis": [
@@ -161,6 +161,7 @@
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
+    "--buildweb-api-url",
     "--buildweb-url"
   ],
   "WaitForJenkinsBuildsToComplete": [

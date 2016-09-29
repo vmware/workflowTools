@@ -6,10 +6,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import static com.vmware.scm.FileChangeType.added;
+import static com.vmware.scm.FileChangeType.copied;
 import static com.vmware.scm.FileChangeType.deleted;
 import static com.vmware.scm.FileChangeType.addedAndModified;
 import static com.vmware.scm.FileChangeType.renamed;
@@ -225,20 +227,28 @@ public class FileChange {
         if (o == null || getClass() != o.getClass()) return false;
         FileChange that = (FileChange) o;
         FileChangeType changeTypeToUseForComparision = that.changeType;
+        List<String> filesFromChangeToCheck = filesAffected;
+        List<String> filesFromOtherChangeToCheck = that.filesAffected;
         if (scmType == ScmType.perforce && that.scmType == ScmType.git) {
             if (that.changeType == renamedAndModified) {
                 changeTypeToUseForComparision = renamed;
             } else if (that.changeType == addedAndModified) {
                 changeTypeToUseForComparision = added;
+            } else if (that.changeType == copied) {
+                changeTypeToUseForComparision = added;
+                filesFromOtherChangeToCheck = Collections.singletonList(that.getLastFileAffected());
             }
         } else if (scmType == ScmType.git && that.scmType == ScmType.perforce) {
             if (changeType == renamedAndModified && that.changeType == renamed) {
                 changeTypeToUseForComparision = renamedAndModified;
             } else if (changeType == addedAndModified && that.changeType == added) {
                 changeTypeToUseForComparision = addedAndModified;
+            } else if (changeType == copied && that.changeType == added) {
+                changeTypeToUseForComparision = copied;
+                filesFromChangeToCheck = Collections.singletonList(getLastFileAffected());
             }
         }
-        return changeType == changeTypeToUseForComparision && Objects.deepEquals(filesAffected, that.filesAffected);
+        return changeType == changeTypeToUseForComparision && Objects.deepEquals(filesFromChangeToCheck, filesFromOtherChangeToCheck);
     }
 
     @Override

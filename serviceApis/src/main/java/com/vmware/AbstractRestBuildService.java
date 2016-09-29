@@ -16,8 +16,9 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
     }
 
     public void checkStatusOfBuilds(ReviewRequestDraft draft) {
-        log.info("Checking status of builds matching url {}", baseUrl);
-        List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(baseUrl);
+        String urlToCheckFor = urlUsedInBuilds();
+        log.info("Checking status of builds matching url {}", urlToCheckFor);
+        List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
 
         if (jobsToCheck.isEmpty()) {
             log.info("No builds found in testing done text");
@@ -27,6 +28,11 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
 
         updateAllBuildsResultSuccessValue(draft, checkIfAllBuildsSucceeded(jobsToCheck));
     }
+
+    protected String urlUsedInBuilds() {
+        return baseUrl;
+    }
+
 
     private boolean checkIfAllBuildsSucceeded(List<JobBuild> jobsToCheck) {
         boolean isSuccess = true;

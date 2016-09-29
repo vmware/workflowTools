@@ -9,9 +9,11 @@ import com.vmware.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,8 +111,18 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
     private String compareDiff(Map<String, String> gitDiff, Map<String, String> perforceDiff) {
         if (!gitDiff.keySet().equals(perforceDiff.keySet())) {
-            return "File list for diff is different, perforce: " + perforceDiff.keySet().toString()
-                    + " git: " + gitDiff.keySet().toString();
+            Set<String> fileChangesNotInPerforce = new HashSet<>(gitDiff.keySet());
+            fileChangesNotInPerforce.removeAll(perforceDiff.keySet());
+            Set<String> fileChangesNotInGit = new HashSet<>(perforceDiff.keySet());
+            fileChangesNotInGit.removeAll(gitDiff.keySet());
+            String errorText = "File list for diff is different";
+            if (!fileChangesNotInPerforce.isEmpty()) {
+                errorText += "\nFiles present in git but missing in perforce " + fileChangesNotInPerforce.toString();
+            }
+            if (!fileChangesNotInGit.isEmpty()) {
+                errorText += "\nFiles present in perforce but missing in git " + fileChangesNotInGit.toString();
+            }
+            return errorText;
         }
         for (String gitDiffFile : gitDiff.keySet()) {
             String gitDiffFileText = gitDiff.get(gitDiffFile);
