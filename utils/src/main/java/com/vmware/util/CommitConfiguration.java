@@ -5,7 +5,6 @@ package com.vmware.util;
  */
 public class CommitConfiguration {
 
-    private final String jenkinsUrl;
     private final String reviewboardUrl;
     private final String buildwebUrl;
     private String testingDoneLabel;
@@ -16,10 +15,9 @@ public class CommitConfiguration {
 
     private String reviewUrlLabel;
 
-    public CommitConfiguration(String reviewboardUrl, String jenkinsUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
+    public CommitConfiguration(String reviewboardUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
                                String reviewedByLabel, String reviewUrlLabel) {
         this.reviewboardUrl = reviewboardUrl;
-        this.jenkinsUrl = jenkinsUrl;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
@@ -60,16 +58,8 @@ public class CommitConfiguration {
         return bugNumberLabel.trim() + "([,\\w\\d\\s-]+)$";
     }
 
-    public String generateJenkinsUrlPattern() {
-        return "Build\\s+(" + jenkinsUrl + "/job/.+?/\\d+/*)";
-    }
-
     public String generateBuildWebNumberPattern() {
         return "http.+?/sb/(\\d+)/*";
-    }
-
-    public String generateFullBuildwebUrlPattern() {
-        return "Build\\s+(" + buildWebUrl() + "/\\d+/*)";
     }
 
     public String buildWebUrl() {

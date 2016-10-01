@@ -25,20 +25,12 @@ public class SelectMatchingChangelist extends BasePerforceCommitAction {
 
     @Override
     public void process() {
-        draft.perforceChangelistId = null;
         List<String> changelists = perforce.getPendingChangelists();
         for (String changelist: changelists) {
             if (changelistDescriptionMatches(changelist)) {
                 log.info("Using changelist {} as summary matches commit summary", changelist);
                 draft.perforceChangelistId = changelist;
                 break;
-            }
-        }
-        if (draft.perforceChangelistId == null) {
-            log.info("No changelist summary matches commit summary {}", draft.summary);
-            if (changelists.size() == 1) {
-                log.info("Using changelist {} as matching changelist since only one changelist exists", changelists.get(0));
-                draft.perforceChangelistId = changelists.get(0);
             }
         }
     }

@@ -46,4 +46,12 @@ public class JobBuild {
         return url + "stop";
     }
 
+    public String details(boolean includeResult) {
+        String buildInfo = "Build " + url;
+        if (includeResult && result != null) {
+            buildInfo += " " + result.name();
+        }
+        return buildInfo;
+    }
+
 }

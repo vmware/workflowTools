@@ -21,10 +21,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static com.vmware.util.ArrayUtils.contains;
 
@@ -450,7 +448,7 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        return new CommitConfiguration(reviewboardUrl, jenkinsUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
+        return new CommitConfiguration(reviewboardUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
                 reviewedByLabel, reviewUrlLabel);
     }
 
