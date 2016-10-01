@@ -123,8 +123,8 @@ public class ReviewRequestDraft extends BaseEntity{
         this.summary = summary;
         this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
         this.jobBuilds.clear();
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateJenkinsUrlPattern()));
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, commitConfiguration.generateFullBuildwebUrlPattern()));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildWithResultPattern()));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
     }
@@ -141,10 +141,6 @@ public class ReviewRequestDraft extends BaseEntity{
         return reviewedBy.equals(trivialReviewerLabel);
     }
 
-    public String fullTestingDoneSection() {
-        return fullTestingDoneSection(true);
-    }
-
     public String fullTestingDoneSectionWithoutJobResults() {
         return fullTestingDoneSection(false);
     }
@@ -152,10 +148,7 @@ public class ReviewRequestDraft extends BaseEntity{
     private String fullTestingDoneSection(boolean includeResults) {
         String sectionText = this.testingDone;
         for (JobBuild build : jobBuilds) {
-            sectionText += "\nBuild " + build.url;
-            if (includeResults) {
-                sectionText += " " + build.result.name();
-            }
+            sectionText += "\n" + build.details(includeResults);
         }
         return sectionText;
     }
@@ -170,16 +163,26 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String stripJobBuildsFromTestingDone(String testingDone) {
-        String patternToSearchFor = "Build\\s+http.+?\\s+" + BuildResult.generateResultPattern();
-        return testingDone.replaceAll(patternToSearchFor, "").trim();
+        String updatedSection = testingDone.replaceAll(buildWithResultPattern(), "").trim();
+        updatedSection = updatedSection.replaceAll(buildPattern(), "").trim();
+        return updatedSection;
+    }
+
+    private String buildPattern() {
+        return "Build\\s+(http\\S+)";
+    }
+
+    private String buildWithResultPattern() {
+        return buildPattern() + "\\s+" + BuildResult.generateResultPattern();
     }
 
     private List<JobBuild> generateJobBuildsList(String text, String jobUrlPattern) {
-        Matcher jobMatcher = Pattern.compile(jobUrlPattern + "\\s+" +
-                BuildResult.generateResultPattern(), Pattern.MULTILINE).matcher(text);
+        Matcher jobMatcher = Pattern.compile(jobUrlPattern + "\\s*$", Pattern.MULTILINE).matcher(text);
         List<JobBuild> jobBuilds = new ArrayList<>();
         while (jobMatcher.find()) {
-            jobBuilds.add(new JobBuild(jobMatcher.group(1), BuildResult.valueOf(jobMatcher.group(2))));
+            String buildUrl = jobMatcher.group(1);
+            BuildResult buildResult = jobMatcher.groupCount() > 1 ? BuildResult.valueOf(jobMatcher.group(2)) : null;
+            jobBuilds.add(new JobBuild(buildUrl, buildResult));
         }
         return jobBuilds;
     }

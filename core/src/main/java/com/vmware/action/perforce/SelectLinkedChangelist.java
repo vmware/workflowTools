@@ -1,4 +1,4 @@
-package com.vmware.action.gitchangeset;
+package com.vmware.action.perforce;
 
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
