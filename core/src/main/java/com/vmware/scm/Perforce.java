@@ -188,6 +188,14 @@ public class Perforce extends BaseScmWrapper {
         return clientName;
     }
 
+    @Override
+    void exitIfCommandFailed(String output) {
+        if (output.contains("Your session has expired, please login again")) {
+            log.error("You need to relogin to Perforce, error message: {}", output);
+            System.exit(1);
+        }
+    }
+
     private List<FileChange> parseFileChanges(String filesText) {
         Matcher lineMatcher = Pattern.compile("\\.\\.\\.\\s+(\\w+)\\s+(.+)").matcher(filesText);
         FileChange fileChange = null;

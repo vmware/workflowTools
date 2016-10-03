@@ -45,6 +45,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
             Set<String> matchingConfigValues = configMappings.getConfigValuesForAction(foundAction);
             values.addAll(matchingConfigValues);
         }
+        values.addAll(valuesParser.calculateJenkinsParameterConfigValues());
         valuesShownWhenNoBuffer.addAll(values);
         return super.complete(buffer, cursor, candidates);
     }

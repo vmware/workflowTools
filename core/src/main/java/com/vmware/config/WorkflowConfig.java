@@ -268,7 +268,7 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time for blocking workflow action to complete.")
     public long waitTimeForBlockingWorkflowAction;
 
-    @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. -JVAPP_NAME=test -JUSERNAME=dbiggs")
+    @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. --JVAPP_NAME=test --JUSERNAME=dbiggs")
     public Map<String, String> jenkinsJobParameters = new TreeMap<>();
 
     @Expose(serialize = false, deserialize = false)
@@ -500,7 +500,7 @@ public class WorkflowConfig {
             return Collections.emptyList();
         }
         for (String configValue : configValues.keySet()) {
-            if (!configValue.startsWith("-J")) {
+            if (!configValue.startsWith("--J")) {
                 continue;
             }
             String parameterName = configValue.substring(2);
