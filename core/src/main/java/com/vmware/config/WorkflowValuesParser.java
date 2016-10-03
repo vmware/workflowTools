@@ -1,13 +1,18 @@
 package com.vmware.config;
 
 import com.vmware.action.BaseAction;
+import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Used to parse actions and config values from workflow arguments.
@@ -85,5 +90,30 @@ public class WorkflowValuesParser {
             configValue += configPieces[i];
         }
         return configValue;
+    }
+
+    public Collection<? extends String> calculateJenkinsParameterConfigValues() {
+        String jenkinsJobsToCall = configValues.get("-j");
+        if (StringUtils.isBlank(jenkinsJobsToCall)) {
+            jenkinsJobsToCall = configValues.get("--jenkins-jobs");
+        }
+        if (StringUtils.isBlank(jenkinsJobsToCall)) {
+            return Collections.emptyList();
+        }
+        String[] jenkinsJobPieces = jenkinsJobsToCall.split("&");
+        if (jenkinsJobPieces.length < 2) {
+            return Collections.emptyList();
+        }
+        Set<String> jenkinsParameterConfigValues = new HashSet<>();
+        for (int i = 1; i < jenkinsJobPieces.length; i++) {
+            String jenkinsParameter = jenkinsJobPieces[i];
+            String[] jenkinsParameterPieces = jenkinsParameter.split("=");
+            if (jenkinsParameterPieces.length != 2) {
+                continue;
+            }
+            jenkinsParameterConfigValues.add("--J" + jenkinsParameterPieces[0]);
+
+        }
+        return jenkinsParameterConfigValues;
     }
 }

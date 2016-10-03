@@ -1,5 +1,6 @@
 package com.vmware.scm;
 
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,9 @@ public abstract class BaseScmWrapper {
             return command;
         }
         for (String argument : arguments) {
+            if (argument == null) {
+                continue;
+            }
             command = command.replaceFirst("\\{\\}", argument);
         }
         return command;

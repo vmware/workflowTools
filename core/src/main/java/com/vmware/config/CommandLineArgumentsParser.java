@@ -107,7 +107,7 @@ public class CommandLineArgumentsParser {
             if (ArrayUtils.contains(ADDITIONAL_ARGUMENT_NAMES, argument)) {
                 continue;
             }
-            if (argument.startsWith("-J")) {
+            if (argument.startsWith("--J")) {
                 continue;
             }
             UnrecognizedCommandLineArgument potentiallyUnrecognizedArgument = new UnrecognizedCommandLineArgument(argument);
