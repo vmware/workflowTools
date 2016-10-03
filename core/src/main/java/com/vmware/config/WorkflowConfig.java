@@ -503,7 +503,7 @@ public class WorkflowConfig {
             if (!configValue.startsWith("--J")) {
                 continue;
             }
-            String parameterName = configValue.substring(2);
+            String parameterName = configValue.substring(3);
             String parameterValue = configValues.get(configValue);
             jenkinsJobParameters.put(parameterName, parameterValue);
         }
