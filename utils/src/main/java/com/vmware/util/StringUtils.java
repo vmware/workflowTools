@@ -42,6 +42,9 @@ public class StringUtils {
     }
 
     public static boolean isInteger(String value) {
+        if (isBlank(value)) {
+            return false;
+        }
         try {
             Integer.parseInt(value);
             return true;
