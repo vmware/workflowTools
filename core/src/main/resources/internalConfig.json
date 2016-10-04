@@ -46,6 +46,8 @@
   "reviewUrlLabel": "Review URL:",
   "noBugNumberLabel": "none",
   "trivialReviewerLabel": "trivial",
+  "alwaysIncludeReviewUrl": false,
+  "noReviewNumberLabel": "none",
   "logLevel": "INFO",
   "maxSummaryLength": 80,
   "maxDescriptionLength": 100,
@@ -58,8 +60,8 @@
        "readNonTrivialCommit": [
           "ReadLastCommit", "ExitIfTrivialCommit"
        ],
-       "readNonTrivialPerforceCommit": [
-          "ExitIfPerforceClientIsNotFound", "readNonTrivialCommit", "SelectLinkedChangelist", "SelectMatchingChangelist", "SelectExistingChangelist"
+       "readPerforceCommit": [
+          "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "SelectLinkedChangelist", "SelectMatchingChangelist", "SelectExistingChangelist"
        ],
        "readPendingChangelist": [
           "ReadPendingChangelist", "ExitIfCommitDoesNotHaveAChangelistId"
@@ -252,13 +254,13 @@
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "updateMatchingChangelist": [
-          "readNonTrivialPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
+          "readPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateMatchingChangelistWithGitDiff": [
-         "readNonTrivialPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
+         "readPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateWithGitChangeset": [
-         "readNonTrivialPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"
+         "readPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"
        ],
        "reviewWithGitChangeset": [
          "updateWithGitChangeset", "CreateReviewIfNeeded", "UploadReviewDiffFromChangelist", "UpdateReviewDetails", "AmendCommit", "displayReviewUrl"

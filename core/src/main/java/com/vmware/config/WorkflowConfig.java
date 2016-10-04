@@ -61,6 +61,12 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Label for review url")
     public String reviewUrlLabel;
 
+    @ConfigurableProperty(commandLine = "--always-include-review-url", help = "Include review url for trivial commits as well")
+    public boolean alwaysIncludeReviewUrl;
+
+    @ConfigurableProperty(help = "Label for no review number, only relevant if review url is always included")
+    public String noReviewNumberLabel;
+
     @ConfigurableProperty(help = "Label for no bug number")
     public String noBugNumberLabel;
 

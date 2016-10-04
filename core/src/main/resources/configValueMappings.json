@@ -136,6 +136,7 @@
     "--reviewboard-url",
     "--search-by-usernames-only",
     "--username",
+    "--always-include-review-url",
     "--review-board-date-format"
   ],
   "StripJenkinsBuilds": [

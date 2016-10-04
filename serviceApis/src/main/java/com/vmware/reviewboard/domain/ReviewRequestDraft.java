@@ -32,7 +32,7 @@ public class ReviewRequestDraft extends BaseEntity{
     private DynamicLogger dynamicLog = new DynamicLogger(log);
 
     @Expose(serialize = false)
-    public Integer id;
+    public String id;
     @Expose(serialize = false, deserialize = false)
     public ReviewRequest reviewRequest;
     @Expose(serialize = false, deserialize = false)
@@ -118,7 +118,7 @@ public class ReviewRequestDraft extends BaseEntity{
         }
         String testingDoneSection = parseMultilineFromText(commitText, commitConfiguration.generateTestingDonePattern(), "Testing Done");
 
-        this.id = parseReviewNumber(commitText, commitConfiguration.generateReviewUrlPattern());
+        this.id = parseSingleLineFromText(commitText, commitConfiguration.generateReviewUrlPattern(), "Review number");
         this.description = description;
         this.summary = summary;
         this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
@@ -130,7 +130,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public boolean hasReviewNumber() {
-        return id != null && id != 0;
+        return StringUtils.isInteger(id);
     }
 
     public boolean hasBugNumber(String noBugNumberLabel) {
@@ -308,13 +308,11 @@ public class ReviewRequestDraft extends BaseEntity{
         if (hasReviewNumber()) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
                     .append(addTrailingSlash(commitConfig.getReviewboardUrl())).append("r/").append(id);
+        } else if (StringUtils.isNotBlank(id)) {
+            builder.append("\n").append(commitConfig.getReviewUrlLabel())
+                    .append(id);
         }
         return builder.toString();
-    }
-
-    private Integer parseReviewNumber(String text, String pattern) {
-        String reviewNumber = parseSingleLineFromText(text, pattern, "Review number");
-        return isNotBlank(reviewNumber) ? Integer.parseInt(reviewNumber) : null;
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description) {

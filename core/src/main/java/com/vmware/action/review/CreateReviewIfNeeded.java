@@ -41,7 +41,7 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
         draft.reviewRepoType = repository.tool.toLowerCase();
-        draft.id = draft.reviewRequest.id;
+        draft.id = String.valueOf(draft.reviewRequest.id);
         log.info("Created new review {}", draft.reviewRequest.id);
     }
 }

@@ -82,6 +82,11 @@ public abstract class BaseSetReviewerList extends BaseCommitReadAction {
         String existingReviewers = addToReviewerList && StringUtils.isNotBlank(draft.reviewedBy) ? draft.reviewedBy + "," : "";
         draft.reviewedBy = generateReviewerList(existingReviewers + reviewers);
         log.info("Reviewer list for review: {}", draft.reviewedBy);
+
+        if (config.alwaysIncludeReviewUrl && config.trivialReviewerLabel.equals(draft.reviewedBy)) {
+            log.info("Setting review url to {} as it is a trivial review", config.noReviewNumberLabel);
+            draft.id = config.noReviewNumberLabel;
+        }
     }
 
     private Completer createUserCompleter(Set<String> autocompleteOptions) {

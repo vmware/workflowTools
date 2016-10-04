@@ -33,12 +33,12 @@ public class SetReviewId extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (draft.id != null && draft.id != 0) {
+        if (StringUtils.isInteger(draft.id)) {
             log.info("Existing review id {}", draft.id);
         }
         log.info("Please enter review id for the commit");
         int reviewId = InputUtils.readValueUntilValidInt("Review ID");
-        draft.id = reviewId;
+        draft.id = String.valueOf(reviewId);
         draft.reviewRequest = reviewBoard.getReviewRequestById(reviewId);
         String summary = draft.reviewRequest.summary;
         if (StringUtils.isBlank(summary)) {
