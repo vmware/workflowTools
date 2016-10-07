@@ -87,6 +87,10 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("p4 revert -w -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
     }
 
+    public void revertFiles(List<String> filePaths) {
+        executeScmCommand("p4 revert -w {}", appendWithDelimiter("", filePaths, " "));
+    }
+
     public String createPendingChangelist(String description, boolean filesExpected) {
         String perforceTemplate = executeScmCommand("p4 change -o");
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, filesExpected);
@@ -125,8 +129,21 @@ public class Perforce extends BaseScmWrapper {
         return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereLocalFileInfoPattern);
     }
 
+    public String fstat(List<String> fileNames) {
+        return executeScmCommand("p4 fstat {}", StringUtils.appendWithDelimiter("", fileNames, " "));
+    }
+
+    public List<String> getOpenedFilesInClient() {
+        return parseFileNamesFromOpenedOutput(executeScmCommand("p4 opened"));
+    }
+
+    public List<String> getOpenedFilesInChangelist(String changelistId) {
+        return parseFileNamesFromOpenedOutput(executeScmCommand("p4 opened -c {}", changelistId));
+    }
+
     public Map<String, List<FileChange>> getAllFileChangesInClient() {
-        String filesText = executeScmCommand("p4 -ztag opened");
+        List<String> fileNames = getOpenedFilesInClient();
+        String filesText = fstat(fileNames);
         List<FileChange> allChanges = parseFileChanges(filesText);
         if (allChanges.isEmpty()) {
             return Collections.emptyMap();
@@ -158,7 +175,8 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public List<FileChange> getFileChangesForPendingChangelist(String id) {
-        String filesText = executeScmCommand("p4 -ztag opened -c {}", id);
+        List<String> filesInChangelist = getOpenedFilesInChangelist(id);
+        String filesText = fstat(filesInChangelist);
         return parseFileChanges(filesText);
     }
 
@@ -196,14 +214,22 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
+    private List<String> parseFileNamesFromOpenedOutput(String output) {
+        List<String> fileNames = new ArrayList<>();
+        Matcher fileNameMatcher = Pattern.compile("(\\S+)#\\d+\\s+").matcher(output);
+        while (fileNameMatcher.find()) {
+            fileNames.add(fileNameMatcher.group(1));
+        }
+        return fileNames;
+    }
+
     private List<FileChange> parseFileChanges(String filesText) {
-        Matcher lineMatcher = Pattern.compile("\\.\\.\\.\\s+(\\w+)\\s+(.+)").matcher(filesText);
+        Matcher lineMatcher = Pattern.compile("\\.\\.\\.\\s+(\\w+)\\s*(\\S+$)?", Pattern.MULTILINE).matcher(filesText);
         FileChange fileChange = null;
         List<FileChange> fileChanges = new ArrayList<>();
-        String clientNameToStrip = "//" + clientName + File.separator;
         while (lineMatcher.find()) {
             String valueName = lineMatcher.group(1);
-            String value = lineMatcher.group(2);
+            String value = lineMatcher.groupCount() > 1 ? lineMatcher.group(2) : null;
             if (valueName.equals("depotFile")) {
                 if (fileChange != null) {
                     fileChanges.add(fileChange);
@@ -211,7 +237,7 @@ public class Perforce extends BaseScmWrapper {
                 fileChange = new FileChange(scmType);
             }
             if (fileChange != null) {
-                fileChange.parseValue(valueName, value, clientNameToStrip);
+                fileChange.parseValue(valueName, value, getWorkingDirectory().getPath());
             }
         }
         if (fileChange != null) {
@@ -233,11 +259,11 @@ public class Perforce extends BaseScmWrapper {
             if (fileChange.getChangeType() != renamed) {
                 continue;
             }
-            String moveDepotFile = fileChange.getFirstFileAffected();
+            String movedDepotFile = fileChange.getFirstFileAffected();
             boolean foundMatchingDeleteFile = false;
             for (FileChange matchingDeleteChange : fileChanges) {
                 if (matchingDeleteChange.getChangeType() == deletedAfterRename
-                        && moveDepotFile.equals(matchingDeleteChange.getDepotFile())) {
+                        && movedDepotFile.equals(matchingDeleteChange.getDepotFile())) {
                     foundMatchingDeleteFile = true;
                     String deleteClientFile = matchingDeleteChange.getLastFileAffected();
                     fileChange.replaceFileAffected(0, deleteClientFile);
@@ -245,7 +271,7 @@ public class Perforce extends BaseScmWrapper {
                 }
             }
             if (!foundMatchingDeleteFile) {
-                throw new RuntimeException("Expected to find matching move/delete action for move depot file " + moveDepotFile);
+                throw new RuntimeException("Expected to find matching move/delete action for moved depot file " + movedDepotFile);
             }
         }
 
@@ -258,7 +284,9 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    public String sync(String fileNames) {
+    public String sync(List<String> filesToSync, String syncChangelistId) {
+        String syncVersion = StringUtils.isBlank(syncChangelistId) ? "" : "@" + syncChangelistId;
+        String fileNames = appendWithDelimiter("", filesToSync, syncVersion + " ") + syncVersion;
         return executeScmCommand("p4 sync -f {}", fileNames);
     }
 
@@ -291,11 +319,11 @@ public class Perforce extends BaseScmWrapper {
             }
         }
 
-        if (!filesToSync.isEmpty()) {
-            log.debug("Syncing existing perforce files {}", filesToSync.toString());
-            String syncVersion = StringUtils.isBlank(syncChangelistId) ? "" : "@" + syncChangelistId;
-            sync(appendWithDelimiter("", filesToSync, syncVersion + " ") + syncVersion);
+        if (filesToSync.isEmpty()) {
+            return;
         }
+        log.debug("Syncing existing perforce files {}", filesToSync.toString());
+        sync(filesToSync, syncChangelistId);
     }
 
     public void openFilesForEditIfNeeded(String changelistId, List<FileChange> fileChanges) {

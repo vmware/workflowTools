@@ -47,7 +47,7 @@ public class CommitConfiguration {
     }
 
     public String generateReviewUrlPattern() {
-        return reviewUrlLabel.trim() + "\\s*(\\w+)|(?:.+?/r/(\\d+)/*)\\s*$";
+        return reviewUrlLabel.trim() + "\\s*(?:(?:\\S+/r/(\\d+)/*)|(\\w+))\\s*$";
     }
 
     public String generateReviewedByPattern() {

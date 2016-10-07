@@ -338,6 +338,13 @@ public class ReviewRequestDraft extends BaseEntity{
             log.debug("Using pattern {} against text\n[{}]", pattern, text);
             return "";
         }
-        return matcher.group(1).trim();
+        // get first non null group match
+        for (int i = 1; i <= matcher.groupCount(); i ++) {
+            String groupValue = matcher.group(i);
+            if (groupValue != null) {
+                return groupValue.trim();
+            }
+        }
+        throw new RuntimeException("No non null group value for text [" + text + "] with pattern [" + pattern + "]");
     }
 }
