@@ -34,6 +34,7 @@ public class FileChange {
     private List<String> filesAffected = new ArrayList<>();
 
     private int fileVersion;
+    private boolean unresolved;
 
     public FileChange(ScmType scmType) {
         this.scmType = scmType;
@@ -48,6 +49,10 @@ public class FileChange {
 
     public void setChangeType(FileChangeType changeType) {
         this.changeType = changeType;
+    }
+
+    public void addFileAffected(String name) {
+        this.filesAffected.add(name);
     }
 
     public void addFileAffected(int index, String name) {
@@ -111,6 +116,14 @@ public class FileChange {
         return fileType;
     }
 
+    public void setUnresolved(boolean unresolved) {
+        this.unresolved = unresolved;
+    }
+
+    public boolean isUnresolved() {
+        return unresolved;
+    }
+
     public boolean matchesOneOf(FileChangeType... changeTypes) {
         for (FileChangeType changeType : changeTypes) {
             if (this.changeType == changeType) {
@@ -139,14 +152,14 @@ public class FileChange {
         }
     }
 
-    public void parseValue(String valueName, String value, String clientNameToStrip) {
+    public void parseValue(String valueName, String value, String clientDirectoryToStrip) {
         switch (valueName) {
             case "depotFile":
                 setDepotFile(value);
                 break;
             case "clientFile":
-                String strippedPath = value.substring(clientNameToStrip.length());
-                addFileAffected(0, strippedPath);
+                String strippedPath = value.substring(clientDirectoryToStrip.length() + 1);
+                addFileAffected(strippedPath);
                 break;
             case "change":
                 setPerforceChangelistId(value);
@@ -157,11 +170,14 @@ public class FileChange {
             case "movedFile":
                 addFileAffected(0, value);
                 break;
-            case "rev":
+            case "haveRev":
                 setFileVersion(Integer.parseInt(value));
                 break;
             case "type":
                 setFileType(value);
+                break;
+            case "unresolved":
+                setUnresolved(true);
                 break;
         }
     }
