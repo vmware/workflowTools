@@ -180,9 +180,13 @@
     "--review-board-date-format"
   ],
   "SetCommitDetailsFromReview": [
+    "--username",
+    "--reviewboard-url",
     "--jenkins-url",
     "--max-description",
-    "--max-summary"
+    "--max-summary",
+    "--patch",
+    "--review-board-date-format"
   ],
   "UploadReviewDiff": [
     "--username",

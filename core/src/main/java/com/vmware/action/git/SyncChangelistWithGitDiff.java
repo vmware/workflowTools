@@ -8,6 +8,7 @@ import com.vmware.scm.FileChangeType;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
         String fromRef = determineRefToDiffAgainst(lastSubmittedChangelistInfo);
         String versionToSyncTo = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo[1] : "";
         perforce.syncPerforceFiles(gitDiffChanges, versionToSyncTo);
-        String diffData = git.diffTree(fromRef, "head", true);
+        String diffData = git.diffTree(fromRef, "head", true, LogLevel.TRACE);
 
         String checkOutput = git.applyDiffToPerforce(perforce.getWorkingDirectory() + File.separator, diffData, true);
 
@@ -43,7 +44,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, gitDiffChanges);
 
         String output = git.applyDiffToPerforce(perforce.getWorkingDirectory() + File.separator, diffData, false);
-        if (StringUtils.isNotBlank(checkOutput)) {
+        if (StringUtils.isNotBlank(output)) {
             perforce.revertChangesInPendingChangelist(draft.perforceChangelistId);
             perforce.clean();
             throw new IllegalArgumentException("Unexpected output when applying git diff!\n" + output);

@@ -54,7 +54,7 @@ public abstract class BaseScmWrapper {
     }
 
     String executeScmCommand(Map<String, String> environmentVariables, String command, String inputText, LogLevel level, String... commandArguments) {
-        String expandedCommand = expandCommand(command, commandArguments);
+        String expandedCommand = scmExecutablePath() + " " + expandCommand(command, commandArguments);
         log.debug("{} command {}", this.getClass().getSimpleName(), expandedCommand);
         String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, level);
         exitIfCommandFailed(output);
@@ -71,7 +71,7 @@ public abstract class BaseScmWrapper {
         return output;
     }
 
-    private String expandCommand(String command, String... arguments) {
+    protected String expandCommand(String command, String... arguments) {
         if (arguments.length == 0) {
             return command;
         }
@@ -83,5 +83,7 @@ public abstract class BaseScmWrapper {
         }
         return command;
     }
+
+    protected abstract String scmExecutablePath();
 
 }

@@ -32,7 +32,8 @@ public class SyncChangelist extends BaseLinkedPerforceCommitAction {
 
         Map<String, List<FileChange>> allPerforceChanges = perforce.getAllFileChangesInClient();
         revertChangesNotInGitDiff(gitDiffChanges, allPerforceChanges);
-        boolean perforceChangesWereReverted = revertAndResyncUnresolvedFiles(allPerforceChanges, versionToSyncTo);
+        List<FileChange> changelistChanges = allPerforceChanges.get(draft.perforceChangelistId);
+        boolean perforceChangesWereReverted = perforce.revertAndResyncUnresolvedFiles(changelistChanges, versionToSyncTo);
         if (perforceChangesWereReverted) {
             allPerforceChanges = perforce.getAllFileChangesInClient(); // refetch as unresolved files were reverted
         }
@@ -43,24 +44,6 @@ public class SyncChangelist extends BaseLinkedPerforceCommitAction {
         log.info("Synced changes to changelist {} in {} seconds\n", draft.perforceChangelistId,
                 TimeUnit.MILLISECONDS.toSeconds(elapsedTime));
 
-    }
-
-    private boolean revertAndResyncUnresolvedFiles(Map<String, List<FileChange>> allPerforceChanges, String versionToSyncTo) {
-        List<FileChange> changelistChanges = allPerforceChanges.get(draft.perforceChangelistId);
-        List<String> unresolvedFilesToRevertAndSync = new ArrayList<>();
-        for (int i = changelistChanges.size() - 1; i >= 0; i--) {
-            FileChange fileChange = changelistChanges.get(i);
-            if (fileChange.isUnresolved()) {
-                unresolvedFilesToRevertAndSync.add(fileChange.getLastFileAffected());
-            }
-        }
-        if (unresolvedFilesToRevertAndSync.isEmpty()) {
-            return false;
-        }
-        log.info("Reverting and resyncing unresolved files: {}", unresolvedFilesToRevertAndSync.toString());
-        perforce.revertFiles(draft.perforceChangelistId, unresolvedFilesToRevertAndSync);
-        perforce.sync(unresolvedFilesToRevertAndSync, versionToSyncTo);
-        return true;
     }
 
     private void copyChangedFilesToClient(List<FileChange> fileChanges) {

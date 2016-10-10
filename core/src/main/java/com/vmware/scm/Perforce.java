@@ -48,7 +48,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public List<String> getPendingChangelists() {
-        String changeLists = executeScmCommand("p4 changes -c {} -s pending", clientName);
+        String changeLists = executeScmCommand("changes -c {} -s pending", clientName);
         if (StringUtils.isBlank(changeLists)) {
             return Collections.emptyList();
         }
@@ -60,85 +60,85 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public String readLastPendingChangelist() {
-        String output = executeScmCommand("p4 changes -m 1 -s pending -l -c {}", clientName);
+        String output = executeScmCommand("changes -m 1 -s pending -l -c {}", clientName);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }
 
     public String readChangelist(String changelistId) {
-        String output = executeScmCommand("p4 describe -s {}", changelistId);
+        String output = executeScmCommand("describe -s {}", changelistId);
         output = output.replaceAll("\n\t", "\n");
         return output;
     }
 
     public String printToFile(String fileToPrint, File outputFile) {
-        return executeScmCommand("p4 print -o {} {}", outputFile.getPath(), fileToPrint);
+        return executeScmCommand("print -o {} {}", outputFile.getPath(), fileToPrint);
     }
 
     public void deletePendingChangelist(String changelistId) {
-        executeScmCommand("p4 change -d " + changelistId, LogLevel.INFO);
+        executeScmCommand("change -d " + changelistId, LogLevel.INFO);
     }
 
     public void revertChangesInPendingChangelist(String changelistId) {
-        executeScmCommand("p4 revert -w -c {} //...", LogLevel.INFO, changelistId);
+        executeScmCommand("revert -w -c {} //...", LogLevel.INFO, changelistId);
     }
 
     public void revertFiles(String changelistId, List<String> filePaths) {
-        executeScmCommand("p4 revert -w -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
+        executeScmCommand("revert -w -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
     }
 
     public void revertFiles(List<String> filePaths) {
-        executeScmCommand("p4 revert -w {}", appendWithDelimiter("", filePaths, " "));
+        executeScmCommand("revert -w {}", appendWithDelimiter("", filePaths, " "));
     }
 
     public String createPendingChangelist(String description, boolean filesExpected) {
-        String perforceTemplate = executeScmCommand("p4 change -o");
+        String perforceTemplate = executeScmCommand("change -o");
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, filesExpected);
-        String output = executeScmCommand("p4 change -i", amendedTemplate, LogLevel.DEBUG);
+        String output = executeScmCommand("change -i", amendedTemplate, LogLevel.DEBUG);
         return changeSucceeded(output) ? MatcherUtils.singleMatch(output, "Change\\s+(\\d+)\\s+created") : null;
     }
 
     public void clean() {
-        executeScmCommand("p4 clean //...", LogLevel.INFO);
+        executeScmCommand("clean //...", LogLevel.INFO);
     }
 
     public void moveAllOpenFilesToChangelist(String changelistId) {
-        executeScmCommand("p4 reopen -c " + changelistId + " //...", LogLevel.INFO);
+        executeScmCommand("reopen -c " + changelistId + " //...", LogLevel.INFO);
     }
 
     public String moveFilesToChangelist(String changelistId, List<String> filePaths) {
-        String output = executeScmCommand("p4 reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
+        String output = executeScmCommand("reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
         exitIfExpectedTextNotPresent(output, "reopened; change " + changelistId, filePaths.size());
         return output;
     }
 
     public String getFileInfo(String filePath) {
-        return executeScmCommand("p4 files " + filePath);
+        return executeScmCommand("files " + filePath);
     }
 
     public Map<String, String> getWhereDepotFileInfoForRelativePaths(List<String> filePaths) {
         String fullPathPrefix = getWorkingDirectory().getPath() + File.separator;
         String filePathTexts = fullPathPrefix + appendWithDelimiter("", filePaths, " " + fullPathPrefix);
-        String[] whereFileOutput = executeScmCommand("p4 where " + filePathTexts).split("\n");
+        String[] whereFileOutput = executeScmCommand("where " + filePathTexts).split("\n");
         return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereDepotFileInfoPattern);
     }
 
     public Map<String, String> getWhereLocalFileInfo(List<String> filePaths) {
         String filePathTexts = appendWithDelimiter("", filePaths, " ");
-        String[] whereFileOutput = executeScmCommand("p4 where " + filePathTexts).split("\n");
+        String[] whereFileOutput = executeScmCommand("where " + filePathTexts).split("\n");
         return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereLocalFileInfoPattern);
     }
 
     public String fstat(List<String> fileNames) {
-        return executeScmCommand("p4 fstat {}", StringUtils.appendWithDelimiter("", fileNames, " "));
+        return executeScmCommand("fstat {}", StringUtils.appendWithDelimiter("", fileNames, " "));
     }
 
     public List<String> getOpenedFilesInClient() {
-        return parseFileNamesFromOpenedOutput(executeScmCommand("p4 opened"));
+        return parseFileNamesFromOpenedOutput(executeScmCommand("opened"));
     }
 
     public List<String> getOpenedFilesInChangelist(String changelistId) {
-        return parseFileNamesFromOpenedOutput(executeScmCommand("p4 opened -c {}", changelistId));
+        return parseFileNamesFromOpenedOutput(executeScmCommand("opened -c {}", changelistId));
     }
 
     public Map<String, List<FileChange>> getAllFileChangesInClient() {
@@ -165,12 +165,12 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public String getCurrentChangelistId(String id) {
-        String changelistText = executeScmCommand("p4 change -o -O " + id);
+        String changelistText = executeScmCommand("change -o -O " + id);
         return MatcherUtils.singleMatch(changelistText, "Change:\\s+(\\d+)");
     }
 
     public String getChangelistStatus(String id) {
-        String changelistText = executeScmCommand("p4 change -o -O " + id);
+        String changelistText = executeScmCommand("change -o -O " + id);
         return MatcherUtils.singleMatch(changelistText, "Status:\\s+(pending|submitted)");
     }
 
@@ -180,12 +180,12 @@ public class Perforce extends BaseScmWrapper {
         return parseFileChanges(filesText);
     }
 
-    public String diffChangelistInGitFormat(String changelistId, boolean binaryPatch) {
+    public String diffChangelistInGitFormat(String changelistId, boolean binaryPatch, LogLevel level) {
         List<FileChange> fileChanges = getFileChangesForPendingChangelist(changelistId);
-        return diffChangelistInGitFormat(fileChanges, changelistId, binaryPatch);
+        return diffChangelistInGitFormat(fileChanges, changelistId, binaryPatch, level);
     }
 
-    public String diffChangelistInGitFormat(List<FileChange> fileChanges, String changelistId, boolean binaryPatch) {
+    public String diffChangelistInGitFormat(List<FileChange> fileChanges, String changelistId, boolean binaryPatch, LogLevel level) {
         String filesToDiff = "";
         if (fileChanges.isEmpty()) {
             log.warn("No open file changes for changelist {}", changelistId);
@@ -197,7 +197,7 @@ public class Perforce extends BaseScmWrapper {
             }
             filesToDiff += fullPath(fileChange.getLastFileAffected());
         }
-        String diffData = diffFilesUsingGit(filesToDiff, binaryPatch);
+        String diffData = diffFilesUsingGit(filesToDiff, binaryPatch, level);
         PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(this);
         return diffCreator.create(diffData, fileChanges, binaryPatch);
     }
@@ -212,6 +212,11 @@ public class Perforce extends BaseScmWrapper {
             log.error("You need to relogin to Perforce, error message: {}", output);
             System.exit(1);
         }
+    }
+
+    @Override
+    protected String scmExecutablePath() {
+        return "p4 -d " + getWorkingDirectory().getPath();
     }
 
     private List<String> parseFileNamesFromOpenedOutput(String output) {
@@ -247,11 +252,11 @@ public class Perforce extends BaseScmWrapper {
         return fileChanges;
     }
 
-    private String diffFilesUsingGit(String filesToDiff, boolean binaryPatch) {
+    private String diffFilesUsingGit(String filesToDiff, boolean binaryPatch, LogLevel level) {
         Map<String, String> environmentVariables = new HashMap<>();
         String binaryFlag = binaryPatch ? " --binary" : "";
         environmentVariables.put("P4DIFF", "git diff --full-index" + binaryFlag);
-        return executeScmCommand(environmentVariables, "p4 diff -du", filesToDiff, LogLevel.DEBUG);
+        return executeScmCommand(environmentVariables, "p4 diff -du", filesToDiff, level);
     }
 
     private void mergeMoveDeleteAndAdds(List<FileChange> fileChanges) {
@@ -287,26 +292,26 @@ public class Perforce extends BaseScmWrapper {
     public String sync(List<String> filesToSync, String syncChangelistId) {
         String syncVersion = StringUtils.isBlank(syncChangelistId) ? "" : "@" + syncChangelistId;
         String fileNames = appendWithDelimiter("", filesToSync, syncVersion + " ") + syncVersion;
-        return executeScmCommand("p4 sync -f {}", fileNames);
+        return executeScmCommand("sync -f {}", fileNames);
     }
 
     public String move(String changelistId, String fromFileName, String toFileName, String extraFlags) {
-        String output = executeScmCommand("p4 move {} -c {} {} {}", extraFlags, changelistId, fromFileName, toFileName);
+        String output = executeScmCommand("move {} -c {} {} {}", extraFlags, changelistId, fromFileName, toFileName);
         return failOutputIfMissingText(output, "moved from");
     }
 
     public String add(String changelistId, String fileName) {
-        String output = executeScmCommand("p4 add -c {} {}", changelistId, fileName);
+        String output = executeScmCommand("add -c {} {}", changelistId, fileName);
         return failOutputIfMissingText(output, "opened for add");
     }
 
     public String openForEdit(String changelistId, String fileName) {
-        String output = executeScmCommand("p4 edit -c {} {}", changelistId, fileName);
+        String output = executeScmCommand("edit -c {} {}", changelistId, fileName);
         return failOutputIfMissingText(output, "opened for edit");
     }
 
     public String markForDelete(String changelistId, String fileName) {
-        String output = executeScmCommand("p4 delete -c {} {}", changelistId, fileName);
+        String output = executeScmCommand("delete -c {} {}", changelistId, fileName);
         return failOutputIfMissingText(output, "opened for delete");
     }
 
@@ -324,6 +329,23 @@ public class Perforce extends BaseScmWrapper {
         }
         log.debug("Syncing existing perforce files {}", filesToSync.toString());
         sync(filesToSync, syncChangelistId);
+    }
+
+    public boolean revertAndResyncUnresolvedFiles(List<FileChange> changelistChanges, String versionToSyncTo) {
+        List<String> unresolvedFilesToRevertAndSync = new ArrayList<>();
+        for (int i = changelistChanges.size() - 1; i >= 0; i--) {
+            FileChange fileChange = changelistChanges.get(i);
+            if (fileChange.isUnresolved()) {
+                unresolvedFilesToRevertAndSync.add(fileChange.getLastFileAffected());
+            }
+        }
+        if (unresolvedFilesToRevertAndSync.isEmpty()) {
+            return false;
+        }
+        log.info("Reverting and resyncing unresolved files: {}", unresolvedFilesToRevertAndSync.toString());
+        revertFiles(unresolvedFilesToRevertAndSync);
+        sync(unresolvedFilesToRevertAndSync, versionToSyncTo);
+        return true;
     }
 
     public void openFilesForEditIfNeeded(String changelistId, List<FileChange> fileChanges) {
@@ -372,16 +394,16 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public boolean updatePendingChangelist(String id, String description) {
-        String perforceTemplate = executeScmCommand("p4 change -o " + id);
+        String perforceTemplate = executeScmCommand("change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, false);
-        String output = executeScmCommand("p4 change -i", amendedTemplate, LogLevel.DEBUG);
+        String output = executeScmCommand("change -i", amendedTemplate, LogLevel.DEBUG);
         return changeSucceeded(output);
     }
 
     public void submitChangelist(String id, String description) {
-        String perforceTemplate = executeScmCommand("p4 change -o " + id);
+        String perforceTemplate = executeScmCommand("change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, true);
-        String submitOutput = executeScmCommand("p4 submit -f revertunchanged -i", amendedTemplate, LogLevel.INFO);
+        String submitOutput = executeScmCommand("submit -f revertunchanged -i", amendedTemplate, LogLevel.INFO);
         String status = getChangelistStatus(id);
         if (!"submitted".equals(status)) {
             log.error("Changelist {} has status {}, expected submitted", id, status);
@@ -413,7 +435,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     private File determineClientDirectoryForClientName() {
-        String info = executeScmCommand("p4 clients -e " + clientName, LogLevel.DEBUG);
+        String info = executeScmCommand("clients -e " + clientName, LogLevel.DEBUG);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + clientName + "\\s+.+?(\\S+)\\s+'Created by");
         if (clientDirectory == null) {
             throw new RuntimeException("Failed to parse client directory for client " + clientName + "\n" + info);
@@ -424,7 +446,7 @@ public class Perforce extends BaseScmWrapper {
     private String determineClientNameForDirectory(String username) {
         String clientRoot = super.getWorkingDirectory().getPath();
         String quotedClientRoot = Pattern.quote(clientRoot);
-        String info = executeScmCommand("p4 clients -u " + username, LogLevel.DEBUG);
+        String info = executeScmCommand("clients -u " + username, LogLevel.DEBUG);
         String clientName = MatcherUtils.singleMatch(info, "Client\\s+(\\S+)\\s+.+?" + quotedClientRoot + "\\s+'Created by");
         if (clientName == null) {
             throw new RuntimeException("Failed to parse client name for directory " + clientRoot

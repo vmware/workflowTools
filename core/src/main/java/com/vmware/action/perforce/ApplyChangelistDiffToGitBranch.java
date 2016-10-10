@@ -10,6 +10,7 @@ import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitAction {
         }
 
         log.info("Generating git compatible diff for perforce changelist {}", changelistIdToUse);
-        String diffData = perforce.diffChangelistInGitFormat(changelistIdToUse, true);
+        String diffData = perforce.diffChangelistInGitFormat(changelistIdToUse, true, LogLevel.TRACE);
 
         String checkOutput = git.applyDiff(diffData, true);
         if (StringUtils.isNotBlank(checkOutput)) {

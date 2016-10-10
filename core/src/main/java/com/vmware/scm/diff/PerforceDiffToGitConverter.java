@@ -23,6 +23,9 @@ public class PerforceDiffToGitConverter {
     private static final String[] VALUES_TO_IGNORE = new String[]{"Moved from", "Moved to"};
     private List<String> depotPaths = new ArrayList<>();
 
+    private String diffText;
+    private List<FileChange> fileChanges;
+
 
     private Perforce perforce;
 
@@ -30,10 +33,11 @@ public class PerforceDiffToGitConverter {
         this.perforce = perforce;
     }
 
-    public String convert(String perforceDiff) {
+    public void convert(String perforceDiff) {
         ListIterator<String> lineIter = Arrays.asList(perforceDiff.split("\n")).listIterator();
         StringBuilder builder = new StringBuilder("");
         Matcher minusMatcher = Pattern.compile("---\\s+.+\\s+(.+)#(\\d+)").matcher("");
+        fileChanges = new ArrayList<>();
         while (lineIter.hasNext()) {
             String line = lineIter.next();
             minusMatcher.reset(line);
@@ -43,15 +47,23 @@ public class PerforceDiffToGitConverter {
 
             if (minusMatcher.find()) {
                 FileChange fileChange = determineFileChange(lineIter, minusMatcher);
+                fileChanges.add(fileChange);
                 builder.append(fileChange.diffGitLine()).append("\n");
                 builder.append(fileChange.createMinusPlusLines()).append("\n");
             } else {
                 builder.append(line).append("\n");
             }
         }
-        String diffText = builder.toString();
+        diffText = builder.toString();
         diffText = replacePathsWithLocalPaths(diffText);
+    }
+
+    public String getDiffText() {
         return diffText;
+    }
+
+    public List<FileChange> getFileChanges() {
+        return fileChanges;
     }
 
     private String replacePathsWithLocalPaths(String diffText) {

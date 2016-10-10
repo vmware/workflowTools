@@ -251,7 +251,7 @@ public class WorkflowConfig {
     public boolean setEmptyPropertiesOnly;
 
     @ConfigurableProperty(commandLine = "-pid,--patch", help = "Id of the review request to use for patching")
-    public int reviewRequestForPatching;
+    public String reviewRequestForPatching;
 
     @ConfigurableProperty(commandLine = "--latest-diff", help = "Always use latest diff from review request for patching")
     public boolean alwaysUseLatestDiff;
