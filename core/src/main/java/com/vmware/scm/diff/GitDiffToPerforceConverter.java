@@ -1,5 +1,6 @@
 package com.vmware.scm.diff;
 
+import com.vmware.scm.FileChange;
 import com.vmware.scm.Perforce;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
@@ -30,11 +31,13 @@ public class GitDiffToPerforceConverter {
     private List<String> whereFilesToCheck = new ArrayList<>();
     private Map<String, String> depotMappings = new HashMap<>();
     private Map<String, String> depotVersions = new HashMap<>();
+    private List<FileChange> fileChanges;
     private String diffDate;
     private String lastDiffFile;
 
     private Perforce perforce;
     private String lastSubmittedChangelist;
+    private String output;
 
     public GitDiffToPerforceConverter(Perforce perforce, String lastSubmittedChangelist) {
         this.perforce = perforce;
@@ -42,6 +45,7 @@ public class GitDiffToPerforceConverter {
     }
 
     public byte[] convert(String gitDiff) {
+        output = "";
         if (gitDiff == null) {
             return null;
         } else if (gitDiff.isEmpty()) {
@@ -49,24 +53,28 @@ public class GitDiffToPerforceConverter {
         }
         depotFilesToCheck.clear();
         whereFilesToCheck.clear();
+        fileChanges = new ArrayList<>();
 
         diffDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         List<String> diffLines = Arrays.asList(gitDiff.split("\n"));
         lastDiffFile = "";
-        String output = "";
+        output = "";
         Iterator<String> linesIterator = diffLines.iterator();
         while (linesIterator.hasNext()) {
             String lineToAdd = convertDiffLine(linesIterator);
-            output = appendLineToOutput(output, lineToAdd);
+            appendLineToOutput(lineToAdd);
         }
 
         addPerforceDepotInfoForFiles();
-        output = addDepotInfoToOutput(output);
-
+        addDepotInfoToOutput();
         return output.getBytes(Charset.forName("UTF-8"));
     }
 
-    private String addDepotInfoToOutput(String output) {
+    public List<FileChange> getFileChanges() {
+        return fileChanges;
+    }
+
+    private void addDepotInfoToOutput() {
         for (String depotFileToCheck : depotMappings.keySet()) {
             String depotMapping = depotMappings.get(depotFileToCheck);
             if (depotMapping == null) {
@@ -76,7 +84,6 @@ public class GitDiffToPerforceConverter {
             output = output.replace("[!!" + depotFileToCheck + "#0!!]", depotMapping + "#" + version);
             output = output.replace("[!!" + depotFileToCheck + "!!]", depotMapping);
         }
-        return output;
     }
 
     private String convertDiffLine(Iterator<String> linesIterator) {
@@ -141,15 +148,14 @@ public class GitDiffToPerforceConverter {
         }
     }
 
-    private String appendLineToOutput(String output, String lineToAdd) {
+    private void appendLineToOutput(String lineToAdd) {
         if (lineToAdd == null) {
-            return output;
+            return;
         }
         if (!output.isEmpty()) {
             output += "\n";
         }
         output += lineToAdd;
-        return output;
     }
 
     private void addPerforceDepotInfoForFiles() {

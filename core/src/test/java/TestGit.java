@@ -29,7 +29,7 @@ public class TestGit {
     private static File workingDirectory;
     private static File testFile;
 
-    Git git;
+    private Git git;
 
     @BeforeClass
     public static void initGitRepo() {

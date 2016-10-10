@@ -1,12 +1,14 @@
 package com.vmware.action.review;
 
 import com.vmware.action.BaseAction;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
+import com.vmware.scm.FileChange;
 import com.vmware.scm.Perforce;
 import com.vmware.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.IOUtils;
@@ -15,9 +17,11 @@ import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @ActionDescription("Applies a specified review request's diff against the local repository.")
-public class ApplyReviewPatch extends BaseAction {
+public class ApplyReviewPatch extends BaseCommitAction {
 
     private ReviewBoard reviewBoard;
 
@@ -37,15 +41,15 @@ public class ApplyReviewPatch extends BaseAction {
 
     @Override
     public void process() {
-        if (config.reviewRequestForPatching == 0) {
+        if (config.reviewRequestForPatching == null) {
             log.info("No review request id specified as source for patch");
-            config.reviewRequestForPatching = InputUtils.readValueUntilValidInt("Review request id for patch");
+            config.reviewRequestForPatching = String.valueOf(InputUtils.readValueUntilValidInt("Review request id for patch"));
         }
-
-        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(config.reviewRequestForPatching);
+        int reviewId = Integer.parseInt(config.reviewRequestForPatching);
+        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(reviewId);
         Repository repository = reviewBoard.getRepository(reviewRequest.getRepositoryLink());
         ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());
-        log.info("Using review request {} ({})", reviewRequest.id, reviewRequest.summary);
+        log.info("Using review request {} ({}) for patching", reviewRequest.id, reviewRequest.summary);
 
         if (diffs.length == 0) {
             throw new IllegalArgumentException(String.format("Review request %s does not have any diffs",
@@ -59,18 +63,34 @@ public class ApplyReviewPatch extends BaseAction {
 
         String diffData = reviewBoard.getDiffData(diffs[diffSelection].getSelfLink());
 
+        List<FileChange> fileChanges;
         if (repository.tool.toLowerCase().contains("perforce")) {
             Perforce perforce = serviceLocator.getPerforce();
-            diffData = new PerforceDiffToGitConverter(perforce).convert(diffData);
+            PerforceDiffToGitConverter diffConverter = new PerforceDiffToGitConverter(perforce);
+            diffConverter.convert(diffData);
+            diffData = diffConverter.getDiffText();
+            fileChanges = diffConverter.getFileChanges();
+        } else {
+            fileChanges = new ArrayList<>();
+            //todo: parse git file changes from perforce
         }
 
-        log.debug("Patch to apply\n{}", diffData);
+        boolean isPerforceClient = !git.workingDirectoryIsInGitRepo();
+        if (isPerforceClient) {
+            if (StringUtils.isBlank(draft.perforceChangelistId)) {
+                throw new RuntimeException("No changelist specified to apply patch to");
+            }
+            Perforce perforce = serviceLocator.getPerforce();
+            perforce.syncPerforceFiles(fileChanges, "");
+            perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, fileChanges);
+        }
+        log.trace("Patch to apply\n{}", diffData);
 
         File currentDir = new File(System.getProperty("user.dir"));
         IOUtils.write(new File(currentDir.getPath() + "/workflow.patch"), diffData);
 
         log.info("Checking if diff {} applies", diffSelection + 1);
-        String checkResult = git.applyDiff(diffData, false);
+        String checkResult = git.applyDiff(diffData, true);
         if (StringUtils.isNotBlank(checkResult)) {
             log.error("Checking of diff failed!\n{}", checkResult);
             return;
@@ -81,6 +101,9 @@ public class ApplyReviewPatch extends BaseAction {
 
         if (StringUtils.isBlank(result.trim())) {
             log.info("Diff successfully applied");
+            if (isPerforceClient) {
+                serviceLocator.getPerforce().renameAddOrDeleteFiles(draft.perforceChangelistId, fileChanges);
+            }
         } else {
             printDiffResult(result);
         }

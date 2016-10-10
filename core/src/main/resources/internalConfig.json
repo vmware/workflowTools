@@ -143,6 +143,9 @@
        "applyPatch": [
           "ApplyReviewPatch"
        ],
+       "applyPatchAsCommit": [
+          "ApplyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
+       ],
        "prepareCommitForPush": [
           "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsBuilds",
           "FormatCommitText", "AmendCommitWithoutJobResults"

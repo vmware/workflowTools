@@ -6,6 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
 import com.vmware.util.StringUtils;
+import com.vmware.util.logging.LogLevel;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         }
 
         List<FileChange> fileChanges = perforce.getFileChangesForPendingChangelist(draft.perforceChangelistId);
-        String rawGitDiff = git.diffTree(fromRef, "head", true);
+        String rawGitDiff = git.diffTree(fromRef, "head", true, LogLevel.TRACE);
         String gitDiff;
         if (containsChangesOfType(fileChanges, FileChangeType.renamed)) {
             gitDiff = stripLinesStartingWith(rawGitDiff, "similarity index");
@@ -48,7 +49,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
             gitDiff = rawGitDiff;
         }
         log.info("Creating perforce diff for changelist {} in git format", draft.perforceChangelistId);
-        String perforceDiff = perforce.diffChangelistInGitFormat(fileChanges, draft.perforceChangelistId, true);
+        String perforceDiff = perforce.diffChangelistInGitFormat(fileChanges, draft.perforceChangelistId, true, LogLevel.TRACE);
         if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
             perforceDiff = stripLinesStartingWith(perforceDiff, "File(s) not opened for edit");
         }
