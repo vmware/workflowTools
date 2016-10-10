@@ -73,7 +73,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void catFile(String fromRef, String filePath, String toFilePath) {
-        String command = String.format("cat-file -p %s:%s", fromRef, filePath);
+        String command = String.format("git cat-file -p %s:%s", fromRef, filePath);
         Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, command, (String) null);
         try {
             Files.copy(statusProcess.getInputStream(), Paths.get(toFilePath), StandardCopyOption.REPLACE_EXISTING);
@@ -200,7 +200,7 @@ public class Git extends BaseScmWrapper {
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "diff %s--no-color --full-index --no-ext-diff --ignore-submodules %s..%s";
         diffCommand = String.format(diffCommand, renamesFlag, parentRef, commitRef);
-        String diffOutput = executeScmCommand(diffCommand);
+        String diffOutput = executeScmCommand(diffCommand, LogLevel.TRACE);
         return diffOutput.length() > 0 ? diffOutput : null;
     }
 
