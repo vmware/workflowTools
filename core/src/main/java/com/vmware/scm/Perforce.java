@@ -256,7 +256,7 @@ public class Perforce extends BaseScmWrapper {
         Map<String, String> environmentVariables = new HashMap<>();
         String binaryFlag = binaryPatch ? " --binary" : "";
         environmentVariables.put("P4DIFF", "git diff --full-index" + binaryFlag);
-        return executeScmCommand(environmentVariables, "p4 diff -du", filesToDiff, level);
+        return executeScmCommand(environmentVariables, "diff -du", filesToDiff, level);
     }
 
     private void mergeMoveDeleteAndAdds(List<FileChange> fileChanges) {
@@ -332,6 +332,9 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public boolean revertAndResyncUnresolvedFiles(List<FileChange> changelistChanges, String versionToSyncTo) {
+        if (changelistChanges == null || changelistChanges.isEmpty()) {
+            return false;
+        }
         List<String> unresolvedFilesToRevertAndSync = new ArrayList<>();
         for (int i = changelistChanges.size() - 1; i >= 0; i--) {
             FileChange fileChange = changelistChanges.get(i);
