@@ -105,13 +105,13 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
 
         log.info("Adding {} cards to trello", issuesForProcessing.size());
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
-        Map<Integer, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
+        Map<Double, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
 
         Swimlane todoLane = swimlanes[0];
         for (Issue issueToAdd : issuesForProcessing) {
             Swimlane swimlaneToUse = todoLane;
             if (issueToAdd.fields.storyPoints != null) {
-                Integer storyPointValue = issueToAdd.fields.storyPoints.intValue();
+                Double storyPointValue = issueToAdd.fields.storyPoints.doubleValue();
                 swimlaneToUse = storyPointSwimlanes.get(storyPointValue);
             }
 
@@ -122,8 +122,8 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         }
     }
 
-    private Map<Integer, Swimlane> convertSwimlanesIntoMap(Swimlane[] swimlanes) {
-        Map<Integer, Swimlane> storyPointSwimlanes = new HashMap<Integer, Swimlane>();
+    private Map<Double, Swimlane> convertSwimlanesIntoMap(Swimlane[] swimlanes) {
+        Map<Double, Swimlane> storyPointSwimlanes = new HashMap<>();
         for (Swimlane swimlane : swimlanes) {
             if (swimlane.getStoryPointValue() != null) {
                 storyPointSwimlanes.put(swimlane.getStoryPointValue(), swimlane);
