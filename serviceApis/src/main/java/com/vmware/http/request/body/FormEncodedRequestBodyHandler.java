@@ -49,8 +49,7 @@ public class FormEncodedRequestBodyHandler {
             }
             String stringValue = String.valueOf(valuesToWrite.get(name));
             String encodedName = URLEncoder.encode(name, "UTF-8");
-            String encodedValue = URLEncoder.encode(stringValue,  "UTF-8");
-            contentToWrite += encodedName + "=" + encodedValue;
+            contentToWrite += encodedName + "=" + stringValue;
         }
         log.trace("Form encoded request\n{}", contentToWrite);
         outputStream.writeBytes(contentToWrite);

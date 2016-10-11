@@ -150,6 +150,16 @@ public class StringUtils {
         return value == null || value.isEmpty();
     }
 
+    public static int indexOrNthOccurence(String text, String searchText, int count) {
+        int index = text.indexOf(searchText);
+        int counter = 1;
+        while (index != -1 && counter < count) {
+            index = text.indexOf(searchText, index + 1);
+            counter++;
+        }
+        return index;
+    }
+
     public static String repeat(int length, String value) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {

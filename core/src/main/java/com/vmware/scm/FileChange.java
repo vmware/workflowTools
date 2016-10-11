@@ -40,6 +40,10 @@ public class FileChange {
         this.scmType = scmType;
     }
 
+    public FileChange(ScmType scmType, FileChangeType changeType, String... filesAffected) {
+        this(scmType, null, changeType, filesAffected);
+    }
+
     public FileChange(ScmType scmType, String fileMode, FileChangeType changeType, String... filesAffected) {
         this.scmType = scmType;
         this.fileMode = fileMode;
@@ -137,10 +141,23 @@ public class FileChange {
         this.fileType = fileType;
         switch (fileType) {
             case "xtext":
+            case "kxtext":
+            case "xbinary":
+            case "ctext":
+            case "ltext":
+            case "uxbinary":
+            case "xtempobj":
+            case "xunicode":
+            case "xutf16":
                 fileMode = "100755";
                 break;
             case "text":
+            case "ktext":
+            case "binary":
+            case "cxtext":
+            case "xltext":
             case "ubinary":
+            case "tempobj":
                 fileMode = "100644";
                 break;
             case "symlink":
