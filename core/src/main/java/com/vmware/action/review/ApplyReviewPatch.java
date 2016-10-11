@@ -10,6 +10,7 @@ import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.scm.FileChange;
 import com.vmware.scm.Perforce;
+import com.vmware.scm.diff.GitDiffToPerforceConverter;
 import com.vmware.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.IOUtils;
 import com.vmware.util.input.InputUtils;
@@ -63,19 +64,19 @@ public class ApplyReviewPatch extends BaseCommitAction {
 
         String diffData = reviewBoard.getDiffData(diffs[diffSelection].getSelfLink());
 
-        List<FileChange> fileChanges;
+        List<FileChange> fileChanges = null;
+        boolean isPerforceClient = !git.workingDirectoryIsInGitRepo();
         if (repository.tool.toLowerCase().contains("perforce")) {
-            Perforce perforce = serviceLocator.getPerforce();
-            PerforceDiffToGitConverter diffConverter = new PerforceDiffToGitConverter(perforce);
-            diffConverter.convert(diffData);
-            diffData = diffConverter.getDiffText();
+            PerforceDiffToGitConverter diffConverter = new PerforceDiffToGitConverter();
+            diffData = diffConverter.convert(diffData);
             fileChanges = diffConverter.getFileChanges();
-        } else {
-            fileChanges = new ArrayList<>();
-            //todo: parse git file changes from perforce
+        } else if (isPerforceClient){
+            Perforce perforce = serviceLocator.getPerforce();
+            GitDiffToPerforceConverter diffConverter = new GitDiffToPerforceConverter(perforce, "");
+            diffConverter.convert(diffData);
+            fileChanges = diffConverter.getFileChanges();
         }
 
-        boolean isPerforceClient = !git.workingDirectoryIsInGitRepo();
         if (isPerforceClient) {
             if (StringUtils.isBlank(draft.perforceChangelistId)) {
                 throw new RuntimeException("No changelist specified to apply patch to");

@@ -1,10 +1,14 @@
 package com.vmware.scm.diff;
 
 import com.vmware.scm.FileChange;
+import com.vmware.scm.FileChangeType;
 import com.vmware.scm.Perforce;
+import com.vmware.scm.ScmType;
+import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +21,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.scm.ScmType.git;
 import static java.lang.String.format;
 
 /**
@@ -92,25 +97,32 @@ public class GitDiffToPerforceConverter {
         String similarityIndex = MatcherUtils.singleMatch(diffLine, "similarity index (\\d+)%");
         String minusDiffFile = MatcherUtils.singleMatch(diffLine, "---\\s+a/(.+)");
         String addDiffFile = MatcherUtils.singleMatch(diffLine, "\\+\\+\\+\\s+b/(.+)");
+        FileChange fileChange = null;
         if (similarityIndex != null) {
             lineToAdd = createFileRenameText(linesIterator, similarityIndex);
         } else if (diffLine.startsWith("--- /dev/null")) {
             String addFile = MatcherUtils.singleMatchExpected(linesIterator.next(), "\\+\\+\\+\\s+b/(.+)");
+            fileChange = new FileChange(git, FileChangeType.added, addFile);
             addWhereFileToCheckIfNeeded(addFile);
             lineToAdd = createPerforceMinusFile(addFile) + "\n" + createPerforceAddFile(addFile);
         } else if (diffLine.startsWith("+++ /dev/null")) {
+            fileChange = new FileChange(git, FileChangeType.deleted, lastDiffFile);
             lineToAdd = createPerforceAddFile(lastDiffFile);
         } else if (minusDiffFile != null) {
             addDepotFileForCheckingIfNeeded(minusDiffFile);
             lastDiffFile = minusDiffFile;
             lineToAdd = createPerforceMinusFile(minusDiffFile);
         } else if (addDiffFile != null) {
+            fileChange = new FileChange(git, FileChangeType.modified, addDiffFile);
             lineToAdd = createPerforceAddFile(addDiffFile);
         } else if (diffLine.equals(" ")) {
             // removing just to be consistent with perforce diffs
             lineToAdd = "";
         } else if (!StringUtils.textStartsWithValue(diffLine, VALUES_TO_IGNORE)) {
             lineToAdd = diffLine;
+        }
+        if (fileChange != null) {
+            fileChanges.add(fileChange);
         }
         return lineToAdd;
     }
@@ -122,6 +134,7 @@ public class GitDiffToPerforceConverter {
         addDepotFileForCheckingIfNeeded(renameFromFile);
         addWhereFileToCheckIfNeeded(renameToFile);
         if (similarityValue == 100) {
+            fileChanges.add(new FileChange(git, FileChangeType.renamed, renameFromFile, renameToFile));
             return format("==== [!!%s#0!!] ==MV== [!!%s!!] ====\n", renameFromFile, renameToFile);
         } else {
             linesIterator.next();
@@ -131,6 +144,7 @@ public class GitDiffToPerforceConverter {
                 throw new IllegalArgumentException(
                         format("Expected renamed to file [%s] name to match +++ b/ file name[%s]", renameToFile, renamedDiffFile));
             }
+            fileChanges.add(new FileChange(git, FileChangeType.renamedAndModified, renameFromFile, renameToFile));
             return format("Moved from: [!!%s!!]\nMoved to: [!!%s!!]\n%s\n%s", renameFromFile, renameToFile,
                     createPerforceMinusFile(renameFromFile), createPerforceAddFile(renameToFile));
         }
@@ -165,7 +179,8 @@ public class GitDiffToPerforceConverter {
                 if (!filesListToCheck.isEmpty()) {
                     filesListToCheck += " ";
                 }
-                filesListToCheck += format("%s/%s@%s", perforce.getWorkingDirectory(), depotFileToCheck, lastSubmittedChangelist);
+                String fileVersion = StringUtils.isNotBlank(lastSubmittedChangelist) ? "@" + lastSubmittedChangelist : "";
+                filesListToCheck += format("%s/%s%s", perforce.getWorkingDirectory(), depotFileToCheck, fileVersion);
             }
             String depotFilesInfo = perforce.getFileInfo(filesListToCheck);
             parsePerforceFilesOutput(depotFilesInfo);
@@ -207,5 +222,13 @@ public class GitDiffToPerforceConverter {
 
     private String createPerforceAddFile(String addDiffFile) {
         return "+++ [!!" + addDiffFile + "!!]\t" + diffDate;
+    }
+
+    public static void main(String[] args) {
+        String diff = IOUtils.read(new File("/Users/dbiggs/Downloads/rb1030085.patch"));
+        PerforceDiffToGitConverter converter = new PerforceDiffToGitConverter();
+        String diffText = converter.convert(diff);
+        System.out.println(diffText);
+
     }
 }

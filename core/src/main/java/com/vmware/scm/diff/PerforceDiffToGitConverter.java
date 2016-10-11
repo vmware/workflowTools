@@ -26,14 +26,7 @@ public class PerforceDiffToGitConverter {
     private String diffText;
     private List<FileChange> fileChanges;
 
-
-    private Perforce perforce;
-
-    public PerforceDiffToGitConverter(Perforce perforce) {
-        this.perforce = perforce;
-    }
-
-    public void convert(String perforceDiff) {
+    public String convert(String perforceDiff) {
         ListIterator<String> lineIter = Arrays.asList(perforceDiff.split("\n")).listIterator();
         StringBuilder builder = new StringBuilder("");
         Matcher minusMatcher = Pattern.compile("---\\s+.+\\s+(.+)#(\\d+)").matcher("");
@@ -56,6 +49,7 @@ public class PerforceDiffToGitConverter {
         }
         diffText = builder.toString();
         diffText = replacePathsWithLocalPaths(diffText);
+        return diffText;
     }
 
     public String getDiffText() {
@@ -67,15 +61,13 @@ public class PerforceDiffToGitConverter {
     }
 
     private String replacePathsWithLocalPaths(String diffText) {
-        Map<String, String> depotMappings = perforce.getWhereLocalFileInfo(depotPaths);
-        String clientDirectory = perforce.getWorkingDirectory().getPath();
-        for (String depotMapping : depotMappings.keySet()) {
-            String localPath = depotMappings.get(depotMapping);
-            if (!localPath.startsWith(clientDirectory)) {
-                throw new RuntimeException("Expected local path " + localPath + " to start with client directory " + clientDirectory);
+        for (String depotPath : depotPaths) {
+            int slashIndexAfterDepotPath = StringUtils.indexOrNthOccurence(depotPath, "/", 5);
+            if (slashIndexAfterDepotPath == -1) {
+                throw new RuntimeException("Expected to find depot path of format //depot/cloudName/branchName/ in depot path " + depotPath);
             }
-            String relativePath = localPath.substring(clientDirectory.length() + 1);
-            diffText = diffText.replace(depotMapping, relativePath);
+            String relativePath = depotPath.substring(slashIndexAfterDepotPath + 1);
+            diffText = diffText.replace(depotPath, relativePath);
         }
         return diffText;
     }

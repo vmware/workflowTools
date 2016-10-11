@@ -1,0 +1,458 @@
+{
+  "actions": [
+    {},
+    {
+      "parameterDefinitions": [
+        {
+          "defaultParameterValue": {
+            "value": ""
+          },
+          "description": "The vCD build to be installed and tested.",
+          "name": "VCD_BUILD",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": ""
+          },
+          "description": "The full name of the vApp as it appears in vCD.",
+          "name": "VAPP_NAME",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "suite-groups/Preflight"
+          },
+          "description": "The test suite or suites to execute.",
+          "name": "TEST_SUITE",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "default"
+          },
+          "description": "The desired vCloud API version--e.g., VCLOUD_API_6_0--or \"default\".",
+          "name": "API_VERSION",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "VCLOUD_API_6_0"
+          },
+          "description": "The desired VCTA API version VCLOUD_API_6_0 which is the last supported version for vcta. ",
+          "name": "vcta_api_version",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": false
+          },
+          "description": "Optional installation of VCTA. Default is not to install. VCTA tests will not be run as part of the Preflight suite, they must be included explicitly.",
+          "name": "INSTALL_VCTA",
+          "type": "BooleanParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "mssql"
+          },
+          "description": "The desired database to install and test against.",
+          "name": "DATABASE",
+          "type": "ChoiceParameterDefinition",
+          "choices": [
+            "mssql",
+            "oracle",
+            "postgres"
+          ]
+        },
+        {
+          "defaultParameterValue": {
+            "value": "development"
+          },
+          "description": "The org in vCD where your vApp resides.",
+          "name": "VCD_CONTEXT",
+          "type": "ChoiceParameterDefinition",
+          "choices": [
+            "development",
+            "test-1",
+            "test-2",
+            "1-60"
+          ]
+        },
+        {
+          "defaultParameterValue": {},
+          "description": "The Jenkins Node label to use when building. Accept the default value of CM_VCD2.",
+          "name": "SITE_ID",
+          "type": "LabelParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": ""
+          },
+          "description": "Optional.<br>\nThe testbed_info.json file is stored in the vApp metadata.<br>\nCut and paste the entire content of your testbed_info.json file here only if you want to override the content stored in the metadata.",
+          "name": "JSON",
+          "type": "TextParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "vcd-sp-infra"
+          },
+          "description": "Your LDAP user name.",
+          "name": "OWNER",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "value": "Integration-Scripts-Deliverables"
+          },
+          "description": "The Jenkins job to copy the integration_scripts from.\n<dl>\n  <dt><a href=\"https://sp-taas.eng.vmware.com/jenkins/view/Infra/job/Integration-Scripts-Deliverables/\">Integration-Scripts-Deliverables</a></dt>\n  <dd>The default, which will provide a TOT deliverable of the integration_scripts.</dd>\n  <dt><a href=\"https://sp-taas.eng.vmware.com/jenkins/view/Infra/job/Integration-Scripts-Deliverables-Staging/\">Integration-Scripts-Deliverables-Staging</a></dt>\n  <dd>Use this if you are testing a change to the integration_scripts. For the <tt>INTEGRATION_SCRIPTS_JOB_NUMBER</tt> below, you should choose \"Specific build\" and provide the job number of the run from your feature branch.</dd>\n</dl>",
+          "name": "INTEGRATION_SCRIPTS_PROJECT_NAME",
+          "type": "ChoiceParameterDefinition",
+          "choices": [
+            "Integration-Scripts-Deliverables",
+            "Integration-Scripts-Deliverables-Staging"
+          ]
+        },
+        {
+          "defaultParameterValue": {
+            "value": "<StatusBuildSelector plugin=\"copyartifact@1.37\"/>"
+          },
+          "description": "Use this to control which Jenkins job build number to use from the project specified in <tt>INTEGRATION_SCRIPTS_PROJECT_NAME</tt>.",
+          "name": "INTEGRATION_SCRIPTS_JOB_NUMBER",
+          "type": "BuildSelectorParameter"
+        }
+      ]
+    },
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
+  ],
+  "description": "Basic workflow job for Preflights. Requires that a dev-vpod has been previously deployed.<br>\r\nThis job will perform the following operations:<br>\r\n1. Install the specified VCD build.<br>\r\n2. Execute suite-groups/Preflight.<br>\r\n3. Revert the testbed to a snapshot to insure a clean, uninstalled environment.<br>",
+  "displayName": "Preflight-2.0-BasicWorkflow",
+  "displayNameOrNull": null,
+  "name": "Preflight-2.0-BasicWorkflow",
+  "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/",
+  "buildable": true,
+  "builds": [
+    {
+      "number": 1630,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1630/"
+    },
+    {
+      "number": 1629,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1629/"
+    },
+    {
+      "number": 1628,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1628/"
+    },
+    {
+      "number": 1627,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1627/"
+    },
+    {
+      "number": 1626,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1626/"
+    },
+    {
+      "number": 1625,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1625/"
+    },
+    {
+      "number": 1624,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1624/"
+    },
+    {
+      "number": 1623,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1623/"
+    },
+    {
+      "number": 1622,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1622/"
+    },
+    {
+      "number": 1621,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1621/"
+    },
+    {
+      "number": 1620,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1620/"
+    },
+    {
+      "number": 1619,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1619/"
+    },
+    {
+      "number": 1618,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1618/"
+    },
+    {
+      "number": 1617,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1617/"
+    },
+    {
+      "number": 1616,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1616/"
+    },
+    {
+      "number": 1615,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1615/"
+    },
+    {
+      "number": 1614,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1614/"
+    },
+    {
+      "number": 1613,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1613/"
+    },
+    {
+      "number": 1612,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1612/"
+    },
+    {
+      "number": 1611,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1611/"
+    },
+    {
+      "number": 1610,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1610/"
+    },
+    {
+      "number": 1609,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1609/"
+    },
+    {
+      "number": 1608,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1608/"
+    },
+    {
+      "number": 1607,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1607/"
+    },
+    {
+      "number": 1606,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1606/"
+    },
+    {
+      "number": 1605,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1605/"
+    },
+    {
+      "number": 1604,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1604/"
+    },
+    {
+      "number": 1603,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1603/"
+    },
+    {
+      "number": 1602,
+      "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1602/"
+    }
+  ],
+  "color": "red",
+  "firstBuild": {
+    "number": 1602,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1602/"
+  },
+  "healthReport": [
+    {
+      "description": "Build stability: 3 out of the last 5 builds failed.",
+      "iconClassName": "icon-health-20to39",
+      "iconUrl": "health-20to39.png",
+      "score": 40
+    }
+  ],
+  "inQueue": false,
+  "keepDependencies": false,
+  "lastBuild": {
+    "number": 1630,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1630/"
+  },
+  "lastCompletedBuild": {
+    "number": 1630,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1630/"
+  },
+  "lastFailedBuild": {
+    "number": 1630,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1630/"
+  },
+  "lastStableBuild": {
+    "number": 1627,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1627/"
+  },
+  "lastSuccessfulBuild": {
+    "number": 1627,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1627/"
+  },
+  "lastUnstableBuild": null,
+  "lastUnsuccessfulBuild": {
+    "number": 1630,
+    "url": "https://sp-taas.eng.vmware.com/jenkins/job/Preflight-2.0-BasicWorkflow/1630/"
+  },
+  "nextBuildNumber": 1631,
+  "property": [
+    {},
+    {},
+    {},
+    {
+      "additionalTag": "",
+      "cleanImages": true,
+      "pushOnSuccess": false,
+      "tagOnCompletion": false
+    },
+    {},
+    {},
+    {},
+    {
+      "parameterDefinitions": [
+        {
+          "defaultParameterValue": {
+            "name": "VCD_BUILD",
+            "value": ""
+          },
+          "description": "The vCD build to be installed and tested.",
+          "name": "VCD_BUILD",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "VAPP_NAME",
+            "value": ""
+          },
+          "description": "The full name of the vApp as it appears in vCD.",
+          "name": "VAPP_NAME",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "TEST_SUITE",
+            "value": "suite-groups/Preflight"
+          },
+          "description": "The test suite or suites to execute.",
+          "name": "TEST_SUITE",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "API_VERSION",
+            "value": "default"
+          },
+          "description": "The desired vCloud API version--e.g., VCLOUD_API_6_0--or \"default\".",
+          "name": "API_VERSION",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "vcta_api_version",
+            "value": "VCLOUD_API_6_0"
+          },
+          "description": "The desired VCTA API version VCLOUD_API_6_0 which is the last supported version for vcta. ",
+          "name": "vcta_api_version",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "INSTALL_VCTA",
+            "value": false
+          },
+          "description": "Optional installation of VCTA. Default is not to install. VCTA tests will not be run as part of the Preflight suite, they must be included explicitly.",
+          "name": "INSTALL_VCTA",
+          "type": "BooleanParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "DATABASE",
+            "value": "mssql"
+          },
+          "description": "The desired database to install and test against.",
+          "name": "DATABASE",
+          "type": "ChoiceParameterDefinition",
+          "choices": [
+            "mssql",
+            "oracle",
+            "postgres"
+          ]
+        },
+        {
+          "defaultParameterValue": {
+            "name": "VCD_CONTEXT",
+            "value": "development"
+          },
+          "description": "The org in vCD where your vApp resides.",
+          "name": "VCD_CONTEXT",
+          "type": "ChoiceParameterDefinition",
+          "choices": [
+            "development",
+            "test-1",
+            "test-2",
+            "1-60"
+          ]
+        },
+        {
+          "defaultParameterValue": {
+            "name": "SITE_ID",
+            "value": "CM_VCD2"
+          },
+          "description": "The Jenkins Node label to use when building. Accept the default value of CM_VCD2.",
+          "name": "SITE_ID",
+          "type": "LabelParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "JSON",
+            "value": ""
+          },
+          "description": "Optional.<br>\nThe testbed_info.json file is stored in the vApp metadata.<br>\nCut and paste the entire content of your testbed_info.json file here only if you want to override the content stored in the metadata.",
+          "name": "JSON",
+          "type": "TextParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "OWNER",
+            "value": "vcd-sp-infra"
+          },
+          "description": "Your LDAP user name.",
+          "name": "OWNER",
+          "type": "StringParameterDefinition"
+        },
+        {
+          "defaultParameterValue": {
+            "name": "INTEGRATION_SCRIPTS_PROJECT_NAME",
+            "value": "Integration-Scripts-Deliverables"
+          },
+          "description": "The Jenkins job to copy the integration_scripts from.\n<dl>\n  <dt><a href=\"https://sp-taas.eng.vmware.com/jenkins/view/Infra/job/Integration-Scripts-Deliverables/\">Integration-Scripts-Deliverables</a></dt>\n  <dd>The default, which will provide a TOT deliverable of the integration_scripts.</dd>\n  <dt><a href=\"https://sp-taas.eng.vmware.com/jenkins/view/Infra/job/Integration-Scripts-Deliverables-Staging/\">Integration-Scripts-Deliverables-Staging</a></dt>\n  <dd>Use this if you are testing a change to the integration_scripts. For the <tt>INTEGRATION_SCRIPTS_JOB_NUMBER</tt> below, you should choose \"Specific build\" and provide the job number of the run from your feature branch.</dd>\n</dl>",
+          "name": "INTEGRATION_SCRIPTS_PROJECT_NAME",
+          "type": "ChoiceParameterDefinition",
+          "choices": [
+            "Integration-Scripts-Deliverables",
+            "Integration-Scripts-Deliverables-Staging"
+          ]
+        },
+        {
+          "defaultParameterValue": {
+            "name": "INTEGRATION_SCRIPTS_JOB_NUMBER",
+            "value": "<StatusBuildSelector plugin=\"copyartifact@1.37\"/>"
+          },
+          "description": "Use this to control which Jenkins job build number to use from the project specified in <tt>INTEGRATION_SCRIPTS_PROJECT_NAME</tt>.",
+          "name": "INTEGRATION_SCRIPTS_JOB_NUMBER",
+          "type": "BuildSelectorParameter"
+        }
+      ]
+    },
+    {}
+  ],
+  "queueItem": null,
+  "concurrentBuild": true,
+  "downstreamProjects": [],
+  "scm": {},
+  "upstreamProjects": []
+}
