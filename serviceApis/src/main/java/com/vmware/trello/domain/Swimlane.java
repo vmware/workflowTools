@@ -29,10 +29,10 @@ public class Swimlane {
         this.name = name;
     }
 
-    public Integer getStoryPointValue() {
-        Matcher matcher = Pattern.compile("(\\d+)\\Q" + STORY_POINTS_SUFFIX + "\\E").matcher(name);
+    public Double getStoryPointValue() {
+        Matcher matcher = Pattern.compile("([\\d.]+)\\Q" + STORY_POINTS_SUFFIX + "\\E").matcher(name);
         if (matcher.find()) {
-            return new Integer(matcher.group(1));
+            return Double.parseDouble(matcher.group(1));
         }
         return null;
     }

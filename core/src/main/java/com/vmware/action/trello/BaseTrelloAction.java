@@ -51,8 +51,13 @@ public abstract class BaseTrelloAction extends BaseMultiActionDataSupport {
             trello.closeSwimlane(swimlanes[i]);
         }
 
-        for (Integer storyPointValue : config.storyPointValues) {
-            Swimlane swimlaneToCreate = new Swimlane(createdBoard, storyPointValue + Swimlane.STORY_POINTS_SUFFIX);
+        for (Double storyPointValue : config.storyPointValues) {
+            String displayValue = String.valueOf(storyPointValue);
+            int storyPointValueAsInt = storyPointValue.intValue();
+            if (storyPointValueAsInt == storyPointValue) {
+                displayValue = String.valueOf(storyPointValueAsInt);
+            }
+            Swimlane swimlaneToCreate = new Swimlane(createdBoard, displayValue + Swimlane.STORY_POINTS_SUFFIX);
             log.info("Creating swimlane {}", swimlaneToCreate.name);
             trello.createSwimlane(swimlaneToCreate);
         }

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -149,7 +150,7 @@ public class WorkflowConfig {
     public boolean includeStoriesWithEstimates;
 
     @ConfigurableProperty(help = "Swimlanes to use for trello. A list of story point values as integers is expected")
-    public SortedSet<Integer> storyPointValues;
+    public LinkedList<Double> storyPointValues;
 
     @ConfigurableProperty(help = "Map of user friendly names for jenkins jobs to select from")
     public Map<String, String> jenkinsJobsMappings = new HashMap<>();

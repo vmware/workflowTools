@@ -43,7 +43,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
         Padder padder = new Padder("{} Swimlanes", selectedBoard.name);
         padder.infoTitle();
         for (Swimlane swimlane : swimlanes) {
-            Integer storyPointValue = swimlane.getStoryPointValue();
+            Double storyPointValue = swimlane.getStoryPointValue();
             if (storyPointValue == null) {
                 log.info("Skipping issues in swimlane {}", swimlane.name);
                 continue;
@@ -65,7 +65,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
         padder.infoTitle();
     }
 
-    private Issue convertCardToIssue(Integer storyPointValue, Card cardToUpdate) {
+    private Issue convertCardToIssue(Double storyPointValue, Card cardToUpdate) {
         Issue issueToUpdate = new Issue(cardToUpdate.getIssueKey());
         issueToUpdate.fields.storyPoints = storyPointValue;
         issueToUpdate.fields.issuetype = new IssueType(IssueTypeDefinition.Story);
