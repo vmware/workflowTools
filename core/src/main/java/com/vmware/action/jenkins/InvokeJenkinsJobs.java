@@ -89,7 +89,8 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, Job jobToInvoke) {
         log.info("Invoking job {}", jobToInvoke.name);
 
-        JobParameters params = constructParametersForJob(jobToInvoke.parameters);
+        JobDetails jobDetails = jenkins.getJobDetails(jobToInvoke);
+        JobParameters params = constructParametersForJob(jobToInvoke.parameters, jobDetails.getParameterDefinitions());
 
         int buildNumber = jenkins.getJobDetails(jobToInvoke).nextBuildNumber;
 
@@ -102,7 +103,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         return expectedNewBuild;
     }
 
-    private JobParameters constructParametersForJob(List<JobParameter> parameters) {
+    private JobParameters constructParametersForJob(List<JobParameter> parameters, List<ParameterDefinition> parameterDefinitions) {
         for (JobParameter parameter : parameters) {
             String paramName = parameter.name;
             String paramValue = parameter.value;
@@ -119,7 +120,30 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             log.info("Setting job param {} to {}", paramName, paramValue);
             parameter.value = paramValue;
         }
+
+        for (ParameterDefinition parameterDefinition : parameterDefinitions) {
+            JobParameter matchingParameter = getParameterByName(parameters, parameterDefinition.name);
+            if (matchingParameter != null) {
+                continue;
+            }
+            if (parameterDefinition.defaultParameterValue == null || StringUtils.isBlank(parameterDefinition.defaultParameterValue.value)) {
+                log.warn("Parameter {} is not specified and does not have a default value, assuming it is an optional parameter", parameterDefinition.name);
+                continue;
+            }
+            JobParameter defaultParameter = new JobParameter(parameterDefinition.name, parameterDefinition.defaultParameterValue.value);
+            log.info("Setting default job param {} to {}", defaultParameter.name, defaultParameter.value);
+            parameters.add(defaultParameter);
+        }
         return new JobParameters(parameters.toArray(new JobParameter[parameters.size()]));
+    }
+
+    private JobParameter getParameterByName(List<JobParameter> parameters, String parameterName) {
+        for (JobParameter parameter : parameters) {
+            if (parameterName.equals(parameter.name)) {
+                return parameter;
+            }
+        }
+        return null;
     }
 
     private String determineSandboxBuildNumber() {
