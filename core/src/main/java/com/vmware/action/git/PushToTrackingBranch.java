@@ -3,6 +3,7 @@ package com.vmware.action.git;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,6 +18,20 @@ public class PushToTrackingBranch extends BaseAction {
 
     @Override
     public void process() {
-        git.push();
+        String trackingBranch = git.getTrackingBranch();
+        if (StringUtils.isBlank(trackingBranch)) {
+            log.debug("Branch {} does not track a remote branch, using configured tracking branch {}",
+                    git.currentBranch(), config.trackingBranch);
+            trackingBranch = config.trackingBranch;
+        }
+
+        String[] pieces = trackingBranch.split("/");
+        if (pieces.length != 2) {
+            log.error("Expected tracking branch to be of the format remote/branchName, was {}", trackingBranch);
+            System.exit(1);
+        }
+        String remote = pieces[0];
+        String branch = pieces[1];
+        git.pushToRemoteBranch(remote, branch);
     }
 }

@@ -219,24 +219,12 @@ public class Git extends BaseScmWrapper {
         log.info("Successfully ran git p4 submit");
     }
 
-    public void push() {
-        String trackingBranch = getTrackingBranch();
-
-        if (trackingBranch == null) {
-            log.error("No tracking branch for current branch {}", currentBranch());
-            System.exit(1);
-        }
-
-        String remoteBranch = trackingBranch.substring("origin/".length());
-        pushToRemoteBranch(remoteBranch);
+    public void pushToRemoteBranch(String remote, String remoteBranch) {
+        pushToRemoteBranch(remote, remoteBranch, false);
     }
 
-    public void pushToRemoteBranch(String remoteBranch) {
-        pushToRemoteBranch(remoteBranch, false);
-    }
-
-    public void forcePushToRemoteBranch(String remoteBranch) {
-        pushToRemoteBranch(remoteBranch, true);
+    public void forcePushToRemoteBranch(String remote, String remoteBranch) {
+        pushToRemoteBranch(remote, remoteBranch, true);
     }
 
     public String mergeBase(String upstreamBranch, String commitRef) {
@@ -388,12 +376,12 @@ public class Git extends BaseScmWrapper {
         return "git";
     }
 
-    private void pushToRemoteBranch(String remoteBranch, boolean forceUpdate) {
+    private void pushToRemoteBranch(String remote, String remoteBranch, boolean forceUpdate) {
         String currentHeadRef = revParse("HEAD");
         log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
 
         String forceUpdateString = forceUpdate ? " -f" : "";
-        String pushCommand = String.format("push origin head:%s%s --porcelain", remoteBranch, forceUpdateString);
+        String pushCommand = String.format("push %s head:%s%s --porcelain", remote, remoteBranch, forceUpdateString);
 
         String pushOutput = executeScmCommand(pushCommand, LogLevel.INFO);
 
@@ -456,7 +444,7 @@ public class Git extends BaseScmWrapper {
         return Collections.unmodifiableList(changes);
     }
 
-    private boolean isGitInstalled() {
+    public boolean isGitInstalled() {
         if (gitInstalled != null) {
             return gitInstalled;
         }
