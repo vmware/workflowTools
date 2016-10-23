@@ -25,9 +25,9 @@ public class PushToRemoteBranch extends BaseAction {
             remoteBranchPath = remoteBranchName;
         }
 
-        remoteBranchPath = remoteBranchPath.replace(":username", config.username);
+        remoteBranchPath = remoteBranchPath.replace("$USERNAME", config.username);
         log.info("Updating remote branch " + remoteBranchPath);
 
-        git.forcePushToRemoteBranch(remoteBranchPath);
+        git.forcePushToRemoteBranch("origin", remoteBranchPath);
     }
 }

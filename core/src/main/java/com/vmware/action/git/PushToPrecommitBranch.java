@@ -20,11 +20,11 @@ public class PushToPrecommitBranch extends BaseAction {
         String remoteBranchName = "precommit";
         String remoteBranchPath = config.remoteBranches.get(remoteBranchName);
         if (StringUtils.isBlank(remoteBranchPath)) {
-            remoteBranchPath = "topic/:username/pre-commit";
+            remoteBranchPath = "topic/$USERNAME/pre-commit";
         }
 
-        remoteBranchPath = remoteBranchPath.replace(":username", config.username);
+        remoteBranchPath = remoteBranchPath.replace("$USERNAME", config.username);
 
-        git.forcePushToRemoteBranch(remoteBranchPath);
+        git.forcePushToRemoteBranch(config.defaultGitRemote, remoteBranchPath);
     }
 }

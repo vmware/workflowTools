@@ -147,6 +147,9 @@
     "--sync-to-branch-latest",
     "--parent"
   ],
+  "PushToDevelop": [
+    "--git-remote"
+  ],
   "PublishReview": [
     "--reviewboard-url"
   ],
@@ -251,6 +254,7 @@
     "--review-board-date-format"
   ],
   "PushToPrecommitBranch": [
+    "--git-remote",
     "--username"
   ],
   "HardSubmitOldShipItReviews": [
@@ -289,9 +293,18 @@
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
   ],
+  "RebaseAgainstMaster": [
+    "--git-remote"
+  ],
+  "PushToMaster": [
+    "--git-remote"
+  ],
   "ReadLastCommit": [
     "--branch",
     "--perforce-client"
+  ],
+  "PushToTrackingBranch": [
+    "--tracking-branch"
   ],
   "FormatCommitText": [
     "--max-description",

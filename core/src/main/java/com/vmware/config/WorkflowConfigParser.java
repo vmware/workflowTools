@@ -45,13 +45,21 @@ public class WorkflowConfigParser {
         applyRuntimeArguments(internalConfig);
         setLogLevel(internalConfig);
 
-        internalConfig.setGitOriginUrlAsReviewBoardRepo();
+        internalConfig.setGitRemoteUrlAsReviewBoardRepo();
 
         applyRepoConfigFileIfExists(internalConfig, loadedConfigFiles);
 
         applyUserConfigFileIfExists(internalConfig, loadedConfigFiles);
 
-        internalConfig.applyGitConfigValues();
+        if (git.isGitInstalled()) {
+            internalConfig.applyGitConfigValues("");
+            String trackingBranch = git.getTrackingBranch();
+            if (StringUtils.isNotBlank(trackingBranch)) {
+                String remoteName = trackingBranch.split("/")[0];
+                log.debug("Applying remote specific config values for git remote {}", remoteName);
+                internalConfig.applyGitConfigValues(remoteName);
+            }
+        }
 
         applySpecifiedConfigFiles(argsParser, internalConfig, loadedConfigFiles);
 

@@ -230,7 +230,10 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--disable-jenkins-login", help = "Skips trying to log into jenkins if the server is not using user login module")
     public boolean disableJenkinsLogin;
 
-    @ConfigurableProperty(help = "Map of remote branches, :username is substituted for the real username.")
+    @ConfigurableProperty(commandLine = "--git-remote", help = "Default git remote. Remote used for pushing to master or other remote branches.")
+    public String defaultGitRemote;
+
+    @ConfigurableProperty(help = "Map of remote branches, $USERNAME is substituted for the real username.")
     public TreeMap<String, String> remoteBranches;
 
     @ConfigurableProperty(commandLine = "-rb, --remote-branch", help = "Remote branch name to use")
@@ -364,22 +367,24 @@ public class WorkflowConfig {
     /**
      * Set separate to other git config values as it shouldn't override a specific workflow file configuration.
      */
-    public void setGitOriginUrlAsReviewBoardRepo() {
-        String gitOriginValue = git.configValue("remote.origin.url");
-        if (StringUtils.isBlank(gitOriginValue)) {
+    public void setGitRemoteUrlAsReviewBoardRepo() {
+        String gitRemoteValue = git.configValue("remote." + defaultGitRemote + ".url");
+        if (StringUtils.isBlank(gitRemoteValue)) {
             return;
         }
 
-        log.debug("Setting git origin value {} as the reviewboard repository", gitOriginValue);
-        reviewBoardRepository = gitOriginValue;
+        log.debug("Setting git remote value {} as the reviewboard repository", gitRemoteValue);
+        reviewBoardRepository = gitRemoteValue;
     }
 
-    public void applyGitConfigValues() {
+    public void applyGitConfigValues(String remoteName) {
+        String remoteText = StringUtils.isBlank(remoteName) ? "" : remoteName + ".";
         Map<String, String> configValues = git.configValues();
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
-            String configValueName = configurableProperty.gitConfigProperty().isEmpty() ? "workflow." + field.getName().toLowerCase()
-                    : configurableProperty.gitConfigProperty();
+            boolean useGitPropertyName = StringUtils.isNotBlank(remoteName) && !configurableProperty.gitConfigProperty().isEmpty();
+            String configValueName = useGitPropertyName ? configurableProperty.gitConfigProperty()
+                    : "workflow." + remoteText + field.getName().toLowerCase();
             String value = configValues.get(configValueName);
             setFieldValue(field, value, "Git Config");
         }
