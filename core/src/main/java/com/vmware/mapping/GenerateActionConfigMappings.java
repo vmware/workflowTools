@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,8 @@ import java.util.logging.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Collections.singletonList;
+
 /**
  * This class in run by the build to generate the action config mappings.
  * Specifically it creates a json file where each action has a list of config values that are relevant for that action.
@@ -32,6 +36,13 @@ import java.util.regex.Pattern;
  * This works because the workflow config class is expected to be called config in all the action classes.
  */
 public class GenerateActionConfigMappings {
+
+    private static Map<String, List<String>> methodNameToConfigValueMappings = new HashMap<>();
+
+    static {
+        methodNameToConfigValueMappings.put("parentBranchPath", singletonList("parentBranch"));
+        methodNameToConfigValueMappings.put("trackingBranchPath", singletonList("trackingBranch"));
+    }
 
     private static final Logger log = LoggerFactory.getLogger(GenerateActionConfigMappings.class);
 
@@ -83,10 +94,19 @@ public class GenerateActionConfigMappings {
     private List<String> convertToCommandLineValues(List<String> foundConfigValues, List<Field> configurableFields) {
         List<String> commandLineOptions = new ArrayList<String>();
 
+        for (int i = foundConfigValues.size() - 1; i >= 0; i--) {
+            String foundConfigValue = foundConfigValues.get(i);
+            if (methodNameToConfigValueMappings.containsKey(foundConfigValue)) {
+                foundConfigValues.addAll(methodNameToConfigValueMappings.get(foundConfigValue));
+            }
+        }
+
         for (int i = foundConfigValues.size() -1; i >= 0; i --) {
             String foundConfigValue = foundConfigValues.get(i);
+            boolean foundMatchingField = false;
             for (Field configurableField : configurableFields) {
                 if (configurableField.getName().equals(foundConfigValue)) {
+                    foundMatchingField = true;
                     ConfigurableProperty configurableProperty = configurableField.getAnnotation(ConfigurableProperty.class);
                     String commandLineText = configurableProperty.commandLine();
                     if (!commandLineText.equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
@@ -95,6 +115,9 @@ public class GenerateActionConfigMappings {
                     }
                     break;
                 }
+            }
+            if (!foundMatchingField) {
+                log.debug("No matching for config value {}, presuming it is a method", foundConfigValue);
             }
         }
         return commandLineOptions;
