@@ -22,7 +22,7 @@ public class SubmitToDepot extends BaseCommitAction {
 
     @Override
     public void process() {
-        log.info("Submitting changes diffed against tracking branch {}", config.trackingBranch);
-        git.submit(config.trackingBranch);
+        log.info("Submitting changes diffed against tracking branch {}", config.trackingBranchPath());
+        git.submit(config.trackingBranchPath());
     }
 }

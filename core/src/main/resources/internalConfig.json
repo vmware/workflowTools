@@ -25,8 +25,8 @@
     "update" : "topic/$USERNAME/update"
   },
   "remoteBranchToUse": "precommit",
-  "trackingBranch": "origin/master",
-  "parentBranch": "origin/master",
+  "trackingBranch": "master",
+  "parentBranch": "master",
   "storyPointValues": [
     1,2,3,5,8,13
   ],
@@ -49,6 +49,7 @@
   "trivialReviewerLabel": "trivial",
   "alwaysIncludeReviewUrl": false,
   "noReviewNumberLabel": "none",
+  "mergeToLabel": "Merge to:",
   "logLevel": "INFO",
   "maxSummaryLength": 80,
   "maxDescriptionLength": 100,

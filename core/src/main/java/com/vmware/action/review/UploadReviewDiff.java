@@ -75,15 +75,15 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private DiffToUpload createReviewRequestDiff() {
-        log.info("Creating git diff against parent {}", config.parentBranch);
+        log.info("Creating git diff against parent {}", config.parentBranchPath());
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
 
         DiffToUpload diff = new DiffToUpload();
-        String mergeBase = git.mergeBase(config.trackingBranch, "HEAD");
-        diff.path = git.diffAsByteArray(config.parentBranch, "HEAD", supportsDiffWithRenames);
-        diff.parent_diff_path = git.diffAsByteArray(mergeBase, config.parentBranch, supportsDiffWithRenames);
+        String mergeBase = git.mergeBase(config.trackingBranchPath(), "HEAD");
+        diff.path = git.diffAsByteArray(config.parentBranchPath(), "HEAD", supportsDiffWithRenames);
+        diff.parent_diff_path = git.diffAsByteArray(mergeBase, config.parentBranchPath(), supportsDiffWithRenames);
         return diff;
     }
 
@@ -98,17 +98,17 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private DiffToUpload createPerforceReviewRequestDiffFromGit() {
-        log.info("Converting git diff into a diff in perforce format against parent branch {}", config.parentBranch);
+        log.info("Converting git diff into a diff in perforce format against parent branch {}", config.parentBranchPath());
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
 
         DiffToUpload diff = new DiffToUpload();
-        String mergeBase = git.mergeBase(config.trackingBranch, "HEAD");
+        String mergeBase = git.mergeBase(config.trackingBranchPath(), "HEAD");
         GitDiffToPerforceConverter diffConverter = new GitDiffToPerforceConverter(serviceLocator.getPerforce(),
                 git.lastSubmittedChangelistInfo()[1]);
-        diff.path = diffConverter.convert(git.diff(config.parentBranch, "HEAD", supportsDiffWithRenames));
-        diff.parent_diff_path = diffConverter.convert(git.diff(mergeBase, config.parentBranch, supportsDiffWithRenames));
+        diff.path = diffConverter.convert(git.diff(config.parentBranchPath(), "HEAD", supportsDiffWithRenames));
+        diff.parent_diff_path = diffConverter.convert(git.diff(mergeBase, config.parentBranchPath(), supportsDiffWithRenames));
         return diff;
     }
 
