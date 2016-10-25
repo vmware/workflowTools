@@ -24,6 +24,7 @@
     "--review-board-date-format"
   ],
   "SyncChangelist": [
+    "--parent",
     "--sync-to-branch-latest"
   ],
   "CheckStatusOfLatestBuilds": [
@@ -49,6 +50,9 @@
   "ConvertCardsToJiraIssues": [
     "--trello-url",
     "--jira-url"
+  ],
+  "AddGitChangesToChangelist": [
+    "--tracking-branch"
   ],
   "InvokeSandboxBuild": [
     "--gobuild-bin-path",
@@ -139,6 +143,8 @@
     "--jenkins-url"
   ],
   "SyncChangelistWithGitDiff": [
+    "--parent",
+    "--tracking-branch",
     "--sync-to-branch-latest"
   ],
   "PushToDevelop": [
@@ -186,6 +192,8 @@
     "--review-board-date-format"
   ],
   "UploadReviewDiff": [
+    "--parent",
+    "--tracking-branch",
     "--username",
     "--perforce-client"
   ],
@@ -198,6 +206,7 @@
     "--review-board-date-format"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
+    "--tracking-branch",
     "--sync-to-branch-latest"
   ],
   "BaseCommitWithJenkinsBuildsAction": [
@@ -235,6 +244,9 @@
     "--username",
     "--bugzilla-url"
   ],
+  "SubmitToDepot": [
+    "--tracking-branch"
+  ],
   "CreateReview": [
     "--username",
     "--reviewboard-url",
@@ -267,6 +279,9 @@
     "--disable-bugzilla",
     "--disable-jira"
   ],
+  "ApplyChangelistToSeparateGitBranch": [
+    "--tracking-branch"
+  ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
   ],
@@ -287,6 +302,9 @@
   "ReadLastCommit": [
     "--branch",
     "--perforce-client"
+  ],
+  "PushToTrackingBranch": [
+    "--tracking-branch"
   ],
   "FormatCommitText": [
     "--max-description",
