@@ -125,7 +125,7 @@ public class TestGit {
     public void printLast200Commits() {
         int numberOfCommitsToCheck = Math.min(git.totalCommitCount(), 200);
         CommitConfiguration configuration = new CommitConfiguration("http://reviewboard",
-                "http://gobuild", "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:");
+                "http://gobuild", "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:", "main");
 
         for (int i = 0; i < numberOfCommitsToCheck; i ++) {
             String commitText = git.commitText(i, true);

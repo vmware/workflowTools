@@ -15,14 +15,20 @@ public class CommitConfiguration {
 
     private String reviewUrlLabel;
 
+    private String mergeToLabel;
+
+    private String mergeToValue;
+
     public CommitConfiguration(String reviewboardUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
-                               String reviewedByLabel, String reviewUrlLabel) {
+                               String reviewedByLabel, String reviewUrlLabel, String mergeToLabel, String mergeToValue) {
         this.reviewboardUrl = reviewboardUrl;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
         this.reviewUrlLabel = padLabel(reviewUrlLabel);
+        this.mergeToLabel = padLabel(mergeToLabel);
         this.buildwebUrl = buildwebUrl;
+        this.mergeToValue = mergeToValue;
     }
 
     public String generateDescriptionPattern() {
@@ -58,6 +64,10 @@ public class CommitConfiguration {
         return bugNumberLabel.trim() + "([,\\w\\d\\s-]+)$";
     }
 
+    public String generateMergeToPattern() {
+        return mergeToLabel.trim() + "\\s*(.+)$";
+    }
+
     public String generateBuildWebNumberPattern() {
         return "http.+?/sb/(\\d+)/*";
     }
@@ -84,6 +94,14 @@ public class CommitConfiguration {
 
     public String getReviewUrlLabel() {
         return reviewUrlLabel;
+    }
+
+    public String getMergeToLabel() {
+        return mergeToLabel;
+    }
+
+    public String getMergeToValue() {
+        return mergeToValue;
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {

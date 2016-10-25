@@ -74,6 +74,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Label for trivial reviewer")
     public String trivialReviewerLabel;
 
+    @ConfigurableProperty(help = "Label for merge to value")
+    public String mergeToLabel;
+
     @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira and review board")
     public String username;
 
@@ -146,6 +149,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-buildwebBranch,--buildweb-branch", help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool")
     public String buildwebBranch;
 
+    @ConfigurableProperty(commandLine = "--merge-to", help = "Value for merge to property")
+    public String mergeToValue;
+
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
     public boolean includeStoriesWithEstimates;
 
@@ -179,10 +185,10 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-g,--groups", help = "Groups to set for the review request or for generating stats")
     public String[] targetGroups;
 
-    @ConfigurableProperty(commandLine = "-tb,--tracking-branch", help = "Tracking branch to use as base for reviews")
+    @ConfigurableProperty(commandLine = "-tb,--tracking-branch", help = "Tracking branch to use as base for reviews and for pushing commits. Combined with defaultGitRemote if no remote specified.")
     public String trackingBranch;
 
-    @ConfigurableProperty(commandLine = "-p,--parent", help = "Parent branch to use for the git diff to upload to review board")
+    @ConfigurableProperty(commandLine = "-p,--parent", help = "Parent branch to use for the git diff to upload to review board. Combined with defaultGitRemote if no remote specified.")
     public String parentBranch;
 
     @ConfigurableProperty(commandLine = "-b,--branch", help = "Optional value to set if using the local branch name for review board is not desired")
@@ -382,11 +388,24 @@ public class WorkflowConfig {
         Map<String, String> configValues = git.configValues();
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
-            boolean useGitPropertyName = StringUtils.isNotBlank(remoteName) && !configurableProperty.gitConfigProperty().isEmpty();
-            String configValueName = useGitPropertyName ? configurableProperty.gitConfigProperty()
-                    : "workflow." + remoteText + field.getName().toLowerCase();
-            String value = configValues.get(configValueName);
-            setFieldValue(field, value, "Git Config");
+            String workflowConfigPropertyName = "workflow." + remoteText + field.getName().toLowerCase();
+            String gitConfigPropertyName = configurableProperty.gitConfigProperty();
+            String valueToSet = null;
+            if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(remoteName)) {
+                String valueByGitConfig = configValues.get(gitConfigPropertyName);
+                String valueByWorkflowProperty = configValues.get(workflowConfigPropertyName);
+                if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByGitConfig)) {
+                    throw new IllegalArgumentException("Property " + field.getName() + " has value " + valueByGitConfig
+                            + " specified by the git config property " + gitConfigPropertyName + " but has value "
+                            + valueByWorkflowProperty + " specified by the workflow property " + workflowConfigPropertyName
+                            + " please remove one of the properties");
+                }
+                valueToSet = valueByGitConfig != null ? valueByGitConfig : valueByWorkflowProperty;
+            } else {
+                valueToSet = configValues.get(workflowConfigPropertyName);
+            }
+
+            setFieldValue(field, valueToSet, "Git Config");
         }
     }
 
@@ -461,7 +480,7 @@ public class WorkflowConfig {
 
     public CommitConfiguration getCommitConfiguration() {
         return new CommitConfiguration(reviewboardUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
-                reviewedByLabel, reviewUrlLabel);
+                reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValue);
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {
@@ -469,6 +488,24 @@ public class WorkflowConfig {
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
         return new JenkinsJobsConfig(jenkinsJobsToUse, presetParams, jenkinsUrl, jobMappings);
+    }
+
+    public String trackingBranchPath() {
+        if (trackingBranch.contains("/")) {
+            return trackingBranch;
+        }
+        return defaultGitRemote + "/" + trackingBranch;
+    }
+
+    public String parentBranchPath() {
+        if (parentBranch.startsWith("/")) { // assuming local branch
+            return parentBranch.substring(1);
+        }
+        // check if it has a slash or is a relative path
+        if (parentBranch.contains("/") || parentBranch.toLowerCase().contains("head")) {
+            return parentBranch;
+        }
+        return defaultGitRemote + "/" + parentBranch;
     }
 
     public Integer parseBugzillaBugNumber(String bugNumber) {

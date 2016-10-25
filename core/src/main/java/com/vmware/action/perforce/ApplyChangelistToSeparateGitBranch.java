@@ -23,8 +23,8 @@ public class ApplyChangelistToSeparateGitBranch extends ApplyChangelistDiffToGit
     public void process() {
         String existingRef = git.revParse("head");
         String newBranchName = "changelist" + draft.perforceChangelistId;
-        log.info("Moving to new branch {} tracking {}", newBranchName, config.trackingBranch);
-        git.newTrackingBranch(newBranchName, config.trackingBranch);
+        log.info("Moving to new branch {} tracking {}", newBranchName, config.trackingBranchPath());
+        git.newTrackingBranch(newBranchName, config.trackingBranchPath());
         super.process();
         String diffData = git.diff(existingRef, true);
         if (StringUtils.isNotBlank(diffData)) {

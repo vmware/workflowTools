@@ -33,11 +33,11 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
     public void process() {
         log.info("Checking if changelist {} matches current git branch", draft.perforceChangelistId);
         String[] lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
-        String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo[0] : config.trackingBranch;
+        String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo[0] : config.trackingBranchPath();
         if (config.syncChangelistToLatestInBranch) {
             log.info("Creating git diff against last submitted changelist {}", lastSubmittedChangelistInfo[1]);
         } else {
-            log.info("Creating git diff against tracking branch {}", config.trackingBranch);
+            log.info("Creating git diff against tracking branch {}", config.trackingBranchPath());
         }
 
         List<FileChange> fileChanges = perforce.getFileChangesForPendingChangelist(draft.perforceChangelistId);

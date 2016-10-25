@@ -102,17 +102,19 @@ public class Git extends BaseScmWrapper {
 
     public String[] lastSubmittedChangelistInfo() {
         Pattern gitP4Pattern = Pattern.compile("\\[git\\-p4:\\s+depot\\-paths.+change\\s+=\\s+(\\d+)\\]");
+        Pattern fusionPattern = Pattern.compile("\\s*Change:\\s*(\\d+)");
         int counter = 0;
         String lastCommitText = commitText(counter++, false);
-        Matcher matcher = gitP4Pattern.matcher(lastCommitText);
-        while (!matcher.find()) {
+        Matcher gitP4Matcher = gitP4Pattern.matcher(lastCommitText);
+        Matcher fusionMatcher = fusionPattern.matcher(lastCommitText);
+        while (!gitP4Matcher.find() && !fusionMatcher.find()) {
             lastCommitText = commitText(counter++, false);
             if (StringUtils.isBlank(lastCommitText)) {
                 throw new IllegalArgumentException("Failed to find last submitted changelist");
             }
-            matcher.reset(lastCommitText);
+            gitP4Matcher.reset(lastCommitText);
         }
-        String changelistId = matcher.group(1);
+        String changelistId = gitP4Matcher.group(1);
         String ref = MatcherUtils.singleMatchExpected(lastCommitText, "commit\\s+(\\w+)");
         return new String[] {ref, changelistId};
     }

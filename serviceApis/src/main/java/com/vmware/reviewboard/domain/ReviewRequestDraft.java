@@ -56,6 +56,7 @@ public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
     public List<IssueInfo> issues = new ArrayList<>();
     public String branch = "";
+    public String mergeTo = "";
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.
@@ -101,13 +102,15 @@ public class ReviewRequestDraft extends BaseEntity{
             log.warn("Text is blank, can't extract commit values!");
             return;
         }
-        String changelistId = parseSingleLineFromText(commitText, "^Change\\s+(\\d+)", "Perforce Changelist Id", DEBUG);
-        if (StringUtils.isNotBlank(changelistId)) {
-            perforceChangelistId = changelistId;
-            log.debug("Matched first line of perforce changelist, id was {}", changelistId);
+        this.perforceChangelistId = parseSingleLineFromText(commitText, "^Change\\s+(\\d+)", "Perforce Changelist Id", DEBUG);
+        if (StringUtils.isNotBlank(perforceChangelistId)) {
+            log.debug("Matched first line of perforce changelist, id was {}", perforceChangelistId);
             commitText = commitText.substring(commitText.indexOf('\n')).trim();
         } else {
             this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Git P4 Changelist Id", DEBUG);
+            if (StringUtils.isBlank(this.perforceChangelistId)) {
+                this.perforceChangelistId = parseSingleLineFromText(commitText, "^\\s*Change:\\s*(\\d+)", "Git Fusion Changelist Id", DEBUG);
+            }
         }
         String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
@@ -127,6 +130,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
+        this.mergeTo = parseSingleLineFromText(commitText, commitConfiguration.generateMergeToPattern(), "Merge To");
     }
 
     public boolean hasReviewNumber() {
@@ -311,6 +315,11 @@ public class ReviewRequestDraft extends BaseEntity{
         } else if (StringUtils.isNotBlank(id)) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
                     .append(id);
+        }
+        if (isNotBlank(mergeTo)) {
+            builder.append("\n").append(commitConfig.getMergeToLabel()).append(mergeTo);
+        } else if (isNotBlank(commitConfig.getMergeToValue())) {
+            builder.append("\n").append(commitConfig.getMergeToLabel()).append(commitConfig.getMergeToValue());
         }
         return builder.toString();
     }
