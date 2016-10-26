@@ -36,7 +36,9 @@ public class CommandLineArgumentsParser {
             String paramName = paramPieces[0];
             String paramValue = null;
 
-            if (paramPieces.length == 2) {
+            if (paramPieces.length == 1 && args[i].endsWith("=")) {
+                paramValue = "";
+            } else if (paramPieces.length == 2) {
                 paramValue = paramPieces[1];
             } else if (i < args.length - 1 && !args[i+1].startsWith("-")) {
                 paramValue = args[++i];
