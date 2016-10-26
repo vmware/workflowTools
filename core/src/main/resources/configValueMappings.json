@@ -139,6 +139,9 @@
     "--always-include-review-url",
     "--review-board-date-format"
   ],
+  "DisplayConfig": [
+    "--specific-properties"
+  ],
   "StripJenkinsBuilds": [
     "--jenkins-url"
   ],
@@ -185,6 +188,7 @@
   "SetCommitDetailsFromReview": [
     "--username",
     "--reviewboard-url",
+    "--buildweb-url",
     "--jenkins-url",
     "--max-description",
     "--max-summary",

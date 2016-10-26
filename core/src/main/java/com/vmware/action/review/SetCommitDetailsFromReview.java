@@ -7,6 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.reviewboard.domain.ReviewRequest;
+import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
@@ -32,27 +33,39 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
     public void process() {
         String reviewId = StringUtils.isInteger(draft.id) ? draft.id : config.reviewRequestForPatching;
         if (!StringUtils.isInteger(reviewId)) {
-            log.info("No review request id specified for retreiving commit details");
+            log.info("No review request id specified for retrieving commit details");
             reviewId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id "));
         }
 
-        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(reviewId));
-        log.info("Using review request {} ({}) for patching", reviewRequest.id, reviewRequest.summary);
-        draft.summary = StringUtils.truncateStringIfNeeded(reviewRequest.summary, config.maxSummaryLength);
-        draft.description = StringUtils.addNewLinesIfNeeded(reviewRequest.description, config.maxDescriptionLength, 0);
 
-        String testingDone = stripJenkinsJobBuildsFromTestingDone(reviewRequest.testingDone, config.jenkinsUrl);
+        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(reviewId));
+        ReviewRequestDraft reviewAsDraft = reviewRequest.asDraft();
+        if (StringUtils.isBlank(reviewRequest.summary)) { // populate values from draft
+            reviewAsDraft = reviewBoard.getReviewRequestDraft(reviewRequest.getDraftLink());
+        }
+        log.info("Using review request {} ({}) for patching", reviewAsDraft.id, reviewRequest.summary);
+        draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, config.maxSummaryLength);
+        draft.description = StringUtils.addNewLinesIfNeeded(reviewAsDraft.description, config.maxDescriptionLength, 0);
+
+        String testingDone = stripJenkinsJobBuildsFromTestingDone(reviewAsDraft.testingDone, config.jenkinsUrl);
+        testingDone = stripBuildwebJobBuildsFromTestingDone(testingDone, config.buildwebUrl);
         testingDone =  StringUtils.addNewLinesIfNeeded(testingDone, config.maxDescriptionLength, "Testing Done: " .length());
         draft.testingDone = testingDone;
-        draft.bugNumbers = reviewRequest.getBugNumbers();
-        if (StringUtils.isBlank(draft.bugNumbers)) {
+        if (StringUtils.isBlank(reviewAsDraft.bugNumbers)) {
             draft.bugNumbers = config.noBugNumberLabel;
+        } else {
+            draft.bugNumbers = reviewAsDraft.bugNumbers;
         }
-        draft.reviewedBy = reviewRequest.getTargetReviewersAsString();
+        draft.reviewedBy = reviewAsDraft.reviewedBy;
+    }
+
+    private String stripBuildwebJobBuildsFromTestingDone(String testingDone, String buildwebUrl) {
+        String patternToSearchFor = "\nBuild\\s+" + buildwebUrl + "\\S+";
+        return testingDone.replaceAll(patternToSearchFor, "").trim();
     }
 
     private String stripJenkinsJobBuildsFromTestingDone(String testingDone, String jenkinsUrl) {
-        String patternToSearchFor = jenkinsUrl + "/job/[\\w-]+/\\d+/*";
+        String patternToSearchFor = "\nBuild\\s+" + jenkinsUrl + "/job/[\\w-]+/\\d+/*";
         return testingDone.replaceAll(patternToSearchFor, "").trim();
     }
 }
