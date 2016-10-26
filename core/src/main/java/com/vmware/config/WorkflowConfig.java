@@ -263,6 +263,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-pid,--patch", help = "Id of the review request to use for patching")
     public String reviewRequestForPatching;
 
+    @ConfigurableProperty(commandLine = "-cp,--specific-properties", help = "Show value for just the specified config properties")
+    public String configPropertiesToDisplay;
+
     @ConfigurableProperty(commandLine = "--latest-diff", help = "Always use latest diff from review request for patching")
     public boolean alwaysUseLatestDiff;
 
@@ -404,8 +407,9 @@ public class WorkflowConfig {
             } else {
                 valueToSet = configValues.get(workflowConfigPropertyName);
             }
+            String source = StringUtils.isNotBlank(remoteName) ? "Git Config Remote " + remoteName : "Git Config";
 
-            setFieldValue(field, valueToSet, "Git Config");
+            setFieldValue(field, valueToSet, source);
         }
     }
 

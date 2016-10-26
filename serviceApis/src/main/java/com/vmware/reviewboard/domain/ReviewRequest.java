@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +97,17 @@ public class ReviewRequest extends BaseEntity {
             reviewersAsString += user.getTitle();
         }
         return reviewersAsString;
+    }
+
+    public ReviewRequestDraft asDraft() {
+        ReviewRequestDraft draft = new ReviewRequestDraft();
+        draft.id = String.valueOf(id);
+        draft.summary = summary;
+        draft.description = description;
+        draft.testingDone = testingDone;
+        draft.reviewedBy = getTargetReviewersAsString();
+        draft.bugNumbers = getBugNumbers();
+        return draft;
     }
 
 }

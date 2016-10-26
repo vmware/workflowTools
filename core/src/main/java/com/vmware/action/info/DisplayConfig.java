@@ -3,11 +3,14 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @ActionDescription("Displays the current workflow configuration.")
@@ -23,8 +26,15 @@ public class DisplayConfig extends BaseAction {
 
         Padder titlePadder = new Padder("Workflow Configuration");
         titlePadder.infoTitle();
+        List<String> specifiedPropertiesToDisplay = new ArrayList<>();
+        if (StringUtils.isNotBlank(config.configPropertiesToDisplay)) {
+            specifiedPropertiesToDisplay.addAll(Arrays.asList(config.configPropertiesToDisplay.split(",")));
+        }
         for (int i = 0; i < config.configurableFields.size(); i ++) {
             Field configField = config.configurableFields.get(i);
+            if (!showValueForProperty(specifiedPropertiesToDisplay, configField.getName())) {
+                continue;
+            }
             String source = config.overriddenConfigSources.get(configField.getName());
             source = source == null ? "default" : source;
             String displayValue = null;
@@ -39,6 +49,18 @@ public class DisplayConfig extends BaseAction {
             }
         }
         titlePadder.infoTitle();
+    }
+
+    private boolean showValueForProperty(List<String> specifiedProperties, String propertyName) {
+        if (specifiedProperties.isEmpty()) {
+            return true;
+        }
+        for (String specifiedProperty : specifiedProperties) {
+            if (specifiedProperty.equalsIgnoreCase(propertyName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String determineDisplayValue(Object value) {
