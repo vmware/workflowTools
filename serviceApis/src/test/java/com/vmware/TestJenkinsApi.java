@@ -51,7 +51,7 @@ public class TestJenkinsApi extends BaseTests {
         Job precommitJob = jenkins.getJobsListing().getPrecommitUnitTestsPostgresJob();
 
         precommitJob.url = precommitJob.url.replace("postgres", "postgres1");
-        jenkins.invokeJob(precommitJob, new JobParameters(new JobParameter[0]));
+        jenkins.invokeJobWithParameters(precommitJob, new JobParameters(new JobParameter[0]));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class TestJenkinsApi extends BaseTests {
 
         JobDetails jobDetails = jenkins.getJobDetails(precommitJob);
         JobParameter usernameParam = new JobParameter("USERNAME", jenkinsUsername);
-        jenkins.invokeJob(precommitJob, new JobParameters(new JobParameter[] {usernameParam}));
+        jenkins.invokeJobWithParameters(precommitJob, new JobParameters(new JobParameter[] {usernameParam}));
 
         JobBuildDetails jobBuildDetails = jenkins.getJobBuildDetails(jobDetails.lastBuild);
         assertNotNull(jobBuildDetails.getJobBuildCommitId());

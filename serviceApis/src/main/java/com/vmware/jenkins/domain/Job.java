@@ -29,6 +29,10 @@ public class Job {
         return url + "build";
     }
 
+    public String getBuildWithParametersUrl() {
+        return url + "buildWithParameters";
+    }
+
     public String getInfoUrl() {
         return url + "api/json";
     }

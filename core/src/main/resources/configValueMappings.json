@@ -57,7 +57,8 @@
   "InvokeSandboxBuild": [
     "--gobuild-bin-path",
     "--buildweb-branch",
-    "--buildweb-project"
+    "--buildweb-project",
+    "--changelist-id"
   ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
