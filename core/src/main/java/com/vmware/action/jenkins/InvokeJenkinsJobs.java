@@ -90,20 +90,25 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         log.info("Invoking job {}", jobToInvoke.name);
 
         JobDetails jobDetails = jenkins.getJobDetails(jobToInvoke);
-        JobParameters params = constructParametersForJob(jobToInvoke.parameters, jobDetails.getParameterDefinitions());
+        JobParameters params = constructParametersForJob(jobToInvoke.parameters);
 
         int buildNumber = jenkins.getJobDetails(jobToInvoke).nextBuildNumber;
 
         JobBuild expectedNewBuild = new JobBuild(buildNumber, jobToInvoke.url);
 
-        log.info("Invoking job {}", expectedNewBuild.url);
-        jenkins.invokeJob(jobToInvoke, params);
+        if (jobDetails.getParameterDefinitions().isEmpty()) {
+            log.info("Invoking job {} with no parameters", expectedNewBuild.url);
+            jenkins.invokeJob(jobToInvoke);
+        } else {
+            log.info("Invoking job {} with parameters", expectedNewBuild.url);
+            jenkins.invokeJobWithParameters(jobToInvoke, params);
+        }
 
         draft.updateTestingDoneWithJobBuild(jobToInvoke.url, expectedNewBuild);
         return expectedNewBuild;
     }
 
-    private JobParameters constructParametersForJob(List<JobParameter> parameters, List<ParameterDefinition> parameterDefinitions) {
+    private JobParameters constructParametersForJob(List<JobParameter> parameters) {
         for (JobParameter parameter : parameters) {
             String paramName = parameter.name;
             String paramValue = parameter.value;
@@ -121,19 +126,6 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             parameter.value = paramValue;
         }
 
-        for (ParameterDefinition parameterDefinition : parameterDefinitions) {
-            JobParameter matchingParameter = getParameterByName(parameters, parameterDefinition.name);
-            if (matchingParameter != null) {
-                continue;
-            }
-            if (parameterDefinition.defaultParameterValue == null || StringUtils.isBlank(parameterDefinition.defaultParameterValue.value)) {
-                log.warn("Parameter {} is not specified and does not have a default value, assuming it is an optional parameter", parameterDefinition.name);
-                continue;
-            }
-            JobParameter defaultParameter = new JobParameter(parameterDefinition.name, parameterDefinition.defaultParameterValue.value);
-            log.info("Setting default job param {} to {}", defaultParameter.name, defaultParameter.value);
-            parameters.add(defaultParameter);
-        }
         return new JobParameters(parameters.toArray(new JobParameter[parameters.size()]));
     }
 

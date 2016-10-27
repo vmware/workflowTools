@@ -25,7 +25,13 @@ public class InvokeSandboxBuild extends BaseCommitAction {
     public void process() {
         String changelistId = draft.perforceChangelistId;
         if (StringUtils.isBlank(changelistId)) {
+            changelistId = config.changelistId;
+        }
+        if (StringUtils.isBlank(changelistId)) {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
+        }
+        if (changelistId.toLowerCase().contains("head")) {
+            changelistId = git.revParse(changelistId);
         }
 
         String[] inputs = new String[] {"opt", "", ""};
