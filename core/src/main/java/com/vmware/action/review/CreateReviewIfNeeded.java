@@ -37,7 +37,7 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
 
     @Override
     public void process() {
-        log.debug("Creating new review");
+        log.info("Creating new review against repository {}", config.reviewBoardRepository);
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
         draft.reviewRepoType = repository.tool.toLowerCase();

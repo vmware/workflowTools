@@ -295,6 +295,11 @@
     "--username",
     "--review-board-date-format"
   ],
+  "DiscardUnpublishedReviews": [
+    "--review-board-date-format",
+    "--username",
+    "--reviewboard-url"
+  ],
   "HardSubmitOldSoftSubmittedReviews": [
     "--old-submit"
   ],

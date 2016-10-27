@@ -39,9 +39,13 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
 
 
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(reviewId));
+
         ReviewRequestDraft reviewAsDraft = reviewRequest.asDraft();
-        if (StringUtils.isBlank(reviewRequest.summary)) { // populate values from draft
-            reviewAsDraft = reviewBoard.getReviewRequestDraft(reviewRequest.getDraftLink());
+        if (StringUtils.isBlank(reviewRequest.summary) && StringUtils.isBlank(reviewRequest.description)) { // populate values from draft
+            reviewAsDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
+        }
+        if (draft == null) {
+            throw new RuntimeException("Summary and description and blank for review request " + reviewId + " and no draft found for request");
         }
         log.info("Using review request {} ({}) for patching", reviewAsDraft.id, reviewRequest.summary);
         draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, config.maxSummaryLength);
