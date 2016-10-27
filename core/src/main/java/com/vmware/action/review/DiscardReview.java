@@ -19,6 +19,6 @@ public class DiscardReview extends BaseCommitUsingReviewBoardAction {
         ReviewRequest reviewRequest = draft.reviewRequest;
         reviewRequest.status = ReviewRequestStatus.discarded;
         reviewBoard.updateReviewRequest(reviewRequest);
-        log.info("Successfully discarded review request");
+        log.info("Successfully discarded review request {}", draft.id);
     }
 }

@@ -3,6 +3,7 @@ package com.vmware.reviewboard;
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
 import com.vmware.http.credentials.UsernamePasswordAsker;
@@ -134,6 +135,15 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewRequestDraft getReviewRequestDraft(Link draftLink) {
         return connection.get(draftLink.getHref(), ReviewRequestDraftResponse.class).draft;
+    }
+
+    public ReviewRequestDraft getReviewRequestDraftWithExceptionHandling(Link draftLink) {
+        try {
+            return connection.get(draftLink.getHref(), ReviewRequestDraftResponse.class).draft;
+        } catch (NotFoundException nfe) {
+            log.debug("No draft found for link {}: {}", draftLink, nfe.getMessage());
+            return null;
+        }
     }
 
     public ReviewRequestDraft updateReviewRequestDraft(Link draftLink, ReviewRequestDraft draft) {
