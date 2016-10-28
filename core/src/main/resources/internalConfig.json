@@ -274,11 +274,11 @@
        "submitWithGitChangeset": [
          "prepareCommitForPush", "updateWithGitChangeset", "SubmitPendingChangelist", "RebaseAgainstMaster", "DeleteChangelistTag"
        ],
+       "sandbox": [
+         "updateMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
+       ],
        "invokeSandboxBuildWithGitChangeset": [
         "updateWithGitChangeset", "InvokeSandboxBuild", "AmendCommit"
-       ],
-       "invokeSandboxBuild": [
-         "updateMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
        ],
        "invokeSandboxBuildWithGitFusion": [
          "ReadLastCommit", "--changelist-id=head", "InvokeSandboxBuild", "AmendCommit"
