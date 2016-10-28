@@ -38,6 +38,7 @@ public class CommitConfiguration {
         appendLabelToPattern(builder, testingDoneLabel);
         appendLabelToPattern(builder, bugNumberLabel);
         appendLabelToPattern(builder, reviewUrlLabel);
+        appendLabelToPattern(builder, mergeToLabel);
         builder.append("($))");
         return builder.toString();
     }
@@ -48,6 +49,7 @@ public class CommitConfiguration {
         appendLabelToPattern(builder, reviewedByLabel);
         appendLabelToPattern(builder, bugNumberLabel);
         appendLabelToPattern(builder, reviewUrlLabel);
+        appendLabelToPattern(builder, mergeToLabel);
         builder.append("($))");
         return builder.toString();
     }

@@ -18,12 +18,12 @@ public class TestPerforce {
     public void canDetermineRootDirectory() {
         File clientDirectory = perforce.getWorkingDirectory();
         assertNotNull(clientDirectory);
-        assertEquals("/Users/dbiggs/vcd", clientDirectory.getPath());
+        assertEquals("/Users/dbiggs/p4-sp-main", clientDirectory.getPath());
     }
 
     @Test
     public void canDetermineClientName() {
-        perforce = new Perforce("dbiggs", null, "/Users/dbiggs/vcd/");
+        perforce = new Perforce("dbiggs", null, "/Users/dbiggs/p4-sp-main/");
         assertEquals("dbiggs-vcloud-sp-main", perforce.getClientName());
     }
 

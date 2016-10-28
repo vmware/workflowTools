@@ -12,6 +12,8 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
+import java.io.File;
+
 import static java.lang.String.format;
 
 @ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
@@ -23,6 +25,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
 
     @Override
     public void process() {
+        String syncTo = "latest";
         String changelistId = draft.perforceChangelistId;
         if (StringUtils.isBlank(changelistId)) {
             changelistId = config.changelistId;
@@ -31,17 +34,20 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
         if (changelistId.toLowerCase().contains("head")) {
+            log.info("Assuming changelist id {} is a git ref, using tracking branch {} as syncTo value",
+                    changelistId, config.trackingBranchPath());
             changelistId = git.revParse(changelistId);
+            syncTo = git.revParse(config.trackingBranchPath());
         }
+        String command = format("%s sandbox queue %s --buildtype=%s --syncto %s --branch=%s --override-branch --changeset=%s --accept-defaults",
+                config.goBuildBinPath, config.buildwebProject, config.buildType, syncTo, config.buildwebBranch, changelistId);
 
-        String[] inputs = new String[] {"opt", "", ""};
-        String[] textsToWaitFor = new String[] {
-                "Buildtype to use [beta]:", config.buildwebProject + "?",
-                format("queued (%s/%s)", config.buildwebProject, config.buildwebBranch)};
-        String command = format("%s sandbox queue %s --syncto latest --branch=%s --changeset=%s",
-                config.goBuildBinPath, config.buildwebProject, config.buildwebBranch, changelistId);
+        log.info("Invoking sandbox build {}", command);
+        String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
+        addBuildNumberInOutputToTestingDone(output);
+    }
 
-        String output = CommandLineUtils.executeScript(command, inputs, textsToWaitFor, LogLevel.INFO);
+    private void addBuildNumberInOutputToTestingDone(String output) {
         CommitConfiguration commitConfig = config.getCommitConfiguration();
         String buildNumberPattern = commitConfig.generateBuildWebNumberPattern();
 

@@ -1,5 +1,6 @@
 package com.vmware.util.logging;
 
+import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,11 @@ public class Padder {
             title += " ";
         }
         int paddingCount = (PADDING_LENGTH - (title.length() + 4)) / 2;
-        this.padding = com.vmware.util.StringUtils.repeat(paddingCount, "*");
+        if (title.length() + 4 > PADDING_LENGTH) {
+            title = title.substring(0, PADDING_LENGTH - 7) + "...";
+            paddingCount = 1;
+        }
+        this.padding = StringUtils.repeat(paddingCount, "*");
         this.title = title;
     }
 
@@ -63,4 +68,7 @@ public class Padder {
         isFirstExecution = false;
     }
 
+    public String getTitle() {
+        return title;
+    }
 }

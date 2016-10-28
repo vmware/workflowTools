@@ -149,6 +149,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-buildwebBranch,--buildweb-branch", help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool")
     public String buildwebBranch;
 
+    @ConfigurableProperty(commandLine = "-buildType,--build-type", help = "Buildweb build type to use, this is for a VMware specific tool")
+    public String buildType;
+
     @ConfigurableProperty(commandLine = "--merge-to", help = "Value for merge to property")
     public String mergeToValue;
 
