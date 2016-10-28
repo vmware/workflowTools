@@ -1,8 +1,10 @@
 package com.vmware.util;
 
 import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
+import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,13 +18,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class IOUtils {
 
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    private static DynamicLogger logger = new DynamicLogger(LoggerFactory.getLogger(IOUtils.class));
 
     public static void write(File file, String data) {
         try {
@@ -71,15 +73,19 @@ public class IOUtils {
     public static String readWithoutClosing(InputStream inputStream) {
         InputStreamReader reader = new InputStreamReader(inputStream);
         try {
-            return read(reader, false);
+            return read(reader, false, null);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
     }
 
     public static String read(InputStream inputStream) {
+        return read(inputStream, null);
+    }
+
+    public static String read(InputStream inputStream, LogLevel printLinesLevel) {
         try (InputStreamReader reader = new InputStreamReader(inputStream)) {
-            return read(reader, true);
+            return read(reader, true, printLinesLevel);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
@@ -108,16 +114,28 @@ public class IOUtils {
         }
     }
 
-    private static String read(Reader input, boolean readUntilStreamClosed) throws IOException {
+    private static String read(Reader input, boolean readUntilStreamClosed, LogLevel printLinesLevel) throws IOException {
         StringWriter writer = new StringWriter();
         char[] buffer = new char[DEFAULT_BUFFER_SIZE];
 
-        int lastReadCount = 0;
+        int lastReadCount;
+        String alreadyWrittenOutput = null;
         do {
             lastReadCount = input.read(buffer);
             if (lastReadCount != -1) {
                 writer.write(buffer, 0, lastReadCount);
+                String outputToWrite = writer.toString();
+                if (alreadyWrittenOutput == null) {
+                    alreadyWrittenOutput = writer.toString();
+                } else {
+                    outputToWrite = outputToWrite.substring(alreadyWrittenOutput.length());
+                    alreadyWrittenOutput += outputToWrite;
+                }
+                if (printLinesLevel != null) {
+                    logger.log(printLinesLevel, outputToWrite.trim());
+                }
             }
+
         } while (canRead(input, readUntilStreamClosed, lastReadCount));
         String output = writer.toString();
         if (output.endsWith("\n")) {

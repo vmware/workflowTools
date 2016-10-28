@@ -19,6 +19,7 @@
   "waitTimeForBlockingWorkflowAction": 1200,
   "buildwebProject": "vcloud",
   "buildwebBranch": "sp-main",
+  "buildType": "opt",
   "defaultGitRemote": "origin",
   "remoteBranches": {
     "precommit" : "topic/$USERNAME/pre-commit",
@@ -277,10 +278,10 @@
         "updateWithGitChangeset", "InvokeSandboxBuild", "AmendCommit"
        ],
        "invokeSandboxBuild": [
-         "updateMatchingChangelist", "--changelistId=head", "InvokeSandboxBuild", "AmendCommit"
+         "updateMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
        ],
        "invokeSandboxBuildWithGitFusion": [
-         "ReadLastCommit", "InvokeSandboxBuild", "AmendCommit"
+         "ReadLastCommit", "--changelist-id=head", "InvokeSandboxBuild", "AmendCommit"
        ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"

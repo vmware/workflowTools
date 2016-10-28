@@ -216,7 +216,11 @@ public class Perforce extends BaseScmWrapper {
 
     @Override
     protected String scmExecutablePath() {
-        return "p4 -d " + getWorkingDirectory().getPath();
+        if (getWorkingDirectory() == null) {
+            return "p4";
+        } else {
+            return "p4 -d " + getWorkingDirectory().getPath();
+        }
     }
 
     private List<String> parseFileNamesFromOpenedOutput(String output) {

@@ -38,6 +38,11 @@ public class CommandLineUtils {
         }
     }
 
+    public static String executeCommand(String command, LogLevel logLevel) {
+        return executeCommand(null, command, null, logLevel);
+    }
+
+
     public static String executeCommand(File workingDirectory, String command, String inputText, LogLevel logLevel) {
         return executeCommand(workingDirectory, null, command, inputText, logLevel);
     }
@@ -50,10 +55,16 @@ public class CommandLineUtils {
             builder.environment().putAll(environmentVariables);
         }
         Date startingDate = new Date();
+        Padder titlePadder = new Padder(command);
+        titlePadder.logTitle(logLevel);
         Process statusProcess = executeCommand(workingDirectory, environmentVariables, command, inputText);
-        String output = IOUtils.read(statusProcess.getInputStream());
+
+        String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
         long elapsedMilliseconds = new Date().getTime() - startingDate.getTime();
-        logProcessOutput(command + " " + elapsedMilliseconds + " ms", output, logLevel);
+        LogLevel elapsedTimeLogLevel = elapsedMilliseconds > 1000 ? logLevel : LogLevel.DEBUG;
+        dynamicLogger.log(elapsedTimeLogLevel, "Execution time {} seconds",
+                String.valueOf(TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds)));
+        titlePadder.logTitle(logLevel);
         return output;
     }
 
@@ -117,12 +128,5 @@ public class CommandLineUtils {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
-    }
-
-    private static void logProcessOutput(String title, String output, LogLevel logLevel) {
-        Padder titlePadder = new Padder(title);
-        titlePadder.logTitle(logLevel);
-        dynamicLogger.log(logLevel, output);
-        titlePadder.logTitle(logLevel);
     }
 }
