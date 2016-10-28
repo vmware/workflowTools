@@ -25,7 +25,6 @@ public class InvokeSandboxBuild extends BaseCommitAction {
 
     @Override
     public void process() {
-        String syncTo = "latest";
         String changelistId = draft.perforceChangelistId;
         if (StringUtils.isBlank(changelistId)) {
             changelistId = config.changelistId;
@@ -33,14 +32,15 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         if (StringUtils.isBlank(changelistId)) {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
+        String syncToParameter = " --syncto latest";
         if (changelistId.toLowerCase().contains("head")) {
             log.info("Assuming changelist id {} is a git ref, using tracking branch {} as syncTo value",
                     changelistId, config.trackingBranchPath());
             changelistId = git.revParse(changelistId);
-            syncTo = git.revParse(config.trackingBranchPath());
+            syncToParameter = ""; // --accept defaults handles it correctly
         }
-        String command = format("%s sandbox queue %s --buildtype=%s --syncto %s --branch=%s --override-branch --changeset=%s --accept-defaults",
-                config.goBuildBinPath, config.buildwebProject, config.buildType, syncTo, config.buildwebBranch, changelistId);
+        String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s --accept-defaults",
+                config.goBuildBinPath, config.buildwebProject, config.buildType, syncToParameter, config.buildwebBranch, changelistId);
 
         log.info("Invoking sandbox build {}", command);
         String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
