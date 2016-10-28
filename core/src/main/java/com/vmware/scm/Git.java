@@ -68,11 +68,13 @@ public class Git extends BaseScmWrapper {
     }
 
     public String diffTree(String fromRef, String ref, boolean binaryPatch, LogLevel level) {
+        checkRefsAreValid(fromRef, ref);
         String binaryFlag = binaryPatch ? " --binary" : "";
         return executeScmCommand("diff-tree -M{} --full-index -U3 -p {} {}",level, binaryFlag, fromRef, ref) + "\n";
     }
 
     public void catFile(String fromRef, String filePath, String toFilePath) {
+        checkRefsAreValid(fromRef);
         String command = String.format("git cat-file -p %s:%s", fromRef, filePath);
         Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, command, (String) null);
         try {
@@ -206,6 +208,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String diff(String parentRef, String commitRef, boolean supportsRenames) {
+        checkRefsAreValid(parentRef, commitRef);
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "diff %s--no-color --full-index --no-ext-diff --ignore-submodules %s..%s";
         diffCommand = String.format(diffCommand, renamesFlag, parentRef, commitRef);
@@ -214,6 +217,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String diff(String commitRef, boolean supportsRenames) {
+        checkRefsAreValid(commitRef);
         String renamesFlag = supportsRenames ? "-M " : "--no-renames ";
         String diffCommand = "diff " + renamesFlag + "--no-color --full-index --no-ext-diff --ignore-submodules " + commitRef;
         return executeScmCommand(diffCommand);
@@ -237,11 +241,16 @@ public class Git extends BaseScmWrapper {
     }
 
     public String mergeBase(String upstreamBranch, String commitRef) {
+        checkRefsAreValid(upstreamBranch, commitRef);
         return executeScmCommand("merge-base " + upstreamBranch + " " + commitRef);
     }
 
     public String revParse(String commitRef) {
-        return executeScmCommand("rev-parse " + commitRef);
+        String output =  executeScmCommand("rev-parse " + commitRef);
+        if (output.contains("ambiguous argument")) {
+            throw new IllegalArgumentException("Commit ref " + commitRef + " is not a valid ref: " + output);
+        }
+        return output;
     }
 
     public String fetch() {
@@ -460,6 +469,12 @@ public class Git extends BaseScmWrapper {
         gitInstalled = isCommandAvailable("git");
 
         return gitInstalled;
+    }
+
+    private void checkRefsAreValid(String... refs) {
+        for (String ref : refs) {
+            revParse(ref);
+        }
     }
 
     private void exitIfNotInRepoRootFolder(String reason) {
