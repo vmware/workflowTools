@@ -28,7 +28,7 @@ public abstract class BaseCommitAction extends BaseAction {
         } else if (StringUtils.isNotBlank(config.perforceClientName)) {
             return readPendingChangelistText();
         } else {
-           log.warn("Not in git repo and config value perforceClientName is not set, can't read last change");
+            log.warn("Not in git repo and config value perforceClientName is not set, can't read last change");
             return "";
         }
     }

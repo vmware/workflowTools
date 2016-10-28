@@ -325,7 +325,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description) {
-        return parseSingleLineFromText(text, pattern, description, WARN);
+        return parseSingleLineFromText(text, pattern, description, DEBUG);
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description, LogLevel logLevel) {
@@ -337,7 +337,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String parseStringFromText(String text, String pattern, int patternFlags, String description) {
-        return parseStringFromText(text, pattern, patternFlags, description, WARN);
+        return parseStringFromText(text, pattern, patternFlags, description, DEBUG);
     }
 
     private String parseStringFromText(String text, String pattern, int patternFlags, String description, LogLevel logLevel) {
