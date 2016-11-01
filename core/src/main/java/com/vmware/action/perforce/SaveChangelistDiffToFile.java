@@ -35,19 +35,7 @@ public class SaveChangelistDiffToFile extends BasePerforceCommitAction {
         } else if (StringUtils.isNotBlank(config.changelistId)) {
             return config.changelistId;
         } else {
-            List<String> openChangelists = perforce.getPendingChangelists();
-            if (openChangelists.isEmpty()) {
-                throw new IllegalArgumentException("No pending changelists in client " + config.perforceClientName);
-            }
-            if (openChangelists.size() == 1) {
-                String changelistToUse = openChangelists.get(0);
-                log.info("Using changelist {} as it is the only pending changelist in client {}",
-                        changelistToUse, config.perforceClientName);
-                return openChangelists.get(0);
-            } else {
-                int selection = InputUtils.readSelection(openChangelists, "Select changelist as source for diff");
-                return openChangelists.get(selection);
-            }
+            return perforce.selectPendingChangelist();
         }
     }
 }

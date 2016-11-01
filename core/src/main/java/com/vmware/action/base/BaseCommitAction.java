@@ -34,7 +34,8 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     private String readPendingChangelistText() {
-        String changelistText = serviceLocator.getPerforce().readLastPendingChangelist();
+        String changelistId = serviceLocator.getPerforce().selectPendingChangelist();
+        String changelistText = serviceLocator.getPerforce().readChangelist(changelistId);
         if (StringUtils.isBlank(changelistText) || !changelistText.contains("\n")) {
             throw new RuntimeException("No pending changelist exists for user " + config.username);
         }

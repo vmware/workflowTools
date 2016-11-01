@@ -51,7 +51,7 @@ public class WorkflowConfigParser {
 
         applyUserConfigFileIfExists(internalConfig, loadedConfigFiles);
 
-        if (git.isGitInstalled()) {
+        if (git.isGitInstalled() && git.workingDirectoryIsInGitRepo()) {
             internalConfig.applyGitConfigValues("");
             String trackingBranch = git.getTrackingBranch();
             if (StringUtils.isNotBlank(trackingBranch)) {

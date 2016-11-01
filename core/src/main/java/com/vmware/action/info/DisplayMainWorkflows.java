@@ -7,6 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.logging.Padder;
 
 import java.util.Arrays;
+import java.util.List;
 
 @ActionDescription("Displays a predefined list of the main workflows.")
 public class DisplayMainWorkflows extends BaseAction {
@@ -17,9 +18,15 @@ public class DisplayMainWorkflows extends BaseAction {
 
     @Override
     public void process() {
-        Padder mainWorkflowsPadder = new Padder("Main Workflows");
+        printWorkflows("Batch", Workflow.BATCH_MAIN_WORKFLOWS);
+        printWorkflows("Git", Workflow.GIT_MAIN_WORKFLOWS);
+        printWorkflows("Perforce", Workflow.PERFORCE_MAIN_WORKFLOWS);
+    }
+
+    protected void printWorkflows(String workflowType, List<String> workflows) {
+        Padder mainWorkflowsPadder = new Padder(workflowType + " Workflows");
         mainWorkflowsPadder.infoTitle();
-        for (String mainWorkflow : Workflow.MAIN_WORKFLOWS) {
+        for (String mainWorkflow : workflows) {
             log.info("{} -> {}", mainWorkflow, Arrays.toString(config.workflows.get(mainWorkflow)));
         }
         mainWorkflowsPadder.infoTitle();

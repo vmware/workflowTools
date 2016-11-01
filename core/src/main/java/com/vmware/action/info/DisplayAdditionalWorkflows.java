@@ -6,7 +6,9 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.logging.Padder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -22,8 +24,12 @@ public class DisplayAdditionalWorkflows extends BaseAction {
         Padder additionalWorkflowsPadder = new Padder("Additional Workflows");
         additionalWorkflowsPadder.infoTitle();
         Set<String> sortedWorkflows = new TreeSet<String>(config.workflows.keySet());
+        List<String> mainWorkflows = new ArrayList<>();
+        mainWorkflows.addAll(Workflow.BATCH_MAIN_WORKFLOWS);
+        mainWorkflows.addAll(Workflow.GIT_MAIN_WORKFLOWS);
+        mainWorkflows.addAll(Workflow.PERFORCE_MAIN_WORKFLOWS);
         for (String workflow : sortedWorkflows) {
-            if (!Workflow.MAIN_WORKFLOWS.contains(workflow) && !config.supportingWorkflows.contains(workflow)) {
+            if (!mainWorkflows.contains(workflow) && !config.supportingWorkflows.contains(workflow)) {
                 log.info("{} -> {}", workflow, Arrays.toString(config.workflows.get(workflow)));
             }
         }

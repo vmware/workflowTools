@@ -1,5 +1,6 @@
 package com.vmware.config;
 
+import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.action.BaseAction;
@@ -491,7 +492,7 @@ public class WorkflowConfig {
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {
-        jenkinsJobParameters.put(JenkinsJobsConfig.USERNAME_PARAM, username);
+        jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
         return new JenkinsJobsConfig(jenkinsJobsToUse, presetParams, jenkinsUrl, jobMappings);

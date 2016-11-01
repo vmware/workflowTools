@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,7 @@ public class TestJenkinsApi extends BaseTests {
         Job precommitJob = jenkins.getJobsListing().getPrecommitUnitTestsPostgresJob();
 
         precommitJob.url = precommitJob.url.replace("postgres", "postgres1");
-        jenkins.invokeJobWithParameters(precommitJob, new JobParameters(new JobParameter[0]));
+        jenkins.invokeJobWithParameters(precommitJob, new JobParameters(Collections.<JobParameter>emptyList()));
     }
 
     @Test
@@ -60,7 +61,7 @@ public class TestJenkinsApi extends BaseTests {
 
         JobDetails jobDetails = jenkins.getJobDetails(precommitJob);
         JobParameter usernameParam = new JobParameter("USERNAME", jenkinsUsername);
-        jenkins.invokeJobWithParameters(precommitJob, new JobParameters(new JobParameter[] {usernameParam}));
+        jenkins.invokeJobWithParameters(precommitJob, new JobParameters(Collections.singletonList(usernameParam)));
 
         JobBuildDetails jobBuildDetails = jenkins.getJobBuildDetails(jobDetails.lastBuild);
         assertNotNull(jobBuildDetails.getJobBuildCommitId());

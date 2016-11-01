@@ -6,9 +6,9 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Updates the description for the pending changelist.")
-public class UpdateChangelistDescription extends BaseLinkedPerforceCommitAction {
-    public UpdateChangelistDescription(WorkflowConfig config) {
+@ActionDescription("Updates the description for the pending changelist matching the git commit.")
+public class UpdateMatchingChangelistDescription extends BaseLinkedPerforceCommitAction {
+    public UpdateMatchingChangelistDescription(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
     }

@@ -90,7 +90,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         log.info("Invoking job {}", jobToInvoke.name);
 
         JobDetails jobDetails = jenkins.getJobDetails(jobToInvoke);
-        JobParameters params = constructParametersForJob(jobToInvoke.parameters);
+        JobParameters params = constructParametersForJob(jobToInvoke.parameters, jobDetails.getParameterDefinitions());
 
         int buildNumber = jenkins.getJobDetails(jobToInvoke).nextBuildNumber;
 
@@ -108,10 +108,19 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         return expectedNewBuild;
     }
 
-    private JobParameters constructParametersForJob(List<JobParameter> parameters) {
+    private JobParameters constructParametersForJob(List<JobParameter> parameters, List<ParameterDefinition> parameterDefinitions) {
         for (JobParameter parameter : parameters) {
             String paramName = parameter.name;
             String paramValue = parameter.value;
+
+            if (getDefinitionByName(parameterDefinitions, paramName) == null) {
+                if (JobParameter.USERNAME_PARAM.equals(paramName)) { // username is added by default to most jobs
+                    log.debug("Not adding {} parameter for job as it is not in the parameter definitions", paramName);
+                } else {
+                    log.info("Not adding {} parameter for job as it is not in the parameter definitions", paramName);
+                }
+                continue;
+            }
 
             if (paramValue.equals(ASK_FOR_PARAM)) {
                 paramValue = InputUtils.readValueUntilNotBlank("Enter " + paramName);
@@ -126,16 +135,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             parameter.value = paramValue;
         }
 
-        return new JobParameters(parameters.toArray(new JobParameter[parameters.size()]));
-    }
-
-    private JobParameter getParameterByName(List<JobParameter> parameters, String parameterName) {
-        for (JobParameter parameter : parameters) {
-            if (parameterName.equals(parameter.name)) {
-                return parameter;
-            }
-        }
-        return null;
+        return new JobParameters(parameters);
     }
 
     private String determineSandboxBuildNumber() {
@@ -152,5 +152,13 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         return buildId;
     }
 
+    private ParameterDefinition getDefinitionByName(List<ParameterDefinition> parameterDefinitions, String name) {
+        for (ParameterDefinition parameterDefinition : parameterDefinitions) {
+            if (parameterDefinition.name.equals(name)) {
+                return parameterDefinition;
+            }
+        }
+        return null;
+    }
 
 }

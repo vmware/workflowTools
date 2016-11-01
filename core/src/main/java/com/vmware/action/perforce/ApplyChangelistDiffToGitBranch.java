@@ -28,9 +28,7 @@ public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitAction {
     public void process() {
         String changelistIdToUse = draft.perforceChangelistId;
         if (StringUtils.isBlank(changelistIdToUse)) {
-            List<String> changelists = perforce.getPendingChangelists();
-            int selection = InputUtils.readSelection(changelists.toArray(new String[changelists.size()]), "Select changelist");
-            changelistIdToUse = changelists.get(selection);
+            changelistIdToUse = perforce.selectPendingChangelist();
         }
 
         log.info("Generating git compatible diff for perforce changelist {}", changelistIdToUse);
