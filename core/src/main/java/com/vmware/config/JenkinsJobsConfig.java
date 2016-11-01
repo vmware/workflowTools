@@ -10,13 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.vmware.jenkins.domain.JobParameter.NO_USERNAME_PARAMETER;
+import static com.vmware.jenkins.domain.JobParameter.USERNAME_PARAM;
+
 /**
  * Encapsulates handling of the jenkins jobs config value.
  */
 public class JenkinsJobsConfig {
 
-    public static final String USERNAME_PARAM = "USERNAME";
-    private static final String NO_USERNAME_PARAMETER = "NO_USERNAME_PARAMETER";
     private static final String USERNAME_VALUE = "$USERNAME";
 
     private Logger log = LoggerFactory.getLogger(this.getClass());

@@ -1,5 +1,6 @@
 package com.vmware.action.perforce;
 
+import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -9,7 +10,7 @@ import com.vmware.util.StringUtils;
 import java.util.List;
 
 @ActionDescription("Attempts based on summary to match the current commit to a perforce changelist.")
-public class SelectMatchingChangelist extends BasePerforceCommitAction {
+public class SelectMatchingChangelist extends BaseLinkedPerforceCommitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");

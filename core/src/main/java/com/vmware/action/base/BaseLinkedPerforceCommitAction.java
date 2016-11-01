@@ -11,6 +11,9 @@ public abstract class BaseLinkedPerforceCommitAction extends BasePerforceCommitA
 
     @Override
     public String cannotRunAction() {
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return "not in git repo directory";
+        }
         if (StringUtils.isBlank(draft.perforceChangelistId)) {
             return "no changelist id read for commit";
         }

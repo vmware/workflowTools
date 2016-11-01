@@ -122,9 +122,6 @@
        "review": [
           "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "setReviewDetails", "displayReviewUrl"
        ],
-       "reviewPendingChangelist": [
-          "readPendingChangelist", "CreateReviewIfNeeded", "UpdateChangelistDescription", "setReviewDetails", "displayReviewUrl"
-       ],
        "reviewCommitWithMatchingChangelist": [
           "updateMatchingChangelist", "CreateReviewIfNeeded", "AmendCommit", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "displayReviewUrl"
        ],
@@ -154,15 +151,18 @@
           "FormatCommitText", "AmendCommitWithoutJobResults"
        ],
        "push": [
-          "prepareCommitForPush", "PushToTrackingBranch", "SoftSubmitReview"
+          "pushSofter"
        ],
-       "pushIt" : [
-          "push"
+       "pushSofter": [
+         "prepareCommitForPush", "PushToTrackingBranch", "SoftSubmitReview"
        ],
        "pushHarder": [
           "prepareCommitForPush", "PushToTrackingBranch", "HardSubmitReview"
        ],
        "submit": [
+          "submitSofter"
+       ],
+       "submitSofter": [
          "prepareCommitForPush", "updateMatchingChangelist", "SubmitPendingChangelist", "DeleteChangelistTag", "SoftSubmitReview"
        ],
        "submitHarder": [
@@ -172,7 +172,7 @@
           "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "DeleteChangelistTag", "HardSubmitReview"
        ],
        "submitChangelist": [
-          "readPendingChangelist", "SubmitPendingChangelist"
+          "prepareCommitForPush", "SubmitPendingChangelist", "HardSubmitReview"
        ],
        "closeOldReviews": [
           "HardSubmitOldSoftSubmittedReviews", "HardSubmitOldShipItReviews"
@@ -260,13 +260,13 @@
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
        "updateMatchingChangelist": [
-          "readPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
+          "readPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateMatchingChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateMatchingChangelistWithGitDiff": [
-         "readPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
+         "readPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateMatchingChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateWithGitChangeset": [
-         "readPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateChangelistDescription"
+         "readPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateMatchingChangelistDescription"
        ],
        "reviewWithGitChangeset": [
          "updateWithGitChangeset", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiffFromChangelist", "UpdateReviewDetails", "displayReviewUrl"

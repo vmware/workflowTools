@@ -1,8 +1,8 @@
 package com.vmware;
 
 import com.vmware.action.BaseAction;
-import com.vmware.action.base.BaseMultiActionDataSupport;
 import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BaseMultiActionDataSupport;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
@@ -16,14 +16,14 @@ import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
-import com.vmware.util.ThreadUtils;
-import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
+import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.Padder;
 import jline.console.completer.ArgumentCompleter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -49,10 +47,16 @@ import java.util.concurrent.TimeUnit;
  * Main class for running the workflow application.
  */
 public class Workflow {
-    public static final List<String> MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("commit", "commitAll", "amendCommit", "review",
-                    "pushable", "push", "commitOffline", "commitAllOffline",
-                    "createTrelloBoardFromLabel" , "closeOldReviews", "restartJobs"));
+    public static final List<String> BATCH_MAIN_WORKFLOWS = Collections.unmodifiableList(
+            Arrays.asList("createTrelloBoardFromLabel", "closeOldReviews", "restartJobs"));
+
+    public static final List<String> GIT_MAIN_WORKFLOWS = Collections.unmodifiableList(
+            Arrays.asList("commit", "commitAll", "amendCommit", "review", "pushable", "push", "submit")
+    );
+
+    public static final List<String> PERFORCE_MAIN_WORKFLOWS = Collections.unmodifiableList(
+            Arrays.asList("moveOpenFilesToPendingChangelist", "review", "pushable", "submitChangelist")
+    );
 
     private static final String EXIT_WORKFLOW = "exit";
 
@@ -76,13 +80,13 @@ public class Workflow {
         if (workflowHistory.size() > 10) {
             workflowHistory.remove(10);
         }
-        String userHome = System.getProperty( "user.home" );
+        String userHome = System.getProperty("user.home");
         File workflowHistoryFile = new File(userHome + File.separator + ".workflowHistory.txt");
         IOUtils.write(workflowHistoryFile, workflowHistory);
     }
 
     private void readWorkflowHistoryFile() {
-        String userHome = System.getProperty( "user.home" );
+        String userHome = System.getProperty("user.home");
         File workflowHistoryFile = new File(userHome + File.separator + ".workflowHistory.txt");
         if (!workflowHistoryFile.exists()) {
             workflowHistory = new ArrayList<>();

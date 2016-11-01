@@ -1,14 +1,24 @@
 package com.vmware.action.perforce;
 
 import com.vmware.action.base.BaseLinkedPerforceCommitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 
 @ActionDescription("Submits the perforce changelist to the depot.")
-public class SubmitPendingChangelist extends BaseLinkedPerforceCommitAction {
+public class SubmitPendingChangelist extends BasePerforceCommitAction {
     public SubmitPendingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
+    }
+
+    @Override
+    public String failWorkflowIfConditionNotMet() {
+        if (StringUtils.isBlank(draft.perforceChangelistId)) {
+            return "no changelist specified";
+        }
+        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.vmware.scm;
 import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
@@ -48,21 +49,35 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public List<String> getPendingChangelists() {
-        String changeLists = executeScmCommand("changes -c {} -s pending", clientName);
-        if (StringUtils.isBlank(changeLists)) {
-            return Collections.emptyList();
-        }
-        List<String> changeListIds = new ArrayList<>();
-        for (String line : changeLists.split("\n")) {
-            changeListIds.add(MatcherUtils.singleMatch(line, "Change\\s+(\\d+)\\s+on"));
-        }
-        return changeListIds;
+        return getPendingChangelists(false);
     }
 
-    public String readLastPendingChangelist() {
-        String output = executeScmCommand("changes -m 1 -s pending -l -c {}", clientName);
-        output = output.replaceAll("\n\t", "\n");
-        return output;
+    private List<String> getPendingChangelists(boolean includeSummary) {
+        String changeListText = executeScmCommand("changes -c {} -s pending", clientName);
+        if (StringUtils.isBlank(changeListText)) {
+            return Collections.emptyList();
+        }
+        List<String> changeLists = new ArrayList<>();
+        for (String line : changeListText.split("\n")) {
+            String changelist = MatcherUtils.singleMatch(line, "Change\\s+(\\d+)\\s+on");
+            if (includeSummary) {
+                changelist += " " + MatcherUtils.singleMatch(line, "\\s+'(.+?)'");
+            }
+            changeLists.add(changelist);
+        }
+        return changeLists;
+    }
+
+    public String selectPendingChangelist() {
+        List<String> changelistIds = getPendingChangelists(true);
+        if (changelistIds.isEmpty()) {
+            throw new RuntimeException("No pending change lists in client " + clientName + " to select from");
+        }
+        if (changelistIds.size() == 1) {
+            return changelistIds.get(0);
+        }
+        int selectedIndex = InputUtils.readSelection(changelistIds, "Select changelist");
+        return changelistIds.get(selectedIndex);
     }
 
     public String readChangelist(String changelistId) {

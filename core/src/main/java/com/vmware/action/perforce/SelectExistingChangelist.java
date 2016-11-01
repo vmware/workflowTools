@@ -1,5 +1,6 @@
 package com.vmware.action.perforce;
 
+import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -9,7 +10,7 @@ import com.vmware.util.StringUtils;
 import java.util.List;
 
 @ActionDescription("Selects the existing changelist if only one changelist exists.")
-public class SelectExistingChangelist extends BasePerforceCommitAction {
+public class SelectExistingChangelist extends BaseLinkedPerforceCommitAction {
     public SelectExistingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
