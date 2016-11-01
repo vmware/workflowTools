@@ -210,7 +210,7 @@ public class Perforce extends BaseScmWrapper {
             if (!filesToDiff.isEmpty()) {
                 filesToDiff += " ";
             }
-            filesToDiff += fullPath(fileChange.getLastFileAffected());
+            filesToDiff += fileChange.getLastFileAffected();
         }
         String diffData = diffFilesUsingGit(filesToDiff, binaryPatch, level);
         PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(this);
@@ -275,7 +275,7 @@ public class Perforce extends BaseScmWrapper {
         Map<String, String> environmentVariables = new HashMap<>();
         String binaryFlag = binaryPatch ? " --binary" : "";
         environmentVariables.put("P4DIFF", "git diff --full-index" + binaryFlag);
-        return executeScmCommand(environmentVariables, "diff -du", filesToDiff, level);
+        return executeScmCommand(environmentVariables, "diff -du " + filesToDiff, null, level);
     }
 
     private void mergeMoveDeleteAndAdds(List<FileChange> fileChanges) {
