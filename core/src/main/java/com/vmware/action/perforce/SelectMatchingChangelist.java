@@ -10,7 +10,7 @@ import com.vmware.util.StringUtils;
 import java.util.List;
 
 @ActionDescription("Attempts based on summary to match the current commit to a perforce changelist.")
-public class SelectMatchingChangelist extends BaseLinkedPerforceCommitAction {
+public class SelectMatchingChangelist extends BasePerforceCommitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
@@ -18,6 +18,9 @@ public class SelectMatchingChangelist extends BaseLinkedPerforceCommitAction {
 
     @Override
     public String cannotRunAction() {
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return "not in git repo directory";
+        }
         if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }

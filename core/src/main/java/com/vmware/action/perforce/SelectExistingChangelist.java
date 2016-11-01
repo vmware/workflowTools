@@ -10,7 +10,7 @@ import com.vmware.util.StringUtils;
 import java.util.List;
 
 @ActionDescription("Selects the existing changelist if only one changelist exists.")
-public class SelectExistingChangelist extends BaseLinkedPerforceCommitAction {
+public class SelectExistingChangelist extends BasePerforceCommitAction {
     public SelectExistingChangelist(WorkflowConfig config) {
         super(config);
         super.setExpectedCommandsToBeAvailable("p4");
@@ -18,6 +18,9 @@ public class SelectExistingChangelist extends BaseLinkedPerforceCommitAction {
 
     @Override
     public String cannotRunAction() {
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return "not in git repo directory";
+        }
         if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }
