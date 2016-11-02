@@ -12,6 +12,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -78,7 +79,11 @@ public class Git extends BaseScmWrapper {
         String command = String.format("git cat-file -p %s:%s", fromRef, filePath);
         Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, command, (String) null);
         try {
-            Files.copy(statusProcess.getInputStream(), Paths.get(toFilePath), StandardCopyOption.REPLACE_EXISTING);
+            File toFile = new File(toFilePath);
+            if (!toFile.exists() && toFile.getParentFile() != null) {
+                toFile.getParentFile().mkdirs();
+            }
+            Files.copy(statusProcess.getInputStream(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
@@ -134,7 +139,7 @@ public class Git extends BaseScmWrapper {
 
     public String commitText(int skipCount, boolean prettyPrint) {
         String prettyPrintCommand = prettyPrint ? " --pretty=%B\n" : "";
-        return executeScmCommand("log -1 --skip={}{}", String.valueOf(skipCount), prettyPrintCommand);
+        return executeScmCommand("log -1 --skip={}{}", String.valueOf(skipCount), prettyPrintCommand).trim();
     }
 
     public String currentBranch() {
