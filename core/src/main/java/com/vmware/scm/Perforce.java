@@ -83,7 +83,7 @@ public class Perforce extends BaseScmWrapper {
     public String readChangelist(String changelistId) {
         String output = executeScmCommand("describe -s {}", changelistId);
         output = output.replaceAll("\n\t", "\n");
-        return output;
+        return output.trim();
     }
 
     public String printToFile(String fileToPrint, File outputFile) {

@@ -12,8 +12,8 @@ public class ExitIfCommitUnchanged extends BaseCommitAction {
 
     @Override
     public void process() {
-        String existingCommitText = git.lastCommitText(true).trim();
-        String updatedCommitText = draft.toText(config.getCommitConfiguration()).trim();
+        String existingCommitText = git.lastCommitText(true);
+        String updatedCommitText = draft.toText(config.getCommitConfiguration());
 
         if (!existingCommitText.equals(updatedCommitText)) {
             return;
