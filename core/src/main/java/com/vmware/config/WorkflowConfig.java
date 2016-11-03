@@ -390,15 +390,16 @@ public class WorkflowConfig {
         reviewBoardRepository = gitRemoteValue;
     }
 
-    public void applyGitConfigValues(String remoteName) {
-        String remoteText = StringUtils.isBlank(remoteName) ? "" : remoteName + ".";
+    public void applyGitConfigValues(String configPrefix) {
+        String configPrefixText = StringUtils.isBlank(configPrefix) ? "" : configPrefix + ".";
         Map<String, String> configValues = git.configValues();
+        String sourceConfigProperty = null;
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
-            String workflowConfigPropertyName = "workflow." + remoteText + field.getName().toLowerCase();
+            String workflowConfigPropertyName = "workflow." + configPrefixText + field.getName().toLowerCase();
             String gitConfigPropertyName = configurableProperty.gitConfigProperty();
             String valueToSet = null;
-            if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(remoteName)) {
+            if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(configPrefix)) {
                 String valueByGitConfig = configValues.get(gitConfigPropertyName);
                 String valueByWorkflowProperty = configValues.get(workflowConfigPropertyName);
                 if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByGitConfig)) {
@@ -407,13 +408,14 @@ public class WorkflowConfig {
                             + valueByWorkflowProperty + " specified by the workflow property " + workflowConfigPropertyName
                             + " please remove one of the properties");
                 }
+                sourceConfigProperty = valueByGitConfig != null ? gitConfigPropertyName : workflowConfigPropertyName;
                 valueToSet = valueByGitConfig != null ? valueByGitConfig : valueByWorkflowProperty;
             } else {
+                sourceConfigProperty = workflowConfigPropertyName;
                 valueToSet = configValues.get(workflowConfigPropertyName);
             }
-            String source = StringUtils.isNotBlank(remoteName) ? "Git Config Remote " + remoteName : "Git Config";
 
-            setFieldValue(field, valueToSet, source);
+            setFieldValue(field, valueToSet, "Git " + sourceConfigProperty);
         }
     }
 

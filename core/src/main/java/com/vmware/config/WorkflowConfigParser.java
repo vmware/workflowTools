@@ -58,6 +58,9 @@ public class WorkflowConfigParser {
                 String remoteName = trackingBranch.split("/")[0];
                 log.debug("Applying remote specific config values for git remote {}", remoteName);
                 internalConfig.applyGitConfigValues(remoteName);
+                String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
+                log.debug("Applying tracking branch specific config values for git tracking branch", trackingBranch);
+                internalConfig.applyGitConfigValues(trackingBranchConfigPrefix);
             }
         }
 
