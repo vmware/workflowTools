@@ -15,6 +15,7 @@ import com.vmware.jira.domain.MultiActionData;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.scm.Git;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
@@ -59,7 +60,7 @@ public class Workflow {
     );
 
     private static final String EXIT_WORKFLOW = "exit";
-
+    private final Git git = new Git();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final WorkflowConfigParser configParser = new WorkflowConfigParser();
     private List<String> workflowHistory;
@@ -245,6 +246,9 @@ public class Workflow {
 
         Padder configPadder = new Padder("Config Options for workflow");
         configPadder.infoTitle();
+        if (git.isGitInstalled()) {
+            log.info("Config values can also be set by executing git config [name in square brackets] [configValue]");
+        }
         for (String configOption : configOptions) {
             Field matchingField = config.getMatchingField(configOption);
             if (matchingField == null) {
@@ -261,7 +265,11 @@ public class Workflow {
                         Object matchingValue = matchingField.get(config);
                         matchingValueText = StringUtils.convertObjectToString(matchingValue);
                     }
-                    log.info("{}={} - {}", configOption, matchingValueText, matchingPropertyText);
+                    String gitConfigValue = "";
+                    if (git.isGitInstalled()) {
+                        gitConfigValue = " [workflow." + matchingField.getName() + "]";
+                    }
+                    log.info("{}={}{} - {}", configOption, matchingValueText, gitConfigValue, matchingPropertyText);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeReflectiveOperationException(e);
                 }
