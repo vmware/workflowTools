@@ -13,8 +13,8 @@ public class RebaseAgainstMaster extends BaseAction {
     @Override
     public void process() {
         String remoteMasterBranch = config.defaultGitRemote + "/master";
-        String remoteMasterRef = git.revParse(remoteMasterBranch);
-        String p4MasterRef = git.revParse("p4/master");
+        String remoteMasterRef = git.revParseWithoutException(remoteMasterBranch);
+        String p4MasterRef = git.revParseWithoutException("p4/master");
         String rebaseOutput;
         if (!remoteMasterRef.contains("unknown revision or path")) {
             log.info("Rebasing against {} after fetching", remoteMasterBranch);

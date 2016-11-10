@@ -250,8 +250,12 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("merge-base " + upstreamBranch + " " + commitRef);
     }
 
+    public String revParseWithoutException(String commitRef) {
+        return executeScmCommand("rev-parse " + commitRef);
+    }
+
     public String revParse(String commitRef) {
-        String output =  executeScmCommand("rev-parse " + commitRef);
+        String output =  revParseWithoutException(commitRef);
         if (output.contains("ambiguous argument")) {
             throw new IllegalArgumentException("Commit ref " + commitRef + " is not a valid ref: " + output);
         }
