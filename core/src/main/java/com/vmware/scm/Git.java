@@ -176,6 +176,8 @@ public class Git extends BaseScmWrapper {
             String[] valuePieces = valueAsText.split("=");
             if (valuePieces.length == 2) {
                 values.put(valuePieces[0], valuePieces[1]);
+            } else if (valuePieces.length == 1) {
+                values.put(valuePieces[0], "");
             } else {
                 log.debug("{} git config value could not be parsed", valueAsText);
             }

@@ -30,6 +30,7 @@ public class DisplayConfig extends BaseAction {
         if (StringUtils.isNotBlank(config.configPropertiesToDisplay)) {
             specifiedPropertiesToDisplay.addAll(Arrays.asList(config.configPropertiesToDisplay.split(",")));
         }
+        boolean printingFirstValue = false;
         for (int i = 0; i < config.configurableFields.size(); i ++) {
             Field configField = config.configurableFields.get(i);
             if (!showValueForProperty(specifiedPropertiesToDisplay, configField.getName())) {
@@ -43,10 +44,12 @@ public class DisplayConfig extends BaseAction {
             } catch (IllegalAccessException e) {
                 throw new RuntimeReflectiveOperationException(e);
             }
-            log.info("{} ({}) - {}", configField.getName(), source, displayValue);
-            if (i < config.configurableFields.size() - 1) {
+            if (!printingFirstValue) {
+                printingFirstValue = true;
+            } else {
                 log.info("");
             }
+            log.info("{} ({}) - {}", configField.getName(), source, displayValue);
         }
         titlePadder.infoTitle();
     }
