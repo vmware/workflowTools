@@ -46,14 +46,14 @@ public class ReopenAndResolveIssues extends BaseBatchJiraAction{
             }
 
             log.info("Resolving issue {} with a resolution of {}", issueToReopen.getKey(), Fixed.name());
-            jira.transitionIssue(resolveTransition);
+            jira.transitionIssue(resolveTransition, Fixed);
             processingCounter++;
         }
         log.info("Successfully reopened and resolved {} issues", processingCounter);
     }
 
     private IssueTransition getIssueTransition(Issue issueToReopen, IssueStatusDefinition transitionForStatus) {
-        if (issueToReopen.getStatus() != Closed) {
+        if (issueToReopen.getStatus() != Closed && issueToReopen.getStatus() != Resolved) {
             log.info("Issue {} has a status of {}, skipping", issueToReopen.getKey(), issueToReopen.getStatus().name());
             return null;
         }

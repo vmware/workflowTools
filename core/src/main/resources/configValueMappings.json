@@ -92,7 +92,6 @@
     "--perforce-client"
   ],
   "SaveChangelistDiffToFile": [
-    "--changelist-id",
     "--output-file"
   ],
   "SetReviewId": [
@@ -160,7 +159,8 @@
   ],
   "BaseCommitAction": [
     "--username",
-    "--perforce-client"
+    "--perforce-client",
+    "--changelist-id"
   ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
@@ -266,6 +266,9 @@
   "HardSubmitOldShipItReviews": [
     "--old-ship-it"
   ],
+  "LoadCompletedIssuesWithoutResolution": [
+    "--username"
+  ],
   "SyncCardsWithJiraIssues": [
     "--trello-url",
     "--jira-url",
@@ -320,9 +323,6 @@
   "FormatCommitText": [
     "--max-description",
     "--max-summary"
-  ],
-  "LoadClosedIssuesWithoutResolution": [
-    "--username"
   ],
   "ReadPendingChangelist": [
     "--username"

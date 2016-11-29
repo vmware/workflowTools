@@ -9,6 +9,7 @@ import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.request.UrlParam;
 import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssueResolution;
 import com.vmware.jira.domain.IssueResolutionDefinition;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTimeTracking;
@@ -136,7 +137,14 @@ public class Jira extends AbstractRestService {
     }
 
     public void transitionIssue(IssueTransition transition) {
+        transitionIssue(transition, null);
+    }
+
+    public void transitionIssue(IssueTransition transition, IssueResolutionDefinition resolution) {
         IssueUpdate updateIssue = new IssueUpdate(transition);
+        if (resolution != null) {
+            updateIssue.fields.resolution = new IssueResolution(resolution);
+        }
         connection.post(urlBaseForKey(transition.issueId) + "transitions", updateIssue);
     }
 
