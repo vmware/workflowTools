@@ -227,7 +227,7 @@
           "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
        ],
        "reopenAndResolveIssues": [
-          "LoadClosedIssuesWithoutResolution", "ExitIfThereAreNoIssuesToProcess", "ReopenAndResolveIssues"
+          "LoadCompletedIssuesWithoutResolution", "ExitIfThereAreNoIssuesToProcess", "ReopenAndResolveIssues"
        ],
        "createTrackingIssueForBug": [
           "AddTrackingIssueForBug", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"

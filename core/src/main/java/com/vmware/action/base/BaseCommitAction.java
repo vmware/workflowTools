@@ -22,6 +22,16 @@ public abstract class BaseCommitAction extends BaseAction {
         this.draft = draft;
     }
 
+    protected String determineChangelistIdToUse() {
+        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+            return draft.perforceChangelistId;
+        } else if (StringUtils.isNotBlank(config.changelistId)) {
+            return config.changelistId;
+        } else {
+            return serviceLocator.getPerforce().selectPendingChangelist();
+        }
+    }
+
     protected String readLastChange() {
         if (git.workingDirectoryIsInGitRepo()) {
             return git.lastCommitText(true);
@@ -34,11 +44,12 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     private String readPendingChangelistText() {
-        String changelistId = serviceLocator.getPerforce().selectPendingChangelist();
+        String changelistId = determineChangelistIdToUse();
         String changelistText = serviceLocator.getPerforce().readChangelist(changelistId);
         if (StringUtils.isBlank(changelistText) || !changelistText.contains("\n")) {
             throw new RuntimeException("No pending changelist exists for user " + config.username);
         }
+        draft.perforceChangelistId = changelistId;
         return changelistText;
     }
 }

@@ -2,7 +2,7 @@ package com.vmware;
 
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
-import com.vmware.jira.domain.IssueFields;
+import com.vmware.jira.domain.IssueResolutionDefinition;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransition;
 import com.vmware.jira.domain.IssueTransitions;
@@ -12,7 +12,6 @@ import com.vmware.jira.domain.JiraUser;
 import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -129,6 +128,16 @@ public class TestJiraApi extends BaseTests {
     @Test
     public void canUpdateEstimateForIssue() {
         jira.updateIssueEstimate(jiraIssueNumber, 1);
+    }
+
+    @Test
+    public void canResolveIssue() {
+        IssueTransitions issueTransitions = jira.getAllowedTransitions(jiraIssueNumber);
+        if (issueTransitions.canTransitionTo(IssueStatusDefinition.Resolved)) {
+            jira.transitionIssue(issueTransitions.getTransitionForStatus(IssueStatusDefinition.Resolved), IssueResolutionDefinition.Fixed);
+        }
+        issueTransitions = jira.getAllowedTransitions(jiraIssueNumber);
+        jira.transitionIssue(issueTransitions.getTransitionForStatus(IssueStatusDefinition.Reopened));
     }
 
 }

@@ -29,13 +29,4 @@ public class SaveChangelistDiffToFile extends BasePerforceCommitAction {
         FileUtils.saveToFile(outputFile, content);
     }
 
-    private String determineChangelistIdToUse() {
-        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
-            return draft.perforceChangelistId;
-        } else if (StringUtils.isNotBlank(config.changelistId)) {
-            return config.changelistId;
-        } else {
-            return perforce.selectPendingChangelist();
-        }
-    }
 }
