@@ -61,9 +61,10 @@ public class CommandLineUtils {
 
         String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
         long elapsedMilliseconds = new Date().getTime() - startingDate.getTime();
-        LogLevel elapsedTimeLogLevel = elapsedMilliseconds > 1000 ? logLevel : LogLevel.DEBUG;
-        dynamicLogger.log(elapsedTimeLogLevel, "Execution time {} seconds",
-                String.valueOf(TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds)));
+        long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds);
+        LogLevel elapsedTimeLogLevel = elapsedTimeInSeconds > 1 ? logLevel : LogLevel.DEBUG;
+        String plural = elapsedTimeInSeconds > 1 ? "s" : "";
+        dynamicLogger.log(elapsedTimeLogLevel, "Execution time {} second{}", String.valueOf(elapsedTimeInSeconds), plural);
         titlePadder.logTitle(logLevel);
         return output;
     }
