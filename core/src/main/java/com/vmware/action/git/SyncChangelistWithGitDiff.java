@@ -25,7 +25,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
 
     @Override
     public void process() {
-        List<FileChange> gitDiffChanges = git.getChangesInDiff(config.parentBranchPath(), "head");
+        List<FileChange> gitDiffChanges = git.getChangesInDiff(config.trackingBranchPath(), "head");
         log.debug("Git diff change count {}", gitDiffChanges.size());
 
         String[] lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();

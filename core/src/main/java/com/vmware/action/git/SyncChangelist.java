@@ -23,7 +23,7 @@ public class SyncChangelist extends BaseLinkedPerforceCommitAction {
     public void process() {
         Date startingDate = new Date();
         log.info("Syncing changes to changelist {}", draft.perforceChangelistId);
-        List<FileChange> gitDiffChanges = git.getChangesInDiff(config.parentBranchPath(), "head");
+        List<FileChange> gitDiffChanges = git.getChangesInDiff(config.trackingBranchPath(), "head");
         log.debug("Git diff change count {}", gitDiffChanges.size());
 
         String[] lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();

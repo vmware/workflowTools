@@ -24,7 +24,7 @@
     "--review-board-date-format"
   ],
   "SyncChangelist": [
-    "--parent",
+    "--tracking-branch",
     "--sync-to-branch-latest"
   ],
   "CheckStatusOfLatestBuilds": [
@@ -147,7 +147,6 @@
     "--jenkins-url"
   ],
   "SyncChangelistWithGitDiff": [
-    "--parent",
     "--tracking-branch",
     "--sync-to-branch-latest"
   ],
