@@ -7,6 +7,8 @@ import com.vmware.scm.ScmType;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -31,6 +33,8 @@ public class GitDiffToPerforceConverter {
 
     private static final String[] VALUES_TO_IGNORE = new String[]{"diff --git", "index ", "deleted file mode", "new file mode"};
     private static final Pattern depotFileInfoPattern = Pattern.compile("(.+)#(\\d+)");
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private List<String> depotFilesToCheck = new ArrayList<>();
     private List<String> whereFilesToCheck = new ArrayList<>();
@@ -200,18 +204,22 @@ public class GitDiffToPerforceConverter {
         int counter = 0;
         for (String depotFileInfo : perforceOutput.split("\n")) {
             String depotFileChecked = depotFilesToCheck.get(counter++);
-            Matcher infoMatcher = parseLine(depotFileInfo, depotFileInfoPattern);
+            Matcher infoMatcher = parseLine(depotFileChecked, depotFileInfo, depotFileInfoPattern);
+            if (infoMatcher == null) {
+                whereFilesToCheck.add(depotFileChecked);
+                continue;
+            }
             String depotMapping = infoMatcher.group(1);
             depotMappings.put(depotFileChecked, depotMapping);
             depotVersions.put(depotMapping, infoMatcher.group(2));
         }
     }
 
-    private Matcher parseLine(String line, Pattern patternToUse) {
+    private Matcher parseLine(String fileName, String line, Pattern patternToUse) {
         Matcher matcher = patternToUse.matcher(line);
         if (!matcher.find()) {
-            throw new RuntimeException("Failed to parse line " + line + " with pattern " + patternToUse.pattern()
-                    + ", perforce working directory " + perforce.getWorkingDirectory() + " is being used");
+            log.warn("Expected {} to exist in perforce: unexpected response {} for p4 files command, using p4 where to get file path", fileName, line);
+            return null;
         }
         return matcher;
     }

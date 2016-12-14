@@ -6,6 +6,7 @@ import com.vmware.scm.Perforce;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.FileUtils;
 import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,10 @@ public class PendingChangelistToGitDiffCreator {
                 secondFile = perforce.fullPath(fileChange.getLastFileAffected());
             }
             String fileDiff = gitDiff(firstFile, secondFile, binaryPatch);
+            if (StringUtils.isBlank(fileDiff) && changeType == added) {
+                log.warn("No content in added file {}", fileChange.getLastFileAffected());
+                continue;
+            }
             if (tempFileForDeleteComparison != null && !tempFileForDeleteComparison.delete()) {
                 log.warn("Failed to delete temporary file created to diff delete for file {}: {}",
                         fileChange.getFirstFileAffected(), tempFileForDeleteComparison.getPath());
