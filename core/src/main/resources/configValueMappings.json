@@ -193,7 +193,7 @@
     "--jenkins-url",
     "--max-description",
     "--max-summary",
-    "--patch",
+    "--review-request-id",
     "--review-board-date-format"
   ],
   "UploadReviewDiff": [
@@ -207,7 +207,7 @@
     "--username",
     "--reviewboard-url",
     "--latest-diff",
-    "--patch",
+    "--review-request-id",
     "--review-board-date-format"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [

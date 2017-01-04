@@ -264,8 +264,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--set-empty-only", help = "Set values for empty properties only. Ignore properties that already have values")
     public boolean setEmptyPropertiesOnly;
 
-    @ConfigurableProperty(commandLine = "-pid,--patch", help = "Id of the review request to use for patching")
-    public String reviewRequestForPatching;
+    @ConfigurableProperty(commandLine = "-rid,--review-request-id", help = "Id of the review request to use")
+    public String reviewRequestId;
 
     @ConfigurableProperty(commandLine = "-cp,--specific-properties", help = "Show value for just the specified config properties")
     public String configPropertiesToDisplay;

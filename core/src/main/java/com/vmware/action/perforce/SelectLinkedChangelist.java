@@ -21,6 +21,9 @@ public class SelectLinkedChangelist extends BasePerforceCommitAction {
         if (!git.workingDirectoryIsInGitRepo()) {
             return "not in git repo directory";
         }
+        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+            return "commit already is linked to changelist " + draft.perforceChangelistId;
+        }
         return super.cannotRunAction();
     }
 
