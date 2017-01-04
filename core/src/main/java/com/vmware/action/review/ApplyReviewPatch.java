@@ -1,6 +1,5 @@
 package com.vmware.action.review;
 
-import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -18,7 +17,6 @@ import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @ActionDescription("Applies a specified review request's diff against the local repository.")
@@ -42,11 +40,11 @@ public class ApplyReviewPatch extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (config.reviewRequestForPatching == null) {
+        if (config.reviewRequestId == null) {
             log.info("No review request id specified as source for patch");
-            config.reviewRequestForPatching = String.valueOf(InputUtils.readValueUntilValidInt("Review request id for patch"));
+            config.reviewRequestId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id for patch"));
         }
-        int reviewId = Integer.parseInt(config.reviewRequestForPatching);
+        int reviewId = Integer.parseInt(config.reviewRequestId);
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(reviewId);
         Repository repository = reviewBoard.getRepository(reviewRequest.getRepositoryLink());
         ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());
@@ -54,7 +52,7 @@ public class ApplyReviewPatch extends BaseCommitAction {
 
         if (diffs.length == 0) {
             throw new IllegalArgumentException(String.format("Review request %s does not have any diffs",
-                    config.reviewRequestForPatching));
+                    config.reviewRequestId));
         }
 
         int diffSelection = diffs.length - 1;
@@ -93,8 +91,7 @@ public class ApplyReviewPatch extends BaseCommitAction {
         log.info("Checking if diff {} applies", diffSelection + 1);
         String checkResult = git.applyDiff(diffData, true);
         if (StringUtils.isNotBlank(checkResult)) {
-            log.error("Checking of diff failed!\n{}", checkResult);
-            return;
+            throw new RuntimeException("Checking of diff failed: " + checkResult);
         }
 
         log.info("Applying diff {}", diffSelection + 1);

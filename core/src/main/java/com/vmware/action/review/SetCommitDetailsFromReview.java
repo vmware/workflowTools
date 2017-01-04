@@ -1,11 +1,9 @@
 package com.vmware.action.review;
 
 import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
-import com.vmware.reviewboard.domain.Repository;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
@@ -31,7 +29,7 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
 
     @Override
     public void process() {
-        String reviewId = StringUtils.isInteger(draft.id) ? draft.id : config.reviewRequestForPatching;
+        String reviewId = StringUtils.isInteger(draft.id) ? draft.id : config.reviewRequestId;
         if (!StringUtils.isInteger(reviewId)) {
             log.info("No review request id specified for retrieving commit details");
             reviewId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id "));

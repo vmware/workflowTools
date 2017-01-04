@@ -64,7 +64,7 @@
           "ReadLastCommit", "ExitIfTrivialCommit"
        ],
        "readPerforceCommit": [
-          "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "SelectLinkedChangelist", "SelectMatchingChangelist", "SelectExistingChangelist"
+          "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "SelectLinkedChangelist", "SelectMatchingChangelist"
        ],
        "readPendingChangelist": [
           "ReadPendingChangelist", "ExitIfCommitDoesNotHaveAChangelistId"

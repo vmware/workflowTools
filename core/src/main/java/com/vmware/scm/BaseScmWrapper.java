@@ -77,7 +77,7 @@ public abstract class BaseScmWrapper {
         }
         for (String argument : arguments) {
             if (argument == null) {
-                continue;
+                argument = "";
             }
             command = command.replaceFirst("\\{\\}", argument);
         }

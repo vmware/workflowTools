@@ -6,7 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 
-@ActionDescription("Reads the most recent pending changelist for the specified perforce client.")
+@ActionDescription("Reads a pending changelist for the specified perforce client.")
 public class ReadPendingChangelist extends BasePerforceCommitAction {
 
     public ReadPendingChangelist(WorkflowConfig config) {

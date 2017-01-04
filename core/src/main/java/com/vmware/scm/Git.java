@@ -65,7 +65,7 @@ public class Git extends BaseScmWrapper {
 
     public String applyDiff(String diffData, boolean check) {
         String checkString = check ? " --check" : "";
-        return executeScmCommand("apply -3 {}", diffData, LogLevel.DEBUG, checkString);
+        return executeScmCommand("apply -3{}", diffData, LogLevel.DEBUG, checkString);
     }
 
     public String diffTree(String fromRef, String ref, boolean binaryPatch, LogLevel level) {
