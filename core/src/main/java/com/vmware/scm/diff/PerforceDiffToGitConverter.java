@@ -2,7 +2,6 @@ package com.vmware.scm.diff;
 
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
-import com.vmware.scm.Perforce;
 import com.vmware.scm.ScmType;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,9 +75,12 @@ public class PerforceDiffToGitConverter {
         FileChange fileChange = new FileChange(ScmType.git);
         int depotVersion = Integer.parseInt(minusMatcher.group(2));
         String plusDepotPath = MatcherUtils.singleMatchExpected(lineIter.next(), "\\+\\+\\+\\s+(.+?)\\s+");
-        String linesLeft = determineLinesLeftAfterChange(lineIter);
+        String[] linesInfo = determineLinesInfoForChange(lineIter);
         fileChange.setFileVersion(depotVersion);
-        fileChange.setChangeType(determineChangeType(minusDepotPath, plusDepotPath, depotVersion, linesLeft));
+        fileChange.setChangeType(determineChangeType(minusDepotPath, plusDepotPath, depotVersion, linesInfo));
+        if (fileChange.getChangeType() == FileChangeType.added) {
+            fileChange.setFileMode("100644");
+        }
         fileChange.addFileAffected(0, minusDepotPath);
         fileChange.addFileAffected(1, plusDepotPath);
         depotPaths.add(minusDepotPath);
@@ -89,21 +90,25 @@ public class PerforceDiffToGitConverter {
         return fileChange;
     }
 
-    private String determineLinesLeftAfterChange(ListIterator<String> lineIter) {
-        String addedLines = null;
+    private String[] determineLinesInfoForChange(ListIterator<String> lineIter) {
         if (lineIter.hasNext()) {
-            addedLines = MatcherUtils.singleMatch(lineIter.next(), "@@\\s+-\\d+,\\d+\\s+\\+(\\d+,\\d+)\\s+@@");
+            Matcher infoMatcher = Pattern.compile("@@\\s+-(\\d+,\\d+)\\s+\\+(\\d+,\\d+)\\s+@@").matcher(lineIter.next());
             lineIter.previous();
+            if (infoMatcher.find()) {
+                return new String[] {infoMatcher.group(1), infoMatcher.group(2)};
+            }
         }
-        return addedLines;
+        return null;
     }
 
-    private FileChangeType determineChangeType(String minusDepotPath, String plusDepotPath, int depotVersion, String linesLeft) {
+    private FileChangeType determineChangeType(String minusDepotPath, String plusDepotPath, int depotVersion, String[] linesInfo) {
         if (!minusDepotPath.equals(plusDepotPath)) {
             return FileChangeType.renamed;
-        } else if ("0,0".equals(linesLeft)) {
+        } else if (linesInfo != null && "0,0".equals(linesInfo[1])) {
             return FileChangeType.deleted;
         } else if (depotVersion == 0) {
+            return FileChangeType.added;
+        } else if (depotVersion == 1 && linesInfo != null && "0,0".equals(linesInfo[0])) {
             return FileChangeType.added;
         } else {
             return FileChangeType.modified;
