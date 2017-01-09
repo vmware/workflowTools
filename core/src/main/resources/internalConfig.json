@@ -140,10 +140,16 @@
        "submitReview": [
           "readNonTrivialCommit", "SoftSubmitReview"
        ],
-       "applyPatch": [
+       "applyPatchToExistingChangelist": [
+          "SelectExistingChangelist", "ApplyReviewPatch"
+       ],
+       "applyPatchToNewChangelist": [
+          "CreatePendingChangelistIfNeeded", "ApplyReviewPatch", "SetCommitDetailsFromReview", "AmendCommit"
+       ],
+       "applyPatchToGit": [
           "ApplyReviewPatch"
        ],
-       "applyPatchAsCommit": [
+       "applyPatchAsGitCommit": [
           "ApplyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
        ],
        "prepareCommitForPush": [
