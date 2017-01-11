@@ -265,7 +265,7 @@
        "createUpdateIssuesFromTrello": [
           "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
        ],
-       "updateMatchingChangelist": [
+       "updateMatchingChangelistWithFileSync": [
           "readPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateMatchingChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "updateMatchingChangelistWithGitDiff": [
@@ -280,8 +280,11 @@
        "submitWithGitChangeset": [
          "prepareCommitForPush", "updateWithGitChangeset", "SubmitPendingChangelist", "DeleteChangelistTag"
        ],
+       "updateMatchingChangelist": [
+         "updateMatchingChangelistWithFileSync"
+       ],
        "sandbox": [
-         "updateMatchingChangelist", "InvokeSandboxBuild", "AmendCommit"
+         "updateMatchingChangelistWithFileSync", "InvokeSandboxBuild", "AmendCommit"
        ],
        "invokeSandboxBuildWithGitChangeset": [
         "updateWithGitChangeset", "InvokeSandboxBuild", "AmendCommit"
