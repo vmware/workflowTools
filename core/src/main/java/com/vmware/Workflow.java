@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Main class for running the workflow application.
@@ -119,7 +121,29 @@ public class Workflow {
             log.info("Exiting");
             System.exit(0);
         }
-        configParser.updateWithRuntimeArguments(config, workFlowText.split(" "));
+        String[] workflowTextPieces = splitWorkflowTextIntoArguments(workFlowText);
+        configParser.updateWithRuntimeArguments(config, workflowTextPieces);
+    }
+
+    private String[] splitWorkflowTextIntoArguments(String workFlowText) {
+        String[] quotedTextPieces = workFlowText.split("[\"']");
+        List<String> workflowTextPieces = new ArrayList<>();
+        for (int i = 0; i < quotedTextPieces.length; i ++) {
+            if (i % 2 == 0) {
+                String[] piecesSplitBySpace = quotedTextPieces[i].split(" ");
+                if (!quotedTextPieces[i].endsWith(" ") && i < quotedTextPieces.length - 1) { // reattach piece of text after space and before quote
+                    quotedTextPieces[i+1] = piecesSplitBySpace[piecesSplitBySpace.length - 1] + quotedTextPieces[i+1];
+                    if (piecesSplitBySpace.length > 1) {
+                        workflowTextPieces.addAll(Arrays.asList(Arrays.copyOf(piecesSplitBySpace, piecesSplitBySpace.length - 1)));
+                    }
+                } else {
+                    workflowTextPieces.addAll(Arrays.asList(piecesSplitBySpace));
+                }
+            } else {
+                workflowTextPieces.add(quotedTextPieces[i]);
+            }
+        }
+        return workflowTextPieces.toArray(new String[workflowTextPieces.size()]);
     }
 
     private ArgumentCompleter createWorkflowCompleter() {

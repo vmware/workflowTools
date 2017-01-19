@@ -153,8 +153,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-buildType,--build-type", help = "Buildweb build type to use, this is for a VMware specific tool")
     public String buildType;
 
-    @ConfigurableProperty(commandLine = "--merge-to", help = "Value for merge to property")
-    public String mergeToValue;
+    @ConfigurableProperty(commandLine = "--merge-to", help = "Comma separate values for merge to property")
+    public String[] mergeToValues;
 
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
     public boolean includeStoriesWithEstimates;
@@ -490,7 +490,7 @@ public class WorkflowConfig {
 
     public CommitConfiguration getCommitConfiguration() {
         return new CommitConfiguration(reviewboardUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
-                reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValue);
+                reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValues);
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {

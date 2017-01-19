@@ -24,16 +24,21 @@ public class CommandLineArgumentsParser {
     private String argumentsText;
 
     public void generateArgumentMap(final String[] args) {
-        argumentsText = StringUtils.join(Arrays.asList(args), " ");
+        argumentsText = "";
 
         argumentMap.clear();
 
         for (int i = 0; i < args.length; i ++) {
+            if (i > 0) {
+                argumentsText += " ";
+            }
             if (!args[i].startsWith("-")) {
+                argumentsText += args[i];
                 continue;
             }
             String[] paramPieces = args[i].split("=");
             String paramName = paramPieces[0];
+            argumentsText += paramName;
             String paramValue = null;
 
             if (paramPieces.length == 1 && args[i].endsWith("=")) {
@@ -42,6 +47,9 @@ public class CommandLineArgumentsParser {
                 paramValue = paramPieces[1];
             } else if (i < args.length - 1 && !args[i+1].startsWith("-")) {
                 paramValue = args[++i];
+            }
+            if (paramValue != null) {
+                argumentsText += "=" + (paramValue.contains(" ") ? "\"" + paramValue + "\"" : paramValue);
             }
 
             argumentMap.put(paramName, paramValue);

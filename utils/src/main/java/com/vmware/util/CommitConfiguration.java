@@ -17,10 +17,10 @@ public class CommitConfiguration {
 
     private String mergeToLabel;
 
-    private String mergeToValue;
+    private String[] mergeToValues;
 
     public CommitConfiguration(String reviewboardUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
-                               String reviewedByLabel, String reviewUrlLabel, String mergeToLabel, String mergeToValue) {
+                               String reviewedByLabel, String reviewUrlLabel, String mergeToLabel, String[] mergeToValues) {
         this.reviewboardUrl = reviewboardUrl;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
@@ -28,7 +28,7 @@ public class CommitConfiguration {
         this.reviewUrlLabel = padLabel(reviewUrlLabel);
         this.mergeToLabel = padLabel(mergeToLabel);
         this.buildwebUrl = buildwebUrl;
-        this.mergeToValue = mergeToValue;
+        this.mergeToValues = mergeToValues;
     }
 
     public String generateDescriptionPattern() {
@@ -102,8 +102,8 @@ public class CommitConfiguration {
         return mergeToLabel;
     }
 
-    public String getMergeToValue() {
-        return mergeToValue;
+    public String[] getMergeToValues() {
+        return mergeToValues;
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {
