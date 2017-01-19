@@ -56,7 +56,7 @@ public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
     public List<IssueInfo> issues = new ArrayList<>();
     public String branch = "";
-    public String mergeTo = "";
+    public String[] mergeToValues = new String[0];
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.
@@ -130,7 +130,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
-        this.mergeTo = parseSingleLineFromText(commitText, commitConfiguration.generateMergeToPattern(), "Merge To");
+        this.mergeToValues = parseRepeatingSingleLineFromText(commitText, commitConfiguration.generateMergeToPattern(), "Merge To");
     }
 
     public boolean hasReviewNumber() {
@@ -316,12 +316,27 @@ public class ReviewRequestDraft extends BaseEntity{
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
                     .append(id);
         }
-        if (isNotBlank(mergeTo)) {
-            builder.append("\n").append(commitConfig.getMergeToLabel()).append(mergeTo);
-        } else if (isNotBlank(commitConfig.getMergeToValue())) {
-            builder.append("\n").append(commitConfig.getMergeToLabel()).append(commitConfig.getMergeToValue());
+        if (mergeToValues.length == 0 && commitConfig.getMergeToValues() != null) {
+            mergeToValues = commitConfig.getMergeToValues();
+        }
+        for (String mergeToValue : mergeToValues) {
+            builder.append("\n").append(commitConfig.getMergeToLabel()).append(mergeToValue);
         }
         return builder.toString();
+    }
+
+    private String[] parseRepeatingSingleLineFromText(String text, String pattern, String description) {
+        Matcher matcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(text);
+        List<String> matches = new ArrayList<>();
+        while (matcher.find()) {
+            matches.add(matcher.group(1));
+        }
+        if (matches.isEmpty()) {
+            dynamicLog.log(DEBUG, "{} not found in commit", description);
+            log.debug("Using pattern {} against text\n[{}]", pattern, text);
+            return new String[0];
+        }
+        return matches.toArray(new String[matches.size()]);
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description) {
