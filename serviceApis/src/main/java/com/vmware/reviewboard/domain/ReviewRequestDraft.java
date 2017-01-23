@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.vmware.util.StringUtils.appendCsvValue;
+import static com.vmware.util.StringUtils.isBlank;
 import static com.vmware.util.StringUtils.isNotBlank;
 import static com.vmware.util.UrlUtils.addTrailingSlash;
 import static com.vmware.util.logging.LogLevel.DEBUG;
@@ -56,7 +57,10 @@ public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
     public List<IssueInfo> issues = new ArrayList<>();
     public String branch = "";
+    @Expose(serialize = false, deserialize = false)
     public String[] mergeToValues = new String[0];
+    @Expose(serialize = false, deserialize = false)
+    public String approvedBy;
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.
@@ -98,17 +102,17 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public void fillValuesFromCommitText(String commitText, CommitConfiguration commitConfiguration) {
-        if (StringUtils.isBlank(commitText)) {
+        if (isBlank(commitText)) {
             log.warn("Text is blank, can't extract commit values!");
             return;
         }
         this.perforceChangelistId = parseSingleLineFromText(commitText, "^Change\\s+(\\d+)", "Perforce Changelist Id", DEBUG);
-        if (StringUtils.isNotBlank(perforceChangelistId)) {
+        if (isNotBlank(perforceChangelistId)) {
             log.debug("Matched first line of perforce changelist, id was {}", perforceChangelistId);
             commitText = commitText.substring(commitText.indexOf('\n')).trim();
         } else {
             this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Git P4 Changelist Id", DEBUG);
-            if (StringUtils.isBlank(this.perforceChangelistId)) {
+            if (isBlank(this.perforceChangelistId)) {
                 this.perforceChangelistId = parseSingleLineFromText(commitText, "^\\s*Change:\\s*(\\d+)", "Git Fusion Changelist Id", DEBUG);
             }
         }
@@ -130,6 +134,7 @@ public class ReviewRequestDraft extends BaseEntity{
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern()));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
+        this.approvedBy = parseSingleLineFromText(commitText, commitConfiguration.generateApprovedByPattern(), "Approved by");
         this.mergeToValues = parseRepeatingSingleLineFromText(commitText, commitConfiguration.generateMergeToPattern(), "Merge To");
     }
 
@@ -138,7 +143,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public boolean hasBugNumber(String noBugNumberLabel) {
-        return StringUtils.isNotBlank(bugNumbers) && !bugNumbers.equals(noBugNumberLabel);
+        return isNotBlank(bugNumbers) && !bugNumbers.equals(noBugNumberLabel);
     }
 
     public boolean isTrivialCommit(String trivialReviewerLabel) {
@@ -270,7 +275,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public boolean hasReviewers() {
-        return StringUtils.isNotBlank(reviewedBy);
+        return isNotBlank(reviewedBy);
     }
 
     /**
@@ -278,11 +283,11 @@ public class ReviewRequestDraft extends BaseEntity{
      */
     public boolean hasData() {
         boolean hasData = false;
-        hasData = StringUtils.isNotBlank(summary);
-        hasData = StringUtils.isNotBlank(description) || hasData;
-        hasData = StringUtils.isNotBlank(testingDone) || hasData;
+        hasData = isNotBlank(summary);
+        hasData = isNotBlank(description) || hasData;
+        hasData = isNotBlank(testingDone) || hasData;
         hasData = !jobBuilds.isEmpty() || hasData;
-        hasData = StringUtils.isNotBlank(bugNumbers) || hasData;
+        hasData = isNotBlank(bugNumbers) || hasData;
         hasData = hasReviewers() || hasData;
         hasData = hasReviewNumber() || hasData;
         return hasData;
@@ -296,7 +301,7 @@ public class ReviewRequestDraft extends BaseEntity{
         StringBuilder builder = new StringBuilder();
         builder.append(summary).append("\n\n");
 
-        if (StringUtils.isNotBlank(description)) {
+        if (isNotBlank(description)) {
             builder.append(description).append("\n");
         }
         String testingDoneSection = fullTestingDoneSection(includeJobResults);
@@ -312,9 +317,8 @@ public class ReviewRequestDraft extends BaseEntity{
         if (hasReviewNumber()) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
                     .append(addTrailingSlash(commitConfig.getReviewboardUrl())).append("r/").append(id);
-        } else if (StringUtils.isNotBlank(id)) {
-            builder.append("\n").append(commitConfig.getReviewUrlLabel())
-                    .append(id);
+        } else if (isNotBlank(id)) {
+            builder.append("\n").append(commitConfig.getReviewUrlLabel()).append(id);
         }
         if (mergeToValues.length == 0 && commitConfig.getMergeToValues() != null) {
             mergeToValues = commitConfig.getMergeToValues();
@@ -322,10 +326,17 @@ public class ReviewRequestDraft extends BaseEntity{
         for (String mergeToValue : mergeToValues) {
             builder.append("\n").append(commitConfig.getMergeToLabel()).append(mergeToValue);
         }
+        if (isBlank(approvedBy) && isNotBlank(commitConfig.getApprovedByValue())) {
+            approvedBy = commitConfig.getApprovedByValue();
+        }
+        if (isNotBlank(approvedBy)) {
+            builder.append("\n").append(commitConfig.getApprovedByLabel()).append(approvedBy);
+        }
         return builder.toString();
     }
 
     private String[] parseRepeatingSingleLineFromText(String text, String pattern, String description) {
+        pattern = "^\\s*" + pattern; // ensure the first non whitespace on a line matches the pattern
         Matcher matcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(text);
         List<String> matches = new ArrayList<>();
         while (matcher.find()) {
@@ -344,6 +355,7 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description, LogLevel logLevel) {
+        pattern = "^\\s*" + pattern; // ensure the first non whitespace on a line matches the pattern
         return parseStringFromText(text, pattern, Pattern.MULTILINE, description, logLevel);
     }
 
