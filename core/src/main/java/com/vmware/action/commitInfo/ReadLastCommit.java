@@ -3,6 +3,7 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.CommandLineUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
@@ -15,9 +16,14 @@ public class ReadLastCommit extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (!git.workingDirectoryIsInGitRepo() && StringUtils.isBlank(config.perforceClientName)) {
-            return "must be in git directory or have perforce config value perforceClientName set";
+        if (git.workingDirectoryIsInGitRepo()) {
+            return null;
+        } else if (!CommandLineUtils.isCommandAvailable("p4")) {
+            return "must be in git directory";
+        } else if (StringUtils.isBlank(config.perforceClientName)) {
+            config.perforceClientName = serviceLocator.getPerforce().getClientName();
         }
+
         return super.failWorkflowIfConditionNotMet();
     }
 
