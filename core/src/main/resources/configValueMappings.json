@@ -313,6 +313,7 @@
     "--git-remote"
   ],
   "ReadLastCommit": [
+    "--username",
     "--branch",
     "--perforce-client"
   ],

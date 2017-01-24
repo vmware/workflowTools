@@ -42,9 +42,10 @@ public class Perforce extends BaseScmWrapper {
             super.setWorkingDirectory(determineClientDirectoryForClientName());
         } else if (StringUtils.isNotBlank(clientDirectory)) {
             super.setWorkingDirectory(new File(clientDirectory));
-            this.clientName = determineClientNameForDirectory(username);
+            this.clientName = determineClientNameForDirectory(username, super.getWorkingDirectory());
         } else {
-            throw new IllegalArgumentException("one of perforceClientName or perforceClientDirectory config values must be set, can also set client name by git-p4.client git config value");
+            super.setWorkingDirectory(new File(System.getProperty("user.dir")));
+            this.clientName = determineClientNameForDirectory(username, super.getWorkingDirectory());
         }
     }
 
@@ -465,7 +466,7 @@ public class Perforce extends BaseScmWrapper {
         return new File(clientDirectory);
     }
 
-    private String determineClientNameForDirectory(String username) {
+    private String determineClientNameForDirectory(String username, File clientDirectory) {
         String clientRoot = super.getWorkingDirectory().getPath();
         String quotedClientRoot = Pattern.quote(clientRoot);
         String info = executeScmCommand("clients -u " + username, LogLevel.DEBUG);
