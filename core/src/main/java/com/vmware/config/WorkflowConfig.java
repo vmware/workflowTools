@@ -396,10 +396,18 @@ public class WorkflowConfig {
         reviewBoardRepository = gitRemoteValue;
     }
 
+    public void setDefaultGitRemoteFromTrackingRemote(String remoteName) {
+        try {
+            setFieldValue(WorkflowConfig.class.getField("defaultGitRemote"), remoteName, "tracking remote");
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
+    }
+
     public void applyGitConfigValues(String configPrefix) {
         String configPrefixText = StringUtils.isBlank(configPrefix) ? "" : configPrefix + ".";
         Map<String, String> configValues = git.configValues();
-        String sourceConfigProperty = null;
+        String sourceConfigProperty;
         for (Field field : configurableFields) {
             ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
             String workflowConfigPropertyName = "workflow." + configPrefixText + field.getName().toLowerCase();

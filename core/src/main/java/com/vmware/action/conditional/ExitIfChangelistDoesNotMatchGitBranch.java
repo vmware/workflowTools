@@ -63,6 +63,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         String reasonForMotMatching = compareDiffContent(gitDiff, perforceDiff);
         if (reasonForMotMatching != null) {
             log.error("Perforce diff didn't match git diff\n{}", reasonForMotMatching);
+            log.error("You might need to pull and rebase your git branch against the latest code.");
             System.exit(0);
         } else if (containsChangesOfType(fileChanges, added, addedAndModified, deleted)) {
             log.info("Perforce diff matches git diff in terms of content, adding or deleting file causes diff ordering to be different for perforce.");

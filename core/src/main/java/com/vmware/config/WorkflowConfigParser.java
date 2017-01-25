@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
+import static com.vmware.util.StringUtils.isNotBlank;
+
 /**
  * Parses the workflow config from the source config files
  */
@@ -52,10 +54,13 @@ public class WorkflowConfigParser {
         applyUserConfigFileIfExists(internalConfig, loadedConfigFiles);
 
         if (git.isGitInstalled() && git.workingDirectoryIsInGitRepo()) {
-            internalConfig.applyGitConfigValues("");
             String trackingBranch = git.getTrackingBranch();
-            if (StringUtils.isNotBlank(trackingBranch)) {
-                String remoteName = trackingBranch.split("/")[0];
+            String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
+            if (isNotBlank(remoteName)) {
+                internalConfig.setDefaultGitRemoteFromTrackingRemote(remoteName); // determined from remote name
+            }
+            internalConfig.applyGitConfigValues("");
+            if (isNotBlank(remoteName)) {
                 log.debug("Applying remote specific config values for git remote {}", remoteName);
                 internalConfig.applyGitConfigValues(remoteName);
                 String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
@@ -114,7 +119,7 @@ public class WorkflowConfigParser {
     private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
         String gitConfigFilePath = git.configValue("workflow.config");
         String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config");
-        if (StringUtils.isNotBlank(configFilePaths)) {
+        if (isNotBlank(configFilePaths)) {
             String[] configFiles = configFilePaths.split(",");
             for (String configFilePath : configFiles) {
                 File configFile = new File(configFilePath);
