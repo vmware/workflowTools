@@ -227,6 +227,9 @@
        "setReviewNumber": [
           "ReadLastCommit", "SetReviewId", "AmendCommit"
        ],
+       "setApprovedBy": [
+          "ReadLastCommit", "SetApprovedBy", "AmendCommit"
+       ],
        "addToDescription": [
           "ReadLastCommit", "AddToDescription", "AmendCommit"
        ],
