@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,6 +38,9 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
 
     @Override
     public void process() {
+        if (StringUtils.isBlank(config.reviewBoardRepository)) {
+            throw new RuntimeException("no reviewboard repository is configured, set a config value for reviewBoardRepository");
+        }
         log.info("Creating new review against repository {}", config.reviewBoardRepository);
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());

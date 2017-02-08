@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 public class StringUtils {
     public static final String NEW_LINE_CHAR = "\n";
@@ -180,16 +181,12 @@ public class StringUtils {
         return matchingValueText;
     }
 
-    public static int countOccurrences(String haystack, char needle) {
-        int count = 0;
-        for (int i=0; i < haystack.length(); i++)
-        {
-            if (haystack.charAt(i) == needle)
-            {
-                count++;
-            }
+    public static String stripLinesStartingWith(String text, String... textsToCheckFor) {
+        String paddedText = "\n" + text + "\n"; // pad with new lines so that searches work for start and end lines
+        for (String textToCheckFor : textsToCheckFor) {
+            paddedText = paddedText.replaceAll("\n" + Pattern.quote(textToCheckFor) + ".+\n", "\n");
         }
-        return count;
+        return paddedText.substring(1, paddedText.length() - 1);
     }
 
 }

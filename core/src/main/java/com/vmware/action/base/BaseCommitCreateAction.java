@@ -13,8 +13,9 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (!git.workingDirectoryIsInGitRepo() && StringUtils.isBlank(config.perforceClientName)) {
-            return "not in git repo and config value perforceClientName is blank";
+        String reasonForFailing = gitRepoOrPerforceClientCanBeUsed();
+        if (StringUtils.isNotBlank(reasonForFailing)) {
+            return reasonForFailing;
         }
         return super.failWorkflowIfConditionNotMet();
     }

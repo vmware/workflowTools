@@ -15,8 +15,9 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(config.perforceClientName)) {
-            return "config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName";
+        String reasonForFailing = perforceClientCanBeUsed();
+        if (reasonForFailing != null) {
+            return reasonForFailing;
         }
         return super.failWorkflowIfConditionNotMet();
     }

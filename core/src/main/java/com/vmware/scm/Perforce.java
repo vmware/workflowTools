@@ -17,9 +17,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.scm.FileChange.containsChangesOfType;
 import static com.vmware.scm.FileChangeType.deletedAfterRename;
 import static com.vmware.scm.FileChangeType.renamed;
 import static com.vmware.util.StringUtils.appendWithDelimiter;
+import static com.vmware.util.StringUtils.stripLinesStartingWith;
 import static java.lang.String.format;
 
 /**
@@ -215,7 +217,11 @@ public class Perforce extends BaseScmWrapper {
         }
         String diffData = diffFilesUsingGit(filesToDiff, binaryPatch, level);
         PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(this);
-        return diffCreator.create(diffData, fileChanges, binaryPatch);
+        String diffText = diffCreator.create(diffData, fileChanges, binaryPatch);
+        if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
+            diffText = stripLinesStartingWith(diffText, "File(s) not opened for edit");
+        }
+        return diffText;
     }
 
     public String getClientName() {

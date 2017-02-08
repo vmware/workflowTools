@@ -8,7 +8,6 @@ public class CommitConfiguration {
     private final String reviewboardUrl;
     private final String buildwebUrl;
     private final String approvedByLabel;
-    private final String approvedByValue;
     private String testingDoneLabel;
 
     private String bugNumberLabel;
@@ -23,7 +22,7 @@ public class CommitConfiguration {
 
     public CommitConfiguration(String reviewboardUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
                                String reviewedByLabel, String reviewUrlLabel, String mergeToLabel, String[] mergeToValues,
-                               String approvedByLabel, String approvedByValue) {
+                               String approvedByLabel) {
         this.reviewboardUrl = reviewboardUrl;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
@@ -33,7 +32,6 @@ public class CommitConfiguration {
         this.buildwebUrl = buildwebUrl;
         this.approvedByLabel = padLabel(approvedByLabel);
         this.mergeToValues = mergeToValues;
-        this.approvedByValue = approvedByValue;
 
     }
 
@@ -120,10 +118,6 @@ public class CommitConfiguration {
 
     public String getApprovedByLabel() {
         return approvedByLabel;
-    }
-
-    public String getApprovedByValue() {
-        return approvedByValue;
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {
