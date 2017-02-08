@@ -148,10 +148,13 @@
           "CreatePendingChangelistIfNeeded", "ApplyReviewPatch", "SetCommitDetailsFromReview", "AmendCommit"
        ],
        "applyPatchToGit": [
-          "ApplyReviewPatch"
+          "SelectExistingChangelist", "ApplyReviewPatch"
        ],
        "applyPatchAsGitCommit": [
           "ApplyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
+       ],
+       "applyChangelistAsGitDiff": [
+          "SelectExistingChangelist", "ApplyChangelistAsGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "prepareCommitForPush": [
           "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsBuilds",

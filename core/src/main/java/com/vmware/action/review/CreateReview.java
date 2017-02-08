@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
+import com.vmware.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,6 +21,14 @@ public class CreateReview extends BaseCommitAction {
     @Override
     public void asyncSetup() {
         reviewBoard = serviceLocator.getReviewBoard();
+    }
+
+    @Override
+    public String failWorkflowIfConditionNotMet() {
+        if (StringUtils.isBlank(config.reviewBoardRepository)) {
+            return "no reviewboard repository is configured, set a config value for reviewBoardRepository";
+        }
+        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

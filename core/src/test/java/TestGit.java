@@ -136,7 +136,7 @@ public class TestGit {
         int numberOfCommitsToCheck = Math.min(git.totalCommitCount(), 200);
         CommitConfiguration configuration = new CommitConfiguration("http://reviewboard",
                 "http://gobuild", "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:",
-                new String[] {"main"}, "approvedBy", "manager");
+                new String[] {"main"}, "approvedBy");
 
         for (int i = 0; i < numberOfCommitsToCheck; i ++) {
             String commitText = git.commitText(i, true);

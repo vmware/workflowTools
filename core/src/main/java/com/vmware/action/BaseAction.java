@@ -4,6 +4,7 @@ import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
+import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,16 @@ public abstract class BaseAction {
             if (!CommandLineUtils.isCommandAvailable(command)) {
                 return "command " + command + " is not available";
             }
+        }
+        return null;
+    }
+
+    protected String perforceClientCanBeUsed() {
+        if (!CommandLineUtils.isCommandAvailable("p4")) {
+            return "p4 command is not availabled";
+        }
+        if (StringUtils.isBlank(config.perforceClientName)) {
+            config.perforceClientName = serviceLocator.getPerforce().getClientName();
         }
         return null;
     }

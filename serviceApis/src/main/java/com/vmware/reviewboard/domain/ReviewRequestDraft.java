@@ -326,9 +326,6 @@ public class ReviewRequestDraft extends BaseEntity{
         for (String mergeToValue : mergeToValues) {
             builder.append("\n").append(commitConfig.getMergeToLabel()).append(mergeToValue);
         }
-        if (isBlank(approvedBy) && isNotBlank(commitConfig.getApprovedByValue())) {
-            approvedBy = commitConfig.getApprovedByValue();
-        }
         if (isNotBlank(approvedBy)) {
             builder.append("\n").append(commitConfig.getApprovedByLabel()).append(approvedBy);
         }

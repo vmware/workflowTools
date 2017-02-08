@@ -21,8 +21,9 @@ public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(config.perforceClientName)) {
-            return "config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName";
+        String reasonForFailing = perforceClientCanBeUsed();
+        if (StringUtils.isNotBlank(reasonForFailing)) {
+            return reasonForFailing;
         }
         if (StringUtils.isBlank(draft.perforceChangelistId)) {
             return "no matching changelist found, run createPendingChangelist as part of workflow";

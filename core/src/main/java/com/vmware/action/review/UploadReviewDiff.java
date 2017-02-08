@@ -25,12 +25,12 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     public void process() {
         String repoType = draft.reviewRepoType;
         if (repoType.contains("perforce")) {
-            checkThatPerforceConfigIsValid();
             if (!git.workingDirectoryIsInGitRepo()) { // in non git repo, run rbt
                 File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
                 uploadDiffUsingRbt(clientDirectory, draft.perforceChangelistId);
             } else {
                 // assuming need to create perforce compatible diff from git
+                checkThatPerforceConfigIsValid();
                 uploadReviewDiff();
             }
         } else if (repoType.equals("git")) {

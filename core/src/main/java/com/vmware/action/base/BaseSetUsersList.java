@@ -12,7 +12,6 @@ import com.vmware.util.StringUtils;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -22,15 +21,15 @@ import java.util.SortedSet;
 
 import static com.vmware.util.StringUtils.isInteger;
 
-public abstract class BaseSetReviewerList extends BaseCommitReadAction {
+public abstract class BaseSetUsersList extends BaseCommitReadAction {
     private boolean searchReviewBoardForUsers;
     private boolean addToReviewerList;
     private ReviewBoard reviewboard;
 
-    public BaseSetReviewerList(WorkflowConfig config, boolean searchReviewBoardForUsers, boolean addToReviewerList) {
-        super(config, "reviewedBy");
+    public BaseSetUsersList(WorkflowConfig config, String propertyName, boolean searchReviewBoardForUsers, boolean addToUserList) {
+        super(config, propertyName);
         this.searchReviewBoardForUsers = searchReviewBoardForUsers;
-        this.addToReviewerList = addToReviewerList;
+        this.addToReviewerList = addToUserList;
     }
 
     @Override
@@ -47,46 +46,19 @@ public abstract class BaseSetReviewerList extends BaseCommitReadAction {
         }
     }
 
-    @Override
-    public void process() {
-        Set<String> autocompleteOptions = new HashSet<>();
-        if (config.reviewerGroups != null && !config.reviewerGroups.isEmpty()) {
-            autocompleteOptions.addAll(config.reviewerGroups.keySet());
-            for (String groupName : config.reviewerGroups.keySet()) {
-                autocompleteOptions.addAll(config.reviewerGroups.get(groupName));
-            }
-            log.info("Enter group name or list number as a reviewer to add entire review group");
-            int count = 1;
-            for (String reviewerGroupName : config.reviewerGroups.keySet()) {
-                log.info("[{}] {}: {}",count++,reviewerGroupName, config.reviewerGroups.get(reviewerGroupName).toString());
-            }
-        } else {
-            log.info("Reviewer groups can be added by setting the reviewerGroups property in an external config file");
-        }
-        if (draft.hasReviewers()) {
-            log.info("Existing reviewer list: {}", draft.reviewedBy);
-        }
+    protected String readUsers(Set<String> additionalOptions, String existingUserTest, String userDescription) {
+        log.info("Tab can be used to autocomplete names");
 
-        if (autocompleteOptions.size() > 0) {
-            log.info("Tab can be used to autocomplete names");
-        }
-
-        Completer userCompleter = createUserCompleter(autocompleteOptions);
+        Completer userCompleter = createUserCompleter(additionalOptions);
         ArgumentCompleter argumentCompleter = new ArgumentCompleter(new CommaArgumentDelimeter(), userCompleter);
         argumentCompleter.setStrict(false);
 
         if (searchReviewBoardForUsers) {
-            log.info("Individual reviewers are parsed from review groups, after entering 3 characters, reviewboard is searched for a user");
+            log.info("After entering 3 characters, reviewboard is searched for a user");
         }
-        String reviewers = InputUtils.readValue("Reviewers (blank means no reviewer)", argumentCompleter);
-        String existingReviewers = addToReviewerList && StringUtils.isNotBlank(draft.reviewedBy) ? draft.reviewedBy + "," : "";
-        draft.reviewedBy = generateReviewerList(existingReviewers + reviewers);
-        log.info("Reviewer list for review: {}", draft.reviewedBy);
-
-        if (config.alwaysIncludeReviewUrl && config.trivialReviewerLabel.equals(draft.reviewedBy)) {
-            log.info("Setting review url to {} as it is a trivial review", config.noReviewNumberLabel);
-            draft.id = config.noReviewNumberLabel;
-        }
+        String users = InputUtils.readValue(userDescription, argumentCompleter);
+        String existingUsers = addToReviewerList && StringUtils.isNotBlank(draft.reviewedBy) ? existingUserTest + "," : "";
+        return generateUserList(existingUsers + users);
     }
 
     private Completer createUserCompleter(Set<String> autocompleteOptions) {
@@ -99,31 +71,31 @@ public abstract class BaseSetReviewerList extends BaseCommitReadAction {
         }
     }
 
-    private String generateReviewerList(String reviewersText) {
-        if (reviewersText.trim().isEmpty()) {
+    private String generateUserList(String usersText) {
+        if (usersText.trim().isEmpty()) {
             return config.trivialReviewerLabel;
         }
 
-        Collection<String> parsedReviewers = new OverwritableSet.UniqueArrayList<>();
-        String[] reviewers = reviewersText.split(",");
-        for (String reviewer : reviewers) {
-            String fragment = reviewer.trim();
+        Collection<String> parsedUsers = new OverwritableSet.UniqueArrayList<>();
+        String[] users = usersText.split(",");
+        for (String user : users) {
+            String fragment = user.trim();
             if (fragment.isEmpty()) {
                 continue;
             }
             Collection<String> reviewersInGroup = getReviewersInGroup(fragment);
             if (reviewersInGroup != null) {
-                addReviewers(parsedReviewers, reviewersInGroup);
+                addReviewers(parsedUsers, reviewersInGroup);
                 continue;
             }
 
-            fragment = convertFragmentToReviewerUsername(fragment);
-            addReviewer(parsedReviewers, fragment);
+            fragment = convertFragmentToUsername(fragment);
+            addReviewer(parsedUsers, fragment);
         }
-        return StringUtils.join(parsedReviewers);
+        return StringUtils.join(parsedUsers);
     }
 
-    private String convertFragmentToReviewerUsername(String fragment) {
+    private String convertFragmentToUsername(String fragment) {
         if (!fragment.contains("(")) {
             return fragment;
         }

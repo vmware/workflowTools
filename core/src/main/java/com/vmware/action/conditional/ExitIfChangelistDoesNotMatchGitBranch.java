@@ -18,9 +18,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.scm.FileChange.containsChangesOfType;
 import static com.vmware.scm.FileChangeType.added;
 import static com.vmware.scm.FileChangeType.addedAndModified;
 import static com.vmware.scm.FileChangeType.deleted;
+import static com.vmware.util.StringUtils.stripLinesStartingWith;
 
 @ActionDescription("Creates a diff for the changelist and compares it to a diff of the current git branch.")
 public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCommitAction {
@@ -50,9 +52,6 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         }
         log.info("Creating perforce diff for changelist {} in git format", draft.perforceChangelistId);
         String perforceDiff = perforce.diffChangelistInGitFormat(fileChanges, draft.perforceChangelistId, true, LogLevel.TRACE);
-        if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
-            perforceDiff = stripLinesStartingWith(perforceDiff, "File(s) not opened for edit");
-        }
         if (StringUtils.equals(gitDiff, perforceDiff)) {
             log.info("Perforce diff matches git diff exactly");
             return;
@@ -76,14 +75,6 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         Map<String, String> gitDiffAsMap = convertDiffToMap(gitDiff);
         Map<String, String> perforceDiffAsMap = convertDiffToMap(perforceDiff);
         return compareDiff(gitDiffAsMap, perforceDiffAsMap);
-    }
-
-    private String stripLinesStartingWith(String text, String... textsToCheckFor) {
-        String paddedText = "\n" + text + "\n"; // pad with new lines so that searches work for start and end lines
-        for (String textToCheckFor : textsToCheckFor) {
-            paddedText = paddedText.replaceAll("\n" + Pattern.quote(textToCheckFor) + ".+\n", "\n");
-        }
-        return paddedText.substring(1, paddedText.length() - 1);
     }
 
     private Map<String, String> convertDiffToMap(String diff) {
@@ -135,17 +126,6 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
             }
         }
         return null;
-    }
-
-    private boolean containsChangesOfType(List<FileChange> changes, FileChangeType... changeTypes) {
-        for (FileChange change : changes) {
-            for (FileChangeType changeType : changeTypes) {
-                if (change.getChangeType() == changeType) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private String compareDiffText(String gitDiff, String perforceDiff) {

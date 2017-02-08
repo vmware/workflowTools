@@ -8,6 +8,7 @@ package com.vmware.action.base;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 
 public abstract class BaseCommitAction extends BaseAction {
@@ -30,6 +31,20 @@ public abstract class BaseCommitAction extends BaseAction {
         } else {
             return serviceLocator.getPerforce().selectPendingChangelist();
         }
+    }
+
+    protected String gitRepoOrPerforceClientCanBeUsed() {
+        String gitReason = "", perforceReason = "";
+        if (git.workingDirectoryIsInGitRepo()) {
+            return null; // don't need to check perforce
+        } else {
+            gitReason = "not in git repo";
+        }
+        perforceReason = perforceClientCanBeUsed();
+        if (StringUtils.isNotBlank(gitReason) && StringUtils.isNotBlank(perforceReason)) {
+            return gitReason + " and " + perforceReason;
+        }
+        return null;
     }
 
     protected String readLastChange() {

@@ -159,9 +159,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--merge-to", help = "Comma separate values for merge to property")
     public String[] mergeToValues;
 
-    @ConfigurableProperty(commandLine = "--approved-by", help = "Optional approved by value")
-    public String approvedByValue;
-
     @ConfigurableProperty(commandLine = "--include-estimated", help = "Whether to include stories already estimated when loading jira issues for processing")
     public boolean includeStoriesWithEstimates;
 
@@ -504,7 +501,7 @@ public class WorkflowConfig {
 
     public CommitConfiguration getCommitConfiguration() {
         return new CommitConfiguration(reviewboardUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
-                reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValues, approvedByLabel, approvedByValue);
+                reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValues, approvedByLabel);
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {

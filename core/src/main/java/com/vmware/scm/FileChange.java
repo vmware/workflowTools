@@ -298,4 +298,15 @@ public class FileChange {
         return changeDescription;
     }
 
+    public static boolean containsChangesOfType(List<FileChange> changes, FileChangeType... changeTypes) {
+        for (FileChange change : changes) {
+            for (FileChangeType changeType : changeTypes) {
+                if (change.getChangeType() == changeType) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

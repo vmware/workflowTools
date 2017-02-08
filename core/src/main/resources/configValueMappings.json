@@ -100,8 +100,8 @@
     "--review-board-date-format"
   ],
   "BasePerforceCommitAction": [
-    "--username",
-    "--perforce-client"
+    "--perforce-client",
+    "--username"
   ],
   "BaseCommitReadAction": [
     "--set-empty-only"
@@ -132,13 +132,6 @@
     "--jira-test-issue",
     "--jira-url",
     "--disable-jira"
-  ],
-  "BaseSetReviewerList": [
-    "--reviewboard-url",
-    "--search-by-usernames-only",
-    "--username",
-    "--always-include-review-url",
-    "--review-board-date-format"
   ],
   "DisplayConfig": [
     "--specific-properties"
@@ -229,8 +222,11 @@
     "--disable-bugzilla"
   ],
   "UploadReviewDiffFromChangelist": [
-    "--username",
-    "--perforce-client"
+    "--perforce-client",
+    "--username"
+  ],
+  "BaseSetReviewersList": [
+    "--always-include-review-url"
   ],
   "SetSummary": [
     "--max-summary",
@@ -255,8 +251,8 @@
   "CreateReview": [
     "--username",
     "--reviewboard-url",
-    "--review-board-repo",
-    "--review-board-date-format"
+    "--review-board-date-format",
+    "--review-board-repo"
   ],
   "PushToPrecommitBranch": [
     "--git-remote",
@@ -309,13 +305,21 @@
   "RebaseAgainstMaster": [
     "--git-remote"
   ],
+  "BaseAction": [
+    "--username",
+    "--perforce-client"
+  ],
   "PushToMaster": [
     "--git-remote"
   ],
-  "ReadLastCommit": [
+  "BaseSetUsersList": [
+    "--reviewboard-url",
+    "--search-by-usernames-only",
     "--username",
-    "--branch",
-    "--perforce-client"
+    "--review-board-date-format"
+  ],
+  "ReadLastCommit": [
+    "--branch"
   ],
   "PushToTrackingBranch": [
     "--tracking-branch"

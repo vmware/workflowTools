@@ -16,14 +16,10 @@ public class ReadLastCommit extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (git.workingDirectoryIsInGitRepo()) {
-            return null;
-        } else if (!CommandLineUtils.isCommandAvailable("p4")) {
-            return "must be in git directory";
-        } else if (StringUtils.isBlank(config.perforceClientName)) {
-            config.perforceClientName = serviceLocator.getPerforce().getClientName();
+        String reasonForFailing = gitRepoOrPerforceClientCanBeUsed();
+        if (StringUtils.isNotBlank(reasonForFailing)) {
+            return reasonForFailing;
         }
-
         return super.failWorkflowIfConditionNotMet();
     }
 
