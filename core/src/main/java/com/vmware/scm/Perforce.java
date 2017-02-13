@@ -7,6 +7,7 @@ import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,7 +31,6 @@ import static java.lang.String.format;
 public class Perforce extends BaseScmWrapper {
 
     private static final Pattern whereDepotFileInfoPattern = Pattern.compile("(//.+?)\\s+");
-    private static final Pattern whereLocalFileInfoPattern = Pattern.compile(".+?\\s+.+?\\s+(.+)");
 
     private String clientName;
 
@@ -135,16 +135,9 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public Map<String, String> getWhereDepotFileInfoForRelativePaths(List<String> filePaths) {
-        String fullPathPrefix = getWorkingDirectory().getPath() + File.separator;
-        String filePathTexts = fullPathPrefix + appendWithDelimiter("", filePaths, " " + fullPathPrefix);
-        String[] whereFileOutput = executeScmCommand("where " + filePathTexts).split("\n");
-        return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereDepotFileInfoPattern);
-    }
-
-    public Map<String, String> getWhereLocalFileInfo(List<String> filePaths) {
         String filePathTexts = appendWithDelimiter("", filePaths, " ");
         String[] whereFileOutput = executeScmCommand("where " + filePathTexts).split("\n");
-        return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereLocalFileInfoPattern);
+        return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereDepotFileInfoPattern);
     }
 
     public String fstat(List<String> fileNames) {
@@ -241,7 +234,12 @@ public class Perforce extends BaseScmWrapper {
         if (getWorkingDirectory() == null) {
             return "p4";
         } else {
-            return "p4 -d " + getWorkingDirectory().getPath();
+            try {
+                return "p4 -d " + getWorkingDirectory().getCanonicalPath();
+            } catch (IOException e) {
+                log.debug("Failed to get real path for working directory " + getWorkingDirectory().getPath(), e);
+                return "p4";
+            }
         }
     }
 

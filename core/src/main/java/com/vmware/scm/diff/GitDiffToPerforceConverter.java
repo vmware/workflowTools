@@ -184,7 +184,7 @@ public class GitDiffToPerforceConverter {
                     filesListToCheck += " ";
                 }
                 String fileVersion = StringUtils.isNotBlank(lastSubmittedChangelist) ? "@" + lastSubmittedChangelist : "";
-                filesListToCheck += format("%s/%s%s", perforce.getWorkingDirectory(), depotFileToCheck, fileVersion);
+                filesListToCheck += format("%s%s", depotFileToCheck, fileVersion);
             }
             String depotFilesInfo = perforce.getFileInfo(filesListToCheck);
             parsePerforceFilesOutput(depotFilesInfo);
