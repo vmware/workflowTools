@@ -15,6 +15,6 @@ public class SetApprovedByOffline extends BaseSetUsersList {
     public void process() {
         log.info("Enter users to approve commit");
         draft.approvedBy = InputUtils.readValueUntilNotBlank("Users");
-        log.info("Approved by user list for review: {}", draft.approvedBy);
+        log.info("Approved by user list: {}", draft.approvedBy);
     }
 }

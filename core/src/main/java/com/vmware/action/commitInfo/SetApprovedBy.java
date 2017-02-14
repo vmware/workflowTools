@@ -14,7 +14,7 @@ public class SetApprovedBy extends BaseSetUsersList {
 
     @Override
     public void process() {
-        log.info("Select users to approve commit");
+        log.info("Enter users to approve commit");
         draft.approvedBy = readUsers(Collections.<String>emptySet(), draft.approvedBy, "Users (blank means no users)");
         log.info("Approved by user list: {}", draft.approvedBy);
     }

@@ -32,7 +32,7 @@ public abstract class BaseSetReviewersList extends BaseSetUsersList {
         }
 
         draft.reviewedBy = readUsers(autocompleteOptions, draft.reviewedBy, "Reviewers (blank means no reviewer)");
-        log.info("Reviewer list for : {}", draft.reviewedBy);
+        log.info("Reviewer list: {}", draft.reviewedBy);
 
         if (config.alwaysIncludeReviewUrl && config.trivialReviewerLabel.equals(draft.reviewedBy)) {
             log.info("Setting review url to {} as it is a trivial review", config.noReviewNumberLabel);
