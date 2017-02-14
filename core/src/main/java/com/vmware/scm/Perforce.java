@@ -7,7 +7,6 @@ import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +22,8 @@ import static com.vmware.scm.FileChangeType.deletedAfterRename;
 import static com.vmware.scm.FileChangeType.renamed;
 import static com.vmware.util.StringUtils.appendWithDelimiter;
 import static com.vmware.util.StringUtils.stripLinesStartingWith;
+import static com.vmware.util.logging.LogLevel.DEBUG;
+import static com.vmware.util.logging.LogLevel.INFO;
 import static java.lang.String.format;
 
 /**
@@ -38,16 +39,16 @@ public class Perforce extends BaseScmWrapper {
         super(ScmType.perforce);
         if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {
             this.clientName = clientName;
-            super.setWorkingDirectory(new File(clientDirectory));
+            super.setWorkingDirectory(clientDirectory);
         } else if (StringUtils.isNotBlank(clientName)) {
             this.clientName = clientName;
             super.setWorkingDirectory(determineClientDirectoryForClientName());
         } else if (StringUtils.isNotBlank(clientDirectory)) {
-            super.setWorkingDirectory(new File(clientDirectory));
-            this.clientName = determineClientNameForDirectory(username, super.getWorkingDirectory());
+            super.setWorkingDirectory(clientDirectory);
+            this.clientName = determineClientNameForDirectory(username);
         } else {
-            super.setWorkingDirectory(new File(System.getProperty("user.dir")));
-            this.clientName = determineClientNameForDirectory(username, super.getWorkingDirectory());
+            super.setWorkingDirectory(System.getProperty("user.dir"));
+            this.clientName = determineClientNameForDirectory(username);
         }
     }
 
@@ -94,11 +95,11 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public void deletePendingChangelist(String changelistId) {
-        executeScmCommand("change -d " + changelistId, LogLevel.INFO);
+        executeScmCommand("change -d " + changelistId, INFO);
     }
 
     public void revertChangesInPendingChangelist(String changelistId) {
-        executeScmCommand("revert -w -c {} //...", LogLevel.INFO, changelistId);
+        executeScmCommand("revert -w -c {} //...", INFO, changelistId);
     }
 
     public void revertFiles(String changelistId, List<String> filePaths) {
@@ -112,16 +113,16 @@ public class Perforce extends BaseScmWrapper {
     public String createPendingChangelist(String description, boolean filesExpected) {
         String perforceTemplate = executeScmCommand("change -o");
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, filesExpected);
-        String output = executeScmCommand("change -i", amendedTemplate, LogLevel.DEBUG);
+        String output = executeScmCommand("change -i", amendedTemplate, DEBUG);
         return changeSucceeded(output) ? MatcherUtils.singleMatch(output, "Change\\s+(\\d+)\\s+created") : null;
     }
 
     public void clean() {
-        executeScmCommand("clean //...", LogLevel.INFO);
+        executeScmCommand("clean //...", INFO);
     }
 
     public void moveAllOpenFilesToChangelist(String changelistId) {
-        executeScmCommand("reopen -c " + changelistId + " //...", LogLevel.INFO);
+        executeScmCommand("reopen -c " + changelistId + " //...", INFO);
     }
 
     public String moveFilesToChangelist(String changelistId, List<String> filePaths) {
@@ -234,12 +235,7 @@ public class Perforce extends BaseScmWrapper {
         if (getWorkingDirectory() == null) {
             return "p4";
         } else {
-            try {
-                return "p4 -d " + getWorkingDirectory().getCanonicalPath();
-            } catch (IOException e) {
-                log.debug("Failed to get real path for working directory " + getWorkingDirectory().getPath(), e);
-                return "p4";
-            }
+            return "p4 -d " + getWorkingDirectory().getPath();
         }
     }
 
@@ -423,14 +419,14 @@ public class Perforce extends BaseScmWrapper {
     public boolean updatePendingChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, false);
-        String output = executeScmCommand("change -i", amendedTemplate, LogLevel.DEBUG);
+        String output = executeScmCommand("change -i", amendedTemplate, DEBUG);
         return changeSucceeded(output);
     }
 
     public void submitChangelist(String id, String description) {
         String perforceTemplate = executeScmCommand("change -o " + id);
         String amendedTemplate = updateTemplateWithDescription(perforceTemplate, description, true);
-        String submitOutput = executeScmCommand("submit -f revertunchanged -i", amendedTemplate, LogLevel.INFO);
+        String submitOutput = executeScmCommand("submit -f revertunchanged -i", amendedTemplate, INFO);
         String status = getChangelistStatus(id);
         if (!"submitted".equals(status)) {
             log.error("Changelist {} has status {}, expected submitted", id, status);
@@ -461,19 +457,19 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    private File determineClientDirectoryForClientName() {
-        String info = executeScmCommand("clients -e " + clientName, LogLevel.DEBUG);
+    private String determineClientDirectoryForClientName() {
+        String info = executeScmCommand("clients -e " + clientName, DEBUG);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + clientName + "\\s+.+?(\\S+)\\s+'Created by");
         if (clientDirectory == null) {
             throw new RuntimeException("Failed to parse client directory for client " + clientName + "\n" + info);
         }
-        return new File(clientDirectory);
+        return clientDirectory;
     }
 
-    private String determineClientNameForDirectory(String username, File clientDirectory) {
+    private String determineClientNameForDirectory(String username) {
         String clientRoot = super.getWorkingDirectory().getPath();
         String quotedClientRoot = Pattern.quote(clientRoot);
-        String info = executeScmCommand("clients -u " + username, LogLevel.DEBUG);
+        String info = executeScmCommand("clients -u " + username, DEBUG);
         String clientName = MatcherUtils.singleMatch(info, "Client\\s+(\\S+)\\s+.+?" + quotedClientRoot + "\\s+'Created by");
         if (clientName == null) {
             throw new RuntimeException("Failed to parse client name for directory " + clientRoot

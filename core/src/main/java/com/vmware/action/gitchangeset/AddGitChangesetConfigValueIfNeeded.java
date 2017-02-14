@@ -4,7 +4,9 @@ import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
-import com.vmware.util.logging.LogLevel;
+
+import java.io.File;
+import java.io.IOException;
 
 @ActionDescription("Adds the git config value changesetsync.checkoutdir to reference the client root directory if needed.")
 public class AddGitChangesetConfigValueIfNeeded extends BasePerforceCommitAction {
@@ -15,16 +17,30 @@ public class AddGitChangesetConfigValueIfNeeded extends BasePerforceCommitAction
 
     @Override
     public void process() {
-        String existingCheckoutDir = git.configValue("changesetsync.checkoutdir");
-        String expectedCheckoutDir = perforce.getWorkingDirectory().getPath();
-        if (StringUtils.isBlank(existingCheckoutDir)) {
-            log.info("Adding git config value changesetsync.checkoutdir={} for git changeset setup", expectedCheckoutDir);
-            git.addConfigValue("changesetsync.checkoutdir", expectedCheckoutDir);
-        } else if (!expectedCheckoutDir.equals(existingCheckoutDir)) {
-            log.warn("Expected directory {} for client {} but git config value changesetsync.checkoutdir is {}",
-                    expectedCheckoutDir, config.perforceClientName, existingCheckoutDir);
+        String clientDirectory = perforce.getWorkingDirectory().getPath();
+        String changesetCheckoutPath = determineChangesetDirectoryCanonicalPath();
+
+        if (StringUtils.isBlank(changesetCheckoutPath)) {
+            log.info("Adding git config value changesetsync.checkoutdir={} for git changeset setup", clientDirectory);
+            git.addConfigValue("changesetsync.checkoutdir", clientDirectory);
+        } else if (!clientDirectory.equals(changesetCheckoutPath)) {
+            log.warn("Expected directory {} for client {} to match git config value changesetsync.checkoutdir {}",
+                    clientDirectory, config.perforceClientName, changesetCheckoutPath);
         } else {
-            log.debug("git config value changesetsync.checkoutdir matches expected directory {}", existingCheckoutDir);
+            log.debug("git config value changesetsync.checkoutdir matches expected directory {}", changesetCheckoutPath);
         }
+    }
+
+    private String determineChangesetDirectoryCanonicalPath() {
+        String checkoutDirectory = git.configValue("changesetsync.checkoutdir");
+        if (StringUtils.isNotBlank(checkoutDirectory)) {
+            try {
+                checkoutDirectory = new File(checkoutDirectory).getCanonicalPath();
+            } catch (IOException e) {
+                log.warn("Cannot get canonical path for changesetsync.checkoutdir value {}: {}", checkoutDirectory,
+                        e.getMessage());
+            }
+        }
+        return checkoutDirectory;
     }
 }

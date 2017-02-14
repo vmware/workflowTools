@@ -1,11 +1,13 @@
 package com.vmware.scm;
 
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import static com.vmware.util.CommandLineUtils.executeCommand;
@@ -31,6 +33,19 @@ public abstract class BaseScmWrapper {
                     + this.getClass().getSimpleName());
         }
         this.workingDirectory = workingDirectory;
+    }
+
+    void setWorkingDirectory(String workingDirectoryPath) {
+        if (workingDirectoryPath == null) {
+            throw new IllegalArgumentException("Cannot set null working directory path for client "
+                    + this.getClass().getSimpleName());
+        }
+        File directoryWithoutNormalizing = new File(workingDirectoryPath);
+        try {
+            this.setWorkingDirectory(directoryWithoutNormalizing.getCanonicalFile());
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     public File getWorkingDirectory() {
@@ -71,7 +86,7 @@ public abstract class BaseScmWrapper {
         return output;
     }
 
-    protected String expandCommand(String command, String... arguments) {
+    private String expandCommand(String command, String... arguments) {
         if (arguments.length == 0) {
             return command;
         }
