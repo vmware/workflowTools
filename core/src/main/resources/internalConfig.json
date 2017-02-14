@@ -130,10 +130,10 @@
           "amendCommit", "review"
        ],
        "diffUploadOnly": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiff"
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiff", "displayReviewUrl"
        ],
        "detailsUpdateOnly": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UpdateReviewDetails"
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UpdateReviewDetails", "displayReviewUrl"
        ],
        "publishReview": [
           "readNonTrivialCommit", "PublishReview", "ExitIfReviewIsNotPublic", "MarkIssueAsInReview"

@@ -16,8 +16,7 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
         ReviewRequest reviewRequest = draft.reviewRequest;
         log.info("Updating information for review " + reviewRequest.id);
 
-        draft.setTargetGroups(config.targetGroups);
-
+        draft.updateTargetGroupsIfNeeded(config.targetGroups);
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
         log.info("Successfully updated review information");
     }

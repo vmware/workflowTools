@@ -47,13 +47,12 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
     }
 
     protected String readUsers(Set<String> additionalOptions, String existingUserTest, String userDescription) {
-        log.info("Tab can be used to autocomplete names");
-
         Completer userCompleter = createUserCompleter(additionalOptions);
         ArgumentCompleter argumentCompleter = new ArgumentCompleter(new CommaArgumentDelimeter(), userCompleter);
         argumentCompleter.setStrict(false);
 
         if (searchReviewBoardForUsers) {
+            log.info("Tab can be used to autocomplete names");
             log.info("After entering 3 characters, reviewboard is searched for a user");
         }
         String users = InputUtils.readValue(userDescription, argumentCompleter);
@@ -111,7 +110,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
         int possibleIndexNumber = isInteger(fragment) ? Integer.parseInt(fragment) : -1;
         int count = 1;
         for (String groupName : reviewerGroups.keySet()) {
-            if (groupName.startsWith(fragment) || possibleIndexNumber == count++) {
+            if (groupName.equalsIgnoreCase(fragment) || possibleIndexNumber == count++) {
                 return reviewerGroups.get(groupName);
             }
         }

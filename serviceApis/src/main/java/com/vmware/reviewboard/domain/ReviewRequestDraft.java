@@ -24,7 +24,6 @@ import static com.vmware.util.StringUtils.isBlank;
 import static com.vmware.util.StringUtils.isNotBlank;
 import static com.vmware.util.UrlUtils.addTrailingSlash;
 import static com.vmware.util.logging.LogLevel.DEBUG;
-import static com.vmware.util.logging.LogLevel.WARN;
 
 public class ReviewRequestDraft extends BaseEntity{
     @Expose(serialize = false, deserialize = false)
@@ -243,12 +242,13 @@ public class ReviewRequestDraft extends BaseEntity{
         return true;
     }
 
-    public void setTargetGroups(String[] targetGroupsArray) {
+    public void updateTargetGroupsIfNeeded(String[] targetGroupsArray) {
         List<String> targetGroups;
-        if (targetGroupsArray != null) {
-            targetGroups = new ArrayList<String>(Arrays.asList(targetGroupsArray));
+        // don't update groups once the review request already has some set
+        if (reviewRequest.targetGroups.isEmpty() && targetGroupsArray != null) {
+            targetGroups = new ArrayList<>(Arrays.asList(targetGroupsArray));
         } else {
-            targetGroups = new ArrayList<String>();
+            targetGroups = new ArrayList<>();
         }
 
         for (Link group : reviewRequest.targetGroups) {
