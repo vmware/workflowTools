@@ -35,7 +35,7 @@ public class Git extends BaseScmWrapper {
 
     public Git() {
         super(ScmType.git);
-        super.setWorkingDirectory(new File(System.getProperty("user.dir")));
+        super.setWorkingDirectory(System.getProperty("user.dir"));
     }
 
     public Git(File workingDirectory) {
