@@ -1,6 +1,7 @@
 package com.vmware.reviewboard.domain;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
 import com.vmware.IssueInfo;
@@ -15,7 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +28,7 @@ import static com.vmware.util.StringUtils.isNotBlank;
 import static com.vmware.util.UrlUtils.addTrailingSlash;
 import static com.vmware.util.logging.LogLevel.DEBUG;
 
-public class ReviewRequestDraft extends BaseEntity{
+public class ReviewRequestDraft extends BaseEntity {
     @Expose(serialize = false, deserialize = false)
     private Logger log = LoggerFactory.getLogger(this.getClass());
     @Expose(serialize = false, deserialize = false)
@@ -49,8 +52,8 @@ public class ReviewRequestDraft extends BaseEntity{
     public String reviewedBy = "";
     @Expose(serialize = false, deserialize = false)
     public String shipItReviewers = "";
-    @Expose(deserialize = false)
-    public String target_groups = "";
+    @JsonAdapter(ReviewGroupsJsonMapper.class)
+    public String target_groups;
     @Expose(serialize = false, deserialize = false)
     public List<JobBuild> jobBuilds = new ArrayList<>();
     @Expose(serialize = false, deserialize = false)
@@ -243,19 +246,19 @@ public class ReviewRequestDraft extends BaseEntity{
     }
 
     public void updateTargetGroupsIfNeeded(String[] targetGroupsArray) {
-        List<String> targetGroups;
-        // don't update groups once the review request already has some set
-        if (reviewRequest.targetGroups.isEmpty() && targetGroupsArray != null) {
-            targetGroups = new ArrayList<>(Arrays.asList(targetGroupsArray));
-        } else {
-            targetGroups = new ArrayList<>();
+        if (this.target_groups != null) { // added from draft
+            return;
         }
 
+        Set<String> targetGroups = new HashSet<>();
         for (Link group : reviewRequest.targetGroups) {
-            if (!targetGroups.contains(group.getTitle())) {
-                log.debug("Adding review board group {}", group.getTitle());
-                targetGroups.add(group.getTitle());
-            }
+            log.debug("Adding review board group {}", group.getTitle());
+            targetGroups.add(group.getTitle());
+        }
+
+        // only add target groups array if review is not public
+        if (!reviewRequest.isPublic && targetGroupsArray != null) {
+            targetGroups.addAll(Arrays.asList(targetGroupsArray));
         }
 
         this.target_groups = StringUtils.join(targetGroups);
