@@ -4,6 +4,7 @@ import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
+import com.vmware.reviewboard.domain.ReviewRequestDraft;
 
 @ActionDescription("Updates the review request draft details (summary, description, testing done, bug number, groups, people).")
 public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
@@ -15,6 +16,11 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
     public void process() {
         ReviewRequest reviewRequest = draft.reviewRequest;
         log.info("Updating information for review " + reviewRequest.id);
+
+        ReviewRequestDraft existingDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
+        if (existingDraft != null) {
+            draft.target_groups = existingDraft.target_groups;
+        }
 
         draft.updateTargetGroupsIfNeeded(config.targetGroups);
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
