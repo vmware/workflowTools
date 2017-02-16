@@ -120,7 +120,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         for (String gitDiffFile : gitDiff.keySet()) {
             String gitDiffFileText = gitDiff.get(gitDiffFile);
             String perforceDiffFileText = perforceDiff.get(gitDiffFile);
-            String reasonForNotMatching = compareDiffText(gitDiffFile, gitDiffFileText, perforceDiffFileText);
+            String reasonForNotMatching = compareDiffText(gitDiffFileText, perforceDiffFileText);
             if (reasonForNotMatching != null) {
                 return gitDiffFile + " did not match\n" + reasonForNotMatching;
             }
@@ -128,16 +128,8 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         return null;
     }
 
-    private String compareDiffText(String fileName, String gitDiff, String perforceDiff) {
+    private String compareDiffText(String gitDiff, String perforceDiff) {
         if (StringUtils.equals(gitDiff, perforceDiff)) {
-            return null;
-        }
-
-        gitDiff = stripLinesStartingWith(gitDiff, "index", "new mode", "---", "+++");
-        perforceDiff = stripLinesStartingWith(perforceDiff, "index", "new mode", "---", "+++");
-
-        if (StringUtils.equals(gitDiff, perforceDiff)) {
-            log.info("{} matches after stripping non content lines", fileName);
             return null;
         }
 
