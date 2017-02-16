@@ -67,7 +67,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         } else if (containsChangesOfType(fileChanges, added, addedAndModified, deleted)) {
             log.info("Perforce diff matches git diff in terms of content, adding or deleting file causes diff ordering to be different for perforce.");
         } else {
-            log.info("Perforce diff matches git diff in terms of content");
+            log.info("Perforce diff matches git diff in terms of content.");
         }
     }
 
@@ -120,7 +120,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         for (String gitDiffFile : gitDiff.keySet()) {
             String gitDiffFileText = gitDiff.get(gitDiffFile);
             String perforceDiffFileText = perforceDiff.get(gitDiffFile);
-            String reasonForNotMatching = compareDiffText(gitDiffFileText, perforceDiffFileText);
+            String reasonForNotMatching = compareDiffText(gitDiffFile, gitDiffFileText, perforceDiffFileText);
             if (reasonForNotMatching != null) {
                 return gitDiffFile + " did not match\n" + reasonForNotMatching;
             }
@@ -128,8 +128,16 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
         return null;
     }
 
-    private String compareDiffText(String gitDiff, String perforceDiff) {
+    private String compareDiffText(String fileName, String gitDiff, String perforceDiff) {
         if (StringUtils.equals(gitDiff, perforceDiff)) {
+            return null;
+        }
+
+        gitDiff = stripLinesStartingWith(gitDiff, "index", "new mode", "---", "+++");
+        perforceDiff = stripLinesStartingWith(perforceDiff, "index", "new mode", "---", "+++");
+
+        if (StringUtils.equals(gitDiff, perforceDiff)) {
+            log.info("{} matches after stripping non content lines", fileName);
             return null;
         }
 
@@ -160,7 +168,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
             String perforceDiffLine = perforceDiffIterator.next();
 
             if (!StringUtils.equals(perforceDiffLine, gitDiffLine)) {
-                return lineCount + "\n" + perforceDiffLine + "\n" + gitDiffLine;
+                return "line " + lineCount + "\n(perforce)\n" + perforceDiffLine + "\n(git)\n" + gitDiffLine;
             }
             if (gitDiffLine.startsWith("+++ " + FileChange.NON_EXISTENT_FILE_IN_GIT)) {
                 log.info("Ignoring delete file lines in git diff as the perforce diff will not have those");
