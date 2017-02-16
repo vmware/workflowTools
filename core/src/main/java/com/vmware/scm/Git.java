@@ -389,6 +389,11 @@ public class Git extends BaseScmWrapper {
     }
 
     @Override
+    public String fullPath(String pathWithinScm) {
+        return getRootDirectory() + File.separator + pathWithinScm;
+    }
+
+    @Override
     protected void exitIfCommandFailed(String gitOutput) {
         if (StringUtils.isBlank(gitOutput)) {
             return;
