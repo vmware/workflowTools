@@ -3,6 +3,8 @@ package com.vmware.action;
 import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.scm.NoPerforceClientForDirectoryException;
+import com.vmware.scm.Perforce;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
@@ -46,8 +48,16 @@ public abstract class BaseAction {
         if (!CommandLineUtils.isCommandAvailable("p4")) {
             return "p4 command is not availabled";
         }
+        Perforce perforce = serviceLocator.getPerforce();
+        if (!perforce.isLoggedIn()) {
+            return "perforce user is not logged in";
+        }
         if (StringUtils.isBlank(config.perforceClientName)) {
-            config.perforceClientName = serviceLocator.getPerforce().getClientName();
+            try {
+                config.perforceClientName = perforce.getClientName();
+            } catch (NoPerforceClientForDirectoryException npc) {
+                return npc.getMessage();
+            }
         }
         return null;
     }

@@ -1,6 +1,8 @@
 package com.vmware.scm;
 
 import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
+import com.vmware.util.CommandLineUtils;
+import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
@@ -33,10 +35,18 @@ public class Perforce extends BaseScmWrapper {
 
     private static final Pattern whereDepotFileInfoPattern = Pattern.compile("(//.+?)\\s+");
 
+    private String username;
     private String clientName;
+
+    private boolean loggedIn;
 
     public Perforce(String username, String clientName, String clientDirectory) {
         super(ScmType.perforce);
+        this.username = username;
+        this.loggedIn = checkIfLoggedIn();
+        if (!loggedIn) {
+            return;
+        }
         if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {
             this.clientName = clientName;
             super.setWorkingDirectory(clientDirectory);
@@ -45,10 +55,8 @@ public class Perforce extends BaseScmWrapper {
             super.setWorkingDirectory(determineClientDirectoryForClientName());
         } else if (StringUtils.isNotBlank(clientDirectory)) {
             super.setWorkingDirectory(clientDirectory);
-            this.clientName = determineClientNameForDirectory(username);
         } else {
             super.setWorkingDirectory(System.getProperty("user.dir"));
-            this.clientName = determineClientNameForDirectory(username);
         }
     }
 
@@ -57,7 +65,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     private List<String> getPendingChangelists(boolean includeSummary) {
-        String changeListText = executeScmCommand("changes -c {} -s pending", clientName);
+        String changeListText = executeScmCommand("changes -c {} -s pending", getClientName());
         if (StringUtils.isBlank(changeListText)) {
             return Collections.emptyList();
         }
@@ -75,7 +83,7 @@ public class Perforce extends BaseScmWrapper {
     public String selectPendingChangelist() {
         List<String> changelistIds = getPendingChangelists(true);
         if (changelistIds.isEmpty()) {
-            throw new RuntimeException("No pending change lists in client " + clientName + " to select from");
+            throw new RuntimeException("No pending change lists in client " + getClientName() + " to select from");
         }
         if (changelistIds.size() == 1) {
             return changelistIds.get(0);
@@ -219,15 +227,20 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public String getClientName() {
+        if (clientName != null) {
+            return clientName;
+        }
+
+        this.clientName = determineClientNameForDirectory(username);
         return clientName;
     }
 
     @Override
-    void exitIfCommandFailed(String output) {
+    String checkIfCommandFailed(String output) {
         if (output.contains("Your session has expired, please login again")) {
-            log.error("You need to relogin to Perforce, error message: {}", output);
-            System.exit(1);
+            return "You need to relogin to Perforce, error message: " + output;
         }
+        return null;
     }
 
     @Override
@@ -435,6 +448,10 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
     private void exitIfExpectedTextNotPresent(String output, String expectedText, int expectedCount) {
         int matches = 0;
         int currentIndex = 0;
@@ -457,6 +474,12 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
+    private boolean checkIfLoggedIn() {
+        Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, "p4 login -s", (String) null);
+        IOUtils.read(statusProcess.getInputStream(), DEBUG);
+        return statusProcess.exitValue() == 0;
+    }
+
     private String determineClientDirectoryForClientName() {
         String info = executeScmCommand("clients -e " + clientName, DEBUG);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + clientName + "\\s+.+?(\\S+)\\s+'Created by");
@@ -472,8 +495,7 @@ public class Perforce extends BaseScmWrapper {
         String info = executeScmCommand("clients -u " + username, DEBUG);
         String clientName = MatcherUtils.singleMatch(info, "Client\\s+(\\S+)\\s+.+?" + quotedClientRoot + "\\s+'Created by");
         if (clientName == null) {
-            throw new RuntimeException("Failed to parse client name for directory " + clientRoot
-                    + " in clients for user " + username + "\n" + info);
+            throw new NoPerforceClientForDirectoryException(clientRoot, username, info);
         }
         return clientName;
     }
