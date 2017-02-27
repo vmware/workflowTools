@@ -32,15 +32,18 @@ import static com.vmware.util.CommandLineUtils.isCommandAvailable;
  */
 public class Git extends BaseScmWrapper {
     private Boolean gitInstalled;
+    private File rootDirectory;
 
     public Git() {
         super(ScmType.git);
         super.setWorkingDirectory(System.getProperty("user.dir"));
+        determineRootDirectory();
     }
 
     public Git(File workingDirectory) {
         super(ScmType.git);
         super.setWorkingDirectory(workingDirectory);
+        determineRootDirectory();
     }
 
     public boolean workingDirectoryIsInGitRepo() {
@@ -51,12 +54,7 @@ public class Git extends BaseScmWrapper {
      * @return The root directory for this repo. Null if this is not a repo
      */
     public File getRootDirectory() {
-        FileFilter gitDirectoryFilter = new GitDirectoryFilter();
-        File matchingDirectory = workingDirectory;
-        while (matchingDirectory != null && matchingDirectory.listFiles(gitDirectoryFilter).length != 1) {
-            matchingDirectory = matchingDirectory.getParentFile();
-        }
-        return matchingDirectory;
+        return rootDirectory;
     }
 
     public String newTrackingBranch(String branchName, String trackingBranch) {
@@ -394,15 +392,15 @@ public class Git extends BaseScmWrapper {
     }
 
     @Override
-    protected void exitIfCommandFailed(String gitOutput) {
+    protected String checkIfCommandFailed(String gitOutput) {
         if (StringUtils.isBlank(gitOutput)) {
-            return;
+            return null;
         }
 
         if (gitOutput.trim().startsWith("fatal: Not a git repository")) {
-            log.error("{} is not in a git repository", System.getProperty("user.dir"));
-            System.exit(1);
+            return System.getProperty("user.dir") + " is not in a git repository";
         }
+        return null;
     }
 
     @Override
@@ -505,11 +503,10 @@ public class Git extends BaseScmWrapper {
         executeScmCommand(commitCommand + " --file=-", msg, LogLevel.DEBUG);
     }
 
-    private class GitDirectoryFilter implements FileFilter {
-        @Override
-        public boolean accept(File file) {
-            return file.isDirectory() && file.getName().equals(".git");
-        }
+    private void determineRootDirectory() {
+        String rootDirectoryPath = CommandLineUtils.executeCommand(workingDirectory, null, "git rev-parse --show-toplevel", null, LogLevel.DEBUG);
+        String commandCheckOutput = checkIfCommandFailed(rootDirectoryPath);
+        rootDirectory = commandCheckOutput == null ? new File(rootDirectoryPath) : null;
     }
 
 }

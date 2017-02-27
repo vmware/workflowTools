@@ -1,6 +1,5 @@
 package com.vmware.scm;
 
-import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
@@ -72,11 +71,16 @@ public abstract class BaseScmWrapper {
         String expandedCommand = scmExecutablePath() + " " + expandCommand(command, commandArguments);
         log.debug("{} command {}", this.getClass().getSimpleName(), expandedCommand);
         String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, level);
-        exitIfCommandFailed(output);
+        String commandCheckOutput = checkIfCommandFailed(output);
+        if (commandCheckOutput != null) {
+            log.error(commandCheckOutput);
+            System.exit(1);
+        }
         return output;
     }
 
-    void exitIfCommandFailed(String output) {
+    String checkIfCommandFailed(String output) {
+        return null;
     }
 
     String failOutputIfMissingText(String output, String expectedText) {
