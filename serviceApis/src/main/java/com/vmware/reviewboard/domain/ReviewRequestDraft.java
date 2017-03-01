@@ -46,15 +46,15 @@ public class ReviewRequestDraft extends BaseEntity {
     public String testingDone = "";
     @Expose
     @SerializedName("bugs_closed")
-    @JsonAdapter(StringArrayMapper.class)
+    @JsonAdapter(StringArrayDeserializer.class)
     public String bugNumbers = "";
     @Expose
     @SerializedName("target_people")
-    @JsonAdapter(LinkArrayMapper.class)
+    @JsonAdapter(LinkArrayDeserializer.class)
     public String reviewedBy = "";
     @Expose(serialize = false, deserialize = false)
     public String shipItReviewers = "";
-    @JsonAdapter(LinkArrayMapper.class)
+    @JsonAdapter(LinkArrayDeserializer.class)
     public String target_groups;
     @Expose(serialize = false, deserialize = false)
     public List<JobBuild> jobBuilds = new ArrayList<>();

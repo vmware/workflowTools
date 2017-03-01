@@ -4,14 +4,12 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.vmware.util.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
-public class StringArrayMapper implements JsonSerializer<String>, JsonDeserializer<String> {
+public class StringArrayDeserializer implements JsonDeserializer<String> {
 
     @Override
     public String deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
@@ -20,10 +18,5 @@ public class StringArrayMapper implements JsonSerializer<String>, JsonDeserializ
             return null;
         }
         return StringUtils.join(Arrays.asList(values));
-    }
-
-    @Override
-    public JsonElement serialize(String s, Type type, JsonSerializationContext jsonSerializationContext) {
-        return jsonSerializationContext.serialize(s, type);
     }
 }
