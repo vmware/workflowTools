@@ -6,25 +6,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.vmware.util.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
-public class ReviewGroupsJsonMapper implements JsonSerializer<String>, JsonDeserializer<String> {
+public class StringArrayMapper implements JsonSerializer<String>, JsonDeserializer<String> {
 
     @Override
     public String deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        Link[] links = jsonDeserializationContext.deserialize(jsonElement, Link[].class);
-        if (links == null) {
+        String[] values = jsonDeserializationContext.deserialize(jsonElement, String[].class);
+        if (values == null) {
             return null;
         }
-        String groupNames = "";
-        for (Link link : links) {
-            if (!groupNames.isEmpty()) {
-                groupNames += ",";
-            }
-            groupNames += link.getTitle();
-        }
-        return groupNames;
+        return StringUtils.join(Arrays.asList(values));
     }
 
     @Override
