@@ -5,14 +5,13 @@ import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jenkins.domain.Job;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.io.File;
 
 import static java.lang.String.format;
 
@@ -55,8 +54,8 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         if (buildNumber != null) {
             String buildUrl = commitConfig.buildWebUrl() + "/" + buildNumber;
             log.info("Adding build {} to commit", buildUrl);
-            draft.updateTestingDoneWithJobBuild(commitConfig.buildWebUrl(),
-                    new JobBuild(buildUrl, BuildResult.BUILDING));
+            Job sandboxJob = Job.sandboxJob(commitConfig.buildWebUrl());
+            draft.updateTestingDoneWithJobBuild(sandboxJob, new JobBuild(sandboxJob.jobDisplayName, buildUrl, BuildResult.BUILDING));
         } else {
             log.warn("Unable to parse build url using pattern {}", buildNumberPattern);
         }

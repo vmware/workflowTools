@@ -104,7 +104,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             jenkins.invokeJobWithParameters(jobToInvoke, params);
         }
 
-        draft.updateTestingDoneWithJobBuild(jobToInvoke.url, expectedNewBuild);
+        draft.updateTestingDoneWithJobBuild(jobToInvoke, expectedNewBuild);
         return expectedNewBuild;
     }
 
@@ -139,7 +139,8 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private String determineSandboxBuildNumber() {
-        JobBuild sandboxBuild = draft.getMatchingJobBuild(config.buildwebUrl);
+        Job sandboxJob = Job.sandboxJob(config.buildwebUrl);
+        JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
         String buildId;
         if (sandboxBuild != null) {
             buildId = sandboxBuild.id();

@@ -157,7 +157,7 @@
           "SelectExistingChangelist", "ApplyChangelistAsGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "prepareCommitForPush": [
-          "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList", "StripJenkinsBuilds",
+          "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList",
           "FormatCommitText", "AmendCommitWithoutJobResults"
        ],
        "push": [

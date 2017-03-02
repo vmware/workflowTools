@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
 import com.vmware.IssueInfo;
 import com.vmware.JobBuild;
+import com.vmware.jenkins.domain.Job;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.StringUtils;
@@ -132,10 +133,10 @@ public class ReviewRequestDraft extends BaseEntity {
         this.id = parseSingleLineFromText(commitText, commitConfiguration.generateReviewUrlPattern(), "Review number");
         this.description = description;
         this.summary = summary;
-        this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection);
+        this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection, commitConfiguration.getJenkinsJobNames());
         this.jobBuilds.clear();
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildWithResultPattern()));
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern()));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildWithResultPattern(commitConfiguration.getJenkinsJobNames())));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern(commitConfiguration.getJenkinsJobNames())));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
         this.approvedBy = parseSingleLineFromText(commitText, commitConfiguration.generateApprovedByPattern(), "Approved by");
@@ -166,36 +167,40 @@ public class ReviewRequestDraft extends BaseEntity {
         return sectionText;
     }
 
-    public JobBuild getMatchingJobBuild(String baseUrl) {
+    public JobBuild getMatchingJobBuild(Job job) {
         for (JobBuild build : jobBuilds) {
-            if (build.url.startsWith(baseUrl)) {
+            if (StringUtils.equals(job.jobDisplayName, build.buildDisplayName) && build.url.startsWith(job.url)) {
                 return build;
             }
         }
         return null;
     }
 
-    private String stripJobBuildsFromTestingDone(String testingDone) {
-        String updatedSection = testingDone.replaceAll(buildWithResultPattern(), "").trim();
-        updatedSection = updatedSection.replaceAll(buildPattern(), "").trim();
+    private String stripJobBuildsFromTestingDone(String testingDone, Set<String> jenkinsJobNames) {
+        String updatedSection = testingDone.replaceAll(buildWithResultPattern(jenkinsJobNames), "").trim();
+        updatedSection = updatedSection.replaceAll(buildPattern(jenkinsJobNames), "").trim();
         return updatedSection;
     }
 
-    private String buildPattern() {
-        return "Build\\s+(http\\S+)";
+    private String buildPattern(Set<String> jenkinsJobNames) {
+        Set<String> namesToCheckFor = new HashSet<>(jenkinsJobNames);
+        namesToCheckFor.addAll(Arrays.asList("Build", "Sandbox"));
+        String namePattenText = "(" + StringUtils.join(namesToCheckFor, "|") + ")";
+        return namePattenText + "\\s+(http\\S+)";
     }
 
-    private String buildWithResultPattern() {
-        return buildPattern() + "\\s+" + BuildResult.generateResultPattern();
+    private String buildWithResultPattern(Set<String> jenkinsJobNames) {
+        return buildPattern(jenkinsJobNames) + "\\s+" + BuildResult.generateResultPattern();
     }
 
     private List<JobBuild> generateJobBuildsList(String text, String jobUrlPattern) {
-        Matcher jobMatcher = Pattern.compile(jobUrlPattern + "\\s*$", Pattern.MULTILINE).matcher(text);
+        Matcher buildMatcher = Pattern.compile(jobUrlPattern + "\\s*$", Pattern.MULTILINE).matcher(text);
         List<JobBuild> jobBuilds = new ArrayList<>();
-        while (jobMatcher.find()) {
-            String buildUrl = jobMatcher.group(1);
-            BuildResult buildResult = jobMatcher.groupCount() > 1 ? BuildResult.valueOf(jobMatcher.group(2)) : null;
-            jobBuilds.add(new JobBuild(buildUrl, buildResult));
+        while (buildMatcher.find()) {
+            String buildDisplayName = buildMatcher.group(1);
+            String buildUrl = buildMatcher.group(2);
+            BuildResult buildResult = buildMatcher.groupCount() > 2 ? BuildResult.valueOf(buildMatcher.group(3)) : null;
+            jobBuilds.add(new JobBuild(buildDisplayName, buildUrl, buildResult));
         }
         return jobBuilds;
     }
@@ -266,8 +271,8 @@ public class ReviewRequestDraft extends BaseEntity {
         this.target_groups = StringUtils.join(targetGroups);
     }
 
-    public void updateTestingDoneWithJobBuild(String baseJobUrl, JobBuild expectedNewBuild) {
-        JobBuild existingBuild = getMatchingJobBuild(baseJobUrl);
+    public void updateTestingDoneWithJobBuild(Job job, JobBuild expectedNewBuild) {
+        JobBuild existingBuild = getMatchingJobBuild(job);
         if (existingBuild == null ) {
             log.debug("Appending {} to testing done", expectedNewBuild.url);
             jobBuilds.add(expectedNewBuild);

@@ -4,6 +4,8 @@ import com.google.gson.annotations.Expose;
 import com.vmware.util.MatcherUtils;
 
 public class JobBuild {
+    @Expose(serialize = false, deserialize = false)
+    public String buildDisplayName;
     public int number;
     public String url;
     @Expose(serialize = false, deserialize = false)
@@ -11,7 +13,8 @@ public class JobBuild {
 
     public JobBuild() {}
 
-    public JobBuild(String url, BuildResult result) {
+    public JobBuild(String buildDisplayName, String url, BuildResult result) {
+        this.buildDisplayName = buildDisplayName;
         this.url = url;
         this.result = result;
     }
@@ -47,7 +50,8 @@ public class JobBuild {
     }
 
     public String details(boolean includeResult) {
-        String buildInfo = "Build " + url;
+        String buildName = buildDisplayName != null ? buildDisplayName : "Build";
+        String buildInfo = buildName + " " + url;
         if (includeResult && result != null) {
             buildInfo += " " + result.name();
         }
