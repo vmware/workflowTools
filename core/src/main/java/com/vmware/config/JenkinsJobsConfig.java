@@ -53,7 +53,9 @@ public class JenkinsJobsConfig {
 
     private void parseJobInfo(String jobInfo) {
         String mappedValue = jenkinsJobsMappings.get(jobInfo);
+        Job job = new Job();
         if (mappedValue != null) {
+            job.jobDisplayName = jobInfo;
             jobInfo = mappedValue;
         } else if (!jobInfo.contains("&")) {
             log.info("Treating job text {} as jenkins job name since it didn't matching any mappings", jobInfo);
@@ -61,14 +63,17 @@ public class JenkinsJobsConfig {
         if (jobInfo.contains("&")) {
             int ampersandIndex = jobInfo.indexOf("&");
             String jobName = jobInfo.substring(0, ampersandIndex);
+            job.name = jobName;
             String paramText = jobInfo.substring(ampersandIndex + 1);
-            addJobConfig(jobName, paramText.split("&"));
+            job.constructUrl(jenkinsUrl, jobName);
+            job.parameters = parseJobParameters(jobName, paramText.split("&"));
         } else {
-            addJobConfig(jobInfo, new String[0]);
+            job.constructUrl(jenkinsUrl, jobInfo);
         }
+        jobs.add(job);
     }
 
-    private void addJobConfig(String jobName, String[] params) {
+    private List<JobParameter> parseJobParameters(String jobName, String[] params) {
         List<JobParameter> parameters = new ArrayList<>();
         for (String param : params) {
             String[] paramPieces = param.split("=");
@@ -79,9 +84,7 @@ public class JenkinsJobsConfig {
             parameters.add(new JobParameter(paramPieces[0], paramPieces[1]));
         }
         expandParameterValues(parameters);
-        Job job = new Job(jenkinsUrl, jobName);
-        job.parameters = parameters;
-        jobs.add(job);
+        return parameters;
     }
 
     private void expandParameterValues(List<JobParameter> parameters) {

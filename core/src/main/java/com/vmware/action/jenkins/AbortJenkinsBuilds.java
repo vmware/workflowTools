@@ -47,7 +47,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private void abortJenkinsJob(ReviewRequestDraft draft, Job job) {
-        JobBuild buildToAbort = draft.getMatchingJobBuild(job.url);
+        JobBuild buildToAbort = draft.getMatchingJobBuild(job);
 
         if (buildToAbort == null) {
             log.debug("No build url found in testing done section for job {}", job.url);

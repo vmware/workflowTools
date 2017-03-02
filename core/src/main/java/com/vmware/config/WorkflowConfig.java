@@ -19,10 +19,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
@@ -500,7 +502,8 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        return new CommitConfiguration(reviewboardUrl, buildwebUrl, testingDoneLabel, bugNumberLabel,
+        Set<String> jobNames = new HashSet<>(jenkinsJobsMappings.keySet());
+        return new CommitConfiguration(reviewboardUrl, buildwebUrl, jobNames, testingDoneLabel, bugNumberLabel,
                 reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValues, approvedByLabel);
     }
 

@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -135,7 +136,7 @@ public class TestGit {
     public void printLast200Commits() {
         int numberOfCommitsToCheck = Math.min(git.totalCommitCount(), 200);
         CommitConfiguration configuration = new CommitConfiguration("http://reviewboard",
-                "http://gobuild", "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:",
+                "http://gobuild", Collections.<String>emptySet(), "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:",
                 new String[] {"main"}, "approvedBy");
 
         for (int i = 0; i < numberOfCommitsToCheck; i ++) {

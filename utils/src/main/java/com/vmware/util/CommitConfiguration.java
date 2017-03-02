@@ -1,5 +1,7 @@
 package com.vmware.util;
 
+import java.util.Set;
+
 /**
  * Configuration information for a commit. Used as a transport class for a review request draft;
  */
@@ -8,6 +10,7 @@ public class CommitConfiguration {
     private final String reviewboardUrl;
     private final String buildwebUrl;
     private final String approvedByLabel;
+    private Set<String> jenkinsJobNames;
     private String testingDoneLabel;
 
     private String bugNumberLabel;
@@ -20,10 +23,11 @@ public class CommitConfiguration {
 
     private String[] mergeToValues;
 
-    public CommitConfiguration(String reviewboardUrl, String buildwebUrl, String testingDoneLabel, String bugNumberLabel,
+    public CommitConfiguration(String reviewboardUrl, String buildwebUrl, Set<String> jenkinsJobNames, String testingDoneLabel, String bugNumberLabel,
                                String reviewedByLabel, String reviewUrlLabel, String mergeToLabel, String[] mergeToValues,
                                String approvedByLabel) {
         this.reviewboardUrl = reviewboardUrl;
+        this.jenkinsJobNames = jenkinsJobNames;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
@@ -86,6 +90,10 @@ public class CommitConfiguration {
 
     public String buildWebUrl() {
         return buildwebUrl + "/sb";
+    }
+
+    public Set<String> getJenkinsJobNames() {
+        return jenkinsJobNames;
     }
 
     public String getReviewboardUrl() {
