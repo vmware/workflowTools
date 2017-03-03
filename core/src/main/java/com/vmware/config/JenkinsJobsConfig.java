@@ -2,6 +2,7 @@ package com.vmware.config;
 
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameter;
+import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,11 @@ public class JenkinsJobsConfig {
             jobInfo = mappedValue;
         } else if (!jobInfo.contains("&")) {
             log.info("Treating job text {} as jenkins job name since it didn't matching any mappings", jobInfo);
+        }
+        int pipeIndex = jobInfo.indexOf("|");
+        if (StringUtils.isBlank(job.jobDisplayName) && pipeIndex != -1) {
+            job.jobDisplayName = jobInfo.substring(0, pipeIndex);
+            jobInfo = jobInfo.substring(pipeIndex + 1);
         }
         if (jobInfo.contains("&")) {
             int ampersandIndex = jobInfo.indexOf("&");
