@@ -335,7 +335,7 @@ public class WorkflowConfig {
 
     public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
         workFlowActions = new WorkflowActionLister().findWorkflowActions();
-        List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), "Command Line");
+        List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), "Command Line", true);
         if (argsParser.containsArgument("--possible-workflow")) {
             overriddenConfigSources.put("workflowsToRun", "Command Line");
             this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
@@ -375,7 +375,7 @@ public class WorkflowConfig {
 
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(workflows, workFlowActions);
         valuesParser.parse(possibleActions);
-        applyConfigValues(valuesParser.getConfigValues(), "Config in Workflow");
+        applyConfigValues(valuesParser.getConfigValues(), "Config in Workflow", false);
         if (!valuesParser.getUnknownActions().isEmpty()) {
             throw new UnknownWorkflowValueException(valuesParser.getUnknownActions());
         }
@@ -570,7 +570,7 @@ public class WorkflowConfig {
         }
     }
 
-    private List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source) {
+    private List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
         }
@@ -580,6 +580,10 @@ public class WorkflowConfig {
             }
             String parameterName = configValue.substring(3);
             String parameterValue = configValues.get(configValue);
+            if (!overwriteJenkinsParameters && jenkinsJobParameters.containsKey(parameterName)) {
+                log.debug("Ignoring config value {} as it is already set", configValue);
+                continue;
+            }
             jenkinsJobParameters.put(parameterName, parameterValue);
         }
         List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
