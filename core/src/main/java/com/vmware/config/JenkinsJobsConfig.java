@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.vmware.jenkins.domain.JobParameter.NO_USERNAME_PARAMETER;
 import static com.vmware.jenkins.domain.JobParameter.USERNAME_PARAM;
@@ -25,6 +28,7 @@ public class JenkinsJobsConfig {
 
     private Map<String, String> jenkinsJobsMappings;
     private Map<String, String> presetParameters;
+    private Set<String> jobDisplayNames = new HashSet<>();
     private String jenkinsUrl;
 
     private List<Job> jobs = new ArrayList<>();
@@ -46,6 +50,9 @@ public class JenkinsJobsConfig {
     }
 
     private void parseJobsText(String jenkinsJobsToUse) {
+        if (jenkinsJobsToUse == null) {
+            return;
+        }
         String[] jobs = jenkinsJobsToUse.split(",");
         for (String jobInfo : jobs) {
             parseJobInfo(jobInfo);
@@ -62,7 +69,7 @@ public class JenkinsJobsConfig {
             log.info("Treating job text {} as jenkins job name since it didn't matching any mappings", jobInfo);
         }
         int pipeIndex = jobInfo.indexOf("|");
-        if (StringUtils.isBlank(job.jobDisplayName) && pipeIndex != -1) {
+        if (pipeIndex != -1) {
             job.jobDisplayName = jobInfo.substring(0, pipeIndex);
             jobInfo = jobInfo.substring(pipeIndex + 1);
         }
@@ -75,6 +82,9 @@ public class JenkinsJobsConfig {
             job.parameters = parseJobParameters(jobName, paramText.split("&"));
         } else {
             job.constructUrl(jenkinsUrl, jobInfo);
+        }
+        if (StringUtils.isNotBlank(job.jobDisplayName)) {
+            jobDisplayNames.add(job.jobDisplayName);
         }
         jobs.add(job);
     }
@@ -126,6 +136,10 @@ public class JenkinsJobsConfig {
             log.debug("Adding default user parameter {} with value {}", USERNAME_PARAM, presetParameters.get(USERNAME_PARAM));
             parameters.add(0, new JobParameter(USERNAME_PARAM, presetParameters.get(USERNAME_PARAM)));
         }
+    }
+
+    public Set<String> getJobDisplayNames() {
+        return Collections.unmodifiableSet(jobDisplayNames);
     }
 
     @Override

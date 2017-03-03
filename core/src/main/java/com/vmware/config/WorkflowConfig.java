@@ -503,6 +503,8 @@ public class WorkflowConfig {
 
     public CommitConfiguration getCommitConfiguration() {
         Set<String> jobNames = new HashSet<>(jenkinsJobsMappings.keySet());
+        Set<String> jobNamesFromWorkflows = getJenkinsJobsConfig().getJobDisplayNames();
+        jobNames.addAll(jobNamesFromWorkflows);
         return new CommitConfiguration(reviewboardUrl, buildwebUrl, jobNames, testingDoneLabel, bugNumberLabel,
                 reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValues, approvedByLabel);
     }
