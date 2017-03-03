@@ -34,9 +34,9 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
     }
 
 
-    private boolean checkIfAllBuildsSucceeded(List<JobBuild> jobsToCheck) {
+    private boolean checkIfAllBuildsSucceeded(List<JobBuild> buildsToCheck) {
         boolean isSuccess = true;
-        for (JobBuild jobBuild : jobsToCheck) {
+        for (JobBuild jobBuild : buildsToCheck) {
             String jobUrl = jobBuild.url;
 
             if (jobBuild.result == null || jobBuild.result == BuildResult.BUILDING) {
@@ -44,7 +44,7 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
                     jobBuild.result = getResultForBuild(jobUrl);
                     log.info("{}: {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
                 } catch (NotFoundException nfe) {
-                    log.info("Build {} could not be found", jobUrl);
+                    log.info("{} {} could not be found", jobBuild.buildDisplayName, jobUrl);
                 }
             } else {
                 log.info("{}: {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);

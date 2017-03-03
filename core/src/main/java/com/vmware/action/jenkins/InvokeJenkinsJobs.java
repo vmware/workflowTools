@@ -95,6 +95,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         int buildNumber = jenkins.getJobDetails(jobToInvoke).nextBuildNumber;
 
         JobBuild expectedNewBuild = new JobBuild(buildNumber, jobToInvoke.url);
+        expectedNewBuild.buildDisplayName = jobToInvoke.jobDisplayName;
 
         if (jobDetails.getParameterDefinitions().isEmpty()) {
             log.info("Invoking job {} with no parameters", expectedNewBuild.url);
