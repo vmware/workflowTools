@@ -1,5 +1,6 @@
 package com.vmware.util;
 
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -9,8 +10,8 @@ public class CommitConfiguration {
 
     private final String reviewboardUrl;
     private final String buildwebUrl;
+    private final String jenkinsUrl;
     private final String approvedByLabel;
-    private Set<String> jenkinsJobNames;
     private String testingDoneLabel;
 
     private String bugNumberLabel;
@@ -23,11 +24,11 @@ public class CommitConfiguration {
 
     private String[] mergeToValues;
 
-    public CommitConfiguration(String reviewboardUrl, String buildwebUrl, Set<String> jenkinsJobNames, String testingDoneLabel, String bugNumberLabel,
+    public CommitConfiguration(String reviewboardUrl, String buildwebUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,
                                String reviewedByLabel, String reviewUrlLabel, String mergeToLabel, String[] mergeToValues,
                                String approvedByLabel) {
         this.reviewboardUrl = reviewboardUrl;
-        this.jenkinsJobNames = jenkinsJobNames;
+        this.jenkinsUrl = jenkinsUrl;
         this.testingDoneLabel = padLabel(testingDoneLabel);
         this.bugNumberLabel = padLabel(bugNumberLabel);
         this.reviewedByLabel = padLabel(reviewedByLabel);
@@ -88,12 +89,12 @@ public class CommitConfiguration {
         return "http.+?/sb/(\\d+)/*";
     }
 
-    public String buildWebUrl() {
-        return buildwebUrl + "/sb";
+    public String generateBuildUrlsPattern() {
+        return "((?:" + StringUtils.join(Arrays.asList(buildwebUrl, jenkinsUrl), "|") + ")\\S+)";
     }
 
-    public Set<String> getJenkinsJobNames() {
-        return jenkinsJobNames;
+    public String buildWebUrl() {
+        return buildwebUrl + "/sb";
     }
 
     public String getReviewboardUrl() {

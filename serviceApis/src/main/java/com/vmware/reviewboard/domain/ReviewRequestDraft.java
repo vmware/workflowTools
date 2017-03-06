@@ -129,14 +129,14 @@ public class ReviewRequestDraft extends BaseEntity {
             description = description.substring(1);
         }
         String testingDoneSection = parseMultilineFromText(commitText, commitConfiguration.generateTestingDonePattern(), "Testing Done");
-
+        String buildUrlsPattern = commitConfiguration.generateBuildUrlsPattern();
         this.id = parseSingleLineFromText(commitText, commitConfiguration.generateReviewUrlPattern(), "Review number");
         this.description = description;
         this.summary = summary;
-        this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection, commitConfiguration.getJenkinsJobNames());
+        this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection, buildUrlsPattern);
         this.jobBuilds.clear();
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildWithResultPattern(commitConfiguration.getJenkinsJobNames())));
-        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern(commitConfiguration.getJenkinsJobNames())));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildWithResultPattern(buildUrlsPattern)));
+        this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern(buildUrlsPattern)));
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
         this.approvedBy = parseSingleLineFromText(commitText, commitConfiguration.generateApprovedByPattern(), "Approved by");
@@ -176,25 +176,22 @@ public class ReviewRequestDraft extends BaseEntity {
         return null;
     }
 
-    private String stripJobBuildsFromTestingDone(String testingDone, Set<String> jenkinsJobNames) {
-        String updatedSection = testingDone.replaceAll(buildWithResultPattern(jenkinsJobNames), "").trim();
-        updatedSection = updatedSection.replaceAll(buildPattern(jenkinsJobNames), "").trim();
+    private String stripJobBuildsFromTestingDone(String testingDone, String buildUrlsPattern) {
+        String updatedSection = testingDone.replaceAll(buildWithResultPattern(buildUrlsPattern), "").trim();
+        updatedSection = updatedSection.replaceAll(buildPattern(buildUrlsPattern), "").trim();
         return updatedSection;
     }
 
-    private String buildPattern(Set<String> jenkinsJobNames) {
-        Set<String> namesToCheckFor = new HashSet<>(jenkinsJobNames);
-        namesToCheckFor.addAll(Arrays.asList("Build", "Sandbox"));
-        String namePattenText = "(" + StringUtils.join(namesToCheckFor, "|") + ")";
-        return namePattenText + "\\s+(http\\S+)";
+    private String buildPattern(String buildUrlsPattern) {
+        return "(\\w+)\\s" + buildUrlsPattern;
     }
 
-    private String buildWithResultPattern(Set<String> jenkinsJobNames) {
-        return buildPattern(jenkinsJobNames) + "\\s+" + BuildResult.generateResultPattern();
+    private String buildWithResultPattern(String buildUrlsPattern) {
+        return buildPattern(buildUrlsPattern) + "\\s+" + BuildResult.generateResultPattern();
     }
 
     private List<JobBuild> generateJobBuildsList(String text, String jobUrlPattern) {
-        Matcher buildMatcher = Pattern.compile(jobUrlPattern + "\\s*$", Pattern.MULTILINE).matcher(text);
+        Matcher buildMatcher = Pattern.compile("^" + jobUrlPattern + "\\s*$", Pattern.MULTILINE).matcher(text);
         List<JobBuild> jobBuilds = new ArrayList<>();
         while (buildMatcher.find()) {
             String buildDisplayName = buildMatcher.group(1);
