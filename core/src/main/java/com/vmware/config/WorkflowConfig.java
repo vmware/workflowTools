@@ -502,10 +502,7 @@ public class WorkflowConfig {
     }
 
     public CommitConfiguration getCommitConfiguration() {
-        Set<String> jobNames = new HashSet<>(jenkinsJobsMappings.keySet());
-        Set<String> jobNamesFromWorkflows = getJenkinsJobsConfig().getJobDisplayNames();
-        jobNames.addAll(jobNamesFromWorkflows);
-        return new CommitConfiguration(reviewboardUrl, buildwebUrl, jobNames, testingDoneLabel, bugNumberLabel,
+        return new CommitConfiguration(reviewboardUrl, buildwebUrl, jenkinsUrl, testingDoneLabel, bugNumberLabel,
                 reviewedByLabel, reviewUrlLabel, mergeToLabel, mergeToValues, approvedByLabel);
     }
 
@@ -513,6 +510,7 @@ public class WorkflowConfig {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
+
         return new JenkinsJobsConfig(jenkinsJobsToUse, presetParams, jenkinsUrl, jobMappings);
     }
 

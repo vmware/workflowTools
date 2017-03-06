@@ -136,7 +136,7 @@ public class TestGit {
     public void printLast200Commits() {
         int numberOfCommitsToCheck = Math.min(git.totalCommitCount(), 200);
         CommitConfiguration configuration = new CommitConfiguration("http://reviewboard",
-                "http://gobuild", Collections.<String>emptySet(), "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:",
+                "http://gobuild", "http://jenkins", "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:",
                 new String[] {"main"}, "approvedBy");
 
         for (int i = 0; i < numberOfCommitsToCheck; i ++) {

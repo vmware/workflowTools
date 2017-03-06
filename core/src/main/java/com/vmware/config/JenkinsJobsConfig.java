@@ -28,7 +28,6 @@ public class JenkinsJobsConfig {
 
     private Map<String, String> jenkinsJobsMappings;
     private Map<String, String> presetParameters;
-    private Set<String> jobDisplayNames = new HashSet<>();
     private String jenkinsUrl;
 
     private List<Job> jobs = new ArrayList<>();
@@ -83,9 +82,6 @@ public class JenkinsJobsConfig {
         } else {
             job.constructUrl(jenkinsUrl, jobInfo);
         }
-        if (StringUtils.isNotBlank(job.jobDisplayName)) {
-            jobDisplayNames.add(job.jobDisplayName);
-        }
         jobs.add(job);
     }
 
@@ -136,10 +132,6 @@ public class JenkinsJobsConfig {
             log.debug("Adding default user parameter {} with value {}", USERNAME_PARAM, presetParameters.get(USERNAME_PARAM));
             parameters.add(0, new JobParameter(USERNAME_PARAM, presetParameters.get(USERNAME_PARAM)));
         }
-    }
-
-    public Set<String> getJobDisplayNames() {
-        return Collections.unmodifiableSet(jobDisplayNames);
     }
 
     @Override
