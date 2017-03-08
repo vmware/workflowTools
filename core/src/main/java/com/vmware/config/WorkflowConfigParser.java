@@ -3,6 +3,7 @@ package com.vmware.config;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.vmware.scm.Git;
+import com.vmware.scm.Perforce;
 import com.vmware.util.logging.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
@@ -53,13 +54,16 @@ public class WorkflowConfigParser {
 
         applyUserConfigFileIfExists(internalConfig, loadedConfigFiles);
 
+        if (git.isGitInstalled()) {
+            internalConfig.applyGitConfigValues("");
+        }
+
         if (git.isGitInstalled() && git.workingDirectoryIsInGitRepo()) {
             String trackingBranch = git.getTrackingBranch();
             String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
             if (isNotBlank(remoteName)) {
                 internalConfig.setDefaultGitRemoteFromTrackingRemote(remoteName); // determined from remote name
             }
-            internalConfig.applyGitConfigValues("");
             if (isNotBlank(remoteName)) {
                 log.debug("Applying remote specific config values for git remote {}", remoteName);
                 internalConfig.applyGitConfigValues(remoteName);
@@ -132,6 +136,10 @@ public class WorkflowConfigParser {
 
     private void applyRepoConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
         File repoDirectory = git.getRootDirectory();
+        if (repoDirectory == null) {
+            Perforce perforce = new Perforce(internalConfig.username, internalConfig.perforceClientName, internalConfig.perforceClientDirectory);
+            repoDirectory = perforce.getWorkingDirectory();
+        }
         if (repoDirectory != null) {
             File repoWorkflowFile = new File(repoDirectory.getAbsolutePath() + File.separator + ".workflow-config.json");
             overrideConfigIfFileExists(internalConfig, repoWorkflowFile, loadedConfigFiles);
