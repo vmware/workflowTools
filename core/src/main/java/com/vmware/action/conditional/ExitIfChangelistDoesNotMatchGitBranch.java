@@ -8,6 +8,7 @@ import com.vmware.scm.FileChangeType;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
         String reasonForMotMatching = compareDiffContent(gitDiff, perforceDiff);
         if (reasonForMotMatching != null) {
-            log.error("Perforce diff didn't match git diff\n{}", reasonForMotMatching);
+            log.error("Perforce diff didn't match git diff\n{}\n", reasonForMotMatching);
             log.error("You might need to pull and rebase your git branch against the latest code.");
             System.exit(0);
         } else if (containsChangesOfType(fileChanges, added, addedAndModified, deleted)) {
@@ -122,7 +123,7 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
             String perforceDiffFileText = perforceDiff.get(gitDiffFile);
             String reasonForNotMatching = compareDiffText(gitDiffFileText, perforceDiffFileText);
             if (reasonForNotMatching != null) {
-                return gitDiffFile + " did not match\n" + reasonForNotMatching;
+                return gitDiffFile + " did not match\n\n" + reasonForNotMatching;
             }
         }
         return null;
@@ -145,6 +146,8 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
         int lineCount = 0;
         String gitDiffLineAfterMoving = null;
+        List<String> perforceLines = new ArrayList<>();
+        List<String> gitLines = new ArrayList<>();
         while (perforceDiffIterator.hasNext()) {
             String gitDiffLine;
             if (gitDiffLineAfterMoving != null) {
@@ -158,9 +161,16 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
             lineCount++;
             String perforceDiffLine = perforceDiffIterator.next();
-
+            addDiffLine(perforceLines, perforceDiffLine);
+            addDiffLine(gitLines, gitDiffLine);
             if (!StringUtils.equals(perforceDiffLine, gitDiffLine)) {
-                return "line " + lineCount + "\n(perforce)\n" + perforceDiffLine + "\n(git)\n" + gitDiffLine;
+                addFollowingLines(perforceLines, perforceDiffIterator);
+                addFollowingLines(gitLines, gitDiffIterator);
+                String lineDifference = "DIFF DIFFERENCE \n(perforce line " + lineCount + ")\n"
+                        + perforceDiffLine + "\n(git line " + lineCount + ")\n" + gitDiffLine;
+                String perforceDiffText = "\n**** PERFORCE DIFF SAMPLE ****\n" + StringUtils.join(perforceLines, "\n");
+                String gitDiffText = "\n**** GIT DIFF SAMPLE ****\n" + StringUtils.join(gitLines, "\n");
+                return lineDifference + "\n" + perforceDiffText + "\n" + gitDiffText;
             }
             if (gitDiffLine.startsWith("+++ " + FileChange.NON_EXISTENT_FILE_IN_GIT)) {
                 log.info("Ignoring delete file lines in git diff as the perforce diff will not have those");
@@ -168,6 +178,20 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
             }
         }
         return "failed to find expected difference between git and perforce diff";
+    }
+
+    private void addFollowingLines(List<String> lines, Iterator<String> diffIterator) {
+        int count = 0;
+        while (count++ < 3 && diffIterator.hasNext()) {
+            lines.add(diffIterator.next());
+        }
+    }
+
+    private void addDiffLine(List<String> lines, String line) {
+        if (lines.size() >= 3) {
+            lines.remove(0);
+        }
+        lines.add(line);
     }
 
     private String moveIteratorUntilLineStartsWith(Iterator<String> iterator, String valueToMatch) {
