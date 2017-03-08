@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  */
 public class Workflow {
     public static final List<String> BATCH_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("createTrelloBoardFromLabel", "closeOldReviews", "restartJobs"));
+            Arrays.asList("createTrelloBoardFromLabel", "closeOldReviews"));
 
     public static final List<String> GIT_MAIN_WORKFLOWS = Collections.unmodifiableList(
             Arrays.asList("commit", "commitAll", "amendCommit", "review", "pushable", "push", "submit")

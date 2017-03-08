@@ -161,7 +161,7 @@
           "FormatCommitText", "AmendCommitWithoutJobResults"
        ],
        "push": [
-          "pushSofter"
+          "pushHarder"
        ],
        "pushSofter": [
          "prepareCommitForPush", "PushToTrackingBranch", "SoftSubmitReview"
@@ -170,7 +170,7 @@
           "prepareCommitForPush", "PushToTrackingBranch", "HardSubmitReview"
        ],
        "submit": [
-          "submitSofter"
+          "submitHarder"
        ],
        "submitSofter": [
          "prepareCommitForPush", "updateMatchingChangelist", "SubmitPendingChangelist", "DeleteChangelistTag", "SoftSubmitReview"
