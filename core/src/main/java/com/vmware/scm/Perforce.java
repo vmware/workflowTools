@@ -55,8 +55,13 @@ public class Perforce extends BaseScmWrapper {
             super.setWorkingDirectory(determineClientDirectoryForClientName());
         } else if (StringUtils.isNotBlank(clientDirectory)) {
             super.setWorkingDirectory(clientDirectory);
+        } else if (CommandLineUtils.isCommandAvailable("p4")) {
+            Map<String, String> infoValues = info();
+            this.clientName = infoValues.get("Client name");
+            String workingDirectory = infoValues.containsKey("Client root") ? infoValues.get("Client root") : System.getProperty("user.dir");
+            super.setWorkingDirectory(workingDirectory);
         } else {
-            super.setWorkingDirectory(System.getProperty("user.dir"));
+            super.setWorkingDirectory(workingDirectory);
         }
     }
 
@@ -65,15 +70,24 @@ public class Perforce extends BaseScmWrapper {
     }
 
     private List<String> getPendingChangelists(boolean includeSummary) {
-        String changeListText = executeScmCommand("changes -c {} -s pending", getClientName());
+        String changeListText = executeScmCommand("changes -c {} -L -s pending", getClientName());
         if (StringUtils.isBlank(changeListText)) {
             return Collections.emptyList();
         }
+        Iterator<String> changelistsIterator = Arrays.asList(changeListText.split("\n")).iterator();
         List<String> changeLists = new ArrayList<>();
-        for (String line : changeListText.split("\n")) {
+        while (changelistsIterator.hasNext()) {
+            String line = changelistsIterator.next();
             String changelist = MatcherUtils.singleMatch(line, "Change\\s+(\\d+)\\s+on");
+            if (StringUtils.isBlank(changelist)) {
+                continue;
+            }
             if (includeSummary) {
-                changelist += " " + MatcherUtils.singleMatch(line, "\\s+'(.+?)'");
+                String summary = null;
+                while (changelistsIterator.hasNext() && StringUtils.isBlank(summary)) {
+                    summary = changelistsIterator.next();
+                }
+                changelist += " " + summary.trim();
             }
             changeLists.add(changelist);
         }
@@ -96,6 +110,19 @@ public class Perforce extends BaseScmWrapper {
         String output = executeScmCommand("describe -s {}", changelistId);
         output = output.replaceAll("\n\t", "\n");
         return output.trim();
+    }
+
+    public Map<String, String> info() {
+        String output = executeScmCommand("info");
+        Map<String, String> values = new HashMap<>();
+        for (String line : output.split("\n")) {
+            String[] linePieces = line.split(":");
+            if (linePieces.length != 2) {
+                continue;
+            }
+            values.put(linePieces[0].trim(), linePieces[1].trim());
+        }
+        return values;
     }
 
     public String printToFile(String fileToPrint, File outputFile) {
@@ -248,7 +275,11 @@ public class Perforce extends BaseScmWrapper {
         if (getWorkingDirectory() == null) {
             return "p4";
         } else {
-            return "p4 -d " + getWorkingDirectory().getPath();
+            String workingDirectoryPath = getWorkingDirectory().getPath();
+            if (!getWorkingDirectory().exists()) {
+                throw new RuntimeException("Perforce client directory " + workingDirectoryPath + " doe not exist");
+            }
+            return "p4 -d " + workingDirectoryPath;
         }
     }
 
