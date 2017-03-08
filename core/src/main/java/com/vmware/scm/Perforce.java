@@ -476,8 +476,13 @@ public class Perforce extends BaseScmWrapper {
 
     private boolean checkIfLoggedIn() {
         Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, "p4 login -s", (String) null);
-        IOUtils.read(statusProcess.getInputStream(), DEBUG);
-        return statusProcess.exitValue() == 0;
+        int exitValue;
+        try {
+            exitValue = statusProcess.waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return exitValue == 0;
     }
 
     private String determineClientDirectoryForClientName() {
