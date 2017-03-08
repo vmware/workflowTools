@@ -108,6 +108,9 @@
        "amendCommit": [
           "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"
        ],
+       "setChangelistDetails": [
+          "readPendingChangelist", "setCommitDetails", "AmendCommit", "DisplayCommit"
+       ],
        "createPendingChangelist": [
           "setCommitDetails", "CreatePendingChangelistIfNeeded"
        ],
