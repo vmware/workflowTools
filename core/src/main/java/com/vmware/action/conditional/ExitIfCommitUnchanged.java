@@ -13,13 +13,7 @@ public class ExitIfCommitUnchanged extends BaseCommitAction {
 
     @Override
     public void process() {
-        ReviewRequestDraft existingDraft =
-                new ReviewRequestDraft(readLastChange(), config.getCommitConfiguration());
-
-        String existingCommitText = existingDraft.toText(config.getCommitConfiguration());
-        String updatedCommitText = draft.toText(config.getCommitConfiguration());
-
-        if (!existingCommitText.equals(updatedCommitText)) {
+        if (!commitTextHasNoChanges(true)) {
             return;
         }
 

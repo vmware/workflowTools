@@ -33,15 +33,12 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     @Override
     protected void commitUsingGit(String description) {
         String existingHeadRef = git.revParse("head");
-        git.amendCommit(updatedCommitText());
+        git.amendCommit(updatedCommitText(includeJobResultsInCommit));
         git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 
     private boolean commitHasNoChanges() {
-        String existingCommitText = readLastChange();
-        String updatedCommitText = updatedCommitText();
-
-        if (!existingCommitText.equals(updatedCommitText)) {
+        if (!commitTextHasNoChanges(includeJobResultsInCommit)) {
             return false;
         }
 
@@ -54,9 +51,5 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
         }
 
         return !includeAllChangesInCommit || git.getStagedChanges().isEmpty();
-    }
-
-    protected String updatedCommitText() {
-        return draft.toText(config.getCommitConfiguration(), includeJobResultsInCommit).trim();
     }
 }
