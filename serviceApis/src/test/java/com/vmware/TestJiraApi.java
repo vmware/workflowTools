@@ -69,7 +69,7 @@ public class TestJiraApi extends BaseTests {
         assertTrue("Expected board items to be returned", boardItems.size() > 0);
 
         RapidView rapidView = jira.getRapidView(boardItems.get(0).getBoardId());
-        List<IssueSummary> backlogStories = rapidView.getBacklogStories();
+        List<IssueSummary> backlogStories = rapidView.getStories(true);
         assertTrue("Expected board to have backlog stories", backlogStories.size() > 0);
     }
 

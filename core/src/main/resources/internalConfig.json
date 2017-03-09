@@ -255,13 +255,16 @@
           "LoadBugsForQuery", "ExitIfThereAreNoBugsToProcess", "ResolveBugsWithResolvedTrackingIssues"
        ],
        "createTrelloBoard": [
-          "LoadBacklogStories", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"
+          "LoadStories", "ExitIfThereAreNoIssuesToProcess", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"
        ],
        "forceCreateTrelloBoard": [
-          "LoadBacklogStories", "CreateTrelloBoard", "SyncCardsWithJiraIssues"
+          "LoadStories", "ExitIfThereAreNoIssuesToProcess", "CreateTrelloBoard", "SyncCardsWithJiraIssues"
        ],
        "createTrelloBoardFromLabel": [
           "createTrelloBoard", "--use-label"
+       ],
+       "createTrelloBoardWithAllStoriesFromLabel": [
+          "createTrelloBoard", "--use-label", "--include-sprint-stories"
        ],
        "forceCreateTrelloBoardFromLabel": [
           "forceCreateTrelloBoard", "--use-label"
