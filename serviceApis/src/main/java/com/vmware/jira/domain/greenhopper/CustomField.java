@@ -8,8 +8,8 @@ public class CustomField {
 
     public CustomFieldValue statFieldValue;
 
-    public boolean containsValue() {
-        if (statFieldValue == null) {
+    public boolean containsValidEstimate() {
+        if (statFieldValue == null || "issueCount".equals(statFieldId))  {
             return false;
         }
 

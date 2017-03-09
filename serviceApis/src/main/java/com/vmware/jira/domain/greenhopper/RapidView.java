@@ -11,25 +11,33 @@ public class RapidView {
 
     public Sprint[] sprints;
 
-    public List<IssueSummary> getBacklogStories() {
-        List<IssueSummary> backlogIssues = new ArrayList<IssueSummary>();
+    public List<IssueSummary> getStories(boolean includeStoriesInSprints) {
+        List<IssueSummary> stories = new ArrayList<IssueSummary>();
 
-        for (IssueSummary issue : issues) {
+        for (IssueSummary issue : this.issues) {
             if (issue.typeDefinition != IssueTypeDefinition.Story) {
                 continue;
             }
-            boolean found = false;
-            for (Sprint sprint : sprints) {
-                if (sprint.containsIssue(issue.id)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                backlogIssues.add(issue);
+            if (includeStoriesInSprints) {
+                stories.add(issue);
+            } else {
+                addIfNotInSprint(stories, issue);
             }
         }
-        return backlogIssues;
+        return stories;
+    }
+
+    private void addIfNotInSprint(List<IssueSummary> issues, IssueSummary issue) {
+        boolean found = false;
+        for (Sprint sprint : sprints) {
+            if (sprint.containsIssue(issue.id)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            issues.add(issue);
+        }
     }
 
 

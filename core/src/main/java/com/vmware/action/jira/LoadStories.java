@@ -13,22 +13,21 @@ import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
+import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 @ActionDescription("Loads a list of jira stories for processing.")
-public class LoadBacklogStories extends BaseBatchJiraAction {
+public class LoadStories extends BaseBatchJiraAction {
 
-    public LoadBacklogStories(WorkflowConfig config) {
+    public LoadStories(WorkflowConfig config) {
         super(config);
     }
 
@@ -48,7 +47,7 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
         MenuItem selectedItem = recentBoards.get(selection);
 
         RapidView rapidView = jira.getRapidView(selectedItem.getBoardId());
-        List<IssueSummary> backlogStories = rapidView.getBacklogStories();
+        List<IssueSummary> backlogStories = rapidView.getStories(config.includeSprintStories);
         if (backlogStories.size() == 0) {
             log.info("No backlog stories found for board {}", selectedItem.label);
             return;
@@ -56,8 +55,19 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
 
         multiActionData.reset();
         SearchRequest searchRequest = createSearchRequestForFullIssueInformation(backlogStories);
+        if (searchRequest == null) {
+            log.warn("No issues can be used as they have all been estimated and configuration does not include estimated stories");
+            return;
+        }
+        List<Issue> issues = new ArrayList<>(Arrays.asList(jira.searchForIssues(searchRequest).issues));
 
-        Issue[] issues = jira.searchForIssues(searchRequest).issues;
+        if (!config.includeStoriesWithEstimates) {
+            removeIssuesWithStoryPoints(issues);
+        }
+
+        if (issues.isEmpty()) {
+            log.warn("No issues can be used as they have all been estimated or have story points and configuration does not include estimated stories");
+        }
 
         multiActionData.projectName = selectedItem.label;
 
@@ -74,7 +84,7 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
             multiActionData.addAllIssues(filterByLabel(issues, selectedLabel));
             multiActionData.projectName += " (" + selectedLabel + ")";
         } else {
-            multiActionData.addAllIssues(Arrays.asList(issues));
+            multiActionData.addAllIssues(issues);
         }
 
         List<Issue> issuesForProcessing = multiActionData.getIssuesForProcessing();
@@ -82,8 +92,23 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
         log.debug("Added issues\n{}", issuesForProcessing.toString());
     }
 
+    private void removeIssuesWithStoryPoints(List<Issue> issues) {
+        Iterator<Issue> issueIterator = issues.iterator();
+        while (issueIterator.hasNext()) {
+            Issue issue = issueIterator.next();
+            if (issue.fields.storyPoints != null) {
+                log.debug("Skipping issue {} as it has story point value {} and configuration does not include estimated stories",
+                        issue.getKey(), issue.fields.storyPoints);
+                issueIterator.remove();
+            }
+        }
+    }
+
     private SearchRequest createSearchRequestForFullIssueInformation(List<IssueSummary> backlogStories) {
         String jqlQuery = constructJqlQuery(backlogStories);
+        if (jqlQuery == null) {
+            return null;
+        }
 
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.jql = jqlQuery;
@@ -94,12 +119,13 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
 
     private String constructJqlQuery(List<IssueSummary> stories) {
         String jqlQuery = "";
+        boolean atLeastOneStoryCanBeUsed = false;
         for (IssueSummary story : stories) {
-            if (!config.includeStoriesWithEstimates && story.estimateStatistic.containsValue()) {
+            if (!config.includeStoriesWithEstimates && story.estimateStatistic.containsValidEstimate()) {
                 log.debug("Skipping issue {} as it has already been estimated and configuration does not include estimated stories", story.key);
                 continue;
             }
-
+            atLeastOneStoryCanBeUsed = true;
             if (jqlQuery.isEmpty()) {
                 jqlQuery = "id in (";
             } else {
@@ -108,11 +134,14 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
 
             jqlQuery += "'" + story.key + "'";
         }
+        if (!atLeastOneStoryCanBeUsed) {
+            return null;
+        }
         jqlQuery += ")";
         return jqlQuery;
     }
 
-    private List<String> getLabelsFromIssues(Issue[] issues) {
+    private List<String> getLabelsFromIssues(List<Issue> issues) {
         Set<String> labels = new HashSet<String>();
         for (Issue issue : issues) {
             if (issue.fields.labels == null) {
@@ -125,7 +154,7 @@ public class LoadBacklogStories extends BaseBatchJiraAction {
         return new ArrayList<String>(labels);
     }
 
-    private List<Issue> filterByLabel(Issue[] issues, String label) {
+    private List<Issue> filterByLabel(List<Issue> issues, String label) {
         List<Issue> filteredIssues = new ArrayList<Issue>();
 
         for (Issue issue : issues) {

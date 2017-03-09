@@ -9,10 +9,6 @@
   "CopyReviewUrlToClipboard": [
     "--reviewboard-url"
   ],
-  "LoadBacklogStories": [
-    "--include-estimated",
-    "--use-label"
-  ],
   "AddGitChangesetConfigValueIfNeeded": [
     "--perforce-client"
   ],
@@ -282,6 +278,11 @@
     "--bugzilla-query",
     "--disable-bugzilla",
     "--disable-jira"
+  ],
+  "LoadStories": [
+    "--use-label",
+    "--include-estimated",
+    "--include-sprint-stories"
   ],
   "ApplyChangelistToSeparateGitBranch": [
     "--tracking-branch"

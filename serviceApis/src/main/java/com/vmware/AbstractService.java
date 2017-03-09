@@ -54,14 +54,14 @@ public abstract class AbstractService {
     public void setupAuthenticatedConnection() {
         int retryCount = 0;
         while (!isConnectionAuthenticated()) {
-            if (retryCount > MAX_LOGIN_RETRIES) {
-                System.exit(1);
-            }
             connectionIsAuthenticated = null;
             displayInputMessage(retryCount);
             try {
                 loginManually();
-            } catch (NotAuthorizedException e) {
+            } catch (NotAuthorizedException | ForbiddenException e) {
+                if (retryCount >= MAX_LOGIN_RETRIES) {
+                    throw e;
+                }
                 connectionIsAuthenticated = false;
             }
             retryCount++;

@@ -209,6 +209,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-defaultJiraComponent,--default-jira-component", help = "Default Jira component to use for creating issues")
     public String defaultJiraComponent;
 
+    @ConfigurableProperty(commandLine = "--include-sprint-stories", help = "When loading jira stories, use this flag to also include stories in sprints")
+    public boolean includeSprintStories;
+
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public String[] bugNumberSearchOrder;
 
