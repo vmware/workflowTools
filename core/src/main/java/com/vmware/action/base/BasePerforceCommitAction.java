@@ -2,7 +2,6 @@ package com.vmware.action.base;
 
 import com.vmware.scm.Perforce;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.StringUtils;
 
 public abstract class BasePerforceCommitAction extends BaseCommitAction {
 
@@ -16,7 +15,7 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        String reasonForFailing = perforceClientCanBeUsed();
+        String reasonForFailing = perforceClientCannotBeUsed();
         if (reasonForFailing != null) {
             return reasonForFailing;
         }
