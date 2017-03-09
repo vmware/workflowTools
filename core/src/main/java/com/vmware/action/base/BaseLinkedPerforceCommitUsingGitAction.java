@@ -3,11 +3,11 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-public abstract class BaseLinkedPerforceCommitAction extends BasePerforceCommitAction {
+public abstract class BaseLinkedPerforceCommitUsingGitAction extends BasePerforceCommitUsingGitAction {
 
-    public BaseLinkedPerforceCommitAction(WorkflowConfig config) {
+    protected BaseLinkedPerforceCommitUsingGitAction(WorkflowConfig config) {
         super(config);
-        this.failIfCannotBeRun = false;
+        super.failIfCannotBeRun = false;
     }
 
     @Override

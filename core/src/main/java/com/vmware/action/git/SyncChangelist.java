@@ -1,6 +1,6 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseLinkedPerforceCommitAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Syncs changelist by copying changed files from git to the perforce client directory.")
-public class SyncChangelist extends BaseLinkedPerforceCommitAction {
+public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
     public SyncChangelist(WorkflowConfig config) {
         super(config);
     }

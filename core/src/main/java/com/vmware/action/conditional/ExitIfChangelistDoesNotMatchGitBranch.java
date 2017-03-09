@@ -1,6 +1,6 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.base.BaseLinkedPerforceCommitAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
@@ -26,7 +26,7 @@ import static com.vmware.scm.FileChangeType.deleted;
 import static com.vmware.util.StringUtils.stripLinesStartingWith;
 
 @ActionDescription("Creates a diff for the changelist and compares it to a diff of the current git branch.")
-public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCommitAction {
+public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCommitUsingGitAction {
 
     public ExitIfChangelistDoesNotMatchGitBranch(WorkflowConfig config) {
         super(config);

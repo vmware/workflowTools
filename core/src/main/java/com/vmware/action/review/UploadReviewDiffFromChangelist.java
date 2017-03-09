@@ -1,6 +1,7 @@
 package com.vmware.action.review;
 
 import com.vmware.action.base.BaseCommitWithReviewAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
@@ -12,23 +13,12 @@ import java.io.File;
 import static java.lang.String.format;
 
 @ActionDescription("Uses rbt post to upload a changelist as a diff to reviewboard, only for perforce.")
-public class UploadReviewDiffFromChangelist extends BaseCommitWithReviewAction {
+public class UploadReviewDiffFromChangelist extends BaseLinkedPerforceCommitAction {
 
     public UploadReviewDiffFromChangelist(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("rbt", "p4");
-    }
-
-    @Override
-    public String failWorkflowIfConditionNotMet() {
-        String reasonForFailing = perforceClientCanBeUsed();
-        if (StringUtils.isNotBlank(reasonForFailing)) {
-            return reasonForFailing;
-        }
-        if (StringUtils.isBlank(draft.perforceChangelistId)) {
-            return "no matching changelist found, run createPendingChangelist as part of workflow";
-        }
-        return super.failWorkflowIfConditionNotMet();
+        super.setExpectedCommandsToBeAvailable("rbt");
+        super.failIfCannotBeRun = true;
     }
 
     @Override

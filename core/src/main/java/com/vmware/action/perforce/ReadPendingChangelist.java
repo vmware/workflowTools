@@ -11,7 +11,6 @@ public class ReadPendingChangelist extends BasePerforceCommitAction {
 
     public ReadPendingChangelist(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

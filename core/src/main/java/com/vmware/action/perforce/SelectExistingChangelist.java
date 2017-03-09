@@ -1,10 +1,8 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
@@ -14,7 +12,6 @@ import java.util.List;
 public class SelectExistingChangelist extends BasePerforceCommitAction {
     public SelectExistingChangelist(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

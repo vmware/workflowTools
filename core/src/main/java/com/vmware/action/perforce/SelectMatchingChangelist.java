@@ -14,7 +14,6 @@ import java.util.Map;
 public class SelectMatchingChangelist extends BasePerforceCommitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override
