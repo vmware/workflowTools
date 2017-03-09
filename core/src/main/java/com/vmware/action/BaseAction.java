@@ -20,6 +20,8 @@ public abstract class BaseAction {
 
     protected final Git git;
 
+    protected boolean failIfCannotBeRun;
+
     private String[] expectedCommandsToBeAvailable;
 
 
@@ -39,6 +41,12 @@ public abstract class BaseAction {
         for (String command : expectedCommandsToBeAvailable) {
             if (!CommandLineUtils.isCommandAvailable(command)) {
                 return "command " + command + " is not available";
+            }
+        }
+        if (failIfCannotBeRun) {
+            String cannotBeRunReason = this.cannotRunAction();
+            if (StringUtils.isNotBlank(cannotBeRunReason)) {
+                return cannotBeRunReason;
             }
         }
         return null;

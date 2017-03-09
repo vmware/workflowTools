@@ -1,6 +1,7 @@
 package com.vmware.action.perforce;
 
 import com.vmware.action.base.BaseLinkedPerforceCommitAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
@@ -8,7 +9,6 @@ import com.vmware.config.WorkflowConfig;
 public class MoveOpenFilesToPendingChangelist extends BaseLinkedPerforceCommitAction {
     public MoveOpenFilesToPendingChangelist(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("p4");
     }
 
     @Override

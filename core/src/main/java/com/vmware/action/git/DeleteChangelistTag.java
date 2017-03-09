@@ -1,13 +1,16 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseLinkedPerforceCommitAction;
-import com.vmware.action.base.BasePerforceCommitAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
 @ActionDescription("Deletes matching changelist tag.")
-public class DeleteChangelistTag extends BaseLinkedPerforceCommitAction {
+public class DeleteChangelistTag extends BaseLinkedPerforceCommitUsingGitAction {
+
+    public DeleteChangelistTag(WorkflowConfig config) {
+        super(config);
+    }
 
     @Override
     public String cannotRunAction() {
@@ -20,10 +23,6 @@ public class DeleteChangelistTag extends BaseLinkedPerforceCommitAction {
             return "tag " + expectedTagName + " does not exist";
         }
         return null;
-    }
-
-    public DeleteChangelistTag(WorkflowConfig config) {
-        super(config);
     }
 
     @Override

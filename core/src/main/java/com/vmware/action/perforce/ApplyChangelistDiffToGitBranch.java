@@ -1,6 +1,7 @@
 package com.vmware.action.perforce;
 
 import com.vmware.action.base.BasePerforceCommitAction;
+import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
@@ -18,10 +19,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 @ActionDescription("Applies a diff for the selected changelist to the current git branch. Can be used to apply shelved changelists.")
-public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitAction {
+public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAction {
 
     public ApplyChangelistDiffToGitBranch(WorkflowConfig config) {
         super(config);
+        super.failIfCannotBeRun = true;
     }
 
     @Override

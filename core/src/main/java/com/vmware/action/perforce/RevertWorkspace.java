@@ -10,7 +10,7 @@ import java.util.List;
 public class RevertWorkspace extends BasePerforceCommitAction {
     public RevertWorkspace(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("p4");
+        super.failIfCannotBeRun = true;
     }
 
     @Override

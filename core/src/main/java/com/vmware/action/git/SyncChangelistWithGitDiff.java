@@ -1,24 +1,17 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseLinkedPerforceCommitAction;
+import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
-import com.vmware.scm.FileChangeType;
-import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @ActionDescription("Syncs the contents of the linked changelist with a git diff against the last submitted changelist in the current branch.")
-public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitAction {
+public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitAction {
     public SyncChangelistWithGitDiff(WorkflowConfig config) {
         super(config);
     }

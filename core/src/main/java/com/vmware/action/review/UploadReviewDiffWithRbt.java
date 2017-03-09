@@ -20,7 +20,14 @@ public class UploadReviewDiffWithRbt extends UploadReviewDiff {
 
     @Override
     protected void uploadReviewDiff() {
+        String repoType = draft.reviewRepoType;
         File workingDirectory = new File(System.getProperty("user.dir"));
-        uploadDiffUsingRbt(workingDirectory, null); // don't specify changelist id as working with git repo
+        if (repoType.contains("perforce")){
+            String changelistId = determineChangelistIdToUse();
+            uploadDiffUsingRbt(workingDirectory, changelistId);
+        } else {
+            // don't specify changelist id as working with non perforce repo
+            uploadDiffUsingRbt(workingDirectory, null);
+        }
     }
 }
