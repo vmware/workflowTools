@@ -172,7 +172,6 @@ public class SetBugNumbers extends BaseCommitReadAction {
             }
         } else {
             if (jira != null) {
-
                 issueInfo = jira.getIssueWithoutException(fullJiraKey);
             }
             if (issueInfo.isNotFound() && bugzilla != null && bugzillaBugNumber != null) {

@@ -30,10 +30,6 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
 
     @Override
     public void process() {
-        createCommit();
-    }
-
-    protected void createCommit() {
         String description = draft.toText(config.getCommitConfiguration());
         if (git.workingDirectoryIsInGitRepo()) {
             commitUsingGit(description);

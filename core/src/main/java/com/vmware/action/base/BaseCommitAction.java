@@ -57,6 +57,18 @@ public abstract class BaseCommitAction extends BaseAction {
         }
     }
 
+    protected boolean commitTextHasNoChanges(boolean includeJobResultsInCommit) {
+        ReviewRequestDraft existingDraft = new ReviewRequestDraft(readLastChange(), config.getCommitConfiguration());
+        String existingCommitText = existingDraft.toText(config.getCommitConfiguration());
+        String updatedCommitText = updatedCommitText(includeJobResultsInCommit);
+
+        return existingCommitText.equals(updatedCommitText);
+    }
+
+    protected String updatedCommitText(boolean includeJobResultsInCommit) {
+        return draft.toText(config.getCommitConfiguration(), includeJobResultsInCommit).trim();
+    }
+
     private String readPendingChangelistText() {
         String changelistId = determineChangelistIdToUse();
         String changelistText = serviceLocator.getPerforce().readChangelist(changelistId);
