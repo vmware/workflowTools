@@ -72,7 +72,7 @@ public abstract class AbstractService {
 
     public String getUsername() {
         if (StringUtils.isBlank(username)) {
-            throw new RuntimeException("Username is empty, please set workflow config value username or git config value user.email");
+            throw new RuntimeException("Username is empty, please set workflow config value username or git config --global user.email [your email address]");
         }
         return username;
     }
