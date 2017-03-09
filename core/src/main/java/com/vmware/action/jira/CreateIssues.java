@@ -20,7 +20,7 @@ public class CreateIssues extends BaseBatchJiraAction {
     @Override
     public String cannotRunAction() {
         if (multiActionData.getIssuesNotInJira().isEmpty()) {
-            return "there are no issues loaded not from Jira";
+            return "there are no issues not loaded from Jira";
         }
         return super.cannotRunAction();
     }

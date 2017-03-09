@@ -1,6 +1,10 @@
 package com.vmware.jira.domain;
 
+import com.vmware.util.StringUtils;
 import com.vmware.util.complexenum.ComplexEnum;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     Bug(1),
@@ -35,5 +39,43 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     @Override
     public Integer getValue() {
         return code;
+    }
+
+    @Override
+    public String toString() {
+        return this.name();
+    }
+
+    public static IssueTypeDefinition[] fromValues(String[] values) {
+        List<IssueTypeDefinition> definitionList = new ArrayList<>();
+        for (String value : values) {
+            if (!StringUtils.isInteger(value)) {
+                throw new IllegalArgumentException("Issue definition type value " + value +
+                        " must be an integer.\nValid values are " + typesWithIntValues());
+            }
+            definitionList.add(fromValue(Integer.parseInt(value)));
+        }
+        return definitionList.toArray(new IssueTypeDefinition[definitionList.size()]);
+    }
+
+    public static IssueTypeDefinition fromValue(int value) {
+        for (IssueTypeDefinition definition : IssueTypeDefinition.values()) {
+            if (value == definition.getValue()) {
+                return definition;
+            }
+        }
+        throw new IllegalArgumentException("No Jira issue type matches int value " + value +
+                "\nValid values are " + typesWithIntValues());
+    }
+
+    private static String typesWithIntValues() {
+        String value = "";
+        for (IssueTypeDefinition definition : IssueTypeDefinition.values()) {
+            if (!value.isEmpty()) {
+                value += ",";
+            }
+            value += definition.name() + "[" + definition.getValue() + "]";
+        }
+        return value;
     }
 }

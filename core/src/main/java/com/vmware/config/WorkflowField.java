@@ -1,5 +1,6 @@
 package com.vmware.config;
 
+import com.vmware.jira.domain.IssueTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,8 @@ public class WorkflowField {
             ((SortedSet) validValue).addAll(Arrays.asList(sourceValue.split(",")));
         } else if (fieldType == String.class) {
             validValue = sourceValue;
+        } else if (fieldType == IssueTypeDefinition[].class) {
+            validValue = IssueTypeDefinition.fromValues(sourceValue.trim().split(","));
         } else {
             log.error("Cannot set configuration property {} of type {} from git config value",
                     field.getName(), fieldType.getSimpleName());

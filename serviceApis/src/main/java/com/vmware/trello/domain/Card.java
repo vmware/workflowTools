@@ -71,7 +71,7 @@ public class Card {
     public String getAcceptanceCriteria() {
         String value = MatcherUtils.singleMatch(desc,
                 "\\*\\*\\s*Acceptance Criteria\\s*\\*\\*(.+)\\*\\*\\s*Description\\s*\\*\\*", Pattern.DOTALL);
-        return value != null ? value.trim() : "to do";
+        return value != null ? value.trim() : null;
     }
 
     @Override

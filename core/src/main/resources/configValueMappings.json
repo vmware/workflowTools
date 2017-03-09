@@ -142,6 +142,13 @@
   "PushToDevelop": [
     "--git-remote"
   ],
+  "LoadIssues": [
+    "--use-label",
+    "--include-estimated",
+    "--include-sprint-stories",
+    "--include-issue-types",
+    "--include-all-issue-types"
+  ],
   "PublishReview": [
     "--reviewboard-url"
   ],
@@ -278,11 +285,6 @@
     "--bugzilla-query",
     "--disable-bugzilla",
     "--disable-jira"
-  ],
-  "LoadStories": [
-    "--use-label",
-    "--include-estimated",
-    "--include-sprint-stories"
   ],
   "ApplyChangelistToSeparateGitBranch": [
     "--tracking-branch"
