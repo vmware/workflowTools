@@ -210,7 +210,7 @@
        ],
        "setMissingCommitValues": [
           "ReadLastCommit", "setCommitDetailsWithoutConfirmation", "ExitIfCommitUnchanged",
-           "ExitIfConfirmationNotGiven", "AmendCommit", "--set-empty-only"
+           "ExitIfConfirmationNotGiven", "AmendCommit", "DisplayCommit", "--set-empty-only"
        ],
        "setSummary": [
           "ReadLastCommit", "SetSummary", "AmendCommit"
