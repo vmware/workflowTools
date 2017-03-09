@@ -1,6 +1,6 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BasePerforceCommitAction;
+import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.MatcherUtils;
@@ -9,16 +9,13 @@ import com.vmware.util.StringUtils;
 import java.util.List;
 
 @ActionDescription("Attempts to find a linked changelist by git tag.")
-public class SelectLinkedChangelist extends BasePerforceCommitAction {
+public class SelectLinkedChangelist extends BasePerforceCommitUsingGitAction {
     public SelectLinkedChangelist(WorkflowConfig config) {
         super(config);
     }
 
     @Override
     public String cannotRunAction() {
-        if (!git.workingDirectoryIsInGitRepo()) {
-            return "not in git repo directory";
-        }
         if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }

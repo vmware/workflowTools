@@ -10,7 +10,6 @@ import java.util.List;
 public class RevertWorkspace extends BasePerforceCommitAction {
     public RevertWorkspace(WorkflowConfig config) {
         super(config);
-        super.failIfCannotBeRun = true;
     }
 
     @Override
@@ -28,17 +27,20 @@ public class RevertWorkspace extends BasePerforceCommitAction {
     private void revertChangesInChangelist(String changelistId) {
         log.info("Reverting open files in changelist {} for client {}", changelistId, config.perforceClientName);
         perforce.revertChangesInPendingChangelist(changelistId);
-        List<String> tags = git.listTags();
         if (changelistId.equals(draft.perforceChangelistId)) {
             log.info("Not deleting changelist {} as it matches the current commit", changelistId);
         } else {
             log.info("Deleting pending changelist {} in client {}", changelistId, config.perforceClientName);
             perforce.deletePendingChangelist(changelistId);
-            deleteMatchingChangelistTag(tags, changelistId);
+            deleteMatchingChangelistTag(changelistId);
         }
     }
 
-    private void deleteMatchingChangelistTag(List<String> tags, String changelistId) {
+    private void deleteMatchingChangelistTag(String changelistId) {
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return;
+        }
+        List<String> tags = git.listTags();
         String matchingTag = "changeset-" + changelistId;
         if (tags.contains(matchingTag)) {
             git.deleteTag(matchingTag);

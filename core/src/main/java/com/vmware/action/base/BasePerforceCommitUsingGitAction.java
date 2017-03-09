@@ -5,6 +5,7 @@ import com.vmware.config.WorkflowConfig;
 public abstract class BasePerforceCommitUsingGitAction extends BasePerforceCommitAction {
     public BasePerforceCommitUsingGitAction(WorkflowConfig config) {
         super(config);
+        super.failIfCannotBeRun = false;
     }
 
     @Override
