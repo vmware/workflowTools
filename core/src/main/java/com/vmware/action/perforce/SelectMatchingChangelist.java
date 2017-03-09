@@ -1,6 +1,6 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BasePerforceCommitAction;
+import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -11,16 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 @ActionDescription("Attempts based on summary to match the current commit to a perforce changelist.")
-public class SelectMatchingChangelist extends BasePerforceCommitAction {
+public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
     }
 
     @Override
     public String cannotRunAction() {
-        if (!git.workingDirectoryIsInGitRepo()) {
-            return "not in git repo directory";
-        }
         if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }

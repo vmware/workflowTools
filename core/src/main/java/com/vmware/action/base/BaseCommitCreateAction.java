@@ -47,6 +47,7 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
     }
 
     protected void commitUsingPerforce(String description) {
+        log.info("Updating changelist description for {}", draft.perforceChangelistId);
         serviceLocator.getPerforce().updatePendingChangelist(draft.perforceChangelistId, description);
     }
 }

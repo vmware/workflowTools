@@ -11,7 +11,7 @@ public class CreatePendingChangelistIfNeeded extends BasePerforceCommitAction {
 
     public CreatePendingChangelistIfNeeded(WorkflowConfig config) {
         super(config);
-        super.failIfCannotBeRun = true;
+        super.failIfCannotBeRun = false;
     }
 
     @Override
