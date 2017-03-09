@@ -8,7 +8,6 @@ package com.vmware.action.base;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 
 public abstract class BaseCommitAction extends BaseAction {
@@ -33,14 +32,14 @@ public abstract class BaseCommitAction extends BaseAction {
         }
     }
 
-    protected String gitRepoOrPerforceClientCanBeUsed() {
+    protected String gitRepoOrPerforceClientCannotBeUsed() {
         String gitReason = "", perforceReason = "";
         if (git.workingDirectoryIsInGitRepo()) {
             return null; // don't need to check perforce
         } else {
             gitReason = "not in git repo";
         }
-        perforceReason = perforceClientCanBeUsed();
+        perforceReason = perforceClientCannotBeUsed();
         if (StringUtils.isNotBlank(gitReason) && StringUtils.isNotBlank(perforceReason)) {
             return gitReason + " and " + perforceReason;
         }
@@ -50,7 +49,7 @@ public abstract class BaseCommitAction extends BaseAction {
     protected String readLastChange() {
         if (git.workingDirectoryIsInGitRepo()) {
             return git.lastCommitText(true);
-        } else if (StringUtils.isNotBlank(config.perforceClientName)) {
+        } else if (perforceClientCannotBeUsed() == null) {
             return readPendingChangelistText();
         } else {
             log.warn("Not in git repo and config value perforceClientName is not set, can't read last change");

@@ -13,7 +13,7 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        String reasonForFailing = gitRepoOrPerforceClientCanBeUsed();
+        String reasonForFailing = gitRepoOrPerforceClientCannotBeUsed();
         if (StringUtils.isNotBlank(reasonForFailing)) {
             return reasonForFailing;
         }

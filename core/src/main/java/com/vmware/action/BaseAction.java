@@ -52,9 +52,9 @@ public abstract class BaseAction {
         return null;
     }
 
-    protected String perforceClientCanBeUsed() {
+    protected String perforceClientCannotBeUsed() {
         if (!CommandLineUtils.isCommandAvailable("p4")) {
-            return "p4 command is not availabled";
+            return "p4 command is not available";
         }
         Perforce perforce = serviceLocator.getPerforce();
         if (!perforce.isLoggedIn()) {

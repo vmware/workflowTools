@@ -150,8 +150,8 @@
     "--reviewboard-url"
   ],
   "BaseCommitAction": [
-    "--username",
     "--perforce-client",
+    "--username",
     "--changelist-id"
   ],
   "ExitIfPerforceClientIsNotFound": [

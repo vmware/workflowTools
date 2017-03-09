@@ -3,7 +3,6 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.CommandLineUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
@@ -16,7 +15,7 @@ public class ReadLastCommit extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        String reasonForFailing = gitRepoOrPerforceClientCanBeUsed();
+        String reasonForFailing = gitRepoOrPerforceClientCannotBeUsed();
         if (StringUtils.isNotBlank(reasonForFailing)) {
             return reasonForFailing;
         }
