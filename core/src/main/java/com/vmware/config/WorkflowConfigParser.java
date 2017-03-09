@@ -117,11 +117,14 @@ public class WorkflowConfigParser {
     }
 
     /**
-     * Applies values from configuration files explicitly specified either via the git workflow.config value or
+     * Applies values from configuration files explicitly specified either via the git workflow.configFile value or
      * via the command line.
      */
     private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
-        String gitConfigFilePath = git.configValue("workflow.config");
+        String gitConfigFilePath = git.configValue("workflow.configFile");
+        if (StringUtils.isBlank(gitConfigFilePath)) {
+            gitConfigFilePath = git.configValue("workflow.config"); // backwards compatibility
+        }
         String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config");
         if (isNotBlank(configFilePaths)) {
             String[] configFiles = configFilePaths.split(",");
