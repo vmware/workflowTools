@@ -8,6 +8,7 @@ import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.UrlUtils;
 
@@ -68,7 +69,10 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
     private Issue convertCardToIssue(Double storyPointValue, Card cardToUpdate) {
         Issue issueToUpdate = new Issue(cardToUpdate.getIssueKey());
         issueToUpdate.fields.storyPoints = storyPointValue;
-        issueToUpdate.fields.issuetype = new IssueType(IssueTypeDefinition.Story);
+        // new issues are created as stories
+        if (StringUtils.isBlank(cardToUpdate.getIssueKey())) {
+            issueToUpdate.fields.issuetype = new IssueType(IssueTypeDefinition.Story);
+        }
         issueToUpdate.fields.summary = cardToUpdate.name;
         String urlForIssue =
                 UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.getKey();

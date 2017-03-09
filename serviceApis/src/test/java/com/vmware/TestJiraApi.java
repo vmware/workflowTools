@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -69,7 +70,7 @@ public class TestJiraApi extends BaseTests {
         assertTrue("Expected board items to be returned", boardItems.size() > 0);
 
         RapidView rapidView = jira.getRapidView(boardItems.get(0).getBoardId());
-        List<IssueSummary> backlogStories = rapidView.getStories(true);
+        List<IssueSummary> backlogStories = rapidView.getIssues(Arrays.asList(IssueTypeDefinition.Story), true);
         assertTrue("Expected board to have backlog stories", backlogStories.size() > 0);
     }
 

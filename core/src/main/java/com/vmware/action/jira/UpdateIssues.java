@@ -3,12 +3,9 @@ package com.vmware.action.jira;
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jira.domain.Issue;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.jira.domain.Issue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Bulk updates Jira issues.")

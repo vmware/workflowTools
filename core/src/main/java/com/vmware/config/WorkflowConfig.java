@@ -1,6 +1,9 @@
 package com.vmware.config;
 
+import com.google.gson.annotations.JsonAdapter;
 import com.vmware.jenkins.domain.JobParameter;
+import com.vmware.jira.domain.IssueTypeDefinition;
+import com.vmware.jira.domain.IssueTypesDefinitionMapper;
 import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.action.BaseAction;
@@ -209,8 +212,15 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-defaultJiraComponent,--default-jira-component", help = "Default Jira component to use for creating issues")
     public String defaultJiraComponent;
 
-    @ConfigurableProperty(commandLine = "--include-sprint-stories", help = "When loading jira stories, use this flag to also include stories in sprints")
+    @ConfigurableProperty(commandLine = "--include-sprint-stories", help = "When loading jira issues, use this flag to also include stories in sprints")
     public boolean includeSprintStories;
+
+    @ConfigurableProperty(commandLine = "--include-all-issue-types", help = "When loading jira issues, use this flag to include issues of all types")
+    public boolean includeAllIssueTypes;
+
+    @JsonAdapter(IssueTypesDefinitionMapper.class)
+    @ConfigurableProperty(commandLine = "--include-issue-types", help = "Specific issue types to include")
+    public IssueTypeDefinition[] issueTypesToInclude;
 
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public String[] bugNumberSearchOrder;

@@ -9,11 +9,11 @@ import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
-import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 
@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-@ActionDescription("Loads a list of jira stories for processing.")
-public class LoadStories extends BaseBatchJiraAction {
+@ActionDescription("Loads a list of jira issues for processing.")
+public class LoadIssues extends BaseBatchJiraAction {
 
-    public LoadStories(WorkflowConfig config) {
+    public LoadIssues(WorkflowConfig config) {
         super(config);
     }
 
@@ -47,9 +47,10 @@ public class LoadStories extends BaseBatchJiraAction {
         MenuItem selectedItem = recentBoards.get(selection);
 
         RapidView rapidView = jira.getRapidView(selectedItem.getBoardId());
-        List<IssueSummary> backlogStories = rapidView.getStories(config.includeSprintStories);
+        List<IssueTypeDefinition> typesToSearchFor = config.includeAllIssueTypes ? null : Arrays.asList(config.issueTypesToInclude);
+        List<IssueSummary> backlogStories = rapidView.getIssues(typesToSearchFor, config.includeSprintStories);
         if (backlogStories.size() == 0) {
-            log.info("No backlog stories found for board {}", selectedItem.label);
+            log.info("No issues of type {} found for board {}", Arrays.toString(config.issueTypesToInclude), selectedItem.label);
             return;
         }
 
