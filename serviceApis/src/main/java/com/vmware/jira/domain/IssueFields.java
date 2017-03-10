@@ -1,16 +1,12 @@
 package com.vmware.jira.domain;
 
+import com.vmware.http.json.RuntimeFieldName;
 import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class IssueFields {
-
-    public static final String STORY_POINTS_FIELD = "customfield_10062";
-
-    public static final String ACCEPTANCE_CRITERIA_FIELD = "customfield_10100";
-
     public Project project;
 
     public Component[] components;
@@ -39,10 +35,10 @@ public class IssueFields {
     @Expose(deserialize = false)
     public IssueTimeTracking timetracking;
 
-    @SerializedName(STORY_POINTS_FIELD)
+    @RuntimeFieldName("storyPointsFieldName")
     public Number storyPoints;
 
-    @SerializedName(ACCEPTANCE_CRITERIA_FIELD)
+    @RuntimeFieldName("acceptanceCriteriaFieldName")
     public String acceptanceCriteria;
 
 

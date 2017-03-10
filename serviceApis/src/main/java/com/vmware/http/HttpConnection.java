@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -61,8 +62,12 @@ public class HttpConnection {
     private boolean useSessionCookies;
 
     public HttpConnection(RequestBodyHandling requestBodyHandling) {
+        this(requestBodyHandling, null);
+    }
+
+    public HttpConnection(RequestBodyHandling requestBodyHandling, Map<String, String> customFieldNames) {
         this.requestBodyHandling = requestBodyHandling;
-        this.gson = new ConfiguredGsonBuilder().build();
+        this.gson = new ConfiguredGsonBuilder(customFieldNames).build();
 
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);

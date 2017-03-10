@@ -18,7 +18,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,7 +37,10 @@ public class TestJiraApi extends BaseTests {
     public static void createIssue() {
         String jiraUsername = testProperties.getProperty("jira.username");
         String jiraUrl = testProperties.getProperty("jira.url");
-        jira = new Jira(jiraUrl, "HW-1001", jiraUsername);
+        Map<String, String> customFieldNames = new HashMap<>();
+        customFieldNames.put("storyPointsFieldName", "customfield_10062");
+        customFieldNames.put("acceptanceCriteriaFieldName", "customfield_10100");
+        jira = new Jira(jiraUrl, "HW-1001", jiraUsername, customFieldNames);
         jira.setupAuthenticatedConnection();
         Issue issueToCreate = new Issue(IssueTypeDefinition.Story, "HW", "Build and Infrastructure",
                 "Test Issue", "Test Description", "Test criteria");

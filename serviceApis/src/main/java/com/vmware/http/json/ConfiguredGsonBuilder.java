@@ -7,6 +7,7 @@ import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTypeDefinition;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -17,10 +18,18 @@ public class ConfiguredGsonBuilder {
     private GsonBuilder builder;
 
     public ConfiguredGsonBuilder() {
-        this(TimeZone.getDefault(), "yyyy-MM-dd HH:mm:ss");
+        this(TimeZone.getDefault(), "yyyy-MM-dd HH:mm:ss", null);
+    }
+
+    public ConfiguredGsonBuilder(Map<String, String> customFieldNames) {
+        this(TimeZone.getDefault(), "yyyy-MM-dd HH:mm:ss", customFieldNames);
     }
 
     public ConfiguredGsonBuilder(TimeZone serverTimezone, String dateFormat) {
+        this(serverTimezone, dateFormat, null);
+    }
+
+    private ConfiguredGsonBuilder(TimeZone serverTimezone, String dateFormat, Map<String, String> customFieldNames) {
         ImprovedExclusionStrategy serializationExclusionStrategy = new ImprovedExclusionStrategy(true);
         ImprovedExclusionStrategy deserializationExclusionStrategy = new ImprovedExclusionStrategy(false);
         this.builder = new GsonBuilder()
@@ -31,6 +40,9 @@ public class ConfiguredGsonBuilder {
                 .registerTypeAdapter(IssueStatusDefinition.class, new ComplexEnumMapper())
                 .registerTypeAdapter(IssueResolutionDefinition.class, new ComplexEnumMapper())
                 .registerTypeAdapter(IssueTypeDefinition.class, new ComplexEnumMapper());
+        if (customFieldNames != null) {
+            this.builder.setFieldNamingStrategy(new RuntimeFieldNamingStrategy(customFieldNames));
+        }
     }
 
     public ConfiguredGsonBuilder setPrettyPrinting() {

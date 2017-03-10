@@ -25,7 +25,7 @@ public class AuthenticateAllApis extends BaseAction {
     public void process() {
         checkAuthentication(new Trello(config.trelloUrl));
         checkAuthentication(new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug));
-        checkAuthentication(new Jira(config.jiraUrl, config.jiraTestIssue, config.username));
+        checkAuthentication(new Jira(config.jiraUrl, config.jiraTestIssue, config.username, config.jiraCustomFieldNames));
         checkAuthentication(new ReviewBoard(config.reviewboardUrl, config.username));
         checkAuthentication(new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin));
     }
