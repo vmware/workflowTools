@@ -37,7 +37,7 @@
   "defaultJiraProject": "HW",
   "bugzillaPrefix": "BZ",
   "bugNumberSearchOrder": [
-        "Bugzilla", "Jira"
+      "Bugzilla", "Jira"
    ],
   "topicTemplates": [
       "Server", "Testing", "UI"
@@ -61,6 +61,10 @@
   "closeOldSubmittedReviewsAfter": 2,
   "closeOldShipItReviewsAfter": 7,
   "jiraTaskEstimateInHours": 1,
+  "jiraCustomFieldNames": {
+    "storyPointsFieldName" : "customfield_10062",
+    "acceptanceCriteriaFieldName" : "customfield_10100"
+  },
   "fileCountRanges": [5,10,20,50,100],
   "keepMissingCards": false,
   "workflows": {

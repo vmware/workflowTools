@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.vmware.http.cookie.ApiAuthentication.jira;
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
@@ -49,9 +50,9 @@ public class Jira extends AbstractRestService {
     private String greenhopperUrl;
     private String testIssueKey;
 
-    public Jira(String jiraUrl, String testIssueKey, String username) {
+    public Jira(String jiraUrl, String testIssueKey, String username, Map<String, String> customFieldNames) {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, username);
-        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
+        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity, customFieldNames);
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";

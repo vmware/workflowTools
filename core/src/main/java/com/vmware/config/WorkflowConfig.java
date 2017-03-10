@@ -222,6 +222,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--include-issue-types", help = "Specific issue types to include")
     public IssueTypeDefinition[] issueTypesToInclude;
 
+    @ConfigurableProperty(help = "Custom field names for Jira")
+    public Map<String, String> jiraCustomFieldNames;
+
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public String[] bugNumberSearchOrder;
 
