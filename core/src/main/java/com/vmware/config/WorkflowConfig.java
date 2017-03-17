@@ -8,6 +8,7 @@ import com.vmware.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.action.BaseAction;
 import com.vmware.util.ArrayUtils;
+import com.vmware.util.CommandLineUtils;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.StringUtils;
 
@@ -501,6 +502,17 @@ public class WorkflowConfig {
             log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
             overriddenConfigSources.put("username", "Git Config");
         }
+    }
+
+    public void parseUsernameFromWhoamIIfBlank() {
+        if (StringUtils.isNotBlank(username)) {
+            return;
+        }
+        String fullUsername = CommandLineUtils.executeCommand("whoami", LogLevel.DEBUG);
+        String[] usernamePieces = fullUsername.split("\\\\");
+        this.username = usernamePieces[usernamePieces.length - 1];
+        log.info("No username set, parsed username {} from whoami output {}", username, fullUsername);
+        overriddenConfigSources.put("username", "Whoami command");
     }
 
     public Field getMatchingField(String commandLineProperty) {
