@@ -54,6 +54,8 @@ public class WorkflowConfigParser {
 
         applyUserConfigFileIfExists(internalConfig, loadedConfigFiles);
 
+        applySpecifiedConfigFiles(argsParser, internalConfig, loadedConfigFiles);
+
         if (git.isGitInstalled()) {
             internalConfig.applyGitConfigValues("");
         }
@@ -72,8 +74,6 @@ public class WorkflowConfigParser {
                 internalConfig.applyGitConfigValues(trackingBranchConfigPrefix);
             }
         }
-
-        applySpecifiedConfigFiles(argsParser, internalConfig, loadedConfigFiles);
 
         applyRuntimeArguments(internalConfig);
 
