@@ -42,7 +42,7 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, missingChanges);
         long elapsedTime = new Date().getTime() - startingDate.getTime();
         long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime);
-        String plural = elapsedTimeInSeconds == 1 ? "s" : "";
+        String plural = elapsedTimeInSeconds == 1 ? "" : "s";
         log.info("Synced changes to changelist {} in {} second{}\n", draft.perforceChangelistId,
                 elapsedTimeInSeconds, plural);
 
