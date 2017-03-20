@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class StringUtils {
@@ -169,16 +170,24 @@ public class StringUtils {
         return builder.toString();
     }
 
-    public static String convertObjectToString(Object matchingValue) {
-        String matchingValueText = "";
-        if (matchingValue instanceof String[]) {
-            matchingValueText = Arrays.toString((Object[]) matchingValue);
-        } else if (matchingValue instanceof int[]) {
-            matchingValueText = Arrays.toString((int[]) matchingValue);
-        } else if (matchingValue != null) {
-            matchingValueText = String.valueOf(matchingValue);
+    public static String convertObjectToString(Object value) {
+        if (value == null) {
+            return "";
+        } else if (value instanceof int[]) {
+            return Arrays.toString((int[]) value);
+        } else if (value.getClass().isArray()) {
+            return Arrays.toString((Object[]) value);
+        } else if (value instanceof Map) {
+            Map values = (Map) value;
+            String displayText = "";
+            for (Object key : values.keySet()) {
+                Object displayValue = convertObjectToString(values.get(key));
+                displayText += "\n" + key + " " + displayValue;
+            }
+            return displayText;
+        } else {
+            return value.toString();
         }
-        return matchingValueText;
     }
 
     public static String stripLinesStartingWith(String text, String... textsToCheckFor) {

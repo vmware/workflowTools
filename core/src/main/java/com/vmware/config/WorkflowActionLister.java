@@ -6,8 +6,8 @@
 package com.vmware.config;
 
 import com.vmware.action.BaseAction;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,12 +102,8 @@ public class WorkflowActionLister {
             return;
         }
 
-        Class actionClass;
-        try {
-            actionClass = Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
+        Class actionClass = ReflectionUtils.forName(className);
+
         if (!Modifier.isAbstract(actionClass.getModifiers())
                 && BaseAction.class.isAssignableFrom(actionClass)) {
             actionsList.add(actionClass);

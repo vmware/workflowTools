@@ -1,8 +1,7 @@
 package com.vmware.http.request;
 
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
+import com.vmware.util.ReflectionUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class PostDeserializeHandler {
@@ -13,11 +12,7 @@ public class PostDeserializeHandler {
                 continue;
             }
 
-            try {
-                method.invoke(createdObject);
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
+            ReflectionUtils.invokeMethod(method, createdObject);
         }
     }
 }

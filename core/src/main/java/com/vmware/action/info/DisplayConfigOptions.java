@@ -7,9 +7,9 @@ import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.io.Reader;
 import java.lang.reflect.Field;
@@ -45,12 +45,7 @@ public class DisplayConfigOptions extends BaseAction {
         log.info("configFile, [-c,--config] Optional configuration file to use, file is in json format, Defaults to config file in jar");
         for (Field field : config.configurableFields) {
             ConfigurableProperty configProperty = field.getAnnotation(ConfigurableProperty.class);
-            Object defaultValue;
-            try {
-                defaultValue = field.get(defaultConfig);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
+            Object defaultValue = ReflectionUtils.getValue(field, defaultConfig);
 
             String defaultDisplayValue;
             if (defaultValue == null) {
