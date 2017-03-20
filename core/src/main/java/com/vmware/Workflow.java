@@ -16,6 +16,7 @@ import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.scm.Git;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
@@ -43,8 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Main class for running the workflow application.
@@ -280,23 +279,20 @@ public class Workflow {
             } else {
                 ConfigurableProperty matchingProperty = matchingField.getAnnotation(ConfigurableProperty.class);
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
-                try {
-                    String matchingValueText;
-                    if (configOption.equals("--jenkins-jobs")) {
-                        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
-                        matchingValueText = jobsConfig.toString();
-                    } else {
-                        Object matchingValue = matchingField.get(config);
-                        matchingValueText = StringUtils.convertObjectToString(matchingValue);
-                    }
-                    String gitConfigValue = "";
-                    if (git.isGitInstalled()) {
-                        gitConfigValue = " [workflow." + matchingField.getName() + "]";
-                    }
-                    log.info("{}={}{} - {}", configOption, matchingValueText, gitConfigValue, matchingPropertyText);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeReflectiveOperationException(e);
+                String matchingValueText;
+                if (configOption.equals("--jenkins-jobs")) {
+                    JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
+                    matchingValueText = jobsConfig.toString();
+                } else {
+                    Object matchingValue = ReflectionUtils.getValue(matchingField, config);
+                    matchingValueText = StringUtils.convertObjectToString(matchingValue);
                 }
+                String source = config.getFieldValueSource(matchingField.getName());
+                String gitConfigValue = "";
+                if (git.isGitInstalled()) {
+                    gitConfigValue = "[" + matchingField.getName() + "]";
+                }
+                log.info("{}{}={} source=[{}] - {}", configOption, gitConfigValue, matchingValueText, source, matchingPropertyText);
             }
         }
         configPadder.infoTitle();

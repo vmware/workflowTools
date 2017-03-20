@@ -2,8 +2,8 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.lang.reflect.Field;
 
@@ -16,21 +16,12 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
     public BaseCommitReadAction(WorkflowConfig config, String propertyName) {
         super(config);
         this.title = StringUtils.splitOnCapitalization(propertyName);
-        try {
-            this.property = ReviewRequestDraft.class.getField(propertyName);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
+        this.property = ReflectionUtils.getField(ReviewRequestDraft.class, propertyName);
     }
 
     @Override
     public String cannotRunAction() {
-        String propertyValue;
-        try {
-            propertyValue = (String) property.get(draft);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
+        String propertyValue = (String) ReflectionUtils.getValue(property, draft);
         if (!config.setEmptyPropertiesOnly || StringUtils.isBlank(propertyValue)) {
             return super.cannotRunAction();
         }

@@ -1,19 +1,18 @@
 package com.vmware.config;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
+import com.vmware.ServiceLocator;
+import com.vmware.action.BaseAction;
 import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.jira.domain.IssueTypesDefinitionMapper;
 import com.vmware.scm.Git;
-import com.vmware.ServiceLocator;
-import com.vmware.action.BaseAction;
 import com.vmware.util.ArrayUtils;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.CommitConfiguration;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
-
-import com.google.gson.annotations.Expose;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
@@ -46,7 +43,7 @@ public class WorkflowConfig {
     private Git git = new Git();
 
     @Expose(serialize = false, deserialize = false)
-    public Map<String, String> overriddenConfigSources = new TreeMap<String, String>();
+    private Map<String, String> overriddenConfigSources = new TreeMap<String, String>();
 
     @Expose(serialize = false, deserialize = false)
     public List<Class<? extends BaseAction>> workFlowActions;
@@ -413,11 +410,7 @@ public class WorkflowConfig {
     }
 
     public void setDefaultGitRemoteFromTrackingRemote(String remoteName) {
-        try {
-            setFieldValue(WorkflowConfig.class.getField("defaultGitRemote"), remoteName, "tracking remote");
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
+        setFieldValue(ReflectionUtils.getField(WorkflowConfig.class, "defaultGitRemote"), remoteName, "tracking remote");
     }
 
     public void applyGitConfigValues(String configPrefix) {
@@ -451,14 +444,8 @@ public class WorkflowConfig {
 
     public void overrideValues(WorkflowConfig overriddenConfig, String configFileName) {
         for (Field field : configurableFields) {
-            Object existingValue;
-            Object value;
-            try {
-                existingValue = field.get(this);
-                value = field.get(overriddenConfig);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
+            Object existingValue = ReflectionUtils.getValue(field, this);
+            Object value = ReflectionUtils.getValue(field, overriddenConfig);
             if (value == null || String.valueOf(value).equals("0") || (value instanceof Boolean && !((Boolean) value))) {
                 continue;
             }
@@ -483,11 +470,7 @@ public class WorkflowConfig {
             } else {
                 overriddenConfigSources.put(field.getName(), configFileName);
                 // override for everything else
-                try {
-                    field.set(this, value);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeReflectiveOperationException(e);
-                }
+                ReflectionUtils.setValue(field, this, value);
             }
         }
     }
@@ -500,7 +483,7 @@ public class WorkflowConfig {
         if (StringUtils.isNotBlank(gitUserEmail) && gitUserEmail.contains("@")) {
             this.username = gitUserEmail.substring(0, gitUserEmail.indexOf("@"));
             log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
-            overriddenConfigSources.put("username", "Git Config");
+            overriddenConfigSources.put("username", "Git user.email");
         }
     }
 
@@ -527,6 +510,11 @@ public class WorkflowConfig {
             }
         }
         return null;
+    }
+
+    public String getFieldValueSource(String fieldName) {
+        String value = overriddenConfigSources.get(fieldName);
+        return value != null ? value : "default";
     }
 
     public CommitConfiguration getCommitConfiguration() {
@@ -588,11 +576,7 @@ public class WorkflowConfig {
         Object validValue = new WorkflowField(field).determineValue(value);
         if (validValue != null) {
             overriddenConfigSources.put(field.getName(), source);
-            try {
-                field.set(this, validValue);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
+            ReflectionUtils.setValue(field, this, validValue);
         }
     }
 

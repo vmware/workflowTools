@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.http.request.DeserializedName;
 import com.vmware.http.request.PostDeserializeHandler;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.complexenum.ComplexEnum;
 import com.vmware.util.complexenum.ComplexEnumSelector;
@@ -12,7 +13,6 @@ import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +37,7 @@ public class MapObjectConverter {
             if (expose != null && !expose.serialize()) {
                 continue;
             }
-            Object value;
-            try {
-                value = field.get(requestObject);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
+            Object value = ReflectionUtils.getValue(field, requestObject);
             if (value == null) {
                 continue;
             }
@@ -57,13 +52,7 @@ public class MapObjectConverter {
     }
 
     public <T> T fromMap(Map values, Class<T> objectClass) {
-        Object createdObject;
-        try {
-            createdObject = objectClass.getConstructor().newInstance();
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
-
+        Object createdObject = ReflectionUtils.newInstance(objectClass);
         for (Field field : objectClass.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
                 continue;
@@ -82,11 +71,7 @@ public class MapObjectConverter {
 
             Object valueToConvert = values.get(nameToUse);
 
-            try {
-                setFieldValue(createdObject, field, valueToConvert);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeReflectiveOperationException(e);
-            }
+            setFieldValue(createdObject, field, valueToConvert);
         }
 
         new PostDeserializeHandler().invokePostDeserializeMethods(createdObject);
@@ -104,16 +89,16 @@ public class MapObjectConverter {
         return objectToCheck.toString();
     }
 
-    private void setFieldValue(Object createdObject, Field field, Object valueToConvert) throws IllegalAccessException {
+    private void setFieldValue(Object createdObject, Field field, Object valueToConvert) {
         Class fieldType = field.getType();
         field.setAccessible(true);
 
         if (valueToConvert.getClass() == fieldType) {
-            field.set(createdObject, valueToConvert);
+            ReflectionUtils.setValue(field, createdObject, valueToConvert);
         } else if (fieldType == String.class) {
-            field.set(createdObject, convertObjectToString(valueToConvert));
+            ReflectionUtils.setValue(field, createdObject, convertObjectToString(valueToConvert));
         } else if (ComplexEnum.class.isAssignableFrom(fieldType)) {
-            field.set(createdObject, ComplexEnumSelector.findByValue(fieldType, String.valueOf(valueToConvert)));
+            ReflectionUtils.setValue(field, createdObject, ComplexEnumSelector.findByValue(fieldType, String.valueOf(valueToConvert)));
         } else if (fieldType.isArray() && valueToConvert instanceof Object[]) {
             Class arrayObjectType = fieldType.getComponentType();
             Object[] valuesToConvert = (Object[]) valueToConvert;
@@ -122,9 +107,9 @@ public class MapObjectConverter {
                 Map listObjectValues = (Map) valuesToConvert[i];
                 Array.set(convertedValues, i, fromMap(listObjectValues, arrayObjectType));
             }
-            field.set(createdObject, convertedValues);
+            ReflectionUtils.setValue(field, createdObject, convertedValues);
         } else if (valueToConvert instanceof Map) {
-            field.set(createdObject, fromMap((Map) valueToConvert, fieldType));
+            ReflectionUtils.setValue(field, createdObject, fromMap((Map) valueToConvert, fieldType));
         } else {
             field.setAccessible(false);
             throw new RuntimeReflectiveOperationException(format("Cannot set value of type %s for field of type %s",
