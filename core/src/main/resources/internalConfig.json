@@ -312,6 +312,9 @@
        "invokeSandboxBuildWithGitFusion": [
          "ReadLastCommit", "--changelist-id=head", "InvokeSandboxBuild", "AmendCommit"
        ],
+       "displayWorkflowBuildInfo": [
+         "DisplayConfig", "--specific-properties=buildInfo"
+       ],
        "intro": [
          "GettingStarted", "DisplayMainWorkflows"
        ],

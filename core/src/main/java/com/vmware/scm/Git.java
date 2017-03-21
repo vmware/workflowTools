@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -474,6 +475,20 @@ public class Git extends BaseScmWrapper {
         }
 
         return Collections.unmodifiableList(changes);
+    }
+
+    public Map<String, String> getLastCommitInfo() {
+        Map<String, String> commitInfo = new LinkedHashMap<>();
+        String commitText = lastCommitText(false);
+        String summary = lastCommitText(true);
+        if (summary.contains("\n")) {
+            summary = summary.substring(0, summary.indexOf('\n'));
+        }
+        commitInfo.put("hash", MatcherUtils.singleMatchExpected(commitText, "commit\\s+(\\w+)"));
+        commitInfo.put("date", MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)"));
+        commitInfo.put("summary", summary);
+        commitInfo.put("author", MatcherUtils.singleMatchExpected(commitText, "Author:\\s+(.+)"));
+        return commitInfo;
     }
 
     public boolean isGitInstalled() {

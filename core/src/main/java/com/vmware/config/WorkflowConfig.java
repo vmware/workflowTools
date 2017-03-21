@@ -43,7 +43,7 @@ public class WorkflowConfig {
     private Git git = new Git();
 
     @Expose(serialize = false, deserialize = false)
-    private Map<String, String> overriddenConfigSources = new TreeMap<String, String>();
+    private Map<String, String> overriddenConfigSources = new TreeMap<>();
 
     @Expose(serialize = false, deserialize = false)
     public List<Class<? extends BaseAction>> workFlowActions;
@@ -53,6 +53,9 @@ public class WorkflowConfig {
 
     @Expose(serialize = false, deserialize = false)
     public String loadedConfigFiles;
+
+    @ConfigurableProperty(help = "Information about the the git commit that this version of workflow tools was built from")
+    public Map<String, String> buildInfo;
 
     @ConfigurableProperty(help = "Label for testing done section")
     public String testingDoneLabel;
