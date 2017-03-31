@@ -41,7 +41,7 @@ public class AddBuildInfoToInternalConfig {
         File targetConfigJsonFile = new File(targetConfigJsonFilePath);
 
 
-        Git git = new Git();
+        Git git = new Git(new File(moduleBaseDirectory));
         if (!git.isGitInstalled()) {
             System.out.println("Git is not installed, cannot add git version info");
             System.exit(0);
