@@ -41,10 +41,10 @@ public class Git extends BaseScmWrapper {
         determineRootDirectory();
     }
 
-    public Git(File workingDirectory) {
+    public Git(File rootDirectory) {
         super(ScmType.git);
-        super.setWorkingDirectory(workingDirectory);
-        determineRootDirectory();
+        super.setWorkingDirectory(rootDirectory);
+        this.rootDirectory = rootDirectory;
     }
 
     public boolean workingDirectoryIsInGitRepo() {
@@ -406,7 +406,11 @@ public class Git extends BaseScmWrapper {
 
     @Override
     protected String scmExecutablePath() {
-        return "git";
+        if (rootDirectory != null && workingDirectory.getPath().contains(rootDirectory.getPath())) {
+            return "git";
+        } else {
+            return "git -C " + workingDirectory.getPath();
+        }
     }
 
     private void pushToRemoteBranch(String remote, String remoteBranch, boolean forceUpdate) {
@@ -519,7 +523,7 @@ public class Git extends BaseScmWrapper {
     }
 
     private void determineRootDirectory() {
-        String rootDirectoryPath = CommandLineUtils.executeCommand(workingDirectory, null, "git rev-parse --show-toplevel", null, LogLevel.DEBUG);
+        String rootDirectoryPath = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
         String commandCheckOutput = checkIfCommandFailed(rootDirectoryPath);
         rootDirectory = commandCheckOutput == null ? new File(rootDirectoryPath) : null;
     }

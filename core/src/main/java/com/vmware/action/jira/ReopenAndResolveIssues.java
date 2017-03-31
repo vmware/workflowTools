@@ -37,7 +37,7 @@ public class ReopenAndResolveIssues extends BaseBatchJiraAction{
                 continue;
             }
 
-            log.info("Reopening issue {} that has no resolution", issueToReopen.getKey());
+            log.info("Reopening issue {} ({}) that has no resolution", issueToReopen.getKey(), issueToReopen.getSummary());
             jira.transitionIssue(reopenTransition);
 
             IssueTransition resolveTransition = getIssueTransition(issueToReopen, Resolved);

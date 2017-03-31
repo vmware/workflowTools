@@ -21,12 +21,9 @@ public class Padder {
     private boolean isFirstExecution = true;
 
     public Padder(String title, Object... args) {
+        title = title.trim();
         for (Object arg : args) {
             title = title.replaceFirst("\\{}", String.valueOf(arg));
-        }
-        // add a trailing space if the length is not even
-        if (title.length() % 2 != 0) {
-            title += " ";
         }
         int paddingCount = (PADDING_LENGTH - (title.length() + 4)) / 2;
         if (title.length() + 4 > PADDING_LENGTH) {
