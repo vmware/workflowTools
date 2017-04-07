@@ -74,15 +74,31 @@ public class ApplyPatch extends BaseCommitAction {
         log.info("Checking if patch applies");
         String checkResult = config.usePatchToApplyDiff ? patchDiff(diffData, true) : git.applyDiff(diffData, true);
         if (StringUtils.isNotBlank(checkResult) && !config.usePatchToApplyDiff) {
-            throw new RuntimeException("Checking of diff failed\n" + checkResult + "\nPatch is stored in workflow.patch");
+            printCheckOutput(checkResult, "git apply --ignore-whitespace -3 --check");
+            String usePatchCommand = InputUtils.readValueUntilNotBlank("Use patch command [" + config.patchCommand + "] to apply patch (Y/N)?");
+            config.usePatchToApplyDiff = "y".equalsIgnoreCase(usePatchCommand);
+            if (!config.usePatchToApplyDiff) {
+                log.warn("Not applying patch, patch is stored in workflow.patch");
+                System.exit(0);
+            } else {
+                checkIfPatchApplies(diffData);
+            }
         } else if (StringUtils.isNotBlank(checkResult)){
-            String applyPatch = InputUtils.readValue("Patch does not applyCleanly\n" + checkResult
-                    + "\nPatch is stored in workflow.patch\nDo you still want to apply (Y/N)?");
+            printCheckOutput(checkResult, config.patchCommand + " --dry-run");
+            String applyPatch = InputUtils.readValue("Do you still want to apply the patch (Y/N)?");
             if (!applyPatch.equalsIgnoreCase("y")) {
-                log.warn("Not applying patch");
+                log.warn("Not applying patch, patch is stored in workflow.patch");
                 System.exit(0);
             }
         }
+    }
+
+    private void printCheckOutput(String output, String title) {
+        Padder padder = new Padder(title);
+        padder.errorTitle();
+        log.info(output);
+        padder.errorTitle();
+        log.error("Checking of patch failed!");
     }
 
     private void printDiffResult(String result) {
