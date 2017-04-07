@@ -9,6 +9,9 @@
   "CopyReviewUrlToClipboard": [
     "--reviewboard-url"
   ],
+  "LoadGitPatchFile": [
+    "--diff-file"
+  ],
   "AddGitChangesetConfigValueIfNeeded": [
     "--perforce-client"
   ],
@@ -89,6 +92,13 @@
   ],
   "SaveChangelistDiffToFile": [
     "--output-file"
+  ],
+  "LoadReviewPatch": [
+    "--username",
+    "--reviewboard-url",
+    "--latest-diff",
+    "--review-request-id",
+    "--review-board-date-format"
   ],
   "SetReviewId": [
     "--username",
@@ -198,14 +208,6 @@
     "--username",
     "--perforce-client"
   ],
-  "ApplyReviewPatch": [
-    "--perforce-client",
-    "--username",
-    "--reviewboard-url",
-    "--latest-diff",
-    "--review-request-id",
-    "--review-board-date-format"
-  ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",
     "--sync-to-branch-latest"
@@ -215,6 +217,9 @@
     "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url"
+  ],
+  "LoadPerforcePatchFile": [
+    "--diff-file"
   ],
   "BaseBatchBugzillaAction": [
     "--bugzilla-test-bug",
@@ -230,6 +235,12 @@
   ],
   "BaseSetReviewersList": [
     "--always-include-review-url"
+  ],
+  "ApplyPatch": [
+    "--perforce-client",
+    "--username",
+    "--patch-command",
+    "--use-patch-command"
   ],
   "SetSummary": [
     "--max-summary",

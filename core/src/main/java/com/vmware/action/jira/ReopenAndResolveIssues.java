@@ -21,7 +21,7 @@ public class ReopenAndResolveIssues extends BaseBatchJiraAction{
 
     @Override
     public String cannotRunAction() {
-        if (multiActionData.noIssuesAdded()) {
+        if (projectIssues.noIssuesAdded()) {
             return "no issues added";
         }
 
@@ -31,7 +31,7 @@ public class ReopenAndResolveIssues extends BaseBatchJiraAction{
     @Override
     public void process() {
         int processingCounter = 0;
-        for (Issue issueToReopen : multiActionData.getIssuesFromJira()) {
+        for (Issue issueToReopen : projectIssues.getIssuesFromJira()) {
             IssueTransition reopenTransition = getIssueTransition(issueToReopen, Reopened);
             if (reopenTransition == null) {
                 continue;

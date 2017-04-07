@@ -40,7 +40,7 @@ public class ReviewRequestDraft extends BaseEntity {
     @Expose(serialize = false, deserialize = false)
     public ReviewRequest reviewRequest;
     @Expose(serialize = false, deserialize = false)
-    public String reviewRepoType;
+    public String repoType;
     public String summary = "";
     public String description = "";
     @SerializedName("testing_done")
@@ -66,6 +66,8 @@ public class ReviewRequestDraft extends BaseEntity {
     public String[] mergeToValues = new String[0];
     @Expose(serialize = false, deserialize = false)
     public String approvedBy;
+    @Expose(serialize = false, deserialize = false)
+    public String draftDiffData;
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.

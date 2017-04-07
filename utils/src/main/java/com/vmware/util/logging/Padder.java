@@ -25,8 +25,9 @@ public class Padder {
         for (Object arg : args) {
             title = title.replaceFirst("\\{}", String.valueOf(arg));
         }
-        int paddingCount = (PADDING_LENGTH - (title.length() + 4)) / 2;
-        if (title.length() + 4 > PADDING_LENGTH) {
+        int fullTitleLength = title.length() + 4;
+        int paddingCount = (PADDING_LENGTH - fullTitleLength) / 2;
+        if (fullTitleLength > PADDING_LENGTH) {
             title = title.substring(0, PADDING_LENGTH - 7) + "...";
             paddingCount = 1;
         }

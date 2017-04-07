@@ -2,32 +2,39 @@ package com.vmware.scm.diff;
 
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
+import com.vmware.scm.Git;
 import com.vmware.scm.ScmType;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.String.format;
 
 /**
  * Converts a perforce diff to a git diff.
  */
 public class PerforceDiffToGitConverter {
 
+    private static final String NON_EXISTENT_INDEX_IN_GIT = "0000000000000000000000000000000000000000";
     private static final String[] VALUES_TO_IGNORE = new String[]{"Moved from", "Moved to"};
-    private List<String> depotPaths = new ArrayList<>();
+    private Set<String> depotPaths = new LinkedHashSet<>();
 
     private String diffText;
     private List<FileChange> fileChanges;
 
-    public String convert(String perforceDiff) {
+    public String convert(String perforceDiff, Git git) {
         ListIterator<String> lineIter = Arrays.asList(perforceDiff.split("\n")).listIterator();
         StringBuilder builder = new StringBuilder("");
-        Matcher minusMatcher = Pattern.compile("---\\s+.+\\s+(.+)#(\\d+)").matcher("");
+        Matcher minusMatcher = Pattern.compile("---\\s+.+\\t(.+)#(\\d+)").matcher("");
         fileChanges = new ArrayList<>();
         while (lineIter.hasNext()) {
             String line = lineIter.next();
@@ -40,13 +47,16 @@ public class PerforceDiffToGitConverter {
                 FileChange fileChange = determineFileChange(lineIter, minusMatcher);
                 fileChanges.add(fileChange);
                 builder.append(fileChange.diffGitLine()).append("\n");
+                if (fileChange.getChangeType() == FileChangeType.deleted) {
+                    String fileIndex = git.hashObject(new File(git.fullPath(fileChange.getLastFileAffected())));
+                    builder.append(format("index %s..%s", fileIndex, NON_EXISTENT_INDEX_IN_GIT)).append("\n");
+                }
                 builder.append(fileChange.createMinusPlusLines()).append("\n");
             } else {
                 builder.append(line).append("\n");
             }
         }
         diffText = builder.toString();
-        diffText = replacePathsWithLocalPaths(diffText);
         return diffText;
     }
 
@@ -70,23 +80,35 @@ public class PerforceDiffToGitConverter {
         return diffText;
     }
 
+    private String relativePath(String depotPath) {
+        int slashIndexAfterDepotPath = StringUtils.indexOrNthOccurence(depotPath, "/", 5);
+        if (slashIndexAfterDepotPath == -1) {
+            throw new RuntimeException("Expected to find depot path of format //depot/cloudName/branchName/ in depot path " + depotPath);
+        }
+        return depotPath.substring(slashIndexAfterDepotPath + 1);
+    }
+
     private FileChange determineFileChange(ListIterator<String> lineIter, Matcher minusMatcher) {
         String minusDepotPath = minusMatcher.group(1);
+        if (!minusDepotPath.startsWith("//")) {
+            throw new RuntimeException("Expected minus depot path to start with //\n" + minusDepotPath);
+        }
         FileChange fileChange = new FileChange(ScmType.git);
         int depotVersion = Integer.parseInt(minusMatcher.group(2));
-        String plusDepotPath = MatcherUtils.singleMatchExpected(lineIter.next(), "\\+\\+\\+\\s+(.+?)\\s+");
+        String plusDepotPath = MatcherUtils.singleMatchExpected(lineIter.next(), "\\+\\+\\+\\s+(.+?)\\t+");
         String[] linesInfo = determineLinesInfoForChange(lineIter);
         fileChange.setFileVersion(depotVersion);
         fileChange.setChangeType(determineChangeType(minusDepotPath, plusDepotPath, depotVersion, linesInfo));
         if (fileChange.getChangeType() == FileChangeType.added) {
             fileChange.setFileMode("100644");
         }
-        fileChange.addFileAffected(0, minusDepotPath);
-        fileChange.addFileAffected(1, plusDepotPath);
-        depotPaths.add(minusDepotPath);
         if (!plusDepotPath.equals(minusDepotPath)) {
-            depotPaths.add(plusDepotPath);
+            if (!plusDepotPath.startsWith("//")) {
+                throw new RuntimeException("Expected plus depot path to start with //\n" + plusDepotPath);
+            }
         }
+        fileChange.addFileAffected(0, relativePath(minusDepotPath));
+        fileChange.addFileAffected(1, relativePath(plusDepotPath));
         return fileChange;
     }
 

@@ -3,10 +3,7 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-public abstract class BaseBatchJiraAction extends BaseMultiActionDataSupport {
+public abstract class BaseBatchJiraAction extends BaseIssuesProcessingAction {
 
     protected Jira jira;
 

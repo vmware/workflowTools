@@ -54,7 +54,7 @@ public class LoadIssues extends BaseBatchJiraAction {
             return;
         }
 
-        multiActionData.reset();
+        projectIssues.reset();
         SearchRequest searchRequest = createSearchRequestForFullIssueInformation(backlogStories);
         if (searchRequest == null) {
             log.warn("No issues can be used as they have all been estimated and configuration does not include estimated stories");
@@ -70,7 +70,7 @@ public class LoadIssues extends BaseBatchJiraAction {
             log.warn("No issues can be used as they have all been estimated or have story points and configuration does not include estimated stories");
         }
 
-        multiActionData.projectName = selectedItem.label;
+        projectIssues.projectName = selectedItem.label;
 
         List<String> labels = getLabelsFromIssues(issues);
 
@@ -82,13 +82,13 @@ public class LoadIssues extends BaseBatchJiraAction {
             log.info("Please enter label to use");
             int selectedLabelIndex = InputUtils.readSelection(labels, "Jira Labels");
             String selectedLabel = labels.get(selectedLabelIndex);
-            multiActionData.addAllIssues(filterByLabel(issues, selectedLabel));
-            multiActionData.projectName += " (" + selectedLabel + ")";
+            projectIssues.addAllIssues(filterByLabel(issues, selectedLabel));
+            projectIssues.projectName += " (" + selectedLabel + ")";
         } else {
-            multiActionData.addAllIssues(issues);
+            projectIssues.addAllIssues(issues);
         }
 
-        List<Issue> issuesForProcessing = multiActionData.getIssuesForProcessing();
+        List<Issue> issuesForProcessing = projectIssues.getIssuesForProcessing();
         log.debug("Added {} issues for processing", issuesForProcessing.size());
         log.debug("Added issues\n{}", issuesForProcessing.toString());
     }

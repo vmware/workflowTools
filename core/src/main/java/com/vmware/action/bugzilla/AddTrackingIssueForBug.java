@@ -7,10 +7,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.input.InputUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Adds a Jira Issue to use for tracking a bugzill bug.")
 public class AddTrackingIssueForBug extends BaseBatchBugzillaAction {
 
@@ -32,7 +28,7 @@ public class AddTrackingIssueForBug extends BaseBatchBugzillaAction {
             }
         }
         Issue trackingIssue = createIssueFromBug(bug);
-        multiActionData.add(trackingIssue);
+        projectIssues.add(trackingIssue);
 
         log.info("A Jira Issue will be created in Jira Project {} to track bug {}: {}", config.defaultJiraProject,
                 trackingIssue.matchingBugzillaNumber(config.bugzillaUrl), bug.getSummary());

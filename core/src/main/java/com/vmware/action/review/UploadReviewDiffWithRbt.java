@@ -1,10 +1,7 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.CommandLineUtils;
-import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 
@@ -20,7 +17,7 @@ public class UploadReviewDiffWithRbt extends UploadReviewDiff {
 
     @Override
     protected void uploadReviewDiff() {
-        String repoType = draft.reviewRepoType;
+        String repoType = draft.repoType;
         File workingDirectory = new File(System.getProperty("user.dir"));
         if (repoType.contains("perforce")){
             String changelistId = determineChangelistIdToUse();

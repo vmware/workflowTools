@@ -6,9 +6,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.http.exception.NotFoundException;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Bulk update the story points for jira issues.")
@@ -20,7 +17,7 @@ public class UpdateStoryPointsOnly extends BaseBatchJiraAction {
 
     @Override
     public String cannotRunAction() {
-        if (multiActionData.getIssuesFromJira().isEmpty()) {
+        if (projectIssues.getIssuesFromJira().isEmpty()) {
             return "there are no issues loaded from Jira";
         }
         return super.cannotRunAction();
@@ -28,7 +25,7 @@ public class UpdateStoryPointsOnly extends BaseBatchJiraAction {
 
     @Override
     public void process() {
-        List<Issue> issuesFromJira = multiActionData.getIssuesFromJira();
+        List<Issue> issuesFromJira = projectIssues.getIssuesFromJira();
         log.info("Setting story points for {} issues", issuesFromJira.size());
 
         for (Issue issueToUpdate : issuesFromJira) {

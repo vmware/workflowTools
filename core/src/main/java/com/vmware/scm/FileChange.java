@@ -199,7 +199,7 @@ public class FileChange {
         }
     }
 
-    public String  diffGitLine() {
+    public String diffGitLine() {
         String aFile = getFirstFileAffected();
         String bFile = getLastFileAffected();
         String header = format("diff --git a/%s b/%s", aFile, bFile);

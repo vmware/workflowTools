@@ -30,7 +30,7 @@ public class LoadCompletedIssuesWithoutResolution extends BaseBatchJiraAction {
             log.info("No issues retrieved for user {} that are closed with no resolution", config.username);
         } else {
             log.info("Retrieved {} issues that are completed with no resolution", matchingIssues.size());
-            multiActionData.addAllIssues(matchingIssues);
+            projectIssues.addAllIssues(matchingIssues);
         }
     }
 

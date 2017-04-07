@@ -7,10 +7,6 @@ import com.vmware.trello.domain.Member;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Creates a trello board if the project name doesn't match an open trello board.")
 public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
 
@@ -21,7 +17,7 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
 
     @Override
     public void process() {
-        String boardName = multiActionData.projectName;
+        String boardName = projectIssues.projectName;
 
         if (StringUtils.isBlank(boardName)) {
             boardName = InputUtils.readValueUntilNotBlank("Enter trello board name");

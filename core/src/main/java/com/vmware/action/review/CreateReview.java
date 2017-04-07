@@ -7,9 +7,6 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Always creates a new review, even if there is an existing review url in the commit.")
 public class CreateReview extends BaseCommitAction {
     private ReviewBoard reviewBoard;
@@ -47,7 +44,7 @@ public class CreateReview extends BaseCommitAction {
 
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
-        draft.reviewRepoType = repository.tool.toLowerCase();
+        draft.repoType = repository.tool.toLowerCase();
         draft.id = String.valueOf(draft.reviewRequest.id);
         log.info("Created empty review {}", draft.id);
     }

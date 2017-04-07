@@ -2,7 +2,7 @@ package com.vmware;
 
 import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseMultiActionDataSupport;
+import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
@@ -11,7 +11,7 @@ import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowConfigParser;
-import com.vmware.jira.domain.MultiActionData;
+import com.vmware.jira.domain.ProjectIssues;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -220,7 +220,7 @@ public class Workflow {
     private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods) {
         log.info("Checking that each action value in the workflows is valid");
         ReviewRequestDraft draft = new ReviewRequestDraft();
-        MultiActionData multiActionData = new MultiActionData();
+        ProjectIssues projectIssues = new ProjectIssues();
         for (Class<? extends BaseAction> action : config.determineActions(StringUtils.join(config.workflows.keySet()))) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
             BaseAction actionObject = instantiateAction(action);
@@ -228,8 +228,8 @@ public class Workflow {
             if (actionObject instanceof BaseCommitAction) {
                 ((BaseCommitAction) actionObject).setDraft(draft);
             }
-            if (actionObject instanceof BaseMultiActionDataSupport) {
-                ((BaseMultiActionDataSupport) actionObject).setMultiActionData(multiActionData);
+            if (actionObject instanceof BaseIssuesProcessingAction) {
+                ((BaseIssuesProcessingAction) actionObject).setProjectIssues(projectIssues);
             }
             if (runAllHelperMethods) {
                 log.info("Running asyncSetup");
@@ -375,8 +375,8 @@ public class Workflow {
         if (action instanceof BaseCommitAction) {
             ((BaseCommitAction) action).setDraft(values.getDraft());
         }
-        if (action instanceof BaseMultiActionDataSupport) {
-            ((BaseMultiActionDataSupport) action).setMultiActionData(values.getMultiActionData());
+        if (action instanceof BaseIssuesProcessingAction) {
+            ((BaseIssuesProcessingAction) action).setProjectIssues(values.getProjectIssues());
         }
         if (action instanceof BaseTrelloAction) {
             ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());

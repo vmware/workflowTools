@@ -7,9 +7,6 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Only creates a new review if there is not an existing review url in the commit.")
 public class CreateReviewIfNeeded extends BaseCommitAction {
     private ReviewBoard reviewBoard;
@@ -44,7 +41,7 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
         log.info("Creating new review against repository {}", config.reviewBoardRepository);
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
-        draft.reviewRepoType = repository.tool.toLowerCase();
+        draft.repoType = repository.tool.toLowerCase();
         draft.id = String.valueOf(draft.reviewRequest.id);
         log.info("Created new review {}", draft.reviewRequest.id);
     }

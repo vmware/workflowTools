@@ -4,9 +4,7 @@ import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.DiffToUpload;
-import com.vmware.scm.Perforce;
 import com.vmware.scm.diff.GitDiffToPerforceConverter;
-import com.vmware.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
@@ -23,7 +21,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
     @Override
     public void process() {
-        String repoType = draft.reviewRepoType;
+        String repoType = draft.repoType;
         if (repoType.contains("perforce")) {
             if (!git.workingDirectoryIsInGitRepo()) { // in non git repo, run rbt
                 File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
@@ -43,7 +41,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     protected void uploadReviewDiff() {
-        String repoType = draft.reviewRepoType;
+        String repoType = draft.repoType;
         DiffToUpload diffToUpload;
         if (repoType.contains("perforce")) {
             diffToUpload = createPerforceReviewRequestDiffFromGit();

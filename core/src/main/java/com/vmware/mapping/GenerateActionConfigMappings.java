@@ -1,23 +1,23 @@
 package com.vmware.mapping;
 
-import com.vmware.util.logging.SimpleLogFormatter;
+import com.google.gson.Gson;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
-
-import com.google.gson.Gson;
 import com.vmware.util.MatcherUtils;
+import com.vmware.util.logging.SimpleLogFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,11 +160,14 @@ public class GenerateActionConfigMappings {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());
         globalLogger.setLevel(Level.INFO);
+
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Enumeration<URL> resources = loader.getResources("com");
 
         if (args.length == 0) {
             log.error("Module base directory not specified");

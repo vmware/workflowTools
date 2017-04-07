@@ -36,7 +36,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
             return "Jira is disabled by config property disableJira";
         }
 
-        if (multiActionData.noBugsAdded()) {
+        if (projectIssues.noBugsAdded()) {
             return "no bugs added";
         }
 
@@ -45,7 +45,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
 
     @Override
     public void process() {
-        for (Bug bug : multiActionData.getBugsForProcessing()) {
+        for (Bug bug : projectIssues.getBugsForProcessing()) {
             Integer bugId = Integer.parseInt(bug.getKey());
             Issue trackingIssue = getValidTrackingIssueForBug(bug);
 

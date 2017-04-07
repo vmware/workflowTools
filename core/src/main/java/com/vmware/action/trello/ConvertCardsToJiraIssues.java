@@ -37,7 +37,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
             return;
         }
 
-        multiActionData.reset();
+        projectIssues.reset();
 
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
 
@@ -60,7 +60,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
 
             for (Card cardToUpdate : cardsToUpdate) {
                 Issue issueToUpdate = convertCardToIssue(storyPointValue, cardToUpdate);
-                multiActionData.add(issueToUpdate);
+                projectIssues.add(issueToUpdate);
             }
         }
         padder.infoTitle();
