@@ -295,6 +295,15 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--latest-diff", help = "Always use latest diff from review request for patching")
     public boolean alwaysUseLatestDiff;
 
+    @ConfigurableProperty(commandLine = "--diff-file", help = "Diff file to load")
+    public String diffFilePath;
+
+    @ConfigurableProperty(commandLine = "--use-patch-command", help = "Use patch command to apply diff")
+    public boolean usePatchToApplyDiff;
+
+    @ConfigurableProperty(commandLine = "--patch-command", help = "Patch command to use to apply patch")
+    public String patchCommand;
+
     @ConfigurableProperty(commandLine = "--use-label", help = "Whether to use a jira label when creating a trello board")
     public boolean useJiraLabel;
 

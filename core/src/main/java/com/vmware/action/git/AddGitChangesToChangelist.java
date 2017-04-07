@@ -1,6 +1,5 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -24,6 +23,6 @@ public class AddGitChangesToChangelist extends BasePerforceCommitAction {
         }
 
         log.info("Moving changes to changelist {}", draft.perforceChangelistId);
-        perforce.moveAllOpenFilesToChangelist(draft.perforceChangelistId);
+        perforce.reopenAllOpenFilesInChangelist(draft.perforceChangelistId);
     }
 }

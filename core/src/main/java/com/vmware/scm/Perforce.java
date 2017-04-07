@@ -2,7 +2,6 @@ package com.vmware.scm;
 
 import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.CommandLineUtils;
-import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
@@ -156,11 +155,17 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("clean //...", INFO);
     }
 
-    public void moveAllOpenFilesToChangelist(String changelistId) {
+    public void reopenAllOpenFilesInChangelist(String changelistId) {
         executeScmCommand("reopen -c " + changelistId + " //...", INFO);
     }
 
-    public String moveFilesToChangelist(String changelistId, List<String> filePaths) {
+    public String reopen(String changelistId, String filePath) {
+        String output = executeScmCommand("reopen -c {} {}", changelistId, filePath);
+        exitIfExpectedTextNotPresent(output, "reopened; change " + changelistId, 1);
+        return output;
+    }
+
+    public String reopen(String changelistId, List<String> filePaths) {
         String output = executeScmCommand("reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
         exitIfExpectedTextNotPresent(output, "reopened; change " + changelistId, filePaths.size());
         return output;
@@ -435,7 +440,7 @@ public class Perforce extends BaseScmWrapper {
             }
         }
         if (!filesToMoveToChangelist.isEmpty()) {
-            moveFilesToChangelist(changelistId, filesToMoveToChangelist);
+            reopen(changelistId, filesToMoveToChangelist);
         }
         if (!filesToOpenForEdit.isEmpty()) {
             openForEdit(changelistId, appendWithDelimiter("", filesToOpenForEdit, " "));
@@ -447,6 +452,10 @@ public class Perforce extends BaseScmWrapper {
             FileChangeType changeType = diffChange.getChangeType();
             String fullPathForFirstFileAffected = fullPath(diffChange.getFirstFileAffected());
             String fullPathForLastFileAffected = fullPath(diffChange.getLastFileAffected());
+            if (StringUtils.isNotBlank(diffChange.getPerforceChangelistId()) && !changelistId.equals(diffChange.getPerforceChangelistId())) {
+                log.info("Reopening file {} from changelist {} in changelist {}", fullPathForLastFileAffected, diffChange.getPerforceChangelistId(), changelistId);
+                reopen(changelistId, fullPathForLastFileAffected);
+            }
             if (changeType == FileChangeType.renamed || changeType == FileChangeType.renamedAndModified) {
                 log.info("Renaming file {} to {}", diffChange.getFirstFileAffected(), diffChange.getLastFileAffected());
                 move(changelistId, fullPathForFirstFileAffected, fullPathForLastFileAffected, "-k");

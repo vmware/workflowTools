@@ -5,10 +5,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Creates a trello board. Uses the projectName if it is not blank. Otherwise asks user for name.")
 public class CreateTrelloBoard  extends BaseTrelloAction {
 
@@ -19,7 +15,7 @@ public class CreateTrelloBoard  extends BaseTrelloAction {
 
     @Override
     public void process() {
-        String boardName = multiActionData.projectName;
+        String boardName = projectIssues.projectName;
 
         if (StringUtils.isBlank(boardName)) {
             boardName = InputUtils.readValueUntilNotBlank("Enter trello board name");

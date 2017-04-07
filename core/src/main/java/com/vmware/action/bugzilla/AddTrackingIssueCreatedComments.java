@@ -6,9 +6,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Adds comment to bugs in Bugzilla with the url for the matching issue in Jira.")
@@ -20,7 +17,7 @@ public class AddTrackingIssueCreatedComments extends BaseBatchBugzillaAction {
 
     @Override
     public String cannotRunAction() {
-        List<Issue> issues = multiActionData.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
+        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
         if (issues.isEmpty()) {
             return "no matching issues found";
         }
@@ -29,7 +26,7 @@ public class AddTrackingIssueCreatedComments extends BaseBatchBugzillaAction {
 
     @Override
     public void process() {
-        List<Issue> issues = multiActionData.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
+        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
         for (Issue issue : issues) {
             int bugzillaId = issue.matchingBugzillaNumber(config.bugzillaUrl);
             Bug matchingBug = bugzilla.getBugByIdWithoutException(bugzillaId);

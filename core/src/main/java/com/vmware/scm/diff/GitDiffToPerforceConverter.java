@@ -2,6 +2,7 @@ package com.vmware.scm.diff;
 
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
+import com.vmware.scm.Git;
 import com.vmware.scm.Perforce;
 import com.vmware.scm.ScmType;
 import com.vmware.util.IOUtils;
@@ -235,7 +236,7 @@ public class GitDiffToPerforceConverter {
     public static void main(String[] args) {
         String diff = IOUtils.read(new File("/Users/dbiggs/Downloads/rb1030085.patch"));
         PerforceDiffToGitConverter converter = new PerforceDiffToGitConverter();
-        String diffText = converter.convert(diff);
+        String diffText = converter.convert(diff, new Git());
         System.out.println(diffText);
 
     }

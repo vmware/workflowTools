@@ -1,7 +1,6 @@
 package com.vmware.action.perforce;
 
 import com.vmware.action.base.BaseLinkedPerforceCommitAction;
-import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
@@ -14,6 +13,6 @@ public class MoveOpenFilesToPendingChangelist extends BaseLinkedPerforceCommitAc
     @Override
     public void process() {
         log.info("Moving all open files to changelist {}", draft.perforceChangelistId);
-        perforce.moveAllOpenFilesToChangelist(draft.perforceChangelistId);
+        perforce.reopenAllOpenFilesInChangelist(draft.perforceChangelistId);
     }
 }

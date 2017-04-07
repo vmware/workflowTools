@@ -64,13 +64,17 @@ public class Git extends BaseScmWrapper {
 
     public String applyDiff(String diffData, boolean check) {
         String checkString = check ? " --check" : "";
-        return executeScmCommand("apply -3{}", diffData, LogLevel.DEBUG, checkString);
+        return executeScmCommand("apply --ignore-whitespace -3{}", diffData, LogLevel.DEBUG, checkString);
     }
 
     public String diffTree(String fromRef, String ref, boolean binaryPatch, LogLevel level) {
         checkRefsAreValid(fromRef, ref);
         String binaryFlag = binaryPatch ? " --binary" : "";
         return executeScmCommand("diff-tree -M{} --full-index -U3 -p {} {}",level, binaryFlag, fromRef, ref) + "\n";
+    }
+
+    public String hashObject(File file) {
+        return executeScmCommand("hash-object {}", file.getPath());
     }
 
     public void catFile(String fromRef, String filePath, String toFilePath) {
@@ -91,7 +95,7 @@ public class Git extends BaseScmWrapper {
     public String applyDiffToPerforce(String rootDirectory, String diffData, boolean check) {
         exitIfNotInRepoRootFolder("apply must be run from the root folder " + getRootDirectory().getPath());
         String checkString = check ? " --check" : "";
-        String output = executeScmCommand("apply --directory={}{}", diffData, LogLevel.DEBUG, rootDirectory, checkString);
+        String output = executeScmCommand("apply --ignore-whitespace --directory={}{}", diffData, LogLevel.DEBUG, rootDirectory, checkString);
         if (StringUtils.isBlank(output)) {
             return output;
         }

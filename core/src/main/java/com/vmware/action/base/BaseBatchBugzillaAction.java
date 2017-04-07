@@ -6,10 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueTypeDefinition;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-public abstract class BaseBatchBugzillaAction extends BaseMultiActionDataSupport {
+public abstract class BaseBatchBugzillaAction extends BaseIssuesProcessingAction {
 
     protected Bugzilla bugzilla;
 

@@ -16,6 +16,7 @@
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 10,
   "goBuildBinPath": "/build/apps/bin/gobuild",
+  "patchCommand": "patch -f -p1 -s",
   "waitTimeForBlockingWorkflowAction": 1200,
   "buildwebProject": "vcloud",
   "buildwebBranch": "sp-main",
@@ -151,17 +152,23 @@
        "submitReview": [
           "readNonTrivialCommit", "SoftSubmitReview"
        ],
-       "applyPatchToExistingChangelist": [
-          "SelectExistingChangelist", "ApplyReviewPatch"
+       "applyPerforcePatch": [
+          "LoadPerforcePatchFile", "ApplyPatch"
        ],
-       "applyPatchToNewChangelist": [
-          "CreatePendingChangelistIfNeeded", "ApplyReviewPatch", "SetCommitDetailsFromReview", "AmendCommit"
+       "applyGitPatch": [
+           "LoadGitPatchFile", "ApplyPatch"
        ],
-       "applyPatchToGit": [
-          "SelectExistingChangelist", "ApplyReviewPatch"
+       "applyReviewPatch": [
+          "LoadReviewPatch", "ApplyPatch"
        ],
-       "applyPatchAsGitCommit": [
-          "ApplyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
+       "applyReviewPatchUsingPatch": [
+          "LoadReviewPatch", "ApplyPatch", "--use-patch-command"
+       ],
+       "applyReviewPatchToNewChangelist": [
+          "CreatePendingChangelistIfNeeded", "applyReviewPatch", "SetCommitDetailsFromReview", "AmendCommit"
+       ],
+       "applyReviewPatchAsGitCommit": [
+          "applyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
        ],
        "applyChangelistAsGitDiff": [
           "SelectExistingChangelist", "ApplyChangelistAsGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
@@ -324,7 +331,7 @@
        ]
    },
   "supportingWorkflows": [
-     "readNonTrivialCommit", "setCommitDetailsWithoutConfirmation", "selectAndConvertBoard",
+      "readNonTrivialCommit", "setCommitDetailsWithoutConfirmation", "selectAndConvertBoard",
       "prepareCommitForPush", "setCommitDetails", "setCommitDetailsOffline", "setReviewDetails"
   ]
 

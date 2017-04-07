@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.List;
 
 @ActionDescription("Bulk create Jira issues.")
@@ -19,7 +16,7 @@ public class CreateIssues extends BaseBatchJiraAction {
 
     @Override
     public String cannotRunAction() {
-        if (multiActionData.getIssuesNotInJira().isEmpty()) {
+        if (projectIssues.getIssuesNotInJira().isEmpty()) {
             return "there are no issues not loaded from Jira";
         }
         return super.cannotRunAction();
@@ -27,7 +24,7 @@ public class CreateIssues extends BaseBatchJiraAction {
 
     @Override
     public void process() {
-        List<Issue> issuesToCreate = multiActionData.getIssuesNotInJira();
+        List<Issue> issuesToCreate = projectIssues.getIssuesNotInJira();
         log.info("Creating {} issue[s]", issuesToCreate.size());
 
         Issue issueToBaseProjectAndComponentOff = null;
@@ -52,7 +49,7 @@ public class CreateIssues extends BaseBatchJiraAction {
     }
 
     private Issue getBaselineIssue() {
-        List<Issue> issuesFromJira = multiActionData.getIssuesFromJira();
+        List<Issue> issuesFromJira = projectIssues.getIssuesFromJira();
         if (issuesFromJira.isEmpty()) {
             throw new IllegalArgumentException("Expected to find issue in list that was already in Jira!");
         }

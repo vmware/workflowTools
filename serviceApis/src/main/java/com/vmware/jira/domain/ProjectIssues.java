@@ -9,15 +9,17 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents data needed across multiple actions.
+ * Represents project issues
  */
-public class MultiActionData {
+public class ProjectIssues {
 
     public String projectName;
 
     private List<Issue> issuesForProcessing = new OverwritableSet.UniqueArrayList<>();
 
     private List<Bug> bugsForProcessing = new OverwritableSet.UniqueArrayList<>();
+
+
 
     public void reset() {
         projectName = "";

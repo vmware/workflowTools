@@ -8,11 +8,7 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
-import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithReviewAction {
     protected ReviewBoard reviewBoard;
@@ -33,7 +29,7 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
         if (draft != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(draft.id));
             Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
-            draft.reviewRepoType = repository.tool.toLowerCase();
+            draft.repoType = repository.tool.toLowerCase();
         }
     }
 

@@ -33,7 +33,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
 
     @Override
     public void process() {
-        if (multiActionData.noIssuesAdded()) {
+        if (projectIssues.noIssuesAdded()) {
             log.info("No jira issues loaded. No need to create trello cards.");
             return;
         }
@@ -47,7 +47,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         Padder padder = new Padder("Adding cards for board {}", selectedBoard.name);
 
         padder.infoTitle();
-        List<Issue> issuesForProcessing = new ArrayList<Issue>(multiActionData.getIssuesForProcessing());
+        List<Issue> issuesForProcessing = new ArrayList<Issue>(projectIssues.getIssuesForProcessing());
         log.info("Processing {} issues", issuesForProcessing.size());
 
         List<Card> existingCards = new ArrayList<Card>(Arrays.asList(trello.getCardsForBoard(selectedBoard)));

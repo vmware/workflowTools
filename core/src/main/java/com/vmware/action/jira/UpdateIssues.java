@@ -17,7 +17,7 @@ public class UpdateIssues extends BaseBatchJiraAction {
 
     @Override
     public String cannotRunAction() {
-        if (multiActionData.getIssuesFromJira().isEmpty()) {
+        if (projectIssues.getIssuesFromJira().isEmpty()) {
             return "there are no issues loaded from Jira";
         }
         return super.cannotRunAction();
@@ -25,7 +25,7 @@ public class UpdateIssues extends BaseBatchJiraAction {
 
     @Override
     public void process() {
-        List<Issue> issuesFromJira = multiActionData.getIssuesFromJira();
+        List<Issue> issuesFromJira = projectIssues.getIssuesFromJira();
         log.info("Updating {} issues", issuesFromJira.size());
 
         for (Issue issueToUpdate : issuesFromJira) {

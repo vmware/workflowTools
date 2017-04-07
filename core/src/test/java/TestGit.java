@@ -2,6 +2,7 @@ import com.vmware.scm.FileChange;
 import com.vmware.scm.Git;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.CommitConfiguration;
+import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;

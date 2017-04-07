@@ -1,13 +1,13 @@
 package com.vmware.action.trello;
 
-import com.vmware.action.base.BaseMultiActionDataSupport;
+import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.util.logging.Padder;
 
-public abstract class BaseTrelloAction extends BaseMultiActionDataSupport {
+public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
 
     protected Trello trello;
 
