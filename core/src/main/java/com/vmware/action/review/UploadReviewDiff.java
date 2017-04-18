@@ -4,6 +4,7 @@ import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.DiffToUpload;
+import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.scm.diff.GitDiffToPerforceConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
@@ -21,8 +22,8 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
     @Override
     public void process() {
-        String repoType = draft.repoType;
-        if (repoType.contains("perforce")) {
+        RepoType repoType = draft.repoType;
+        if (repoType == RepoType.perforce) {
             if (!git.workingDirectoryIsInGitRepo()) { // in non git repo, run rbt
                 File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
                 uploadDiffUsingRbt(clientDirectory, draft.perforceChangelistId);
@@ -31,7 +32,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
                 checkThatPerforceConfigIsValid();
                 uploadReviewDiff();
             }
-        } else if (repoType.equals("git")) {
+        } else if (repoType == RepoType.git) {
             uploadReviewDiff();
         } else {
             log.info("No special support for repo type {}, just doing rbt post", repoType);
@@ -41,9 +42,9 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     protected void uploadReviewDiff() {
-        String repoType = draft.repoType;
+        RepoType repoType = draft.repoType;
         DiffToUpload diffToUpload;
-        if (repoType.contains("perforce")) {
+        if (repoType == RepoType.perforce) {
             diffToUpload = createPerforceReviewRequestDiffFromGit();
         } else {
             diffToUpload = createReviewRequestDiff();
@@ -105,8 +106,8 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         String mergeBase = git.mergeBase(config.trackingBranchPath(), "HEAD");
         GitDiffToPerforceConverter diffConverter = new GitDiffToPerforceConverter(serviceLocator.getPerforce(),
                 git.lastSubmittedChangelistInfo()[1]);
-        diff.path = diffConverter.convert(git.diff(config.parentBranchPath(), "HEAD", supportsDiffWithRenames));
-        diff.parent_diff_path = diffConverter.convert(git.diff(mergeBase, config.parentBranchPath(), supportsDiffWithRenames));
+        diff.path = diffConverter.convertAsBytes(git.diff(config.parentBranchPath(), "HEAD", supportsDiffWithRenames));
+        diff.parent_diff_path = diffConverter.convertAsBytes(git.diff(mergeBase, config.parentBranchPath(), supportsDiffWithRenames));
         return diff;
     }
 

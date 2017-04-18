@@ -7,6 +7,7 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 
@@ -29,7 +30,7 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
         if (draft != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(draft.id));
             Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
-            draft.repoType = repository.tool.toLowerCase();
+            draft.repoType = repository.getRepoType();
         }
     }
 

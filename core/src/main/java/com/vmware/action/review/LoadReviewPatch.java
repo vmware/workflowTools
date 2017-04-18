@@ -4,20 +4,11 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
-import com.vmware.scm.FileChange;
-import com.vmware.scm.Perforce;
-import com.vmware.scm.diff.GitDiffToPerforceConverter;
-import com.vmware.scm.diff.PerforceDiffToGitConverter;
-import com.vmware.util.IOUtils;
 import com.vmware.util.input.InputUtils;
-import com.vmware.util.logging.Padder;
-import com.vmware.util.StringUtils;
-
-import java.io.File;
-import java.util.List;
 
 @ActionDescription("Loads diff data for the specified review")
 public class LoadReviewPatch extends BaseCommitAction {
@@ -60,7 +51,7 @@ public class LoadReviewPatch extends BaseCommitAction {
             diffSelection = InputUtils.readSelection(diffs, "Select diff to apply");
         }
 
-        draft.repoType = repository.tool;
-        draft.draftDiffData = reviewBoard.getDiffData(diffs[diffSelection].getSelfLink());
+        draft.repoType = repository.getRepoType();
+        draft.draftPatchData = reviewBoard.getDiffData(diffs[diffSelection].getSelfLink());
     }
 }

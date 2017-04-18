@@ -30,7 +30,7 @@ import static java.lang.String.format;
 /**
  * Converts a git diff to the perforce diff format.
  */
-public class GitDiffToPerforceConverter {
+public class GitDiffToPerforceConverter implements DiffConverter {
 
     private static final String[] VALUES_TO_IGNORE = new String[]{"diff --git", "index ", "deleted file mode", "new file mode"};
     private static final Pattern depotFileInfoPattern = Pattern.compile("(.+)#(\\d+)");
@@ -54,12 +54,11 @@ public class GitDiffToPerforceConverter {
         this.lastSubmittedChangelist = lastSubmittedChangelist;
     }
 
-    public byte[] convert(String gitDiff) {
-        output = "";
+    public String convert(String gitDiff) {
         if (gitDiff == null) {
             return null;
         } else if (gitDiff.isEmpty()) {
-            return new byte[0];
+            return "";
         }
         depotFilesToCheck.clear();
         whereFilesToCheck.clear();
@@ -77,7 +76,13 @@ public class GitDiffToPerforceConverter {
 
         addPerforceDepotInfoForFiles();
         addDepotInfoToOutput();
-        return output.getBytes(Charset.forName("UTF-8"));
+        return output;
+    }
+
+    @Override
+    public byte[] convertAsBytes(String diffData) {
+        String convertedData = convert(diffData);
+        return convertedData != null ? convertedData.getBytes(Charset.forName("UTF-8")) : null;
     }
 
     public List<FileChange> getFileChanges() {
@@ -235,8 +240,8 @@ public class GitDiffToPerforceConverter {
 
     public static void main(String[] args) {
         String diff = IOUtils.read(new File("/Users/dbiggs/Downloads/rb1030085.patch"));
-        PerforceDiffToGitConverter converter = new PerforceDiffToGitConverter();
-        String diffText = converter.convert(diff, new Git());
+        PerforceDiffToGitConverter converter = new PerforceDiffToGitConverter(new Git());
+        String diffText = converter.convert(diff);
         System.out.println(diffText);
 
     }

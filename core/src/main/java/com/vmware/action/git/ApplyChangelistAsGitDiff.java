@@ -24,11 +24,11 @@ public class ApplyChangelistAsGitDiff extends BasePerforceCommitAction {
     @Override
     public void process() {
         String perforceDiff = perforce.diffChangelistInGitFormat(draft.perforceChangelistId, true, LogLevel.INFO);
-        String checkData = git.applyDiff(perforceDiff, true);
+        String checkData = git.applyPatch(perforceDiff, true);
         if (StringUtils.isNotBlank(checkData)) {
             throw new RuntimeException("Diff does not apply cleanly: " + checkData);
         }
-        String output = git.applyDiff(perforceDiff, false);
+        String output = git.applyPatch(perforceDiff, false);
         if (StringUtils.isNotBlank(output)) {
             log.info("Output from running git diff: {}", output);
         } else {

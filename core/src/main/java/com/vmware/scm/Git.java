@@ -62,9 +62,13 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("checkout -b {} {}", branchName, trackingBranch);
     }
 
-    public String applyDiff(String diffData, boolean check) {
+    public String applyPartialPatch(String patchData) {
+        return executeScmCommand("apply --ignore-whitespace -3 --reject", patchData, LogLevel.DEBUG);
+    }
+
+    public String applyPatch(String patchData, boolean check) {
         String checkString = check ? " --check" : "";
-        return executeScmCommand("apply --ignore-whitespace -3{}", diffData, LogLevel.DEBUG, checkString);
+        return executeScmCommand("apply --ignore-whitespace -3{}", patchData, LogLevel.DEBUG, checkString);
     }
 
     public String diffTree(String fromRef, String ref, boolean binaryPatch, LogLevel level) {

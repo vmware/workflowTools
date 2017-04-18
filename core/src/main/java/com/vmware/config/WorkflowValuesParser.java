@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +44,8 @@ public class WorkflowValuesParser {
             if (workflowValue.startsWith("-")) {
                 String[] configPieces = workflowValue.split("=");
                 // assuming that the config value is boolean if no value specified
-                String fieldValue = configPieces.length < 2 ? Boolean.TRUE.toString() : joinPieces(configPieces);
+                String fieldValue = configPieces.length < 2 ? Boolean.TRUE.toString() :
+                        StringUtils.join(Arrays.asList(configPieces), "=");
                 configValues.put(configPieces[0], fieldValue);
                 continue;
             }
@@ -53,9 +55,7 @@ public class WorkflowValuesParser {
                 continue;
             }
             boolean found = false;
-            List<String> allActionNames = new ArrayList<String>();
             for (Class<? extends BaseAction> action : workFlowActions) {
-                allActionNames.add(action.getSimpleName());
                 if (action.getSimpleName().equals(workflowValue)) {
                     actionClasses.add(action);
                     found = true;
@@ -79,17 +79,6 @@ public class WorkflowValuesParser {
 
     public List<String> getUnknownActions() {
         return unknownActions;
-    }
-
-    private String joinPieces(String[] configPieces) {
-        String configValue = "";
-        for (int i = 1; i < configPieces.length; i ++) {
-            if (!configValue.isEmpty()) {
-                configValue += "=";
-            }
-            configValue += configPieces[i];
-        }
-        return configValue;
     }
 
     public Collection<? extends String> calculateJenkinsParameterConfigValues() {

@@ -1,22 +1,15 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
-import com.vmware.scm.FileChangeType;
 import com.vmware.util.FileUtils;
-import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.regex.Matcher;
 
 @ActionDescription("Applies a diff for the selected changelist to the current git branch. Can be used to apply shelved changelists.")
 public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAction {
@@ -36,13 +29,13 @@ public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAc
         log.info("Generating git compatible diff for perforce changelist {}", changelistIdToUse);
         String diffData = perforce.diffChangelistInGitFormat(changelistIdToUse, true, LogLevel.TRACE);
 
-        String checkOutput = git.applyDiff(diffData, true);
+        String checkOutput = git.applyPatch(diffData, true);
         if (StringUtils.isNotBlank(checkOutput)) {
             log.debug("Failed diff\n{}" + diffData);
             throw new IllegalArgumentException("Check of git diff failed!\n" + checkOutput);
         }
         log.info("Check of diff succeeded, applying diff");
-        String applyOutput = git.applyDiff(diffData, false);
+        String applyOutput = git.applyPatch(diffData, false);
         if (StringUtils.isNotBlank(applyOutput)) {
             saveDiffAndThrowException(applyOutput, diffData);
         }
