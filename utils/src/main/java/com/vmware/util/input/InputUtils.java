@@ -19,11 +19,15 @@ public class InputUtils {
 
     private static final String MAX_LENGTH_INDICATOR = "*";
 
-    public static Integer readSelection(Collection<String> choices, String title) {
+    public static int readSelection(Collection<String> choices, String title) {
         return readSelection(choices.toArray(new String[choices.size()]), title);
     }
 
-    public static Integer readSelection(InputListSelection[] choices, String title) {
+    public static int readSelection(List<InputListSelection> choices, String title) {
+        return readSelection(choices.toArray(new InputListSelection[choices.size()]), title);
+    }
+
+    public static int readSelection(InputListSelection[] choices, String title) {
         String[] choiceTexts = new String[choices.length];
         for (int i = 0; i < choices.length; i++) {
             choiceTexts[i] = choices[i].getLabel();
@@ -31,7 +35,7 @@ public class InputUtils {
         return readSelection(choiceTexts, title);
     }
 
-    public static Integer readSelection(String[] choices, String title) {
+    public static int readSelection(String[] choices, String title) {
         if (choices == null || choices.length == 0) {
             throw new IllegalArgumentException("No " + title + " to select from");
         }

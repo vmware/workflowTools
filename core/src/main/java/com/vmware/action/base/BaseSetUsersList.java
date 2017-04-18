@@ -197,7 +197,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
             }
             ReviewUser reviewUser = ReviewUser.fromText(value);
             if (reviewUser == null) {
-                System.out.println("Null user for value " + value);
+                log.info("Null user for value " + value);
                 return super.bufferMatchesValue(buffer, value);
             }
             return super.bufferMatchesValue(buffer, value) || super.bufferMatchesValue(buffer, reviewUser.username)

@@ -27,8 +27,6 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         super.values.addAll(configMappings.allConfigValues());
     }
 
-
-
     @Override
     public int complete(final String buffer, final int cursor, final List<CharSequence> candidates) {
         if (argumentList == null || argumentList.getArguments().length == 0) {
@@ -36,8 +34,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         }
 
         String workflowString = argumentList.getArguments()[0];
-        WorkflowValuesParser valuesParser = null;
-        valuesParser = new WorkflowValuesParser(config.workflows, config.workFlowActions);
+        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config.workflows, config.workFlowActions);
         valuesParser.parse(workflowString.split(","));
         values.clear();
         valuesShownWhenNoBuffer.clear();
@@ -49,8 +46,6 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         valuesShownWhenNoBuffer.addAll(values);
         return super.complete(buffer, cursor, candidates);
     }
-
-
 
     @Override
     public void setArgumentList(ArgumentCompleter.ArgumentList argumentList) {

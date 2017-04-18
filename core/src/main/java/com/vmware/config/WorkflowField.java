@@ -50,6 +50,8 @@ public class WorkflowField {
             validValue = sourceValue;
         } else if (fieldType == IssueTypeDefinition[].class) {
             validValue = IssueTypeDefinition.fromValues(sourceValue.trim().split(","));
+        } else if (fieldType == ActionAfterFailedPatchCheck.class) {
+            validValue = ActionAfterFailedPatchCheck.fromValue(sourceValue);
         } else {
             log.error("Cannot set configuration property {} of type {} from git config value",
                     field.getName(), fieldType.getSimpleName());

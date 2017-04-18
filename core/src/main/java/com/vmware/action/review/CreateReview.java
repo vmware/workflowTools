@@ -4,6 +4,7 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 
@@ -44,7 +45,7 @@ public class CreateReview extends BaseCommitAction {
 
         draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
-        draft.repoType = repository.tool.toLowerCase();
+        draft.repoType = repository.getRepoType();
         draft.id = String.valueOf(draft.reviewRequest.id);
         log.info("Created empty review {}", draft.id);
     }

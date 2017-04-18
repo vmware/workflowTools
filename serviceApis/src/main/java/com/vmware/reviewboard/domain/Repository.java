@@ -10,4 +10,8 @@ public class Repository extends BaseEntity {
 
     public String tool;
 
+    public RepoType getRepoType() {
+        return tool != null ? RepoType.fromValue(tool.toLowerCase()) : null;
+    }
+
 }

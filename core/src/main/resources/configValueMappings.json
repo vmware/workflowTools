@@ -239,6 +239,7 @@
   "ApplyPatch": [
     "--perforce-client",
     "--username",
+    "--action-after-failed-patch-check",
     "--patch-command",
     "--use-patch-command"
   ],

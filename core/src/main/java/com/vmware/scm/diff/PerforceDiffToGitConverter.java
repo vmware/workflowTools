@@ -8,6 +8,7 @@ import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -22,7 +23,7 @@ import static java.lang.String.format;
 /**
  * Converts a perforce diff to a git diff.
  */
-public class PerforceDiffToGitConverter {
+public class PerforceDiffToGitConverter implements DiffConverter {
 
     private static final String NON_EXISTENT_INDEX_IN_GIT = "0000000000000000000000000000000000000000";
     private static final String[] VALUES_TO_IGNORE = new String[]{"Moved from", "Moved to"};
@@ -31,7 +32,13 @@ public class PerforceDiffToGitConverter {
     private String diffText;
     private List<FileChange> fileChanges;
 
-    public String convert(String perforceDiff, Git git) {
+    private Git git;
+
+    public PerforceDiffToGitConverter(Git git) {
+        this.git = git;
+    }
+
+    public String convert(String perforceDiff) {
         ListIterator<String> lineIter = Arrays.asList(perforceDiff.split("\n")).listIterator();
         StringBuilder builder = new StringBuilder("");
         Matcher minusMatcher = Pattern.compile("---\\s+.+\\t(.+)#(\\d+)").matcher("");
@@ -58,6 +65,12 @@ public class PerforceDiffToGitConverter {
         }
         diffText = builder.toString();
         return diffText;
+    }
+
+    @Override
+    public byte[] convertAsBytes(String diffData) {
+        String convertedData = convert(diffData);
+        return convertedData != null ? convertedData.getBytes(Charset.forName("UTF-8")) : null;
     }
 
     public String getDiffText() {
