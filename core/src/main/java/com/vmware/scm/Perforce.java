@@ -9,7 +9,7 @@ import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +26,7 @@ import static com.vmware.util.StringUtils.stripLinesStartingWith;
 import static com.vmware.util.logging.LogLevel.DEBUG;
 import static com.vmware.util.logging.LogLevel.INFO;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 /**
  * Wrapper around p4 commands
@@ -73,7 +74,7 @@ public class Perforce extends BaseScmWrapper {
         if (StringUtils.isBlank(changeListText)) {
             return Collections.emptyList();
         }
-        Iterator<String> changelistsIterator = Arrays.asList(changeListText.split("\n")).iterator();
+        Iterator<String> changelistsIterator = asList(changeListText.split("\n")).iterator();
         List<String> changeLists = new ArrayList<>();
         while (changelistsIterator.hasNext()) {
             String line = changelistsIterator.next();
@@ -161,13 +162,13 @@ public class Perforce extends BaseScmWrapper {
 
     public String reopen(String changelistId, String filePath) {
         String output = executeScmCommand("reopen -c {} {}", changelistId, filePath);
-        exitIfExpectedTextNotPresent(output, "reopened; change " + changelistId, 1);
+        exitIfExpectedTextNotPresent(output, asList("reopened; change " + changelistId, "nothing changed"), 1);
         return output;
     }
 
     public String reopen(String changelistId, List<String> filePaths) {
         String output = executeScmCommand("reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
-        exitIfExpectedTextNotPresent(output, "reopened; change " + changelistId, filePaths.size());
+        exitIfExpectedTextNotPresent(output, asList("reopened; change " + changelistId, "nothing changed"), filePaths.size());
         return output;
     }
 
@@ -178,7 +179,7 @@ public class Perforce extends BaseScmWrapper {
     public Map<String, String> getWhereDepotFileInfoForRelativePaths(List<String> filePaths) {
         String filePathTexts = appendWithDelimiter("", filePaths, " ");
         String[] whereFileOutput = executeScmCommand("where " + filePathTexts).split("\n");
-        return addMatchedValuesToMap(filePaths, Arrays.asList(whereFileOutput), whereDepotFileInfoPattern);
+        return addMatchedValuesToMap(filePaths, asList(whereFileOutput), whereDepotFileInfoPattern);
     }
 
     public String fstat(List<String> fileNames) {
@@ -492,16 +493,24 @@ public class Perforce extends BaseScmWrapper {
         return loggedIn;
     }
 
-    private void exitIfExpectedTextNotPresent(String output, String expectedText, int expectedCount) {
+    private void exitIfExpectedTextNotPresent(String output, Collection<String> expectedTextOptions, int expectedCount) {
         int matches = 0;
         int currentIndex = 0;
         while (matches++ < expectedCount) {
-            int matchIndex = output.indexOf(expectedText, currentIndex);
-            if (matchIndex == -1) {
-                throw new RuntimeException("Unexpected output from reopen command,"
-                        + expectedText + " text was not present\n" + output);
+            int matchIndex = -1;
+            String matchedText = "";
+            for (String expectedText : expectedTextOptions) {
+                matchIndex = output.indexOf(expectedText, currentIndex);
+                if (matchIndex != -1) {
+                    matchedText = expectedText;
+                    break;
+                }
             }
-            currentIndex = matchIndex + expectedText.length();
+            if (matchIndex == -1) {
+                throw new RuntimeException("Unexpected output from command, none of"
+                        + expectedTextOptions.toString() + " options were present\n" + output);
+            }
+            currentIndex = matchIndex + matchedText.length();
         }
     }
 
