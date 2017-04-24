@@ -2,6 +2,11 @@ package com.vmware.jira.domain;
 
 import com.google.gson.annotations.SerializedName;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.util.exception.RuntimeIOException;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 public class LoginInfo {
 
@@ -16,7 +21,11 @@ public class LoginInfo {
 
     public LoginInfo(UsernamePasswordCredentials credentials) {
         this.usernane = credentials.getUsername();
-        this.password = credentials.getPassword();
+        try {
+            this.password = URLEncoder.encode(credentials.getPassword(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeIOException(e);
+        }
         this.cookie = "true";
     }
 }
