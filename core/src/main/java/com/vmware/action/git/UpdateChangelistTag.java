@@ -21,13 +21,13 @@ public class UpdateChangelistTag extends BaseLinkedPerforceCommitUsingGitAction 
         List<String> existingTags = git.listTags();
         if (!existingTags.contains(expectedTagName)) {
             log.info("Creating tag {}", expectedTagName);
-            git.updateTag(expectedTagName, LogLevel.INFO);
+            git.updateTag(expectedTagName, LogLevel.DEBUG);
         } else {
             String existingRevision = git.revParse(expectedTagName);
             String headRevision = git.revParse("head");
             if (!headRevision.equals(existingRevision)) {
                 log.info("Updating {} from {} revision to {}", expectedTagName, existingRevision, headRevision);
-                git.updateTag(expectedTagName, LogLevel.INFO);
+                git.updateTag(expectedTagName, LogLevel.DEBUG);
             } else {
                 log.debug("{} already matches head revision", expectedTagName, headRevision);
             }
