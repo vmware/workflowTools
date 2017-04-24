@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,10 +41,11 @@ public class WorkflowValuesParser {
     public void parse(String[] workflowValues) {
         for (String workflowValue : workflowValues) {
             if (workflowValue.startsWith("-")) {
+                int equalsIndex = workflowValue.indexOf("=");
                 String[] configPieces = workflowValue.split("=");
+
                 // assuming that the config value is boolean if no value specified
-                String fieldValue = configPieces.length < 2 ? Boolean.TRUE.toString() :
-                        StringUtils.join(Arrays.asList(configPieces), "=");
+                String fieldValue = equalsIndex == -1 ? Boolean.TRUE.toString() : workflowValue.substring(equalsIndex + 1);
                 configValues.put(configPieces[0], fieldValue);
                 continue;
             }
