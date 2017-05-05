@@ -188,7 +188,11 @@ public class FileChange {
                 addFileAffected(0, value);
                 break;
             case "haveRev":
-                setFileVersion(Integer.parseInt(value));
+                if ("none".equalsIgnoreCase(value)) {
+                    setFileVersion(0);
+                } else if (StringUtils.isInteger(value)) {
+                    setFileVersion(Integer.parseInt(value));
+                }
                 break;
             case "type":
                 setFileType(value);
