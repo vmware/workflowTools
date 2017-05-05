@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 import static com.vmware.util.CommandLineUtils.executeCommand;
@@ -85,7 +86,29 @@ public abstract class BaseScmWrapper {
 
     String failOutputIfMissingText(String output, String expectedText) {
         if (!output.contains(expectedText)) {
-            throw new RuntimeException("Expcted to find text " + expectedText + " in output " + output);
+            throw new RuntimeException("Expected to find text " + expectedText + " in output " + output);
+        }
+        return output;
+    }
+
+    String failOutputIfMissingText(String output, Collection<String> expectedTextOptions, int expectedCount) {
+        int matches = 0;
+        int currentIndex = 0;
+        while (matches++ < expectedCount) {
+            int matchIndex = -1;
+            String matchedText = "";
+            for (String expectedText : expectedTextOptions) {
+                matchIndex = output.indexOf(expectedText, currentIndex);
+                if (matchIndex != -1) {
+                    matchedText = expectedText;
+                    break;
+                }
+            }
+            if (matchIndex == -1) {
+                throw new RuntimeException("Unexpected output from command, none of"
+                        + expectedTextOptions.toString() + " options were present\n" + output);
+            }
+            currentIndex = matchIndex + matchedText.length();
         }
         return output;
     }
