@@ -201,14 +201,6 @@ public class Workflow {
             log.error(e.getMessage());
             askForWorkflow();
             runWorkflow();
-        } catch (IllegalArgumentException iae) {
-            log.error(iae.getMessage());
-            if (log.isDebugEnabled()) {
-                log.debug(iae.getMessage(), iae);
-            } else if (log.isTraceEnabled()) {
-                log.trace(iae.getMessage(), iae);
-                iae.printStackTrace();
-            }
         }
     }
 
