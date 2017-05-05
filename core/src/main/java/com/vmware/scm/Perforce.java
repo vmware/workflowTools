@@ -9,7 +9,7 @@ import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -162,14 +162,12 @@ public class Perforce extends BaseScmWrapper {
 
     public String reopen(String changelistId, String filePath) {
         String output = executeScmCommand("reopen -c {} {}", changelistId, filePath);
-        exitIfExpectedTextNotPresent(output, asList("reopened; change " + changelistId, "nothing changed"), 1);
-        return output;
+        return failOutputIfMissingText(output, asList("reopened; change " + changelistId, "nothing changed"), 1);
     }
 
     public String reopen(String changelistId, List<String> filePaths) {
         String output = executeScmCommand("reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
-        exitIfExpectedTextNotPresent(output, asList("reopened; change " + changelistId, "nothing changed"), filePaths.size());
-        return output;
+        return failOutputIfMissingText(output, asList("reopened; change " + changelistId, "nothing changed"), filePaths.size());
     }
 
     public String getFileInfo(String filePath) {
@@ -367,7 +365,7 @@ public class Perforce extends BaseScmWrapper {
 
     public String move(String changelistId, String fromFileName, String toFileName, String extraFlags) {
         String output = executeScmCommand("move {} -c {} {} {}", extraFlags, changelistId, fromFileName, toFileName);
-        return failOutputIfMissingText(output, "moved from");
+        return failOutputIfMissingText(output, Arrays.asList("moved from", "already opened for move/delete"), 1);
     }
 
     public String add(String changelistId, String fileName) {
@@ -491,27 +489,6 @@ public class Perforce extends BaseScmWrapper {
 
     public boolean isLoggedIn() {
         return loggedIn;
-    }
-
-    private void exitIfExpectedTextNotPresent(String output, Collection<String> expectedTextOptions, int expectedCount) {
-        int matches = 0;
-        int currentIndex = 0;
-        while (matches++ < expectedCount) {
-            int matchIndex = -1;
-            String matchedText = "";
-            for (String expectedText : expectedTextOptions) {
-                matchIndex = output.indexOf(expectedText, currentIndex);
-                if (matchIndex != -1) {
-                    matchedText = expectedText;
-                    break;
-                }
-            }
-            if (matchIndex == -1) {
-                throw new RuntimeException("Unexpected output from command, none of"
-                        + expectedTextOptions.toString() + " options were present\n" + output);
-            }
-            currentIndex = matchIndex + matchedText.length();
-        }
     }
 
     private boolean changeSucceeded(String output) {
