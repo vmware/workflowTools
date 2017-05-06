@@ -2,6 +2,7 @@ package com.vmware.jira.domain;
 
 import com.vmware.util.StringUtils;
 import com.vmware.util.complexenum.ComplexEnum;
+import com.vmware.util.exception.InvalidDataException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +51,8 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
         List<IssueTypeDefinition> definitionList = new ArrayList<>();
         for (String value : values) {
             if (!StringUtils.isInteger(value)) {
-                throw new IllegalArgumentException("Issue definition type value " + value +
-                        " must be an integer.\nValid values are " + typesWithIntValues());
+                throw new InvalidDataException("Issue definition type value {} must be an integer." +
+                        "\nValid values are {}", value, typesWithIntValues());
             }
             definitionList.add(fromValue(Integer.parseInt(value)));
         }
@@ -64,8 +65,8 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
                 return definition;
             }
         }
-        throw new IllegalArgumentException("No Jira issue type matches int value " + value +
-                "\nValid values are " + typesWithIntValues());
+        throw new InvalidDataException("No Jira issue type matches int value {}\nValid values are {}",
+                String.valueOf(value), typesWithIntValues());
     }
 
     private static String typesWithIntValues() {

@@ -1,5 +1,6 @@
 package com.vmware.scm;
 
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import static com.vmware.util.CommandLineUtils.executeCommand;
+import static com.vmware.util.StringUtils.addArgumentsToValue;
 
 /**
  * Common functionality for both git and perforce wrappers can be put in this superclass.
@@ -29,7 +31,7 @@ public abstract class BaseScmWrapper {
 
     void setWorkingDirectory(File workingDirectory) {
         if (workingDirectory == null) {
-            throw new IllegalArgumentException("Cannot set null working directory for client "
+            throw new InvalidDataException("Cannot set null working directory for client "
                     + this.getClass().getSimpleName());
         }
         this.workingDirectory = workingDirectory;
@@ -37,7 +39,7 @@ public abstract class BaseScmWrapper {
 
     void setWorkingDirectory(String workingDirectoryPath) {
         if (workingDirectoryPath == null) {
-            throw new IllegalArgumentException("Cannot set null working directory path for client "
+            throw new InvalidDataException("Cannot set null working directory path for client "
                     + this.getClass().getSimpleName());
         }
         File directoryWithoutNormalizing = new File(workingDirectoryPath);
@@ -69,7 +71,7 @@ public abstract class BaseScmWrapper {
     }
 
     String executeScmCommand(Map<String, String> environmentVariables, String command, String inputText, LogLevel level, String... commandArguments) {
-        String expandedCommand = scmExecutablePath() + " " + expandCommand(command, commandArguments);
+        String expandedCommand = scmExecutablePath() + " " + addArgumentsToValue(command, commandArguments);
         log.debug("{} command {}", this.getClass().getSimpleName(), expandedCommand);
         String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, level);
         String commandCheckOutput = checkIfCommandFailed(output);
@@ -111,19 +113,6 @@ public abstract class BaseScmWrapper {
             currentIndex = matchIndex + matchedText.length();
         }
         return output;
-    }
-
-    private String expandCommand(String command, String... arguments) {
-        if (arguments.length == 0) {
-            return command;
-        }
-        for (String argument : arguments) {
-            if (argument == null) {
-                argument = "";
-            }
-            command = command.replaceFirst("\\{\\}", argument);
-        }
-        return command;
     }
 
     protected abstract String scmExecutablePath();

@@ -22,7 +22,6 @@ public class DisplayConfig extends BaseAction {
     @Override
     public void process() {
         log.info("Loaded config files {}", config.loadedConfigFiles);
-
         Padder titlePadder = new Padder("Workflow Configuration");
         titlePadder.infoTitle();
         List<String> specifiedPropertiesToDisplay = new ArrayList<>();

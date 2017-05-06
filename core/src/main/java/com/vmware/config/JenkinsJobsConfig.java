@@ -2,17 +2,14 @@ package com.vmware.config;
 
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameter;
-import com.vmware.util.StringUtils;
+import com.vmware.util.exception.InvalidDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.vmware.jenkins.domain.JobParameter.NO_USERNAME_PARAMETER;
 import static com.vmware.jenkins.domain.JobParameter.USERNAME_PARAM;
@@ -90,8 +87,8 @@ public class JenkinsJobsConfig {
         for (String param : params) {
             String[] paramPieces = param.split("=");
             if (paramPieces.length != 2) {
-                throw new IllegalArgumentException("Parameter " + param + " for job " + jobName
-                        + " should be of the format name=value");
+                throw new InvalidDataException(
+                        "Parameter {} for job {} should be of the format name=value", param, jobName);
             }
             parameters.add(new JobParameter(paramPieces[0], paramPieces[1]));
         }

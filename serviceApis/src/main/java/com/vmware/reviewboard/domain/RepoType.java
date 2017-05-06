@@ -1,5 +1,7 @@
 package com.vmware.reviewboard.domain;
 
+import com.vmware.util.exception.InvalidDataException;
+
 public enum RepoType {
     git,
     perforce;
@@ -14,7 +16,7 @@ public enum RepoType {
         } else if (value.contains("git")) {
             return git;
         } else {
-            throw new IllegalArgumentException("Repo type value " + value + " not supported");
+            throw new InvalidDataException("Repo type value {} not supported", value);
         }
     }
 }

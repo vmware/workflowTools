@@ -1,5 +1,6 @@
 package com.vmware.util;
 
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -121,7 +121,7 @@ public class CommandLineUtils {
                     }
                 }
                 if (!matchedText) {
-                    throw new IllegalArgumentException("Failed to match " + textsToWaitFor[i] + " in script output " + totalOutput);
+                    throw new InvalidDataException("Failed to match {} in script output {}", textsToWaitFor[i], totalOutput);
                 }
 
             }

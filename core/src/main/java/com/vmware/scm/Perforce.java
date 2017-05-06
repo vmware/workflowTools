@@ -4,6 +4,7 @@ import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
@@ -534,11 +535,11 @@ public class Perforce extends BaseScmWrapper {
     private String updateTemplateWithDescription(String perforceTemplate, String commitText, boolean filesExpected) {
         int descriptionIndex = perforceTemplate.indexOf("Description:");
         if (descriptionIndex == -1) {
-            throw new IllegalArgumentException("Failed to find Description: in perforce template:\n" + perforceTemplate);
+            throw new InvalidDataException("Failed to find Description: in perforce template:\n" + perforceTemplate);
         }
         int filesIndex = perforceTemplate.indexOf("Files:");
         if (filesIndex == -1 && filesExpected) {
-            throw new IllegalArgumentException("Failed to find Files: in perforce template, does the git commit have file changes?:\n" + perforceTemplate);
+            throw new InvalidDataException("Failed to find Files: in perforce template, does the git commit have file changes?:\n" + perforceTemplate);
         } else if (filesIndex == -1) {
             log.debug("No files detected");
             filesIndex = perforceTemplate.length();

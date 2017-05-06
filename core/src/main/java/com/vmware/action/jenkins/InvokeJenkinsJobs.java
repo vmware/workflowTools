@@ -8,14 +8,12 @@ import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.*;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -146,7 +144,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         if (sandboxBuild != null) {
             buildId = sandboxBuild.id();
             if (buildId == null) {
-                throw new IllegalArgumentException("No build number found in url " + sandboxBuild.url);
+                throw new InvalidDataException("No build number found in url " + sandboxBuild.url);
             }
         } else {
             buildId = InputUtils.readValueUntilNotBlank("Sandbox build number");
