@@ -1,5 +1,6 @@
 package com.vmware.config;
 
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 
@@ -27,7 +28,8 @@ public enum ActionAfterFailedPatchCheck implements InputListSelection {
         try {
             return ActionAfterFailedPatchCheck.valueOf(value);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Invalid value " + value + ". Valid values from actionAfterFailedPatchCheck are nothing, partial or usePatchCommand");
+            throw new InvalidDataException(
+                    "Invalid value {}. Valid values from actionAfterFailedPatchCheck are nothing, partial or usePatchCommand", value);
         }
     }
 

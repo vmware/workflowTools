@@ -99,6 +99,19 @@ public class StringUtils {
         return newValue;
     }
 
+    public static String addArgumentsToValue(String value, String... arguments) {
+        if (arguments.length == 0) {
+            return value;
+        }
+        for (String argument : arguments) {
+            if (argument == null) {
+                argument = "";
+            }
+            value = value.replaceFirst("\\{\\}", argument);
+        }
+        return value;
+    }
+
     public static String join(Collection<String> values) {
         return join(values, ",");
     }

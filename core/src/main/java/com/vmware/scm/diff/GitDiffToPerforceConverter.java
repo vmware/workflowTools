@@ -4,10 +4,10 @@ import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
 import com.vmware.scm.Git;
 import com.vmware.scm.Perforce;
-import com.vmware.scm.ScmType;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.InvalidDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,7 @@ public class GitDiffToPerforceConverter implements DiffConverter {
         for (String depotFileToCheck : depotMappings.keySet()) {
             String depotMapping = depotMappings.get(depotFileToCheck);
             if (depotMapping == null) {
-                throw new IllegalArgumentException("No depot mapping for file " + depotFileToCheck);
+                throw new InvalidDataException("No depot mapping for file " + depotFileToCheck);
             }
             String version = depotVersions.get(depotMapping);
             output = output.replace("[!!" + depotFileToCheck + "#0!!]", depotMapping + "#" + version);
@@ -151,8 +151,8 @@ public class GitDiffToPerforceConverter implements DiffConverter {
             linesIterator.next();
             String renamedDiffFile = MatcherUtils.singleMatchExpected(linesIterator.next(), "\\+\\+\\+\\s+b/(.+)");
             if (!renameToFile.equals(renamedDiffFile)) {
-                throw new IllegalArgumentException(
-                        format("Expected renamed to file [%s] name to match +++ b/ file name[%s]", renameToFile, renamedDiffFile));
+                throw new InvalidDataException(
+                        "Expected renamed to file [{}] name to match +++ b/ file name[{}]", renameToFile, renamedDiffFile);
             }
             fileChanges.add(new FileChange(git, FileChangeType.renamedAndModified, renameFromFile, renameToFile));
             return format("Moved from: [!!%s!!]\nMoved to: [!!%s!!]\n%s\n%s", renameFromFile, renameToFile,

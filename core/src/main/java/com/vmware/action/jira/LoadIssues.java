@@ -14,6 +14,7 @@ import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 
@@ -75,7 +76,7 @@ public class LoadIssues extends BaseBatchJiraAction {
         List<String> labels = getLabelsFromIssues(issues);
 
         if (config.useJiraLabel && labels.size() == 0) {
-            throw new IllegalArgumentException("Use jira label is set to true but none of the issues have labels");
+            throw new InvalidDataException("Use jira label is set to true but none of the issues have labels");
         }
 
         if (config.useJiraLabel) {

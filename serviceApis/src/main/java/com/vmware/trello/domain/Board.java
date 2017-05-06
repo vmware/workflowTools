@@ -2,6 +2,7 @@ package com.vmware.trello.domain;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.StringUtils;
 
@@ -83,6 +84,6 @@ public class Board implements InputListSelection {
                 return boardMember;
             }
         }
-        throw new IllegalArgumentException("No owner found for board " + name);
+        throw new InvalidDataException("No owner found for board " + name);
     }
 }

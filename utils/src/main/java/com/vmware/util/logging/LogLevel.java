@@ -1,5 +1,7 @@
 package com.vmware.util.logging;
 
+import com.vmware.util.exception.InvalidDataException;
+
 import java.util.logging.Level;
 
 /**
@@ -29,6 +31,6 @@ public enum LogLevel {
                 return logLevel;
             }
         }
-        throw new IllegalArgumentException("No log level found for level " + level.getName());
+        throw new InvalidDataException("No log level found for level " + level.getName());
     }
 }

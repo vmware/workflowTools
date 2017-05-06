@@ -1,7 +1,7 @@
 package com.vmware.config;
 
 import com.vmware.util.ArrayUtils;
-import com.vmware.util.StringUtils;
+import com.vmware.util.exception.InvalidDataException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Parsed command line arguments.
@@ -77,8 +76,8 @@ public class CommandLineArgumentsParser {
         for (String key : possibleMatchingValues) {
             if (argumentMap.containsKey(key)) {
                 if (foundKey != null) {
-                    throw new IllegalArgumentException(
-                            String.format("Both %s and %s command line arguments found, only one should be set", foundKey, key));
+                    throw new InvalidDataException(
+                            "Both {} and {} command line arguments found, only one should be set", foundKey, key);
                 }
                 foundKey = key;
             }
@@ -94,7 +93,7 @@ public class CommandLineArgumentsParser {
 
         String argumentValue = argumentMap.get(matchingArgumentKey);
         if (argumentValue == null) {
-            throw new IllegalArgumentException("Command line argument " + matchingArgumentKey + " did not specify a value");
+            throw new InvalidDataException("Command line argument {} did not specify a value", matchingArgumentKey);
         }
         return argumentValue;
     }
@@ -105,7 +104,7 @@ public class CommandLineArgumentsParser {
         String argValue = getArgument(NO_DEFAULT, possibleMatchingValues);
 
         if (argValue == null) {
-            throw new IllegalArgumentException("Expected to find match for config names " + Arrays.toString(possibleMatchingValues));
+            throw new InvalidDataException("Expected to find match for config names " + Arrays.toString(possibleMatchingValues));
         }
         return argValue;
     }
@@ -145,7 +144,7 @@ public class CommandLineArgumentsParser {
             for (UnrecognizedCommandLineArgument unrecognizedArgument : unrecognizedArguments) {
                 errorMessage += "\n" + unrecognizedArgument.toString() + "\n";
             }
-            throw new IllegalArgumentException(errorMessage);
+            throw new InvalidDataException(errorMessage);
         }
     }
 

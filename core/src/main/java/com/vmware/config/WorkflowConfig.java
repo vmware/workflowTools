@@ -13,6 +13,7 @@ import com.vmware.util.CommandLineUtils;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -353,8 +354,8 @@ public class WorkflowConfig {
                     continue;
                 }
                 if (usedParams.contains(param)) {
-                    throw new RuntimeException(
-                            String.format("Config flag %s has already been set to configure another property", param));
+                    throw new InvalidDataException(
+                            "Config flag {} has already been set to configure another property", param);
                 }
                 usedParams.add(param);
             }
@@ -441,10 +442,10 @@ public class WorkflowConfig {
                 String valueByGitConfig = configValues.get(gitConfigPropertyName);
                 String valueByWorkflowProperty = configValues.get(workflowConfigPropertyName);
                 if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByGitConfig)) {
-                    throw new IllegalArgumentException("Property " + field.getName() + " has value " + valueByGitConfig
-                            + " specified by the git config property " + gitConfigPropertyName + " but has value "
-                            + valueByWorkflowProperty + " specified by the workflow property " + workflowConfigPropertyName
-                            + " please remove one of the properties");
+                    throw new InvalidDataException("Property {} has value {} specified by the git config property {}" +
+                            " but has value {} specified by the workflow property {}, please remove one of the properties",
+                            field.getName(), valueByGitConfig, gitConfigPropertyName, valueByWorkflowProperty,
+                            workflowConfigPropertyName);
                 }
                 sourceConfigProperty = valueByGitConfig != null ? gitConfigPropertyName : workflowConfigPropertyName;
                 valueToSet = valueByGitConfig != null ? valueByGitConfig : valueByWorkflowProperty;

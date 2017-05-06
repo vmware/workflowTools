@@ -5,6 +5,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.logging.Padder;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         }
 
         if (selectedBoard == null) {
-            throw new IllegalArgumentException
+            throw new InvalidDataException
                     ("No trello board has been loaded or created. Add a CreateTrelloBoard or SelectTrelloBoard actions.");
 
         }

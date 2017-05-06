@@ -20,6 +20,7 @@ import com.vmware.util.ReflectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
@@ -201,6 +202,12 @@ public class Workflow {
             log.error(e.getMessage());
             askForWorkflow();
             runWorkflow();
+        } catch (InvalidDataException iie) {
+            if (log.isDebugEnabled()) {
+                throw iie;
+            } else {
+                log.error(iie.getMessage());
+            }
         }
     }
 
