@@ -121,6 +121,9 @@
   "UpdateReviewDetails": [
     "--groups"
   ],
+  "UploadReviewDiffWithRbt": [
+    "--username"
+  ],
   "CreateReviewIfNeeded": [
     "--username",
     "--reviewboard-url",
@@ -205,8 +208,8 @@
   "UploadReviewDiff": [
     "--parent",
     "--tracking-branch",
-    "--username",
-    "--perforce-client"
+    "--perforce-client",
+    "--username"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",

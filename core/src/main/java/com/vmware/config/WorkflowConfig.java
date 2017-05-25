@@ -8,6 +8,7 @@ import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.jira.domain.IssueTypesDefinitionMapper;
 import com.vmware.scm.Git;
+import com.vmware.scm.Perforce;
 import com.vmware.util.ArrayUtils;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.CommitConfiguration;
@@ -500,6 +501,18 @@ public class WorkflowConfig {
             this.username = gitUserEmail.substring(0, gitUserEmail.indexOf("@"));
             log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
             overriddenConfigSources.put("username", "Git user.email");
+        }
+    }
+
+    public void parseUsernameFromPerforceIfBlank() {
+        if (StringUtils.isNotBlank(username)) {
+            return;
+        }
+        Perforce perforce = new Perforce(System.getProperty("user.dir"));
+        if (perforce.isLoggedIn()) {
+            this.username = perforce.getUsername();
+            log.info("No username set, using perforce user {} as username", username);
+            overriddenConfigSources.put("username", "Perforce user");
         }
     }
 

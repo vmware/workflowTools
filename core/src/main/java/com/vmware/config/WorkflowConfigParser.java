@@ -84,6 +84,7 @@ public class WorkflowConfigParser {
         log.debug("Loaded config files: {}", internalConfig.loadedConfigFiles);
 
         internalConfig.parseUsernameFromGitEmailIfBlank();
+        internalConfig.parseUsernameFromPerforceIfBlank();
         internalConfig.parseUsernameFromWhoamIIfBlank();
 
         log.trace("Workflow Config\n{}", gson.toJson(internalConfig));
