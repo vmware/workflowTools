@@ -26,7 +26,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         if (repoType == RepoType.perforce) {
             if (!git.workingDirectoryIsInGitRepo()) { // in non git repo, run rbt
                 File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
-                uploadDiffUsingRbt(clientDirectory, draft.perforceChangelistId);
+                uploadDiffUsingRbt(clientDirectory, config.username, draft.perforceChangelistId);
             } else {
                 // assuming need to create perforce compatible diff from git
                 checkThatPerforceConfigIsValid();
@@ -37,7 +37,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         } else {
             log.info("No special support for repo type {}, just doing rbt post", repoType);
             File workingDirectory = new File(System.getProperty("user.dir"));
-            uploadDiffUsingRbt(workingDirectory, null);
+            uploadDiffUsingRbt(workingDirectory, config.username, null);
         }
     }
 
@@ -60,9 +60,10 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         log.info("Successfully uploaded review diff");
     }
 
-    protected void uploadDiffUsingRbt(File workingDirectory, String changelistId) {
+    protected void uploadDiffUsingRbt(File workingDirectory, String username, String changelistId) {
         String changelistIdText = changelistId != null ? " " + changelistId : "";
-        String command = format("rbt post -r %s%s", draft.id, changelistIdText);
+        String usernameParameter = "--username=" + username;
+        String command = format("rbt post %s -r %s%s", usernameParameter, draft.id, changelistIdText);
         runRbtCommand(workingDirectory, command);
     }
 

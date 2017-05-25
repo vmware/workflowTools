@@ -143,8 +143,8 @@ public class FileChange {
             case "xtext":
             case "kxtext":
             case "xbinary":
-            case "ctext":
-            case "ltext":
+            case "cxtext":
+            case "xltext":
             case "uxbinary":
             case "xtempobj":
             case "xunicode":
@@ -152,10 +152,11 @@ public class FileChange {
                 fileMode = "100755";
                 break;
             case "text":
+            case "text+k":
             case "ktext":
             case "binary":
-            case "cxtext":
-            case "xltext":
+            case "ctext":
+            case "ltext":
             case "ubinary":
             case "tempobj":
                 fileMode = "100644";
@@ -164,7 +165,7 @@ public class FileChange {
                 fileMode = "120000";
                 break;
             default:
-                log.warn("Unrecognized file type {}, setting file mode to 100644", fileType);
+                log.warn("Unrecognized file type {}, setting file mode to default value 100644", fileType);
                 fileMode = "100644";
         }
     }

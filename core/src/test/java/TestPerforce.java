@@ -23,7 +23,9 @@ public class TestPerforce {
 
     @Test
     public void canDetermineClientName() {
-        perforce = new Perforce("dbiggs", null, "/Users/dbiggs/p4-sp-main/");
+        perforce = new Perforce("/Users/dbiggs/p4-sp-main/");
+        assertTrue(perforce.isLoggedIn());
+        assertEquals("dbiggs", perforce.getUsername());
         assertEquals("dbiggs-vcloud-sp-main", perforce.getClientName());
     }
 

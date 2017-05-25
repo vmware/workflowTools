@@ -2,11 +2,13 @@ package com.vmware.scm;
 
 import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.CommandLineUtils;
+import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.InvalidDataException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
+import sun.misc.Perf;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,12 +43,24 @@ public class Perforce extends BaseScmWrapper {
 
     private boolean loggedIn;
 
+    public Perforce(String clientDirectory) {
+        this(null, null, clientDirectory);
+    }
+
     public Perforce(String username, String clientName, String clientDirectory) {
         super(ScmType.perforce);
+        if (!CommandLineUtils.isCommandAvailable("p4")) {
+            super.setWorkingDirectory(workingDirectory);
+            return;
+        }
         this.username = username;
-        this.loggedIn = checkIfLoggedIn();
+        String perforceUser = checkIfLoggedIn();
+        this.loggedIn = perforceUser != null;
         if (!loggedIn) {
             return;
+        }
+        if (StringUtils.isBlank(this.username)) {
+            this.username = perforceUser;
         }
         if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {
             this.clientName = clientName;
@@ -56,14 +70,17 @@ public class Perforce extends BaseScmWrapper {
             super.setWorkingDirectory(determineClientDirectoryForClientName());
         } else if (StringUtils.isNotBlank(clientDirectory)) {
             super.setWorkingDirectory(clientDirectory);
-        } else if (CommandLineUtils.isCommandAvailable("p4")) {
+        } else {
             Map<String, String> infoValues = info();
             this.clientName = infoValues.get("Client name");
             String workingDirectory = infoValues.containsKey("Client root") ? infoValues.get("Client root") : System.getProperty("user.dir");
             super.setWorkingDirectory(workingDirectory);
-        } else {
-            super.setWorkingDirectory(workingDirectory);
         }
+    }
+
+    private String loggedInUser() {
+
+        return null;
     }
 
     public List<String> getPendingChangelists() {
@@ -492,6 +509,10 @@ public class Perforce extends BaseScmWrapper {
         return loggedIn;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     private boolean changeSucceeded(String output) {
         if (output.contains("Error in change specification")) {
             log.error("Failed to apply change\n{}\n", output);
@@ -501,15 +522,18 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    private boolean checkIfLoggedIn() {
+    private String checkIfLoggedIn() {
         Process statusProcess = CommandLineUtils.executeCommand(workingDirectory, null, "p4 login -s", (String) null);
-        int exitValue;
         try {
-            exitValue = statusProcess.waitFor();
+            String output = IOUtils.read(statusProcess.getInputStream());
+            int exitValue = statusProcess.waitFor();
+            if (exitValue != 0) {
+                return null;
+            }
+            return MatcherUtils.singleMatchExpected(output, "User\\s(\\w+)\\s+ticket");
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return exitValue == 0;
     }
 
     private String determineClientDirectoryForClientName() {
@@ -563,7 +587,5 @@ public class Perforce extends BaseScmWrapper {
             values.put(sourceValues.get(i), matcher.group(1));
         }
         return values;
-
     }
-
 }

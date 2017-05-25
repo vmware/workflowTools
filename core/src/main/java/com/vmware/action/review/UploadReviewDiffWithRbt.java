@@ -22,10 +22,10 @@ public class UploadReviewDiffWithRbt extends UploadReviewDiff {
         File workingDirectory = new File(System.getProperty("user.dir"));
         if (repoType == RepoType.perforce){
             String changelistId = determineChangelistIdToUse();
-            uploadDiffUsingRbt(workingDirectory, changelistId);
+            uploadDiffUsingRbt(workingDirectory, config.username, changelistId);
         } else {
             // don't specify changelist id as working with non perforce repo
-            uploadDiffUsingRbt(workingDirectory, null);
+            uploadDiffUsingRbt(workingDirectory, config.username, null);
         }
     }
 }
