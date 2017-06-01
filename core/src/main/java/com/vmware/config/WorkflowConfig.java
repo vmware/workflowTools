@@ -312,6 +312,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--use-label", help = "Whether to use a jira label when creating a trello board")
     public boolean useJiraLabel;
 
+    @ConfigurableProperty(commandLine = "--use-fix-version", help = "Whether to use a jira fix by version when creating a trello board")
+    public boolean useFixVersion;
+
     @ConfigurableProperty(commandLine = "-kmc,--keep-missing-cards", help = "Whether to not delete existing cards in Trello that do not match a loaded Jira issue")
     public boolean keepMissingCards;
 

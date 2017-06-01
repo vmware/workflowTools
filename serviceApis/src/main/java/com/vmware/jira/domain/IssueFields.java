@@ -18,6 +18,9 @@ public class IssueFields {
     @Expose(serialize = false)
     public String[] labels;
 
+    @Expose(serialize = false)
+    public FixVersion[] fixVersions;
+
     public JiraUser assignee;
 
     @Expose(serialize = false)
