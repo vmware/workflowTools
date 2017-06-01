@@ -8,6 +8,7 @@ package com.vmware.action.jira;
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jira.domain.FixVersion;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueTypeDefinition;
 import com.vmware.jira.domain.MenuItem;
@@ -74,20 +75,41 @@ public class LoadIssues extends BaseBatchJiraAction {
         projectIssues.projectName = selectedItem.label;
 
         List<String> labels = getLabelsFromIssues(issues);
+        List<String> fixByVersions = getFixByVersionsFromIssues(issues);
+
 
         if (config.useJiraLabel && labels.size() == 0) {
             throw new InvalidDataException("Use jira label is set to true but none of the issues have labels");
         }
 
+        if (config.useFixVersion && fixByVersions.size() == 0) {
+            throw new InvalidDataException("Use fix by version is set to true but none of the issues have fix by versions");
+        }
+
+        String additionalInfo = "";
+
         if (config.useJiraLabel) {
             log.info("Please enter label to use");
             int selectedLabelIndex = InputUtils.readSelection(labels, "Jira Labels");
             String selectedLabel = labels.get(selectedLabelIndex);
-            projectIssues.addAllIssues(filterByLabel(issues, selectedLabel));
-            projectIssues.projectName += " (" + selectedLabel + ")";
-        } else {
-            projectIssues.addAllIssues(issues);
+            issues = filterByLabel(issues, selectedLabel);
+            additionalInfo = selectedLabel;
         }
+
+        if (config.useFixVersion) {
+            log.info("Please enter fix by version to use");
+            int selectedIndex = InputUtils.readSelection(fixByVersions, "Jira Fix By Versions");
+            String selectedFixByVersion = fixByVersions.get(selectedIndex);
+            issues = filterByFixByVersion(issues, selectedFixByVersion);
+            if (!additionalInfo.isEmpty()) {
+                additionalInfo += ",";
+            }
+            additionalInfo += selectedFixByVersion;
+        }
+        if (!additionalInfo.isEmpty()) {
+            projectIssues.projectName += "(" + additionalInfo + ")";
+        }
+        projectIssues.addAllIssues(issues);
 
         List<Issue> issuesForProcessing = projectIssues.getIssuesForProcessing();
         log.debug("Added {} issues for processing", issuesForProcessing.size());
@@ -115,7 +137,7 @@ public class LoadIssues extends BaseBatchJiraAction {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.jql = jqlQuery;
         searchRequest.maxResults = backlogStories.size();
-        searchRequest.fields = new String[] {"summary","description","assignee","status","issuetype", "labels","customfield_10062","customfield_10100"};
+        searchRequest.fields = new String[] {"summary","description","assignee","status", "fixVersions","issuetype", "labels","customfield_10062","customfield_10100"};
         return searchRequest;
     }
 
@@ -153,7 +175,21 @@ public class LoadIssues extends BaseBatchJiraAction {
             labels.addAll(Arrays.asList(issue.fields.labels));
         }
 
-        return new ArrayList<String>(labels);
+        return new ArrayList<>(labels);
+    }
+
+    private List<String> getFixByVersionsFromIssues(List<Issue> issues) {
+        Set<String> labels = new HashSet<String>();
+        for (Issue issue : issues) {
+            if (issue.fields.fixVersions == null) {
+                continue;
+            }
+            for (FixVersion fixVersion : issue.fields.fixVersions) {
+                labels.add(fixVersion.name);
+            }
+        }
+
+        return new ArrayList<>(labels);
     }
 
     private List<Issue> filterByLabel(List<Issue> issues, String label) {
@@ -161,6 +197,17 @@ public class LoadIssues extends BaseBatchJiraAction {
 
         for (Issue issue : issues) {
             if (issue.hasLabel(label)) {
+                filteredIssues.add(issue);
+            }
+        }
+        return filteredIssues;
+    }
+
+    private List<Issue> filterByFixByVersion(List<Issue> issues, String version) {
+        List<Issue> filteredIssues = new ArrayList<Issue>();
+
+        for (Issue issue : issues) {
+            if (issue.hasFixVersion(version)) {
                 filteredIssues.add(issue);
             }
         }

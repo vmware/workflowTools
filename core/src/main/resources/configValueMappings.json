@@ -156,6 +156,7 @@
     "--git-remote"
   ],
   "LoadIssues": [
+    "--use-fix-version",
     "--use-label",
     "--include-estimated",
     "--include-sprint-stories",

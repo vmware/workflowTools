@@ -277,6 +277,9 @@
        "createTrelloBoardFromLabel": [
           "createTrelloBoard", "--use-label"
        ],
+       "createTrelloBoardFromFixVersion": [
+          "createTrelloBoard", "--use-fix-version"
+       ],
        "createTrelloBoardWithAllStoriesFromLabel": [
           "createTrelloBoard", "--use-label", "--include-sprint-stories"
        ],
