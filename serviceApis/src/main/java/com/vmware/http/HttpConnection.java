@@ -228,7 +228,9 @@ public class HttpConnection {
     }
 
     private void addCookiesHeader(String host) {
-        activeConnection.setRequestProperty("Cookie", cookieFileStore.toCookieRequestText(host, useSessionCookies));
+        String cookieHeaderValue = cookieFileStore.toCookieRequestText(host, useSessionCookies);
+        log.trace("Cookie header {}", cookieHeaderValue);
+        activeConnection.setRequestProperty("Cookie", cookieHeaderValue);
     }
 
     private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) {

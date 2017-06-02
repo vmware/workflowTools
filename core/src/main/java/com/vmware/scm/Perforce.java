@@ -437,6 +437,12 @@ public class Perforce extends BaseScmWrapper {
         return true;
     }
 
+    public void revertAndResyncUnresolvedFile(String filePath, String versionToSyncTo) {
+        log.info("Reverting and resyncing unresolved file: {}", filePath);
+        revertFiles(Collections.singletonList(filePath));
+        sync(Collections.singletonList(filePath), versionToSyncTo);
+    }
+
     public void openFilesForEditIfNeeded(String changelistId, List<FileChange> fileChanges) {
         List<String> filesToOpenForEdit = new ArrayList<>();
         List<String> filesToMoveToChangelist = new ArrayList<>();
@@ -464,7 +470,7 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    public void renameAddOrDeleteFiles(String changelistId, List<FileChange> fileChanges) {
+    public void renameAddOrDeleteFiles(String changelistId, List<FileChange> fileChanges, String versionToSyncTo) {
         for (FileChange diffChange : fileChanges) {
             FileChangeType changeType = diffChange.getChangeType();
             String fullPathForFirstFileAffected = fullPath(diffChange.getFirstFileAffected());
@@ -472,6 +478,9 @@ public class Perforce extends BaseScmWrapper {
             if (StringUtils.isNotBlank(diffChange.getPerforceChangelistId()) && !changelistId.equals(diffChange.getPerforceChangelistId())) {
                 log.info("Reopening file {} from changelist {} in changelist {}", fullPathForLastFileAffected, diffChange.getPerforceChangelistId(), changelistId);
                 reopen(changelistId, fullPathForLastFileAffected);
+                if (diffChange.isUnresolved()) {
+                    revertAndResyncUnresolvedFile(fullPathForLastFileAffected, versionToSyncTo);
+                }
             }
             if (changeType == FileChangeType.renamed || changeType == FileChangeType.renamedAndModified) {
                 log.info("Renaming file {} to {}", diffChange.getFirstFileAffected(), diffChange.getLastFileAffected());

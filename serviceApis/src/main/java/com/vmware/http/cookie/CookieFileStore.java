@@ -3,6 +3,8 @@ package com.vmware.http.cookie;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.IOUtils;
 import com.vmware.util.exception.RuntimeIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +21,8 @@ import java.util.regex.Pattern;
 import static com.vmware.util.StringUtils.appendWithDelimiter;
 
 public class CookieFileStore {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+
     private final String homeFolder;
     private List<Cookie> authCookies = new ArrayList<Cookie>();
     private List<Cookie> sessionCookies = new ArrayList<Cookie>();
@@ -80,6 +84,7 @@ public class CookieFileStore {
     public void addCookieIfUseful(Cookie cookieToCheck) {
         ApiAuthentication apiAuthentication = ApiAuthentication.loadByName(cookieToCheck.getName());
         if (apiAuthentication == null) {
+            log.debug("Adding session cookie {}:{}", cookieToCheck.getName(), cookieToCheck.getValue());
             sessionCookies.add(cookieToCheck);
             return;
         }
@@ -88,8 +93,11 @@ public class CookieFileStore {
         if (existingCookie == null || cookieToCheck.getExpiryDate().after(existingCookie.getExpiryDate())
                 || !cookieToCheck.getValue().equals(existingCookie.getValue())) {
 
-            if (existingCookie != null)
+            if (existingCookie != null) {
+                log.debug("Removing existing auth cookie {}", cookieToCheck.getName());
                 authCookies.remove(existingCookie);
+            }
+            log.debug("Adding auth cookie {}:{}", cookieToCheck.getName(), cookieToCheck.getValue());
             authCookies.add(cookieToCheck);
             try {
                 writeCookieToFile(existingCookie, cookieToCheck, apiAuthentication.getFileName());

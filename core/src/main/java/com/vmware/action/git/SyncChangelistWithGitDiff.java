@@ -45,7 +45,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
         }
         log.info("Applied git diff to changelist {}", draft.perforceChangelistId);
 
-        perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, gitDiffChanges);
+        perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, gitDiffChanges, versionToSyncTo);
         log.info("Ran p4 move,add,edit,delete for affected files");
     }
 
