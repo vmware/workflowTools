@@ -195,7 +195,7 @@ public class StringUtils {
             String displayText = "";
             for (Object key : values.keySet()) {
                 Object displayValue = convertObjectToString(values.get(key));
-                displayText += "\n" + key + " " + displayValue;
+                displayText += "\n" + key + ": " + displayValue;
             }
             return displayText;
         } else {
