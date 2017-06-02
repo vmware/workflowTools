@@ -494,10 +494,9 @@ public class Git extends BaseScmWrapper {
         if (summary.contains("\n")) {
             summary = summary.substring(0, summary.indexOf('\n'));
         }
-        commitInfo.put("hash", MatcherUtils.singleMatchExpected(commitText, "commit\\s+(\\w+)"));
-        commitInfo.put("date", MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)"));
-        commitInfo.put("summary", summary);
-        commitInfo.put("author", MatcherUtils.singleMatchExpected(commitText, "Author:\\s+(.+)"));
+        commitInfo.put("Date", MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)"));
+        commitInfo.put("Summary", summary);
+        commitInfo.put("Author", MatcherUtils.singleMatchExpected(commitText, "Author:\\s+(.+)"));
         return commitInfo;
     }
 
