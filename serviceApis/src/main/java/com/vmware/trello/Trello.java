@@ -29,6 +29,7 @@ import com.vmware.util.exception.InvalidDataException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -123,7 +124,8 @@ public class Trello extends AbstractRestService {
         UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
         connection.setUseSessionCookies(true);
-        String dscValue = UUID.randomUUID().toString(); // used as a CSRF value
+        // Trello seems to be particular over what is used as a dsc value, this one is copied from the browser
+        String dscValue = "eac1c0ee5fbaf55de92323e7abf75e4b19888ce430f95afe83e63885f8959eff";
         connection.addCookie(new Cookie("dsc", dscValue));
         AuthCode authCode = connection.post(loginUrl, AuthCode.class, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
         connection.post(sessionUrl, new SessionAuthentication(authCode.code, dscValue), aRefererHeader("https://trello.com/login?returnUrl=%2Flogged-out"));

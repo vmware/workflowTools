@@ -5,15 +5,21 @@
  */
 package com.vmware.http.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.HttpURLConnection;
 
 public class ExceptionChecker {
+
+    private static Logger log = LoggerFactory.getLogger(ExceptionChecker.class);
 
     public static void throwExceptionIfStatusIsNotValid(String currentUrl, final int statusCode, final String responseText) {
         if (isStatusValid(statusCode)) {
             return;
         }
-        
+        log.debug("Response {} for url {}: {}", statusCode, currentUrl, responseText);
+
         switch (statusCode) {
             case DoesNotExistException.STATUS_CODE:
                 throw new DoesNotExistException(responseText);

@@ -80,7 +80,7 @@ public class ApplyPatch extends BaseCommitAction {
             printPatchResult(result);
         }
         if (isPerforceClient) {
-            serviceLocator.getPerforce().renameAddOrDeleteFiles(changelistId, fileChanges);
+            serviceLocator.getPerforce().renameAddOrDeleteFiles(changelistId, fileChanges, "");
         }
     }
 
