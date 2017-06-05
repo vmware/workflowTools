@@ -10,10 +10,6 @@ import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.trello.Trello;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Ensures that all apis have a valid token / cookie. Primarily for testing.")
 public class AuthenticateAllApis extends BaseAction {
 
@@ -25,7 +21,7 @@ public class AuthenticateAllApis extends BaseAction {
     public void process() {
         checkAuthentication(new Trello(config.trelloUrl));
         checkAuthentication(new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug));
-        checkAuthentication(new Jira(config.jiraUrl, config.jiraTestIssue, config.username, config.jiraCustomFieldNames));
+        checkAuthentication(new Jira(config.jiraUrl, config.username, config.jiraCustomFieldNames));
         checkAuthentication(new ReviewBoard(config.reviewboardUrl, config.username));
         checkAuthentication(new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin));
     }

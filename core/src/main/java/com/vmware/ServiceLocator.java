@@ -40,7 +40,7 @@ public class ServiceLocator {
 
     public Jira getJira() {
         if (jira == null) {
-            jira = new Jira(config.jiraUrl, config.jiraTestIssue, config.username, config.jiraCustomFieldNames);
+            jira = new Jira(config.jiraUrl, config.username, config.jiraCustomFieldNames);
         }
         return jira;
     }

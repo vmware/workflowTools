@@ -40,7 +40,7 @@ public class TestJiraApi extends BaseTests {
         Map<String, String> customFieldNames = new HashMap<>();
         customFieldNames.put("storyPointsFieldName", "customfield_10062");
         customFieldNames.put("acceptanceCriteriaFieldName", "customfield_10100");
-        jira = new Jira(jiraUrl, "HW-1001", jiraUsername, customFieldNames);
+        jira = new Jira(jiraUrl, jiraUsername, customFieldNames);
         jira.setupAuthenticatedConnection();
         Issue issueToCreate = new Issue(IssueTypeDefinition.Story, "HW", "Build and Infrastructure",
                 "Test Issue", "Test Description", "Test criteria");

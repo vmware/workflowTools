@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.input.InputUtils;
 
-@ActionDescription("Adds a Jira Issue to use for tracking a bugzill bug.")
+@ActionDescription("Adds a Jira Issue to use for tracking a bugzilla bug.")
 public class AddTrackingIssueForBug extends BaseBatchBugzillaAction {
 
     public AddTrackingIssueForBug(WorkflowConfig config) {

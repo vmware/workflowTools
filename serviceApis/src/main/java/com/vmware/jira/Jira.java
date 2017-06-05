@@ -48,16 +48,14 @@ public class Jira extends AbstractRestService {
     private String searchUrl;
     private String legacyApiUrl;
     private String greenhopperUrl;
-    private String testIssueKey;
 
-    public Jira(String jiraUrl, String testIssueKey, String username, Map<String, String> customFieldNames) {
+    public Jira(String jiraUrl, String username, Map<String, String> customFieldNames) {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, username);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity, customFieldNames);
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";
         this.greenhopperUrl = baseUrl + "rest/greenhopper/1.0/";
-        this.testIssueKey = testIssueKey;
     }
 
     public List<MenuItem> getRecentBoardItems() {
@@ -183,7 +181,7 @@ public class Jira extends AbstractRestService {
 
     @Override
     protected void checkAuthenticationAgainstServer() {
-        connection.get(apiUrl + "issue/" + testIssueKey + "/editmeta",null);
+        connection.get(baseUrl + "rest/auth/1/session",null);
         if (!connection.hasCookie(jira)) {
             log.warn("Cookie {} should have been retrieved from jira login!", jira.getCookieName());
         }

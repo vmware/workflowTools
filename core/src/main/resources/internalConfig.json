@@ -3,7 +3,6 @@
   "reviewboardUrl": "https://reviewboard.eng.vmware.com",
   "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
   "jiraUrl": "https://jira-hzn.eng.vmware.com",
-  "jiraTestIssue": "HW-1001",
   "bugzillaUrl": "https://bugzilla.eng.vmware.com",
   "bugzillaQuery": "My Assigned",
   "bugzillaTestBug": 10001,
