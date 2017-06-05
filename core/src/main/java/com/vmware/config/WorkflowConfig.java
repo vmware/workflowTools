@@ -116,9 +116,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-jiraUrl,--jira-url", help = "Url for jira server")
     public String jiraUrl;
 
-    @ConfigurableProperty(commandLine = "-jiraTestIssue,--jira-test-issue", help = "Issue key to fetch to test user is logged in")
-    public String jiraTestIssue;
-
     @ConfigurableProperty(commandLine = "-disableJira,--disable-jira", help = "Don't use Jira when checking bug numbers")
     public boolean disableJira;
 

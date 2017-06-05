@@ -41,7 +41,6 @@
     "--ignore-jenkins-job-failure"
   ],
   "BaseTransitionJiraIssue": [
-    "--jira-test-issue",
     "--jira-url",
     "--username",
     "--disable-jira"
@@ -66,7 +65,6 @@
     "--jenkins-uses-csrf",
     "--jenkins-url",
     "--reviewboard-url",
-    "--jira-test-issue",
     "--jira-url",
     "--bugzilla-test-bug",
     "--username",
@@ -78,7 +76,6 @@
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--username",
-    "--jira-test-issue",
     "--jira-url",
     "--disable-jira"
   ],
@@ -132,13 +129,11 @@
   ],
   "UpdateTaskEstimates": [
     "--username",
-    "--jira-test-issue",
     "--jira-url",
     "--estimate"
   ],
   "BaseBatchJiraAction": [
     "--username",
-    "--jira-test-issue",
     "--jira-url",
     "--disable-jira"
   ],
@@ -295,7 +290,6 @@
     "--bugzilla-test-bug",
     "--bugzilla-url",
     "--username",
-    "--jira-test-issue",
     "--jira-url",
     "--default-jira-project",
     "--bugzilla-query",
