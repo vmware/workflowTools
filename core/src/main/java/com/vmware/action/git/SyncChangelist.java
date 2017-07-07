@@ -33,11 +33,15 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         Map<String, List<FileChange>> allPerforceChanges = perforce.getAllFileChangesInClient();
         revertChangesNotInGitDiff(gitDiffChanges, allPerforceChanges);
         List<FileChange> changelistChanges = allPerforceChanges.get(draft.perforceChangelistId);
-        boolean perforceChangesWereReverted = perforce.revertAndResyncUnresolvedFiles(changelistChanges, versionToSyncTo);
-        if (perforceChangesWereReverted) {
-            allPerforceChanges = perforce.getAllFileChangesInClient(); // refetch as unresolved files were reverted
+        List<FileChange> missingChanges = findChangesNotInPerforce(gitDiffChanges, allPerforceChanges);
+        List<FileChange> allChangelistChanges = new ArrayList<>();
+        if (changelistChanges != null) {
+            allChangelistChanges.addAll(changelistChanges);
         }
-        List<FileChange> missingChanges = makePerforceAwareOfMissingChanges(gitDiffChanges, allPerforceChanges);
+        allChangelistChanges.addAll(missingChanges);
+
+        perforce.revertAndResyncUnresolvedFiles(allChangelistChanges, versionToSyncTo);
+        perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, missingChanges);
         copyChangedFilesToClient(gitDiffChanges);
         perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, missingChanges, versionToSyncTo);
         long elapsedTime = new Date().getTime() - startingDate.getTime();
@@ -59,17 +63,18 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
             File fileInPerforce = new File(perforce.fullPath(fileChange.getLastFileAffected()));
 
             git.catFile("head", fileChange.getLastFileAffected(), fileInPerforce.getPath());
-            if (fileInGit.canExecute() != fileInPerforce.canExecute()) {
-                if (!fileInPerforce.setExecutable(fileInGit.canExecute())) {
-                    log.warn("Failed to set executable to {} for file {}",fileInGit.canExecute(),
-                            fileInPerforce.getPath());
-                }
-                log.debug("Changing file {} executable to {}", fileChange.getLastFileAffected(), fileInGit.canExecute());
+
+            if (fileInGit.canExecute() == fileInPerforce.canExecute()) {
+                return;
+            }
+            log.debug("Changing file {} executable to {}", fileChange.getLastFileAffected(), fileInGit.canExecute());
+            if (!fileInPerforce.setExecutable(fileInGit.canExecute())) {
+                log.warn("Failed to set executable to {} for file {}", fileInGit.canExecute(), fileInPerforce.getPath());
             }
         }
     }
 
-    private List<FileChange> makePerforceAwareOfMissingChanges(List<FileChange> gitDiffChanges, Map<String, List<FileChange>> allPerforceChanges) {
+    private List<FileChange> findChangesNotInPerforce(List<FileChange> gitDiffChanges, Map<String, List<FileChange>> allPerforceChanges) {
         List<FileChange> changesToAddToPerforce = new ArrayList<>();
         List<FileChange> allPerforceChangesList = allChangesInMap(allPerforceChanges);
         for (FileChange gitDiffChange : gitDiffChanges) {
@@ -83,9 +88,6 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
                 changesToAddToPerforce.add(gitDiffChange);
             }
         }
-
-        perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, changesToAddToPerforce);
-
         return changesToAddToPerforce;
     }
 

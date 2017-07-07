@@ -52,6 +52,15 @@ public abstract class BaseAction {
         return null;
     }
 
+    protected Perforce getLoggedInPerforceClient() {
+        String reasonForFailing = perforceClientCannotBeUsed();
+        if (StringUtils.isNotBlank(reasonForFailing)) {
+            log.error("Exiting as " + reasonForFailing);
+            System.exit(1);
+        }
+        return serviceLocator.getPerforce();
+    }
+
     protected String perforceClientCannotBeUsed() {
         if (!CommandLineUtils.isCommandAvailable("p4")) {
             return "p4 command is not available";
