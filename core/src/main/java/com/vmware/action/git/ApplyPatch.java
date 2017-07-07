@@ -51,7 +51,7 @@ public class ApplyPatch extends BaseCommitAction {
             diffConverter = new PerforceDiffToGitConverter(git);
             patchData = diffConverter.convert(patchData);
         } else if (isPerforceClient){
-            diffConverter = new GitDiffToPerforceConverter(serviceLocator.getPerforce(), "");
+            diffConverter = new GitDiffToPerforceConverter(getLoggedInPerforceClient(), "");
         }
 
         if (diffConverter != null) {
@@ -61,7 +61,7 @@ public class ApplyPatch extends BaseCommitAction {
         String changelistId = null;
         if (isPerforceClient) {
             changelistId = determineChangelistIdToUse();
-            Perforce perforce = serviceLocator.getPerforce();
+            Perforce perforce = getLoggedInPerforceClient();
             perforce.syncPerforceFiles(fileChanges, "");
             perforce.openFilesForEditIfNeeded(changelistId, fileChanges);
         }
