@@ -65,7 +65,7 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
             git.catFile("head", fileChange.getLastFileAffected(), fileInPerforce.getPath());
 
             if (fileInGit.canExecute() == fileInPerforce.canExecute()) {
-                return;
+                continue;
             }
             log.debug("Changing file {} executable to {}", fileChange.getLastFileAffected(), fileInGit.canExecute());
             if (!fileInPerforce.setExecutable(fileInGit.canExecute())) {
