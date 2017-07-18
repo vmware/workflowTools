@@ -40,7 +40,8 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         }
         allChangelistChanges.addAll(missingChanges);
 
-        perforce.revertAndResyncUnresolvedFiles(allChangelistChanges, versionToSyncTo);
+        List<FileChange> resyncedFiles = perforce.revertAndResyncUnresolvedFiles(allChangelistChanges, versionToSyncTo);
+        missingChanges.addAll(resyncedFiles);
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, missingChanges);
         copyChangedFilesToClient(gitDiffChanges);
         perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, missingChanges, versionToSyncTo);
