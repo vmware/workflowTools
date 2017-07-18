@@ -178,11 +178,6 @@ public class Perforce extends BaseScmWrapper {
         executeScmCommand("reopen -c " + changelistId + " //...", INFO);
     }
 
-    public String reopen(String changelistId, String filePath) {
-        String output = executeScmCommand("reopen -c {} {}", changelistId, filePath);
-        return failOutputIfMissingText(output, asList("reopened; change " + changelistId, "nothing changed"), 1);
-    }
-
     public String reopen(String changelistId, List<String> filePaths) {
         String output = executeScmCommand("reopen -c {} {}", changelistId, appendWithDelimiter("", filePaths, " "));
         return failOutputIfMissingText(output, asList("reopened; change " + changelistId, "nothing changed"), filePaths.size());
@@ -417,34 +412,31 @@ public class Perforce extends BaseScmWrapper {
         sync(filesToSync, syncChangelistId);
     }
 
-    public boolean revertAndResyncUnresolvedFiles(List<FileChange> changelistChanges, String versionToSyncTo) {
+    public List<FileChange> revertAndResyncUnresolvedFiles(List<FileChange> changelistChanges, String versionToSyncTo) {
         if (changelistChanges == null || changelistChanges.isEmpty()) {
-            return false;
+            return Collections.emptyList();
         }
+        List<FileChange> unresolvedFileChanges = new ArrayList<>();
         List<String> unresolvedFilesToRevertAndSync = new ArrayList<>();
         for (int i = changelistChanges.size() - 1; i >= 0; i--) {
             FileChange fileChange = changelistChanges.get(i);
             if (fileChange.isUnresolved()) {
+                fileChange.setPerforceChangelistId(null);
+                unresolvedFileChanges.add(fileChange);
                 unresolvedFilesToRevertAndSync.add(fileChange.getLastFileAffected());
             }
         }
         if (unresolvedFilesToRevertAndSync.isEmpty()) {
-            return false;
+            return Collections.emptyList();
         }
         log.info("Reverting and resyncing unresolved files: {}", unresolvedFilesToRevertAndSync.toString());
         revertFiles(unresolvedFilesToRevertAndSync);
         sync(unresolvedFilesToRevertAndSync, versionToSyncTo);
-        return true;
-    }
-
-    public void revertAndResyncUnresolvedFile(String filePath, String versionToSyncTo) {
-        log.info("Reverting and resyncing unresolved file: {}", filePath);
-        revertFiles(Collections.singletonList(filePath));
-        sync(Collections.singletonList(filePath), versionToSyncTo);
+        return unresolvedFileChanges;
     }
 
     public void openFilesForEditIfNeeded(String changelistId, List<FileChange> fileChanges) {
-        List<String> filesToOpenForEdit = new ArrayList<>();
+        List<String> filePathsToOpenForEdit = new ArrayList<>();
         List<String> filesToMoveToChangelist = new ArrayList<>();
 
         for (FileChange diffChange : fileChanges) {
@@ -457,16 +449,19 @@ public class Perforce extends BaseScmWrapper {
 
             String fullPath = fullPath(diffChange.getFirstFileAffected());
             if (StringUtils.isNotBlank(diffChange.getPerforceChangelistId())) {
+                log.info("Moving file {} from changelist {}", diffChange.getFirstFileAffected(),
+                        diffChange.getPerforceChangelistId());
                 filesToMoveToChangelist.add(fullPath);
             } else {
-                filesToOpenForEdit.add(fullPath);
+                log.info("Opening file {} for edit", diffChange.getFirstFileAffected());
+                filePathsToOpenForEdit.add(fullPath);
             }
         }
         if (!filesToMoveToChangelist.isEmpty()) {
             reopen(changelistId, filesToMoveToChangelist);
         }
-        if (!filesToOpenForEdit.isEmpty()) {
-            openForEdit(changelistId, appendWithDelimiter("", filesToOpenForEdit, " "));
+        if (!filePathsToOpenForEdit.isEmpty()) {
+            openForEdit(changelistId, appendWithDelimiter("", filePathsToOpenForEdit, " "));
         }
     }
 
@@ -475,13 +470,6 @@ public class Perforce extends BaseScmWrapper {
             FileChangeType changeType = diffChange.getChangeType();
             String fullPathForFirstFileAffected = fullPath(diffChange.getFirstFileAffected());
             String fullPathForLastFileAffected = fullPath(diffChange.getLastFileAffected());
-            if (StringUtils.isNotBlank(diffChange.getPerforceChangelistId()) && !changelistId.equals(diffChange.getPerforceChangelistId())) {
-                log.info("Reopening file {} from changelist {} in changelist {}", fullPathForLastFileAffected, diffChange.getPerforceChangelistId(), changelistId);
-                reopen(changelistId, fullPathForLastFileAffected);
-                if (diffChange.isUnresolved()) {
-                    revertAndResyncUnresolvedFile(fullPathForLastFileAffected, versionToSyncTo);
-                }
-            }
             if (changeType == FileChangeType.renamed || changeType == FileChangeType.renamedAndModified) {
                 log.info("Renaming file {} to {}", diffChange.getFirstFileAffected(), diffChange.getLastFileAffected());
                 move(changelistId, fullPathForFirstFileAffected, fullPathForLastFileAffected, "-k");
