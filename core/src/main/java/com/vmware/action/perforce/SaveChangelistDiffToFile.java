@@ -20,7 +20,7 @@ public class SaveChangelistDiffToFile extends BasePerforceCommitAction {
         String changelistIdToUse = determineChangelistIdToUse();
         String outputFilePath = StringUtils.isNotBlank(config.outputFileForContent) ? config.outputFileForContent
                 : "changelist" + changelistIdToUse + ".patch";
-        String content = perforce.diffChangelistInGitFormat(changelistIdToUse, true, LogLevel.TRACE);
+        String content = perforce.diffChangelistInGitFormat(changelistIdToUse, LogLevel.TRACE);
         File outputFile = new File(outputFilePath);
         outputFile.delete();
         log.info("Saving diff for changelist {} to file {}", changelistIdToUse, outputFile.getPath());

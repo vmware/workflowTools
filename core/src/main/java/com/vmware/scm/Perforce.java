@@ -244,30 +244,9 @@ public class Perforce extends BaseScmWrapper {
         return parseFileChanges(filesText);
     }
 
-    public String diffChangelistInGitFormat(String changelistId, boolean binaryPatch, LogLevel level) {
-        List<FileChange> fileChanges = getFileChangesForPendingChangelist(changelistId);
-        return diffChangelistInGitFormat(fileChanges, changelistId, binaryPatch, level);
-    }
-
-    public String diffChangelistInGitFormat(List<FileChange> fileChanges, String changelistId, boolean binaryPatch, LogLevel level) {
-        String filesToDiff = "";
-        if (fileChanges.isEmpty()) {
-            log.warn("No open file changes for changelist {}", changelistId);
-            return "";
-        }
-        for (FileChange fileChange : fileChanges) {
-            if (!filesToDiff.isEmpty()) {
-                filesToDiff += " ";
-            }
-            filesToDiff += fileChange.getLastFileAffected();
-        }
-        String diffData = diffFilesUsingGit(filesToDiff, binaryPatch, level);
+    public String diffChangelistInGitFormat(String changelistId, LogLevel level) {
         PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(this);
-        String diffText = diffCreator.create(diffData, fileChanges, binaryPatch);
-        if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
-            diffText = stripLinesStartingWith(diffText, "File(s) not opened for edit");
-        }
-        return diffText;
+        return diffCreator.create(changelistId, level);
     }
 
     public String getClientName() {
@@ -333,7 +312,7 @@ public class Perforce extends BaseScmWrapper {
         return fileChanges;
     }
 
-    private String diffFilesUsingGit(String filesToDiff, boolean binaryPatch, LogLevel level) {
+    public String diffFilesUsingGit(String filesToDiff, boolean binaryPatch, LogLevel level) {
         Map<String, String> environmentVariables = new HashMap<>();
         String binaryFlag = binaryPatch ? " --binary" : "";
         environmentVariables.put("P4DIFF", "git diff --full-index" + binaryFlag);

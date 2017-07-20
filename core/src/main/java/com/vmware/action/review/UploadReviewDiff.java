@@ -62,8 +62,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
     protected void uploadDiffUsingRbt(File workingDirectory, String username, String changelistId) {
         String changelistIdText = changelistId != null ? " " + changelistId : "";
-        String usernameParameter = "--username=" + username;
-        String command = format("rbt post %s -r %s%s", usernameParameter, draft.id, changelistIdText);
+        String command = format("rbt post -r %s%s", draft.id, changelistIdText);
         runRbtCommand(workingDirectory, command);
     }
 

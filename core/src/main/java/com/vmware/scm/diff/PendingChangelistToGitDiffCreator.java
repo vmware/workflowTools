@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.vmware.scm.FileChange.containsChangesOfType;
 import static com.vmware.scm.FileChangeType.added;
 import static com.vmware.scm.FileChangeType.addedAndModified;
 import static com.vmware.scm.FileChangeType.deleted;
+import static com.vmware.util.StringUtils.stripLinesStartingWith;
 import static java.lang.String.format;
 
 /**
@@ -38,7 +40,18 @@ public class PendingChangelistToGitDiffCreator {
         this.perforce = perforce;
     }
 
-    public String create(String diffData, List<FileChange> fileChanges, boolean binaryPatch) {
+    public String create(String changelistId, LogLevel level) {
+        List<FileChange> fileChanges = perforce.getFileChangesForPendingChangelist(changelistId);
+        return create(changelistId, fileChanges, level);
+    }
+
+    public String create(String changelistId, List<FileChange> fileChanges, LogLevel level) {
+        if (fileChanges.isEmpty()) {
+            log.warn("No open file changes for changelist {}", changelistId);
+            return "";
+        }
+        String filesToDiff = convertToText(fileChanges);
+        String diffData = perforce.diffFilesUsingGit(filesToDiff, true, level);
         StringBuilder gitCompatibleData = null;
         String[] diffLines = diffData.split("\n");
         Iterator<String> diffLinesIterator = Arrays.asList(diffLines).iterator();
@@ -71,8 +84,26 @@ public class PendingChangelistToGitDiffCreator {
             }
         }
 
-        appendDiffForAddedOrDeletedFiles(fileChanges, binaryPatch, gitCompatibleData);
-        return gitCompatibleData != null ? gitCompatibleData.append("\n").toString() : "";
+        appendDiffForAddedOrDeletedFiles(fileChanges, true, gitCompatibleData);
+        if (gitCompatibleData == null) {
+            return "";
+        }
+        String diffText = gitCompatibleData.append("\n").toString();
+        if (!containsChangesOfType(fileChanges, FileChangeType.modified)) {
+            diffText = stripLinesStartingWith(diffText, "File(s) not opened for edit");
+        }
+        return diffText;
+    }
+
+    private String convertToText(List<FileChange> fileChanges) {
+        String filesToDiff = "";
+        for (FileChange fileChange : fileChanges) {
+            if (!filesToDiff.isEmpty()) {
+                filesToDiff += " ";
+            }
+            filesToDiff += fileChange.getLastFileAffected();
+        }
+        return filesToDiff;
     }
 
     private void createFullGitHeaderInfo(Iterator<String> diffLinesIterator, FileChange fileChange,

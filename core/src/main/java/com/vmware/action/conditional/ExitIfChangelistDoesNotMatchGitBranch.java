@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
+import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
@@ -52,7 +53,9 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
             gitDiff = rawGitDiff;
         }
         log.info("Creating perforce diff for changelist {} in git format", draft.perforceChangelistId);
-        String perforceDiff = perforce.diffChangelistInGitFormat(fileChanges, draft.perforceChangelistId, true, LogLevel.TRACE);
+
+        PendingChangelistToGitDiffCreator diffCreator = new PendingChangelistToGitDiffCreator(perforce);
+        String perforceDiff = diffCreator.create(draft.perforceChangelistId, fileChanges, LogLevel.TRACE);
         if (StringUtils.equals(gitDiff, perforceDiff)) {
             log.info("Perforce diff matches git diff exactly");
             return;
