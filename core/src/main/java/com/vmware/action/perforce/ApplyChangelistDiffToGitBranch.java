@@ -28,7 +28,7 @@ public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAc
         }
 
         log.info("Generating git compatible diff for perforce changelist {}", changelistIdToUse);
-        String diffData = perforce.diffChangelistInGitFormat(changelistIdToUse, true, LogLevel.TRACE);
+        String diffData = perforce.diffChangelistInGitFormat(changelistIdToUse, LogLevel.TRACE);
 
         String checkOutput = git.applyPatch(diffData, true);
         if (StringUtils.isNotBlank(checkOutput)) {
