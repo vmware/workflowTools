@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
 import com.vmware.scm.FileChangeType;
+import com.vmware.scm.GitChangelistRef;
 import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
@@ -36,10 +37,10 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
     @Override
     public void process() {
         log.info("Checking if changelist {} matches current git branch", draft.perforceChangelistId);
-        String[] lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
-        String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo[0] : config.trackingBranchPath();
+        GitChangelistRef lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
+        String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getCommitRef() : config.trackingBranchPath();
         if (config.syncChangelistToLatestInBranch) {
-            log.info("Creating git diff against last submitted changelist {}", lastSubmittedChangelistInfo[1]);
+            log.info("Creating git diff against last submitted changelist {}", lastSubmittedChangelistInfo.getChangelistId());
         } else {
             log.info("Creating git diff against tracking branch {}", config.trackingBranchPath());
         }

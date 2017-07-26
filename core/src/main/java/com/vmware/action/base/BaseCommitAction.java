@@ -8,7 +8,11 @@ package com.vmware.action.base;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.scm.FileChange;
 import com.vmware.util.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class BaseCommitAction extends BaseAction {
 
@@ -54,6 +58,18 @@ public abstract class BaseCommitAction extends BaseAction {
         } else {
             log.warn("Not in git repo and config value perforceClientName is not set, can't read last change");
             return "";
+        }
+    }
+
+    protected List<FileChange> getFileChangesInLastCommit() {
+        if (git.workingDirectoryIsInGitRepo()) {
+            return git.getChangesInDiff("head~1", "head");
+        } else if (perforceClientCannotBeUsed() == null) {
+            String changelistId = determineChangelistIdToUse();
+            return serviceLocator.getPerforce().getFileChangesForPendingChangelist(changelistId);
+        } else {
+            log.warn("Not in git repo and config value perforceClientName is not set, can't read last change");
+            return Collections.emptyList();
         }
     }
 

@@ -112,7 +112,7 @@ public class Git extends BaseScmWrapper {
         return output;
     }
 
-    public String[] lastSubmittedChangelistInfo() {
+    public GitChangelistRef lastSubmittedChangelistInfo() {
         Pattern gitP4Pattern = Pattern.compile("\\[git\\-p4:\\s+depot\\-paths.+change\\s+=\\s+(\\d+)\\]");
         Pattern fusionPattern = Pattern.compile("\\s*Change:\\s*(\\d+)");
         int counter = 0;
@@ -135,7 +135,7 @@ public class Git extends BaseScmWrapper {
             }
         }
         String ref = MatcherUtils.singleMatchExpected(lastCommitText, "commit\\s+(\\w+)");
-        return new String[] {ref, changelistId};
+        return new GitChangelistRef(ref, changelistId);
     }
 
     public String lastCommitText(boolean prettyPrint) {
