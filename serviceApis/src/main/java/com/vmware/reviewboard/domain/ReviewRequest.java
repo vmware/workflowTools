@@ -24,7 +24,7 @@ public class ReviewRequest extends BaseEntity {
     @SerializedName("target_people")
     @Expose(serialize = false)
     private List<Link> targetUsers = new ArrayList<Link>();
-    @SerializedName("target_groups")
+    @SerializedName("targetGroups")
     @Expose(serialize = false)
     public List<Link> targetGroups = new ArrayList<Link>();
     @Expose(serialize = false)

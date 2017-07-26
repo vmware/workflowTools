@@ -330,6 +330,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. --JVAPP_NAME=test --JUSERNAME=dbiggs")
     public Map<String, String> jenkinsJobParameters = new TreeMap<>();
 
+    @ConfigurableProperty(help = "Adds review groups if a commit has file changes that match a file mapping")
+    public Map<String, String> reviewGroupFileMappings = new TreeMap<>();
+
     @Expose(serialize = false, deserialize = false)
     private ServiceLocator serviceLocator = null;
 

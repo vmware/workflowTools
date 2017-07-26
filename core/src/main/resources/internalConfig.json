@@ -125,16 +125,19 @@
           "readPendingChangelist", "MoveOpenFilesToPendingChangelist"
        ],
        "setReviewDetails": [
-          "UpdateReviewDetails", "UploadReviewDiff"
+          "AddReviewGroupsForMatchingFileMappings", "UpdateReviewDetails"
+       ],
+       "setReviewDetailsAndDiff": [
+          "AddReviewGroupsForMatchingFileMappings", "UpdateReviewDetails", "UploadReviewDiff"
        ],
        "forceNewReview": [
-          "readNonTrivialCommit", "CreateReview", "AmendCommit", "setReviewDetails", "displayReviewUrl"
+          "readNonTrivialCommit", "CreateReview", "AmendCommit", "setReviewDetailsAndDiff", "displayReviewUrl"
        ],
        "review": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "setReviewDetails", "displayReviewUrl"
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "setReviewDetailsAndDiff", "displayReviewUrl"
        ],
        "reviewCommitWithMatchingChangelist": [
-          "updateMatchingChangelist", "CreateReviewIfNeeded", "AmendCommit", "UpdateReviewDetails", "UploadReviewDiffFromChangelist", "displayReviewUrl"
+          "updateMatchingChangelist", "CreateReviewIfNeeded", "AmendCommit", "AddReviewGroupsForMatchingFileMappings", "setReviewDetails", "UploadReviewDiffFromChangelist", "displayReviewUrl"
        ],
        "amendReview": [
           "amendCommit", "review"
@@ -143,7 +146,7 @@
           "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiff", "displayReviewUrl"
        ],
        "detailsUpdateOnly": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UpdateReviewDetails", "displayReviewUrl"
+          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "setReviewDetails", "displayReviewUrl"
        ],
        "publishReview": [
           "readNonTrivialCommit", "PublishReview", "ExitIfReviewIsNotPublic", "MarkIssueAsInReview"
@@ -304,7 +307,7 @@
          "readPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateMatchingChangelistDescription"
        ],
        "reviewWithGitChangeset": [
-         "updateWithGitChangeset", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiffFromChangelist", "UpdateReviewDetails", "displayReviewUrl"
+         "updateWithGitChangeset", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiffFromChangelist", "setReviewDetails", "displayReviewUrl"
        ],
        "submitWithGitChangeset": [
          "prepareCommitForPush", "updateWithGitChangeset", "SubmitPendingChangelist", "DeleteChangelistTag"
@@ -334,7 +337,7 @@
    },
   "supportingWorkflows": [
       "readNonTrivialCommit", "setCommitDetailsWithoutConfirmation", "selectAndConvertBoard",
-      "prepareCommitForPush", "setCommitDetails", "setCommitDetailsOffline", "setReviewDetails"
+      "prepareCommitForPush", "setCommitDetails", "setCommitDetailsOffline", "setReviewDetails", "setReviewDetailsAndDiff"
   ]
 
 }

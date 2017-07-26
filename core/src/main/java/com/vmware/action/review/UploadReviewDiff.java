@@ -105,7 +105,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         DiffToUpload diff = new DiffToUpload();
         String mergeBase = git.mergeBase(config.trackingBranchPath(), "HEAD");
         GitDiffToPerforceConverter diffConverter = new GitDiffToPerforceConverter(getLoggedInPerforceClient(),
-                git.lastSubmittedChangelistInfo()[1]);
+                git.lastSubmittedChangelistInfo().getChangelistId());
         diff.path = diffConverter.convertAsBytes(git.diff(config.parentBranchPath(), "HEAD", supportsDiffWithRenames));
         diff.parent_diff_path = diffConverter.convertAsBytes(git.diff(mergeBase, config.parentBranchPath(), supportsDiffWithRenames));
         return diff;

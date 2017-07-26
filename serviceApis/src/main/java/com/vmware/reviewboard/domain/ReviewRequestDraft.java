@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,8 +56,9 @@ public class ReviewRequestDraft extends BaseEntity {
     public String reviewedBy = "";
     @Expose(serialize = false, deserialize = false)
     public String shipItReviewers = "";
+    @SerializedName("target_groups")
     @JsonAdapter(LinkArrayDeserializer.class)
-    public String target_groups;
+    public String targetGroups;
     @Expose(serialize = false, deserialize = false)
     public List<JobBuild> jobBuilds = new ArrayList<>();
     @Expose(serialize = false, deserialize = false)
@@ -68,6 +70,9 @@ public class ReviewRequestDraft extends BaseEntity {
     public String approvedBy;
     @Expose(serialize = false, deserialize = false)
     public String draftPatchData;
+    @Expose(serialize = false, deserialize = false)
+    public Set<String> extraTargetGroupsToAdd = new TreeSet<>();
+
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.
@@ -88,13 +93,13 @@ public class ReviewRequestDraft extends BaseEntity {
     public ReviewRequestDraft() {}
 
     public ReviewRequestDraft(final String summary, final String description, final String testingDone,
-                              final String bugNumbers, final String reviewedBy, String target_groups, String branch) {
+                              final String bugNumbers, final String reviewedBy, String targetGroups, String branch) {
         this.summary = summary;
         this.description = description;
         this.testingDone = testingDone;
         this.bugNumbers = bugNumbers;
         this.reviewedBy = reviewedBy;
-        this.target_groups = target_groups;
+        this.targetGroups = targetGroups;
         this.branch = branch;
     }
 
@@ -252,7 +257,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public void updateTargetGroupsIfNeeded(String[] targetGroupsArray) {
-        if (this.target_groups != null) { // added from draft
+        if (this.targetGroups != null) { // added from draft
             return;
         }
 
@@ -267,7 +272,16 @@ public class ReviewRequestDraft extends BaseEntity {
             targetGroups.addAll(Arrays.asList(targetGroupsArray));
         }
 
-        this.target_groups = StringUtils.join(targetGroups);
+        this.targetGroups = StringUtils.join(targetGroups);
+    }
+
+    public void addExtraTargetGroups() {
+        Set<String> existingTargetGroups = new TreeSet<>();
+        if (targetGroups != null) {
+            existingTargetGroups.addAll(Arrays.asList(targetGroups.trim().split(",")));
+        }
+        existingTargetGroups.addAll(extraTargetGroupsToAdd);
+        targetGroups = StringUtils.join(existingTargetGroups);
     }
 
     public void updateTestingDoneWithJobBuild(Job job, JobBuild expectedNewBuild) {

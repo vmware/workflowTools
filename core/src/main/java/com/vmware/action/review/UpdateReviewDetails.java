@@ -19,10 +19,11 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
 
         ReviewRequestDraft existingDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
         if (existingDraft != null) {
-            draft.target_groups = existingDraft.target_groups;
+            draft.targetGroups = existingDraft.targetGroups;
         }
 
         draft.updateTargetGroupsIfNeeded(config.targetGroups);
+        draft.addExtraTargetGroups();
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
         log.info("Successfully updated review information");
     }
