@@ -4,6 +4,7 @@ import com.vmware.http.RequestParams;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
@@ -58,7 +59,7 @@ public abstract class AbstractService {
             displayInputMessage(retryCount);
             try {
                 loginManually();
-            } catch (NotAuthorizedException | ForbiddenException e) {
+            } catch (NotAuthorizedException | ForbiddenException | NotFoundException e) {
                 if (retryCount >= MAX_LOGIN_RETRIES) {
                     throw e;
                 }

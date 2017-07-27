@@ -318,7 +318,8 @@ public class Workflow {
             while (!actionsSetup.contains(action)) {
                 String actionName = action.getClass().getSimpleName();
                 if (waitTimeInMilliSeconds > 10000) {
-                    throw new RuntimeException(actionName + ".asyncSetup failed to finish in 10 seconds");
+                    log.error(actionName + ".asyncSetup failed to finish in 10 seconds");
+                    System.exit(1);
                 }
                 if (waitTimeInMilliSeconds > 0 && waitTimeInMilliSeconds % 1000 == 0) {
                     log.debug("Waiting for {}.asyncSetup to finish, waited {} seconds",
