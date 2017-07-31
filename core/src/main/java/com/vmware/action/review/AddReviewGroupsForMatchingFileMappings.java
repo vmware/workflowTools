@@ -40,6 +40,9 @@ public class AddReviewGroupsForMatchingFileMappings extends BaseCommitAction{
     }
 
     private void addTargetGroupForPath(String groupName, String path, String mapping) {
+        if (draft.extraTargetGroupsToAdd.contains(groupName)) {
+            return;
+        }
         log.info("Adding review group {} as path {} matches mapping {}", groupName, path, mapping);
         draft.extraTargetGroupsToAdd.add(groupName);
     }

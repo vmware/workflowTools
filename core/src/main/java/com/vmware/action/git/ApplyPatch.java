@@ -13,7 +13,6 @@ import com.vmware.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
 
@@ -80,7 +79,7 @@ public class ApplyPatch extends BaseCommitAction {
             printPatchResult(result);
         }
         if (isPerforceClient) {
-            serviceLocator.getPerforce().renameAddOrDeleteFiles(changelistId, fileChanges, "");
+            serviceLocator.getPerforce().renameAddOrDeleteFiles(changelistId, fileChanges);
         }
     }
 

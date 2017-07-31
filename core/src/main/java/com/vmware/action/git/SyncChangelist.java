@@ -32,7 +32,10 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         perforce.syncPerforceFiles(gitDiffChanges, versionToSyncTo);
 
         Map<String, List<FileChange>> allPerforceChanges = perforce.getAllFileChangesInClient();
-        revertChangesNotInGitDiff(gitDiffChanges, allPerforceChanges);
+        boolean filesReverted = revertChangesNotInGitDiff(gitDiffChanges, allPerforceChanges);
+        if (filesReverted) { // refech as files were reverted
+            allPerforceChanges = perforce.getAllFileChangesInClient();
+        }
         List<FileChange> changelistChanges = allPerforceChanges.get(draft.perforceChangelistId);
         List<FileChange> missingChanges = findChangesNotInPerforce(gitDiffChanges, allPerforceChanges);
         List<FileChange> allChangelistChanges = new ArrayList<>();
@@ -45,7 +48,7 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         missingChanges.addAll(resyncedFiles);
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, missingChanges);
         copyChangedFilesToClient(gitDiffChanges);
-        perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, missingChanges, versionToSyncTo);
+        perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, missingChanges);
         long elapsedTime = new Date().getTime() - startingDate.getTime();
         long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime);
         String plural = elapsedTimeInSeconds == 1 ? "" : "s";
@@ -93,9 +96,9 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         return changesToAddToPerforce;
     }
 
-    private void revertChangesNotInGitDiff(List<FileChange> gitDiffChanges, Map<String, List<FileChange>> allPerforceChanges) {
+    private boolean revertChangesNotInGitDiff(List<FileChange> gitDiffChanges, Map<String, List<FileChange>> allPerforceChanges) {
         if (!allPerforceChanges.containsKey(draft.perforceChangelistId)) {
-            return;
+            return false;
         }
 
         List<FileChange> perforceChangesToRemove = new ArrayList<>(allPerforceChanges.get(draft.perforceChangelistId));
@@ -104,7 +107,9 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         if (!pathsToRevert.isEmpty()) {
             log.info("Reverting following perforce changes not in git diff\n{}", pathsToRevert.toString());
             perforce.revertFiles(draft.perforceChangelistId, pathsToRevert);
+            return true;
         }
+        return false;
     }
 
     private List<String> filePathsForChanges(List<FileChange> changes, boolean lastPathAffected) {
