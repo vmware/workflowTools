@@ -275,7 +275,10 @@ public class ReviewRequestDraft extends BaseEntity {
         this.targetGroups = StringUtils.join(targetGroups);
     }
 
-    public void addExtraTargetGroups() {
+    public void addExtraTargetGroupsIfNeeded() {
+        if (extraTargetGroupsToAdd.isEmpty()) {
+            return;
+        }
         Set<String> existingTargetGroups = new TreeSet<>();
         if (targetGroups != null) {
             existingTargetGroups.addAll(Arrays.asList(targetGroups.trim().split(",")));

@@ -362,7 +362,14 @@ public class Perforce extends BaseScmWrapper {
 
     public String add(String changelistId, String fileName) {
         String output = executeScmCommand("add -c {} {}", changelistId, fileName);
-        return failOutputIfMissingText(output, "opened for add");
+        // need to use reopen
+        String otherChangelistId = MatcherUtils.singleMatch(output, "change from change (\\d+)");
+        if (otherChangelistId != null) {
+            log.info("Reopening file {} from changelist {} as it has already been added", fileName, otherChangelistId);
+            return reopen(changelistId, Collections.singletonList(fileName));
+        } else {
+            return failOutputIfMissingText(output, "opened for add");
+        }
     }
 
     public String openForEdit(String changelistId, String fileName) {
@@ -444,7 +451,7 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    public void renameAddOrDeleteFiles(String changelistId, List<FileChange> fileChanges, String versionToSyncTo) {
+    public void renameAddOrDeleteFiles(String changelistId, List<FileChange> fileChanges) {
         for (FileChange diffChange : fileChanges) {
             FileChangeType changeType = diffChange.getChangeType();
             String fullPathForFirstFileAffected = fullPath(diffChange.getFirstFileAffected());

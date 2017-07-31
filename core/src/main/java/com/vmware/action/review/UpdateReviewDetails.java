@@ -23,7 +23,7 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
         }
 
         draft.updateTargetGroupsIfNeeded(config.targetGroups);
-        draft.addExtraTargetGroups();
+        draft.addExtraTargetGroupsIfNeeded();
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
         log.info("Successfully updated review information");
     }
