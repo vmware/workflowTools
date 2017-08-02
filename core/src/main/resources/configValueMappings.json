@@ -342,6 +342,7 @@
     "--max-summary"
   ],
   "ReadPendingChangelist": [
-    "--username"
+    "--username",
+    "--changelist-id"
   ]
 }

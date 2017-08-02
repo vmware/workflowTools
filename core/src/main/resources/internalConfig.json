@@ -173,7 +173,10 @@
           "applyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
        ],
        "applyChangelistAsGitDiff": [
-          "SelectExistingChangelist", "ApplyChangelistAsGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
+          "SelectExistingChangelist", "ApplyChangelistAsGitDiff"
+       ],
+       "applyChangelistAsGitCommit": [
+          "SelectExistingChangelist", "ReadPendingChangelist", "ApplyChangelistAsGitDiff", "CommitAll", "DisplayLastCommit", "ExitIfChangelistDoesNotMatchGitBranch"
        ],
        "prepareCommitForPush": [
           "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList",
