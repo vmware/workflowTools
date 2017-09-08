@@ -1,5 +1,6 @@
 package com.vmware.action.review;
 
+import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -8,6 +9,9 @@ import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 @ActionDescription("Sets the git commit details from the associated review request. Uses published review info only.")
 public class SetCommitDetailsFromReview extends BaseCommitAction {
@@ -49,10 +53,14 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, config.maxSummaryLength);
         draft.description = StringUtils.addNewLinesIfNeeded(reviewAsDraft.description, config.maxDescriptionLength, 0);
 
-        String testingDone = stripJenkinsJobBuildsFromTestingDone(reviewAsDraft.testingDone, config.jenkinsUrl);
-        testingDone = stripBuildwebJobBuildsFromTestingDone(testingDone, config.buildwebUrl);
+        String fullReviewText = reviewRequest.summary + "\n" + reviewAsDraft.description
+                + "\n" + config.getCommitConfiguration().getTestingDoneLabel() + reviewRequest.testingDone;
+        ReviewRequestDraft draftConstructedFromReviewDetails = new ReviewRequestDraft(fullReviewText, config.getCommitConfiguration());
+
+        String testingDone = draftConstructedFromReviewDetails.testingDone;
         testingDone =  StringUtils.addNewLinesIfNeeded(testingDone, config.maxDescriptionLength, "Testing Done: " .length());
         draft.testingDone = testingDone;
+        syncJobBuilds(draftConstructedFromReviewDetails);
         if (StringUtils.isBlank(reviewAsDraft.bugNumbers)) {
             draft.bugNumbers = config.noBugNumberLabel;
         } else {
@@ -61,13 +69,19 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         draft.reviewedBy = reviewAsDraft.reviewedBy;
     }
 
-    private String stripBuildwebJobBuildsFromTestingDone(String testingDone, String buildwebUrl) {
-        String patternToSearchFor = "\nBuild\\s+" + buildwebUrl + "\\S+";
-        return testingDone.replaceAll(patternToSearchFor, "").trim();
-    }
-
-    private String stripJenkinsJobBuildsFromTestingDone(String testingDone, String jenkinsUrl) {
-        String patternToSearchFor = "\nBuild\\s+" + jenkinsUrl + "/job/[\\w-]+/\\d+/*";
-        return testingDone.replaceAll(patternToSearchFor, "").trim();
+    private void syncJobBuilds(ReviewRequestDraft draftConstructedFromReviewDetails) {
+        List<JobBuild> existingBuilds = draft.jobBuilds;
+        List<JobBuild> buildsFromReview = draftConstructedFromReviewDetails.jobBuilds;
+        for (JobBuild jobBuildFromReview : buildsFromReview) {
+            Optional<JobBuild> existingBuild =
+                    existingBuilds.stream().filter(build -> build.url.equals(jobBuildFromReview.url)).findFirst();
+            if (!existingBuild.isPresent()) {
+                existingBuilds.add(jobBuildFromReview);
+            } else if (jobBuildFromReview.result != null) {
+                existingBuild.get().result = jobBuildFromReview.result;
+            }
+        }
+        existingBuilds.removeIf(build -> buildsFromReview.stream()
+                .noneMatch(buildFromReview -> StringUtils.equals(build.url, buildFromReview.url)));
     }
 }

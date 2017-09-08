@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RapidView {
@@ -33,13 +34,7 @@ public class RapidView {
     }
 
     private void addIfNotInSprint(List<IssueSummary> issues, IssueSummary issue) {
-        boolean found = false;
-        for (Sprint sprint : sprints) {
-            if (sprint.containsIssue(issue.id)) {
-                found = true;
-                break;
-            }
-        }
+        boolean found = Arrays.stream(sprints).anyMatch(sprint -> sprint.containsIssue(issue.id));
         if (!found) {
             issues.add(issue);
         }

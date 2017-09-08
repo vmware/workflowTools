@@ -116,10 +116,6 @@ public class FileChange {
         this.fileMode = fileMode;
     }
 
-    public String getFileType() {
-        return fileType;
-    }
-
     public void setUnresolved(boolean unresolved) {
         this.unresolved = unresolved;
     }
@@ -149,6 +145,7 @@ public class FileChange {
             case "xtempobj":
             case "xunicode":
             case "xutf16":
+            case "text+x":
                 fileMode = "100755";
                 break;
             case "text":
@@ -165,7 +162,7 @@ public class FileChange {
                 fileMode = "120000";
                 break;
             default:
-                log.warn("Unrecognized file type {}, setting file mode to default value 100644", fileType);
+                log.warn("Unrecognized file type {} for {}, setting file mode to default value 100644", fileType, getLastFileAffected());
                 fileMode = "100644";
         }
     }

@@ -346,7 +346,7 @@ public class WorkflowConfig {
     }
 
     public void generateConfigurablePropertyList() {
-        List<String> usedParams = new ArrayList<String>();
+        Map<String, Field> usedParams = new HashMap<>();
         for (Field field : WorkflowConfig.class.getFields()) {
             ConfigurableProperty configProperty = field.getAnnotation(ConfigurableProperty.class);
             if (configProperty == null) {
@@ -357,11 +357,12 @@ public class WorkflowConfig {
                 if (param.equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
                     continue;
                 }
-                if (usedParams.contains(param)) {
+                if (usedParams.containsKey(param)) {
                     throw new InvalidDataException(
-                            "Config flag {} has already been set to configure another property", param);
+                            "Config flag {} has already been set to configure another property {}", param,
+                            usedParams.get(param).getName());
                 }
-                usedParams.add(param);
+                usedParams.put(param, field);
             }
             configurableFields.add(field);
         }
