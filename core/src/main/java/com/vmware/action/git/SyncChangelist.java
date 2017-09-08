@@ -88,9 +88,8 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
                 continue;
             }
             FileChange existingPerforceChange = allPerforceChangesList.get(allPerforceChangesList.indexOf(gitDiffChange));
-            gitDiffChange.setPerforceChangelistId(existingPerforceChange.getPerforceChangelistId());
             if (!existingPerforceChange.getPerforceChangelistId().equals(draft.perforceChangelistId)) {
-                changesToAddToPerforce.add(gitDiffChange);
+                changesToAddToPerforce.add(existingPerforceChange);
             }
         }
         return changesToAddToPerforce;

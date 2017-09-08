@@ -194,8 +194,6 @@
   "SetCommitDetailsFromReview": [
     "--username",
     "--reviewboard-url",
-    "--buildweb-url",
-    "--jenkins-url",
     "--max-description",
     "--max-summary",
     "--review-request-id",

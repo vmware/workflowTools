@@ -24,18 +24,11 @@ public class SelectLinkedChangelist extends BasePerforceCommitUsingGitAction {
 
     @Override
     public void process() {
-        boolean foundMatchingTag = false;
         String headRef = git.revParse("head");
         List<String> tags = git.listTags();
-        for (String tag : tags) {
-            String tagRef = git.revParse(tag);
-            if (headRef.equals(tagRef)) {
-                foundMatchingTag = true;
-                draft.perforceChangelistId = MatcherUtils.singleMatch(tag, "changeset-(\\d+)");
-                break;
-            }
-        }
-        if (foundMatchingTag) {
+        String matchingTag = tags.stream().filter(tag -> headRef.equals(git.revParse(tag))).findFirst().orElse(null);
+        if (matchingTag != null) {
+            draft.perforceChangelistId = MatcherUtils.singleMatch(matchingTag, "changeset-(\\d+)");
             log.info("Changelist {} is linked to commit", draft.perforceChangelistId);
         } else {
             log.info("No changelist linked with commit after checking git tags");

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -25,11 +26,11 @@ public class WorkflowValuesParser {
     private List<String> unknownActions = new ArrayList<String>();
 
     private Map<String, String[]> workflows;
-    private List<Class<? extends BaseAction>> workFlowActions;
+    private List<Class<? extends BaseAction>> workflowActions;
 
-    public WorkflowValuesParser(Map<String, String[]> workflows, List<Class<? extends BaseAction>> workFlowActions) {
+    public WorkflowValuesParser(Map<String, String[]> workflows, List<Class<? extends BaseAction>> workflowActions) {
         this.workflows = workflows;
-        this.workFlowActions = workFlowActions;
+        this.workflowActions = workflowActions;
     }
 
     public void reset() {
@@ -54,18 +55,13 @@ public class WorkflowValuesParser {
                 parse(workflows.get(workflowValue));
                 continue;
             }
-            boolean found = false;
-            for (Class<? extends BaseAction> action : workFlowActions) {
-                if (action.getSimpleName().equals(workflowValue)) {
-                    actionClasses.add(action);
-                    found = true;
-                }
-            }
-            if (found) {
+            Optional<Class<? extends BaseAction>> matchingAction = workflowActions.stream().filter(action -> action.getSimpleName().equals(workflowValue)).findFirst();
+            if (matchingAction.isPresent()) {
+                actionClasses.add(matchingAction.get());
                 log.trace("Found action class {}", workflowValue);
-                continue;
+            } else {
+                unknownActions.add(workflowValue);
             }
-            unknownActions.add(workflowValue);
         }
     }
 

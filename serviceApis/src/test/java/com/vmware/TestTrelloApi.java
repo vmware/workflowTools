@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -61,12 +62,7 @@ public class TestTrelloApi extends BaseTests {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
 
-        boolean found = false;
-        for (Board board : boards) {
-            if (board.id.equals(testBoard.id)) {
-                found = true;
-            }
-        }
+        boolean found = Arrays.stream(boards).anyMatch(board -> board.id.equals(testBoard.id));
         assertTrue("Expected test board to be part of user's boards", found);
     }
 
