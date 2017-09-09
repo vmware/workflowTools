@@ -15,7 +15,7 @@ import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 
@@ -79,11 +79,11 @@ public class LoadIssues extends BaseBatchJiraAction {
 
 
         if (config.useJiraLabel && labels.size() == 0) {
-            throw new InvalidDataException("Use jira label is set to true but none of the issues have labels");
+            throw new FatalException("Use jira label is set to true but none of the issues have labels");
         }
 
         if (config.useFixVersion && fixByVersions.size() == 0) {
-            throw new InvalidDataException("Use fix by version is set to true but none of the issues have fix by versions");
+            throw new FatalException("Use fix by version is set to true but none of the issues have fix by versions");
         }
 
         String additionalInfo = "";

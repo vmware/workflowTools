@@ -1,6 +1,6 @@
 package com.vmware.reviewboard.domain;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 public enum RepoType {
     git,
@@ -16,7 +16,7 @@ public enum RepoType {
         } else if (value.contains("git")) {
             return git;
         } else {
-            throw new InvalidDataException("Repo type value {} not supported", value);
+            throw new FatalException("Repo type value {} not supported", value);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.ByteArrayInputStream;
@@ -37,7 +37,7 @@ public class FileUtils {
 
     public static List<File> scanDirectorRecursivelyForFiles(File directoryToScan, FileFilter fileFilter) {
         if (!directoryToScan.exists()) {
-            throw new InvalidDataException(directoryToScan.getPath() + " does not exist!");
+            throw new FatalException(directoryToScan.getPath() + " does not exist!");
         }
 
         List<File> files = new ArrayList<File>();

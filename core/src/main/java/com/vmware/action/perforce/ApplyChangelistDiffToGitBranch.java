@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 
@@ -33,7 +33,7 @@ public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAc
         String checkOutput = git.applyPatch(diffData, true);
         if (StringUtils.isNotBlank(checkOutput)) {
             log.debug("Failed diff\n{}" + diffData);
-            throw new InvalidDataException("Check of git diff failed!\n" + checkOutput);
+            throw new FatalException("Check of git diff failed!\n" + checkOutput);
         }
         log.info("Check of diff succeeded, applying diff");
         String applyOutput = git.applyPatch(diffData, false);
@@ -47,7 +47,7 @@ public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAc
         try {
             File tempPatchFile = File.createTempFile("failedDiff", ".patch");
             FileUtils.saveToFile(tempPatchFile, diffData);
-            throw new InvalidDataException("Failed to apply diff cleanly, saved diff to temp file {}!\n{}",
+            throw new FatalException("Failed to apply diff cleanly, saved diff to temp file {}!\n{}",
                     tempPatchFile.getPath(), applyOutput);
         } catch (IOException e) {
             throw new RuntimeIOException(e);

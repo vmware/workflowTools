@@ -14,7 +14,7 @@ import com.vmware.util.CommandLineUtils;
 import com.vmware.util.CommitConfiguration;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -358,7 +358,7 @@ public class WorkflowConfig {
                     continue;
                 }
                 if (usedParams.containsKey(param)) {
-                    throw new InvalidDataException(
+                    throw new FatalException(
                             "Config flag {} has already been set to configure another property {}", param,
                             usedParams.get(param).getName());
                 }
@@ -447,7 +447,7 @@ public class WorkflowConfig {
                 String valueByGitConfig = configValues.get(gitConfigPropertyName);
                 String valueByWorkflowProperty = configValues.get(workflowConfigPropertyName);
                 if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByGitConfig)) {
-                    throw new InvalidDataException("Property {} has value {} specified by the git config property {}" +
+                    throw new FatalException("Property {} has value {} specified by the git config property {}" +
                             " but has value {} specified by the workflow property {}, please remove one of the properties",
                             field.getName(), valueByGitConfig, gitConfigPropertyName, valueByWorkflowProperty,
                             workflowConfigPropertyName);

@@ -1,6 +1,6 @@
 package com.vmware.scm;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public abstract class BaseScmWrapper {
 
     void setWorkingDirectory(File workingDirectory) {
         if (workingDirectory == null) {
-            throw new InvalidDataException("Cannot set null working directory for client "
+            throw new FatalException("Cannot set null working directory for client "
                     + this.getClass().getSimpleName());
         }
         this.workingDirectory = workingDirectory;
@@ -39,7 +39,7 @@ public abstract class BaseScmWrapper {
 
     void setWorkingDirectory(String workingDirectoryPath) {
         if (workingDirectoryPath == null) {
-            throw new InvalidDataException("Cannot set null working directory path for client "
+            throw new FatalException("Cannot set null working directory path for client "
                     + this.getClass().getSimpleName());
         }
         File directoryWithoutNormalizing = new File(workingDirectoryPath);

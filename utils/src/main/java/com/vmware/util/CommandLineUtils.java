@@ -1,6 +1,6 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
@@ -121,7 +121,7 @@ public class CommandLineUtils {
                     }
                 }
                 if (!matchedText) {
-                    throw new InvalidDataException("Failed to match {} in script output {}", textsToWaitFor[i], totalOutput);
+                    throw new FatalException("Failed to match {} in script output {}", textsToWaitFor[i], totalOutput);
                 }
 
             }

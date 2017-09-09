@@ -20,7 +20,7 @@ import com.vmware.util.ReflectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
@@ -202,7 +202,8 @@ public class Workflow {
             log.error(e.getMessage());
             askForWorkflow();
             runWorkflow();
-        } catch (InvalidDataException iie) {
+        } catch (FatalException iie) {
+            log.info("");
             if (log.isDebugEnabled()) {
                 throw iie;
             } else {
@@ -353,18 +354,16 @@ public class Workflow {
         log.debug("Executing workflow action {}", actionName);
         setWorkflowValuesOnAction(action, values);
 
-        String reasonForFailingAction = action.failWorkflowIfConditionNotMet();
-
-        if (reasonForFailingAction != null) {
-            log.error("Workflow failed by action {} as {}", actionName, reasonForFailingAction);
-            System.exit(1);
-        }
-
         String reasonForNotRunningAction = action.cannotRunAction();
 
         if (reasonForNotRunningAction != null) {
             log.info("Skipping running of action {} as {}", actionName, reasonForNotRunningAction);
         } else {
+            String reasonForFailingAction = action.failWorkflowIfConditionNotMet();
+            if (reasonForFailingAction != null) {
+                log.error("Workflow failed by action {} as {}", actionName, reasonForFailingAction);
+                System.exit(1);
+            }
             action.preprocess();
             action.process();
         }

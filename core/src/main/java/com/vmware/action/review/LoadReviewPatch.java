@@ -7,7 +7,7 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Loads diff data for the specified review")
@@ -42,7 +42,7 @@ public class LoadReviewPatch extends BaseCommitAction {
         log.info("Using review request {} ({}) for patching", reviewRequest.id, reviewRequest.summary);
 
         if (diffs.length == 0) {
-            throw new InvalidDataException("Review request {} does not have any diffs", config.reviewRequestId);
+            throw new FatalException("Review request {} does not have any diffs", config.reviewRequestId);
         }
 
         int diffSelection = diffs.length - 1;

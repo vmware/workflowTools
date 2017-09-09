@@ -1,7 +1,7 @@
 package com.vmware.config;
 
 import com.vmware.util.ArrayUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +76,7 @@ public class CommandLineArgumentsParser {
         for (String key : possibleMatchingValues) {
             if (argumentMap.containsKey(key)) {
                 if (foundKey != null) {
-                    throw new InvalidDataException(
+                    throw new FatalException(
                             "Both {} and {} command line arguments found, only one should be set", foundKey, key);
                 }
                 foundKey = key;
@@ -93,7 +93,7 @@ public class CommandLineArgumentsParser {
 
         String argumentValue = argumentMap.get(matchingArgumentKey);
         if (argumentValue == null) {
-            throw new InvalidDataException("Command line argument {} did not specify a value", matchingArgumentKey);
+            throw new FatalException("Command line argument {} did not specify a value", matchingArgumentKey);
         }
         return argumentValue;
     }
@@ -104,7 +104,7 @@ public class CommandLineArgumentsParser {
         String argValue = getArgument(NO_DEFAULT, possibleMatchingValues);
 
         if (argValue == null) {
-            throw new InvalidDataException("Expected to find match for config names " + Arrays.toString(possibleMatchingValues));
+            throw new FatalException("Expected to find match for config names " + Arrays.toString(possibleMatchingValues));
         }
         return argValue;
     }
@@ -144,7 +144,7 @@ public class CommandLineArgumentsParser {
             for (UnrecognizedCommandLineArgument unrecognizedArgument : unrecognizedArguments) {
                 errorMessage += "\n" + unrecognizedArgument.toString() + "\n";
             }
-            throw new InvalidDataException(errorMessage);
+            throw new FatalException(errorMessage);
         }
     }
 

@@ -25,13 +25,11 @@ import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -170,7 +168,7 @@ public class Trello extends AbstractRestService {
             return matcher.group(1);
         }
         log.debug("Api page text\n{}", text);
-        throw new InvalidDataException("No match for pattern " + pattern);
+        throw new FatalException("No match for pattern " + pattern);
     }
 
     private static String createApiUrl(String trelloUrl) {

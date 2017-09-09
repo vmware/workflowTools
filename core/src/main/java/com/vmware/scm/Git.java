@@ -4,7 +4,7 @@ import com.vmware.util.CommandLineUtils;
 import com.vmware.util.FileUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 
@@ -128,7 +128,7 @@ public class Git extends BaseScmWrapper {
             } else {
                 lastCommitText = commitText(counter++, false);
                 if (StringUtils.isBlank(lastCommitText)) {
-                    throw new InvalidDataException("Failed to find last submitted changelist");
+                    throw new FatalException("Failed to find last submitted changelist");
                 }
                 gitP4Matcher.reset(lastCommitText);
                 fusionMatcher.reset(lastCommitText);
@@ -264,7 +264,7 @@ public class Git extends BaseScmWrapper {
     public String revParse(String commitRef) {
         String output =  revParseWithoutException(commitRef);
         if (output.contains("ambiguous argument")) {
-            throw new InvalidDataException("Commit ref {} is not a valid ref: {}", commitRef, output);
+            throw new FatalException("Commit ref {} is not a valid ref: {}", commitRef, output);
         }
         return output;
     }

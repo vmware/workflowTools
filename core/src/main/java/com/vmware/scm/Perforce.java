@@ -5,10 +5,9 @@ import com.vmware.util.CommandLineUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
-import sun.misc.Perf;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,11 +20,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.scm.FileChange.containsChangesOfType;
 import static com.vmware.scm.FileChangeType.deletedAfterRename;
 import static com.vmware.scm.FileChangeType.renamed;
 import static com.vmware.util.StringUtils.appendWithDelimiter;
-import static com.vmware.util.StringUtils.stripLinesStartingWith;
 import static com.vmware.util.logging.LogLevel.DEBUG;
 import static com.vmware.util.logging.LogLevel.INFO;
 import static java.lang.String.format;
@@ -542,11 +539,11 @@ public class Perforce extends BaseScmWrapper {
     private String updateTemplateWithDescription(String perforceTemplate, String commitText, boolean filesExpected) {
         int descriptionIndex = perforceTemplate.indexOf("Description:");
         if (descriptionIndex == -1) {
-            throw new InvalidDataException("Failed to find Description: in perforce template:\n" + perforceTemplate);
+            throw new FatalException("Failed to find Description: in perforce template:\n" + perforceTemplate);
         }
         int filesIndex = perforceTemplate.indexOf("Files:");
         if (filesIndex == -1 && filesExpected) {
-            throw new InvalidDataException("Failed to find Files: in perforce template, does the git commit have file changes?:\n" + perforceTemplate);
+            throw new FatalException("Failed to find Files: in perforce template, does the git commit have file changes?:\n" + perforceTemplate);
         } else if (filesIndex == -1) {
             log.debug("No files detected");
             filesIndex = perforceTemplate.length();

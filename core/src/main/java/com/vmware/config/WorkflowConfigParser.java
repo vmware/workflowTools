@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.vmware.scm.Git;
 import com.vmware.scm.Perforce;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
@@ -169,7 +169,7 @@ public class WorkflowConfigParser {
 
     private WorkflowConfig readExternalWorkflowConfig(File configFilePath) {
         if (!configFilePath.exists()) {
-            throw new InvalidDataException("Config file {} does not exist", configFilePath.getPath());
+            throw new FatalException("Config file {} does not exist", configFilePath.getPath());
         }
 
         Reader externalConfigReader = null;

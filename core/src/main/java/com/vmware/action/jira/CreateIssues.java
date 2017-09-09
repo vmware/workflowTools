@@ -4,7 +4,7 @@ import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class CreateIssues extends BaseBatchJiraAction {
     private Issue getBaselineIssue() {
         List<Issue> issuesFromJira = projectIssues.getIssuesFromJira();
         if (issuesFromJira.isEmpty()) {
-            throw new InvalidDataException("Expected to find issue in list that was already in Jira!");
+            throw new FatalException("Expected to find issue in list that was already in Jira!");
         }
         Issue issueToUse = issuesFromJira.get(0);
         Issue baselineIssue = jira.getIssueByKey(issueToUse.getKey());
