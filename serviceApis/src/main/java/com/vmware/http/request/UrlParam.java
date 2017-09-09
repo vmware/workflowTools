@@ -1,6 +1,6 @@
 package com.vmware.http.request;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 /**
  * Will be appended to the url as GET parameters for a request.
@@ -14,7 +14,7 @@ public class UrlParam extends RequestParam {
     public static UrlParam fromText(String paramText) {
         String[] paramPieces = paramText.split("=");
         if (paramPieces.length != 2) {
-            throw new InvalidDataException(
+            throw new FatalException(
                     "{} is not a valid url parameter, rerun with -d flag for debugging info", paramText);
         }
         return new UrlParam(paramPieces[0], paramPieces[1]);

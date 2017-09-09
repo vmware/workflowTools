@@ -1,7 +1,7 @@
 package com.vmware.jira.domain;
 
 import com.google.gson.annotations.Expose;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 public class IssueTransitions {
 
@@ -28,6 +28,6 @@ public class IssueTransitions {
                 return transition;
             }
         }
-        throw new InvalidDataException("No transition available for status " + toStatus.name());
+        throw new FatalException("No transition available for status " + toStatus.name());
     }
 }

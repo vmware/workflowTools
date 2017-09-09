@@ -10,10 +10,11 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 
 public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithReviewAction {
     protected ReviewBoard reviewBoard;
-
+    private RuntimeException reviewBoardException;
 
     public BaseCommitUsingReviewBoardAction(WorkflowConfig config) {
         super(config);
@@ -21,7 +22,19 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
 
     @Override
     public void asyncSetup() {
-        reviewBoard = serviceLocator.getReviewBoard();
+        try {
+            reviewBoard = serviceLocator.getReviewBoard();
+        } catch (FatalException re) {
+            this.reviewBoardException = re;
+        }
+    }
+
+    @Override
+    public String failWorkflowIfConditionNotMet() {
+        if (reviewBoardException != null) {
+            throw reviewBoardException;
+        }
+        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

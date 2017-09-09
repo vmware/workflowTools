@@ -7,7 +7,7 @@ import com.vmware.scm.Perforce;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,7 @@ public class GitDiffToPerforceConverter implements DiffConverter {
         for (String depotFileToCheck : depotMappings.keySet()) {
             String depotMapping = depotMappings.get(depotFileToCheck);
             if (depotMapping == null) {
-                throw new InvalidDataException("No depot mapping for file " + depotFileToCheck);
+                throw new FatalException("No depot mapping for file " + depotFileToCheck);
             }
             String version = depotVersions.get(depotMapping);
             output = output.replace("[!!" + depotFileToCheck + "#0!!]", depotMapping + "#" + version);
@@ -151,7 +151,7 @@ public class GitDiffToPerforceConverter implements DiffConverter {
             linesIterator.next();
             String renamedDiffFile = MatcherUtils.singleMatchExpected(linesIterator.next(), "\\+\\+\\+\\s+b/(.+)");
             if (!renameToFile.equals(renamedDiffFile)) {
-                throw new InvalidDataException(
+                throw new FatalException(
                         "Expected renamed to file [{}] name to match +++ b/ file name[{}]", renameToFile, renamedDiffFile);
             }
             fileChanges.add(new FileChange(git, FileChangeType.renamedAndModified, renameFromFile, renameToFile));

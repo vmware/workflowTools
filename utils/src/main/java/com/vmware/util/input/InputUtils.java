@@ -1,6 +1,6 @@
 package com.vmware.util.input;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
@@ -38,7 +38,7 @@ public class InputUtils {
 
     public static int readSelection(String[] choices, String title) {
         if (choices == null || choices.length == 0) {
-            throw new InvalidDataException("No {} to select from", title);
+            throw new FatalException("No {} to select from", title);
         }
 
         Padder padder = new Padder(title);

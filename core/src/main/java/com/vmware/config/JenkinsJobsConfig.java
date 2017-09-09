@@ -2,7 +2,7 @@ package com.vmware.config;
 
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameter;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class JenkinsJobsConfig {
         for (String param : params) {
             String[] paramPieces = param.split("=");
             if (paramPieces.length != 2) {
-                throw new InvalidDataException(
+                throw new FatalException(
                         "Parameter {} for job {} should be of the format name=value", param, jobName);
             }
             parameters.add(new JobParameter(paramPieces[0], paramPieces[1]));

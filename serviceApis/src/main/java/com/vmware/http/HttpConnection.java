@@ -15,6 +15,7 @@ import com.vmware.http.request.RequestParam;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 import com.vmware.util.IOUtils;
 import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.exception.RuntimeURISyntaxException;
 import com.vmware.util.input.InputUtils;
@@ -305,11 +306,9 @@ public class HttpConnection {
     }
 
     private void handleNetworkException(IOException e) {
-        log.info("");
-        log.error("Unknown host exception thrown: {}", e.getMessage());
-        log.error("Are you connected to the corporate network?");
-        log.error("Failed to access host {}", activeConnection.getURL().getHost());
-        System.exit(1);
+        throw new FatalException(e, "Unknown host exception thrown: " + e.getMessage()
+                + "\nAre you connected to the corporate network?"
+                + "\nFailed to access host " + activeConnection.getURL().getHost());
     }
 
     private String parseResponseText() throws IOException {

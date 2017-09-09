@@ -1,6 +1,6 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +20,7 @@ public class MatcherUtils {
     public static String singleMatchExpected(String text, String pattern) {
         String value = singleMatch(text, pattern);
         if (value == null) {
-            throw new InvalidDataException("Pattern {} not matched in text {}", pattern, text);
+            throw new FatalException("Pattern {} not matched in text {}", pattern, text);
         }
         return value;
     }

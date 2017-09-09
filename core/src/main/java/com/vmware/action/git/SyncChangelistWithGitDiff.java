@@ -6,7 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.scm.FileChange;
 import com.vmware.scm.GitChangelistRef;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.InvalidDataException;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
 
         if (StringUtils.isNotBlank(checkOutput)) {
             log.debug("Failed diff\n{}", diffData);
-            throw new InvalidDataException("Check of git diff failed!\n" + checkOutput);
+            throw new FatalException("Check of git diff failed!\n" + checkOutput);
         }
 
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, gitDiffChanges);
@@ -42,7 +42,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
         if (StringUtils.isNotBlank(output)) {
             perforce.revertChangesInPendingChangelist(draft.perforceChangelistId);
             perforce.clean();
-            throw new InvalidDataException("Unexpected output when applying git diff!\n" + output);
+            throw new FatalException("Unexpected output when applying git diff!\n" + output);
         }
         log.info("Applied git diff to changelist {}", draft.perforceChangelistId);
 
