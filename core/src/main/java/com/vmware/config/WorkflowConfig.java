@@ -89,6 +89,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Label for approved by value")
     public String approvedByLabel;
 
+    @ConfigurableProperty(commandLine = "-da,--default-approver", help = "Default user to use for approving")
+    public String defaultApprover;
+
     @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira and review board")
     public String username;
 

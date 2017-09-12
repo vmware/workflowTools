@@ -166,6 +166,9 @@
     "--username",
     "--changelist-id"
   ],
+  "SetDefaultApprover": [
+    "--default-approver"
+  ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
   ],
