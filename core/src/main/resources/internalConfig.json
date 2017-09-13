@@ -22,8 +22,8 @@
   "buildType": "opt",
   "defaultGitRemote": "origin",
   "remoteBranches": {
-    "precommit" : "topic/$USERNAME/pre-commit",
-    "update" : "topic/$USERNAME/update"
+    "precommit": "topic/$USERNAME/pre-commit",
+    "update": "topic/$USERNAME/update"
   },
   "remoteBranchToUse": "precommit",
   "trackingBranch": "master",
@@ -32,18 +32,28 @@
     8
   ],
   "storyPointValues": [
-    1,2,3,5,8,13
+    1,
+    2,
+    3,
+    5,
+    8,
+    13
   ],
   "defaultJiraProject": "HW",
   "bugzillaPrefix": "BZ",
   "bugNumberSearchOrder": [
-      "Bugzilla", "Jira"
-   ],
+    "Bugzilla",
+    "Jira"
+  ],
   "topicTemplates": [
-      "Server", "Testing", "UI"
+    "Server",
+    "Testing",
+    "UI"
   ],
   "testingDoneTemplates": [
-      "Ran Unit Tests.", "Ran server tests.", "Manual testing."
+    "Ran Unit Tests.",
+    "Ran server tests.",
+    "Manual testing."
   ],
   "testingDoneLabel": "Testing Done:",
   "bugNumberLabel": "Bug Number:",
@@ -62,288 +72,542 @@
   "closeOldShipItReviewsAfter": 7,
   "jiraTaskEstimateInHours": 1,
   "jiraCustomFieldNames": {
-    "storyPointsFieldName" : "customfield_10062",
-    "acceptanceCriteriaFieldName" : "customfield_10100"
+    "storyPointsFieldName": "customfield_10062",
+    "acceptanceCriteriaFieldName": "customfield_10100"
   },
-  "fileCountRanges": [5,10,20,50,100],
+  "fileCountRanges": [
+    5,
+    10,
+    20,
+    50,
+    100
+  ],
   "keepMissingCards": false,
   "workflows": {
-       "readNonTrivialCommit": [
-          "ReadLastCommit", "ExitIfTrivialCommit"
-       ],
-       "readPerforceCommit": [
-          "ExitIfPerforceClientIsNotFound", "ReadLastCommit", "SelectLinkedChangelist", "SelectMatchingChangelist", "UpdateChangelistTag"
-       ],
-       "readPendingChangelist": [
-          "ReadPendingChangelist", "ExitIfCommitDoesNotHaveAChangelistId"
-       ],
-       "displayReviewUrl": [
-          "DisplayReviewUrl", "CopyReviewUrlToClipboard"
-       ],
-       "setCommitDetailsWithoutConfirmation": [
-          "SetSummary", "SetDescription", "SetTestingDone", "SetReviewedBy", "SetBugNumbers"
-       ],
-       "setCommitDetails": [
-          "setCommitDetailsWithoutConfirmation", "ExitIfConfirmationNotGiven"
-       ],
-       "setCommitDetailsOffline": [
-          "SetSummary", "SetDescription", "SetTestingDone",
-                      "SetReviewedByOffline", "SetBugNumbersOffline", "ExitIfConfirmationNotGiven"
-       ],
-       "setCommitDetailsFromReview": [
-          "ReadLastCommit", "SetCommitDetailsFromReview", "DisplayCommit",
-          "ExitIfConfirmationNotGiven", "AmendCommit"
-       ],
-       "commitAll": [
-          "ExitIfNoChangesDetectedByGit", "setCommitDetails", "CommitAll", "MarkIssueAsInProgress", "DisplayLastCommit"
-       ],
-       "commitAllOffline": [
-          "ExitIfNoChangesDetectedByGit", "setCommitDetailsOffline", "CommitAll", "DisplayLastCommit"
-       ],
-       "commit": [
-          "ExitIfNoStagedChangesDetectedByGit", "setCommitDetails", "Commit", "MarkIssueAsInProgress", "DisplayLastCommit"
-       ],
-       "commitOffline": [
-          "ExitIfNoStagedChangesDetectedByGit", "setCommitDetailsOffline", "Commit", "DisplayLastCommit"
-       ],
-       "quickCommitAll": [
-          "ExitIfNoChangesDetectedByGit", "SetSummary", "SetDescription", "CommitAll", "DisplayLastCommit"
-       ],
-       "quickCommit": [
-          "ExitIfNoStagedChangesDetectedByGit", "SetSummary", "SetDescription", "Commit", "DisplayLastCommit"
-       ],
-       "amendCommit": [
-          "ExitIfNoChangesDetectedByGit", "DisplayLastCommit", "ExitIfConfirmationNotGiven", "AmendCommitFilesOnly"
-       ],
-       "setChangelistDetails": [
-          "readPendingChangelist", "setCommitDetails", "AmendCommit", "DisplayCommit"
-       ],
-       "createPendingChangelist": [
-          "setCommitDetails", "CreatePendingChangelistIfNeeded"
-       ],
-       "moveOpenFilesToPendingChangelist": [
-          "readPendingChangelist", "MoveOpenFilesToPendingChangelist"
-       ],
-       "setReviewDetails": [
-          "AddReviewGroupsForMatchingFileMappings", "UpdateReviewDetails"
-       ],
-       "setReviewDetailsAndDiff": [
-          "AddReviewGroupsForMatchingFileMappings", "UpdateReviewDetails", "UploadReviewDiff"
-       ],
-       "forceNewReview": [
-          "readNonTrivialCommit", "CreateReview", "AmendCommit", "setReviewDetailsAndDiff", "displayReviewUrl"
-       ],
-       "review": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "setReviewDetailsAndDiff", "displayReviewUrl"
-       ],
-       "reviewCommitWithMatchingChangelist": [
-          "updateMatchingChangelist", "CreateReviewIfNeeded", "AmendCommit", "AddReviewGroupsForMatchingFileMappings", "setReviewDetails", "UploadReviewDiffFromChangelist", "displayReviewUrl"
-       ],
-       "amendReview": [
-          "amendCommit", "review"
-       ],
-       "diffUploadOnly": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiff", "displayReviewUrl"
-       ],
-       "detailsUpdateOnly": [
-          "readNonTrivialCommit", "CreateReviewIfNeeded", "AmendCommit", "setReviewDetails", "displayReviewUrl"
-       ],
-       "publishReview": [
-          "readNonTrivialCommit", "PublishReview", "ExitIfReviewIsNotPublic", "MarkIssueAsInReview"
-       ],
-       "submitReview": [
-          "readNonTrivialCommit", "SoftSubmitReview"
-       ],
-       "applyPerforcePatch": [
-          "LoadPerforcePatchFile", "ApplyPatch"
-       ],
-       "applyGitPatch": [
-           "LoadGitPatchFile", "ApplyPatch"
-       ],
-       "applyReviewPatch": [
-          "LoadReviewPatch", "ApplyPatch"
-       ],
-       "applyReviewPatchUsingPatch": [
-          "LoadReviewPatch", "ApplyPatch", "--use-patch-command"
-       ],
-       "applyReviewPatchToNewChangelist": [
-          "CreatePendingChangelistIfNeeded", "applyReviewPatch", "SetCommitDetailsFromReview", "AmendCommit"
-       ],
-       "applyReviewPatchAsGitCommit": [
-          "applyReviewPatch", "SetCommitDetailsFromReview", "CommitAll", "DisplayLastCommit"
-       ],
-       "applyChangelistAsGitDiff": [
-          "SelectExistingChangelist", "ApplyChangelistAsGitDiff"
-       ],
-       "applyChangelistAsGitCommit": [
-          "SelectExistingChangelist", "ReadPendingChangelist", "ApplyChangelistAsGitDiff", "CommitAll", "DisplayLastCommit", "ExitIfChangelistDoesNotMatchGitBranch"
-       ],
-       "prepareCommitForPush": [
-          "ReadLastCommit", "ExitIfReviewHasNoShipIts", "SetReviewedByAsShipItsList",
-          "FormatCommitText", "AmendCommitWithoutJobResults"
-       ],
-       "push": [
-          "pushHarder"
-       ],
-       "pushSofter": [
-         "prepareCommitForPush", "PushToTrackingBranch", "SoftSubmitReview"
-       ],
-       "pushHarder": [
-          "prepareCommitForPush", "PushToTrackingBranch", "HardSubmitReview"
-       ],
-       "submit": [
-          "submitHarder"
-       ],
-       "submitSofter": [
-         "prepareCommitForPush", "updateMatchingChangelist", "SubmitPendingChangelist", "DeleteChangelistTag", "SoftSubmitReview"
-       ],
-       "submitHarder": [
-         "prepareCommitForPush", "updateMatchingChangelist", "SubmitPendingChangelist", "DeleteChangelistTag", "HardSubmitReview"
-       ],
-       "submitWithGitP4": [
-          "prepareCommitForPush", "RevertWorkspace", "SubmitToDepot", "DeleteChangelistTag", "HardSubmitReview"
-       ],
-       "submitChangelist": [
-          "prepareCommitForPush", "SubmitPendingChangelist", "HardSubmitReview"
-       ],
-       "closeOldReviews": [
-          "HardSubmitOldSoftSubmittedReviews", "HardSubmitOldShipItReviews"
-       ],
-       "startJobs": [
-          "PushToPrecommitBranch", "ReadLastCommit", "InvokeJenkinsJobs", "AmendCommit"
-       ],
-       "restartJobs": [
-          "PushToPrecommitBranch", "restartJobsWithoutUpdate"
-       ],
-       "restartJobsWithoutUpdate": [
-          "ReadLastCommit", "AbortJenkinsBuilds", "InvokeJenkinsJobs", "AmendCommit"
-       ],
-       "stopJobs": [
-          "ReadLastCommit", "AbortJenkinsBuilds", "AmendCommit"
-       ],
-       "pushable": [
-          "ReadLastCommit", "CheckStatusOfJenkinsBuilds", "CheckStatusOfBuildwebBuilds", "CheckStatusOfReviewShipIts", "AmendCommit"
-       ],
-       "resolveIssue": [
-          "ReadLastCommit", "ExitIfCommitHasNoBugNumber", "MarkBugAsResolved", "MarkIssueAsResolved"
-       ],
-       "setMissingCommitValues": [
-          "ReadLastCommit", "setCommitDetailsWithoutConfirmation", "ExitIfCommitUnchanged",
-           "ExitIfConfirmationNotGiven", "AmendCommit", "DisplayCommit", "--set-empty-only"
-       ],
-       "setSummary": [
-          "ReadLastCommit", "SetSummary", "AmendCommit"
-       ],
-       "setDescription": [
-          "ReadLastCommit", "SetDescription", "AmendCommit"
-       ],
-       "setTestingDone": [
-          "ReadLastCommit", "SetTestingDone", "AmendCommit"
-       ],
-       "setBugNumber": [
-          "ReadLastCommit", "SetBugNumbers", "AmendCommit"
-       ],
-       "setReviewedBy": [
-          "ReadLastCommit", "SetReviewedBy", "AmendCommit"
-       ],
-       "setReviewNumber": [
-          "ReadLastCommit", "SetReviewId", "AmendCommit"
-       ],
-       "setApprovedBy": [
-          "ReadLastCommit", "SetApprovedBy", "AmendCommit"
-       ],
-       "setDefaultApprover": [
-          "ReadLastCommit", "SetDefaultApprover", "AmendCommit"
-       ],
-       "addToDescription": [
-          "ReadLastCommit", "AddToDescription", "AmendCommit"
-       ],
-       "addToTestingDone": [
-          "ReadLastCommit", "AddToTestingDone", "AmendCommit"
-       ],
-       "addToReviewedBy": [
-          "ReadLastCommit", "AddToReviewedBy", "AmendCommit"
-       ],
-       "reopenAndResolveIssues": [
-          "LoadCompletedIssuesWithoutResolution", "ExitIfThereAreNoIssuesToProcess", "ReopenAndResolveIssues"
-       ],
-       "createTrackingIssueForBug": [
-          "AddTrackingIssueForBug", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
-       ],
-       "createTrackingIssuesForQuery": [
-          "LoadBugsForQuery", "AddTrackingIssuesForQuery", "ExitIfThereAreNoIssuesToProcess", "ExitIfConfirmationNotGiven", "CreateIssues", "AddTrackingIssueCreatedComments"
-       ],
-       "resolveBugsForQuery": [
-          "LoadBugsForQuery", "ExitIfThereAreNoBugsToProcess", "ResolveBugsWithResolvedTrackingIssues"
-       ],
-       "createTrelloBoard": [
-          "LoadIssues", "ExitIfThereAreNoIssuesToProcess", "CreateTrelloBoardIfNeeded", "SyncCardsWithJiraIssues"
-       ],
-       "forceCreateTrelloBoard": [
-          "LoadIssues", "ExitIfThereAreNoIssuesToProcess", "CreateTrelloBoard", "SyncCardsWithJiraIssues"
-       ],
-       "createTrelloBoardFromLabel": [
-          "createTrelloBoard", "--use-label"
-       ],
-       "createTrelloBoardFromFixVersion": [
-          "createTrelloBoard", "--use-fix-version"
-       ],
-       "createTrelloBoardWithAllStoriesFromLabel": [
-          "createTrelloBoard", "--use-label", "--include-sprint-stories"
-       ],
-       "forceCreateTrelloBoardFromLabel": [
-          "forceCreateTrelloBoard", "--use-label"
-       ],
-       "selectAndConvertBoard": [
-           "SelectTrelloBoard", "ExitIfNoTrelloBoardSelected", "ConvertCardsToJiraIssues"
-       ],
-       "setStoryPoints": [
-          "selectAndConvertBoard", "UpdateStoryPointsOnly"
-       ],
-       "createUpdateIssuesFromTrello": [
-          "selectAndConvertBoard", "UpdateIssues", "CreateIssues"
-       ],
-       "updateMatchingChangelistWithFileSync": [
-          "readPerforceCommit", "CreatePendingChangelistIfNeeded", "UpdateMatchingChangelistDescription", "SyncChangelist", "ExitIfChangelistDoesNotMatchGitBranch"
-       ],
-       "updateMatchingChangelistWithGitDiff": [
-         "readPerforceCommit", "RevertWorkspace", "CreatePendingChangelistIfNeeded", "UpdateMatchingChangelistDescription", "SyncChangelistWithGitDiff", "ExitIfChangelistDoesNotMatchGitBranch"
-       ],
-       "updateWithGitChangeset": [
-         "readPerforceCommit", "AddGitChangesetConfigValueIfNeeded", "CreatePendingChangelistIfNeeded", "UpdateChangelistWithGitChangeset", "UpdateMatchingChangelistDescription"
-       ],
-       "reviewWithGitChangeset": [
-         "updateWithGitChangeset", "CreateReviewIfNeeded", "AmendCommit", "UploadReviewDiffFromChangelist", "setReviewDetails", "displayReviewUrl"
-       ],
-       "submitWithGitChangeset": [
-         "prepareCommitForPush", "updateWithGitChangeset", "SubmitPendingChangelist", "DeleteChangelistTag"
-       ],
-       "updateMatchingChangelist": [
-         "updateMatchingChangelistWithFileSync"
-       ],
-       "sandbox": [
-         "updateMatchingChangelistWithFileSync", "InvokeSandboxBuild", "AmendCommit"
-       ],
-       "invokeSandboxBuildWithGitChangeset": [
-        "updateWithGitChangeset", "InvokeSandboxBuild", "AmendCommit"
-       ],
-       "invokeSandboxBuildWithGitFusion": [
-         "ReadLastCommit", "--changelist-id=head", "InvokeSandboxBuild", "AmendCommit"
-       ],
-       "displayWorkflowBuildInfo": [
-         "DisplayConfig", "--specific-properties=buildInfo"
-       ],
-       "intro": [
-         "GettingStarted", "DisplayMainWorkflows"
-       ],
-       "help": [
-          "DisplayApiTokensInfo", "DisplayConfig", "DisplayWorkflowActions",
-           "DisplayCustomActionsHelp", "DisplayMainWorkflows", "DisplayAdditionalWorkflows"
-       ]
-   },
+    "readNonTrivialCommit": [
+      "ReadLastCommit",
+      "ExitIfTrivialCommit"
+    ],
+    "readPerforceCommit": [
+      "ExitIfPerforceClientIsNotFound",
+      "ReadLastCommit",
+      "SelectLinkedChangelist",
+      "SelectMatchingChangelist",
+      "UpdateChangelistTag"
+    ],
+    "readPendingChangelist": [
+      "ReadPendingChangelist",
+      "ExitIfCommitDoesNotHaveAChangelistId"
+    ],
+    "displayReviewUrl": [
+      "DisplayReviewUrl",
+      "CopyReviewUrlToClipboard"
+    ],
+    "setCommitDetailsWithoutConfirmation": [
+      "SetSummary",
+      "SetDescription",
+      "SetTestingDone",
+      "SetReviewedBy",
+      "SetBugNumbers"
+    ],
+    "setCommitDetails": [
+      "setCommitDetailsWithoutConfirmation",
+      "ExitIfConfirmationNotGiven"
+    ],
+    "setCommitDetailsOffline": [
+      "SetSummary",
+      "SetDescription",
+      "SetTestingDone",
+      "SetReviewedByOffline",
+      "SetBugNumbersOffline",
+      "ExitIfConfirmationNotGiven"
+    ],
+    "setCommitDetailsFromReview": [
+      "ReadLastCommit",
+      "SetCommitDetailsFromReview",
+      "DisplayCommit",
+      "ExitIfConfirmationNotGiven",
+      "AmendCommit"
+    ],
+    "commitAll": [
+      "ExitIfNoChangesDetectedByGit",
+      "setCommitDetails",
+      "CommitAll",
+      "MarkIssueAsInProgress",
+      "DisplayLastCommit"
+    ],
+    "commitAllOffline": [
+      "ExitIfNoChangesDetectedByGit",
+      "setCommitDetailsOffline",
+      "CommitAll",
+      "DisplayLastCommit"
+    ],
+    "commit": [
+      "ExitIfNoStagedChangesDetectedByGit",
+      "setCommitDetails",
+      "Commit",
+      "MarkIssueAsInProgress",
+      "DisplayLastCommit"
+    ],
+    "commitOffline": [
+      "ExitIfNoStagedChangesDetectedByGit",
+      "setCommitDetailsOffline",
+      "Commit",
+      "DisplayLastCommit"
+    ],
+    "quickCommitAll": [
+      "ExitIfNoChangesDetectedByGit",
+      "SetSummary",
+      "SetDescription",
+      "CommitAll",
+      "DisplayLastCommit"
+    ],
+    "quickCommit": [
+      "ExitIfNoStagedChangesDetectedByGit",
+      "SetSummary",
+      "SetDescription",
+      "Commit",
+      "DisplayLastCommit"
+    ],
+    "amendCommit": [
+      "ExitIfNoChangesDetectedByGit",
+      "DisplayLastCommit",
+      "ExitIfConfirmationNotGiven",
+      "AmendCommitFilesOnly"
+    ],
+    "setChangelistDetails": [
+      "readPendingChangelist",
+      "setCommitDetails",
+      "AmendCommit",
+      "DisplayCommit"
+    ],
+    "createPendingChangelist": [
+      "setCommitDetails",
+      "CreatePendingChangelistIfNeeded"
+    ],
+    "moveOpenFilesToPendingChangelist": [
+      "readPendingChangelist",
+      "MoveOpenFilesToPendingChangelist"
+    ],
+    "setReviewDetails": [
+      "AddReviewGroupsForMatchingFileMappings",
+      "UpdateReviewDetails"
+    ],
+    "setReviewDetailsAndDiff": [
+      "AddReviewGroupsForMatchingFileMappings",
+      "UpdateReviewDetails",
+      "UploadReviewDiff"
+    ],
+    "forceNewReview": [
+      "readNonTrivialCommit",
+      "CreateReview",
+      "AmendCommit",
+      "setReviewDetailsAndDiff",
+      "displayReviewUrl"
+    ],
+    "review": [
+      "readNonTrivialCommit",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "setReviewDetailsAndDiff",
+      "displayReviewUrl"
+    ],
+    "reviewCommitWithMatchingChangelist": [
+      "updateMatchingChangelist",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "AddReviewGroupsForMatchingFileMappings",
+      "setReviewDetails",
+      "UploadReviewDiffFromChangelist",
+      "displayReviewUrl"
+    ],
+    "amendReview": [
+      "amendCommit",
+      "review"
+    ],
+    "diffUploadOnly": [
+      "readNonTrivialCommit",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "UploadReviewDiff",
+      "displayReviewUrl"
+    ],
+    "detailsUpdateOnly": [
+      "readNonTrivialCommit",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "setReviewDetails",
+      "displayReviewUrl"
+    ],
+    "publishReview": [
+      "readNonTrivialCommit",
+      "PublishReview",
+      "ExitIfReviewIsNotPublic",
+      "MarkIssueAsInReview"
+    ],
+    "submitReview": [
+      "readNonTrivialCommit",
+      "SoftSubmitReview"
+    ],
+    "applyPerforcePatch": [
+      "LoadPerforcePatchFile",
+      "ApplyPatch"
+    ],
+    "applyGitPatch": [
+      "LoadGitPatchFile",
+      "ApplyPatch"
+    ],
+    "applyReviewPatch": [
+      "LoadReviewPatch",
+      "ApplyPatch"
+    ],
+    "applyReviewPatchUsingPatch": [
+      "LoadReviewPatch",
+      "ApplyPatch",
+      "--use-patch-command"
+    ],
+    "applyReviewPatchToNewChangelist": [
+      "CreatePendingChangelistIfNeeded",
+      "applyReviewPatch",
+      "SetCommitDetailsFromReview",
+      "AmendCommit"
+    ],
+    "applyReviewPatchAsGitCommit": [
+      "applyReviewPatch",
+      "SetCommitDetailsFromReview",
+      "CommitAll",
+      "DisplayLastCommit"
+    ],
+    "applyChangelistAsGitDiff": [
+      "SelectExistingChangelist",
+      "ApplyChangelistAsGitDiff"
+    ],
+    "applyChangelistAsGitCommit": [
+      "SelectExistingChangelist",
+      "ReadPendingChangelist",
+      "ApplyChangelistAsGitDiff",
+      "CommitAll",
+      "DisplayLastCommit",
+      "ExitIfChangelistDoesNotMatchGitBranch"
+    ],
+    "prepareCommitForPush": [
+      "ReadLastCommit",
+      "ExitIfReviewHasNoShipIts",
+      "SetReviewedByAsShipItsList",
+      "FormatCommitText",
+      "AmendCommitWithoutJobResults"
+    ],
+    "push": [
+      "pushHarder"
+    ],
+    "pushSofter": [
+      "prepareCommitForPush",
+      "PushToTrackingBranch",
+      "SoftSubmitReview"
+    ],
+    "pushHarder": [
+      "prepareCommitForPush",
+      "PushToTrackingBranch",
+      "HardSubmitReview"
+    ],
+    "submit": [
+      "submitHarder"
+    ],
+    "submitSofter": [
+      "prepareCommitForPush",
+      "updateMatchingChangelist",
+      "SubmitPendingChangelist",
+      "DeleteChangelistTag",
+      "SoftSubmitReview"
+    ],
+    "submitHarder": [
+      "prepareCommitForPush",
+      "updateMatchingChangelist",
+      "SubmitPendingChangelist",
+      "DeleteChangelistTag",
+      "HardSubmitReview"
+    ],
+    "submitWithGitP4": [
+      "prepareCommitForPush",
+      "RevertWorkspace",
+      "SubmitToDepot",
+      "DeleteChangelistTag",
+      "HardSubmitReview"
+    ],
+    "submitChangelist": [
+      "prepareCommitForPush",
+      "SubmitPendingChangelist",
+      "HardSubmitReview"
+    ],
+    "closeOldReviews": [
+      "HardSubmitOldSoftSubmittedReviews",
+      "HardSubmitOldShipItReviews"
+    ],
+    "startJobs": [
+      "PushToPrecommitBranch",
+      "ReadLastCommit",
+      "InvokeJenkinsJobs",
+      "AmendCommit"
+    ],
+    "restartJobs": [
+      "PushToPrecommitBranch",
+      "restartJobsWithoutUpdate"
+    ],
+    "restartJobsWithoutUpdate": [
+      "ReadLastCommit",
+      "AbortJenkinsBuilds",
+      "InvokeJenkinsJobs",
+      "AmendCommit"
+    ],
+    "stopJobs": [
+      "ReadLastCommit",
+      "AbortJenkinsBuilds",
+      "AmendCommit"
+    ],
+    "pushable": [
+      "ReadLastCommit",
+      "CheckStatusOfJenkinsBuilds",
+      "CheckStatusOfBuildwebBuilds",
+      "CheckStatusOfReviewShipIts",
+      "AmendCommit"
+    ],
+    "resolveIssue": [
+      "ReadLastCommit",
+      "ExitIfCommitHasNoBugNumber",
+      "MarkBugAsResolved",
+      "MarkIssueAsResolved"
+    ],
+    "setMissingCommitValues": [
+      "ReadLastCommit",
+      "setCommitDetailsWithoutConfirmation",
+      "ExitIfCommitUnchanged",
+      "ExitIfConfirmationNotGiven",
+      "AmendCommit",
+      "DisplayCommit",
+      "--set-empty-only"
+    ],
+    "setSummary": [
+      "ReadLastCommit",
+      "SetSummary",
+      "AmendCommit"
+    ],
+    "setDescription": [
+      "ReadLastCommit",
+      "SetDescription",
+      "AmendCommit"
+    ],
+    "setTestingDone": [
+      "ReadLastCommit",
+      "SetTestingDone",
+      "AmendCommit"
+    ],
+    "setBugNumber": [
+      "ReadLastCommit",
+      "SetBugNumbers",
+      "AmendCommit"
+    ],
+    "setReviewedBy": [
+      "ReadLastCommit",
+      "SetReviewedBy",
+      "AmendCommit"
+    ],
+    "setReviewNumber": [
+      "ReadLastCommit",
+      "SetReviewId",
+      "AmendCommit"
+    ],
+    "setApprovedBy": [
+      "ReadLastCommit",
+      "SetApprovedBy",
+      "AmendCommit"
+    ],
+    "setDefaultApprover": [
+      "ReadLastCommit",
+      "SetDefaultApprover",
+      "AmendCommit"
+    ],
+    "addToDescription": [
+      "ReadLastCommit",
+      "AddToDescription",
+      "AmendCommit"
+    ],
+    "addToTestingDone": [
+      "ReadLastCommit",
+      "AddToTestingDone",
+      "AmendCommit"
+    ],
+    "addToReviewedBy": [
+      "ReadLastCommit",
+      "AddToReviewedBy",
+      "AmendCommit"
+    ],
+    "reopenAndResolveIssues": [
+      "LoadCompletedIssuesWithoutResolution",
+      "ExitIfThereAreNoIssuesToProcess",
+      "ReopenAndResolveIssues"
+    ],
+    "createTrackingIssueForBug": [
+      "AddTrackingIssueForBug",
+      "ExitIfThereAreNoIssuesToProcess",
+      "ExitIfConfirmationNotGiven",
+      "CreateIssues",
+      "AddTrackingIssueCreatedComments"
+    ],
+    "createTrackingIssuesForQuery": [
+      "LoadBugsForQuery",
+      "AddTrackingIssuesForQuery",
+      "ExitIfThereAreNoIssuesToProcess",
+      "ExitIfConfirmationNotGiven",
+      "CreateIssues",
+      "AddTrackingIssueCreatedComments"
+    ],
+    "resolveBugsForQuery": [
+      "LoadBugsForQuery",
+      "ExitIfThereAreNoBugsToProcess",
+      "ResolveBugsWithResolvedTrackingIssues"
+    ],
+    "createTrelloBoard": [
+      "LoadIssues",
+      "ExitIfThereAreNoIssuesToProcess",
+      "CreateTrelloBoardIfNeeded",
+      "SyncCardsWithJiraIssues"
+    ],
+    "syncTrelloBoard": [
+      "LoadIssues",
+      "ExitIfThereAreNoIssuesToProcess",
+      "SelectTrelloBoard",
+      "SyncCardsWithJiraIssues"
+    ],
+    "forceCreateTrelloBoard": [
+      "LoadIssues",
+      "ExitIfThereAreNoIssuesToProcess",
+      "CreateTrelloBoard",
+      "SyncCardsWithJiraIssues"
+    ],
+    "createTrelloBoardFromLabel": [
+      "createTrelloBoard",
+      "--use-label"
+    ],
+    "createTrelloBoardFromFixVersion": [
+      "createTrelloBoard",
+      "--use-fix-version"
+    ],
+    "createTrelloBoardWithAllStoriesFromLabel": [
+      "createTrelloBoard",
+      "--use-label",
+      "--include-sprint-stories"
+    ],
+    "forceCreateTrelloBoardFromLabel": [
+      "forceCreateTrelloBoard",
+      "--use-label"
+    ],
+    "syncTrelloBoardFromLabel": [
+      "syncTrelloBoard",
+      "--use-label"
+    ],
+    "syncTrelloBoardFromFixVersion": [
+      "syncTrelloBoard",
+      "--use-fix-version"
+    ],
+    "syncTrelloBoardWithAllStoriesFromLabel": [
+      "syncTrelloBoard",
+      "--use-label",
+      "--include-sprint-stories"
+    ],
+    "selectAndConvertBoard": [
+      "SelectTrelloBoard",
+      "ExitIfNoTrelloBoardSelected",
+      "ConvertCardsToJiraIssues"
+    ],
+    "setStoryPoints": [
+      "selectAndConvertBoard",
+      "UpdateStoryPointsOnly"
+    ],
+    "createUpdateIssuesFromTrello": [
+      "selectAndConvertBoard",
+      "UpdateIssues",
+      "CreateIssues"
+    ],
+    "updateMatchingChangelistWithFileSync": [
+      "readPerforceCommit",
+      "CreatePendingChangelistIfNeeded",
+      "UpdateMatchingChangelistDescription",
+      "SyncChangelist",
+      "ExitIfChangelistDoesNotMatchGitBranch"
+    ],
+    "updateMatchingChangelistWithGitDiff": [
+      "readPerforceCommit",
+      "RevertWorkspace",
+      "CreatePendingChangelistIfNeeded",
+      "UpdateMatchingChangelistDescription",
+      "SyncChangelistWithGitDiff",
+      "ExitIfChangelistDoesNotMatchGitBranch"
+    ],
+    "updateWithGitChangeset": [
+      "readPerforceCommit",
+      "AddGitChangesetConfigValueIfNeeded",
+      "CreatePendingChangelistIfNeeded",
+      "UpdateChangelistWithGitChangeset",
+      "UpdateMatchingChangelistDescription"
+    ],
+    "reviewWithGitChangeset": [
+      "updateWithGitChangeset",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "UploadReviewDiffFromChangelist",
+      "setReviewDetails",
+      "displayReviewUrl"
+    ],
+    "submitWithGitChangeset": [
+      "prepareCommitForPush",
+      "updateWithGitChangeset",
+      "SubmitPendingChangelist",
+      "DeleteChangelistTag"
+    ],
+    "updateMatchingChangelist": [
+      "updateMatchingChangelistWithFileSync"
+    ],
+    "sandbox": [
+      "updateMatchingChangelistWithFileSync",
+      "InvokeSandboxBuild",
+      "AmendCommit"
+    ],
+    "invokeSandboxBuildWithGitChangeset": [
+      "updateWithGitChangeset",
+      "InvokeSandboxBuild",
+      "AmendCommit"
+    ],
+    "invokeSandboxBuildWithGitFusion": [
+      "ReadLastCommit",
+      "--changelist-id=head",
+      "InvokeSandboxBuild",
+      "AmendCommit"
+    ],
+    "displayWorkflowBuildInfo": [
+      "DisplayConfig",
+      "--specific-properties=buildInfo"
+    ],
+    "intro": [
+      "GettingStarted",
+      "DisplayMainWorkflows"
+    ],
+    "help": [
+      "DisplayApiTokensInfo",
+      "DisplayConfig",
+      "DisplayWorkflowActions",
+      "DisplayCustomActionsHelp",
+      "DisplayMainWorkflows",
+      "DisplayAdditionalWorkflows"
+    ]
+  },
   "supportingWorkflows": [
-      "readNonTrivialCommit", "setCommitDetailsWithoutConfirmation", "selectAndConvertBoard",
-      "prepareCommitForPush", "setCommitDetails", "setCommitDetailsOffline", "setReviewDetails", "setReviewDetailsAndDiff"
+    "readNonTrivialCommit",
+    "setCommitDetailsWithoutConfirmation",
+    "selectAndConvertBoard",
+    "prepareCommitForPush",
+    "setCommitDetails",
+    "setCommitDetailsOffline",
+    "setReviewDetails",
+    "setReviewDetailsAndDiff"
   ]
-
 }

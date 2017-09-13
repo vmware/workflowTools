@@ -45,9 +45,15 @@ public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
         Board createdBoard = trello.createBoard(boardToCreate);
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(createdBoard);
 
-        log.info("Closing all existing lanes except for todo lane");
+        createDefaultSwimlanes(createdBoard, swimlanes);
+        padder.infoTitle();
+
+        selectedBoard = createdBoard;
+    }
+
+    protected void createDefaultSwimlanes(Board createdBoard, Swimlane[] swimlanes) {
         for (int i = 1; i < swimlanes.length; i ++) {
-            log.info("Closing unneeded board {}", swimlanes[i].name);
+            log.info("Closing unneeded swim lane {}", swimlanes[i].name);
             trello.closeSwimlane(swimlanes[i]);
         }
 
@@ -64,8 +70,5 @@ public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
 
         log.info("Creating parking lot lane");
         trello.createSwimlane(new Swimlane(createdBoard, "Parking Lot"));
-        padder.infoTitle();
-
-        selectedBoard = createdBoard;
     }
 }

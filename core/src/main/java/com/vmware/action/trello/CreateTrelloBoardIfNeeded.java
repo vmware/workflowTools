@@ -16,6 +16,14 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
     }
 
     @Override
+    public String cannotRunAction() {
+        if (selectedBoard != null) {
+            return "board " + selectedBoard.name + " is already selected";
+        }
+        return super.cannotRunAction();
+    }
+
+    @Override
     public void process() {
         String boardName = projectIssues.projectName;
 
