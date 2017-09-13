@@ -27,5 +27,6 @@ public class SelectTrelloBoard  extends BaseTrelloAction {
 
         int boardToUse = InputUtils.readSelection(openBoards, "Trello Boards");
         selectedBoard = openBoards[boardToUse];
+
     }
 }

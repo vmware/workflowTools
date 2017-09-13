@@ -106,6 +106,10 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
 
         log.info("Adding {} cards to trello", issuesForProcessing.size());
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
+        if (swimlanes.length == 0) {
+            createDefaultSwimlanes(selectedBoard, swimlanes);
+            swimlanes = trello.getSwimlanesForBoard(selectedBoard);
+        }
         Map<Double, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
 
         Swimlane todoLane = swimlanes[0];
