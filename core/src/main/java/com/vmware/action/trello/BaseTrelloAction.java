@@ -7,6 +7,11 @@ import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.util.logging.Padder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
 
     protected Trello trello;
@@ -43,32 +48,10 @@ public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
         log.info("Creating trello board");
 
         Board createdBoard = trello.createBoard(boardToCreate);
-        Swimlane[] swimlanes = trello.getSwimlanesForBoard(createdBoard);
 
-        createDefaultSwimlanes(createdBoard, swimlanes);
+        trello.createDefaultSwimlanesIfNeeded(createdBoard, config.storyPointValues);
         padder.infoTitle();
 
         selectedBoard = createdBoard;
-    }
-
-    protected void createDefaultSwimlanes(Board createdBoard, Swimlane[] swimlanes) {
-        for (int i = 1; i < swimlanes.length; i ++) {
-            log.info("Closing unneeded swim lane {}", swimlanes[i].name);
-            trello.closeSwimlane(swimlanes[i]);
-        }
-
-        for (Double storyPointValue : config.storyPointValues) {
-            String displayValue = String.valueOf(storyPointValue);
-            int storyPointValueAsInt = storyPointValue.intValue();
-            if (storyPointValueAsInt == storyPointValue) {
-                displayValue = String.valueOf(storyPointValueAsInt);
-            }
-            Swimlane swimlaneToCreate = new Swimlane(createdBoard, displayValue + Swimlane.STORY_POINTS_SUFFIX);
-            log.info("Creating swimlane {}", swimlaneToCreate.name);
-            trello.createSwimlane(swimlaneToCreate);
-        }
-
-        log.info("Creating parking lot lane");
-        trello.createSwimlane(new Swimlane(createdBoard, "Parking Lot"));
     }
 }

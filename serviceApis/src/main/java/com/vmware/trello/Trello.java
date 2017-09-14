@@ -21,6 +21,7 @@ import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.LoginInfo;
 import com.vmware.trello.domain.Member;
 import com.vmware.trello.domain.SessionAuthentication;
+import com.vmware.trello.domain.StringValue;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
 import com.vmware.util.StringUtils;
@@ -30,8 +31,10 @@ import com.vmware.util.exception.FatalException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.vmware.http.cookie.ApiAuthentication.trello;
 import static com.vmware.http.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
@@ -77,6 +80,11 @@ public class Trello extends AbstractRestService {
         connection.put(url, new BooleanValue(true));
     }
 
+    public void moveSwimlane(Swimlane swimlane, String position) {
+        String url = String.format("%slists/%s/pos", apiUrl, swimlane.id);
+        connection.put(url, new StringValue(position));
+    }
+
     public Card createCard(Card cardToCreate) {
         return connection.post(apiUrl + "cards", Card.class, cardToCreate);
     }
@@ -104,6 +112,44 @@ public class Trello extends AbstractRestService {
     public Card[] getCardsForBoard(Board board) {
         String url = String.format("%sboards/%s/cards", apiUrl, board.id);
         return connection.get(url, Card[].class);
+    }
+
+    public void createDefaultSwimlanesIfNeeded(Board board, List<Double> storyPointValues) {
+        List<Swimlane> existingSwimlanes = Arrays.asList(getSwimlanesForBoard(board));
+        List<String> defaultSwimlaneNames = new ArrayList<>();
+        defaultSwimlaneNames.add("To Do");
+        storyPointValues.forEach(storyPoint -> defaultSwimlaneNames.add(createDisplayValue(storyPoint)));
+        defaultSwimlaneNames.add("Parking Lot");
+
+        List<String> existingSwimlaneNames = existingSwimlanes.stream()
+                .map(swimlane -> swimlane.name).collect(Collectors.toList());
+        if (defaultSwimlaneNames.equals(existingSwimlaneNames)) {
+            log.info("Swimlanes on board match expected values");
+            return;
+        }
+
+        for (Swimlane existingSwimlane : existingSwimlanes) {
+            boolean matchesDefaultSwimlaneName = defaultSwimlaneNames.stream()
+                    .anyMatch(name -> name.equalsIgnoreCase(existingSwimlane.name));
+            if (!matchesDefaultSwimlaneName) {
+                log.info("Deleting unneeded swimlane {}", existingSwimlane.name);
+                closeSwimlane(existingSwimlane);
+            }
+        }
+
+        for (int i = 0; i < defaultSwimlaneNames.size(); i++) {
+            String swimLaneName = defaultSwimlaneNames.get(i);
+            Optional<Swimlane> matchingSwimlane = existingSwimlanes.stream()
+                    .filter(swimlane -> swimlane.name.equalsIgnoreCase(swimLaneName)).findFirst();
+            String position = String.valueOf(i);
+            if (!matchingSwimlane.isPresent()) {
+                createSwimlane(board, swimLaneName, position);
+            } else if (!position.equalsIgnoreCase(matchingSwimlane.get().pos)) {
+                Swimlane swimlane = matchingSwimlane.get();
+                log.info("Moving swimlane {} from position {} to {}", swimlane.name, swimlane.pos, position);
+                moveSwimlane(swimlane, position);
+            }
+        }
     }
 
     @Override
@@ -135,6 +181,22 @@ public class Trello extends AbstractRestService {
         connection.addStatefulParams(authQueryParams);
 
         saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello);
+    }
+
+    private void createSwimlane(Board board, String displayValue, String position) {
+        Swimlane swimlaneToCreate = new Swimlane(board, displayValue);
+        swimlaneToCreate.pos = position;
+        log.info("Creating swimlane {} at position {}", swimlaneToCreate.name, position);
+        createSwimlane(swimlaneToCreate);
+    }
+
+    private String createDisplayValue(Double storyPointValue) {
+        String displayValue = String.valueOf(storyPointValue);
+        int storyPointValueAsInt = storyPointValue.intValue();
+        if (storyPointValueAsInt == storyPointValue) {
+            displayValue = String.valueOf(storyPointValueAsInt);
+        }
+        return displayValue + Swimlane.STORY_POINTS_SUFFIX;
     }
 
     private List<UrlParam> scrapeAuthInfoFromUI(String apiTokenPage) {
