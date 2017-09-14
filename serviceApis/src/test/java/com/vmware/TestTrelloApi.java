@@ -50,6 +50,12 @@ public class TestTrelloApi extends BaseTests {
     }
 
     @Test
+    public void canCreateDefaultSwimlanesIfNecessary() {
+        trello.createDefaultSwimlanesIfNeeded(testBoard, Arrays.asList(1D,1.5D,3D,5D,8D,13D));
+    }
+
+
+    @Test
     public void canGetCards() {
         Board[] boards = trello.getOpenBoardsForUser();
         assertTrue("Expected user to have trello boards", boards.length > 0);
