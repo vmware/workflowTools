@@ -235,6 +235,7 @@ public class FileChange {
             case renamed:
             case renamedAndModified:
             case modified:
+            case integrate:
                 return createGitMinusPlusLine(aFile, bFile);
             case added:
             case addedAndModified:
