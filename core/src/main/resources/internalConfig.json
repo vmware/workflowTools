@@ -467,18 +467,21 @@
       "ResolveBugsWithResolvedTrackingIssues"
     ],
     "createTrelloBoard": [
+      "SelectJiraBoard",
       "LoadIssues",
       "ExitIfThereAreNoIssuesToProcess",
       "CreateTrelloBoardIfNeeded",
       "SyncCardsWithJiraIssues"
     ],
     "syncTrelloBoard": [
+      "SelectJiraBoard",
       "LoadIssues",
       "ExitIfThereAreNoIssuesToProcess",
       "SelectTrelloBoard",
       "SyncCardsWithJiraIssues"
     ],
     "forceCreateTrelloBoard": [
+      "SelectJiraBoard",
       "LoadIssues",
       "ExitIfThereAreNoIssuesToProcess",
       "CreateTrelloBoard",
@@ -520,6 +523,11 @@
       "ConvertCardsToJiraIssues"
     ],
     "setStoryPoints": [
+      "selectAndConvertBoard",
+      "UpdateStoryPointsOnly"
+    ],
+    "setStoryPointsForBoard": [
+      "SelectJiraBoard",
       "selectAndConvertBoard",
       "UpdateStoryPointsOnly"
     ],

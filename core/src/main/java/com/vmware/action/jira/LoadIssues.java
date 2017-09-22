@@ -15,6 +15,7 @@ import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
@@ -34,29 +35,24 @@ public class LoadIssues extends BaseBatchJiraAction {
     }
 
     @Override
-    public void process() {
-        List<MenuItem> recentBoards = jira.getRecentBoardItems();
-        if (recentBoards.isEmpty()) {
-            log.info("No recent boards in jira. Please use the web UI to select the board you want to use");
-            return;
+    public String cannotRunAction() {
+        if (StringUtils.isBlank(projectIssues.boardId)) {
+            return "no JIRA board selected";
         }
+        return super.cannotRunAction();
+    }
 
-        log.info("Please select project board for loading backlog stories");
-        log.info("Only recent boards for you are shown");
+    @Override
+    public void process() {
 
-        Integer selection = InputUtils.readSelection(
-                recentBoards.toArray(new InputListSelection[recentBoards.size()]), "Jira Boards");
-        MenuItem selectedItem = recentBoards.get(selection);
-
-        RapidView rapidView = jira.getRapidView(selectedItem.getBoardId());
+        RapidView rapidView = jira.getRapidView(projectIssues.boardId);
         List<IssueTypeDefinition> typesToSearchFor = config.includeAllIssueTypes ? null : Arrays.asList(config.issueTypesToInclude);
         List<IssueSummary> backlogStories = rapidView.getIssues(typesToSearchFor, config.includeSprintStories);
         if (backlogStories.size() == 0) {
-            log.info("No issues of type {} found for board {}", Arrays.toString(config.issueTypesToInclude), selectedItem.label);
+            log.info("No issues of type {} found for board {}", Arrays.toString(config.issueTypesToInclude), projectIssues.projectName);
             return;
         }
 
-        projectIssues.reset();
         SearchRequest searchRequest = createSearchRequestForFullIssueInformation(backlogStories);
         if (searchRequest == null) {
             log.warn("No issues can be used as they have all been estimated and configuration does not include estimated stories");
@@ -71,8 +67,6 @@ public class LoadIssues extends BaseBatchJiraAction {
         if (issues.isEmpty()) {
             log.warn("No issues can be used as they have all been estimated or have story points and configuration does not include estimated stories");
         }
-
-        projectIssues.projectName = selectedItem.label;
 
         List<String> labels = getLabelsFromIssues(issues);
         List<String> fixByVersions = getFixByVersionsFromIssues(issues);

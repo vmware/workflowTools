@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.util.StringUtils;
 
 import java.util.List;
 
@@ -38,8 +39,12 @@ public class UpdateStoryPointsOnly extends BaseBatchJiraAction {
                             , issueToUpdate.getKey(), pointsDisplayValue);
                     continue;
                 }
-                jira.updateIssueStoryPointsOnly(issueToUpdate);
-                log.debug("Updated story points to {} for issue {}", pointsDisplayValue, issueToUpdate.getKey());
+                if (StringUtils.isNotBlank(projectIssues.boardId)) {
+                    jira.updateIssueStoryPointsUsingAgileApi(issueToUpdate, projectIssues.boardId);
+                } else {
+                    jira.updateIssueStoryPointsOnly(issueToUpdate);
+                }
+                log.info("Updated story points to {} for issue {}", pointsDisplayValue, issueToUpdate.getKey());
             } catch (NotFoundException e) {
                 // ignore if the issue does not exist anymore in JIRA
                 log.info("Ignoring missing issue '{}'", issueToUpdate.getKey());
