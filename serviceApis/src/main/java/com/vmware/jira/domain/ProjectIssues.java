@@ -15,6 +15,8 @@ public class ProjectIssues {
 
     public String projectName;
 
+    public String boardId;
+
     private List<Issue> issuesForProcessing = new OverwritableSet.UniqueArrayList<>();
 
     private List<Bug> bugsForProcessing = new OverwritableSet.UniqueArrayList<>();
@@ -23,6 +25,11 @@ public class ProjectIssues {
 
     public void reset() {
         projectName = "";
+        boardId = "";
+        clearIssues();
+    }
+
+    public void clearIssues() {
         issuesForProcessing.clear();
         bugsForProcessing.clear();
     }

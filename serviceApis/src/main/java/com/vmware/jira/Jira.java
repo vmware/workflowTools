@@ -23,6 +23,7 @@ import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.RapidView;
+import com.vmware.trello.domain.StringValue;
 import com.vmware.util.complexenum.ComplexEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class Jira extends AbstractRestService {
     private String loginUrl;
     private String searchUrl;
     private String legacyApiUrl;
+    private String agileUrl;
     private String greenhopperUrl;
 
     public Jira(String jiraUrl, String username, Map<String, String> customFieldNames) {
@@ -55,6 +57,7 @@ public class Jira extends AbstractRestService {
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";
+        this.agileUrl = baseUrl + "rest/agile/1.0/";
         this.greenhopperUrl = baseUrl + "rest/greenhopper/1.0/";
     }
 
@@ -166,6 +169,15 @@ public class Jira extends AbstractRestService {
         updateIssue.fields.storyPoints = issue.fields.storyPoints;
         connection.put(urlBaseForKey(issue.getKey()), updateIssue);
     }
+
+    public void updateIssueStoryPointsUsingAgileApi(Issue issue, String boardId) {
+        IssueUpdate updateIssue = new IssueUpdate();
+        updateIssue.fields.storyPoints = issue.fields.storyPoints;
+        String url = agileUrl + "issue/" + issue.getKey() + "/estimation?boardId=" + boardId;
+        StringValue storyPoints = new StringValue(String.valueOf(issue.fields.storyPoints));
+        connection.put(url, storyPoints);
+    }
+
 
     public void deleteIssue(String key) {
         connection.delete(urlBaseForKey(key));

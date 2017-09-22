@@ -13,7 +13,9 @@ public enum IssueStatusDefinition implements ComplexEnum<Integer> {
     ReadyForQE(10020),
     Verified(10023),
     ResolvedButUnverified(10024),
+    ToDo(10025),
     InPipeline(10128),
+    Blocked(10227),
     UnknownValue(-1);
 
 

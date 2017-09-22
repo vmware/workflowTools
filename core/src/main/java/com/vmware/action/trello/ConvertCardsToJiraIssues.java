@@ -37,7 +37,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
             return;
         }
 
-        projectIssues.reset();
+        projectIssues.clearIssues();
 
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
 
