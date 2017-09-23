@@ -2,10 +2,12 @@ package com.vmware.config;
 
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameter;
+import com.vmware.util.FileUtils;
 import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -110,6 +112,12 @@ public class JenkinsJobsConfig {
             if (presetParameters.containsKey(paramName)) {
                 paramValue = presetParameters.get(paramName);
                 log.debug("Setting parameter {} to preset parameter {}", paramName, paramValue);
+                if (paramValue.startsWith("$FILE:")) {
+                    String fileName = paramValue.substring("$FILE:".length());
+                    log.debug("Using {} file as source for parameter {}", fileName, paramName);
+                    paramValue = FileUtils.readFileAsString(new File(fileName));
+                    log.trace("File parameter {} output:\n{}", fileName, paramValue);
+                }
             }
 
             while (paramValue.contains(USERNAME_VALUE)) {

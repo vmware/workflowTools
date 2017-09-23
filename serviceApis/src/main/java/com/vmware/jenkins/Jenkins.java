@@ -43,8 +43,7 @@ public class Jenkins extends AbstractRestBuildService {
         this.configureUrl = baseUrl + "me/configure";
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
-        // invoking a job will use url params only as defaults aren't well supported via /build
-        connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedJsonEntity);
+        connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
 
         if (disableLogin) {
             log.info("Not attempting to read api token for Jenkins as disableLogin is true");
@@ -70,7 +69,7 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     public void invokeJobWithParameters(Job jobToInvoke, JobParameters params) {
-        optimisticPost(jobToInvoke.getBuildWithParametersUrl(), null, params.toUrlParams());
+        optimisticPost(jobToInvoke.getBuildWithParametersUrl(), params.toMap());
     }
 
     public JobDetails getJobDetails(Job jobToInvoke) {

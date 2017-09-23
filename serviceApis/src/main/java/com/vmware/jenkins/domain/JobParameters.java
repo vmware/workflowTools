@@ -1,12 +1,16 @@
 package com.vmware.jenkins.domain;
 
 import com.vmware.http.request.RequestParam;
+import com.vmware.http.request.UrlParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JobParameters {
     private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -16,16 +20,11 @@ public class JobParameters {
         this.parameter.addAll(parameters);
     }
 
-    public RequestParam[] toUrlParams() {
+    public Map<String, Object> toMap() {
         if (parameter == null) {
             return null;
         }
-        RequestParam[] urlParams = new RequestParam[parameter.size()];
-        int counter = 0;
-        for (JobParameter jobParam : parameter) {
-            urlParams[counter++] = jobParam.toUrlParam();
-        }
-        return urlParams;
+        return parameter.stream().collect(Collectors.toMap(param -> param.name, param -> param.value));
     }
 
 }
