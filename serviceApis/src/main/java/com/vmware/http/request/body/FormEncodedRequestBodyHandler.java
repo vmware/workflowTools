@@ -19,7 +19,11 @@ public class FormEncodedRequestBodyHandler {
     public void writeObjectAsFormEncoded(final HttpConnection connection, final Object requestObject) {
         Map<String, Object> valuesToWrite;
         try {
-            valuesToWrite = new MapObjectConverter().toMap(requestObject);
+            if (requestObject instanceof Map) {
+                valuesToWrite = (Map<String, Object>) requestObject;
+            } else {
+                valuesToWrite = new MapObjectConverter().toMap(requestObject);
+            }
             writeValuesAsFormEncoded(connection, valuesToWrite);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
@@ -29,7 +33,7 @@ public class FormEncodedRequestBodyHandler {
     public void writeObjectAsUrlEncodedJson(final HttpConnection connection, final Object requestObject) {
         String jsonText = connection.toJson(requestObject);
         log.trace("Request Json: {}", jsonText);
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         values.put("json", jsonText);
         try {
             writeValuesAsFormEncoded(connection, values);
