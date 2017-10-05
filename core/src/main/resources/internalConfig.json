@@ -292,6 +292,7 @@
     ],
     "prepareCommitForPush": [
       "ReadLastCommit",
+      "ExitIfCommitFailsCheckstyle",
       "ExitIfReviewHasNoShipIts",
       "SetReviewedByAsShipItsList",
       "FormatCommitText",
