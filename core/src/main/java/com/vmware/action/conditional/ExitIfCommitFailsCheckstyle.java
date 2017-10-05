@@ -86,6 +86,9 @@ public class ExitIfCommitFailsCheckstyle extends BaseCommitAction {
     }
 
     private boolean fileChangeStartsWithMapping(FileChange fileChange) {
+        if (!fileChange.getLastFileAffected().endsWith(".java")) {
+            return false;
+        }
         if (config.checkstyleFileMappings == null || config.checkstyleFileMappings.isEmpty()) {
             return true;
         }
