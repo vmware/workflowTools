@@ -124,13 +124,13 @@ public class FileChange {
         return unresolved;
     }
 
-    public boolean matchesOneOf(FileChangeType... changeTypes) {
+    public boolean matchesNoneOf(FileChangeType... changeTypes) {
         for (FileChangeType changeType : changeTypes) {
             if (this.changeType == changeType) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public void setFileType(String fileType) {

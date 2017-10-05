@@ -323,6 +323,11 @@
     "--username",
     "--perforce-client"
   ],
+  "ExitIfCommitFailsCheckstyle": [
+    "--checkstyle-suppressions-xml-path",
+    "--checkstyle-config-xml-path",
+    "--checkstyle-jar-path"
+  ],
   "PushToMaster": [
     "--git-remote"
   ],
