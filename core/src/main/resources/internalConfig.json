@@ -367,6 +367,7 @@
     ],
     "pushable": [
       "ReadLastCommit",
+      "ExitIfCommitFailsCheckstyle",
       "CheckStatusOfJenkinsBuilds",
       "CheckStatusOfBuildwebBuilds",
       "CheckStatusOfReviewShipIts",
