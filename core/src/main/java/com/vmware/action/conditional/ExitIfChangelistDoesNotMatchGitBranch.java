@@ -77,32 +77,38 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
     }
 
     private String compareDiffContent(String gitDiff, String perforceDiff) {
+        log.debug("Converting git diff to file map");
         Map<String, String> gitDiffAsMap = convertDiffToMap(gitDiff);
+        log.debug("Converting perforce diff to file map");
         Map<String, String> perforceDiffAsMap = convertDiffToMap(perforceDiff);
+        log.debug("Comparing files individually");
         return compareDiff(gitDiffAsMap, perforceDiffAsMap);
     }
 
     private Map<String, String> convertDiffToMap(String diff) {
         Matcher diffLineMatcher = Pattern.compile("diff --git\\s+.+b/(.+)").matcher("");
         String fileName = null;
-        String fileDiff = null;
+        StringBuilder fileDiffBuilder = new StringBuilder();
         Map<String, String> fileDiffs = new HashMap<>();
         for (String diffLine : diff.split("\n")) {
+            if (diffLine.startsWith("---") || diffLine.startsWith("+++")) {
+                continue;
+            }
             diffLineMatcher.reset(diffLine);
             if (diffLineMatcher.find()) {
                 if (fileName != null) {
-                    fileDiffs.put(fileName, fileDiff);
+                    fileDiffs.put(fileName, fileDiffBuilder.toString());
                 }
                 fileName = diffLineMatcher.group(1);
-                fileDiff = diffLine;
-            } else if (fileDiff != null) {
-                fileDiff += "\n" + diffLine;
+                fileDiffBuilder = new StringBuilder(diffLine);
+            } else if (fileDiffBuilder.length() > 0) {
+                fileDiffBuilder.append("\n").append(diffLine);
             } else {
-                fileDiff = diffLine;
+                fileDiffBuilder.append(diffLine);
             }
         }
         if (fileName != null) {
-            fileDiffs.put(fileName, fileDiff);
+            fileDiffs.put(fileName, fileDiffBuilder.toString());
         }
         return fileDiffs;
     }
