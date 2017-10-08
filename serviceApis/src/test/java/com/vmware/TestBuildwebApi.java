@@ -18,8 +18,9 @@ public class TestBuildwebApi extends BaseTests {
     public void init() {
         String url = testProperties.getProperty("buildweb.url");
         String apiUrl = testProperties.getProperty("buildweb.api.url");
+        String logsUrlPattern = testProperties.getProperty("buildweb.logs.url.pattern");
         String username = testProperties.getProperty("buildweb.username");
-        buildweb = new Buildweb(url, apiUrl, username);
+        buildweb = new Buildweb(url, apiUrl, logsUrlPattern, username);
     }
 
     @Test
@@ -31,9 +32,11 @@ public class TestBuildwebApi extends BaseTests {
 
     @Test
     public void buildWithCompileErrorStateIsTreatedAsFailed() {
-        SandboxBuild build = buildweb.getSandboxBuild("7202366");
-        assertEquals(7202366, build.id);
+        SandboxBuild build = buildweb.getSandboxBuild("11330096");
+        assertEquals(11330096, build.id);
         assertEquals(BuildResult.FAILURE, build.getBuildResult());
+        String buildOutput = buildweb.getBuildOutput(String.valueOf(build.id), 300);
+        System.out.println(buildOutput);
     }
 
 

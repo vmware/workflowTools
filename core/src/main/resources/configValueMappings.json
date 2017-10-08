@@ -9,6 +9,11 @@
   "CopyReviewUrlToClipboard": [
     "--reviewboard-url"
   ],
+  "BaseCheckstyleAction": [
+    "--checkstyle-suppressions-xml-path",
+    "--checkstyle-config-xml-path",
+    "--checkstyle-jar-path"
+  ],
   "LoadGitPatchFile": [
     "--diff-file"
   ],
@@ -177,6 +182,7 @@
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
+    "--buildweb-logs-url-pattern",
     "--buildweb-api-url",
     "--buildweb-url"
   ],
@@ -300,6 +306,9 @@
   "ApplyChangelistToSeparateGitBranch": [
     "--tracking-branch"
   ],
+  "DisplayBuildOutputForBuildwebFailures": [
+    "--logs-line-count"
+  ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
   ],
@@ -322,11 +331,6 @@
   "BaseAction": [
     "--username",
     "--perforce-client"
-  ],
-  "ExitIfCommitFailsCheckstyle": [
-    "--checkstyle-suppressions-xml-path",
-    "--checkstyle-config-xml-path",
-    "--checkstyle-jar-path"
   ],
   "PushToMaster": [
     "--git-remote"
