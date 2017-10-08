@@ -1,5 +1,6 @@
 package com.vmware.util;
 
+import com.vmware.util.collection.CircularFifoQueue;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
@@ -18,8 +19,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
 
 public class IOUtils {
 
@@ -91,6 +96,17 @@ public class IOUtils {
         }
     }
 
+    public static String tail(String url, int numberOfLinesToTail) {
+        try {
+            URLConnection urlConnection = new URL(url).openConnection();
+            Queue<String> lines = new CircularFifoQueue<>(numberOfLinesToTail);
+            addLines(urlConnection.getInputStream(), lines);
+            return StringUtils.join(lines, "\n");
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
     public static List<String> readLines(File file) {
         try {
             return readLines(new FileInputStream(file));
@@ -100,15 +116,19 @@ public class IOUtils {
     }
 
     public static List<String> readLines(InputStream inputStream) {
+        List<String> lines = new ArrayList<>();
+        addLines(inputStream, lines);
+        return lines;
+    }
+
+    public static void addLines(InputStream inputStream, Collection<String> lines) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            List<String> lines = new ArrayList<>();
             String line = reader.readLine();
             while (line != null) {
                 lines.add(line);
                 line = reader.readLine();
             }
             reader.close();
-            return lines;
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
