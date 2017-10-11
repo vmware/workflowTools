@@ -2,6 +2,8 @@ package com.vmware;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
 
 public class JobBuild {
     @Expose(serialize = false, deserialize = false)
@@ -46,15 +48,15 @@ public class JobBuild {
     }
 
     public String getJenkinsInfoUrl() {
-        return url + "api/json";
+        return fullUrl("api/json");
     }
 
     public String getConsoleOutputUrl() {
-        return url + "consoleText";
+        return fullUrl("consoleText");
     }
 
     public String getJenkinsStopUrl() {
-        return url + "stop";
+        return fullUrl("stop");
     }
 
     public String details(boolean includeResult) {
@@ -66,4 +68,7 @@ public class JobBuild {
         return buildInfo;
     }
 
+    private String fullUrl(String path) {
+        return UrlUtils.addTrailingSlash(url) + path;
+    }
 }
