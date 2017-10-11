@@ -6,6 +6,7 @@ import java.util.EnumSet;
 
 public enum BuildResult {
     SUCCESS,
+    UNSTABLE,
     FAILURE,
     ABORTED,
     BUILDING;

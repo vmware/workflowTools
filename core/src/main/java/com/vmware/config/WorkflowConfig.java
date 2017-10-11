@@ -116,8 +116,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--buildweb-logs-url-pattern", help = "Url patter for buildweb logs")
     public String buildwebLogsUrlPattern;
 
-    @ConfigurableProperty(commandLine = "--logs-line-count", help = "How many lines of the log to show")
-    public int buildwebLogLineCount;
+    @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
+    public int logLineCount;
 
     @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
     public boolean jenkinsUsesCsrf;

@@ -12,14 +12,14 @@ public class DisplayBuildOutputForBuildwebFailures extends BaseCommitWithBuildwe
 
     @Override
     public String cannotRunAction() {
-        if (config.buildwebLogLineCount <= 0) {
-            return "line count to show (buildwebLogLineCount) is " + config.buildwebLogLineCount;
+        if (config.logLineCount <= 0) {
+            return "line count to show (logLineCount) is " + config.logLineCount;
         }
         return super.cannotRunAction();
     }
 
     @Override
     public void process() {
-        buildweb.logOutputForFailedBuilds(draft, config.buildwebLogLineCount);
+        buildweb.logOutputForFailedBuilds(draft, config.logLineCount);
     }
 }
