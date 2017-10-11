@@ -293,6 +293,9 @@
   "BaseReadMultiLine": [
     "--max-description"
   ],
+  "DisplayBuildOutputForJenkinsFailures": [
+    "--log-line-count"
+  ],
   "SetBugNumbers": [
     "--bugzilla-test-bug",
     "--bugzilla-url",
@@ -307,7 +310,7 @@
     "--tracking-branch"
   ],
   "DisplayBuildOutputForBuildwebFailures": [
-    "--logs-line-count"
+    "--log-line-count"
   ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"

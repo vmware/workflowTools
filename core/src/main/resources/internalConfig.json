@@ -11,7 +11,7 @@
   "buildwebUrl": "https://buildweb.eng.vmware.com",
   "buildwebApiUrl": "https://buildapi.eng.vmware.com",
   "buildwebLogsUrlPattern": "http://build-squid.eng.vmware.com/build/mts/release/sb-%s/logs/linux-centos64-64/gobuilds.log",
-  "buildwebLogLineCount": 100,
+  "logLineCount": 100,
   "jenkinsUsesCsrf": false,
   "waitForJenkinsJobCompletion": false,
   "ignoreJenkinsJobFailure": false,
@@ -372,6 +372,7 @@
       "CheckStatusOfBuildwebBuilds",
       "DisplayBuildOutputForBuildwebFailures",
       "CheckStatusOfJenkinsBuilds",
+      "DisplayBuildOutputForJenkinsFailures",
       "CheckCommitForCheckstyleErrors",
       "CheckStatusOfReviewShipIts",
       "AmendCommit"

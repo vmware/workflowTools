@@ -18,7 +18,9 @@ import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.JobsList;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.IOUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.logging.Padder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +84,20 @@ public class Jenkins extends AbstractRestBuildService {
 
     public void stopJobBuild(JobBuild jobBuildToStop) {
         optimisticPost(jobBuildToStop.getJenkinsStopUrl(), null);
+    }
+
+    public void logOutputForFailedBuilds(ReviewRequestDraft draft, int linesToShow) {
+        String urlToCheckFor = urlUsedInBuilds();
+        log.debug("Displaying output for failed builds matching url {}", urlToCheckFor);
+        List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
+        jobsToCheck.stream().filter(JobBuild::isFailure)
+                .forEach(jobBuild -> {
+                    Padder buildPadder = new Padder("Jenkins build {} result", jobBuild.id());
+                    buildPadder.errorTitle();
+                    String consoleOutupt = IOUtils.tail(jobBuild.getConsoleOutputUrl(), linesToShow);
+                    log.info(consoleOutupt);
+                    buildPadder.errorTitle();
+                });
     }
 
     @Override

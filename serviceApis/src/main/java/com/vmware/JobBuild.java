@@ -41,8 +41,16 @@ public class JobBuild {
         return MatcherUtils.singleMatch(url, "http.+?/(\\d+)/*.*?");
     }
 
+    public boolean isFailure() {
+        return result == BuildResult.FAILURE || result == BuildResult.UNSTABLE;
+    }
+
     public String getJenkinsInfoUrl() {
         return url + "api/json";
+    }
+
+    public String getConsoleOutputUrl() {
+        return url + "consoleText";
     }
 
     public String getJenkinsStopUrl() {
