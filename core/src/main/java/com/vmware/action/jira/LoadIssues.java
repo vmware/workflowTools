@@ -136,7 +136,7 @@ public class LoadIssues extends BaseBatchJiraAction {
     }
 
     private String constructJqlQuery(List<IssueSummary> stories) {
-        String jqlQuery = "";
+        StringBuilder jqlQueryBuilder = new StringBuilder();
         boolean atLeastOneStoryCanBeUsed = false;
         for (IssueSummary story : stories) {
             if (!config.includeStoriesWithEstimates && story.estimateStatistic.containsValidEstimate()) {
@@ -144,19 +144,19 @@ public class LoadIssues extends BaseBatchJiraAction {
                 continue;
             }
             atLeastOneStoryCanBeUsed = true;
-            if (jqlQuery.isEmpty()) {
-                jqlQuery = "id in (";
+            if (jqlQueryBuilder.length() == 0) {
+                jqlQueryBuilder.append("id in (");
             } else {
-                jqlQuery += ",";
+                jqlQueryBuilder.append(",");
             }
 
-            jqlQuery += "'" + story.key + "'";
+            jqlQueryBuilder.append("'").append(story.key).append("'");
         }
         if (!atLeastOneStoryCanBeUsed) {
             return null;
         }
-        jqlQuery += ")";
-        return jqlQuery;
+        jqlQueryBuilder.append(")");
+        return jqlQueryBuilder.toString();
     }
 
     private List<String> getLabelsFromIssues(List<Issue> issues) {
