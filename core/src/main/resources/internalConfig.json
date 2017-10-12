@@ -177,6 +177,12 @@
       "ExitIfConfirmationNotGiven",
       "AmendCommitFilesOnly"
     ],
+    "amendCommitAll": [
+      "ExitIfNoChangesDetectedByGit",
+      "DisplayLastCommit",
+      "ExitIfConfirmationNotGiven",
+      "AmendCommitAllFilesOnly"
+    ],
     "setChangelistDetails": [
       "readPendingChangelist",
       "setCommitDetails",
@@ -224,7 +230,7 @@
       "displayReviewUrl"
     ],
     "amendReview": [
-      "amendCommit",
+      "amendCommitAll",
       "review"
     ],
     "diffUploadOnly": [
