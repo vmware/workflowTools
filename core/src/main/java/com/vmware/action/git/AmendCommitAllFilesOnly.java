@@ -5,10 +5,10 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.logging.LogLevel;
 
-@ActionDescription("Performs a git commit --amend without modifying any part of the commit message. Uses the existing commit message.")
-public class AmendCommitFilesOnly extends BaseCommitAmendAction {
+@ActionDescription("Performs a git commit --amend --all without modifying any part of the commit message. Uses the existing commit message.")
+public class AmendCommitAllFilesOnly extends BaseCommitAmendAction {
 
-    public AmendCommitFilesOnly(WorkflowConfig config) {
+    public AmendCommitAllFilesOnly(WorkflowConfig config) {
         super(config, true, false);
     }
 
@@ -20,7 +20,7 @@ public class AmendCommitFilesOnly extends BaseCommitAmendAction {
     @Override
     protected void commitUsingGit(String description) {
         String existingHeadRef = git.revParse("head");
-        git.amendCommit(git.lastCommitText(true));
+        git.amendCommitWithAllFileChanges(git.lastCommitText(true));
         git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 

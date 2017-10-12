@@ -23,16 +23,12 @@ public class JobBuild {
 
     public JobBuild(final int number, final String baseUrl, BuildResult result) {
         this.number = number;
-        this.url = baseUrl + number + "/";
+        this.url = baseUrl + number;
         this.result = result;
     }
 
     public JobBuild(final int number, final String baseUrl) {
         this(number, baseUrl, BuildResult.BUILDING);
-    }
-
-    public String getBaseUrl() {
-        return url.substring(0, url.lastIndexOf(String.valueOf(number)));
     }
 
     public boolean containsUrl(String url) {

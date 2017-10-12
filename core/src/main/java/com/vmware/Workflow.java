@@ -51,10 +51,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class Workflow {
     public static final List<String> BATCH_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("createTrelloBoardFromLabel", "closeOldReviews"));
+            Arrays.asList("createTrelloBoardFromLabel", "createTrelloBoardFromFixVersion", "setStoryPointsForBoard", "closeOldReviews"));
 
     public static final List<String> GIT_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("commit", "commitAll", "amendCommit", "review", "pushable", "push", "submit")
+            Arrays.asList("commit", "commitAll", "amendCommit", "amendCommitAll", "review", "pushable", "push", "submit")
     );
 
     public static final List<String> PERFORCE_MAIN_WORKFLOWS = Collections.unmodifiableList(
