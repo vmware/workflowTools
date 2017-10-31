@@ -128,9 +128,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-dr,--dry-run", help = "Shows the workflow actions that would be run")
     public boolean dryRun;
 
-    @ConfigurableProperty(commandLine = "--set-empty-only", help = "Set values for empty properties only. Ignore properties that already have values")
-    public boolean setEmptyPropertiesOnly;
-
     @ConfigurableProperty(commandLine = "-cp,--specific-properties", help = "Show value for just the specified config properties")
     public String configPropertiesToDisplay;
 

@@ -18,7 +18,7 @@ public class SetSummary extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (!config.setEmptyPropertiesOnly || StringUtils.isBlank(draft.summary)) {
+        if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isBlank(draft.summary)) {
             return super.cannotRunAction();
         }
 
