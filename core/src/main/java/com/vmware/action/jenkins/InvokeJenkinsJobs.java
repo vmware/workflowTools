@@ -4,16 +4,21 @@ import com.vmware.BuildResult;
 import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
-import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jenkins.domain.*;
+import com.vmware.config.jenkins.Job;
+import com.vmware.config.jenkins.JobParameter;
+import com.vmware.jenkins.domain.JobBuildDetails;
+import com.vmware.jenkins.domain.JobDetails;
+import com.vmware.jenkins.domain.JobParameters;
+import com.vmware.jenkins.domain.ParameterDefinition;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -36,15 +41,14 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     public void process() {
         askForJenkinsJobKeysIfBlank();
 
-        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
         int counter = 0;
-        for (Job job : jobsConfig.jobs()) {
+        for (Job job : jenkinsJobsConfig.jobs()) {
             if (counter == 0) {
                 log.info("");
             }
             JobBuild newBuild = invokeJenkinsJob(draft, job);
             boolean success = waitForBuildToCompleteIfNecessary(newBuild);
-            if (!success && counter < jobsConfig.size() - 1 && !config.ignoreJenkinsJobFailure) {
+            if (!success && counter < jenkinsJobsConfig.size() - 1 && !jenkinsConfig.ignoreJenkinsJobFailure) {
                 log.warn("Build did not complete successfully, aborting running of builds");
                 break;
             }
@@ -53,7 +57,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private boolean waitForBuildToCompleteIfNecessary(final JobBuild newBuild) {
-        if (!config.waitForJenkinsJobCompletion) {
+        if (!jenkinsConfig.waitForJenkinsJobCompletion) {
             return true;
         }
 
@@ -73,14 +77,15 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private void askForJenkinsJobKeysIfBlank() {
-        if (StringUtils.isNotBlank(config.jenkinsJobsToUse)) {
+        if (StringUtils.isNotBlank(jenkinsConfig.jenkinsJobsToUse)) {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        if (config.jenkinsJobsMappings == null || config.jenkinsJobsMappings.isEmpty()) {
-            config.jenkinsJobsToUse = InputUtils.readValue("Jenkins jobs");
+        Map<String, String> jenkinsJobsMappings = config.jenkinsJobsConfig.jenkinsJobsMappings;
+        if (jenkinsJobsMappings == null || jenkinsJobsMappings.isEmpty()) {
+            jenkinsConfig.jenkinsJobsToUse = InputUtils.readValue("Jenkins jobs");
         } else {
-            config.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobsMappings.keySet());
+            jenkinsConfig.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", jenkinsJobsMappings.keySet());
         }
     }
 
@@ -138,7 +143,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private String determineSandboxBuildNumber() {
-        Job sandboxJob = Job.sandboxJob(config.buildwebUrl);
+        Job sandboxJob = Job.sandboxJob(buildwebConfig.buildwebUrl);
         JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
         String buildId;
         if (sandboxBuild != null) {

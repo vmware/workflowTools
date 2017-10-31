@@ -4,7 +4,7 @@ import com.vmware.action.base.BaseCommitWithBuildwebBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-@ActionDescription("Tails the output for buildweb failures")
+@ActionDescription("Tails the output for buildweb failures.")
 public class DisplayBuildOutputForBuildwebFailures extends BaseCommitWithBuildwebBuildsAction {
     public DisplayBuildOutputForBuildwebFailures(WorkflowConfig config) {
         super(config);

@@ -1,11 +1,14 @@
 package com.vmware.mapping;
 
 import com.vmware.action.BaseAction;
+import com.vmware.action.git.GenerateGitCommitStats;
+import com.vmware.config.ActionDescription;
 import com.vmware.util.ClasspathResource;
 
 import com.google.gson.Gson;
 
 import java.io.Reader;
+import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +44,15 @@ public class ConfigMappings {
             if (configValuesForClass != null) {
                 configValues.addAll(configValuesForClass);
             }
-            classToGetValuesFor = classToGetValuesFor.getSuperclass();
+            boolean ignoreSuperClass = false;
+            if (classToGetValuesFor != BaseAction.class && classToGetValuesFor.isAnnotationPresent(ActionDescription.class)) {
+                Class<? extends BaseAction> actionClass = classToGetValuesFor;
+                ignoreSuperClass = actionClass.getAnnotation(ActionDescription.class).ignoreConfigValuesInSuperclass();
+            }
+            classToGetValuesFor = ignoreSuperClass ? Object.class : classToGetValuesFor.getSuperclass();
         }
         // add global values
+        configValues.add("--username");
         configValues.add("--dry-run");
         configValues.add("--debug");
         configValues.add("--trace");
@@ -56,5 +65,10 @@ public class ConfigMappings {
             configValues.addAll(mappings.get(className));
         }
         return configValues;
+    }
+
+    public static void main(String[] args) {
+        ConfigMappings configMappings = new ConfigMappings();
+        System.out.println(configMappings.getConfigValuesForAction(GenerateGitCommitStats.class));
     }
 }

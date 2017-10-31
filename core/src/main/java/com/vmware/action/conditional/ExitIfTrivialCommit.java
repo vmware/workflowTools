@@ -13,7 +13,7 @@ public class ExitIfTrivialCommit extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (!draft.isTrivialCommit(config.trivialReviewerLabel)) {
+        if (!draft.isTrivialCommit(commitConfig.trivialReviewerLabel)) {
             return;
         }
 

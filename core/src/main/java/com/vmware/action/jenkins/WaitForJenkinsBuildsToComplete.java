@@ -16,7 +16,7 @@ public class WaitForJenkinsBuildsToComplete extends BaseCommitWithJenkinsBuildsA
 
     @Override
     public String cannotRunAction() {
-        if (draft.jobBuildsMatchingUrl(config.jenkinsUrl).isEmpty()) {
+        if (draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl).isEmpty()) {
             return "commit does not contain any jenkins builds";
         }
         return super.cannotRunAction();
@@ -28,7 +28,7 @@ public class WaitForJenkinsBuildsToComplete extends BaseCommitWithJenkinsBuildsA
             @Override
             public Boolean call() throws Exception {
                 jenkins.checkStatusOfBuilds(draft);
-                return draft.allJobBuildsMatchingUrlAreComplete(config.jenkinsUrl);
+                return draft.allJobBuildsMatchingUrlAreComplete(jenkinsConfig.jenkinsUrl);
             }
         };
         log.info("Waiting for all jenkins builds to complete");

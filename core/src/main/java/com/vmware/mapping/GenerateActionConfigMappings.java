@@ -3,10 +3,12 @@ package com.vmware.mapping;
 import com.google.gson.Gson;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.section.SectionConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.SimpleLogFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 
@@ -46,13 +50,13 @@ public class GenerateActionConfigMappings {
 
     private static final Logger log = LoggerFactory.getLogger(GenerateActionConfigMappings.class);
 
-    private static final Pattern configValuePattern = Pattern.compile("[^\\.]config\\.(\\w+)");
-
     private static final Pattern serviceLocatorMethodPattern = Pattern.compile("[^\\.]serviceLocator\\.(\\w+)");
 
     private Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
 
     private Map<String, List<String>> locatorMethodArguments = new HashMap<>();
+
+    private Pattern configValuePattern;
 
     private File actionDirectory;
 
@@ -73,6 +77,8 @@ public class GenerateActionConfigMappings {
             log.info("No action files found at {}", actionDirectory.getPath());
             return;
         }
+
+        configValuePattern = createConfigValuesPattern();
 
         WorkflowConfig config = new WorkflowConfig();
         config.generateConfigurablePropertyList();
@@ -220,6 +226,14 @@ public class GenerateActionConfigMappings {
         if (currentMethodName != null) {
             locatorMethodArguments.put(currentMethodName, currentArguments);
         }
+    }
+
+    private Pattern createConfigValuesPattern() {
+        List<String> sectionConfigFields = Arrays.stream(WorkflowConfig.class.getFields())
+                .filter(field -> field.getAnnotation(SectionConfig.class) != null)
+                .map(Field::getName).collect(Collectors.toList());
+        String configValuesPattern = StringUtils.appendWithDelimiter("config", sectionConfigFields, "|");
+        return Pattern.compile("[^\\.](?:" + configValuesPattern + ")\\.(\\w+)");
     }
 
     private static ConsoleHandler createHandler() {

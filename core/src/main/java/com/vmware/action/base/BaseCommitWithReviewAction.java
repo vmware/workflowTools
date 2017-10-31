@@ -10,7 +10,7 @@ public abstract class BaseCommitWithReviewAction extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (draft.isTrivialCommit(config.trivialReviewerLabel)) {
+        if (draft.isTrivialCommit(commitConfig.trivialReviewerLabel)) {
             return "commit is trivial";
         }
 

@@ -5,9 +5,8 @@ import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jenkins.domain.Job;
+import com.vmware.config.jenkins.Job;
 import com.vmware.util.CommandLineUtils;
-import com.vmware.util.CommitConfiguration;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
@@ -26,7 +25,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
     public void process() {
         String changelistId = draft.perforceChangelistId;
         if (StringUtils.isBlank(changelistId)) {
-            changelistId = config.changelistId;
+            changelistId = perforceClientConfig.changelistId;
         }
         if (StringUtils.isBlank(changelistId)) {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
@@ -34,12 +33,13 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         String syncToParameter = " --syncto latest";
         if (changelistId.toLowerCase().contains("head")) {
             log.info("Assuming changelist id {} is a git ref, using tracking branch {} as syncTo value",
-                    changelistId, config.trackingBranchPath());
+                    changelistId, gitRepoConfig.trackingBranchPath());
             changelistId = git.revParse(changelistId);
             syncToParameter = ""; // --accept-defaults handles it correctly
         }
         String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s --accept-defaults",
-                config.goBuildBinPath, config.buildwebProject, config.buildType, syncToParameter, config.buildwebBranch, changelistId);
+                buildwebConfig.goBuildBinPath, buildwebConfig.buildwebProject, buildwebConfig.buildType,
+                syncToParameter, buildwebConfig.buildwebBranch, changelistId);
 
         log.info("Invoking sandbox build {}", command);
         String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
@@ -47,7 +47,6 @@ public class InvokeSandboxBuild extends BaseCommitAction {
     }
 
     private void addBuildNumberInOutputToTestingDone(String output) {
-        CommitConfiguration commitConfig = config.getCommitConfiguration();
         String buildNumberPattern = commitConfig.generateBuildWebNumberPattern();
 
         String buildNumber = MatcherUtils.singleMatch(output, buildNumberPattern);

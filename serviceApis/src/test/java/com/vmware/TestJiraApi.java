@@ -6,7 +6,7 @@ import com.vmware.jira.domain.IssueResolutionDefinition;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransition;
 import com.vmware.jira.domain.IssueTransitions;
-import com.vmware.jira.domain.IssueTypeDefinition;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.IssuesResponse;
 import com.vmware.jira.domain.JiraUser;
 import com.vmware.jira.domain.MenuItem;

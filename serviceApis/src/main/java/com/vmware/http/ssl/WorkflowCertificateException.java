@@ -9,10 +9,6 @@ public class WorkflowCertificateException extends RuntimeException {
         super(message);
     }
 
-    public WorkflowCertificateException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public WorkflowCertificateException(Throwable cause) {
         super(cause);
     }

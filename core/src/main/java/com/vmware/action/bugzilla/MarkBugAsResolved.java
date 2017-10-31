@@ -32,7 +32,7 @@ public class MarkBugAsResolved extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (!draft.hasBugNumber(config.noBugNumberLabel)) {
+        if (!draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
             return "commit has no bug number";
         }
         return super.cannotRunAction();
@@ -42,7 +42,7 @@ public class MarkBugAsResolved extends BaseCommitAction {
     @Override
     public void process() {
         for (String bugNumber : draft.bugNumbersAsArray()) {
-            Integer bugId = config.parseBugzillaBugNumber(bugNumber.trim());
+            Integer bugId = bugzillaConfig.parseBugzillaBugNumber(bugNumber.trim());
             if (bugId == null) {
                 log.info("{} is not a Bugzilla id, assuming that it is a Jira issue key, skipping", bugNumber);
                 return;

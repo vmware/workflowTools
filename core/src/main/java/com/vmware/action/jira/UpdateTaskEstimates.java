@@ -35,7 +35,7 @@ public class UpdateTaskEstimates extends BaseAction {
 
     @Override
     public void process() {
-        log.info("Updating open jira issues with no original estimate to {} hour(s)", config.jiraTaskEstimateInHours);
+        log.info("Updating open jira issues with no original estimate to {} hour(s)", jiraConfig.jiraTaskEstimateInHours);
         updateEstimatesIfNeeded(jira.getCreatedTasksForUser(), "Created Tasks");
         updateEstimatesIfNeeded(jira.getOpenTasksForUser(), "Assigned Tasks");
     }
@@ -50,8 +50,8 @@ public class UpdateTaskEstimates extends BaseAction {
                         HOURS.convert(task.fields.originalEstimateInSeconds, SECONDS));
                 continue;
             }
-            log.info("Updating issue's original estimate to {} hour(s)", config.jiraTaskEstimateInHours);
-            jira.updateIssueEstimate(task.getKey(), config.jiraTaskEstimateInHours);
+            log.info("Updating issue's original estimate to {} hour(s)", jiraConfig.jiraTaskEstimateInHours);
+            jira.updateIssueEstimate(task.getKey(), jiraConfig.jiraTaskEstimateInHours);
             log.info("Successfully updated jira issue");
         }
         log.info("");

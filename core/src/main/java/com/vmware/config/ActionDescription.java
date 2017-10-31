@@ -14,4 +14,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ActionDescription {
     String value();
+    boolean ignoreConfigValuesInSuperclass() default false;
 }

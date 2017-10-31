@@ -17,10 +17,10 @@ public class PushToRemoteBranch extends BaseAction {
 
     @Override
     public void process() {
-        String remoteBranchName = config.remoteBranchToUse;
-        String remoteBranchPath = config.remoteBranches.get(remoteBranchName);
+        String remoteBranchName = gitRepoConfig.remoteBranchToUse;
+        String remoteBranchPath = gitRepoConfig.remoteBranches.get(remoteBranchName);
         if (StringUtils.isBlank(remoteBranchPath)) {
-            log.info("{} did not match any predefined remote branch names {}.", remoteBranchName, config.remoteBranches.keySet().toString());
+            log.info("{} did not match any predefined remote branch names {}.", remoteBranchName, gitRepoConfig.remoteBranches.keySet().toString());
             log.info("Assuming that it is a valid remote branch path.");
             remoteBranchPath = remoteBranchName;
         }

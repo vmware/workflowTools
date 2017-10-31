@@ -16,12 +16,7 @@ public class StringUtils {
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
 
     public static boolean textStartsWithValue(String text, String... valuesToCheck) {
-        for (String value : valuesToCheck) {
-            if (text.startsWith(value)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(valuesToCheck).anyMatch(text::startsWith);
     }
 
     public static String appendCsvValue(String existingValue, String valueToAdd) {
@@ -60,14 +55,14 @@ public class StringUtils {
             return value;
         }
         String newValue = value.substring(0, maxLength -3) + "...";
-        log.info("Truncating string \n{}\nto\n{}", value, newValue);
+        log.debug("Truncating string \n{}\nto\n{}", value, newValue);
         return newValue;
     }
 
     public static String addNewLinesIfNeeded(String value, int maxLineLength, int labelLength) {
         String newValue = "";
         String[] lines = value.split("[\r\n]");
-        for (int i = 0; i < lines.length; i ++) {
+        for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             int maxLengthToUse = newValue.isEmpty() && labelLength > 0 ? maxLineLength - labelLength: maxLineLength;
             String newLine = "";
@@ -121,7 +116,7 @@ public class StringUtils {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        for (String value : values){
+        for (String value : values) {
             if (builder.length() != 0) {
                 builder.append(delimeter);
             }
@@ -209,6 +204,14 @@ public class StringUtils {
             paddedText = paddedText.replaceAll("\n" + Pattern.quote(textToCheckFor) + ".+\n", "\n");
         }
         return paddedText.substring(1, paddedText.length() - 1);
+    }
+
+    public static String pluralize(long value, String description) {
+        if (value > 1) {
+            return value + " " + description + "s";
+        } else {
+            return value + " " + description;
+        }
     }
 
 }

@@ -4,7 +4,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Primarily used for testing, moves to a new branch, applies the changelist, compares content to old branch")
+@ActionDescription("Primarily used for testing, moves to a new branch, applies the changelist, compares content to old branch.")
 public class ApplyChangelistToSeparateGitBranch extends ApplyChangelistDiffToGitBranch {
 
     public ApplyChangelistToSeparateGitBranch(WorkflowConfig config) {
@@ -23,8 +23,8 @@ public class ApplyChangelistToSeparateGitBranch extends ApplyChangelistDiffToGit
     public void process() {
         String existingRef = git.revParse("head");
         String newBranchName = "changelist" + draft.perforceChangelistId;
-        log.info("Moving to new branch {} tracking {}", newBranchName, config.trackingBranchPath());
-        git.newTrackingBranch(newBranchName, config.trackingBranchPath());
+        log.info("Moving to new branch {} tracking {}", newBranchName, gitRepoConfig.trackingBranchPath());
+        git.newTrackingBranch(newBranchName, gitRepoConfig.trackingBranchPath());
         super.process();
         String diffData = git.diff(existingRef, true);
         if (StringUtils.isNotBlank(diffData)) {
@@ -33,7 +33,7 @@ public class ApplyChangelistToSeparateGitBranch extends ApplyChangelistDiffToGit
         } else {
             log.info("Diff applied cleanly to branch {}!", newBranchName);
             log.info("Creating commit for changes");
-            git.commitWithAllFileChanges(draft.toText(config.getCommitConfiguration()));
+            git.commitWithAllFileChanges(draft.toText(commitConfig));
         }
     }
 }

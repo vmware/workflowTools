@@ -31,16 +31,16 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
 
     @Override
     public void preprocess() {
-        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
     }
 
     @Override
     public void process() {
-        if (StringUtils.isBlank(config.reviewBoardRepository)) {
+        if (StringUtils.isBlank(reviewBoardConfig.reviewBoardRepository)) {
             throw new RuntimeException("no reviewboard repository is configured, set a config value for reviewBoardRepository");
         }
-        log.info("Creating new review against repository {}", config.reviewBoardRepository);
-        draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
+        log.info("Creating new review against repository {}", reviewBoardConfig.reviewBoardRepository);
+        draft.reviewRequest = reviewBoard.createReviewRequest(reviewBoardConfig.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
         draft.repoType = repository.getRepoType();
         draft.id = String.valueOf(draft.reviewRequest.id);

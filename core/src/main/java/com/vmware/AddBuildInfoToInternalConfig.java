@@ -3,7 +3,7 @@ package com.vmware;
 import com.google.gson.Gson;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.scm.Git;
+import com.vmware.util.scm.Git;
 import com.vmware.util.IOUtils;
 import com.vmware.util.logging.SimpleLogFormatter;
 import org.slf4j.Logger;

@@ -1,6 +1,7 @@
 package com.vmware.jira.domain;
 
 import com.google.gson.annotations.SerializedName;
+import com.vmware.config.jira.IssueTypeDefinition;
 
 public class IssueType {
 

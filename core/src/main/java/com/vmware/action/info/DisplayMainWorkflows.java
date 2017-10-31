@@ -27,7 +27,7 @@ public class DisplayMainWorkflows extends BaseAction {
         Padder mainWorkflowsPadder = new Padder(workflowType + " Workflows");
         mainWorkflowsPadder.infoTitle();
         for (String mainWorkflow : workflows) {
-            log.info("{} -> {}", mainWorkflow, Arrays.toString(config.workflows.get(mainWorkflow)));
+            log.info("{} -> {}", mainWorkflow, config.workflows.get(mainWorkflow).toString());
         }
         mainWorkflowsPadder.infoTitle();
     }

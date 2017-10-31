@@ -30,7 +30,7 @@ public abstract class BaseBatchCloseReviews extends BaseAction {
 
     @Override
     public void preprocess() {
-        this.reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        this.reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
     }
 
     public void closeReviews(ReviewRequest[] openRequests) {

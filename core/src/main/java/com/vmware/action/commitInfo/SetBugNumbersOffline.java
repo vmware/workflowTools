@@ -19,7 +19,7 @@ public class SetBugNumbersOffline extends BaseCommitReadAction {
 
     @Override
     public void process() {
-        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(config.noBugNumberLabel)) {
+        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
             log.info("");
             log.info("Existing Bug Numbers: {}", draft.bugNumbers);
         }
@@ -32,7 +32,7 @@ public class SetBugNumbersOffline extends BaseCommitReadAction {
             bugNumberText = appendCsvValue(bugNumberText, bugNumber);
         }
         if (bugNumberText.isEmpty()) {
-            bugNumberText = config.noBugNumberLabel;
+            bugNumberText = commitConfig.noBugNumberLabel;
         }
         draft.bugNumbers = bugNumberText;
         log.info("Bug number for commit: {}", draft.bugNumbers);

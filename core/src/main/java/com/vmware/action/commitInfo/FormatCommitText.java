@@ -16,12 +16,12 @@ public class FormatCommitText extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (draft.summary.length() > config.maxSummaryLength) {
-            throw new FatalException("Commit summary is greater than max length " + config.maxSummaryLength);
+        if (draft.summary.length() > commitConfig.maxSummaryLength) {
+            throw new FatalException("Commit summary is greater than max length " + commitConfig.maxSummaryLength);
         }
 
-        draft.description = addNewLinesIfNeeded(draft.description, config.maxDescriptionLength, 0);
-        draft.testingDone = addNewLinesIfNeeded(draft.testingDone, config.maxDescriptionLength,
-                config.testingDoneLabel.length());
+        draft.description = addNewLinesIfNeeded(draft.description, commitConfig.maxDescriptionLength, 0);
+        draft.testingDone = addNewLinesIfNeeded(draft.testingDone, commitConfig.maxDescriptionLength,
+                commitConfig.testingDoneLabel.length());
     }
 }

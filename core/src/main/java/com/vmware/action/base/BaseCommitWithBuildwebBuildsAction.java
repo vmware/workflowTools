@@ -1,6 +1,5 @@
 package com.vmware.action.base;
 
-import com.vmware.ServiceLocator;
 import com.vmware.buildweb.Buildweb;
 import com.vmware.config.WorkflowConfig;
 
@@ -10,7 +9,7 @@ public abstract class BaseCommitWithBuildwebBuildsAction extends BaseCommitActio
 
     @Override
     public String cannotRunAction() {
-        if (draft.jobBuildsMatchingUrl(config.buildwebUrl).isEmpty()) {
+        if (draft.jobBuildsMatchingUrl(buildwebConfig.buildwebUrl).isEmpty()) {
             return "the commit has no Buildweb builds in the testing done section";
         } else {
             return super.cannotRunAction();

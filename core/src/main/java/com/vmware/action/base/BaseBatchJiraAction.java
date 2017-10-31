@@ -13,7 +13,7 @@ public abstract class BaseBatchJiraAction extends BaseIssuesProcessingAction {
 
     @Override
     public String cannotRunAction() {
-        if (config.disableJira) {
+        if (jiraConfig.disableJira) {
             return "Jira is disabled by config property disableJira";
         }
         return super.cannotRunAction();

@@ -22,7 +22,7 @@ public class SubmitPendingChangelist extends BasePerforceCommitAction {
     @Override
     public void process() {
         final boolean DO_NOT_INCLUDE_JOB_RESULTS = false;
-        String description = draft.toText(config.getCommitConfiguration(), DO_NOT_INCLUDE_JOB_RESULTS);
+        String description = draft.toText(commitConfig, DO_NOT_INCLUDE_JOB_RESULTS);
         perforce.submitChangelist(draft.perforceChangelistId, description);
     }
 }

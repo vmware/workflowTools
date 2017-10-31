@@ -15,20 +15,21 @@ public class ReadPendingChangelist extends BasePerforceCommitAction {
 
     @Override
     public void process() {
-        String changelistId = StringUtils.isNotBlank(config.changelistId) ? config.changelistId : perforce.selectPendingChangelist();
+        String changelistId = StringUtils.isNotBlank(perforceClientConfig.changelistId)
+                ? perforceClientConfig.changelistId : perforce.selectPendingChangelist();
         String changelistText = perforce.readChangelist(changelistId);
         if (StringUtils.isBlank(changelistText) || !changelistText.contains("\n")) {
             throw new RuntimeException("No pending changelist exists for user " + config.username);
         }
 
-        draft.fillValuesFromCommitText(changelistText, config.getCommitConfiguration());
+        draft.fillValuesFromCommitText(changelistText, commitConfig);
         if (StringUtils.isBlank(draft.perforceChangelistId)) {
             throw new RuntimeException("Failed to parse changelist id from text\n" + changelistText);
         }
 
         Padder titlePadder = new Padder("Parsed Values");
         titlePadder.debugTitle();
-        log.debug(draft.toText(config.getCommitConfiguration()));
+        log.debug(draft.toText(commitConfig));
         titlePadder.debugTitle();
     }
 }

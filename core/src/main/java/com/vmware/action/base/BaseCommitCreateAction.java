@@ -30,16 +30,16 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
 
     @Override
     public void process() {
-        String description = draft.toText(config.getCommitConfiguration());
+        String description = draft.toText(commitConfig);
         if (git.workingDirectoryIsInGitRepo()) {
             commitUsingGit(description);
-        } else if (StringUtils.isNotBlank(config.perforceClientName)) {
+        } else if (StringUtils.isNotBlank(perforceClientConfig.perforceClientName)) {
             commitUsingPerforce(description);
         }
     }
 
     protected void commitUsingGit(String description) {
-        git.commit(draft.toText(config.getCommitConfiguration()));
+        git.commit(draft.toText(commitConfig));
     }
 
     protected void commitUsingPerforce(String description) {

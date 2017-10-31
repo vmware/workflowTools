@@ -6,16 +6,17 @@ import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
-import com.vmware.config.JenkinsJobsConfig;
+import com.vmware.config.section.JenkinsJobsConfig;
 import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
+import com.vmware.config.WorkflowActions;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowConfigParser;
 import com.vmware.jira.domain.ProjectIssues;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.scm.Git;
+import com.vmware.util.scm.Git;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Main class for running the workflow application.
@@ -67,11 +69,13 @@ public class Workflow {
     private final WorkflowConfigParser configParser = new WorkflowConfigParser();
     private List<String> workflowHistory;
     private WorkflowConfig config;
+    private ServiceLocator serviceLocator;
 
     public void init(String[] args) {
         readWorkflowHistoryFile();
 
         config = configParser.parseWorkflowConfig(args);
+        serviceLocator = new ServiceLocator(config);
         askForWorkflowIfEmpty();
     }
 
@@ -157,11 +161,10 @@ public class Workflow {
                 autocompleteList.add(workflow);
             }
         }
-
-        for (Class workflowAction : config.workFlowActions) {
-            // ! means that it won't show up if nothing is entered
-            autocompleteList.add("!" + workflowAction.getSimpleName());
-        }
+        WorkflowActions workflowActions = new WorkflowActions(config);
+        // ! means that it won't show up if nothing is entered
+        autocompleteList.addAll(workflowActions.getWorkflowActions()
+                .stream().map(workflowAction -> "!" + workflowAction.getSimpleName()).collect(Collectors.toList()));
         ImprovedStringsCompleter workflowCompleter = new ImprovedStringsCompleter(autocompleteList);
         workflowCompleter.setDelimeterText("");
         workflowCompleter.addValue("!" + EXIT_WORKFLOW);
@@ -188,14 +191,15 @@ public class Workflow {
         }
 
         try {
-            List<Class<? extends BaseAction>> workflowActions = config.determineActions(workflowToRun);
+            WorkflowActions workflowActions = new WorkflowActions(config);
+            List<Class<? extends BaseAction>> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
             if (config.dryRun) {
-                dryRunActions(workflowActions);
+                dryRunActions(actions);
             } else {
                 Date startingDate = new Date();
-                runActions(workflowActions, new WorkflowActionValues());
+                runActions(actions, new WorkflowActionValues());
                 outputTotalExecutionTime(startingDate);
             }
         } catch (UnknownWorkflowValueException e) {
@@ -224,7 +228,8 @@ public class Workflow {
         log.info("Checking that each action value in the workflows is valid");
         ReviewRequestDraft draft = new ReviewRequestDraft();
         ProjectIssues projectIssues = new ProjectIssues();
-        for (Class<? extends BaseAction> action : config.determineActions(StringUtils.join(config.workflows.keySet()))) {
+        WorkflowActions workflowActions = new WorkflowActions(config);
+        for (Class<? extends BaseAction> action : workflowActions.determineActions(StringUtils.join(config.workflows.keySet()))) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
             BaseAction actionObject = instantiateAction(action);
 
@@ -284,7 +289,7 @@ public class Workflow {
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 String matchingValueText;
                 if (configOption.equals("--jenkins-jobs")) {
-                    JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
+                    JenkinsJobsConfig jobsConfig = config.jenkinsJobsConfig;
                     matchingValueText = jobsConfig.toString();
                 } else {
                     Object matchingValue = ReflectionUtils.getValue(matchingField, config);
@@ -387,7 +392,9 @@ public class Workflow {
 
     private BaseAction instantiateAction(Class<? extends BaseAction> actionToInstantiate) {
         try {
-            return actionToInstantiate.getConstructor(WorkflowConfig.class).newInstance(config);
+            BaseAction action = actionToInstantiate.getConstructor(WorkflowConfig.class).newInstance(config);
+            action.setServiceLocator(serviceLocator);
+            return action;
         } catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeReflectiveOperationException(e);
         }

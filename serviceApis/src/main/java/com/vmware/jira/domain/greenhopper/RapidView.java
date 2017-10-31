@@ -1,6 +1,6 @@
 package com.vmware.jira.domain.greenhopper;
 
-import com.vmware.jira.domain.IssueTypeDefinition;
+import com.vmware.config.jira.IssueTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -49,7 +49,7 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
 
         Member boardOwner = trello.getTrelloMember(matchingBoard.getFirstOwner().idMember);
         log.warn("Board is not owned by you, it's owned by {}", boardOwner.fullName);
-        String useOtherBoard = config.ownBoardsOnly ? "n"
+        String useOtherBoard = trelloConfig.ownBoardsOnly ? "n"
                 : InputUtils.readValue("Sync jira issues with this existing board? [y/n]");
         if ("y".equalsIgnoreCase(useOtherBoard)) {
             selectedBoard = matchingBoard;

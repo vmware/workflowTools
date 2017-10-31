@@ -20,17 +20,17 @@ public class RevertWorkspace extends BasePerforceCommitAction {
             revertChangesInChangelist(changelistId);
         }
 
-        log.info("Reverting open files in default changelist for client {}", config.perforceClientName);
+        log.info("Reverting open files in default changelist for client {}", perforceClientConfig.perforceClientName);
         perforce.revertChangesInPendingChangelist("default");
     }
 
     private void revertChangesInChangelist(String changelistId) {
-        log.info("Reverting open files in changelist {} for client {}", changelistId, config.perforceClientName);
+        log.info("Reverting open files in changelist {} for client {}", changelistId, perforceClientConfig.perforceClientName);
         perforce.revertChangesInPendingChangelist(changelistId);
         if (changelistId.equals(draft.perforceChangelistId)) {
             log.info("Not deleting changelist {} as it matches the current commit", changelistId);
         } else {
-            log.info("Deleting pending changelist {} in client {}", changelistId, config.perforceClientName);
+            log.info("Deleting pending changelist {} in client {}", changelistId, perforceClientConfig.perforceClientName);
             perforce.deletePendingChangelist(changelistId);
             deleteMatchingChangelistTag(changelistId);
         }

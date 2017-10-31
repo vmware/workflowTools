@@ -16,6 +16,6 @@ public class PushToMaster extends BaseAction {
 
     @Override
     public void process() {
-        git.pushToRemoteBranch(config.defaultGitRemote, "master");
+        git.pushToRemoteBranch(gitRepoConfig.defaultGitRemote, "master");
     }
 }

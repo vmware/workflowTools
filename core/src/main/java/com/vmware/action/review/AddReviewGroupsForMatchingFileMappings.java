@@ -1,10 +1,9 @@
 package com.vmware.action.review;
 
 import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
+import com.vmware.util.scm.FileChange;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class AddReviewGroupsForMatchingFileMappings extends BaseCommitAction{
 
     @Override
     public String cannotRunAction() {
-        if (config.reviewGroupFileMappings.isEmpty()) {
+        if (reviewBoardConfig.reviewGroupFileMappings.isEmpty()) {
             return "no review group file mappings present";
         }
         return super.cannotRunAction();
@@ -27,8 +26,8 @@ public class AddReviewGroupsForMatchingFileMappings extends BaseCommitAction{
     public void process() {
         List<FileChange> fileChanges = getFileChangesInLastCommit();
 
-        for (String fileMapping : config.reviewGroupFileMappings.keySet()) {
-            String matchingGroup = config.reviewGroupFileMappings.get(fileMapping);
+        for (String fileMapping : reviewBoardConfig.reviewGroupFileMappings.keySet()) {
+            String matchingGroup = reviewBoardConfig.reviewGroupFileMappings.get(fileMapping);
             for (FileChange fileChange : fileChanges) {
                 if (fileChange.getFirstFileAffected().startsWith(fileMapping)) {
                     addTargetGroupForPath(matchingGroup, fileChange.getFirstFileAffected(), fileMapping);

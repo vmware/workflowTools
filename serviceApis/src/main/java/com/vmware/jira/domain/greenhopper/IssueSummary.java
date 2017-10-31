@@ -3,7 +3,7 @@ package com.vmware.jira.domain.greenhopper;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.jira.domain.IssueStatus;
 import com.vmware.jira.domain.IssueType;
-import com.vmware.jira.domain.IssueTypeDefinition;
+import com.vmware.config.jira.IssueTypeDefinition;
 
 public class IssueSummary {
 

@@ -4,13 +4,7 @@ import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Board;
-import com.vmware.trello.domain.Swimlane;
 import com.vmware.util.logging.Padder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
 
@@ -49,7 +43,7 @@ public abstract class BaseTrelloAction extends BaseIssuesProcessingAction {
 
         Board createdBoard = trello.createBoard(boardToCreate);
 
-        trello.createDefaultSwimlanesIfNeeded(createdBoard, config.storyPointValues);
+        trello.createDefaultSwimlanesIfNeeded(createdBoard, trelloConfig.storyPointValues);
         padder.infoTitle();
 
         selectedBoard = createdBoard;

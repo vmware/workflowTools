@@ -21,8 +21,8 @@ public class PushToTrackingBranch extends BaseAction {
         String trackingBranch = git.getTrackingBranch();
         if (StringUtils.isBlank(trackingBranch)) {
             log.debug("Branch {} does not track a remote branch, using configured tracking branch {}",
-                    git.currentBranch(), config.trackingBranchPath());
-            trackingBranch = config.trackingBranchPath();
+                    git.currentBranch(), gitRepoConfig.trackingBranchPath());
+            trackingBranch = gitRepoConfig.trackingBranchPath();
         }
 
         String[] pieces = trackingBranch.split("/");

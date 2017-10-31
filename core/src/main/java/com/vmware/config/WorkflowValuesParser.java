@@ -25,10 +25,10 @@ public class WorkflowValuesParser {
     private Map<String, String> configValues = new HashMap<String, String>();
     private List<String> unknownActions = new ArrayList<String>();
 
-    private Map<String, String[]> workflows;
+    private Map<String, List<String>> workflows;
     private List<Class<? extends BaseAction>> workflowActions;
 
-    public WorkflowValuesParser(Map<String, String[]> workflows, List<Class<? extends BaseAction>> workflowActions) {
+    public WorkflowValuesParser(Map<String, List<String>> workflows, List<Class<? extends BaseAction>> workflowActions) {
         this.workflows = workflows;
         this.workflowActions = workflowActions;
     }
@@ -39,7 +39,7 @@ public class WorkflowValuesParser {
         unknownActions.clear();
     }
 
-    public void parse(String[] workflowValues) {
+    public void parse(List<String> workflowValues) {
         for (String workflowValue : workflowValues) {
             if (workflowValue.startsWith("-")) {
                 int equalsIndex = workflowValue.indexOf("=");

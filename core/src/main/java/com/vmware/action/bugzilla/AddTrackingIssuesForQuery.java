@@ -19,7 +19,7 @@ public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
     public String cannotRunAction() {
         List<Bug> bugList = projectIssues.getBugsForProcessing();
         if (bugList.isEmpty()) {
-            return " no bugs found for named query " + config.bugzillaQuery;
+            return " no bugs found for named query " + bugzillaConfig.bugzillaQuery;
         }
         return super.cannotRunAction();
     }
@@ -35,12 +35,12 @@ public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
             }
             Issue trackingIssue = createIssueFromBug(bug);
             projectIssues.add(trackingIssue);
-            log.info("\nA Jira Issue will be created in Jira Project {} to track bug {}\n{}", config.defaultJiraProject,
-                    trackingIssue.matchingBugzillaNumber(config.bugzillaUrl), bug.getSummary());
+            log.info("\nA Jira Issue will be created in Jira Project {} to track bug {}\n{}", jiraConfig.defaultJiraProject,
+                    trackingIssue.matchingBugzillaNumber(bugzillaConfig.bugzillaUrl), bug.getSummary());
         }
 
         if (projectIssues.noIssuesAdded()) {
-            log.info("No issues added", config.bugzillaQuery);
+            log.info("No issues added", bugzillaConfig.bugzillaQuery);
         }
     }
 }

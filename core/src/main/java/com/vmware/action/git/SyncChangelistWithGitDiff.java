@@ -3,8 +3,8 @@ package com.vmware.action.git;
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
-import com.vmware.scm.GitChangelistRef;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.GitChangelistRef;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.LogLevel;
@@ -20,12 +20,12 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
 
     @Override
     public void process() {
-        List<FileChange> gitDiffChanges = git.getChangesInDiff(config.trackingBranchPath(), "head");
+        List<FileChange> gitDiffChanges = git.getChangesInDiff(gitRepoConfig.trackingBranchPath(), "head");
         log.debug("Git diff change count {}", gitDiffChanges.size());
 
         GitChangelistRef lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
         String fromRef = determineRefToDiffAgainst(lastSubmittedChangelistInfo);
-        String versionToSyncTo = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getChangelistId() : "";
+        String versionToSyncTo = buildwebConfig.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getChangelistId() : "";
         perforce.syncPerforceFiles(gitDiffChanges, versionToSyncTo);
         String diffData = git.diffTree(fromRef, "head", true, LogLevel.TRACE);
 
@@ -52,12 +52,12 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
 
     private String determineRefToDiffAgainst(GitChangelistRef lastSubmittedChangelistInfo) {
         String fromRef;
-        if (config.syncChangelistToLatestInBranch) {
+        if (buildwebConfig.syncChangelistToLatestInBranch) {
             log.info("Syncing files to be modified to changelist {} and applying diff", lastSubmittedChangelistInfo.getChangelistId());
             fromRef = lastSubmittedChangelistInfo.getCommitRef();
         } else {
             log.info("Syncing files to be modified to latest");
-            fromRef = config.trackingBranchPath();
+            fromRef = gitRepoConfig.trackingBranchPath();
         }
         return fromRef;
     }

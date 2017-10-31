@@ -3,7 +3,7 @@ package com.vmware.action.conditional;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
+import com.vmware.util.scm.FileChange;
 import com.vmware.util.logging.Padder;
 
 import java.util.List;

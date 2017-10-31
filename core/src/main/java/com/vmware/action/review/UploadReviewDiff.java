@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.RepoType;
-import com.vmware.scm.diff.GitDiffToPerforceConverter;
+import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
@@ -74,20 +74,20 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private DiffToUpload createReviewRequestDiff() {
-        log.info("Creating git diff against parent {}", config.parentBranchPath());
+        log.info("Creating git diff against parent {}", gitRepoConfig.parentBranchPath());
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
 
         DiffToUpload diff = new DiffToUpload();
-        String mergeBase = git.mergeBase(config.trackingBranchPath(), "HEAD");
-        diff.path = git.diffAsByteArray(config.parentBranchPath(), "HEAD", supportsDiffWithRenames);
-        diff.parent_diff_path = git.diffAsByteArray(mergeBase, config.parentBranchPath(), supportsDiffWithRenames);
+        String mergeBase = git.mergeBase(gitRepoConfig.trackingBranchPath(), "HEAD");
+        diff.path = git.diffAsByteArray(gitRepoConfig.parentBranchPath(), "HEAD", supportsDiffWithRenames);
+        diff.parent_diff_path = git.diffAsByteArray(mergeBase, gitRepoConfig.parentBranchPath(), supportsDiffWithRenames);
         return diff;
     }
 
     private void checkThatPerforceConfigIsValid() {
-        if (StringUtils.isBlank(config.perforceClientName)) {
+        if (StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
             throw new RuntimeException("config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName");
         }
         // if root directory is null, then assuming it should be a perforce client
@@ -97,17 +97,17 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private DiffToUpload createPerforceReviewRequestDiffFromGit() {
-        log.info("Converting git diff into a diff in perforce format against parent branch {}", config.parentBranchPath());
+        log.info("Converting git diff into a diff in perforce format against parent branch {}", gitRepoConfig.parentBranchPath());
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
 
         DiffToUpload diff = new DiffToUpload();
-        String mergeBase = git.mergeBase(config.trackingBranchPath(), "HEAD");
+        String mergeBase = git.mergeBase(gitRepoConfig.trackingBranchPath(), "HEAD");
         GitDiffToPerforceConverter diffConverter = new GitDiffToPerforceConverter(getLoggedInPerforceClient(),
                 git.lastSubmittedChangelistInfo().getChangelistId());
-        diff.path = diffConverter.convertAsBytes(git.diff(config.parentBranchPath(), "HEAD", supportsDiffWithRenames));
-        diff.parent_diff_path = diffConverter.convertAsBytes(git.diff(mergeBase, config.parentBranchPath(), supportsDiffWithRenames));
+        diff.path = diffConverter.convertAsBytes(git.diff(gitRepoConfig.parentBranchPath(), "HEAD", supportsDiffWithRenames));
+        diff.parent_diff_path = diffConverter.convertAsBytes(git.diff(mergeBase, gitRepoConfig.parentBranchPath(), supportsDiffWithRenames));
         return diff;
     }
 

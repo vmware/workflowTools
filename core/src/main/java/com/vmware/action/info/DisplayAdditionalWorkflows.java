@@ -30,7 +30,7 @@ public class DisplayAdditionalWorkflows extends BaseAction {
         mainWorkflows.addAll(Workflow.PERFORCE_MAIN_WORKFLOWS);
         for (String workflow : sortedWorkflows) {
             if (!mainWorkflows.contains(workflow) && !config.supportingWorkflows.contains(workflow)) {
-                log.info("{} -> {}", workflow, Arrays.toString(config.workflows.get(workflow)));
+                log.info("{} -> {}", workflow, config.workflows.get(workflow).toString());
             }
         }
         additionalWorkflowsPadder.infoTitle();

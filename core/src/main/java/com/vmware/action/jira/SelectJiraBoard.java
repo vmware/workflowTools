@@ -9,7 +9,7 @@ import com.vmware.util.input.InputUtils;
 
 import java.util.List;
 
-@ActionDescription("Select a board on JIRA to use")
+@ActionDescription("Select a board on JIRA to use.")
 public class SelectJiraBoard extends BaseBatchJiraAction {
 
     public SelectJiraBoard(WorkflowConfig config) {

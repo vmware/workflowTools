@@ -14,7 +14,7 @@ public class ExitIfPerforceClientIsNotFound extends BaseAction {
     @Override
     public void process() {
         String reasonForFailing = perforceClientCannotBeUsed();
-        if (StringUtils.isBlank(reasonForFailing) && StringUtils.isBlank(config.perforceClientName)) {
+        if (StringUtils.isBlank(reasonForFailing) && StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
             reasonForFailing = "perforceClientName config value is not set, can also be set by git-p4.client git config value.";
         }
         if (StringUtils.isNotBlank(reasonForFailing)) {

@@ -39,7 +39,7 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
 
     @Override
     public void preprocess() {
-        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
         if (draft != null && draft.id != null && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(draft.id));
             Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());

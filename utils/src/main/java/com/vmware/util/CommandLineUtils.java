@@ -10,9 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Used for easy use of executing commands
@@ -49,7 +53,7 @@ public class CommandLineUtils {
 
     public static String executeCommand(File workingDirectory, Map<String, String> environmentVariables,
                                         String command, String inputText, LogLevel logLevel) {
-        ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
+        ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).directory(workingDirectory)
                 .redirectErrorStream(true);
         if (environmentVariables != null) {
             builder.environment().putAll(environmentVariables);
@@ -71,7 +75,7 @@ public class CommandLineUtils {
 
     public static Process executeCommand(File workingDirectory, Map<String, String> environmentVariables,
                                         String command, String inputText) {
-        ProcessBuilder builder = new ProcessBuilder(command.split(" ")).directory(workingDirectory)
+        ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).directory(workingDirectory)
                 .redirectErrorStream(true);
         if (environmentVariables != null) {
             builder.environment().putAll(environmentVariables);
@@ -90,7 +94,7 @@ public class CommandLineUtils {
 
     public static String executeScript(String command, String[] inputs, String[] textsToWaitFor, LogLevel logLevel) {
         log.info("Executing script {}", command);
-        ProcessBuilder builder = new ProcessBuilder(command.split(" ")).redirectErrorStream(true);
+        ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).redirectErrorStream(true);
         String totalOutput = "";
         try {
             Process statusProcess = builder.start();
@@ -129,5 +133,25 @@ public class CommandLineUtils {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
+    }
+
+    private static String[] splitCommand(String command) {
+        command += " "; // To detect last token when not quoted...
+        ArrayList<String> strings = new ArrayList<String>();
+        boolean inQuote = false;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < command.length(); i++) {
+            char c = command.charAt(i);
+            if (c == '"' || c == ' ' && !inQuote) {
+                if (c == '"')
+                    inQuote = !inQuote;
+                if (!inQuote && sb.length() > 0) {
+                    strings.add(sb.toString());
+                    sb.delete(0, sb.length());
+                }
+            } else
+                sb.append(c);
+        }
+        return strings.toArray(new String[strings.size()]);
     }
 }

@@ -17,7 +17,7 @@ public class AddTrackingIssueCreatedComments extends BaseBatchBugzillaAction {
 
     @Override
     public String cannotRunAction() {
-        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
+        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(bugzillaConfig.bugzillaUrl);
         if (issues.isEmpty()) {
             return "no matching issues found";
         }
@@ -26,9 +26,9 @@ public class AddTrackingIssueCreatedComments extends BaseBatchBugzillaAction {
 
     @Override
     public void process() {
-        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(config.bugzillaUrl);
+        List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(bugzillaConfig.bugzillaUrl);
         for (Issue issue : issues) {
-            int bugzillaId = issue.matchingBugzillaNumber(config.bugzillaUrl);
+            int bugzillaId = issue.matchingBugzillaNumber(bugzillaConfig.bugzillaUrl);
             Bug matchingBug = bugzilla.getBugByIdWithoutException(bugzillaId);
             if (matchingBug.isNotFound()) {
                 log.warn("Bug with id {} was not found in Bugzilla, skipping", bugzillaId);

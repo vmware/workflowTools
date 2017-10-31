@@ -2,18 +2,16 @@ package com.vmware.action.jenkins;
 
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
-import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.JobBuild;
 import com.vmware.BuildResult;
 import com.vmware.http.exception.NotFoundException;
-import com.vmware.jenkins.domain.Job;
+import com.vmware.config.jenkins.Job;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 @ActionDescription("Aborts the jenkins builds specified by the jenkinsJobsToUse config property. Updates status for jenkins build urls in testing done section.")
 public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
@@ -28,21 +26,21 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
         jenkins.checkStatusOfBuilds(draft);
         log.info("");
 
-        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
-        for (Job jenkinsJob: jobsConfig.jobs()) {
+        for (Job jenkinsJob: jenkinsJobsConfig.jobs()) {
             abortJenkinsJob(draft, jenkinsJob);
         }
     }
 
     private void askForJenkinsJobKeysIfBlank() {
-        if (StringUtils.isNotBlank(config.jenkinsJobsToUse)) {
+        if (StringUtils.isNotBlank(jenkinsConfig.jenkinsJobsToUse)) {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        if (config.jenkinsJobsMappings == null || config.jenkinsJobsMappings.isEmpty()) {
-            config.jenkinsJobsToUse = InputUtils.readValue("Jenkins job keys");
+        Map<String, String> jenkinsJobsMappings = config.jenkinsJobsConfig.jenkinsJobsMappings;
+        if (jenkinsJobsMappings == null || jenkinsJobsMappings.isEmpty()) {
+            jenkinsConfig.jenkinsJobsToUse = InputUtils.readValue("Jenkins job keys");
         } else {
-            config.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", config.jenkinsJobsMappings.keySet());
+            jenkinsConfig.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Jenkins job keys (TAB for list)", jenkinsJobsMappings.keySet());
         }
     }
 

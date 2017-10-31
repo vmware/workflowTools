@@ -32,7 +32,7 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
 
     @Override
     public String cannotRunAction() {
-        if (config.disableJira) {
+        if (jiraConfig.disableJira) {
             return "Jira is disabled by config property disableJira";
         }
 

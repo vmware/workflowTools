@@ -1,10 +1,24 @@
 package com.vmware.util;
 
+import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class DateUtils {
+
+    public static Date parseDate(String dateValue) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy zzzzz");
+        try {
+            return dateFormat.parse(dateValue);
+        } catch (ParseException e) {
+            LoggerFactory.getLogger(DateUtils.class).debug("Failed to parse " + dateValue + ": " + e.getMessage());
+            return null;
+        }
+    }
 
     public static long workWeekMinutesBetween(Date date1, Date date2) {
         long duration = minutesBetween(date1, date2);
