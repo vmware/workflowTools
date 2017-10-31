@@ -49,7 +49,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public boolean workingDirectoryIsInGitRepo() {
-        return getRootDirectory() != null;
+        return isGitInstalled() && getRootDirectory() != null;
     }
 
     /**
