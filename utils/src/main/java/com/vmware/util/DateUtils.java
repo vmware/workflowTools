@@ -11,13 +11,11 @@ import java.util.concurrent.TimeUnit;
 public class DateUtils {
 
     public static Date parseDate(String dateValue) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy zzzzz");
-        try {
-            return dateFormat.parse(dateValue);
-        } catch (ParseException e) {
-            LoggerFactory.getLogger(DateUtils.class).debug("Failed to parse " + dateValue + ": " + e.getMessage());
-            return null;
+        Date date = parseDate(dateValue, "EEE MMM dd HH:mm:ss yyyy zzzzz");
+        if (date == null) {
+            date = parseDate(dateValue, "EEE MMM dd HH:mm:ss yyyy");
         }
+        return date;
     }
 
     public static long workWeekMinutesBetween(Date date1, Date date2) {
@@ -45,5 +43,16 @@ public class DateUtils {
             date1Calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         return weekendMinutes;
+    }
+
+    private static Date parseDate(String dateValue, String pattern) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        try {
+            return dateFormat.parse(dateValue);
+        } catch (ParseException e) {
+            LoggerFactory.getLogger(DateUtils.class).debug("Failed to parse "
+                    + dateValue + " from " + pattern + ": " + e.getMessage());
+            return null;
+        }
     }
 }
