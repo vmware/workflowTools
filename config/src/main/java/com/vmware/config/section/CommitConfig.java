@@ -94,7 +94,7 @@ public class CommitConfig {
         appendLabelToPattern(builder, reviewUrlLabel);
         appendLabelToPattern(builder, mergeToLabel);
         appendLabelToPattern(builder, approvedByLabel);
-        appendLabelToPattern(builder, "\\s+\\d+\\s+ file\\w*\\s+changed");
+        appendLabelToPattern(builder, "\\s+\\d+\\s+files*\\s+changed");
         builder.append("($))");
         return builder.toString();
     }

@@ -150,7 +150,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String commitText(int skipCount) {
-        return executeScmCommand("log -1 --skip={} --pretty=\"commit %H%nAuthor: %an <%ae>%nDate: %ad%n%B\" --shortstat",
+        return executeScmCommand("log -1 --skip={} --pretty=\"commit %H%nAuthor: %an <%ae>%nDate: %ad%n%B\" --shortstat --date=local",
                 String.valueOf(skipCount)).trim();
     }
 
