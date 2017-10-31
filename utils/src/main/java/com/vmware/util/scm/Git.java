@@ -7,15 +7,18 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
+import com.vmware.util.logging.SimpleLogFormatter;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -149,6 +152,13 @@ public class Git extends BaseScmWrapper {
     public String commitText(int skipCount) {
         return executeScmCommand("log -1 --skip={} --pretty=\"commit %H%nAuthor: %an <%ae>%nDate: %ad%n%B\" --shortstat",
                 String.valueOf(skipCount)).trim();
+    }
+
+    public List<String> commitsSince(Date date) {
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZZZ").format(date);
+        String commitsOutput = executeScmCommand("log --pretty=\";break;commit %H%nAuthor: %an <%ae>%nDate: %ad%n%B\" --shortstat --date=local --since={}",
+                formattedDate);
+        return Arrays.asList(commitsOutput.split(";break;"));
     }
 
     public String commitTextBody(int skipCount) {

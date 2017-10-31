@@ -45,8 +45,6 @@ public class GenerateGitCommitStats extends BaseAction {
         log.info("Computing stats against all git commits newer than {} ({} days ago)",
                 oldestDateToCheckAgainst.toString(), statsConfig.lastNumberOfDaysForStats);
 
-        String commitText = git.commitText(0);
-        ReviewRequestDraft draft = new ReviewRequestDraft(commitText, commitConfig);
         TitledHashMap<String, Integer> totalCounts = new TitledHashMap<>("total");
         List<TitledHashMap<String, Integer>> countRanges = new ArrayList<>();
         Map<String, List<String>> commitSummariesForAuthor = new HashMap<>();
@@ -65,13 +63,19 @@ public class GenerateGitCommitStats extends BaseAction {
         TitledHashMap<String, Integer> onelineTestingDoneCounts = new TitledHashMap<>("oneliners");
         TitledHashMap<String, Integer> shortTestingDoneCounts = new TitledHashMap<>("short description");
         int numberOfCommitsChecked = 0;
-        while (draft.commitDate != null && oldestDateToCheckAgainst.before(draft.commitDate)) {
-            String authorEmail = draft.authorEmail;
-            if (StringUtils.isBlank(authorEmail)) {
-                commitText = git.commitText(++numberOfCommitsChecked);
-                draft = new ReviewRequestDraft(commitText, commitConfig);
+        List<String> commitsSinceDate = git.commitsSince(oldestDateToCheckAgainst);
+        log.info("Read {} commits from repo {} since date {}", commitsSinceDate.size() - 1,
+                git.getRootDirectory().getPath(), oldestDateToCheckAgainst.toString());
+        for (String commitText: commitsSinceDate) {
+            if (StringUtils.isBlank(commitText)) {
                 continue;
             }
+            ReviewRequestDraft draft = new ReviewRequestDraft(commitText, commitConfig);
+            String authorEmail = draft.authorEmail;
+            if (StringUtils.isBlank(authorEmail)) {
+                continue;
+            }
+            numberOfCommitsChecked++;
             incrementCount(authorEmail, totalCounts);
             if (draft.isTrivialCommit(commitConfig.trivialReviewerLabel)) {
                 incrementCount(authorEmail, trivialAuthorCounts);
@@ -102,10 +106,8 @@ public class GenerateGitCommitStats extends BaseAction {
                 }
                 commitSummariesForAuthor.get(draft.authorEmail).add(draft.summaryInfo(statsConfig.maxSummaryLength));
             }
-            commitText = git.commitText(++numberOfCommitsChecked);
-            draft = new ReviewRequestDraft(commitText, commitConfig);
         }
-        log.info("{} commits checked", numberOfCommitsChecked);
+        log.info("Successfully parsed {} commits", numberOfCommitsChecked);
 
         countRanges.add(0, totalCounts);
         printResults(countRanges, "Total counts");
@@ -121,7 +123,7 @@ public class GenerateGitCommitStats extends BaseAction {
     private void printCommitSummaries(Map<String, List<String>> commitSummariesForAuthor) {
         List<String> sortedAuthors = commitSummariesForAuthor.keySet().stream().sorted().collect(Collectors.toList());
         for (String authorEmail : sortedAuthors) {
-            Padder authorPadder = new Padder("Commits for {}", authorEmail);
+            Padder authorPadder = new Padder("Commits ({}) for {}", commitSummariesForAuthor.get(authorEmail).size(), authorEmail);
             authorPadder.infoTitle();
             for (String summary : commitSummariesForAuthor.get(authorEmail)) {
                 log.info(summary);
