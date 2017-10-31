@@ -120,7 +120,8 @@
     "--file-count-ranges"
   ],
   "UpdateReviewDetails": [
-    "--groups"
+    "--groups",
+    "--disable-markdown"
   ],
   "UploadReviewDiffWithRbt": [
     "--username"

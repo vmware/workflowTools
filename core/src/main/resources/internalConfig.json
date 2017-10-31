@@ -30,6 +30,7 @@
   "remoteBranchToUse": "precommit",
   "trackingBranch": "master",
   "parentBranch": "master",
+  "disableMarkdown": false,
   "issueTypesToInclude": [
     8
   ],

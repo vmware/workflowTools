@@ -22,6 +22,16 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
             draft.targetGroups = existingDraft.targetGroups;
         }
 
+        if (reviewBoardConfig.disableMarkdown) {
+            log.info("Sending description and testing done as plain text");
+            draft.descriptionTextType = "plain";
+            draft.testingDoneTextType = "plain";
+        } else {
+            log.info("Sending description and testing done as markdown text");
+            draft.descriptionTextType = "markdown";
+            draft.testingDoneTextType = "markdown";
+        }
+
         draft.updateTargetGroupsIfNeeded(reviewBoardConfig.targetGroups);
         draft.addExtraTargetGroupsIfNeeded();
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
