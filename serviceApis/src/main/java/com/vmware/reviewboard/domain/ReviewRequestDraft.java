@@ -63,6 +63,13 @@ public class ReviewRequestDraft extends BaseEntity {
     @SerializedName("target_groups")
     @JsonAdapter(LinkArrayDeserializer.class)
     public String targetGroups;
+    @Expose(deserialize = false)
+    @SerializedName("description_text_type")
+    public String descriptionTextType;
+    @Expose(deserialize = false)
+    @SerializedName("testing_done_text_type")
+    public String testingDoneTextType;
+
     @Expose(serialize = false, deserialize = false)
     public List<JobBuild> jobBuilds = new ArrayList<>();
     @Expose(serialize = false, deserialize = false)
