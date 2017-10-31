@@ -49,7 +49,7 @@ public class GenerateGitCommitStats extends BaseAction {
         List<TitledHashMap<String, Integer>> countRanges = new ArrayList<>();
         Map<String, List<String>> commitSummariesForAuthor = new HashMap<>();
         for (int i = 0; i < (statsConfig.fileCountRanges.length); i ++) {
-            log.info("{}: {} max file changes, {} max line changes", sizeNames.get(i),
+            log.info("{}: {} max file changes or {} max line changes", sizeNames.get(i),
                     statsConfig.fileCountRanges[i], statsConfig.lineCountRanges[i]);
             countRanges.add(new TitledHashMap<>(sizeNames.get(i)));
         }
@@ -59,7 +59,7 @@ public class GenerateGitCommitStats extends BaseAction {
         countRanges.add(new TitledHashMap<>(spillOverSize));
 
         TitledHashMap<String, Integer> trivialAuthorCounts = new TitledHashMap<>("trivial");
-        TitledHashMap<String, Integer> noBugNumberCounts = new TitledHashMap<>("noBugNumber");
+        TitledHashMap<String, Integer> noBugNumberCounts = new TitledHashMap<>("No bug number");
         TitledHashMap<String, Integer> onelineTestingDoneCounts = new TitledHashMap<>("oneliners");
         TitledHashMap<String, Integer> shortTestingDoneCounts = new TitledHashMap<>("short description");
         int numberOfCommitsChecked = 0;
@@ -111,8 +111,7 @@ public class GenerateGitCommitStats extends BaseAction {
 
         countRanges.add(0, totalCounts);
         printResults(countRanges, "Total counts");
-        printResults(Collections.singletonList(trivialAuthorCounts), "Trivial commit counts");
-        printResults(Collections.singletonList(noBugNumberCounts), "No bug number commit counts");
+        printResults(Arrays.asList(trivialAuthorCounts, noBugNumberCounts), "Simple commit counts");
         printResults(Arrays.asList(shortTestingDoneCounts, onelineTestingDoneCounts), "Short Testing done counts");
 
         if (!commitSummariesForAuthor.isEmpty()) {

@@ -16,6 +16,7 @@ import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -477,7 +478,8 @@ public class ReviewRequestDraft extends BaseEntity {
 
     public String summaryInfo(int maxSummaryLength) {
         String truncatedSummary = truncateStringIfNeeded(summary, maxSummaryLength);
-        return String.format("%s: %s, %s", truncatedSummary,
+        String dateText = commitDate != null ? " " + new SimpleDateFormat("dd-MM-yyyy").format(commitDate) + "," : "";
+        return String.format("%s:%s %s, %s", truncatedSummary, dateText,
                 pluralize(filesChanged, "file"), pluralize(totalLineChanges(), "line change"));
     }
 
