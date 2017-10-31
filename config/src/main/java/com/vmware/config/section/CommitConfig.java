@@ -67,6 +67,9 @@ public class CommitConfig {
     @ConfigurableProperty(help = "Template values for testing done, press up to cycle through values when entering testing done")
     public String[] testingDoneTemplates;
 
+    @ConfigurableProperty(commandLine = "--set-empty-only", help = "Set values for empty properties only. Ignore properties that already have values")
+    public boolean setEmptyPropertiesOnly;
+
     public CommitConfig() {}
 
     public CommitConfig(String reviewboardUrl, String buildwebUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,
