@@ -2,9 +2,11 @@ package com.vmware.http.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowConfigMapper;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.IssueResolutionDefinition;
 import com.vmware.jira.domain.IssueStatusDefinition;
-import com.vmware.jira.domain.IssueTypeDefinition;
 
 import java.util.Date;
 import java.util.Map;
@@ -39,7 +41,8 @@ public class ConfiguredGsonBuilder {
                 .registerTypeAdapter(Date.class, new DateWithTimezoneMapper(dateFormat, serverTimezone))
                 .registerTypeAdapter(IssueStatusDefinition.class, new ComplexEnumMapper())
                 .registerTypeAdapter(IssueResolutionDefinition.class, new ComplexEnumMapper())
-                .registerTypeAdapter(IssueTypeDefinition.class, new ComplexEnumMapper());
+                .registerTypeAdapter(IssueTypeDefinition.class, new ComplexEnumMapper())
+                .registerTypeAdapter(WorkflowConfig.class, new WorkflowConfigMapper());
         if (customFieldNames != null) {
             this.builder.setFieldNamingStrategy(new RuntimeFieldNamingStrategy(customFieldNames));
         }

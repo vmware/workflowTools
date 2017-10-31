@@ -1,6 +1,7 @@
 package com.vmware.mapping;
 
 import com.vmware.action.BaseAction;
+import com.vmware.config.WorkflowActions;
 import com.vmware.config.WorkflowValuesParser;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.ArgumentListAware;
@@ -8,6 +9,7 @@ import com.vmware.util.input.ImprovedStringsCompleter;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -20,10 +22,12 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
     private ConfigMappings configMappings;
     private ArgumentCompleter.ArgumentList argumentList;
     private WorkflowConfig config;
+    private List<Class<? extends BaseAction>> workflowActions;
 
     public ConfigValuesCompleter(WorkflowConfig config) {
         this.configMappings = new ConfigMappings();
         this.config = config;
+        this.workflowActions = new WorkflowActions(config).getWorkflowActions();
         super.values.addAll(configMappings.allConfigValues());
     }
 
@@ -34,8 +38,8 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         }
 
         String workflowString = argumentList.getArguments()[0];
-        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config.workflows, config.workFlowActions);
-        valuesParser.parse(workflowString.split(","));
+        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config.workflows, workflowActions);
+        valuesParser.parse(Arrays.asList(workflowString.split(",")));
         values.clear();
         valuesShownWhenNoBuffer.clear();
         for (Class<? extends BaseAction> foundAction : valuesParser.getActionClasses()) {

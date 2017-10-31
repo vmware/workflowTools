@@ -17,7 +17,7 @@ public class DisplayReviewUrl extends BaseCommitWithReviewAction {
     @Override
     public void process() {
         if (StringUtils.isInteger(draft.id)) {
-            log.info("{}r/{}/", UrlUtils.addTrailingSlash(config.reviewboardUrl), draft.id);
+            log.info("{}r/{}/", UrlUtils.addTrailingSlash(reviewBoardConfig.reviewboardUrl), draft.id);
         } else {
             log.info("Review url: {}", draft.id);
         }

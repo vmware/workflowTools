@@ -22,7 +22,7 @@ public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {
 
     @Override
     public void process() {
-        String reviewUrl = String.format("%sr/%s/", UrlUtils.addTrailingSlash(config.reviewboardUrl), draft.id);
+        String reviewUrl = String.format("%sr/%s/", UrlUtils.addTrailingSlash(reviewBoardConfig.reviewboardUrl), draft.id);
 
         String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         boolean isOsx = osName.contains("mac") || osName.contains("darwin");

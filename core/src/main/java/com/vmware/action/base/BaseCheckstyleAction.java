@@ -1,21 +1,21 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
+import com.vmware.util.scm.FileChange;
 
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.vmware.scm.FileChangeType.deleted;
-import static com.vmware.scm.FileChangeType.deletedAfterRename;
 import static com.vmware.util.StringUtils.appendWithDelimiter;
+import static com.vmware.util.scm.FileChangeType.deleted;
+import static com.vmware.util.scm.FileChangeType.deletedAfterRename;
 
 public abstract class BaseCheckstyleAction extends BaseCommitAction {
 
@@ -30,11 +30,11 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isBlank(config.checkstyleJarPath)) {
+        if (StringUtils.isBlank(checkstyleConfig.checkstyleJarPath)) {
             return "checkstyleJarPath is not set";
-        } else if (StringUtils.isBlank(config.checkstyleConfigXmlPath)) {
+        } else if (StringUtils.isBlank(checkstyleConfig.checkstyleConfigXmlPath)) {
             return "checkstyleConfigXmlPath is not set";
-        } else if (StringUtils.isBlank(config.checkstyleSuppressionsXmlPath)) {
+        } else if (StringUtils.isBlank(checkstyleConfig.checkstyleSuppressionsXmlPath)) {
             return "checkstyleSuppressionsXmlPath is not set";
         } else {
             return super.cannotRunAction();
@@ -44,10 +44,11 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
     @Override
     public void process() {
         log.debug("Using checkstyle jar {} with config file {} and suppressions file {}",
-                config.checkstyleJarPath, config.checkstyleConfigXmlPath, config.checkstyleSuppressionsXmlPath);
-        String checkstyleJarFullPath = createFullPath(config.checkstyleJarPath);
-        String checkstyleConfigXmlFullPath = createFullPath(config.checkstyleConfigXmlPath);
-        String checkstyleSuppressionsXmlFullPath = createFullPath(config.checkstyleSuppressionsXmlPath);
+                checkstyleConfig.checkstyleJarPath, checkstyleConfig.checkstyleConfigXmlPath,
+                checkstyleConfig.checkstyleSuppressionsXmlPath);
+        String checkstyleJarFullPath = createFullPath(checkstyleConfig.checkstyleJarPath);
+        String checkstyleConfigXmlFullPath = createFullPath(checkstyleConfig.checkstyleConfigXmlPath);
+        String checkstyleSuppressionsXmlFullPath = createFullPath(checkstyleConfig.checkstyleSuppressionsXmlPath);
 
         log.debug("Using checkstyle jar path {} with config file path {} and suppressions file path {}",
                 checkstyleJarFullPath, checkstyleConfigXmlFullPath, checkstyleSuppressionsXmlFullPath);
@@ -91,10 +92,10 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
         if (!fileChange.getLastFileAffected().endsWith(".java")) {
             return false;
         }
-        if (config.checkstyleFileMappings == null || config.checkstyleFileMappings.isEmpty()) {
+        if (checkstyleConfig.checkstyleFileMappings == null || checkstyleConfig.checkstyleFileMappings.isEmpty()) {
             return true;
         }
-        return config.checkstyleFileMappings.stream()
+        return checkstyleConfig.checkstyleFileMappings.stream()
                 .anyMatch(fileMapping -> fileChange.getLastFileAffected().startsWith(fileMapping));
     }
 

@@ -1,5 +1,7 @@
 package com.vmware.jenkins.domain;
 
+import com.vmware.config.jenkins.Job;
+
 import java.util.NoSuchElementException;
 
 public class JobsList {

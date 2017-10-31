@@ -4,7 +4,7 @@ import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-@ActionDescription("Displays build output for jenkins jobs that are not successful")
+@ActionDescription("Displays build output for jenkins jobs that are not successful.")
 public class DisplayBuildOutputForJenkinsFailures extends BaseCommitWithJenkinsBuildsAction {
 
     public DisplayBuildOutputForJenkinsFailures(WorkflowConfig config) {

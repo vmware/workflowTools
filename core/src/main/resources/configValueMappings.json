@@ -21,8 +21,6 @@
     "--perforce-client"
   ],
   "GenerateReviewStats": [
-    "--username",
-    "--reviewboard-url",
     "--file-count-ranges",
     "--groups",
     "--review-board-date-format"
@@ -46,12 +44,10 @@
     "--ignore-jenkins-job-failure"
   ],
   "BaseTransitionJiraIssue": [
-    "--jira-url",
     "--username",
     "--disable-jira"
   ],
   "ConvertCardsToJiraIssues": [
-    "--trello-url",
     "--jira-url"
   ],
   "AddGitChangesToChangelist": [
@@ -81,7 +77,6 @@
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--username",
-    "--jira-url",
     "--disable-jira"
   ],
   "AddTrackingIssuesForQuery": [
@@ -97,18 +92,15 @@
   ],
   "LoadReviewPatch": [
     "--username",
-    "--reviewboard-url",
     "--latest-diff",
     "--review-request-id",
     "--review-board-date-format"
   ],
   "SetReviewId": [
     "--username",
-    "--reviewboard-url",
     "--review-board-date-format"
   ],
   "BasePerforceCommitAction": [
-    "--perforce-client",
     "--username"
   ],
   "BaseCommitReadAction": [
@@ -120,6 +112,13 @@
   "LoadBugsForQuery": [
     "--bugzilla-query"
   ],
+  "GenerateGitCommitStats": [
+    "--max-summary",
+    "--authors",
+    "--last-number-of-days",
+    "--line-count-ranges",
+    "--file-count-ranges"
+  ],
   "UpdateReviewDetails": [
     "--groups"
   ],
@@ -128,18 +127,15 @@
   ],
   "CreateReviewIfNeeded": [
     "--username",
-    "--reviewboard-url",
     "--review-board-repo",
     "--review-board-date-format"
   ],
   "UpdateTaskEstimates": [
     "--username",
-    "--jira-url",
     "--estimate"
   ],
   "BaseBatchJiraAction": [
     "--username",
-    "--jira-url",
     "--disable-jira"
   ],
   "DisplayConfig": [
@@ -167,7 +163,6 @@
     "--reviewboard-url"
   ],
   "BaseCommitAction": [
-    "--perforce-client",
     "--username",
     "--changelist-id"
   ],
@@ -176,9 +171,6 @@
   ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
-  ],
-  "BaseTrelloAction": [
-    "--trello-url"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
@@ -195,14 +187,11 @@
     "--perforce-client"
   ],
   "BaseCommitUsingReviewBoardAction": [
-    "--perforce-client",
     "--username",
-    "--reviewboard-url",
     "--review-board-date-format"
   ],
   "SetCommitDetailsFromReview": [
     "--username",
-    "--reviewboard-url",
     "--max-description",
     "--max-summary",
     "--review-request-id",
@@ -228,22 +217,18 @@
     "--diff-file"
   ],
   "BaseBatchBugzillaAction": [
-    "--bugzilla-test-bug",
     "--username",
-    "--bugzilla-url",
     "--default-jira-component",
     "--default-jira-project",
     "--disable-bugzilla"
   ],
   "UploadReviewDiffFromChangelist": [
-    "--perforce-client",
     "--username"
   ],
   "BaseSetReviewersList": [
     "--always-include-review-url"
   ],
   "ApplyPatch": [
-    "--perforce-client",
     "--username",
     "--action-after-failed-patch-check",
     "--patch-command",
@@ -262,16 +247,13 @@
     "--default-jira-project"
   ],
   "MarkBugAsResolved": [
-    "--bugzilla-test-bug",
-    "--username",
-    "--bugzilla-url"
+    "--username"
   ],
   "SubmitToDepot": [
     "--tracking-branch"
   ],
   "CreateReview": [
     "--username",
-    "--reviewboard-url",
     "--review-board-date-format",
     "--review-board-repo"
   ],
@@ -279,14 +261,10 @@
     "--git-remote",
     "--username"
   ],
-  "HardSubmitOldShipItReviews": [
-    "--old-ship-it"
-  ],
   "LoadCompletedIssuesWithoutResolution": [
     "--username"
   ],
   "SyncCardsWithJiraIssues": [
-    "--trello-url",
     "--jira-url",
     "--keep-missing-cards"
   ],
@@ -297,14 +275,14 @@
     "--log-line-count"
   ],
   "SetBugNumbers": [
-    "--bugzilla-test-bug",
-    "--bugzilla-url",
     "--username",
-    "--jira-url",
     "--default-jira-project",
     "--bugzilla-query",
     "--disable-bugzilla",
     "--disable-jira"
+  ],
+  "BaseReviewBoardAction": [
+    "--username"
   ],
   "ApplyChangelistToSeparateGitBranch": [
     "--tracking-branch"
@@ -316,17 +294,11 @@
     "--own-boards-only"
   ],
   "BaseBatchCloseReviews": [
-    "--reviewboard-url",
     "--username",
     "--review-board-date-format"
   ],
   "DiscardUnpublishedReviews": [
-    "--review-board-date-format",
-    "--username",
-    "--reviewboard-url"
-  ],
-  "HardSubmitOldSoftSubmittedReviews": [
-    "--old-submit"
+    "--username"
   ],
   "RebaseAgainstMaster": [
     "--git-remote"
@@ -339,7 +311,6 @@
     "--git-remote"
   ],
   "BaseSetUsersList": [
-    "--reviewboard-url",
     "--search-by-usernames-only",
     "--username",
     "--review-board-date-format"

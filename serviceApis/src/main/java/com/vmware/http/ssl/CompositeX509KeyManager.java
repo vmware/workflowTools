@@ -7,6 +7,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import javax.net.ssl.X509KeyManager;
 
@@ -39,13 +40,8 @@ public class CompositeX509KeyManager implements X509KeyManager {
      */
     @Override
     public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
-        for (X509KeyManager keyManager : keyManagers) {
-            String alias = keyManager.chooseClientAlias(keyType, issuers, socket);
-            if (alias != null) {
-                return alias;
-            }
-        }
-        return null;
+        return keyManagers.stream().map(keyManager -> keyManager.chooseClientAlias(keyType, issuers, socket))
+                .filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -54,13 +50,8 @@ public class CompositeX509KeyManager implements X509KeyManager {
      */
     @Override
     public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-        for (X509KeyManager keyManager : keyManagers) {
-            String alias = keyManager.chooseServerAlias(keyType, issuers, socket);
-            if (alias != null) {
-                return alias;
-            }
-        }
-        return null;
+        return keyManagers.stream().map(keyManager -> keyManager.chooseServerAlias(keyType, issuers, socket))
+                .filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -69,13 +60,8 @@ public class CompositeX509KeyManager implements X509KeyManager {
      */
     @Override
     public PrivateKey getPrivateKey(String alias) {
-        for (X509KeyManager keyManager : keyManagers) {
-            PrivateKey privateKey = keyManager.getPrivateKey(alias);
-            if (privateKey != null) {
-                return privateKey;
-            }
-        }
-        return null;
+        return keyManagers.stream().map(keyManager -> keyManager.getPrivateKey(alias))
+                .filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -84,13 +70,8 @@ public class CompositeX509KeyManager implements X509KeyManager {
      */
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        for (X509KeyManager keyManager : keyManagers) {
-            X509Certificate[] chain = keyManager.getCertificateChain(alias);
-            if (chain != null && chain.length > 0) {
-                return chain;
-            }
-        }
-        return null;
+        return keyManagers.stream().map(keyManager -> keyManager.getCertificateChain(alias))
+                .filter(chain -> chain != null && chain.length > 0).findFirst().orElse(null);
     }
 
     /**

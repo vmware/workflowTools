@@ -20,7 +20,7 @@ public class PublishReview extends BaseCommitUsingReviewBoardAction {
         try {
             reviewBoard.getReviewRequestDraft(reviewRequest.getDraftLink());
         } catch (NotFoundException e) {
-            log.error("No changes detected for review request {}\n{}", draft.id, config.reviewboardUrl + "/r/" + reviewRequest.id);
+            log.error("No changes detected for review request {}\n{}", draft.id, reviewBoardConfig.reviewboardUrl + "/r/" + reviewRequest.id);
             return;
         }
 

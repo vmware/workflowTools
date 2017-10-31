@@ -1,5 +1,5 @@
-import com.vmware.scm.FileChange;
-import com.vmware.scm.Perforce;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.Perforce;
 import org.junit.Test;
 
 import java.io.File;

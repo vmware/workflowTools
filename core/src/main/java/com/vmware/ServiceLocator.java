@@ -3,11 +3,13 @@ package com.vmware;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.buildweb.Buildweb;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.section.BuildwebConfig;
+import com.vmware.config.section.JenkinsConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
-import com.vmware.scm.Git;
-import com.vmware.scm.Perforce;
+import com.vmware.util.scm.Git;
+import com.vmware.util.scm.Perforce;
 import com.vmware.trello.Trello;
 
 /**
@@ -40,23 +42,23 @@ public class ServiceLocator {
 
     public Jira getJira() {
         if (jira == null) {
-            jira = new Jira(config.jiraUrl, config.username, config.jiraCustomFieldNames);
+            jira = new Jira(config.jiraConfig.jiraUrl, config.username, config.jiraConfig.jiraCustomFieldNames);
         }
         return jira;
     }
 
     public Bugzilla getBugzilla() {
         if (bugzilla == null) {
-            bugzilla = new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug);
+            bugzilla = new Bugzilla(config.bugzillaConfig.bugzillaUrl, config.username, config.bugzillaConfig.bugzillaTestBug);
         }
         return bugzilla;
     }
 
     public ReviewBoard getReviewBoard() {
         if (reviewBoard == null) {
-            reviewBoard = new ReviewBoard(config.reviewboardUrl, config.username);
+            reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username);
             if (reviewBoard.isConnectionAuthenticated()) {
-                reviewBoard.updateServerTimeZone(config.reviewBoardDateFormat);
+                reviewBoard.updateServerTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
             }
         }
         return reviewBoard;
@@ -64,21 +66,24 @@ public class ServiceLocator {
 
     public Jenkins getJenkins() {
         if (jenkins == null) {
-            jenkins = new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin);
+            JenkinsConfig jenkinsConfig = config.jenkinsConfig;
+            jenkins = new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin);
         }
         return jenkins;
     }
 
     public Buildweb getBuildweb() {
         if (buildweb == null) {
-            buildweb = new Buildweb(config.buildwebUrl, config.buildwebApiUrl, config.buildwebLogsUrlPattern, config.username);
+            BuildwebConfig buildwebConfig = config.buildwebConfig;
+            buildweb = new Buildweb(buildwebConfig.buildwebUrl, buildwebConfig.buildwebApiUrl,
+                    buildwebConfig.buildwebLogsUrlPattern, config.username);
         }
         return buildweb;
     }
 
     public Trello getTrello() {
         if (trello == null) {
-            trello = new Trello(config.trelloUrl);
+            trello = new Trello(config.trelloConfig.trelloUrl);
         }
         return trello;
     }
@@ -92,7 +97,8 @@ public class ServiceLocator {
 
     public Perforce getPerforce() {
         if (perforce == null) {
-            perforce = new Perforce(config.username, config.perforceClientName, config.perforceClientDirectory);
+            perforce = new Perforce(config.username,
+                    config.perforceClientConfig.perforceClientName, config.perforceClientConfig.perforceClientDirectory);
         }
         return perforce;
     }

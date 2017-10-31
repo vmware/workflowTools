@@ -5,6 +5,8 @@ import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Util methods for invoking reflection methods and wrapping the exceptions with runtime exceptions.
@@ -45,7 +47,8 @@ public class ReflectionUtils {
 
     public static Object getValue(Field field, Object instance) {
         try {
-            return field.get(instance);
+            Object instanceToUse = determineInstanceForField(field, instance);
+            return field.get(instanceToUse);
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
         }
@@ -53,10 +56,22 @@ public class ReflectionUtils {
 
     public static void setValue(Field field, Object instance, Object value) {
         try {
-            field.set(instance, value);
+            Object instanceToUse = determineInstanceForField(field, instance);
+            field.set(instanceToUse, value);
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
         }
     }
 
+    private static Object determineInstanceForField(Field field, Object instance) throws IllegalAccessException {
+        if (field.getDeclaringClass().isAssignableFrom(instance.getClass())) {
+            return instance;
+        }
+        Optional<Field> matchingAdditionalConfigField = Arrays.stream(instance.getClass().getFields())
+                .filter(configField -> configField.getType() == field.getDeclaringClass()).findFirst();
+        if (!matchingAdditionalConfigField.isPresent()) {
+            throw new RuntimeException("Failed to find field for class " + field.getDeclaringClass().getName() + " in " + instance.getClass().getName());
+        }
+        return matchingAdditionalConfigField.get().get(instance);
+    }
 }

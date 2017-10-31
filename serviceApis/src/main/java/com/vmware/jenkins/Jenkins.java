@@ -12,7 +12,7 @@ import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.jenkins.domain.CsrfCrumb;
-import com.vmware.jenkins.domain.Job;
+import com.vmware.config.jenkins.Job;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;

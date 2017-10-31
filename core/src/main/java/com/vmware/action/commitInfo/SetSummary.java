@@ -31,9 +31,9 @@ public class SetSummary extends BaseCommitAction {
             log.info("Existing Summary\n" + draft.summary);
         }
 
-        String topic = InputUtils.readData("Topic (defaults to " + config.defaultTopic + " if none set)",
-                true, 20, config.topicTemplates);
-        topic = topic.isEmpty() ? config.defaultTopic : topic;
-        draft.summary = topic + ": " + InputUtils.readData("Enter Summary", true, config.maxSummaryLength - (topic.length() + 2));
+        String topic = InputUtils.readData("Topic (defaults to " + commitConfig.defaultTopic + " if none set)",
+                true, 20, commitConfig.topicTemplates);
+        topic = topic.isEmpty() ? commitConfig.defaultTopic : topic;
+        draft.summary = topic + ": " + InputUtils.readData("Enter Summary", true, commitConfig.maxSummaryLength - (topic.length() + 2));
     }
 }

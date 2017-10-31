@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Set approved by to the default user vaue")
+@ActionDescription("Set approved by to the default user value.")
 public class SetDefaultApprover extends BaseCommitAction {
     public SetDefaultApprover(WorkflowConfig config) {
         super(config);
@@ -13,7 +13,7 @@ public class SetDefaultApprover extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(config.defaultApprover)) {
+        if (StringUtils.isBlank(commitConfig.defaultApprover)) {
             return "no default approver set, config value defaultApprover must be set";
         }
         return super.cannotRunAction();
@@ -21,7 +21,7 @@ public class SetDefaultApprover extends BaseCommitAction {
 
     @Override
     public void process() {
-        log.info("Setting approved by to default approver value {}", config.defaultApprover);
-        draft.approvedBy = config.defaultApprover;
+        log.info("Setting approved by to default approver value {}", commitConfig.defaultApprover);
+        draft.approvedBy = commitConfig.defaultApprover;
     }
 }

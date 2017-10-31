@@ -151,21 +151,15 @@ public class WorkflowCertificateManager {
     }
 
     private X509KeyManager getFirstX509KeyManager(KeyManager[] keyManagers) {
-        for (KeyManager keyManager : keyManagers) {
-            if (keyManager instanceof X509KeyManager) {
-                return (X509KeyManager) keyManager;
-            }
-        }
-        throw new WorkflowCertificateException("No key manager found");
+        return Arrays.stream(keyManagers).filter(keyManager -> keyManager instanceof X509KeyManager)
+                .map(keyManager -> (X509KeyManager) keyManager)
+                .findFirst().orElseThrow(() -> new WorkflowCertificateException("No key manager found"));
     }
 
     private X509TrustManager getFirstX509TrustManager(TrustManager[] trustManagers) {
-        for (TrustManager trustManager : trustManagers) {
-            if (trustManager instanceof X509TrustManager) {
-                return (X509TrustManager) trustManager;
-            }
-        }
-        throw new WorkflowCertificateException("No trust manager found");
+        return Arrays.stream(trustManagers).filter(trustManager -> trustManager instanceof X509TrustManager)
+                .map(trustManager -> (X509TrustManager) trustManager)
+                .findFirst().orElseThrow(() -> new WorkflowCertificateException("No trust manager found"));
     }
 
     private void createKeyStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {

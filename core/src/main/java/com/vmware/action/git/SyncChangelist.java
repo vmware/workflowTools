@@ -3,9 +3,9 @@ package com.vmware.action.git;
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
-import com.vmware.scm.FileChangeType;
-import com.vmware.scm.GitChangelistRef;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.FileChangeType;
+import com.vmware.util.scm.GitChangelistRef;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,11 +24,11 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
     public void process() {
         Date startingDate = new Date();
         log.info("Syncing changes to changelist {}", draft.perforceChangelistId);
-        List<FileChange> gitDiffChanges = git.getChangesInDiff(config.trackingBranchPath(), "head");
+        List<FileChange> gitDiffChanges = git.getChangesInDiff(gitRepoConfig.trackingBranchPath(), "head");
         log.debug("Git diff change count {}", gitDiffChanges.size());
 
         GitChangelistRef lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
-        String versionToSyncTo = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getChangelistId() : "";
+        String versionToSyncTo = buildwebConfig.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getChangelistId() : "";
         perforce.syncPerforceFiles(gitDiffChanges, versionToSyncTo);
 
         Map<String, List<FileChange>> allPerforceChanges = perforce.getAllFileChangesInClient();

@@ -37,10 +37,10 @@ import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
 import static com.vmware.jira.domain.IssueStatusDefinition.InReview;
 import static com.vmware.jira.domain.IssueStatusDefinition.Open;
 import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
-import static com.vmware.jira.domain.IssueTypeDefinition.Bug;
-import static com.vmware.jira.domain.IssueTypeDefinition.Feature;
-import static com.vmware.jira.domain.IssueTypeDefinition.Improvement;
-import static com.vmware.jira.domain.IssueTypeDefinition.TechComm;
+import static com.vmware.config.jira.IssueTypeDefinition.Bug;
+import static com.vmware.config.jira.IssueTypeDefinition.Feature;
+import static com.vmware.config.jira.IssueTypeDefinition.Improvement;
+import static com.vmware.config.jira.IssueTypeDefinition.TechComm;
 
 public class Jira extends AbstractRestService {
 

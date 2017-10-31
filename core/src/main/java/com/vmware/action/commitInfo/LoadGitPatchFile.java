@@ -18,7 +18,7 @@ public class LoadGitPatchFile extends BaseCommitAction {
 
     @Override
     public void process() {
-        String diffFilePath = config.diffFilePath;
+        String diffFilePath = patchConfig.diffFilePath;
         if (StringUtils.isBlank(diffFilePath)) {
             diffFilePath = InputUtils.readValueUntilNotBlank("Git diff path");
         }

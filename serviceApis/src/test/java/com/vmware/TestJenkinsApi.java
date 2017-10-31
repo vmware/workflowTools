@@ -1,18 +1,16 @@
 package com.vmware;
 
 import com.vmware.jenkins.Jenkins;
-import com.vmware.jenkins.domain.Job;
+import com.vmware.config.jenkins.Job;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
-import com.vmware.jenkins.domain.JobParameter;
+import com.vmware.config.jenkins.JobParameter;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.JobsList;
 import com.vmware.http.exception.NotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

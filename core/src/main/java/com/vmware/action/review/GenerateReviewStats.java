@@ -1,18 +1,18 @@
 package com.vmware.action.review;
 
-import com.vmware.action.BaseAction;
+import com.vmware.action.base.BaseReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.reviewboard.domain.ReviewRequests;
 import com.vmware.reviewboard.domain.ReviewStatType;
 import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.util.DateUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
-import com.vmware.util.StringUtils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -27,31 +27,26 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 
 @ActionDescription("Generate review board statistics for specified groups.")
-public class GenerateReviewStats extends BaseAction {
-    private ReviewBoard reviewBoard;
+public class GenerateReviewStats extends BaseReviewBoardAction {
 
     public GenerateReviewStats(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public void asyncSetup() {
-        reviewBoard = serviceLocator.getReviewBoard();
-    }
-
-    @Override
     public void process() {
-        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
         String groupsToUse = "";
-        if (config.targetGroups == null || config.targetGroups.length == 0) {
+        CommitStatsConfig statsConfig = this.statsConfig;
+        if (reviewBoardConfig.targetGroups == null || reviewBoardConfig.targetGroups.length == 0) {
             log.info("No target groups selected");
             groupsToUse = InputUtils.readValueUntilNotBlank("Please enter target groups");
         } else {
-            groupsToUse = StringUtils.join(Arrays.asList(config.targetGroups));
+            groupsToUse = StringUtils.join(Arrays.asList(reviewBoardConfig.targetGroups));
         }
 
         log.info("Generating stats for groups {} with file count ranges {}",
-                groupsToUse, Arrays.toString(config.fileCountRanges));
+                groupsToUse, Arrays.toString(statsConfig.fileCountRanges));
         long aMonthAgo = new Date().getTime() - TimeUnit.DAYS.toMillis(30);
 
         ReviewRequests recentReviews =
@@ -67,9 +62,9 @@ public class GenerateReviewStats extends BaseAction {
         fetchFileCountsForReviewRequests(recentReviews.review_requests);
 
         int filteredCount = 0;
-        for (int i = 0; i < config.fileCountRanges.length; i ++) {
-            int startRange = i == 0 ? 1 : config.fileCountRanges[i-1] + 1;
-            int endRange = config.fileCountRanges[i];
+        for (int i = 0; i < statsConfig.fileCountRanges.length; i ++) {
+            int startRange = i == 0 ? 1 : statsConfig.fileCountRanges[i-1] + 1;
+            int endRange = statsConfig.fileCountRanges[i];
             List<ReviewRequest> filteredRequests = filterReviewRequestsByMaxFileCount(recentReviews.review_requests,
                     startRange, endRange);
             Padder padder = new Padder("File count range {} -> {}, ({} requests)", startRange, endRange,
@@ -93,7 +88,7 @@ public class GenerateReviewStats extends BaseAction {
         log.info("Processed {} requests", filteredCount);
         if (filteredCount < totalReviewsCount) {
             log.info("{} review requests were not included in ranges {}",
-                    (totalReviewsCount - filteredCount), Arrays.toString(config.fileCountRanges));
+                    (totalReviewsCount - filteredCount), Arrays.toString(statsConfig.fileCountRanges));
         }
     }
 

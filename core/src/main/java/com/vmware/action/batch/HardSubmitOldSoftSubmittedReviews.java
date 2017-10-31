@@ -13,7 +13,7 @@ import java.text.ParseException;
 public class HardSubmitOldSoftSubmittedReviews extends BaseBatchCloseReviews {
 
     public HardSubmitOldSoftSubmittedReviews(WorkflowConfig config) {
-        super(config, "submitted comment", config.closeOldSubmittedReviewsAfter);
+        super(config, "submitted comment", config.reviewBoardConfig.closeOldSubmittedReviewsAfter);
     }
 
     @Override

@@ -19,11 +19,11 @@ public class AuthenticateAllApis extends BaseAction {
 
     @Override
     public void process() {
-        checkAuthentication(new Trello(config.trelloUrl));
-        checkAuthentication(new Bugzilla(config.bugzillaUrl, config.username, config.bugzillaTestBug));
-        checkAuthentication(new Jira(config.jiraUrl, config.username, config.jiraCustomFieldNames));
-        checkAuthentication(new ReviewBoard(config.reviewboardUrl, config.username));
-        checkAuthentication(new Jenkins(config.jenkinsUrl, config.username, config.jenkinsUsesCsrf, config.disableJenkinsLogin));
+        checkAuthentication(new Trello(trelloConfig.trelloUrl));
+        checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
+        checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
+        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username));
+        checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin));
     }
 
     private void checkAuthentication(AbstractService restService) {

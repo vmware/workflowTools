@@ -5,11 +5,11 @@ import com.vmware.config.ActionAfterFailedPatchCheck;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.RepoType;
-import com.vmware.scm.FileChange;
-import com.vmware.scm.Perforce;
-import com.vmware.scm.diff.DiffConverter;
-import com.vmware.scm.diff.GitDiffToPerforceConverter;
-import com.vmware.scm.diff.PerforceDiffToGitConverter;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.Perforce;
+import com.vmware.util.scm.diff.DiffConverter;
+import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
+import com.vmware.util.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
@@ -19,7 +19,7 @@ import com.vmware.util.logging.Padder;
 import java.io.File;
 import java.util.List;
 
-@ActionDescription("Used to apply patch data")
+@ActionDescription("Used to apply patch data.")
 public class ApplyPatch extends BaseCommitAction {
 
     public ApplyPatch(WorkflowConfig config) {
@@ -113,28 +113,28 @@ public class ApplyPatch extends BaseCommitAction {
 
     private PatchCheckResult checkIfPatchApplies(String patchData) {
         log.info("Checking if patch applies");
-        String checkResult = config.usePatchCommand ? patch(patchData, true) : git.applyPatch(patchData, true);
-        String checkCommand = config.usePatchCommand ? config.patchCommand + " --dry-run"
+        String checkResult = patchConfig.usePatchCommand ? patch(patchData, true) : git.applyPatch(patchData, true);
+        String checkCommand = patchConfig.usePatchCommand ? patchConfig.patchCommand + " --dry-run"
                 : "git apply --ignore-whitespace -3 --check";
         if (StringUtils.isBlank(checkResult)) {
-            return config.usePatchCommand ? PatchCheckResult.applyPatchUsingPatchCommand :
+            return patchConfig.usePatchCommand ? PatchCheckResult.applyPatchUsingPatchCommand :
                     PatchCheckResult.applyPatchUsingGitApply;
         }
 
         printCheckOutput(checkResult, checkCommand);
-        if (config.actionAfterFailedPatchCheck == null) {
-            config.actionAfterFailedPatchCheck = ActionAfterFailedPatchCheck.askForAction(config.usePatchCommand);
+        if (patchConfig.actionAfterFailedPatchCheck == null) {
+            patchConfig.actionAfterFailedPatchCheck = ActionAfterFailedPatchCheck.askForAction(patchConfig.usePatchCommand);
         }
 
-        switch (config.actionAfterFailedPatchCheck) {
+        switch (patchConfig.actionAfterFailedPatchCheck) {
             case partial:
-                return config.usePatchCommand ? PatchCheckResult.applyPartialPatchUsingPatchCommand :
+                return patchConfig.usePatchCommand ? PatchCheckResult.applyPartialPatchUsingPatchCommand :
                         PatchCheckResult.applyPatchUsingGitApply;
             case usePatchCommand:
-                if (config.usePatchCommand) {
+                if (patchConfig.usePatchCommand) {
                     return PatchCheckResult.nothing;
                 }
-                config.usePatchCommand = true;
+                patchConfig.usePatchCommand = true;
                 return checkIfPatchApplies(patchData);
             default:
                 return PatchCheckResult.nothing;
@@ -158,7 +158,7 @@ public class ApplyPatch extends BaseCommitAction {
     }
 
     private String patch(String patchData, boolean dryRun) {
-        String command = config.patchCommand;
+        String command = patchConfig.patchCommand;
         if (dryRun) {
             command += " --dry-run";
         }

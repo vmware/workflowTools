@@ -16,6 +16,6 @@ public class PushToDevelop extends BaseAction {
 
     @Override
     public void process() {
-        git.pushToRemoteBranch(config.defaultGitRemote, "develop");
+        git.pushToRemoteBranch(gitRepoConfig.defaultGitRemote, "develop");
     }
 }

@@ -38,10 +38,10 @@ public class SetBugNumbers extends BaseCommitReadAction {
     @Override
     public void asyncSetup() {
         loadedIssues.clear();
-        if (!config.disableJira) {
+        if (!jiraConfig.disableJira) {
             loadJiraIssues();
         }
-        if (!config.disableBugzilla) {
+        if (!bugzillaConfig.disableBugzilla) {
             loadBugzillaBugs();
         }
     }
@@ -51,7 +51,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         loadIssuesList(draft);
         printIssuesList();
         List<IssueInfo> issues = null;
-        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(config.noBugNumberLabel)) {
+        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
             log.info("");
             log.info("Existing bug numbers: " + draft.bugNumbers);
         }
@@ -62,13 +62,13 @@ public class SetBugNumbers extends BaseCommitReadAction {
             issues = getBugsAndIssues(bugNumbers);
             waitingForBugNumbers = false;
             if (listHasNoBugNumbers(issues)) {
-                draft.bugNumbers = config.noBugNumberLabel;
+                draft.bugNumbers = commitConfig.noBugNumberLabel;
             } else if (!allIssuesWereFound(issues)) {
                 String reenterBugNumber = InputUtils.readValue("One or more issues not found, reenter bug numbers? [y/n]");
                 waitingForBugNumbers = reenterBugNumber.equalsIgnoreCase("y");
             }
         }
-        draft.setIssues(issues, config.noBugNumberLabel);
+        draft.setIssues(issues, commitConfig.noBugNumberLabel);
         log.info("Bug numbers for commit: {}", draft.bugNumbers);
     }
 
@@ -87,9 +87,9 @@ public class SetBugNumbers extends BaseCommitReadAction {
         if (!bugzilla.isBaseUriTrusted() || !bugzilla.isConnectionAuthenticated()) {
             return;
         }
-        if (bugzilla.containsSavedQuery(config.bugzillaQuery)) {
+        if (bugzilla.containsSavedQuery(bugzillaConfig.bugzillaQuery)) {
             userHasBugzillaQuery = true;
-            loadedIssues.addAll(bugzilla.getBugsForQuery(config.bugzillaQuery));
+            loadedIssues.addAll(bugzilla.getBugsForQuery(bugzillaConfig.bugzillaQuery));
         }
         bugzillaBugsLoaded = true;
     }
@@ -114,7 +114,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
     private void printIssuesList() {
         if (bugzilla != null && !userHasBugzillaQuery) {
             log.info("\n**  Can't load your Bugzilla bugs as saved query {} not found in your bugzilla query list  **" +
-                    "\nPlease create if you want to easily select a bugzilla bug", config.bugzillaQuery);
+                    "\nPlease create if you want to easily select a bugzilla bug", bugzillaConfig.bugzillaQuery);
         }
         if (loadedIssues.size() > 0) {
             IssueInfo firstIssue = loadedIssues.iterator().next();
@@ -130,7 +130,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
 
     private List<IssueInfo> getBugsAndIssues(String bugNumberText) {
         if (bugNumberText == null || bugNumberText.isEmpty()) {
-            bugNumberText = config.noBugNumberLabel;
+            bugNumberText = commitConfig.noBugNumberLabel;
         }
 
         List<IssueInfo> issues = new ArrayList<>();
@@ -150,7 +150,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
     }
 
     private IssueInfo getIssue(String bugNumber) {
-        if (bugNumber.equals(config.noBugNumberLabel)) {
+        if (bugNumber.equals(commitConfig.noBugNumberLabel)) {
             return Issue.noBugNumber;
         } else if (StringUtils.isInteger(bugNumber)) {
             int number = Integer.parseInt(bugNumber);
@@ -162,7 +162,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         String fullJiraKey = getFullJiraKey(bugNumber);
         // test that bug number is a valid jira issue or bugzilla bug
         IssueInfo issueInfo = Issue.aNotFoundIssue(bugNumber);
-        Integer bugzillaBugNumber = config.parseBugzillaBugNumber(bugNumber);
+        Integer bugzillaBugNumber = bugzillaConfig.parseBugzillaBugNumber(bugNumber);
         if (config.getSearchOrderForService("Bugzilla") == 0) {
             if (bugzilla != null && bugzillaBugNumber != null) {
                 issueInfo = bugzilla.getBugByIdWithoutException(bugzillaBugNumber);
@@ -185,7 +185,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         if (!StringUtils.isInteger(bugNumber)) {
             return bugNumber;
         }
-        return config.defaultJiraProject + "-" + bugNumber;
+        return jiraConfig.defaultJiraProject + "-" + bugNumber;
     }
 
     private boolean allIssuesWereFound(List<IssueInfo> issues) {

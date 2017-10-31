@@ -10,14 +10,12 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.FixVersion;
 import com.vmware.jira.domain.Issue;
-import com.vmware.jira.domain.IssueTypeDefinition;
-import com.vmware.jira.domain.MenuItem;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 
 import java.util.ArrayList;
@@ -46,10 +44,10 @@ public class LoadIssues extends BaseBatchJiraAction {
     public void process() {
 
         RapidView rapidView = jira.getRapidView(projectIssues.boardId);
-        List<IssueTypeDefinition> typesToSearchFor = config.includeAllIssueTypes ? null : Arrays.asList(config.issueTypesToInclude);
-        List<IssueSummary> backlogStories = rapidView.getIssues(typesToSearchFor, config.includeSprintStories);
+        List<IssueTypeDefinition> typesToSearchFor = jiraConfig.includeAllIssueTypes ? null : Arrays.asList(jiraConfig.issueTypesToInclude);
+        List<IssueSummary> backlogStories = rapidView.getIssues(typesToSearchFor, jiraConfig.includeSprintStories);
         if (backlogStories.size() == 0) {
-            log.info("No issues of type {} found for board {}", Arrays.toString(config.issueTypesToInclude), projectIssues.projectName);
+            log.info("No issues of type {} found for board {}", Arrays.toString(jiraConfig.issueTypesToInclude), projectIssues.projectName);
             return;
         }
 
@@ -60,7 +58,7 @@ public class LoadIssues extends BaseBatchJiraAction {
         }
         List<Issue> issues = new ArrayList<>(Arrays.asList(jira.searchForIssues(searchRequest).issues));
 
-        if (!config.includeStoriesWithEstimates) {
+        if (!jiraConfig.includeStoriesWithEstimates) {
             removeIssuesWithStoryPoints(issues);
         }
 
@@ -72,17 +70,17 @@ public class LoadIssues extends BaseBatchJiraAction {
         List<String> fixByVersions = getFixByVersionsFromIssues(issues);
 
 
-        if (config.useJiraLabel && labels.size() == 0) {
+        if (jiraConfig.useJiraLabel && labels.size() == 0) {
             throw new FatalException("Use jira label is set to true but none of the issues have labels");
         }
 
-        if (config.useFixVersion && fixByVersions.size() == 0) {
+        if (jiraConfig.useFixVersion && fixByVersions.size() == 0) {
             throw new FatalException("Use fix by version is set to true but none of the issues have fix by versions");
         }
 
         String additionalInfo = "";
 
-        if (config.useJiraLabel) {
+        if (jiraConfig.useJiraLabel) {
             log.info("Please enter label to use");
             int selectedLabelIndex = InputUtils.readSelection(labels, "Jira Labels");
             String selectedLabel = labels.get(selectedLabelIndex);
@@ -90,7 +88,7 @@ public class LoadIssues extends BaseBatchJiraAction {
             additionalInfo = selectedLabel;
         }
 
-        if (config.useFixVersion) {
+        if (jiraConfig.useFixVersion) {
             log.info("Please enter fix by version to use");
             int selectedIndex = InputUtils.readSelection(fixByVersions, "Jira Fix By Versions");
             String selectedFixByVersion = fixByVersions.get(selectedIndex);
@@ -139,7 +137,7 @@ public class LoadIssues extends BaseBatchJiraAction {
         StringBuilder jqlQueryBuilder = new StringBuilder();
         boolean atLeastOneStoryCanBeUsed = false;
         for (IssueSummary story : stories) {
-            if (!config.includeStoriesWithEstimates && story.estimateStatistic.containsValidEstimate()) {
+            if (!jiraConfig.includeStoriesWithEstimates && story.estimateStatistic.containsValidEstimate()) {
                 log.debug("Skipping issue {} as it has already been estimated and configuration does not include estimated stories", story.key);
                 continue;
             }

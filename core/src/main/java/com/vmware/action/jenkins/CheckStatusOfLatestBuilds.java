@@ -3,12 +3,13 @@ package com.vmware.action.jenkins;
 import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
-import com.vmware.config.JenkinsJobsConfig;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.jenkins.Job;
 import com.vmware.jenkins.Jenkins;
-import com.vmware.jenkins.domain.*;
-import com.vmware.util.input.InputUtils;
+import com.vmware.jenkins.domain.JobBuildDetails;
+import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.util.StringUtils;
+import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Checks the status of the latest job specified for the specified user.")
 public class CheckStatusOfLatestBuilds extends BaseAction {
@@ -31,15 +32,11 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
 
     @Override
     public void process() {
-        if (StringUtils.isBlank(config.jenkinsJobsToUse)) {
-            config.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Enter jobs");
+        if (StringUtils.isBlank(jenkinsConfig.jenkinsJobsToUse)) {
+            jenkinsConfig.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Enter jobs");
         }
 
-        JenkinsJobsConfig jobsConfig = config.getJenkinsJobsConfig();
-
-        for (Job job : jobsConfig.jobs()) {
-            checkStatusOfLatestJob(job);
-        }
+        jenkinsJobsConfig.jobs().forEach(this::checkStatusOfLatestJob);
     }
 
     private void checkStatusOfLatestJob(Job jobToCheck) {
@@ -55,7 +52,7 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
             if (buildDetails.getJobInitiator().equals(config.username)) {
                 matchedBuild = buildDetails;
                 break;
-            } else if (buildCounter == config.maxJenkinsBuildsToCheck) {
+            } else if (buildCounter == jenkinsConfig.maxJenkinsBuildsToCheck) {
                 log.info("Checked {} number of jenkins builds, set maxJenkinsBuildsToCheck " +
                         "to a higher number if you want more builds to be checked");
                 break;

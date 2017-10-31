@@ -52,7 +52,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         log.info("Processing {} issues", issuesForProcessing.size());
 
         List<Card> existingCards = new ArrayList<Card>(Arrays.asList(trello.getCardsForBoard(selectedBoard)));
-        if (!config.keepMissingCards) {
+        if (!trelloConfig.keepMissingCards) {
             deleteMissingCards(issuesForProcessing, existingCards);
         }
         filterOutExistingIssues(issuesForProcessing, existingCards);
@@ -105,7 +105,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         }
 
         log.info("Adding {} cards to trello", issuesForProcessing.size());
-        trello.createDefaultSwimlanesIfNeeded(selectedBoard, config.storyPointValues);
+        trello.createDefaultSwimlanesIfNeeded(selectedBoard, trelloConfig.storyPointValues);
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
         Map<Double, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
 
@@ -117,7 +117,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
                 swimlaneToUse = storyPointSwimlanes.get(storyPointValue);
             }
 
-            Card cardToAdd = new Card(swimlaneToUse, issueToAdd, config.jiraUrl);
+            Card cardToAdd = new Card(swimlaneToUse, issueToAdd, jiraConfig.jiraUrl);
 
             log.debug("Adding card for issue {} to swimlane {}", issueToAdd.getKey(), swimlaneToUse.name);
             trello.createCard(cardToAdd);
@@ -138,7 +138,7 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         int issueRemovalCount = 0;
         for (int i = issuesForProcessing.size() - 1; i >= 0; i--) {
             Issue issueToCheck = issuesForProcessing.get(i);
-            Card matchingCard = new Card(issueToCheck, config.jiraUrl);
+            Card matchingCard = new Card(issueToCheck, jiraConfig.jiraUrl);
             if (existingCards.contains(matchingCard)) {
                 log.debug("Issue {} already exists in trello, skipping.", issueToCheck.id);
                 issuesForProcessing.remove(i);

@@ -15,11 +15,11 @@ import java.util.Optional;
 
 @ActionDescription("Sets the git commit details from the associated review request. Uses published review info only.")
 public class SetCommitDetailsFromReview extends BaseCommitAction {
+    private ReviewBoard reviewBoard;
+
     public SetCommitDetailsFromReview(WorkflowConfig config) {
         super(config);
     }
-
-    private ReviewBoard reviewBoard;
 
     @Override
     public void asyncSetup() {
@@ -28,12 +28,12 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
 
     @Override
     public void preprocess() {
-        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
     }
 
     @Override
     public void process() {
-        String reviewId = StringUtils.isInteger(draft.id) ? draft.id : config.reviewRequestId;
+        String reviewId = StringUtils.isInteger(draft.id) ? draft.id : reviewBoardConfig.reviewRequestId;
         if (!StringUtils.isInteger(reviewId)) {
             log.info("No review request id specified for retrieving commit details");
             reviewId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id "));
@@ -50,19 +50,19 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
             throw new RuntimeException("Summary and description and blank for review request " + reviewId + " and no draft found for request");
         }
         log.info("Using review request {} ({}) for patching", reviewAsDraft.id, reviewRequest.summary);
-        draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, config.maxSummaryLength);
-        draft.description = StringUtils.addNewLinesIfNeeded(reviewAsDraft.description, config.maxDescriptionLength, 0);
+        draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, commitConfig.maxSummaryLength);
+        draft.description = StringUtils.addNewLinesIfNeeded(reviewAsDraft.description, commitConfig.maxDescriptionLength, 0);
 
         String fullReviewText = reviewRequest.summary + "\n" + reviewAsDraft.description
-                + "\n" + config.getCommitConfiguration().getTestingDoneLabel() + reviewRequest.testingDone;
-        ReviewRequestDraft draftConstructedFromReviewDetails = new ReviewRequestDraft(fullReviewText, config.getCommitConfiguration());
+                + "\n" + commitConfig.getTestingDoneLabel() + reviewRequest.testingDone;
+        ReviewRequestDraft draftConstructedFromReviewDetails = new ReviewRequestDraft(fullReviewText, commitConfig);
 
         String testingDone = draftConstructedFromReviewDetails.testingDone;
-        testingDone =  StringUtils.addNewLinesIfNeeded(testingDone, config.maxDescriptionLength, "Testing Done: " .length());
+        testingDone =  StringUtils.addNewLinesIfNeeded(testingDone, commitConfig.maxDescriptionLength, "Testing Done: " .length());
         draft.testingDone = testingDone;
         syncJobBuilds(draftConstructedFromReviewDetails);
         if (StringUtils.isBlank(reviewAsDraft.bugNumbers)) {
-            draft.bugNumbers = config.noBugNumberLabel;
+            draft.bugNumbers = commitConfig.noBugNumberLabel;
         } else {
             draft.bugNumbers = reviewAsDraft.bugNumbers;
         }

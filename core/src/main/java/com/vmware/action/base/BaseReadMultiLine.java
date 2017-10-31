@@ -26,9 +26,9 @@ public abstract class BaseReadMultiLine extends BaseCommitReadAction {
         }
         String titleToDisplay = propertyValue.isEmpty() || !append ? title : "additional " + title;
         if (append) {
-            propertyValue += NEW_LINE_CHAR + InputUtils.readData(titleToDisplay, false, config.maxDescriptionLength);
+            propertyValue += NEW_LINE_CHAR + InputUtils.readData(titleToDisplay, false, commitConfig.maxDescriptionLength);
         } else {
-            propertyValue = InputUtils.readData(titleToDisplay, false, config.maxDescriptionLength, historyValues);
+            propertyValue = InputUtils.readData(titleToDisplay, false, commitConfig.maxDescriptionLength, historyValues);
         }
         ReflectionUtils.setValue(property, draft, propertyValue);
     }

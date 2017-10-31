@@ -13,7 +13,7 @@ public class ExitIfCommitHasNoBugNumber extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (draft.hasBugNumber(config.noBugNumberLabel)) {
+        if (draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
             return;
         }
 

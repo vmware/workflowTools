@@ -4,11 +4,11 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Link;
 import com.vmware.reviewboard.domain.ReviewUser;
+import com.vmware.util.StringUtils;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
-import com.vmware.util.StringUtils;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 
@@ -42,7 +42,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
     @Override
     public void preprocess() {
         if (searchReviewBoardForUsers) {
-            this.reviewboard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+            this.reviewboard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
         }
     }
 
@@ -72,7 +72,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
 
     private String generateUserList(String usersText) {
         if (usersText.trim().isEmpty()) {
-            return config.trivialReviewerLabel;
+            return commitConfig.trivialReviewerLabel;
         }
 
         Collection<String> parsedUsers = new OverwritableSet.UniqueArrayList<>();
@@ -102,7 +102,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
     }
 
     private Set<String> getReviewersInGroup(String fragment) {
-        LinkedHashMap<String, SortedSet<String>> reviewerGroups = config.reviewerGroups;
+        LinkedHashMap<String, SortedSet<String>> reviewerGroups = reviewBoardConfig.reviewerGroups;
         if (reviewerGroups == null) {
             return null;
         }
@@ -160,7 +160,8 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
                 if (usersLink == null) {
                     usersLink = reviewBoard.getRootLinkList().getUsersLink();
                 }
-                List<ReviewUser> users = reviewBoard.searchUsersMatchingText(usersLink, buffer, config.searchByUsernamesOnly);
+                List<ReviewUser> users = reviewBoard.searchUsersMatchingText(usersLink, buffer,
+                        reviewBoardConfig.searchByUsernamesOnly);
                 for (ReviewUser user : users) {
                     values.add(user.toString());
                 }

@@ -8,8 +8,8 @@ package com.vmware.action.base;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.scm.FileChange;
 import com.vmware.util.StringUtils;
+import com.vmware.util.scm.FileChange;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +29,8 @@ public abstract class BaseCommitAction extends BaseAction {
     protected String determineChangelistIdToUse() {
         if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
             return draft.perforceChangelistId;
-        } else if (StringUtils.isNotBlank(config.changelistId)) {
-            return config.changelistId;
+        } else if (StringUtils.isNotBlank(perforceClientConfig.changelistId)) {
+            return perforceClientConfig.changelistId;
         } else {
             return serviceLocator.getPerforce().selectPendingChangelist();
         }
@@ -52,7 +52,7 @@ public abstract class BaseCommitAction extends BaseAction {
 
     protected String readLastChange() {
         if (git.workingDirectoryIsInGitRepo()) {
-            return git.lastCommitText(true);
+            return git.lastCommitText();
         } else if (perforceClientCannotBeUsed() == null) {
             return readPendingChangelistText();
         } else {
@@ -74,15 +74,15 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     protected boolean commitTextHasNoChanges(boolean includeJobResultsInCommit) {
-        ReviewRequestDraft existingDraft = new ReviewRequestDraft(readLastChange(), config.getCommitConfiguration());
-        String existingCommitText = existingDraft.toText(config.getCommitConfiguration());
+        ReviewRequestDraft existingDraft = new ReviewRequestDraft(readLastChange(), commitConfig);
+        String existingCommitText = existingDraft.toText(commitConfig);
         String updatedCommitText = updatedCommitText(includeJobResultsInCommit);
 
         return existingCommitText.equals(updatedCommitText);
     }
 
     protected String updatedCommitText(boolean includeJobResultsInCommit) {
-        return draft.toText(config.getCommitConfiguration(), includeJobResultsInCommit).trim();
+        return draft.toText(commitConfig, includeJobResultsInCommit).trim();
     }
 
     private String readPendingChangelistText() {

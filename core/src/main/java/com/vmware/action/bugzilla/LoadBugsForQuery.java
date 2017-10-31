@@ -16,8 +16,8 @@ public class LoadBugsForQuery extends BaseBatchBugzillaAction {
 
     @Override
     public void process() {
-        log.info("Using named query {} for retrieving bugs, change by specifying --bugzilla-query=QueryName", config.bugzillaQuery);
-        List<Bug> bugList = bugzilla.getBugsForQuery(config.bugzillaQuery);
+        log.info("Using named query {} for retrieving bugs, change by specifying --bugzilla-query=QueryName", bugzillaConfig.bugzillaQuery);
+        List<Bug> bugList = bugzilla.getBugsForQuery(bugzillaConfig.bugzillaQuery);
         projectIssues.addAllBugs(bugList);
     }
 }

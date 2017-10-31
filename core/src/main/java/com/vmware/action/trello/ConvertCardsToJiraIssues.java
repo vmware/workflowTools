@@ -4,7 +4,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueType;
-import com.vmware.jira.domain.IssueTypeDefinition;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
@@ -75,7 +75,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
         }
         issueToUpdate.fields.summary = cardToUpdate.name;
         String urlForIssue =
-                UrlUtils.addTrailingSlash(config.jiraUrl) + "browse/" + issueToUpdate.getKey();
+                UrlUtils.addTrailingSlash(jiraConfig.jiraUrl) + "browse/" + issueToUpdate.getKey();
         issueToUpdate.fields.description = cardToUpdate.getDescriptionWithoutJiraUrl(urlForIssue);
         issueToUpdate.fields.acceptanceCriteria = cardToUpdate.getAcceptanceCriteria();
         return issueToUpdate;

@@ -1,10 +1,24 @@
 package com.vmware.action;
 
-import com.vmware.scm.Git;
+import com.vmware.config.section.BugzillaConfig;
+import com.vmware.config.section.BuildwebConfig;
+import com.vmware.config.section.CheckstyleConfig;
+import com.vmware.config.section.CommitConfig;
+import com.vmware.config.section.CommitStatsConfig;
+import com.vmware.config.section.GitRepoConfig;
+import com.vmware.config.section.JenkinsConfig;
+import com.vmware.config.section.JenkinsJobsConfig;
+import com.vmware.config.section.JiraConfig;
+import com.vmware.config.section.PatchConfig;
+import com.vmware.config.section.PerforceClientConfig;
+import com.vmware.config.section.ReviewBoardConfig;
+import com.vmware.config.section.TrelloConfig;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.scm.Git;
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.NoPerforceClientForDirectoryException;
-import com.vmware.scm.Perforce;
+import com.vmware.util.scm.NoPerforceClientForDirectoryException;
+import com.vmware.util.scm.Perforce;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
@@ -14,11 +28,24 @@ public abstract class BaseAction {
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
+    protected final GitRepoConfig gitRepoConfig;
+    protected final PerforceClientConfig perforceClientConfig;
+    protected final CommitConfig commitConfig;
+    protected final CommitStatsConfig statsConfig;
     protected final WorkflowConfig config;
+    protected final ReviewBoardConfig reviewBoardConfig;
+    protected final JiraConfig jiraConfig;
+    protected final BugzillaConfig bugzillaConfig;
+    protected final JenkinsConfig jenkinsConfig;
+    protected final JenkinsJobsConfig jenkinsJobsConfig;
+    protected final TrelloConfig trelloConfig;
+    protected final CheckstyleConfig checkstyleConfig;
+    protected final PatchConfig patchConfig;
+    protected final BuildwebConfig buildwebConfig;
 
-    protected final ServiceLocator serviceLocator;
+    protected ServiceLocator serviceLocator;
 
-    protected final Git git;
+    protected Git git;
 
     protected boolean failIfCannotBeRun;
 
@@ -27,8 +54,19 @@ public abstract class BaseAction {
 
     public BaseAction(WorkflowConfig config) {
         this.config = config;
-        this.serviceLocator = config.configuredServiceLocator();
-        this.git = serviceLocator.getGit();
+        this.commitConfig = config.commitConfig;
+        this.statsConfig = config.statsConfig;
+        this.gitRepoConfig = config.gitRepoConfig;
+        this.perforceClientConfig = config.perforceClientConfig;
+        this.reviewBoardConfig = config.reviewBoardConfig;
+        this.jiraConfig = config.jiraConfig;
+        this.bugzillaConfig = config.bugzillaConfig;
+        this.jenkinsConfig = config.jenkinsConfig;
+        this.jenkinsJobsConfig = config.jenkinsJobsConfig;
+        this.trelloConfig = config.trelloConfig;
+        this.checkstyleConfig = config.checkstyleConfig;
+        this.patchConfig = config.patchConfig;
+        this.buildwebConfig = config.buildwebConfig;
     }
 
     /**
@@ -55,8 +93,7 @@ public abstract class BaseAction {
     protected Perforce getLoggedInPerforceClient() {
         String reasonForFailing = perforceClientCannotBeUsed();
         if (StringUtils.isNotBlank(reasonForFailing)) {
-            log.error("Exiting as " + reasonForFailing);
-            System.exit(1);
+            throw new FatalException("Exiting as " + reasonForFailing);
         }
         return serviceLocator.getPerforce();
     }
@@ -69,9 +106,9 @@ public abstract class BaseAction {
         if (!perforce.isLoggedIn()) {
             return "perforce user is not logged in";
         }
-        if (StringUtils.isBlank(config.perforceClientName)) {
+        if (StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
             try {
-                config.perforceClientName = perforce.getClientName();
+                perforceClientConfig.perforceClientName = perforce.getClientName();
             } catch (NoPerforceClientForDirectoryException npc) {
                 return npc.getMessage();
             }
@@ -96,6 +133,11 @@ public abstract class BaseAction {
      * Override if any setup is needed before the process method is called
      */
     public void preprocess() {
+    }
+
+    public void setServiceLocator(ServiceLocator serviceLocator) {
+        this.serviceLocator = serviceLocator;
+        this.git = serviceLocator.getGit();
     }
 
     public abstract void process();

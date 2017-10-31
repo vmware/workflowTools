@@ -19,7 +19,7 @@ public class StripJenkinsBuilds extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (draft.jobBuildsMatchingUrl(config.jenkinsUrl).isEmpty()) {
+        if (draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl).isEmpty()) {
             return "commit has no Jenkins builds";
         }
         return super.cannotRunAction();
@@ -28,7 +28,7 @@ public class StripJenkinsBuilds extends BaseCommitAction {
     @Override
     public void process() {
         log.info("Stripping jenkins builds from commit");
-        for (JobBuild jobBuild : draft.jobBuildsMatchingUrl(config.jenkinsUrl)) {
+        for (JobBuild jobBuild : draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl)) {
             draft.jobBuilds.remove(jobBuild);
         }
     }

@@ -10,7 +10,7 @@ import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
-@ActionDescription("Loads diff data for the specified review")
+@ActionDescription("Loads diff data for the specified review.")
 public class LoadReviewPatch extends BaseCommitAction {
 
     private ReviewBoard reviewBoard;
@@ -26,27 +26,27 @@ public class LoadReviewPatch extends BaseCommitAction {
 
     @Override
     public void preprocess() {
-        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
     }
 
     @Override
     public void process() {
-        if (config.reviewRequestId == null) {
+        if (reviewBoardConfig.reviewRequestId == null) {
             log.info("No review request id specified as source for patch");
-            config.reviewRequestId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id for patch"));
+            reviewBoardConfig.reviewRequestId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id for patch"));
         }
-        int reviewId = Integer.parseInt(config.reviewRequestId);
+        int reviewId = Integer.parseInt(reviewBoardConfig.reviewRequestId);
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(reviewId);
         Repository repository = reviewBoard.getRepository(reviewRequest.getRepositoryLink());
         ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());
         log.info("Using review request {} ({}) for patching", reviewRequest.id, reviewRequest.summary);
 
         if (diffs.length == 0) {
-            throw new FatalException("Review request {} does not have any diffs", config.reviewRequestId);
+            throw new FatalException("Review request {} does not have any diffs", reviewBoardConfig.reviewRequestId);
         }
 
         int diffSelection = diffs.length - 1;
-        if (!config.alwaysUseLatestDiff && diffs.length > 1) {
+        if (!patchConfig.alwaysUseLatestDiff && diffs.length > 1) {
             diffSelection = InputUtils.readSelection(diffs, "Select diff to apply");
         }
 

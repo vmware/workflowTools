@@ -3,10 +3,10 @@ package com.vmware.action.conditional;
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.scm.FileChange;
-import com.vmware.scm.FileChangeType;
-import com.vmware.scm.GitChangelistRef;
-import com.vmware.scm.diff.PendingChangelistToGitDiffCreator;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.FileChangeType;
+import com.vmware.util.scm.GitChangelistRef;
+import com.vmware.util.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
@@ -21,10 +21,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.scm.FileChange.containsChangesOfType;
-import static com.vmware.scm.FileChangeType.added;
-import static com.vmware.scm.FileChangeType.addedAndModified;
-import static com.vmware.scm.FileChangeType.deleted;
+import static com.vmware.util.scm.FileChange.containsChangesOfType;
+import static com.vmware.util.scm.FileChangeType.added;
+import static com.vmware.util.scm.FileChangeType.addedAndModified;
+import static com.vmware.util.scm.FileChangeType.deleted;
 import static com.vmware.util.StringUtils.stripLinesStartingWith;
 
 @ActionDescription("Creates a diff for the changelist and compares it to a diff of the current git branch.")
@@ -38,11 +38,11 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
     public void process() {
         log.info("Checking if changelist {} matches current git branch", draft.perforceChangelistId);
         GitChangelistRef lastSubmittedChangelistInfo = git.lastSubmittedChangelistInfo();
-        String fromRef = config.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getCommitRef() : config.trackingBranchPath();
-        if (config.syncChangelistToLatestInBranch) {
+        String fromRef = buildwebConfig.syncChangelistToLatestInBranch ? lastSubmittedChangelistInfo.getCommitRef() : gitRepoConfig.trackingBranchPath();
+        if (buildwebConfig.syncChangelistToLatestInBranch) {
             log.info("Creating git diff against last submitted changelist {}", lastSubmittedChangelistInfo.getChangelistId());
         } else {
-            log.info("Creating git diff against tracking branch {}", config.trackingBranchPath());
+            log.info("Creating git diff against tracking branch {}", gitRepoConfig.trackingBranchPath());
         }
 
         List<FileChange> fileChanges = perforce.getFileChangesForPendingChangelist(draft.perforceChangelistId);

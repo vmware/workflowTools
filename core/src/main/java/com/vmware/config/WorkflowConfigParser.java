@@ -2,8 +2,10 @@ package com.vmware.config;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.vmware.scm.Git;
-import com.vmware.scm.Perforce;
+import com.vmware.config.commandLine.CommandLineArgumentsParser;
+import com.vmware.config.section.PerforceClientConfig;
+import com.vmware.util.scm.Git;
+import com.vmware.util.scm.Perforce;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.SimpleLogFormatter;
 import com.vmware.http.json.ConfiguredGsonBuilder;
@@ -22,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
-
-import static com.vmware.util.StringUtils.isNotBlank;
 
 /**
  * Parses the workflow config from the source config files
@@ -64,10 +64,10 @@ public class WorkflowConfigParser {
         if (git.isGitInstalled() && git.workingDirectoryIsInGitRepo()) {
             String trackingBranch = git.getTrackingBranch();
             String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
-            if (isNotBlank(remoteName)) {
+            if (StringUtils.isNotBlank(remoteName)) {
                 internalConfig.setDefaultGitRemoteFromTrackingRemote(remoteName); // determined from remote name
             }
-            if (isNotBlank(remoteName)) {
+            if (StringUtils.isNotBlank(remoteName)) {
                 log.debug("Applying remote specific config values for git remote {}", remoteName);
                 internalConfig.applyGitConfigValues(remoteName);
                 String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
@@ -129,7 +129,7 @@ public class WorkflowConfigParser {
             gitConfigFilePath = git.configValue("workflow.config"); // backwards compatibility
         }
         String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config");
-        if (isNotBlank(configFilePaths)) {
+        if (StringUtils.isNotBlank(configFilePaths)) {
             String[] configFiles = configFilePaths.split(",");
             for (String configFilePath : configFiles) {
                 File configFile = new File(configFilePath);
@@ -143,7 +143,9 @@ public class WorkflowConfigParser {
     private void applyRepoConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
         File repoDirectory = git.getRootDirectory();
         if (repoDirectory == null) {
-            Perforce perforce = new Perforce(internalConfig.username, internalConfig.perforceClientName, internalConfig.perforceClientDirectory);
+            PerforceClientConfig clientConfig = internalConfig.perforceClientConfig;
+            Perforce perforce = new Perforce(internalConfig.username,
+                    clientConfig.perforceClientName, clientConfig.perforceClientDirectory);
             repoDirectory = perforce.getWorkingDirectory();
         }
         if (repoDirectory != null) {

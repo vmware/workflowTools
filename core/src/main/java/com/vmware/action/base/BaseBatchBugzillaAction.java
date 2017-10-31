@@ -3,8 +3,8 @@ package com.vmware.action.base;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.Issue;
-import com.vmware.jira.domain.IssueTypeDefinition;
 
 public abstract class BaseBatchBugzillaAction extends BaseIssuesProcessingAction {
 
@@ -26,7 +26,7 @@ public abstract class BaseBatchBugzillaAction extends BaseIssuesProcessingAction
 
     @Override
     public String cannotRunAction() {
-        if (config.disableBugzilla) {
+        if (bugzillaConfig.disableBugzilla) {
             return "Bugzilla is disabled by config property disableBugzilla";
         }
         return super.cannotRunAction();
@@ -35,8 +35,7 @@ public abstract class BaseBatchBugzillaAction extends BaseIssuesProcessingAction
     protected Issue createIssueFromBug(Bug bug) {
         String summary = "[BZ-" + bug.getKey() + "] " + bug.getSummary();
         String description = bug.getWebUrl() + "\n" + bug.getDescription();
-        Issue matchingIssue = new Issue(IssueTypeDefinition.Bug, config.defaultJiraProject,
-                config.defaultJiraComponent, summary, description, null);
-        return matchingIssue;
+        return new Issue(IssueTypeDefinition.Bug, jiraConfig.defaultJiraProject,
+                jiraConfig.defaultJiraComponent, summary, description, null);
     }
 }

@@ -23,7 +23,7 @@ public class CreateReview extends BaseCommitAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(config.reviewBoardRepository)) {
+        if (StringUtils.isBlank(reviewBoardConfig.reviewBoardRepository)) {
             return "no reviewboard repository is configured, set a config value for reviewBoardRepository";
         }
         return super.failWorkflowIfConditionNotMet();
@@ -31,19 +31,19 @@ public class CreateReview extends BaseCommitAction {
 
     @Override
     public void preprocess() {
-        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(config.reviewBoardDateFormat);
+        reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
     }
 
     @Override
     public void process() {
         if (!draft.hasReviewNumber()) {
-            log.info("Creating new review against repository {}", config.reviewBoardRepository);
+            log.info("Creating new review against repository {}", reviewBoardConfig.reviewBoardRepository);
         } else {
             log.info("Creating new review against repository {} to replace review {} for this commit",
-                    config.reviewBoardRepository, draft.id);
+                    reviewBoardConfig.reviewBoardRepository, draft.id);
         }
 
-        draft.reviewRequest = reviewBoard.createReviewRequest(config.reviewBoardRepository);
+        draft.reviewRequest = reviewBoard.createReviewRequest(reviewBoardConfig.reviewBoardRepository);
         Repository repository = reviewBoard.getRepository(draft.reviewRequest.getRepositoryLink());
         draft.repoType = repository.getRepoType();
         draft.id = String.valueOf(draft.reviewRequest.id);

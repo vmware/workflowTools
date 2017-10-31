@@ -1,6 +1,6 @@
 package com.vmware.action.base;
 
-import com.vmware.scm.Perforce;
+import com.vmware.util.scm.Perforce;
 import com.vmware.config.WorkflowConfig;
 
 public abstract class BasePerforceCommitAction extends BaseCommitAction {

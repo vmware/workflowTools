@@ -6,9 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
 import com.vmware.IssueInfo;
 import com.vmware.JobBuild;
-import com.vmware.jenkins.domain.Job;
+import com.vmware.config.section.CommitConfig;
+import com.vmware.config.jenkins.Job;
 import com.vmware.jira.domain.Issue;
-import com.vmware.util.CommitConfiguration;
+import com.vmware.util.DateUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +29,8 @@ import java.util.regex.Pattern;
 import static com.vmware.util.StringUtils.appendCsvValue;
 import static com.vmware.util.StringUtils.isBlank;
 import static com.vmware.util.StringUtils.isNotBlank;
+import static com.vmware.util.StringUtils.pluralize;
+import static com.vmware.util.StringUtils.truncateStringIfNeeded;
 import static com.vmware.util.UrlUtils.addTrailingSlash;
 import static com.vmware.util.logging.LogLevel.DEBUG;
 
@@ -90,6 +94,28 @@ public class ReviewRequestDraft extends BaseEntity {
     @Expose(serialize = false, deserialize = false)
     public String perforceChangelistId;
 
+    @Expose(serialize = false, deserialize = false)
+    public String commitHash;
+
+    @Expose(serialize = false, deserialize = false)
+    public String authorName;
+
+    @Expose(serialize = false, deserialize = false)
+    public String authorEmail;
+
+    @Expose(serialize = false, deserialize = false)
+    public Date commitDate;
+
+    @Expose(serialize = false, deserialize = false)
+    public int filesChanged;
+
+    @Expose(serialize = false, deserialize = false)
+    public int lineInsertions;
+
+    @Expose(serialize = false, deserialize = false)
+    public int lineDeletions;
+
+
     public ReviewRequestDraft() {}
 
     public ReviewRequestDraft(final String summary, final String description, final String testingDone,
@@ -103,8 +129,8 @@ public class ReviewRequestDraft extends BaseEntity {
         this.branch = branch;
     }
 
-    public ReviewRequestDraft(final String commitText, CommitConfiguration commitConfiguration) {
-        fillValuesFromCommitText(commitText, commitConfiguration);
+    public ReviewRequestDraft(final String commitText, CommitConfig commitConfig) {
+        fillValuesFromCommitText(commitText, commitConfig);
     }
 
     public static ReviewRequestDraft anEmptyDraftForPublishingAReview() {
@@ -113,7 +139,7 @@ public class ReviewRequestDraft extends BaseEntity {
         return draft;
     }
 
-    public void fillValuesFromCommitText(String commitText, CommitConfiguration commitConfiguration) {
+    public void fillValuesFromCommitText(String commitText, CommitConfig commitConfig) {
         if (isBlank(commitText)) {
             log.warn("Text is blank, can't extract commit values!");
             return;
@@ -128,26 +154,44 @@ public class ReviewRequestDraft extends BaseEntity {
                 this.perforceChangelistId = parseSingleLineFromText(commitText, "^\\s*Change:\\s*(\\d+)", "Git Fusion Changelist Id", DEBUG);
             }
         }
-        String description = parseMultilineFromText(commitText, commitConfiguration.generateDescriptionPattern(), "Description");
+
+        this.commitHash = parseSingleLineFromText(commitText, "^commit\\s+(\\w+)", "Git Commit Hash", DEBUG);
+        this.authorName = parseSingleLineFromText(commitText, "^Author:\\s+(.+) <", "Git Commit Author Name", DEBUG);
+        this.authorEmail = parseSingleLineFromText(commitText, "^Author:.+<(.+)>", "Git Commit Author Email", DEBUG);
+        String commitDateAsString = parseSingleLineFromText(commitText, "^Date:\\s+(.+)", "Git Commit Date", DEBUG);
+        if (isNotBlank(commitDateAsString)) {
+            commitText = commitText.substring(commitText.indexOf(commitDateAsString) + commitDateAsString.length());
+            this.commitDate = DateUtils.parseDate(commitDateAsString);
+        }
+
+        while (commitText.startsWith("\n")) {
+            commitText = commitText.substring(1);
+        }
+
+        String description = parseMultilineFromText(commitText, commitConfig.generateDescriptionPattern(), "Description");
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
         String summary = commitText.substring(0, summaryIndex);
         description = description.length() < summary.length() + 1 ? "" : description.substring(summary.length() + 1);
         if (description.length() > 0 && description.charAt(0) == '\n') {
             description = description.substring(1);
         }
-        String testingDoneSection = parseMultilineFromText(commitText, commitConfiguration.generateTestingDonePattern(), "Testing Done");
-        String buildUrlsPattern = commitConfiguration.generateBuildUrlsPattern();
-        this.id = parseSingleLineFromText(commitText, commitConfiguration.generateReviewUrlPattern(), "Review number");
+        String testingDoneSection = parseMultilineFromText(commitText, commitConfig.generateTestingDonePattern(), "Testing Done");
+        String buildUrlsPattern = commitConfig.generateBuildUrlsPattern();
+        this.id = parseSingleLineFromText(commitText, commitConfig.generateReviewUrlPattern(), "Review number");
         this.description = description;
         this.summary = summary;
         this.testingDone = stripJobBuildsFromTestingDone(testingDoneSection, buildUrlsPattern);
         this.jobBuilds.clear();
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildWithResultPattern(buildUrlsPattern)));
         this.jobBuilds.addAll(generateJobBuildsList(testingDoneSection, buildPattern(buildUrlsPattern)));
-        this.bugNumbers = parseSingleLineFromText(commitText, commitConfiguration.generateBugNumberPattern(), "Bug Number");
-        this.reviewedBy = parseSingleLineFromText(commitText, commitConfiguration.generateReviewedByPattern(), "Reviewers");
-        this.approvedBy = parseSingleLineFromText(commitText, commitConfiguration.generateApprovedByPattern(), "Approved by");
-        this.mergeToValues = parseRepeatingSingleLineFromText(commitText, commitConfiguration.generateMergeToPattern(), "Merge To");
+        this.bugNumbers = parseSingleLineFromText(commitText, commitConfig.generateBugNumberPattern(), "Bug Number");
+        this.reviewedBy = parseSingleLineFromText(commitText, commitConfig.generateReviewedByPattern(), "Reviewers");
+        this.approvedBy = parseSingleLineFromText(commitText, commitConfig.generateApprovedByPattern(), "Approved by");
+        this.mergeToValues = parseRepeatingSingleLineFromText(commitText, commitConfig.generateMergeToPattern(), "Merge To");
+
+        this.filesChanged = parseValueFromText(commitText, "(\\d+) files* changed", "Files Changed");
+        this.lineInsertions = parseValueFromText(commitText, ".+?(\\d+) insertions*\\(\\+\\)", "Line Insertions");
+        this.lineDeletions = parseValueFromText(commitText, ".+?(\\d+) deletions*\\(-\\)", "Lines Deleted");
     }
 
     public boolean hasReviewNumber() {
@@ -319,11 +363,11 @@ public class ReviewRequestDraft extends BaseEntity {
         return hasData;
     }
 
-    public String toText(CommitConfiguration commitConfig) {
+    public String toText(CommitConfig commitConfig) {
         return toText(commitConfig, true);
     }
 
-    public String toText(CommitConfiguration commitConfig, boolean includeJobResults) {
+    public String toText(CommitConfig commitConfig, boolean includeJobResults) {
         StringBuilder builder = new StringBuilder();
         builder.append(summary).append("\n\n");
 
@@ -373,6 +417,11 @@ public class ReviewRequestDraft extends BaseEntity {
         return matches.toArray(new String[matches.size()]);
     }
 
+    private int parseValueFromText(String text, String pattern, String description) {
+        String valueAsString = parseSingleLineFromText(text, pattern, description);
+        return isNotBlank(valueAsString) ? Integer.parseInt(valueAsString) : 0;
+    }
+
     private String parseSingleLineFromText(String text, String pattern, String description) {
         return parseSingleLineFromText(text, pattern, description, DEBUG);
     }
@@ -405,5 +454,27 @@ public class ReviewRequestDraft extends BaseEntity {
             }
         }
         throw new RuntimeException("No non null group value for text [" + text + "] with pattern [" + pattern + "]");
+    }
+
+    public boolean isCommitSmallerThan(int maxFileCount, int maxLineCount) {
+        return filesChanged <= maxFileCount || totalLineChanges() <= maxLineCount;
+    }
+
+    public boolean matchesAuthor(String authorEmails) {
+        if (authorEmails == null) {
+            return false;
+        }
+        return Arrays.stream(authorEmails.split(",")).map(String::trim)
+                .anyMatch(authorEmail -> authorEmail.equals(this.authorEmail));
+    }
+
+    public String summaryInfo(int maxSummaryLength) {
+        String truncatedSummary = truncateStringIfNeeded(summary, maxSummaryLength);
+        return String.format("%s: %s, %s", truncatedSummary,
+                pluralize(filesChanged, "file"), pluralize(totalLineChanges(), "line change"));
+    }
+
+    private int totalLineChanges() {
+        return lineInsertions + lineDeletions;
     }
 }

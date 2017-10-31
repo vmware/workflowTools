@@ -25,7 +25,7 @@ public class AddGitChangesetConfigValueIfNeeded extends BaseLinkedPerforceCommit
             git.addConfigValue("changesetsync.checkoutdir", clientDirectory);
         } else if (!clientDirectory.equals(changesetCheckoutPath)) {
             log.warn("Expected directory {} for client {} to match git config value changesetsync.checkoutdir {}",
-                    clientDirectory, config.perforceClientName, changesetCheckoutPath);
+                    clientDirectory, perforceClientConfig.perforceClientName, changesetCheckoutPath);
         } else {
             log.debug("git config value changesetsync.checkoutdir matches expected directory {}", changesetCheckoutPath);
         }

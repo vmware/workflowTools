@@ -1,8 +1,7 @@
-import com.vmware.scm.FileChange;
-import com.vmware.scm.Git;
+import com.vmware.config.section.CommitConfig;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.Git;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.CommitConfiguration;
-import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
@@ -13,13 +12,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.vmware.scm.FileChangeType.deleted;
-import static com.vmware.scm.FileChangeType.modified;
-import static com.vmware.scm.FileChangeType.renamed;
+import static com.vmware.util.scm.FileChangeType.deleted;
+import static com.vmware.util.scm.FileChangeType.modified;
+import static com.vmware.util.scm.FileChangeType.renamed;
 import static java.lang.String.format;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -136,14 +134,13 @@ public class TestGit {
     @Test
     public void printLast200Commits() {
         int numberOfCommitsToCheck = Math.min(git.totalCommitCount(), 200);
-        CommitConfiguration configuration = new CommitConfiguration("http://reviewboard",
+        CommitConfig configuration = new CommitConfig("http://reviewboard",
                 "http://gobuild", "http://jenkins", "Testing Done:", "Bug Number:", "Reviewed by:", "Review URL:", "Merge to:",
                 new String[] {"main"}, "approvedBy");
 
         for (int i = 0; i < numberOfCommitsToCheck; i ++) {
-            String commitText = git.commitText(i, true);
-            ReviewRequestDraft draft = new ReviewRequestDraft();
-            draft.fillValuesFromCommitText(commitText, configuration);
+            String commitText = git.commitText(i);
+            ReviewRequestDraft draft = new ReviewRequestDraft(commitText, configuration);
             System.out.println((i + 1) + "\n" + draft.toText(configuration));
         }
     }

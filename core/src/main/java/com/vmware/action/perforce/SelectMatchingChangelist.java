@@ -30,7 +30,7 @@ public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {
         Map<String, ReviewRequestDraft> potentialMatches = new HashMap<>();
         for (String changelistId: changelists) {
             String changelistDescription = perforce.readChangelist(changelistId);
-            ReviewRequestDraft potentialMatch = new ReviewRequestDraft(changelistDescription, config.getCommitConfiguration());
+            ReviewRequestDraft potentialMatch = new ReviewRequestDraft(changelistDescription, commitConfig);
             potentialMatch.perforceChangelistId = changelistId;
             if (descriptionMatches(potentialMatch) || reviewNumberMatches(potentialMatch)) {
                 draft.perforceChangelistId = changelistId;
@@ -67,7 +67,7 @@ public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {
     }
 
     private boolean bugNumbersMatches(ReviewRequestDraft potentialMatch) {
-        if (draft.hasBugNumber(config.noBugNumberLabel) && draft.bugNumbers.equals(potentialMatch.bugNumbers)) {
+        if (draft.hasBugNumber(commitConfig.noBugNumberLabel) && draft.bugNumbers.equals(potentialMatch.bugNumbers)) {
             log.info("Using changelist {} as bug numbers {} match commit", potentialMatch.perforceChangelistId, draft.bugNumbers);
             return true;
         } else {

@@ -27,11 +27,11 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (config.disableJira) {
+        if (jiraConfig.disableJira) {
             return "Jira is disabled by config property disableJira";
         }
 
-        if (!draft.hasBugNumber(config.noBugNumberLabel)) {
+        if (!draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
             return "the commit has no bug number";
         }
         return super.cannotRunAction();
@@ -54,7 +54,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
     private void transitionIssue(String bugNumber) {
         IssueStatusDefinition lastStatusToTransitionTo = toStatuses[toStatuses.length - 1];
 
-        if (config.parseBugzillaBugNumber(bugNumber) != null) {
+        if (bugzillaConfig.parseBugzillaBugNumber(bugNumber) != null) {
             log.info("Bug number {} appears to be a bugzilla bug, can't transition to {}",
                     lastStatusToTransitionTo.name());
             return;

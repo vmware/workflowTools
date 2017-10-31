@@ -24,7 +24,7 @@ public class CreatePendingChangelistIfNeeded extends BasePerforceCommitAction {
 
     @Override
     public void process() {
-        String changelistText = draft.toText(config.getCommitConfiguration());
+        String changelistText = draft.toText(commitConfig);
         String changelistId = perforce.createPendingChangelist(changelistText, false);
         log.info("Created changelist with id {}", changelistId);
         draft.perforceChangelistId = changelistId;

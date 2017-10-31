@@ -13,7 +13,7 @@ import java.text.ParseException;
 public class HardSubmitOldShipItReviews extends BaseBatchCloseReviews {
 
     public HardSubmitOldShipItReviews(WorkflowConfig config) {
-        super(config, "ship its", config.closeOldShipItReviewsAfter);
+        super(config, "ship its", config.reviewBoardConfig.closeOldShipItReviewsAfter);
     }
 
     @Override

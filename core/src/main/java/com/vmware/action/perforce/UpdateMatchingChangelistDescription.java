@@ -13,10 +13,10 @@ public class UpdateMatchingChangelistDescription extends BaseLinkedPerforceCommi
 
     @Override
     public void process() {
-        String description = draft.toText(config.getCommitConfiguration());
+        String description = draft.toText(commitConfig);
         String existingPerforceChangelistText = perforce.readChangelist(draft.perforceChangelistId);
-        ReviewRequestDraft existingDraft = new ReviewRequestDraft(existingPerforceChangelistText, config.getCommitConfiguration());
-        String existingDescription = existingDraft.toText(config.getCommitConfiguration(), true);
+        ReviewRequestDraft existingDraft = new ReviewRequestDraft(existingPerforceChangelistText, commitConfig);
+        String existingDescription = existingDraft.toText(commitConfig, true);
         if (description.equals(existingDescription)) {
             log.info("Not updating description for changelist {} as it hasn't changed", draft.perforceChangelistId);
             return;
