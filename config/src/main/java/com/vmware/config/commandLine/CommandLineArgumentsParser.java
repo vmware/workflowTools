@@ -2,6 +2,7 @@ package com.vmware.config.commandLine;
 
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.ArrayUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 
 import java.util.ArrayList;
@@ -122,8 +123,8 @@ public class CommandLineArgumentsParser {
             }
             UnrecognizedCommandLineArgument potentiallyUnrecognizedArgument = new UnrecognizedCommandLineArgument(argument);
             for (ConfigurableProperty validProperty : validProperties) {
-                String[] validMatches = validProperty.commandLine().split(",");
-                if (ArrayUtils.contains(validMatches,argument)) {
+                List<String> validMatches = StringUtils.splitAndTrim(validProperty.commandLine(), ",");
+                if (validMatches.contains(argument)) {
                     potentiallyUnrecognizedArgument = null;
                     break;
                 }

@@ -152,23 +152,23 @@ public class CommitConfig {
     }
 
     public String getTestingDoneLabel() {
-        return testingDoneLabel;
+        return padLabel(testingDoneLabel);
     }
 
     public String getBugNumberLabel() {
-        return bugNumberLabel;
+        return padLabel(bugNumberLabel);
     }
 
     public String getReviewedByLabel() {
-        return reviewedByLabel;
+        return padLabel(reviewedByLabel);
     }
 
     public String getReviewUrlLabel() {
-        return reviewUrlLabel;
+        return padLabel(reviewUrlLabel);
     }
 
     public String getMergeToLabel() {
-        return mergeToLabel;
+        return padLabel(mergeToLabel);
     }
 
     public String[] getMergeToValues() {
@@ -176,7 +176,7 @@ public class CommitConfig {
     }
 
     public String getApprovedByLabel() {
-        return approvedByLabel;
+        return padLabel(approvedByLabel);
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {
@@ -185,6 +185,9 @@ public class CommitConfig {
 
 
     private String padLabel(String label) {
+        if (label == null) {
+            return null;
+        }
         return label.endsWith(" ") ? label : label + " ";
     }
 }
