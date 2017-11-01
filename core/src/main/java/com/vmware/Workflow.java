@@ -280,6 +280,7 @@ public class Workflow {
         if (git.isGitInstalled()) {
             log.info("Config values can also be set by executing git config [name in square brackets] [configValue]");
         }
+
         for (String configOption : configOptions) {
             Field matchingField = config.getMatchingField(configOption);
             if (matchingField == null) {
@@ -289,8 +290,7 @@ public class Workflow {
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 String matchingValueText;
                 if (configOption.equals("--jenkins-jobs")) {
-                    JenkinsJobsConfig jobsConfig = config.jenkinsJobsConfig;
-                    matchingValueText = jobsConfig.toString();
+                    matchingValueText = config.jenkinsConfig.getJenkinsJobsConfig().toString();
                 } else {
                     Object matchingValue = ReflectionUtils.getValue(matchingField, config);
                     matchingValueText = StringUtils.convertObjectToString(matchingValue);

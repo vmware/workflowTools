@@ -28,11 +28,9 @@ public class JenkinsJobsConfig {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @ConfigurableProperty(help = "Map of user friendly names for jenkins jobs to select from")
     public Map<String, String> jenkinsJobsMappings = new HashMap<>();
 
-    @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. --JVAPP_NAME=test --JUSERNAME=dbiggs")
-    public Map<String, String> jenkinsJobParameters = new TreeMap<>();
+    public Map<String, String> presetParameters = new TreeMap<>();
 
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
@@ -45,6 +43,13 @@ public class JenkinsJobsConfig {
 
     public int size() {
         return jobs.size();
+    }
+
+    public JenkinsJobsConfig(String jenkinsJobsToUse, Map<String, String> presetParameters, String jenkinsUrl, Map<String, String> jenkinsJobsMappings) {
+        this.presetParameters = presetParameters;
+        this.jenkinsUrl = jenkinsUrl;
+        this.jenkinsJobsMappings = jenkinsJobsMappings;
+        parseJobsText(jenkinsJobsToUse);
     }
 
     private void parseJobsText(String jenkinsJobsToUse) {
@@ -109,8 +114,8 @@ public class JenkinsJobsConfig {
                 setDefaultUsernameParam = false;
             }
 
-            if (jenkinsJobParameters.containsKey(paramName)) {
-                paramValue = jenkinsJobParameters.get(paramName);
+            if (presetParameters.containsKey(paramName)) {
+                paramValue = presetParameters.get(paramName);
                 log.debug("Setting parameter {} to preset parameter {}", paramName, paramValue);
                 if (paramValue.startsWith("$FILE:")) {
                     String fileName = paramValue.substring("$FILE:".length());
@@ -121,7 +126,7 @@ public class JenkinsJobsConfig {
             }
 
             while (paramValue.contains(USERNAME_VALUE)) {
-                paramValue = paramValue.replace(USERNAME_VALUE, jenkinsJobParameters.get(USERNAME_PARAM));
+                paramValue = paramValue.replace(USERNAME_VALUE, presetParameters.get(USERNAME_PARAM));
             }
 
             if (paramName.equals(NO_USERNAME_PARAMETER) && Boolean.valueOf(paramValue)) {
@@ -134,8 +139,8 @@ public class JenkinsJobsConfig {
         }
 
         if (setDefaultUsernameParam) {
-            log.debug("Adding default user parameter {} with value {}", USERNAME_PARAM, jenkinsJobParameters.get(USERNAME_PARAM));
-            parameters.add(0, new JobParameter(USERNAME_PARAM, jenkinsJobParameters.get(USERNAME_PARAM)));
+            log.debug("Adding default user parameter {} with value {}", USERNAME_PARAM, presetParameters.get(USERNAME_PARAM));
+            parameters.add(0, new JobParameter(USERNAME_PARAM, presetParameters.get(USERNAME_PARAM)));
         }
     }
 

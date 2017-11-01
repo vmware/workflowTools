@@ -7,6 +7,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.jenkins.Job;
 import com.vmware.config.jenkins.JobParameter;
+import com.vmware.config.section.JenkinsJobsConfig;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;
@@ -42,6 +43,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         askForJenkinsJobKeysIfBlank();
 
         int counter = 0;
+        JenkinsJobsConfig jenkinsJobsConfig = jenkinsConfig.getJenkinsJobsConfig();
         for (Job job : jenkinsJobsConfig.jobs()) {
             if (counter == 0) {
                 log.info("");
@@ -81,7 +83,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        Map<String, String> jenkinsJobsMappings = config.jenkinsJobsConfig.jenkinsJobsMappings;
+        Map<String, String> jenkinsJobsMappings = config.jenkinsConfig.jenkinsJobsMappings;
         if (jenkinsJobsMappings == null || jenkinsJobsMappings.isEmpty()) {
             jenkinsConfig.jenkinsJobsToUse = InputUtils.readValue("Jenkins jobs");
         } else {
