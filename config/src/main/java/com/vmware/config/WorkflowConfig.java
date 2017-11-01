@@ -2,6 +2,7 @@ package com.vmware.config;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.config.section.BuildwebConfig;
+import com.vmware.config.section.LoggingConfig;
 import com.vmware.config.section.PatchConfig;
 import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.SectionConfig;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Workflow configuration.
@@ -55,6 +57,9 @@ public class WorkflowConfig {
 
     @Expose(serialize = false, deserialize = false)
     public String loadedConfigFiles;
+
+    @SectionConfig
+    public LoggingConfig loggingConfig;
 
     @SectionConfig
     public GitRepoConfig gitRepoConfig;
@@ -107,15 +112,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public String[] bugNumberSearchOrder;
 
-    @ConfigurableProperty(commandLine = "-t,--trace", help = "Sets log level to trace")
-    public boolean traceLogLevel;
-
-    @ConfigurableProperty(commandLine = "-d,--debug", help = "Sets log level to debug")
-    public boolean debugLogLevel;
-
-    @ConfigurableProperty(commandLine = "-l, ,--log, --log-level", help = "Sets log level to any of the following, SEVERE,INFO,FINE,FINER,FINEST")
-    public String logLevel;
-
     @ConfigurableProperty(help = "A map of workflows that can be configured. A workflow comprises a list of workflow actions.")
     public TreeMap<String, List<String>> workflows;
 
@@ -151,15 +147,6 @@ public class WorkflowConfig {
             this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
         }
         argsParser.checkForUnrecognizedArguments(commandLineProperties);
-    }
-
-    public LogLevel determineLogLevel() {
-        if (traceLogLevel) {
-            logLevel = LogLevel.TRACE.name();
-        } else if (debugLogLevel) {
-            logLevel = LogLevel.DEBUG.name();
-        }
-        return LogLevel.valueOf(logLevel);
     }
 
     public int getSearchOrderForService(String serviceToCheckFor) {
@@ -327,8 +314,8 @@ public class WorkflowConfig {
                 continue;
             }
             for (String configValue : configValues.keySet()) {
-                String[] commandLineArguments = configurableProperty.commandLine().split(",");
-                if (ArrayUtils.contains(commandLineArguments, configValue)) {
+                List<String> commandLineArguments = StringUtils.splitAndTrim(configurableProperty.commandLine(), ",");
+                if (commandLineArguments.contains(configValue)) {
                     propertiesAffected.add(configurableProperty);
                     String value = configValues.get(configValue);
                     if (value == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {

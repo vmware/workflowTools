@@ -7,8 +7,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StringUtils {
     public static final String NEW_LINE_CHAR = "\n";
@@ -212,6 +215,14 @@ public class StringUtils {
         } else {
             return value + " " + description;
         }
+    }
+
+    public static List<String> splitAndTrim(String value, String delimeter) {
+        if (value == null) {
+            return Collections.emptyList();
+        }
+        String[] spltValues = value.split(delimeter);
+        return Arrays.stream(spltValues).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
     }
 
 }

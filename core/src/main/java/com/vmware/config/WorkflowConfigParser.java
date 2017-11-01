@@ -114,7 +114,7 @@ public class WorkflowConfigParser {
 
     private void setLogLevel(WorkflowConfig internalConfig) {
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        LogLevel logLevelToUse = internalConfig.determineLogLevel();
+        LogLevel logLevelToUse = internalConfig.loggingConfig.determineLogLevel();
         globalLogger.setLevel(logLevelToUse.getLevel());
         log.debug("Using log level {}", logLevelToUse);
     }
