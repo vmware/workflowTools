@@ -1,6 +1,7 @@
 package com.vmware.config.section;
 
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.jenkins.JobParameter;
 
 import java.util.Collections;

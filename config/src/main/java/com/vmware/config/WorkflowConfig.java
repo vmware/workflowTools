@@ -12,7 +12,7 @@ import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
 import com.vmware.config.section.JenkinsConfig;
-import com.vmware.config.section.JenkinsJobsConfig;
+import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.section.JiraConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.TrelloConfig;

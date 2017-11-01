@@ -7,7 +7,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.jenkins.Job;
 import com.vmware.config.jenkins.JobParameter;
-import com.vmware.config.section.JenkinsJobsConfig;
+import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;

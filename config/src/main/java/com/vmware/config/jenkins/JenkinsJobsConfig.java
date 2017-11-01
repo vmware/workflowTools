@@ -1,6 +1,5 @@
-package com.vmware.config.section;
+package com.vmware.config.jenkins;
 
-import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.jenkins.Job;
 import com.vmware.config.jenkins.JobParameter;
 import com.vmware.util.FileUtils;
@@ -32,7 +31,6 @@ public class JenkinsJobsConfig {
 
     public Map<String, String> presetParameters = new TreeMap<>();
 
-    @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
 
     private List<Job> jobs = new ArrayList<>();

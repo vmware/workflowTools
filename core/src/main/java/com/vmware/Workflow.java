@@ -6,7 +6,6 @@ import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
-import com.vmware.config.section.JenkinsJobsConfig;
 import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowActions;
