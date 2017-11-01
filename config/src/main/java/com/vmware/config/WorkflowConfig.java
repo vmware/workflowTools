@@ -183,7 +183,7 @@ public class WorkflowConfig {
             if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(configPrefix)) {
                 String valueByGitConfig = configValues.get(gitConfigPropertyName);
                 String valueByWorkflowProperty = configValues.get(workflowConfigPropertyName);
-                if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByGitConfig)) {
+                if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByWorkflowProperty)) {
                     throw new FatalException("Property {} has value {} specified by the git config property {}" +
                             " but has value {} specified by the workflow property {}, please remove one of the properties",
                             field.getName(), valueByGitConfig, gitConfigPropertyName, valueByWorkflowProperty,
