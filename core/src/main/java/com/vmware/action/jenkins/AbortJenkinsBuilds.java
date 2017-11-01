@@ -26,7 +26,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
         jenkins.checkStatusOfBuilds(draft);
         log.info("");
 
-        for (Job jenkinsJob: jenkinsJobsConfig.jobs()) {
+        for (Job jenkinsJob: jenkinsConfig.getJenkinsJobsConfig().jobs()) {
             abortJenkinsJob(draft, jenkinsJob);
         }
     }
@@ -36,7 +36,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        Map<String, String> jenkinsJobsMappings = config.jenkinsJobsConfig.jenkinsJobsMappings;
+        Map<String, String> jenkinsJobsMappings = config.jenkinsConfig.jenkinsJobsMappings;
         if (jenkinsJobsMappings == null || jenkinsJobsMappings.isEmpty()) {
             jenkinsConfig.jenkinsJobsToUse = InputUtils.readValue("Jenkins job keys");
         } else {

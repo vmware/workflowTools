@@ -1,5 +1,7 @@
 package com.vmware.action;
 
+import com.vmware.ServiceLocator;
+import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.CheckstyleConfig;
@@ -7,20 +9,17 @@ import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
 import com.vmware.config.section.JenkinsConfig;
-import com.vmware.config.section.JenkinsJobsConfig;
 import com.vmware.config.section.JiraConfig;
 import com.vmware.config.section.PatchConfig;
 import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.TrelloConfig;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.scm.Git;
-import com.vmware.ServiceLocator;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.util.scm.NoPerforceClientForDirectoryException;
-import com.vmware.util.scm.Perforce;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.scm.Git;
+import com.vmware.util.scm.NoPerforceClientForDirectoryException;
+import com.vmware.util.scm.Perforce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ public abstract class BaseAction {
     protected final JiraConfig jiraConfig;
     protected final BugzillaConfig bugzillaConfig;
     protected final JenkinsConfig jenkinsConfig;
-    protected final JenkinsJobsConfig jenkinsJobsConfig;
     protected final TrelloConfig trelloConfig;
     protected final CheckstyleConfig checkstyleConfig;
     protected final PatchConfig patchConfig;
@@ -62,7 +60,6 @@ public abstract class BaseAction {
         this.jiraConfig = config.jiraConfig;
         this.bugzillaConfig = config.bugzillaConfig;
         this.jenkinsConfig = config.jenkinsConfig;
-        this.jenkinsJobsConfig = config.jenkinsJobsConfig;
         this.trelloConfig = config.trelloConfig;
         this.checkstyleConfig = config.checkstyleConfig;
         this.patchConfig = config.patchConfig;

@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * Workflow configuration.
@@ -84,9 +83,6 @@ public class WorkflowConfig {
 
     @SectionConfig
     public JenkinsConfig jenkinsConfig;
-
-    @SectionConfig
-    public JenkinsJobsConfig jenkinsJobsConfig;
 
     @SectionConfig
     public TrelloConfig trelloConfig;
@@ -295,17 +291,18 @@ public class WorkflowConfig {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
         }
+        JenkinsJobsConfig jenkinsJobsConfig = jenkinsConfig.getJenkinsJobsConfig();
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith("--J")) {
                 continue;
             }
             String parameterName = configValue.substring(3);
             String parameterValue = configValues.get(configValue);
-            if (!overwriteJenkinsParameters && jenkinsJobsConfig.jenkinsJobParameters.containsKey(parameterName)) {
+            if (!overwriteJenkinsParameters && jenkinsJobsConfig.presetParameters.containsKey(parameterName)) {
                 log.debug("Ignoring config value {} as it is already set", configValue);
                 continue;
             }
-            jenkinsJobsConfig.jenkinsJobParameters.put(parameterName, parameterValue);
+            jenkinsJobsConfig.presetParameters.put(parameterName, parameterValue);
         }
         List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
         for (Field field : configurableFields) {
