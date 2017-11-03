@@ -10,7 +10,9 @@ import com.vmware.util.logging.Padder;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @ActionDescription("Displays the current workflow configuration.")
 public class DisplayConfig extends BaseAction {
@@ -29,9 +31,10 @@ public class DisplayConfig extends BaseAction {
             specifiedPropertiesToDisplay.addAll(Arrays.asList(config.configPropertiesToDisplay.split(",")));
         }
         boolean printingFirstValue = false;
+        Set<String> alreadyProcessedProperties = new HashSet<>();
         for (int i = 0; i < config.configurableFields.size(); i ++) {
             Field configField = config.configurableFields.get(i);
-            if (!showValueForProperty(specifiedPropertiesToDisplay, configField.getName())) {
+            if (!showValueForProperty(specifiedPropertiesToDisplay, configField.getName(), alreadyProcessedProperties)) {
                 continue;
             }
             String source = config.getFieldValueSource(configField.getName());
@@ -46,7 +49,11 @@ public class DisplayConfig extends BaseAction {
         titlePadder.infoTitle();
     }
 
-    private boolean showValueForProperty(List<String> specifiedProperties, String propertyName) {
+    private boolean showValueForProperty(List<String> specifiedProperties, String propertyName, Set<String> alreadyProcessedProperties) {
+        if (alreadyProcessedProperties.contains(propertyName)) {
+            return false;
+        }
+        alreadyProcessedProperties.add(propertyName);
         if (specifiedProperties.isEmpty()) {
             return true;
         }
