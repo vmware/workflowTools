@@ -11,9 +11,6 @@ import java.util.TreeMap;
 
 public class JenkinsConfig {
 
-    @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira and review board")
-    public String username;
-
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
 
@@ -41,7 +38,7 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. --JVAPP_NAME=test --JUSERNAME=dbiggs")
     public Map<String, String> jenkinsJobParameters = new TreeMap<>();
 
-    public JenkinsJobsConfig getJenkinsJobsConfig() {
+    public JenkinsJobsConfig getJenkinsJobsConfig(String username) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);

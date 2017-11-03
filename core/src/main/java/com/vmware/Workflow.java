@@ -289,7 +289,7 @@ public class Workflow {
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 String matchingValueText;
                 if (configOption.equals("--jenkins-jobs")) {
-                    matchingValueText = config.jenkinsConfig.getJenkinsJobsConfig().toString();
+                    matchingValueText = config.getJenkinsJobsConfig().toString();
                 } else {
                     Object matchingValue = ReflectionUtils.getValue(matchingField, config);
                     matchingValueText = StringUtils.convertObjectToString(matchingValue);
