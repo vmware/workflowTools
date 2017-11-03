@@ -97,11 +97,11 @@ public class JenkinsJobsConfig {
             }
             parameters.add(new JobParameter(paramPieces[0], paramPieces[1]));
         }
-        expandParameterValues(parameters);
+        expandParameterValues(jobName, parameters);
         return parameters;
     }
 
-    private void expandParameterValues(List<JobParameter> parameters) {
+    private void expandParameterValues(String jobName, List<JobParameter> parameters) {
         boolean setDefaultUsernameParam = true;
         Iterator<JobParameter> paramIter = parameters.iterator();
         while (paramIter.hasNext()) {
@@ -124,6 +124,9 @@ public class JenkinsJobsConfig {
             }
 
             while (paramValue.contains(USERNAME_VALUE)) {
+                if (presetParameters.get(USERNAME_PARAM) == null) {
+                    throw new FatalException("Cannot replace username parameter in jenkins job " + jobName);
+                }
                 paramValue = paramValue.replace(USERNAME_VALUE, presetParameters.get(USERNAME_PARAM));
             }
 

@@ -26,7 +26,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
         jenkins.checkStatusOfBuilds(draft);
         log.info("");
 
-        for (Job jenkinsJob: jenkinsConfig.getJenkinsJobsConfig().jobs()) {
+        for (Job jenkinsJob: config.getJenkinsJobsConfig().jobs()) {
             abortJenkinsJob(draft, jenkinsJob);
         }
     }

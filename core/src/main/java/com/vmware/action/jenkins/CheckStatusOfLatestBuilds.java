@@ -36,7 +36,7 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
             jenkinsConfig.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Enter jobs");
         }
 
-        jenkinsConfig.getJenkinsJobsConfig().jobs().forEach(this::checkStatusOfLatestJob);
+        config.getJenkinsJobsConfig().jobs().forEach(this::checkStatusOfLatestJob);
     }
 
     private void checkStatusOfLatestJob(Job jobToCheck) {

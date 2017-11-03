@@ -43,7 +43,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         askForJenkinsJobKeysIfBlank();
 
         int counter = 0;
-        JenkinsJobsConfig jenkinsJobsConfig = jenkinsConfig.getJenkinsJobsConfig();
+        JenkinsJobsConfig jenkinsJobsConfig = config.getJenkinsJobsConfig();
         for (Job job : jenkinsJobsConfig.jobs()) {
             if (counter == 0) {
                 log.info("");

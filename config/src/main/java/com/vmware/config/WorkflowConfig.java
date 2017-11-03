@@ -291,7 +291,7 @@ public class WorkflowConfig {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
         }
-        JenkinsJobsConfig jenkinsJobsConfig = jenkinsConfig.getJenkinsJobsConfig();
+        JenkinsJobsConfig jenkinsJobsConfig = getJenkinsJobsConfig();
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith("--J")) {
                 continue;
@@ -323,6 +323,10 @@ public class WorkflowConfig {
             }
         }
         return propertiesAffected;
+    }
+
+    public JenkinsJobsConfig getJenkinsJobsConfig() {
+        return jenkinsConfig.getJenkinsJobsConfig(this.username);
     }
 
     private void addConfigurablePropertiesForClass(Class classToCheck, Map<String, Field> usedParams) {
