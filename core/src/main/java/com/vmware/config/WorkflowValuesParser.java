@@ -1,6 +1,7 @@
 package com.vmware.config;
 
 import com.vmware.action.BaseAction;
+import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,14 +83,16 @@ public class WorkflowValuesParser {
         if (StringUtils.isBlank(jenkinsJobsToCall)) {
             jenkinsJobsToCall = configValues.get("--jenkins-jobs");
         }
+        String displayNameParameter = "--J" + JenkinsJobsConfig.JOB_DISPLAY_NAME_PARAM;
         if (StringUtils.isBlank(jenkinsJobsToCall)) {
-            return Collections.emptyList();
+            return Collections.singleton(displayNameParameter);
         }
         String[] jenkinsJobPieces = jenkinsJobsToCall.split("&");
         if (jenkinsJobPieces.length < 2) {
             return Collections.emptyList();
         }
         Set<String> jenkinsParameterConfigValues = new HashSet<>();
+        jenkinsParameterConfigValues.add(displayNameParameter);
         for (int i = 1; i < jenkinsJobPieces.length; i++) {
             String jenkinsParameter = jenkinsJobPieces[i];
             String[] jenkinsParameterPieces = jenkinsParameter.split("=");
@@ -97,7 +100,6 @@ public class WorkflowValuesParser {
                 continue;
             }
             jenkinsParameterConfigValues.add("--J" + jenkinsParameterPieces[0]);
-
         }
         return jenkinsParameterConfigValues;
     }

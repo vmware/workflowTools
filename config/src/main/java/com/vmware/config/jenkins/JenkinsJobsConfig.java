@@ -3,6 +3,7 @@ package com.vmware.config.jenkins;
 import com.vmware.config.jenkins.Job;
 import com.vmware.config.jenkins.JobParameter;
 import com.vmware.util.FileUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ import static com.vmware.config.jenkins.JobParameter.USERNAME_PARAM;
  * Encapsulates handling of the jenkins jobs config value.
  */
 public class JenkinsJobsConfig {
+
+    public static final String JOB_DISPLAY_NAME_PARAM = "DISPLAY_NAME";
 
     private static final String USERNAME_VALUE = "$USERNAME";
 
@@ -55,12 +58,13 @@ public class JenkinsJobsConfig {
             return;
         }
         String[] jobs = jenkinsJobsToUse.split(",");
+        int jobCounter = 0;
         for (String jobInfo : jobs) {
-            parseJobInfo(jobInfo);
+            parseJobInfo(jobInfo, jobCounter++);
         }
     }
 
-    private void parseJobInfo(String jobInfo) {
+    private void parseJobInfo(String jobInfo, int jobCounter) {
         String mappedValue = jenkinsJobsMappings.get(jobInfo);
         Job job = new Job();
         if (mappedValue != null) {
@@ -73,6 +77,14 @@ public class JenkinsJobsConfig {
         if (pipeIndex != -1) {
             job.jobDisplayName = jobInfo.substring(0, pipeIndex);
             jobInfo = jobInfo.substring(pipeIndex + 1);
+        } else {
+            job.jobDisplayName = "Build";
+        }
+        if (presetParameters.containsKey(JOB_DISPLAY_NAME_PARAM)) {
+            String[] jobNames = presetParameters.get(JOB_DISPLAY_NAME_PARAM).split(",");
+            if (jobNames.length > jobCounter) {
+                job.jobDisplayName = jobNames[jobCounter];
+            }
         }
         if (jobInfo.contains("&")) {
             int ampersandIndex = jobInfo.indexOf("&");
@@ -149,14 +161,8 @@ public class JenkinsJobsConfig {
     public String toString() {
         String jobText = "";
         for (Job job : jobs) {
-            List<JobParameter> params = job.parameters;
-            if (!jobText.isEmpty()) {
-                jobText += ",";
-            }
-            jobText += job.name;
-            for (JobParameter param : params) {
-                jobText += "&" + param.name + "=" + param.value;
-            }
+            jobText = StringUtils.appendWithDelimiter(jobText, job.jobDisplayName + "|" + job.name, ",");
+            jobText = StringUtils.appendWithDelimiter(jobText, job.parameters, "&");
         }
         return jobText;
     }
