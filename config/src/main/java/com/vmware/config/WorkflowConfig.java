@@ -291,18 +291,17 @@ public class WorkflowConfig {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
         }
-        JenkinsJobsConfig jenkinsJobsConfig = getJenkinsJobsConfig();
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith("--J")) {
                 continue;
             }
             String parameterName = configValue.substring(3);
             String parameterValue = configValues.get(configValue);
-            if (!overwriteJenkinsParameters && jenkinsJobsConfig.presetParameters.containsKey(parameterName)) {
+            if (!overwriteJenkinsParameters && jenkinsConfig.jenkinsJobParameters.containsKey(parameterName)) {
                 log.debug("Ignoring config value {} as it is already set", configValue);
                 continue;
             }
-            jenkinsJobsConfig.presetParameters.put(parameterName, parameterValue);
+            jenkinsConfig.jenkinsJobParameters.put(parameterName, parameterValue);
         }
         List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
         for (Field field : configurableFields) {
