@@ -24,15 +24,14 @@ import static com.vmware.config.jenkins.JobParameter.USERNAME_PARAM;
  */
 public class JenkinsJobsConfig {
 
-    public static final String JOB_DISPLAY_NAME_PARAM = "DISPLAY_NAME";
-
     private static final String USERNAME_VALUE = "$USERNAME";
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public Map<String, String> jenkinsJobsMappings = new HashMap<>();
+    private Map<String, String> jenkinsJobsMappings = new HashMap<>();
 
-    public Map<String, String> presetParameters = new TreeMap<>();
+    private String[] jobsDisplayNames;
+    private Map<String, String> presetParameters = new TreeMap<>();
 
     public String jenkinsUrl;
 
@@ -46,8 +45,9 @@ public class JenkinsJobsConfig {
         return jobs.size();
     }
 
-    public JenkinsJobsConfig(String jenkinsJobsToUse, Map<String, String> presetParameters, String jenkinsUrl, Map<String, String> jenkinsJobsMappings) {
+    public JenkinsJobsConfig(String jenkinsJobsToUse, String[] jobsDisplayNames, Map<String, String> presetParameters, String jenkinsUrl, Map<String, String> jenkinsJobsMappings) {
         this.presetParameters = presetParameters;
+        this.jobsDisplayNames = jobsDisplayNames;
         this.jenkinsUrl = jenkinsUrl;
         this.jenkinsJobsMappings = jenkinsJobsMappings;
         parseJobsText(jenkinsJobsToUse);
@@ -80,10 +80,9 @@ public class JenkinsJobsConfig {
         } else {
             job.jobDisplayName = "Build";
         }
-        if (presetParameters.containsKey(JOB_DISPLAY_NAME_PARAM)) {
-            String[] jobNames = presetParameters.get(JOB_DISPLAY_NAME_PARAM).split(",");
-            if (jobNames.length > jobCounter) {
-                job.jobDisplayName = jobNames[jobCounter];
+        if (jobsDisplayNames != null) {
+            if (jobsDisplayNames.length > jobCounter) {
+                job.jobDisplayName = jobsDisplayNames[jobCounter];
             }
         }
         if (jobInfo.contains("&")) {

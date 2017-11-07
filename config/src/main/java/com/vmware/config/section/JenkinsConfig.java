@@ -29,6 +29,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the names and parameters for the jenkins jobs to invoke. Separate jobs by commas and parameters by ampersands")
     public String jenkinsJobsToUse;
 
+    @ConfigurableProperty(commandLine = "--job-display-names", help = "Display names to use for the jobs invoked")
+    public String[] jobsDisplayNames;
+
     @ConfigurableProperty(commandLine = "--disable-jenkins-login", help = "Skips trying to log into jenkins if the server is not using user login module")
     public boolean disableJenkinsLogin;
 
@@ -43,7 +46,7 @@ public class JenkinsConfig {
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
 
-        return new JenkinsJobsConfig(jenkinsJobsToUse, presetParams, jenkinsUrl, jobMappings);
+        return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, presetParams, jenkinsUrl, jobMappings);
     }
 
 }

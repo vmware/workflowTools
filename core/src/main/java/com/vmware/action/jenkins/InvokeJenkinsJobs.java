@@ -18,6 +18,7 @@ import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -42,6 +43,9 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     public void process() {
         askForJenkinsJobKeysIfBlank();
 
+        if (jenkinsConfig.jobsDisplayNames != null) {
+            log.debug("Using job display names {}", Arrays.toString(jenkinsConfig.jobsDisplayNames));
+        }
         int counter = 0;
         JenkinsJobsConfig jenkinsJobsConfig = config.getJenkinsJobsConfig();
         for (Job job : jenkinsJobsConfig.jobs()) {
