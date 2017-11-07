@@ -41,7 +41,8 @@
     "--jenkins-jobs",
     "--wait-time",
     "--wait-for-jenkins",
-    "--ignore-jenkins-job-failure"
+    "--ignore-jenkins-job-failure",
+    "--job-display-names"
   ],
   "BaseTransitionJiraIssue": [
     "--username",

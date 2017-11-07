@@ -83,16 +83,14 @@ public class WorkflowValuesParser {
         if (StringUtils.isBlank(jenkinsJobsToCall)) {
             jenkinsJobsToCall = configValues.get("--jenkins-jobs");
         }
-        String displayNameParameter = "--J" + JenkinsJobsConfig.JOB_DISPLAY_NAME_PARAM;
         if (StringUtils.isBlank(jenkinsJobsToCall)) {
-            return Collections.singleton(displayNameParameter);
+            return Collections.emptyList();
         }
         String[] jenkinsJobPieces = jenkinsJobsToCall.split("&");
         if (jenkinsJobPieces.length < 2) {
             return Collections.emptyList();
         }
         Set<String> jenkinsParameterConfigValues = new HashSet<>();
-        jenkinsParameterConfigValues.add(displayNameParameter);
         for (int i = 1; i < jenkinsJobPieces.length; i++) {
             String jenkinsParameter = jenkinsJobPieces[i];
             String[] jenkinsParameterPieces = jenkinsParameter.split("=");
