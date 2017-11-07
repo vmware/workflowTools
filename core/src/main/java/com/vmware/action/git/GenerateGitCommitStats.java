@@ -10,7 +10,6 @@ import com.vmware.util.logging.Padder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +18,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.vmware.util.StringUtils.pluralize;
 
 @ActionDescription(value = "Generates stats for git commits.", ignoreConfigValuesInSuperclass = true)
 public class GenerateGitCommitStats extends BaseAction {
@@ -42,8 +43,8 @@ public class GenerateGitCommitStats extends BaseAction {
     @Override
     public void process() {
         Date oldestDateToCheckAgainst = new Date(new Date().getTime() - TimeUnit.DAYS.toMillis(statsConfig.lastNumberOfDaysForStats));
-        log.info("Computing stats against all git commits newer than {} ({} days ago)",
-                oldestDateToCheckAgainst.toString(), statsConfig.lastNumberOfDaysForStats);
+        log.info("Computing stats against all git commits newer than {} ({} ago)",
+                oldestDateToCheckAgainst.toString(), pluralize(statsConfig.lastNumberOfDaysForStats, "day"));
 
         TitledHashMap<String, Integer> totalCounts = new TitledHashMap<>("total");
         List<TitledHashMap<String, Integer>> countRanges = new ArrayList<>();
@@ -100,14 +101,14 @@ public class GenerateGitCommitStats extends BaseAction {
             if (StringUtils.isBlank(draft.testingDone) || draft.testingDone.length() < 40) {
                 incrementCount(authorEmail, shortTestingDoneCounts);
             }
-            if ("all".equalsIgnoreCase(statsConfig.authorsForCommits) || draft.matchesAuthor(statsConfig.authorsForCommits)) {
+            if ("all".equalsIgnoreCase(statsConfig.authorEmailsForCommits) || draft.matchesAuthor(statsConfig.authorEmailsForCommits)) {
                 if (!commitSummariesForAuthor.containsKey(draft.authorEmail)) {
                     commitSummariesForAuthor.put(draft.authorEmail, new ArrayList<>());
                 }
                 commitSummariesForAuthor.get(draft.authorEmail).add(draft.summaryInfo(statsConfig.maxSummaryLength));
             }
         }
-        log.info("Successfully parsed {} commits", numberOfCommitsChecked);
+        log.debug("Successfully parsed {} commits", numberOfCommitsChecked);
 
         countRanges.add(0, totalCounts);
         printResults(countRanges, "Total counts");
@@ -116,6 +117,9 @@ public class GenerateGitCommitStats extends BaseAction {
 
         if (!commitSummariesForAuthor.isEmpty()) {
             printCommitSummaries(commitSummariesForAuthor);
+        }
+        if (!"all".equals(statsConfig.authorEmailsForCommits)) {
+            log.info("Use --author-emails=all to show individual commit summaries for all users");
         }
     }
 
