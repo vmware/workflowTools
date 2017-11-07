@@ -19,6 +19,6 @@ public class CommitStatsConfig {
     @ConfigurableProperty(commandLine = "-ms,--max-summary", help = "Sets max line length for the one line summary")
     public int maxSummaryLength;
 
-    @ConfigurableProperty(commandLine = "--authors", help = "Show commits for specified authors, should be comman separated")
-    public String authorsForCommits;
+    @ConfigurableProperty(commandLine = "--author-emails", help = "Show commits for specified author emails, should be comma separated. Use all for all authors")
+    public String authorEmailsForCommits;
 }

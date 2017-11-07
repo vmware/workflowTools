@@ -115,7 +115,7 @@
   ],
   "GenerateGitCommitStats": [
     "--max-summary",
-    "--authors",
+    "--author-emails",
     "--last-number-of-days",
     "--line-count-ranges",
     "--file-count-ranges"
