@@ -166,6 +166,7 @@
   ],
   "BaseCommitAction": [
     "--username",
+    "--perforce-client",
     "--changelist-id"
   ],
   "SetDefaultApprover": [
@@ -304,10 +305,6 @@
   ],
   "RebaseAgainstMaster": [
     "--git-remote"
-  ],
-  "BaseAction": [
-    "--username",
-    "--perforce-client"
   ],
   "PushToMaster": [
     "--git-remote"

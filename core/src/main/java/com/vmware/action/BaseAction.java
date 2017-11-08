@@ -16,10 +16,7 @@ import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
 import com.vmware.util.scm.Git;
-import com.vmware.util.scm.NoPerforceClientForDirectoryException;
-import com.vmware.util.scm.Perforce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,32 +79,6 @@ public abstract class BaseAction {
             String cannotBeRunReason = this.cannotRunAction();
             if (StringUtils.isNotBlank(cannotBeRunReason)) {
                 return cannotBeRunReason;
-            }
-        }
-        return null;
-    }
-
-    protected Perforce getLoggedInPerforceClient() {
-        String reasonForFailing = perforceClientCannotBeUsed();
-        if (StringUtils.isNotBlank(reasonForFailing)) {
-            throw new FatalException("Exiting as " + reasonForFailing);
-        }
-        return serviceLocator.getPerforce();
-    }
-
-    protected String perforceClientCannotBeUsed() {
-        if (!CommandLineUtils.isCommandAvailable("p4")) {
-            return "p4 command is not available";
-        }
-        Perforce perforce = serviceLocator.getPerforce();
-        if (!perforce.isLoggedIn()) {
-            return "perforce user is not logged in";
-        }
-        if (StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
-            try {
-                perforceClientConfig.perforceClientName = perforce.getClientName();
-            } catch (NoPerforceClientForDirectoryException npc) {
-                return npc.getMessage();
             }
         }
         return null;

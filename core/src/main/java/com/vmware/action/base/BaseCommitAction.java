@@ -8,8 +8,12 @@ package com.vmware.action.base;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.NoPerforceClientForDirectoryException;
+import com.vmware.util.scm.Perforce;
 
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +87,32 @@ public abstract class BaseCommitAction extends BaseAction {
 
     protected String updatedCommitText(boolean includeJobResultsInCommit) {
         return draft.toText(commitConfig, includeJobResultsInCommit).trim();
+    }
+
+    protected Perforce getLoggedInPerforceClient() {
+        String reasonForFailing = perforceClientCannotBeUsed();
+        if (StringUtils.isNotBlank(reasonForFailing)) {
+            throw new FatalException("Exiting as " + reasonForFailing);
+        }
+        return serviceLocator.getPerforce();
+    }
+
+    protected String perforceClientCannotBeUsed() {
+        if (!CommandLineUtils.isCommandAvailable("p4")) {
+            return "p4 command is not available";
+        }
+        Perforce perforce = serviceLocator.getPerforce();
+        if (!perforce.isLoggedIn()) {
+            return "perforce user is not logged in";
+        }
+        if (StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
+            try {
+                perforceClientConfig.perforceClientName = perforce.getClientName();
+            } catch (NoPerforceClientForDirectoryException npc) {
+                return npc.getMessage();
+            }
+        }
+        return null;
     }
 
     private String readPendingChangelistText() {

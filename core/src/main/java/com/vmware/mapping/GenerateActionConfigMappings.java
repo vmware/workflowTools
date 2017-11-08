@@ -208,15 +208,13 @@ public class GenerateActionConfigMappings {
         List<String> currentArguments = null;
         for (String line : lines) {
             String matchedMethodName = MatcherUtils.singleMatch(line, "public \\w+ (\\w+)\\(");
-            if (currentMethodName == null && matchedMethodName == null) {
-                continue;
-            } else if (matchedMethodName != null) {
+            if (matchedMethodName != null) {
                 if (currentMethodName != null) {
                     locatorMethodArguments.put(currentMethodName, currentArguments);
                 }
                 currentMethodName = matchedMethodName;
                 currentArguments = new ArrayList<>();
-            } else {
+            } else if (currentMethodName != null) {
                 Matcher configValueMatcher = configValuePattern.matcher(line);
                 while (configValueMatcher.find()) {
                     currentArguments.add(configValueMatcher.group(1));
