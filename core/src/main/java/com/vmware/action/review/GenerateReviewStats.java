@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.vmware.util.StringUtils.pluralize;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 
@@ -115,12 +116,12 @@ public class GenerateReviewStats extends BaseReviewBoardAction {
         }
 
         long timeInHours = HOURS.convert((long) value, TimeUnit.MINUTES);
-        if (timeInHours >= 24) {
+        if (timeInHours >= DAYS.toHours(1)) {
             long timeInDays = DAYS.convert((long) value, TimeUnit.MINUTES);
             long fullDaysInHours = HOURS.convert(timeInDays, DAYS);
-            return timeInDays + " days, " + (timeInHours - fullDaysInHours) + " hours";
+            return pluralize(timeInDays, "day") + ", " + pluralize((timeInHours - fullDaysInHours), "hour");
         }
-        return timeInHours + " hours";
+        return pluralize(timeInHours, "hour");
     }
 
     private List<ReviewRequest> filterReviewRequestsByMaxFileCount(ReviewRequest[] reviewRequests,
@@ -203,7 +204,7 @@ public class GenerateReviewStats extends BaseReviewBoardAction {
             ReviewRequestDiff[] diffs = reviewBoard.getDiffsForReviewRequest(reviewRequest.getDiffsLink());
             reviewRequest.diffs = diffs;
             reviewRequest.fileCount = reviewBoard.getFilesCountForReviewRequestDiff(diffs[diffs.length -1].getFilesLink());
-            reviewRequest.stats.put(ReviewStatType.diffCount, Long.valueOf(reviewRequest.diffs.length));
+            reviewRequest.stats.put(ReviewStatType.diffCount, (long) reviewRequest.diffs.length);
         }
     }
 

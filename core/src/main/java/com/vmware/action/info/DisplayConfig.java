@@ -32,7 +32,7 @@ public class DisplayConfig extends BaseAction {
         }
         boolean printingFirstValue = false;
         Set<String> alreadyProcessedProperties = new HashSet<>();
-        for (int i = 0; i < config.configurableFields.size(); i ++) {
+        for (int i = 0; i < config.configurableFields.size(); i++) {
             Field configField = config.configurableFields.get(i);
             if (!showValueForProperty(specifiedPropertiesToDisplay, configField.getName(), alreadyProcessedProperties)) {
                 continue;

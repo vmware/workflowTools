@@ -1,7 +1,5 @@
 package com.vmware.config.jenkins;
 
-import com.vmware.config.jenkins.Job;
-import com.vmware.config.jenkins.JobParameter;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;

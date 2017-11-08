@@ -1,23 +1,22 @@
 package com.vmware.config;
 
 import com.google.gson.annotations.Expose;
-import com.vmware.config.section.BuildwebConfig;
-import com.vmware.config.section.LoggingConfig;
-import com.vmware.config.section.PatchConfig;
-import com.vmware.config.section.PerforceClientConfig;
-import com.vmware.config.section.SectionConfig;
+import com.vmware.config.commandLine.CommandLineArgumentsParser;
+import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.section.BugzillaConfig;
+import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.CheckstyleConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
 import com.vmware.config.section.JenkinsConfig;
-import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.section.JiraConfig;
+import com.vmware.config.section.LoggingConfig;
+import com.vmware.config.section.PatchConfig;
+import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
+import com.vmware.config.section.SectionConfig;
 import com.vmware.config.section.TrelloConfig;
-import com.vmware.config.commandLine.CommandLineArgumentsParser;
-import com.vmware.util.ArrayUtils;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
@@ -36,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Workflow configuration.
@@ -275,7 +275,9 @@ public class WorkflowConfig {
                 continue;
             }
 
-            if (ArrayUtils.contains(property.commandLine().split(","), commandLineProperty)) {
+            List<String> params = Arrays.stream(property.commandLine().split(","))
+                    .map(String::trim).collect(Collectors.toList());
+            if (params.contains(commandLineProperty)) {
                 return field;
             }
         }
