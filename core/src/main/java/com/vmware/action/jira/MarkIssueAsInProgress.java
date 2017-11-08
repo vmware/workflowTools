@@ -1,13 +1,9 @@
 package com.vmware.action.jira;
 
-
 import com.vmware.action.base.BaseTransitionJiraIssue;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.IssueStatusDefinition;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
 import static com.vmware.jira.domain.IssueStatusDefinition.Open;
