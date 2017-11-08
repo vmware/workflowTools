@@ -15,8 +15,6 @@ public class UserReview extends BaseEntity {
 
     public Date timestamp;
 
-    public String body_bottom;
-
     public String getReviewUsername() {
         return getLink("user").getTitle();
     }

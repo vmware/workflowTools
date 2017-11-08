@@ -23,7 +23,8 @@ public class SoftSubmitReview extends BaseCommitUsingReviewBoardAction {
 
         UserReview softSubmitReview = reviewBoard.getSoftSubmitReview(reviewRequest);
         if (softSubmitReview != null) {
-            log.info("Review request already commented as submitted \n({})", softSubmitReview);
+            log.info("Review request already commented as submitted on {}\n[{}]", softSubmitReview.timestamp,
+                    softSubmitReview.body_top);
             return;
         }
 
