@@ -357,23 +357,24 @@
       "HardSubmitOldSoftSubmittedReviews",
       "HardSubmitOldShipItReviews"
     ],
-    "startJobs": [
+    "invokeJobsAfterPush": [
       "PushToPrecommitBranch",
-      "ReadLastCommit",
-      "InvokeJenkinsJobs",
-      "AmendCommit"
+      "invokeJobs"
     ],
     "restartJobs": [
       "PushToPrecommitBranch",
-      "restartJobsWithoutUpdate"
+      "invokeJobs"
     ],
-    "restartJobsWithoutUpdate": [
+    "invokeJobs": [
       "ReadLastCommit",
       "AbortJenkinsBuilds",
       "InvokeJenkinsJobs",
       "AmendCommit"
     ],
-    "stopJobs": [
+    "restartJobsWithoutUpdate": [
+      "invokeJobs"
+    ],
+    "abortJobs": [
       "ReadLastCommit",
       "AbortJenkinsBuilds",
       "AmendCommit"
