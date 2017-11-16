@@ -6,7 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Util methods for invoking reflection methods and wrapping the exceptions with runtime exceptions.
@@ -21,9 +23,12 @@ public class ReflectionUtils {
         }
     }
 
-    public static Object newInstance(Class clazz) {
+    public static Object newInstance(Class clazz, Object... constructorParameters) {
         try {
-            return clazz.getConstructor().newInstance();
+            List<Class> parameterClasses =
+                    Arrays.stream(constructorParameters).map(Object::getClass).collect(Collectors.toList());
+            Class[] parameterClassesArray = parameterClasses.toArray(new Class[parameterClasses.size()]);
+            return clazz.getConstructor(parameterClassesArray).newInstance(constructorParameters);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeReflectiveOperationException(e);
         }

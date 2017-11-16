@@ -14,6 +14,10 @@
     "--checkstyle-config-xml-path",
     "--checkstyle-jar-path"
   ],
+  "DisplayBuildOutputForBuildwebBuilds": [
+    "--include-in-progress",
+    "--log-line-count"
+  ],
   "LoadGitPatchFile": [
     "--diff-file"
   ],
@@ -112,6 +116,10 @@
   ],
   "LoadBugsForQuery": [
     "--bugzilla-query"
+  ],
+  "DisplayBuildOutputForJenkinsJobs": [
+    "--include-in-progress",
+    "--log-line-count"
   ],
   "GenerateGitCommitStats": [
     "--max-summary",
@@ -274,9 +282,6 @@
   "BaseReadMultiLine": [
     "--max-description"
   ],
-  "DisplayBuildOutputForJenkinsFailures": [
-    "--log-line-count"
-  ],
   "SetBugNumbers": [
     "--username",
     "--default-jira-project",
@@ -289,9 +294,6 @@
   ],
   "ApplyChangelistToSeparateGitBranch": [
     "--tracking-branch"
-  ],
-  "DisplayBuildOutputForBuildwebFailures": [
-    "--log-line-count"
   ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"

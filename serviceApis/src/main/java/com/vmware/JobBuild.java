@@ -5,6 +5,8 @@ import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 
+import java.util.Arrays;
+
 public class JobBuild {
     @Expose(serialize = false, deserialize = false)
     public String buildDisplayName;
@@ -35,12 +37,12 @@ public class JobBuild {
         return this.url != null && this.url.contains(url);
     }
 
-    public String id() {
-        return MatcherUtils.singleMatch(url, "http.+?/(\\d+)/*.*?");
+    public boolean matches(BuildResult... results) {
+        return Arrays.stream(results).anyMatch(result -> result == this.result);
     }
 
-    public boolean isFailure() {
-        return result == BuildResult.FAILURE || result == BuildResult.UNSTABLE;
+    public String id() {
+        return MatcherUtils.singleMatch(url, "http.+?/(\\d+)/*.*?");
     }
 
     public String getJenkinsInfoUrl() {
