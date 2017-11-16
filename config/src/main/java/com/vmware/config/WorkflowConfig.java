@@ -33,7 +33,7 @@ import java.util.TreeMap;
  */
 public class WorkflowConfig {
 
-    private static Logger log = LoggerFactory.getLogger(WorkflowConfig.class.getName());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Expose(serialize = false, deserialize = false)
     private Git git = new Git();
@@ -110,9 +110,7 @@ public class WorkflowConfig {
     @Expose(serialize = false, deserialize = false)
     private WorkflowFields configurableFields;
 
-    public WorkflowConfig() {}
-
-    public void generateConfigurableFieldList() {
+    public WorkflowConfig() {
         this.configurableFields = new WorkflowFields(this);
     }
 

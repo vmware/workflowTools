@@ -42,7 +42,6 @@ public class WorkflowConfigParser {
         globalLogger.addHandler(createHandler());
 
         WorkflowConfig internalConfig = readInternalConfig();
-        internalConfig.generateConfigurableFieldList();
 
         List<String> loadedConfigFiles = new ArrayList<String>();
 
