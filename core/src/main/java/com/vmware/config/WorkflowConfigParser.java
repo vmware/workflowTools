@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
@@ -57,23 +58,21 @@ public class WorkflowConfigParser {
 
         applySpecifiedConfigFiles(argsParser, internalConfig, loadedConfigFiles);
 
-        WorkflowFields fields = internalConfig.getConfigurableFields();
-        if (git.isGitInstalled()) {
-            internalConfig.applyGitConfigValues("");
-        }
+        WorkflowFields configurableFields = internalConfig.getConfigurableFields();
+        Map<String, String> gitConfigValues = git.configValues();
+        configurableFields.applyGitConfigValues("", gitConfigValues);
 
         if (git.isGitInstalled() && git.workingDirectoryIsInGitRepo()) {
             String trackingBranch = git.getTrackingBranch();
             String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
             if (StringUtils.isNotBlank(remoteName)) {
-                internalConfig.setDefaultGitRemoteFromTrackingRemote(remoteName); // determined from remote name
-            }
-            if (StringUtils.isNotBlank(remoteName)) {
+                configurableFields.setFieldValue("defaultGitRemote", remoteName, "tracking remote");
+
                 log.debug("Applying remote specific config values for git remote {}", remoteName);
-                internalConfig.applyGitConfigValues(remoteName);
+                configurableFields.applyGitConfigValues(remoteName, gitConfigValues);
                 String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
                 log.debug("Applying tracking branch specific config values for git tracking branch", trackingBranch);
-                internalConfig.applyGitConfigValues(trackingBranchConfigPrefix);
+                configurableFields.applyGitConfigValues(trackingBranchConfigPrefix, gitConfigValues);
             }
         }
 
@@ -84,9 +83,13 @@ public class WorkflowConfigParser {
         internalConfig.loadedConfigFiles = loadedConfigFiles.toString();
         log.debug("Loaded config files: {}", internalConfig.loadedConfigFiles);
 
-        internalConfig.parseUsernameFromGitEmailIfBlank();
-        internalConfig.parseUsernameFromPerforceIfBlank();
-        internalConfig.parseUsernameFromWhoamIIfBlank();
+        if (StringUtils.isBlank(internalConfig.username)) {
+            String[] parsedUsernameInfo = new UsernameParser(git).parse();
+            if (parsedUsernameInfo != null) {
+                internalConfig.username = parsedUsernameInfo[0];
+                configurableFields.markFieldAsOverridden("username", parsedUsernameInfo[1]);
+            }
+        }
 
         log.trace("Workflow Config\n{}", gson.toJson(internalConfig));
 
@@ -202,5 +205,4 @@ public class WorkflowConfigParser {
         handler.setLevel(Level.FINEST);
         return handler;
     }
-
 }

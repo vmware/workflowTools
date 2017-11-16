@@ -17,25 +17,15 @@ import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.config.section.TrelloConfig;
-import com.vmware.util.CommandLineUtils;
-import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.logging.LogLevel;
 import com.vmware.util.scm.Git;
-import com.vmware.util.scm.Perforce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * Workflow configuration.
@@ -148,45 +138,6 @@ public class WorkflowConfig {
         reviewBoardConfig.reviewBoardRepository = gitRemoteValue;
     }
 
-    public void setDefaultGitRemoteFromTrackingRemote(String remoteName) {
-        configurableFields.setFieldValue("defaultGitRemote", remoteName, "tracking remote");
-    }
-
-    public void parseUsernameFromGitEmailIfBlank() {
-        if (StringUtils.isNotBlank(username)) {
-            return;
-        }
-        String gitUserEmail = git.configValue("user.email");
-        if (StringUtils.isNotBlank(gitUserEmail) && gitUserEmail.contains("@")) {
-            this.username = gitUserEmail.substring(0, gitUserEmail.indexOf("@"));
-            log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
-            configurableFields.markFieldAsOverridden("username", "Git user.email");
-        }
-    }
-
-    public void parseUsernameFromPerforceIfBlank() {
-        if (StringUtils.isNotBlank(username)) {
-            return;
-        }
-        Perforce perforce = new Perforce(System.getProperty("user.dir"));
-        if (perforce.isLoggedIn()) {
-            this.username = perforce.getUsername();
-            log.info("No username set, using perforce user {} as username", username);
-            configurableFields.markFieldAsOverridden("username", "Perforce user");
-        }
-    }
-
-    public void parseUsernameFromWhoamIIfBlank() {
-        if (StringUtils.isNotBlank(username) || !CommandLineUtils.isCommandAvailable("whoami")) {
-            return;
-        }
-        String fullUsername = CommandLineUtils.executeCommand("whoami", LogLevel.DEBUG);
-        String[] usernamePieces = fullUsername.split("\\\\");
-        this.username = usernamePieces[usernamePieces.length - 1];
-        log.info("No username set, parsed username {} from whoami output {}", username, fullUsername);
-        configurableFields.markFieldAsOverridden("username", "Whoami command");
-    }
-
     public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
@@ -208,10 +159,6 @@ public class WorkflowConfig {
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {
         return jenkinsConfig.getJenkinsJobsConfig(this.username);
-    }
-
-    public void applyGitConfigValues(String configPrefix) {
-        configurableFields.applyGitConfigValues(configPrefix, git.configValues());
     }
 
     public WorkflowFields getConfigurableFields() {

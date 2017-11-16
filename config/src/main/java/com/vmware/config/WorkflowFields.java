@@ -90,13 +90,16 @@ public class WorkflowFields {
     }
 
     public void applyGitConfigValues(String configPrefix, Map<String, String> gitConfigValues) {
+        if (gitConfigValues.isEmpty()) {
+            return;
+        }
         String configPrefixText = StringUtils.isBlank(configPrefix) ? "" : configPrefix + ".";
         String sourceConfigProperty;
         for (WorkflowField field : configurableFields) {
             ConfigurableProperty configurableProperty = field.configAnnotation();
             String workflowConfigPropertyName = "workflow." + configPrefixText + field.getName().toLowerCase();
             String gitConfigPropertyName = configurableProperty.gitConfigProperty();
-            String valueToSet = null;
+            String valueToSet;
             if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(configPrefix)) {
                 String valueByGitConfig = gitConfigValues.get(gitConfigPropertyName);
                 String valueByWorkflowProperty = gitConfigValues.get(workflowConfigPropertyName);
