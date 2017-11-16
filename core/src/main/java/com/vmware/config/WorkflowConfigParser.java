@@ -86,13 +86,11 @@ public class WorkflowConfigParser {
         if (StringUtils.isBlank(internalConfig.username)) {
             String[] parsedUsernameInfo = new UsernameParser(git).parse();
             if (parsedUsernameInfo != null) {
-                internalConfig.username = parsedUsernameInfo[0];
-                configurableFields.markFieldAsOverridden("username", parsedUsernameInfo[1]);
+                internalConfig.setUsernameFromParsedValue(parsedUsernameInfo[0], parsedUsernameInfo[1]);
             }
         }
 
         log.trace("Workflow Config\n{}", gson.toJson(internalConfig));
-
         return internalConfig;
     }
 
