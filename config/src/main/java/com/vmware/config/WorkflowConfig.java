@@ -125,6 +125,14 @@ public class WorkflowConfig {
         argsParser.checkForUnrecognizedArguments(commandLineProperties);
     }
 
+    public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
+        if (configValues.isEmpty()) {
+            return Collections.emptyList();
+        }
+        jenkinsConfig.addJenkinsParametersFromConfigValues(configValues, overwriteJenkinsParameters);
+        return configurableFields.applyConfigValues(configValues, source);
+    }
+
     /**
      * Set separate to other git config values as it shouldn't override a specific workflow file configuration.
      */
@@ -138,23 +146,9 @@ public class WorkflowConfig {
         reviewBoardConfig.reviewBoardRepository = gitRemoteValue;
     }
 
-    public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
-        if (configValues.isEmpty()) {
-            return Collections.emptyList();
-        }
-        for (String configValue : configValues.keySet()) {
-            if (!configValue.startsWith("--J")) {
-                continue;
-            }
-            String parameterName = configValue.substring(3);
-            String parameterValue = configValues.get(configValue);
-            if (!overwriteJenkinsParameters && jenkinsConfig.jenkinsJobParameters.containsKey(parameterName)) {
-                log.debug("Ignoring config value {} as it is already set", configValue);
-                continue;
-            }
-            jenkinsConfig.jenkinsJobParameters.put(parameterName, parameterValue);
-        }
-        return configurableFields.applyConfigValues(configValues, source);
+    public void setUsernameFromParsedValue(String username, String source) {
+        this.username = username;
+        configurableFields.markFieldAsOverridden("username", source);
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {

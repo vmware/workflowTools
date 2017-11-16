@@ -3,6 +3,8 @@ package com.vmware.config.section;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.jenkins.JobParameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +12,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class JenkinsConfig {
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
     public String jenkinsUrl;
@@ -47,6 +51,20 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
     public boolean includeInProgressBuilds;
 
+    public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {
+        for (String configValue : configValues.keySet()) {
+            if (!configValue.startsWith("--J")) {
+                continue;
+            }
+            String parameterName = configValue.substring(3);
+            String parameterValue = configValues.get(configValue);
+            if (!overwriteJenkinsParameters && jenkinsJobParameters.containsKey(parameterName)) {
+                log.debug("Ignoring config value {} as it is already set", configValue);
+                continue;
+            }
+            jenkinsJobParameters.put(parameterName, parameterValue);
+        }
+    }
 
     public JenkinsJobsConfig getJenkinsJobsConfig(String username) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
