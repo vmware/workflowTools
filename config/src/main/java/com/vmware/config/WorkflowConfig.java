@@ -105,6 +105,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
     public int logLineCount;
 
+    @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
+    public boolean includeRunningBuilds;
+
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public String[] bugNumberSearchOrder;
 

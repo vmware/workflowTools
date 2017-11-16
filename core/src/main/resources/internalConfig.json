@@ -382,9 +382,9 @@
     "pushable": [
       "ReadLastCommit",
       "CheckStatusOfBuildwebBuilds",
-      "DisplayBuildOutputForBuildwebFailures",
+      "DisplayBuildOutputForBuildwebBuilds",
       "CheckStatusOfJenkinsBuilds",
-      "DisplayBuildOutputForJenkinsFailures",
+      "DisplayBuildOutputForJenkinsJobs",
       "CheckCommitForCheckstyleErrors",
       "CheckStatusOfReviewShipIts",
       "AmendCommit"

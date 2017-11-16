@@ -34,16 +34,16 @@ public class Buildweb extends AbstractRestBuildService {
         return connection.get(baseUrl + "sb/build/" + id, SandboxBuild.class);
     }
 
-    public void logOutputForFailedBuilds(ReviewRequestDraft draft, int linesToShow) {
+    public void logOutputForBuilds(ReviewRequestDraft draft, int linesToShow, BuildResult... results) {
         String urlToCheckFor = urlUsedInBuilds();
         log.debug("Displaying output for failed builds matching url {}", urlToCheckFor);
         List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
-        jobsToCheck.stream().filter(jobBuild -> jobBuild.result == BuildResult.FAILURE)
+        jobsToCheck.stream().filter(jobBuild -> jobBuild.matches(results))
                 .forEach(jobBuild -> {
-                    Padder buildPadder = new Padder("Buildweb build {} result", jobBuild.id());
-                    buildPadder.errorTitle();
+                    Padder buildPadder = new Padder("Buildweb build {} result {}", jobBuild.id(), jobBuild.result);
+                    buildPadder.infoTitle();
                     log.info(getBuildOutput(jobBuild.id(), linesToShow));
-                    buildPadder.errorTitle();
+                    buildPadder.infoTitle();
                 });
     }
 

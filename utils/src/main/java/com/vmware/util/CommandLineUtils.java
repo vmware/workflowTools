@@ -80,59 +80,61 @@ public class CommandLineUtils {
         if (environmentVariables != null) {
             builder.environment().putAll(environmentVariables);
         }
-        try {
-            Process statusProcess = builder.start();
-            if (inputText != null) {
-                IOUtils.write(statusProcess.getOutputStream(), inputText);
-            }
-            return statusProcess;
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
-    }
 
+        Process statusProcess = startProcess(builder);
+        if (inputText != null) {
+            IOUtils.write(statusProcess.getOutputStream(), inputText);
+        }
+        return statusProcess;
+    }
 
     public static String executeScript(String command, String[] inputs, String[] textsToWaitFor, LogLevel logLevel) {
         log.info("Executing script {}", command);
         ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).redirectErrorStream(true);
         String totalOutput = "";
-        try {
-            Process statusProcess = builder.start();
-            for (int i = 0; i < textsToWaitFor.length; i ++) {
-                long sleepTime = 0;
-                boolean matchedText = false;
-                while (sleepTime < TimeUnit.SECONDS.toMillis(30) && !matchedText) {
-                    String output = IOUtils.readWithoutClosing(statusProcess.getInputStream());
-                    if (StringUtils.isNotBlank(output)) {
-                        dynamicLogger.log(logLevel, output);
-                    }
-                    if (!totalOutput.isEmpty()) {
-                        totalOutput += "\n";
-                    }
-                    totalOutput += output;
-                    matchedText = output.trim().contains(textsToWaitFor[i]);
-                    if (matchedText && inputs.length > i) {
-                        dynamicLogger.log(logLevel, "Found {} in output, writing [{}]", textsToWaitFor[i], inputs[i]);
-                        totalOutput += inputs[i];
-                        IOUtils.writeWithoutClosing(statusProcess.getOutputStream(), inputs[i] + "\n");
-                        sleepTime = 0;
-                    } else if (matchedText) {
-                        dynamicLogger.log(logLevel, "Found {} in output", textsToWaitFor[i]);
-                        sleepTime = 0;
-                    } else {
-                        sleepTime += TimeUnit.SECONDS.toMillis(2);
-                        ThreadUtils.sleep(2, TimeUnit.SECONDS);
-                    }
-                }
-                if (!matchedText) {
-                    throw new FatalException("Failed to match {} in script output {}", textsToWaitFor[i], totalOutput);
-                }
 
+        Process statusProcess = startProcess(builder);
+
+        for (int i = 0; i < textsToWaitFor.length; i ++) {
+            long sleepTime = 0;
+            boolean matchedText = false;
+            long maxSleepTimeInMillis = TimeUnit.SECONDS.toMillis(30);
+            while (sleepTime < maxSleepTimeInMillis && !matchedText) {
+                String output = IOUtils.readWithoutClosing(statusProcess.getInputStream());
+                if (StringUtils.isNotBlank(output)) {
+                    dynamicLogger.log(logLevel, output);
+                }
+                totalOutput = StringUtils.appendWithDelimiter(totalOutput, output, "\n");
+                matchedText = output.trim().contains(textsToWaitFor[i]);
+                if (matchedText && inputs.length > i) {
+                    dynamicLogger.log(logLevel, "Found {} in output, writing [{}]", textsToWaitFor[i], inputs[i]);
+                    totalOutput += inputs[i];
+                    IOUtils.writeWithoutClosing(statusProcess.getOutputStream(), inputs[i] + "\n");
+                    sleepTime = 0;
+                } else if (matchedText) {
+                    dynamicLogger.log(logLevel, "Found {} in output", textsToWaitFor[i]);
+                    sleepTime = 0;
+                } else {
+                    sleepTime += ThreadUtils.sleep(2, TimeUnit.SECONDS);
+                }
             }
-            return totalOutput;
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
+            if (!matchedText) {
+                throw new FatalException("Failed to match {} in script output {}", textsToWaitFor[i], totalOutput);
+            }
+
         }
+        return totalOutput;
+
+    }
+
+    private static Process startProcess(ProcessBuilder builder) {
+        Process statusProcess;
+        try {
+            statusProcess = builder.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return statusProcess;
     }
 
     private static String[] splitCommand(String command) {
@@ -141,16 +143,18 @@ public class CommandLineUtils {
         boolean inQuote = false;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < command.length(); i++) {
-            char c = command.charAt(i);
-            if (c == '"' || c == ' ' && !inQuote) {
-                if (c == '"')
+            char character = command.charAt(i);
+            if (character == '"' || character == ' ' && !inQuote) {
+                if (character == '"') {
                     inQuote = !inQuote;
+                }
                 if (!inQuote && sb.length() > 0) {
                     strings.add(sb.toString());
                     sb.delete(0, sb.length());
                 }
-            } else
-                sb.append(c);
+            } else {
+                sb.append(character);
+            }
         }
         return strings.toArray(new String[strings.size()]);
     }

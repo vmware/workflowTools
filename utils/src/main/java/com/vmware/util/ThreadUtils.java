@@ -12,9 +12,11 @@ public class ThreadUtils {
 
     private static Logger log = LoggerFactory.getLogger(ThreadUtils.class);
 
-    public static void sleep(long amount, TimeUnit timeUnit) {
+    public static long sleep(long amount, TimeUnit timeUnit) {
         try {
-            Thread.sleep(timeUnit.toMillis(amount));
+            long sleepTime = timeUnit.toMillis(amount);
+            Thread.sleep(sleepTime);
+            return sleepTime;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -50,8 +50,8 @@ public class DateUtils {
         try {
             return dateFormat.parse(dateValue);
         } catch (ParseException e) {
-            LoggerFactory.getLogger(DateUtils.class).debug("Failed to parse "
-                    + dateValue + " from " + pattern + ": " + e.getMessage());
+            LoggerFactory.getLogger(DateUtils.class)
+                    .debug("Failed to parse {} from {}: {}", dateValue, pattern, e.getMessage());
             return null;
         }
     }

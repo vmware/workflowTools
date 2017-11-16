@@ -86,17 +86,17 @@ public class Jenkins extends AbstractRestBuildService {
         optimisticPost(jobBuildToStop.getJenkinsStopUrl(), null);
     }
 
-    public void logOutputForFailedBuilds(ReviewRequestDraft draft, int linesToShow) {
+    public void logOutputForBuildsMatchingResult(ReviewRequestDraft draft, int linesToShow, BuildResult... buildTypes) {
         String urlToCheckFor = urlUsedInBuilds();
         log.debug("Displaying output for failed builds matching url {}", urlToCheckFor);
         List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
-        jobsToCheck.stream().filter(JobBuild::isFailure)
+        jobsToCheck.stream().filter(build -> build.matches(buildTypes))
                 .forEach(jobBuild -> {
-                    Padder buildPadder = new Padder("Jenkins build {} result", jobBuild.id());
-                    buildPadder.errorTitle();
+                    Padder buildPadder = new Padder("Jenkins build {} result {}", jobBuild.id(), jobBuild.result);
+                    buildPadder.infoTitle();
                     String consoleOutupt = IOUtils.tail(jobBuild.getConsoleOutputUrl(), linesToShow);
                     log.info(consoleOutupt);
-                    buildPadder.errorTitle();
+                    buildPadder.infoTitle();
                 });
     }
 

@@ -90,6 +90,9 @@ public class FileUtils {
 
     private static void addDirectoryToList(List<File> files, File directory, FileFilter fileFilter) {
         File[] filesFound = directory.listFiles(fileFilter);
+        if (filesFound == null) {
+            return;
+        }
         for (File fileFound : filesFound) {
             if (fileFound.isDirectory()) {
                 addDirectoryToList(files, fileFound, fileFilter);

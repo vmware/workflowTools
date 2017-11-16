@@ -155,7 +155,6 @@ public class IOUtils {
                     logger.log(printLinesLevel, outputToWrite.trim());
                 }
             }
-
         } while (canRead(input, readUntilStreamClosed, lastReadCount));
         String output = writer.toString();
         if (output.endsWith("\n")) {
