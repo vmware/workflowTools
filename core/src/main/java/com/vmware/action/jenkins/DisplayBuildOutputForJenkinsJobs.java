@@ -17,18 +17,18 @@ public class DisplayBuildOutputForJenkinsJobs extends BaseCommitWithJenkinsBuild
 
     @Override
     public String cannotRunAction() {
-        if (config.logLineCount <= 0) {
-            return "line count to show (logLineCount) is " + config.logLineCount;
+        if (jenkinsConfig.logLineCount <= 0) {
+            return "line count to show (logLineCount) is " + jenkinsConfig.logLineCount;
         }
         return super.cannotRunAction();
     }
 
     @Override
     public void process() {
-        if (config.includeRunningBuilds) {
-            jenkins.logOutputForBuildsMatchingResult(draft, config.logLineCount, FAILURE, UNSTABLE, BUILDING);
+        if (jenkinsConfig.includeInProgressBuilds) {
+            jenkins.logOutputForBuildsMatchingResult(draft, jenkinsConfig.logLineCount, FAILURE, UNSTABLE, BUILDING);
         } else {
-            jenkins.logOutputForBuildsMatchingResult(draft, config.logLineCount, FAILURE, UNSTABLE);
+            jenkins.logOutputForBuildsMatchingResult(draft, jenkinsConfig.logLineCount, FAILURE, UNSTABLE);
         }
     }
 }

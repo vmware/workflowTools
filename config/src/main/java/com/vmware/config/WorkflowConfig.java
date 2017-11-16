@@ -49,12 +49,6 @@ public class WorkflowConfig {
     private Git git = new Git();
 
     @Expose(serialize = false, deserialize = false)
-    private Map<String, String> overriddenConfigSources = new TreeMap<>();
-
-    @Expose(serialize = false, deserialize = false)
-    public List<Field> configurableFields = new ArrayList<>();
-
-    @Expose(serialize = false, deserialize = false)
     public String loadedConfigFiles;
 
     @SectionConfig
@@ -102,14 +96,8 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira and review board")
     public String username;
 
-    @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
-    public int logLineCount;
-
-    @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
-    public boolean includeRunningBuilds;
-
     @ConfigurableProperty(help = "Order of services to check against for bug number")
-    public String[] bugNumberSearchOrder;
+    public List<String> bugNumberSearchOrder;
 
     @ConfigurableProperty(help = "A map of workflows that can be configured. A workflow comprises a list of workflow actions.")
     public TreeMap<String, List<String>> workflows;
@@ -129,32 +117,22 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time in seconds for blocking workflow action to complete.")
     public int waitTimeForBlockingWorkflowAction;
 
+    @Expose(serialize = false, deserialize = false)
+    private WorkflowFields configurableFields;
+
     public WorkflowConfig() {}
 
-    public void generateConfigurablePropertyList() {
-        Map<String, Field> usedParams = new HashMap<>();
-        addConfigurablePropertiesForClass(WorkflowConfig.class, usedParams);
-
-        Arrays.stream(WorkflowConfig.class.getFields()).filter(field -> field.getAnnotation(SectionConfig.class) != null)
-                .forEach(field -> addConfigurablePropertiesForClass(field.getType(), usedParams));
+    public void generateConfigurableFieldList() {
+        this.configurableFields = new WorkflowFields(this);
     }
 
     public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
         List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), "Command Line", true);
         if (argsParser.containsArgument("--possible-workflow")) {
-            overriddenConfigSources.put("workflowsToRun", "Command Line");
+            configurableFields.markFieldAsOverridden("workflowsToRun", "Command Line");
             this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
         }
         argsParser.checkForUnrecognizedArguments(commandLineProperties);
-    }
-
-    public int getSearchOrderForService(String serviceToCheckFor) {
-        for (int i = 0; i < bugNumberSearchOrder.length; i ++) {
-            if (bugNumberSearchOrder[i].equalsIgnoreCase(serviceToCheckFor)) {
-               return i;
-            }
-        }
-        return -1;
     }
 
     /**
@@ -171,69 +149,7 @@ public class WorkflowConfig {
     }
 
     public void setDefaultGitRemoteFromTrackingRemote(String remoteName) {
-        setFieldValue(ReflectionUtils.getField(GitRepoConfig.class, "defaultGitRemote"), remoteName, "tracking remote");
-    }
-
-    public void applyGitConfigValues(String configPrefix) {
-        String configPrefixText = StringUtils.isBlank(configPrefix) ? "" : configPrefix + ".";
-        Map<String, String> configValues = git.configValues();
-        String sourceConfigProperty;
-        for (Field field : configurableFields) {
-            ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
-            String workflowConfigPropertyName = "workflow." + configPrefixText + field.getName().toLowerCase();
-            String gitConfigPropertyName = configurableProperty.gitConfigProperty();
-            String valueToSet = null;
-            if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(configPrefix)) {
-                String valueByGitConfig = configValues.get(gitConfigPropertyName);
-                String valueByWorkflowProperty = configValues.get(workflowConfigPropertyName);
-                if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByWorkflowProperty)) {
-                    throw new FatalException("Property {} has value {} specified by the git config property {}" +
-                            " but has value {} specified by the workflow property {}, please remove one of the properties",
-                            field.getName(), valueByGitConfig, gitConfigPropertyName, valueByWorkflowProperty,
-                            workflowConfigPropertyName);
-                }
-                sourceConfigProperty = valueByGitConfig != null ? gitConfigPropertyName : workflowConfigPropertyName;
-                valueToSet = valueByGitConfig != null ? valueByGitConfig : valueByWorkflowProperty;
-            } else {
-                sourceConfigProperty = workflowConfigPropertyName;
-                valueToSet = configValues.get(workflowConfigPropertyName);
-            }
-
-            setFieldValue(field, valueToSet, "Git " + sourceConfigProperty);
-        }
-    }
-
-    public void overrideValues(WorkflowConfig overriddenConfig, String configFileName) {
-        for (Field field : configurableFields) {
-            Object existingValue = ReflectionUtils.getValue(field, this);
-            Object value = ReflectionUtils.getValue(field, overriddenConfig);
-            if (value == null || String.valueOf(value).equals("0") || (value instanceof Boolean && !((Boolean) value))) {
-                continue;
-            }
-            // copy values to default config map if value is a map
-            if (existingValue != null && value instanceof Map) {
-                Map valueMap = (Map) value;
-                if (valueMap.isEmpty()) {
-                    continue;
-                }
-                Map existingValues = (Map) existingValue;
-                String existingConfigValue = overriddenConfigSources.get(field.getName());
-                String updatedConfigValue;
-                if (existingConfigValue == null && !existingValues.isEmpty()) {
-                    updatedConfigValue = "default, " + configFileName;
-                } else if (existingConfigValue == null) {
-                    updatedConfigValue = configFileName;
-                } else {
-                    updatedConfigValue = existingConfigValue + ", " + configFileName;
-                }
-                overriddenConfigSources.put(field.getName(), updatedConfigValue);
-                existingValues.putAll(valueMap);
-            } else {
-                overriddenConfigSources.put(field.getName(), configFileName);
-                // override for everything else
-                ReflectionUtils.setValue(field, this, value);
-            }
-        }
+        configurableFields.setFieldValue("defaultGitRemote", remoteName, "tracking remote");
     }
 
     public void parseUsernameFromGitEmailIfBlank() {
@@ -244,7 +160,7 @@ public class WorkflowConfig {
         if (StringUtils.isNotBlank(gitUserEmail) && gitUserEmail.contains("@")) {
             this.username = gitUserEmail.substring(0, gitUserEmail.indexOf("@"));
             log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
-            overriddenConfigSources.put("username", "Git user.email");
+            configurableFields.markFieldAsOverridden("username", "Git user.email");
         }
     }
 
@@ -256,40 +172,19 @@ public class WorkflowConfig {
         if (perforce.isLoggedIn()) {
             this.username = perforce.getUsername();
             log.info("No username set, using perforce user {} as username", username);
-            overriddenConfigSources.put("username", "Perforce user");
+            configurableFields.markFieldAsOverridden("username", "Perforce user");
         }
     }
 
     public void parseUsernameFromWhoamIIfBlank() {
-        if (StringUtils.isNotBlank(username)) {
+        if (StringUtils.isNotBlank(username) || !CommandLineUtils.isCommandAvailable("whoami")) {
             return;
         }
         String fullUsername = CommandLineUtils.executeCommand("whoami", LogLevel.DEBUG);
         String[] usernamePieces = fullUsername.split("\\\\");
         this.username = usernamePieces[usernamePieces.length - 1];
         log.info("No username set, parsed username {} from whoami output {}", username, fullUsername);
-        overriddenConfigSources.put("username", "Whoami command");
-    }
-
-    public Field getMatchingField(String commandLineProperty) {
-        for (Field field : configurableFields) {
-            ConfigurableProperty property = field.getAnnotation(ConfigurableProperty.class);
-            if (property.commandLine().equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
-                continue;
-            }
-
-            List<String> params = Arrays.stream(property.commandLine().split(","))
-                    .map(String::trim).collect(Collectors.toList());
-            if (params.contains(commandLineProperty)) {
-                return field;
-            }
-        }
-        return null;
-    }
-
-    public String getFieldValueSource(String fieldName) {
-        String value = overriddenConfigSources.get(fieldName);
-        return value != null ? value : "default";
+        configurableFields.markFieldAsOverridden("username", "Whoami command");
     }
 
     public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
@@ -308,60 +203,18 @@ public class WorkflowConfig {
             }
             jenkinsConfig.jenkinsJobParameters.put(parameterName, parameterValue);
         }
-        List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
-        for (Field field : configurableFields) {
-            ConfigurableProperty configurableProperty = field.getAnnotation(ConfigurableProperty.class);
-            if (configurableProperty.commandLine().equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
-                continue;
-            }
-            for (String configValue : configValues.keySet()) {
-                List<String> commandLineArguments = StringUtils.splitAndTrim(configurableProperty.commandLine(), ",");
-                if (commandLineArguments.contains(configValue)) {
-                    propertiesAffected.add(configurableProperty);
-                    String value = configValues.get(configValue);
-                    if (value == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
-                        value = Boolean.TRUE.toString();
-                    }
-                    setFieldValue(field, value, source);
-                }
-            }
-        }
-        return propertiesAffected;
+        return configurableFields.applyConfigValues(configValues, source);
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {
         return jenkinsConfig.getJenkinsJobsConfig(this.username);
     }
 
-    private void addConfigurablePropertiesForClass(Class classToCheck, Map<String, Field> usedParams) {
-        for (Field field : classToCheck.getFields()) {
-            ConfigurableProperty configProperty = field.getAnnotation(ConfigurableProperty.class);
-            if (configProperty == null) {
-                continue;
-            }
-            String[] params = configProperty.commandLine().split(",");
-            for (String param : params) {
-                if (param.equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
-                    continue;
-                }
-                boolean fieldNameAlreadyUsed = configurableFields.stream()
-                        .anyMatch(existingField -> existingField.getName().equals(field.getName()));
-                if (!fieldNameAlreadyUsed && usedParams.containsKey(param)) {
-                    throw new FatalException(
-                            "Config flag {} has already been set to configure another property {}", param,
-                            usedParams.get(param).getName());
-                }
-                usedParams.put(param, field);
-            }
-            configurableFields.add(field);
-        }
+    public void applyGitConfigValues(String configPrefix) {
+        configurableFields.applyGitConfigValues(configPrefix, git.configValues());
     }
 
-    private void setFieldValue(Field field, String value, String source) {
-        Object validValue = new WorkflowField(field).determineValue(value);
-        if (validValue != null) {
-            overriddenConfigSources.put(field.getName(), source);
-            ReflectionUtils.setValue(field, this, validValue);
-        }
+    public WorkflowFields getConfigurableFields() {
+        return configurableFields;
     }
 }

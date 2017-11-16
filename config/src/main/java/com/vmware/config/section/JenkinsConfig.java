@@ -41,6 +41,13 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. --JVAPP_NAME=test --JUSERNAME=dbiggs")
     public Map<String, String> jenkinsJobParameters = new TreeMap<>();
 
+    @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
+    public int logLineCount;
+
+    @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
+    public boolean includeInProgressBuilds;
+
+
     public JenkinsJobsConfig getJenkinsJobsConfig(String username) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);

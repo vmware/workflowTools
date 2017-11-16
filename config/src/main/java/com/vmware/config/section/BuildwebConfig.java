@@ -27,4 +27,11 @@ public class BuildwebConfig {
 
     @ConfigurableProperty(commandLine = "-syncToBranchLatest,--sync-to-branch-latest", help = "By default, files to be synced to the latest in perforce, this flag syncs them to the latest changelist known to the git branch")
     public boolean syncChangelistToLatestInBranch;
+
+    @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
+    public int logLineCount;
+
+    @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
+    public boolean includeInProgressBuilds;
+
 }

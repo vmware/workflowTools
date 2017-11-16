@@ -163,7 +163,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         // test that bug number is a valid jira issue or bugzilla bug
         IssueInfo issueInfo = Issue.aNotFoundIssue(bugNumber);
         Integer bugzillaBugNumber = bugzillaConfig.parseBugzillaBugNumber(bugNumber);
-        if (config.getSearchOrderForService("Bugzilla") == 0) {
+        if (config.bugNumberSearchOrder.indexOf("Bugzilla") == 0) {
             if (bugzilla != null && bugzillaBugNumber != null) {
                 issueInfo = bugzilla.getBugByIdWithoutException(bugzillaBugNumber);
             }

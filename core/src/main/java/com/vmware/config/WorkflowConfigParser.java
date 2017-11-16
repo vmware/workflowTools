@@ -41,7 +41,7 @@ public class WorkflowConfigParser {
         globalLogger.addHandler(createHandler());
 
         WorkflowConfig internalConfig = readInternalConfig();
-        internalConfig.generateConfigurablePropertyList();
+        internalConfig.generateConfigurableFieldList();
 
         List<String> loadedConfigFiles = new ArrayList<String>();
 
@@ -57,6 +57,7 @@ public class WorkflowConfigParser {
 
         applySpecifiedConfigFiles(argsParser, internalConfig, loadedConfigFiles);
 
+        WorkflowFields fields = internalConfig.getConfigurableFields();
         if (git.isGitInstalled()) {
             internalConfig.applyGitConfigValues("");
         }
@@ -130,11 +131,12 @@ public class WorkflowConfigParser {
         }
         String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config");
         if (StringUtils.isNotBlank(configFilePaths)) {
+            WorkflowFields fields = internalConfig.getConfigurableFields();
             String[] configFiles = configFilePaths.split(",");
             for (String configFilePath : configFiles) {
                 File configFile = new File(configFilePath);
                 WorkflowConfig overriddenConfig = readExternalWorkflowConfig(configFile);
-                internalConfig.overrideValues(overriddenConfig, configFile.getPath());
+                fields.overrideValues(overriddenConfig, configFile.getPath());
                 loadedConfigFiles.add(configFile.getPath());
             }
         }
@@ -165,7 +167,7 @@ public class WorkflowConfigParser {
             return;
         }
         WorkflowConfig repoConfig = readExternalWorkflowConfig(repoWorkflowFile);
-        internalConfig.overrideValues(repoConfig, repoWorkflowFile.getPath());
+        internalConfig.getConfigurableFields().overrideValues(repoConfig, repoWorkflowFile.getPath());
         loadedConfigFiles.add(repoWorkflowFile.getPath());
     }
 

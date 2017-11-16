@@ -16,18 +16,18 @@ public class DisplayBuildOutputForBuildwebBuilds extends BaseCommitWithBuildwebB
 
     @Override
     public String cannotRunAction() {
-        if (config.logLineCount <= 0) {
-            return "line count to show (logLineCount) is " + config.logLineCount;
+        if (buildwebConfig.logLineCount <= 0) {
+            return "line count to show (logLineCount) is " + buildwebConfig.logLineCount;
         }
         return super.cannotRunAction();
     }
 
     @Override
     public void process() {
-        if (config.includeRunningBuilds) {
-            buildweb.logOutputForBuilds(draft, config.logLineCount, FAILURE, UNSTABLE, BUILDING);
+        if (buildwebConfig.includeInProgressBuilds) {
+            buildweb.logOutputForBuilds(draft, buildwebConfig.logLineCount, FAILURE, UNSTABLE, BUILDING);
         } else {
-            buildweb.logOutputForBuilds(draft, config.logLineCount, FAILURE, UNSTABLE);
+            buildweb.logOutputForBuilds(draft, buildwebConfig.logLineCount, FAILURE, UNSTABLE);
         }
     }
 }

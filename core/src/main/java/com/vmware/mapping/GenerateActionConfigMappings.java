@@ -3,6 +3,8 @@ package com.vmware.mapping;
 import com.google.gson.Gson;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.FileUtils;
@@ -81,14 +83,15 @@ public class GenerateActionConfigMappings {
         configValuePattern = createConfigValuesPattern();
 
         WorkflowConfig config = new WorkflowConfig();
-        config.generateConfigurablePropertyList();
+        config.generateConfigurableFieldList();
 
         Map<String, String[]> mappings = new HashMap<String, String[]>();
         populateLocatorMethodArguments();
+        WorkflowFields configurableFields = config.getConfigurableFields();
         for (File javaActionFile : javaActionFiles) {
             String className = FileUtils.stripExtension(javaActionFile);
             List<String> foundConfigValues = parseFileForConfigValues(javaActionFile);
-            List<String> commandLineOptions = convertToCommandLineValues(foundConfigValues, config.configurableFields);
+            List<String> commandLineOptions = convertToCommandLineValues(foundConfigValues, configurableFields.values());
             if (!commandLineOptions.isEmpty()) {
                 mappings.put(className, commandLineOptions.toArray(new String[commandLineOptions.size()]));
             }
@@ -97,7 +100,7 @@ public class GenerateActionConfigMappings {
         IOUtils.write(outputFile, jsonOutput);
     }
 
-    private List<String> convertToCommandLineValues(List<String> foundConfigValues, List<Field> configurableFields) {
+    private List<String> convertToCommandLineValues(List<String> foundConfigValues, List<WorkflowField> configurableFields) {
         List<String> commandLineOptions = new ArrayList<String>();
 
         for (int i = foundConfigValues.size() - 1; i >= 0; i--) {
@@ -110,10 +113,10 @@ public class GenerateActionConfigMappings {
         for (int i = foundConfigValues.size() -1; i >= 0; i --) {
             String foundConfigValue = foundConfigValues.get(i);
             boolean foundMatchingField = false;
-            for (Field configurableField : configurableFields) {
+            for (WorkflowField configurableField : configurableFields) {
                 if (configurableField.getName().equals(foundConfigValue)) {
                     foundMatchingField = true;
-                    ConfigurableProperty configurableProperty = configurableField.getAnnotation(ConfigurableProperty.class);
+                    ConfigurableProperty configurableProperty = configurableField.configAnnotation();
                     String commandLineText = configurableProperty.commandLine();
                     if (!commandLineText.equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
                         String[] commandLineArgs = commandLineText.split(",");
