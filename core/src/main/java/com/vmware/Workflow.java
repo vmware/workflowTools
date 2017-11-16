@@ -11,6 +11,8 @@ import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowActions;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowConfigParser;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
 import com.vmware.jira.domain.ProjectIssues;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
@@ -280,21 +282,22 @@ public class Workflow {
             log.info("Config values can also be set by executing git config [name in square brackets] [configValue]");
         }
 
+        WorkflowFields configurableFields = config.getConfigurableFields();
         for (String configOption : configOptions) {
-            Field matchingField = config.getMatchingField(configOption);
+            WorkflowField matchingField = configurableFields.getMatchingField(configOption);
             if (matchingField == null) {
                 log.info("{} - {}", configOption, "Unknown config option");
             } else {
-                ConfigurableProperty matchingProperty = matchingField.getAnnotation(ConfigurableProperty.class);
+                ConfigurableProperty matchingProperty = matchingField.configAnnotation();
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 String matchingValueText;
                 if (configOption.equals("--jenkins-jobs")) {
                     matchingValueText = config.getJenkinsJobsConfig().toString();
                 } else {
-                    Object matchingValue = ReflectionUtils.getValue(matchingField, config);
+                    Object matchingValue = matchingField.getValue(config);
                     matchingValueText = StringUtils.convertObjectToString(matchingValue);
                 }
-                String source = config.getFieldValueSource(matchingField.getName());
+                String source = configurableFields.getFieldValueSource(matchingField.getName());
                 String gitConfigValue = "";
                 if (git.isGitInstalled()) {
                     gitConfigValue = "[" + matchingField.getName() + "]";

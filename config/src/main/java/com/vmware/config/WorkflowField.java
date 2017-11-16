@@ -1,6 +1,8 @@
 package com.vmware.config;
 
 import com.vmware.config.jira.IssueTypeDefinition;
+import com.vmware.util.ReflectionUtils;
+import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +19,7 @@ public class WorkflowField {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Field field;
+    private Class<?> type;
 
     public WorkflowField(Field field) {
         this.field = field;
@@ -59,5 +62,29 @@ public class WorkflowField {
                     field.getName(), fieldType.getSimpleName());
         }
         return validValue;
+    }
+
+    public String getName() {
+        return field.getName();
+    }
+
+    public Object getValue(Object instance) {
+        return ReflectionUtils.getValue(field, instance);
+    }
+    
+    public void setValue(Object instance, Object value) {
+        ReflectionUtils.setValue(field, instance, value);
+    }
+    
+    public String getDisplayValue(Object instance) {
+        return StringUtils.convertObjectToString(getValue(instance));
+    }
+
+    public ConfigurableProperty configAnnotation() {
+        return field.getAnnotation(ConfigurableProperty.class);
+    }
+
+    public Class<?> getType() {
+        return field.getType();
     }
 }

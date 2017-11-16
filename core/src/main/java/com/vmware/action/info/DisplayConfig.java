@@ -3,6 +3,8 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
@@ -32,13 +34,14 @@ public class DisplayConfig extends BaseAction {
         }
         boolean printingFirstValue = false;
         Set<String> alreadyProcessedProperties = new HashSet<>();
-        for (int i = 0; i < config.configurableFields.size(); i++) {
-            Field configField = config.configurableFields.get(i);
+        WorkflowFields fields = config.getConfigurableFields();
+        for (int i = 0; i < fields.size(); i++) {
+            WorkflowField configField = fields.get(i);
             if (!showValueForProperty(specifiedPropertiesToDisplay, configField.getName(), alreadyProcessedProperties)) {
                 continue;
             }
-            String source = config.getFieldValueSource(configField.getName());
-            String displayValue = StringUtils.convertObjectToString(ReflectionUtils.getValue(configField, config));
+            String source = fields.getFieldValueSource(configField.getName());
+            String displayValue = configField.getDisplayValue(config);
             if (!printingFirstValue) {
                 printingFirstValue = true;
             } else {

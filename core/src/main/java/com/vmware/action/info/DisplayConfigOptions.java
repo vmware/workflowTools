@@ -5,6 +5,8 @@ import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.ReflectionUtils;
@@ -12,7 +14,6 @@ import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
 import java.io.Reader;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -43,9 +44,10 @@ public class DisplayConfigOptions extends BaseAction {
         Padder titlePadder = new Padder("Configuration Options");
         titlePadder.infoTitle();
         log.info("configFile, [-c,--config] Optional configuration file to use, file is in json format, Defaults to config file in jar");
-        for (Field field : config.configurableFields) {
-            ConfigurableProperty configProperty = field.getAnnotation(ConfigurableProperty.class);
-            Object defaultValue = ReflectionUtils.getValue(field, defaultConfig);
+        WorkflowFields configurableFields = config.getConfigurableFields();
+        for (WorkflowField field : configurableFields.values()) {
+            ConfigurableProperty configProperty = field.configAnnotation();
+            Object defaultValue = field.getValue(defaultConfig);
 
             String defaultDisplayValue;
             if (defaultValue == null) {
