@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestPerforce {
 
-    private Perforce perforce = new Perforce("dbiggs", "dbiggs-vcloud-sp-main", null);
+    private Perforce perforce = new Perforce("dbiggs-vcloud-sp-main", null);
 
     @Test
     public void canDetermineRootDirectory() {

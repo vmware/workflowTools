@@ -36,28 +36,25 @@ public class Perforce extends BaseScmWrapper {
     private static final Pattern whereDepotFileInfoPattern = Pattern.compile("(//.+?)\\s+");
 
     private String username;
+
     private String clientName;
 
     private boolean loggedIn;
 
     public Perforce(String clientDirectory) {
-        this(null, null, clientDirectory);
+        this(null, clientDirectory);
     }
 
-    public Perforce(String username, String clientName, String clientDirectory) {
+    public Perforce(String clientName, String clientDirectory) {
         super(ScmType.perforce);
         if (!CommandLineUtils.isCommandAvailable("p4")) {
             super.setWorkingDirectory(workingDirectory);
             return;
         }
-        this.username = username;
-        String perforceUser = checkIfLoggedIn();
-        this.loggedIn = perforceUser != null;
+        this.username = checkIfLoggedIn();
+        this.loggedIn = username != null;
         if (!loggedIn) {
             return;
-        }
-        if (StringUtils.isBlank(this.username)) {
-            this.username = perforceUser;
         }
         if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {
             this.clientName = clientName;
@@ -102,7 +99,9 @@ public class Perforce extends BaseScmWrapper {
                 while (changelistsIterator.hasNext() && StringUtils.isBlank(summary)) {
                     summary = changelistsIterator.next();
                 }
-                changelist += " " + summary.trim();
+                if (summary != null) {
+                    changelist += " " + summary.trim();
+                }
             }
             changeLists.add(changelist);
         }

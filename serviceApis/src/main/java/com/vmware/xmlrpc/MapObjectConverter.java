@@ -112,8 +112,8 @@ public class MapObjectConverter {
             ReflectionUtils.setValue(field, createdObject, fromMap((Map) valueToConvert, fieldType));
         } else {
             field.setAccessible(false);
-            throw new RuntimeReflectiveOperationException(format("Cannot set value of type %s for field of type %s",
-                    valueToConvert.getClass().getSimpleName(), fieldType.getSimpleName()));
+            throw new RuntimeReflectiveOperationException("Cannot set value of type {} for field of type {}",
+                    valueToConvert.getClass().getSimpleName(), fieldType.getSimpleName());
         }
         field.setAccessible(false);
     }

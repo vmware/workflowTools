@@ -11,6 +11,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.util.ReflectionUtils;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -87,7 +88,7 @@ public class WorkflowConfigMapper implements JsonDeserializer<WorkflowConfig>, J
                         JsonSerializer customSerializer = (JsonSerializer) field.getAnnotation(JsonAdapter.class).value().newInstance();
                         fieldJsonObject = customSerializer.serialize(fieldValue, field.getType(), jsonSerializationContext);
                     } catch (InstantiationException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeReflectiveOperationException(e);
                     }
                 } else {
                     fieldJsonObject = jsonSerializationContext.serialize(fieldValue);

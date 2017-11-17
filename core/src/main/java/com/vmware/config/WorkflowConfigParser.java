@@ -146,8 +146,7 @@ public class WorkflowConfigParser {
         File repoDirectory = git.getRootDirectory();
         if (repoDirectory == null) {
             PerforceClientConfig clientConfig = internalConfig.perforceClientConfig;
-            Perforce perforce = new Perforce(internalConfig.username,
-                    clientConfig.perforceClientName, clientConfig.perforceClientDirectory);
+            Perforce perforce = new Perforce(clientConfig.perforceClientName, clientConfig.perforceClientDirectory);
             repoDirectory = perforce.getWorkingDirectory();
         }
         if (repoDirectory != null) {
