@@ -135,7 +135,7 @@ public class WorkflowConfig {
      * Set separate to other git config values as it shouldn't override a specific workflow file configuration.
      */
     public void setGitRemoteUrlAsReviewBoardRepo() {
-        String gitRemoteValue = git.configValue("remote." + gitRepoConfig.defaultGitRemote + ".url");
+        String gitRemoteValue = git.configValue(String.format("remote.%s.url", gitRepoConfig.defaultGitRemote));
         if (StringUtils.isBlank(gitRemoteValue)) {
             return;
         }

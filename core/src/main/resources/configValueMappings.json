@@ -105,9 +105,6 @@
     "--username",
     "--review-board-date-format"
   ],
-  "BasePerforceCommitAction": [
-    "--username"
-  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
   ],
@@ -194,7 +191,6 @@
     "--jenkins-url"
   ],
   "BaseCommitCreateAction": [
-    "--username",
     "--perforce-client"
   ],
   "BaseCommitUsingReviewBoardAction": [
@@ -233,14 +229,10 @@
     "--default-jira-project",
     "--disable-bugzilla"
   ],
-  "UploadReviewDiffFromChangelist": [
-    "--username"
-  ],
   "BaseSetReviewersList": [
     "--always-include-review-url"
   ],
   "ApplyPatch": [
-    "--username",
     "--action-after-failed-patch-check",
     "--patch-command",
     "--use-patch-command"

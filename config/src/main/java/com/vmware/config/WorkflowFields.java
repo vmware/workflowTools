@@ -172,7 +172,13 @@ public class WorkflowFields {
         return configurableFields.get(index);
     }
 
+    private void populateConfigurableFields() {
+        Map<String, Field> usedParams = new HashMap<>();
+        addConfigurablePropertiesForClass(WorkflowConfig.class, usedParams);
 
+        Arrays.stream(WorkflowConfig.class.getFields()).filter(field -> field.getAnnotation(SectionConfig.class) != null)
+                .forEach(field -> addConfigurablePropertiesForClass(field.getType(), usedParams));
+    }
 
     private void addConfigurablePropertiesForClass(Class classToCheck, Map<String, Field> usedParams) {
         for (Field field : classToCheck.getFields()) {
@@ -197,13 +203,4 @@ public class WorkflowFields {
             configurableFields.add(new WorkflowField(field));
         }
     }
-
-    private void populateConfigurableFields() {
-        Map<String, Field> usedParams = new HashMap<>();
-        addConfigurablePropertiesForClass(WorkflowConfig.class, usedParams);
-
-        Arrays.stream(WorkflowConfig.class.getFields()).filter(field -> field.getAnnotation(SectionConfig.class) != null)
-                .forEach(field -> addConfigurablePropertiesForClass(field.getType(), usedParams));
-    }
-
 }

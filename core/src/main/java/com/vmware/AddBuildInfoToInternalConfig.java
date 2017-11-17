@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Date;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -53,6 +54,7 @@ public class AddBuildInfoToInternalConfig {
         WorkflowConfig workflowConfig = gson.fromJson(new FileReader(sourceConfigJsonFile), WorkflowConfig.class);
 
         workflowConfig.buildInfo = git.getLastCommitInfo();
+        workflowConfig.buildInfo.put("Creation Date", new Date().toString());
         log.info("Adding last commit info\n{}", workflowConfig.buildInfo);
         String jsonOutput = gson.toJson(workflowConfig);
         log.info("Saving to target config file {}", targetConfigJsonFilePath);
