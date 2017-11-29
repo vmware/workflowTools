@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -41,56 +40,65 @@ public class WorkflowConfigParser {
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());
 
-        WorkflowConfig internalConfig = readInternalConfig();
-
-        List<String> loadedConfigFiles = new ArrayList<String>();
+        WorkflowConfig config = readInternalConfig();
 
         // apply twice so that setting a debug log level can be detected earlier
-        applyRuntimeArguments(internalConfig);
-        setLogLevel(internalConfig);
+        applyRuntimeArguments(config);
+        setLogLevel(config);
 
-        internalConfig.setGitRemoteUrlAsReviewBoardRepo();
+        String gitRemoteValue = git.configValue(String.format("remote.%s.url", config.gitRepoConfig.defaultGitRemote));
+        config.setGitRemoteUrlAsReviewBoardRepo(gitRemoteValue);
 
-        applyRepoConfigFileIfExists(internalConfig, loadedConfigFiles);
+        applyRepoConfigFileIfExists(config);
+        applyUserConfigFileIfExists(config);
+        applySpecifiedConfigFiles(argsParser, config);
 
-        applyUserConfigFileIfExists(internalConfig, loadedConfigFiles);
+        applyGitConfigValuesAsWorkflowConfigValues(config);
 
-        applySpecifiedConfigFiles(argsParser, internalConfig, loadedConfigFiles);
+        applyRuntimeArguments(config);
+        setLogLevel(config);
 
-        WorkflowFields configurableFields = internalConfig.getConfigurableFields();
+        log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
+
+        parseUsernameIfBlank(config);
+
+        log.trace("Workflow Config\n{}", gson.toJson(config));
+        return config;
+    }
+
+    private void applyGitConfigValuesAsWorkflowConfigValues(WorkflowConfig config) {
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return;
+        }
+
+        WorkflowFields configurableFields = config.getConfigurableFields();
         Map<String, String> gitConfigValues = git.configValues();
         configurableFields.applyGitConfigValues("", gitConfigValues);
 
-        if (git.isGitInstalled() && git.workingDirectoryIsInGitRepo()) {
-            String trackingBranch = git.getTrackingBranch();
-            String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
-            if (StringUtils.isNotBlank(remoteName)) {
-                configurableFields.setFieldValue("defaultGitRemote", remoteName, "tracking remote");
+        String trackingBranch = git.getTrackingBranch();
+        String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
+        if (StringUtils.isNotBlank(remoteName)) {
+            configurableFields.setFieldValue("defaultGitRemote", remoteName, "tracking remote");
 
-                log.debug("Applying remote specific config values for git remote {}", remoteName);
-                configurableFields.applyGitConfigValues(remoteName, gitConfigValues);
-                String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
-                log.debug("Applying tracking branch specific config values for git tracking branch", trackingBranch);
-                configurableFields.applyGitConfigValues(trackingBranchConfigPrefix, gitConfigValues);
-            }
+            log.debug("Applying remote specific config values for git remote {}", remoteName);
+            configurableFields.applyGitConfigValues(remoteName, gitConfigValues);
+            String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
+            log.debug("Applying tracking branch specific config values for git tracking branch", trackingBranch);
+            configurableFields.applyGitConfigValues(trackingBranchConfigPrefix, gitConfigValues);
+        }
+    }
+
+    private void parseUsernameIfBlank(WorkflowConfig config) {
+        if (StringUtils.isNotBlank(config.username)) {
+            return;
         }
 
-        applyRuntimeArguments(internalConfig);
-
-        setLogLevel(internalConfig);
-
-        internalConfig.loadedConfigFiles = loadedConfigFiles.toString();
-        log.debug("Loaded config files: {}", internalConfig.loadedConfigFiles);
-
-        if (StringUtils.isBlank(internalConfig.username)) {
-            String[] parsedUsernameInfo = new UsernameParser(git).parse();
-            if (parsedUsernameInfo != null) {
-                internalConfig.setUsernameFromParsedValue(parsedUsernameInfo[0], parsedUsernameInfo[1]);
-            }
+        String[] parsedUsernameInfo = new UsernameParser().parse();
+        if (parsedUsernameInfo != null) {
+            config.setUsernameFromParsedValue(parsedUsernameInfo[0], parsedUsernameInfo[1]);
+        } else {
+            log.warn("Unable to determine username, some workflows might not work. Please use --username to set username");
         }
-
-        log.trace("Workflow Config\n{}", gson.toJson(internalConfig));
-        return internalConfig;
     }
 
     public void updateWithRuntimeArguments(WorkflowConfig config, String[] args) {
@@ -124,25 +132,26 @@ public class WorkflowConfigParser {
      * Applies values from configuration files explicitly specified either via the git workflow.configFile value or
      * via the command line.
      */
-    private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
+    private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig) {
         String gitConfigFilePath = git.configValue("workflow.configFile");
         if (StringUtils.isBlank(gitConfigFilePath)) {
             gitConfigFilePath = git.configValue("workflow.config"); // backwards compatibility
         }
-        String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config");
-        if (StringUtils.isNotBlank(configFilePaths)) {
-            WorkflowFields fields = internalConfig.getConfigurableFields();
-            String[] configFiles = configFilePaths.split(",");
-            for (String configFilePath : configFiles) {
-                File configFile = new File(configFilePath);
-                WorkflowConfig overriddenConfig = readExternalWorkflowConfig(configFile);
-                fields.overrideValues(overriddenConfig, configFile.getPath());
-                loadedConfigFiles.add(configFile.getPath());
-            }
+        String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config", "--config");
+        if (StringUtils.isBlank(configFilePaths)) {
+            return;
+        }
+
+        WorkflowFields fields = internalConfig.getConfigurableFields();
+        String[] configFiles = configFilePaths.split(",");
+        for (String configFilePath : configFiles) {
+            File configFile = new File(configFilePath);
+            WorkflowConfig overriddenConfig = readExternalWorkflowConfig(configFile);
+            fields.overrideValues(overriddenConfig, configFile.getPath());
         }
     }
 
-    private void applyRepoConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
+    private void applyRepoConfigFileIfExists(WorkflowConfig internalConfig) {
         File repoDirectory = git.getRootDirectory();
         if (repoDirectory == null) {
             PerforceClientConfig clientConfig = internalConfig.perforceClientConfig;
@@ -151,23 +160,22 @@ public class WorkflowConfigParser {
         }
         if (repoDirectory != null) {
             File repoWorkflowFile = new File(repoDirectory.getAbsolutePath() + File.separator + ".workflow-config.json");
-            overrideConfigIfFileExists(internalConfig, repoWorkflowFile, loadedConfigFiles);
+            overrideConfigIfFileExists(internalConfig, repoWorkflowFile);
         }
     }
 
-    private void applyUserConfigFileIfExists(WorkflowConfig internalConfig, List<String> loadedConfigFiles) {
+    private void applyUserConfigFileIfExists(WorkflowConfig internalConfig) {
         String homeFolder = System.getProperty("user.home");
         File userConfigFile = new File(homeFolder + File.separator + ".workflow-config.json");
-        overrideConfigIfFileExists(internalConfig, userConfigFile, loadedConfigFiles);
+        overrideConfigIfFileExists(internalConfig, userConfigFile);
     }
 
-    private void overrideConfigIfFileExists(WorkflowConfig internalConfig, File repoWorkflowFile, List<String> loadedConfigFiles) {
+    private void overrideConfigIfFileExists(WorkflowConfig internalConfig, File repoWorkflowFile) {
         if (!repoWorkflowFile.exists()) {
             return;
         }
         WorkflowConfig repoConfig = readExternalWorkflowConfig(repoWorkflowFile);
         internalConfig.getConfigurableFields().overrideValues(repoConfig, repoWorkflowFile.getPath());
-        loadedConfigFiles.add(repoWorkflowFile.getPath());
     }
 
     private WorkflowConfig readExternalWorkflowConfig(File configFilePath) {
@@ -175,18 +183,13 @@ public class WorkflowConfigParser {
             throw new FatalException("Config file {} does not exist", configFilePath.getPath());
         }
 
-        Reader externalConfigReader = null;
         try {
-            externalConfigReader = new FileReader(configFilePath);
+            return gson.fromJson(new FileReader(configFilePath), WorkflowConfig.class);
+        } catch (JsonSyntaxException e) {
+            throw new FatalException("Syntax error in external config file {}:\n{}",
+                    configFilePath.getPath(), e.getMessage());
         } catch (FileNotFoundException e) {
             throw new RuntimeIOException(e);
-        }
-        try {
-            return gson.fromJson(externalConfigReader, WorkflowConfig.class);
-        } catch (JsonSyntaxException e) {
-            log.error("Syntax error in external config file {}:\n{}", configFilePath.getPath(), e.getMessage());
-            System.exit(1);
-            return null;
         }
     }
 

@@ -27,6 +27,8 @@ public class WorkflowFields {
     @Expose(serialize = false, deserialize = false)
     private List<WorkflowField> configurableFields = new ArrayList<>();
 
+    private List<String> loadedConfigFiles = new ArrayList<>();
+
     private WorkflowConfig workflowConfig;
 
     public WorkflowFields(WorkflowConfig workflowConfig) {
@@ -57,6 +59,7 @@ public class WorkflowFields {
     }
 
     public void overrideValues(WorkflowConfig overriddenConfig, String configFileName) {
+        loadedConfigFiles.add(configFileName);
         for (WorkflowField field : configurableFields) {
             Object existingValue = field.getValue(workflowConfig);
             Object value = field.getValue(overriddenConfig);
@@ -158,6 +161,10 @@ public class WorkflowFields {
             overriddenConfigSources.put(field.getName(), source);
             field.setValue(workflowConfig, validValue);
         }
+    }
+
+    public String loadedConfigFilesText() {
+        return loadedConfigFiles.toString();
     }
 
     public List<WorkflowField> values() {

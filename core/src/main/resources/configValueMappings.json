@@ -41,7 +41,6 @@
     "--jenkins-jobs"
   ],
   "InvokeJenkinsJobs": [
-    "--buildweb-url",
     "--jenkins-jobs",
     "--wait-time",
     "--wait-for-jenkins",
@@ -129,9 +128,6 @@
     "--groups",
     "--disable-markdown"
   ],
-  "UploadReviewDiffWithRbt": [
-    "--username"
-  ],
   "CreateReviewIfNeeded": [
     "--username",
     "--review-board-repo",
@@ -171,6 +167,7 @@
   ],
   "BaseCommitAction": [
     "--username",
+    "--buildweb-url",
     "--perforce-client",
     "--changelist-id"
   ],
@@ -207,8 +204,7 @@
   "UploadReviewDiff": [
     "--parent",
     "--tracking-branch",
-    "--perforce-client",
-    "--username"
+    "--perforce-client"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",
@@ -251,6 +247,14 @@
   ],
   "MarkBugAsResolved": [
     "--username"
+  ],
+  "ExecuteSshCommand": [
+    "--ssh-password",
+    "--ssh-username",
+    "--ssh-port",
+    "--ssh-host",
+    "--ssh-site",
+    "--ssh-command"
   ],
   "SubmitToDepot": [
     "--tracking-branch"

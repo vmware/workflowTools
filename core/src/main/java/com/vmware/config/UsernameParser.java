@@ -15,11 +15,7 @@ public class UsernameParser {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private Git git;
-
-    public UsernameParser(Git git) {
-        this.git = git;
-    }
+    private Git git = new Git();
 
     private String username;
 
