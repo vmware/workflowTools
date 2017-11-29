@@ -2,6 +2,8 @@ package com.vmware.util;
 
 import com.vmware.util.exception.FatalException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +12,15 @@ public class MatcherUtils {
     public static String singleMatch(String text, String pattern, int flags) {
         Matcher matcher = Pattern.compile(pattern, flags).matcher(text);
         return getMatchedValue(matcher);
+    }
+
+    public static List<String> allMatches(String text, String pattern) {
+        Matcher matcher = Pattern.compile(pattern).matcher(text);
+        List<String> matches = new ArrayList<>();
+        while (matcher.find()) {
+            matches.add(matcher.group(1));
+        }
+        return matches;
     }
 
     public static String singleMatch(String text, String pattern) {

@@ -5,12 +5,15 @@
  */
 package com.vmware.action.base;
 
+import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.jenkins.Job;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputUtils;
 import com.vmware.util.scm.FileChange;
 import com.vmware.util.scm.NoPerforceClientForDirectoryException;
 import com.vmware.util.scm.Perforce;
@@ -113,6 +116,21 @@ public abstract class BaseCommitAction extends BaseAction {
             }
         }
         return null;
+    }
+
+    protected String determineSandboxBuildNumber() {
+        Job sandboxJob = Job.sandboxJob(buildwebConfig.buildwebUrl);
+        JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
+        String buildId;
+        if (sandboxBuild != null) {
+            buildId = sandboxBuild.id();
+            if (buildId == null) {
+                throw new FatalException("No build number found in url " + sandboxBuild.url);
+            }
+        } else {
+            buildId = InputUtils.readValueUntilNotBlank("Sandbox build number");
+        }
+        return buildId;
     }
 
     private String readPendingChangelistText() {

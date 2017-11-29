@@ -13,6 +13,7 @@ import com.vmware.config.section.JiraConfig;
 import com.vmware.config.section.PatchConfig;
 import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
+import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
@@ -37,6 +38,7 @@ public abstract class BaseAction {
     protected final CheckstyleConfig checkstyleConfig;
     protected final PatchConfig patchConfig;
     protected final BuildwebConfig buildwebConfig;
+    protected SshConfig sshConfig;
 
     protected ServiceLocator serviceLocator;
 
@@ -61,6 +63,7 @@ public abstract class BaseAction {
         this.checkstyleConfig = config.checkstyleConfig;
         this.patchConfig = config.patchConfig;
         this.buildwebConfig = config.buildwebConfig;
+        this.sshConfig = config.sshConfig;
     }
 
     /**

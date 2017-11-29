@@ -16,9 +16,9 @@ import com.vmware.config.section.PatchConfig;
 import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SectionConfig;
+import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.util.StringUtils;
-import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +34,6 @@ import java.util.TreeMap;
 public class WorkflowConfig {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Expose(serialize = false, deserialize = false)
-    private Git git = new Git();
-
-    @Expose(serialize = false, deserialize = false)
-    public String loadedConfigFiles;
 
     @SectionConfig
     public LoggingConfig loggingConfig;
@@ -79,6 +73,9 @@ public class WorkflowConfig {
 
     @SectionConfig
     public BuildwebConfig buildwebConfig;
+
+    @SectionConfig
+    public SshConfig sshConfig;
 
     @ConfigurableProperty(help = "Information about the the git commit that this version of workflow tools was built from")
     public Map<String, String> buildInfo;
@@ -134,8 +131,7 @@ public class WorkflowConfig {
     /**
      * Set separate to other git config values as it shouldn't override a specific workflow file configuration.
      */
-    public void setGitRemoteUrlAsReviewBoardRepo() {
-        String gitRemoteValue = git.configValue(String.format("remote.%s.url", gitRepoConfig.defaultGitRemote));
+    public void setGitRemoteUrlAsReviewBoardRepo(String gitRemoteValue) {
         if (StringUtils.isBlank(gitRemoteValue)) {
             return;
         }

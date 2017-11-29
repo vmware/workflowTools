@@ -11,5 +11,4 @@ public interface DiffConverter {
     byte[] convertAsBytes(String diffData);
 
     List<FileChange> getFileChanges();
-
 }

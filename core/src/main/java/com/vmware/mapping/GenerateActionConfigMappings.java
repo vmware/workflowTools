@@ -48,6 +48,7 @@ public class GenerateActionConfigMappings {
     static {
         methodNameToConfigValueMappings.put("parentBranchPath", singletonList("parentBranch"));
         methodNameToConfigValueMappings.put("trackingBranchPath", singletonList("trackingBranch"));
+        methodNameToConfigValueMappings.put("commandLineSite", Arrays.asList("sshHost", "sshPort", "sshUsername", "sshPassword"));
     }
 
     private static final Logger log = LoggerFactory.getLogger(GenerateActionConfigMappings.class);

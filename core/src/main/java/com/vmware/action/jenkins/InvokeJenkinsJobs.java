@@ -148,21 +148,6 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         return new JobParameters(parameters);
     }
 
-    private String determineSandboxBuildNumber() {
-        Job sandboxJob = Job.sandboxJob(buildwebConfig.buildwebUrl);
-        JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
-        String buildId;
-        if (sandboxBuild != null) {
-            buildId = sandboxBuild.id();
-            if (buildId == null) {
-                throw new FatalException("No build number found in url " + sandboxBuild.url);
-            }
-        } else {
-            buildId = InputUtils.readValueUntilNotBlank("Sandbox build number");
-        }
-        return buildId;
-    }
-
     private ParameterDefinition getDefinitionByName(List<ParameterDefinition> parameterDefinitions, String name) {
         for (ParameterDefinition parameterDefinition : parameterDefinitions) {
             if (parameterDefinition.name.equals(name)) {

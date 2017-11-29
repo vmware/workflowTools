@@ -74,13 +74,13 @@ public class WorkflowConfigMapper implements JsonDeserializer<WorkflowConfig>, J
         return configJsonObject;
     }
 
-    private void serializeConfigurableProperties(JsonObject configJsonObject, Object configClass, JsonSerializationContext jsonSerializationContext) {
-        List<Field> configurableFields = Arrays.stream(configClass.getClass().getFields())
+    private void serializeConfigurableProperties(JsonObject configJsonObject, Object configInstance, JsonSerializationContext jsonSerializationContext) {
+        List<Field> configurableFields = Arrays.stream(configInstance.getClass().getFields())
                 .filter(field -> field.getAnnotation(ConfigurableProperty.class) != null).collect(Collectors.toList());
 
         configurableFields.forEach(field -> {
             String fieldName = determineNameToUseForField(field);
-            Object fieldValue = ReflectionUtils.getValue(field, configClass);
+            Object fieldValue = ReflectionUtils.getValue(field, configInstance);
             if (fieldValue != null) {
                 JsonElement fieldJsonObject;
                 if (field.getAnnotation(JsonAdapter.class) != null) {

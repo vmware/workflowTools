@@ -1,5 +1,6 @@
 package com.vmware.util;
 
+import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,12 @@ public class StringUtils {
     public static final String NEW_LINE_CHAR = "\n";
 
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
+
+    public static void throwFatalExceptionIfBlank(String value, String propertyName) {
+        if (StringUtils.isBlank(value)) {
+            throw new FatalException("{} cannot be null", propertyName);
+        }
+    }
 
     public static boolean textStartsWithValue(String text, String... valuesToCheck) {
         return Arrays.stream(valuesToCheck).anyMatch(text::startsWith);
