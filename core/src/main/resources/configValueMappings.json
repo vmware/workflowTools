@@ -155,6 +155,7 @@
     "--git-remote"
   ],
   "LoadIssues": [
+    "--use-epics",
     "--use-fix-version",
     "--use-label",
     "--include-estimated",

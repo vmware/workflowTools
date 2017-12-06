@@ -17,6 +17,7 @@ import com.vmware.util.ThreadUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -143,7 +144,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
             issues.add(getIssue(bugNumber.trim()));
         }
         if (issues.contains(Issue.noBugNumber)) {
-            issues.retainAll(Arrays.asList(Issue.noBugNumber));
+            issues.retainAll(Collections.singletonList(Issue.noBugNumber));
         }
 
         return issues;

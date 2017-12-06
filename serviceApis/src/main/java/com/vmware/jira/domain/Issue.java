@@ -8,6 +8,8 @@ import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.List;
+
 public class Issue implements IssueInfo {
 
     public static Issue noBugNumber = Issue.noBugNumber();
@@ -47,20 +49,9 @@ public class Issue implements IssueInfo {
         this.fields = fields;
     }
 
-    public boolean hasLabel(String label) {
-        return ArrayUtils.contains(fields.labels, label);
-    }
-
-    public boolean hasFixVersion(String version) {
-        if (fields.fixVersions == null) {
-            return false;
-        }
-        for (FixVersion fixVersion : fields.fixVersions) {
-            if (StringUtils.equals(fixVersion.name, version)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean hasFieldValue(FilterableIssueField fieldType, String value) {
+        List<String> values = fields.valuesForFilterableField(fieldType);
+        return values.contains(value);
     }
 
     private static Issue noBugNumber() {

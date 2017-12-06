@@ -41,8 +41,11 @@ public class JiraConfig {
     public int jiraTaskEstimateInHours;
 
     @ConfigurableProperty(commandLine = "--use-label", help = "Whether to use a jira label when loading Jira issues")
-    public boolean useJiraLabel;
+    public boolean useLabel;
 
     @ConfigurableProperty(commandLine = "--use-fix-version", help = "Whether to use a jira fix by version when loading Jira issues")
     public boolean useFixVersion;
+
+    @ConfigurableProperty(commandLine = "--use-epics", help = "Whether to use parent epics when loading Jira issues")
+    public boolean useEpics;
 }

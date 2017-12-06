@@ -5,6 +5,11 @@ import com.vmware.util.StringUtils;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.exception.FatalException;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IssueFields {
     public Project project;
@@ -16,10 +21,10 @@ public class IssueFields {
     public String description;
 
     @Expose(serialize = false)
-    public String[] labels;
+    public List<String> labels;
 
     @Expose(serialize = false)
-    public FixVersion[] fixVersions;
+    public List<FixVersion> fixVersions;
 
     public JiraUser assignee;
 
@@ -43,6 +48,9 @@ public class IssueFields {
 
     @RuntimeFieldName("acceptanceCriteriaFieldName")
     public String acceptanceCriteria;
+
+    @RuntimeFieldName("parentEpicFieldName")
+    public String parentEpic;
 
 
     public boolean storyPointsEqual(Number value) {
@@ -68,5 +76,19 @@ public class IssueFields {
             StringUtils.appendCsvValue(text, component.name);
         }
         return text;
+    }
+
+    public List<String> valuesForFilterableField(FilterableIssueField field) {
+        switch (field) {
+            case label:
+                return labels != null ? labels : Collections.emptyList();
+            case fixByVersion:
+                return fixVersions != null
+                        ? fixVersions.stream().map(fixVersion -> fixVersion.name).collect(Collectors.toList()) : Collections.emptyList();
+            case epic:
+                return StringUtils.isNotBlank(parentEpic) ? Collections.singletonList(parentEpic) : Collections.emptyList();
+            default:
+                throw new FatalException("No handling for filterable field " + field);
+        }
     }
 }
