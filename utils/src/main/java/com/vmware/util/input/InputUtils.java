@@ -11,8 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InputUtils {
 
@@ -21,7 +24,7 @@ public class InputUtils {
     private static final String MAX_LENGTH_INDICATOR = "*";
 
     public static int readSelection(Collection<String> choices, String title) {
-        return readSelection(choices.toArray(new String[choices.size()]), title);
+        return readSelections(choices, title, true).get(0);
     }
 
     public static int readSelection(List<InputListSelection> choices, String title) {
@@ -29,15 +32,12 @@ public class InputUtils {
     }
 
     public static int readSelection(InputListSelection[] choices, String title) {
-        String[] choiceTexts = new String[choices.length];
-        for (int i = 0; i < choices.length; i++) {
-            choiceTexts[i] = choices[i].getLabel();
-        }
-        return readSelection(choiceTexts, title);
+        List<String> choiceTexts = Arrays.stream(choices).map(InputListSelection::getLabel).collect(Collectors.toList());
+        return readSelections(choiceTexts, title, true).get(0);
     }
 
-    public static int readSelection(String[] choices, String title) {
-        if (choices == null || choices.length == 0) {
+    public static List<Integer> readSelections(Collection<String> choices, String title, boolean singleSelection) {
+        if (choices == null || choices.isEmpty()) {
             throw new FatalException("No {} to select from", title);
         }
 
@@ -49,20 +49,24 @@ public class InputUtils {
         }
         padder.infoTitle();
 
-        Integer selection = null;
-        while (selection == null) {
-            String selectionValue = readValue("Enter selection");
-            if (!StringUtils.isInteger(selectionValue)) {
+        List<Integer> selections = null;
+        while (selections == null) {
+            String plural = singleSelection ? "" : "s";
+            List<String> selectionValues = StringUtils.splitAndTrim(readValueUntilNotBlank("Enter selection" + plural), ",");
+            if (!selectionValues.stream().allMatch(StringUtils::isInteger)) {
                 log.info("Please enter a valid number");
             } else {
-                selection = Integer.parseInt(selectionValue);
-                if (selection < 1 || selection > choices.length) {
-                    log.info("Please enter a number between {} and {}", 1, choices.length);
-                    selection = null;
+                selections = selectionValues.stream().map((Integer::parseInt)).collect(Collectors.toList());
+                boolean invalidSelectino = selections.stream()
+                        .anyMatch(selection -> selection < 1 || selection > choices.size());
+                if (invalidSelectino) {
+                    log.info("Please enter a number between {} and {}", 1, choices.size());
+                    selections = null;
                 }
             }
         }
-        return selection - 1;
+        selections = selections.stream().map(selection -> (selection -1)).collect(Collectors.toList());
+        return selections;
     }
 
     public static String readValueUntilNotBlank(String label, Collection<String> autoCompleteOptions) {

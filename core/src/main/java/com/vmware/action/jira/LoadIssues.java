@@ -8,7 +8,7 @@ package com.vmware.action.jira;
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jira.domain.FixVersion;
+import com.vmware.jira.domain.FilterableIssueField;
 import com.vmware.jira.domain.Issue;
 import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.SearchRequest;
@@ -24,6 +24,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.vmware.jira.domain.FilterableIssueField.epic;
+import static com.vmware.jira.domain.FilterableIssueField.fixByVersion;
+import static com.vmware.jira.domain.FilterableIssueField.label;
 
 @ActionDescription("Loads a list of jira issues for processing.")
 public class LoadIssues extends BaseBatchJiraAction {
@@ -66,46 +71,56 @@ public class LoadIssues extends BaseBatchJiraAction {
             log.warn("No issues can be used as they have all been estimated or have story points and configuration does not include estimated stories");
         }
 
-        List<String> labels = getLabelsFromIssues(issues);
-        List<String> fixByVersions = getFixByVersionsFromIssues(issues);
-
-
-        if (jiraConfig.useJiraLabel && labels.size() == 0) {
-            throw new FatalException("Use jira label is set to true but none of the issues have labels");
-        }
-
-        if (jiraConfig.useFixVersion && fixByVersions.size() == 0) {
-            throw new FatalException("Use fix by version is set to true but none of the issues have fix by versions");
-        }
-
         String additionalInfo = "";
 
-        if (jiraConfig.useJiraLabel) {
-            log.info("Please enter label to use");
-            int selectedLabelIndex = InputUtils.readSelection(labels, "Jira Labels");
-            String selectedLabel = labels.get(selectedLabelIndex);
-            issues = filterByLabel(issues, selectedLabel);
-            additionalInfo = selectedLabel;
+        if (jiraConfig.useLabel) {
+            List<String> labels = getValuesFromIssues(issues, label);
+            if (labels.isEmpty()) {
+                throw new FatalException("Use label is set to true but none of the issues have labels");
+            }
+
+            log.info("Please enter labels to use");
+            List<Integer> selectedIndices = InputUtils.readSelections(labels, "Jira Labels", false);
+            List<String> selectedLabels = selectedIndices.stream().map(labels::get).collect(Collectors.toList());
+            issues = filterByFieldValue(issues, label, selectedLabels);
+            additionalInfo = StringUtils.join(selectedLabels);
         }
 
         if (jiraConfig.useFixVersion) {
-            log.info("Please enter fix by version to use");
-            int selectedIndex = InputUtils.readSelection(fixByVersions, "Jira Fix By Versions");
-            String selectedFixByVersion = fixByVersions.get(selectedIndex);
-            issues = filterByFixByVersion(issues, selectedFixByVersion);
-            if (!additionalInfo.isEmpty()) {
-                additionalInfo += ",";
+            List<String> fixByVersions = getValuesFromIssues(issues, fixByVersion);
+            if (fixByVersions.isEmpty()) {
+                throw new FatalException("Use fix by is set to true but none of the issues have fix by versions");
             }
-            additionalInfo += selectedFixByVersion;
+
+            log.info("Please enter fix by versions to use");
+            List<Integer> selectedIndices = InputUtils.readSelections(fixByVersions, "Jira Fix By Versions", false);
+            List<String> selectedFixByVersions = selectedIndices.stream().map(fixByVersions::get).collect(Collectors.toList());
+            issues = filterByFieldValue(issues, fixByVersion, selectedFixByVersions);
+            additionalInfo += StringUtils.appendWithDelimiter(additionalInfo, fixByVersions, ",");
         }
+
+        if (jiraConfig.useEpics) {
+            List<String> epics = getValuesFromIssues(issues, epic);
+            if (epics.isEmpty()) {
+                throw new FatalException("Use epics is set to true but none of the issues have parent epics");
+            }
+
+            log.info("Please enter parent epics to use");
+            List<String> epicSummaries = epics.stream()
+                    .map(epicKey -> epicKey + ": " + jira.getIssueByKey(epicKey).getSummary()).collect(Collectors.toList());
+            List<Integer> selectedIndices = InputUtils.readSelections(epicSummaries, "Epics", false);
+            List<String> selectedParentEpics = selectedIndices.stream().map(epics::get).collect(Collectors.toList());
+            issues = filterByFieldValue(issues, epic, selectedParentEpics);
+        }
+
         if (!additionalInfo.isEmpty()) {
             projectIssues.projectName += "(" + additionalInfo + ")";
         }
         projectIssues.addAllIssues(issues);
 
         List<Issue> issuesForProcessing = projectIssues.getIssuesForProcessing();
-        log.debug("Added {} issues for processing", issuesForProcessing.size());
-        log.debug("Added issues\n{}", issuesForProcessing.toString());
+        log.debug("Added {} for processing", StringUtils.pluralize(issuesForProcessing.size(), "issue"));
+        issuesForProcessing.forEach(issue -> log.debug(issue.toString()));
     }
 
     private void removeIssuesWithStoryPoints(List<Issue> issues) {
@@ -129,7 +144,10 @@ public class LoadIssues extends BaseBatchJiraAction {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.jql = jqlQuery;
         searchRequest.maxResults = backlogStories.size();
-        searchRequest.fields = new String[] {"summary","description","assignee","status", "fixVersions","issuetype", "labels","customfield_10062","customfield_10100"};
+        List<String> fieldsToInclude = new ArrayList<>();
+        fieldsToInclude.addAll(Arrays.asList("summary","description","assignee","status", "fixVersions","issuetype", "labels"));
+        fieldsToInclude.addAll(jiraConfig.jiraCustomFieldNames.values());
+        searchRequest.fields = fieldsToInclude.toArray(new String[fieldsToInclude.size()]);
         return searchRequest;
     }
 
@@ -157,53 +175,15 @@ public class LoadIssues extends BaseBatchJiraAction {
         return jqlQueryBuilder.toString();
     }
 
-    private List<String> getLabelsFromIssues(List<Issue> issues) {
-        Set<String> labels = new HashSet<String>();
-        for (Issue issue : issues) {
-            if (issue.fields.labels == null) {
-                continue;
-            }
-
-            labels.addAll(Arrays.asList(issue.fields.labels));
-        }
-
-        return new ArrayList<>(labels);
+    private List<String> getValuesFromIssues(List<Issue> issues, FilterableIssueField fieldType) {
+        Set<String> values = new HashSet<String>();
+        issues.forEach(issue -> values.addAll(issue.fields.valuesForFilterableField(fieldType)));
+        return new ArrayList<>(values);
     }
 
-    private List<String> getFixByVersionsFromIssues(List<Issue> issues) {
-        Set<String> labels = new HashSet<String>();
-        for (Issue issue : issues) {
-            if (issue.fields.fixVersions == null) {
-                continue;
-            }
-            for (FixVersion fixVersion : issue.fields.fixVersions) {
-                labels.add(fixVersion.name);
-            }
-        }
-
-        return new ArrayList<>(labels);
+    private List<Issue> filterByFieldValue(List<Issue> issues, FilterableIssueField fieldType, List<String> values) {
+        return issues.stream()
+                .filter(issue -> values.stream()
+                        .anyMatch(value -> issue.hasFieldValue(fieldType, value))).collect(Collectors.toList());
     }
-
-    private List<Issue> filterByLabel(List<Issue> issues, String label) {
-        List<Issue> filteredIssues = new ArrayList<Issue>();
-
-        for (Issue issue : issues) {
-            if (issue.hasLabel(label)) {
-                filteredIssues.add(issue);
-            }
-        }
-        return filteredIssues;
-    }
-
-    private List<Issue> filterByFixByVersion(List<Issue> issues, String version) {
-        List<Issue> filteredIssues = new ArrayList<Issue>();
-
-        for (Issue issue : issues) {
-            if (issue.hasFixVersion(version)) {
-                filteredIssues.add(issue);
-            }
-        }
-        return filteredIssues;
-    }
-
 }

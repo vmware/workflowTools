@@ -13,6 +13,7 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     Task(3),
     Improvement(4),
     SubTask(6),
+    Epic(7),
     Story(8),
     TechnicalTask(9),
     PlanningBoardMarker(10),
