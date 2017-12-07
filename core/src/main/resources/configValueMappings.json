@@ -41,6 +41,7 @@
     "--jenkins-jobs"
   ],
   "InvokeJenkinsJobs": [
+    "--build-display-name",
     "--jenkins-jobs",
     "--wait-time",
     "--wait-for-jenkins",
@@ -60,6 +61,7 @@
   "InvokeSandboxBuild": [
     "--tracking-branch",
     "--component-builds",
+    "--build-display-name",
     "--buildweb-branch",
     "--build-type",
     "--buildweb-project",
@@ -256,6 +258,7 @@
     "--ssh-username",
     "--ssh-port",
     "--ssh-host",
+    "--build-display-name",
     "--ssh-site",
     "--ssh-command"
   ],

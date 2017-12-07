@@ -19,6 +19,7 @@
   "goBuildBinPath": "/build/apps/bin/gobuild",
   "patchCommand": "patch -f -p1 -s",
   "waitTimeForBlockingWorkflowAction": 1200,
+  "buildDisplayName": "Sandbox",
   "buildwebProject": "vcloud",
   "buildwebBranch": "sp-main",
   "buildType": "opt",

@@ -70,7 +70,7 @@ public class ExecuteSshCommand extends BaseCommitAction {
         List<String> parameterNamesInCommand = MatcherUtils.allMatches(sshCommand, "($[_\\w]+)");
         for (String parameterName : parameterNamesInCommand) {
             if (parameterName.equals(SANDBOX_BUILD_NUMBER)) {
-                sshCommand = sshCommand.replace(parameterName, determineSandboxBuildNumber());
+                sshCommand = sshCommand.replace(parameterName, determineSandboxBuildNumber(buildwebConfig.buildDisplayName));
             } else {
                 String label = parameterName.length() < 2 ? parameterName :
                         parameterName.substring(0, 1).toUpperCase() + parameterName.substring(1).toLowerCase();
