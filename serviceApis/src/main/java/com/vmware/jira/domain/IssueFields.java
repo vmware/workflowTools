@@ -52,7 +52,6 @@ public class IssueFields {
     @RuntimeFieldName("parentEpicFieldName")
     public String parentEpic;
 
-
     public boolean storyPointsEqual(Number value) {
         if (storyPoints == null) {
             return value == null;

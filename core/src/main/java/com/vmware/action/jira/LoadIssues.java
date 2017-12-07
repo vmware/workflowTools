@@ -8,9 +8,9 @@ package com.vmware.action.jira;
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.FilterableIssueField;
 import com.vmware.jira.domain.Issue;
-import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.IssueSummary;
 import com.vmware.jira.domain.greenhopper.RapidView;
@@ -20,10 +20,8 @@ import com.vmware.util.input.InputUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.vmware.jira.domain.FilterableIssueField.epic;
@@ -74,7 +72,7 @@ public class LoadIssues extends BaseBatchJiraAction {
         String additionalInfo = "";
 
         if (jiraConfig.useLabel) {
-            List<String> labels = getValuesFromIssues(issues, label);
+            List<String> labels = getFieldValuesFromIssues(issues, label);
             if (labels.isEmpty()) {
                 throw new FatalException("Use label is set to true but none of the issues have labels");
             }
@@ -82,12 +80,12 @@ public class LoadIssues extends BaseBatchJiraAction {
             log.info("Please enter labels to use");
             List<Integer> selectedIndices = InputUtils.readSelections(labels, "Jira Labels", false);
             List<String> selectedLabels = selectedIndices.stream().map(labels::get).collect(Collectors.toList());
-            issues = filterByFieldValue(issues, label, selectedLabels);
+            issues = filterByFieldValues(issues, label, selectedLabels);
             additionalInfo = StringUtils.join(selectedLabels);
         }
 
         if (jiraConfig.useFixVersion) {
-            List<String> fixByVersions = getValuesFromIssues(issues, fixByVersion);
+            List<String> fixByVersions = getFieldValuesFromIssues(issues, fixByVersion);
             if (fixByVersions.isEmpty()) {
                 throw new FatalException("Use fix by is set to true but none of the issues have fix by versions");
             }
@@ -95,12 +93,12 @@ public class LoadIssues extends BaseBatchJiraAction {
             log.info("Please enter fix by versions to use");
             List<Integer> selectedIndices = InputUtils.readSelections(fixByVersions, "Jira Fix By Versions", false);
             List<String> selectedFixByVersions = selectedIndices.stream().map(fixByVersions::get).collect(Collectors.toList());
-            issues = filterByFieldValue(issues, fixByVersion, selectedFixByVersions);
+            issues = filterByFieldValues(issues, fixByVersion, selectedFixByVersions);
             additionalInfo += StringUtils.appendWithDelimiter(additionalInfo, fixByVersions, ",");
         }
 
         if (jiraConfig.useEpics) {
-            List<String> epics = getValuesFromIssues(issues, epic);
+            List<String> epics = getFieldValuesFromIssues(issues, epic);
             if (epics.isEmpty()) {
                 throw new FatalException("Use epics is set to true but none of the issues have parent epics");
             }
@@ -110,7 +108,7 @@ public class LoadIssues extends BaseBatchJiraAction {
                     .map(epicKey -> epicKey + ": " + jira.getIssueByKey(epicKey).getSummary()).collect(Collectors.toList());
             List<Integer> selectedIndices = InputUtils.readSelections(epicSummaries, "Epics", false);
             List<String> selectedParentEpics = selectedIndices.stream().map(epics::get).collect(Collectors.toList());
-            issues = filterByFieldValue(issues, epic, selectedParentEpics);
+            issues = filterByFieldValues(issues, epic, selectedParentEpics);
         }
 
         if (!additionalInfo.isEmpty()) {
@@ -175,13 +173,12 @@ public class LoadIssues extends BaseBatchJiraAction {
         return jqlQueryBuilder.toString();
     }
 
-    private List<String> getValuesFromIssues(List<Issue> issues, FilterableIssueField fieldType) {
-        Set<String> values = new HashSet<String>();
-        issues.forEach(issue -> values.addAll(issue.fields.valuesForFilterableField(fieldType)));
-        return new ArrayList<>(values);
+    private List<String> getFieldValuesFromIssues(List<Issue> issues, FilterableIssueField fieldType) {
+        return issues.stream()
+                .flatMap(issue -> issue.fields.valuesForFilterableField(fieldType).stream()).collect(Collectors.toList());
     }
 
-    private List<Issue> filterByFieldValue(List<Issue> issues, FilterableIssueField fieldType, List<String> values) {
+    private List<Issue> filterByFieldValues(List<Issue> issues, FilterableIssueField fieldType, List<String> values) {
         return issues.stream()
                 .filter(issue -> values.stream()
                         .anyMatch(value -> issue.hasFieldValue(fieldType, value))).collect(Collectors.toList());

@@ -59,10 +59,12 @@
   ],
   "InvokeSandboxBuild": [
     "--tracking-branch",
+    "--component-builds",
     "--buildweb-branch",
     "--build-type",
     "--buildweb-project",
     "--gobuild-bin-path",
+    "--store-trees",
     "--changelist-id"
   ],
   "AuthenticateAllApis": [

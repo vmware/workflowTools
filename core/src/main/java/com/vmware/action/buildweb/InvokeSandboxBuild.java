@@ -17,6 +17,8 @@ import static java.lang.String.format;
 @ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
 public class InvokeSandboxBuild extends BaseCommitAction {
 
+    private static final String SANDBOX_BUILD_NUMBER = "$SANDBOX_BUILD";
+
     public InvokeSandboxBuild(WorkflowConfig config) {
         super(config);
     }
@@ -31,19 +33,39 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
         String syncToParameter = " --syncto latest";
+        String storeTreesParamter = buildwebConfig.storeTrees ? " --store-trees" : "";
+        String componentBuildsParameter = createComponentBuildsParameter();
+
         if (changelistId.toLowerCase().contains("head")) {
             log.info("Assuming changelist id {} is a git ref, using tracking branch {} as syncTo value",
                     changelistId, gitRepoConfig.trackingBranchPath());
             changelistId = git.revParse(changelistId);
             syncToParameter = ""; // --accept-defaults handles it correctly
         }
-        String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s --accept-defaults",
+        String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s%s%s --accept-defaults",
                 buildwebConfig.goBuildBinPath, buildwebConfig.buildwebProject, buildwebConfig.buildType,
-                syncToParameter, buildwebConfig.buildwebBranch, changelistId);
+                syncToParameter, buildwebConfig.buildwebBranch,
+                changelistId, storeTreesParamter, componentBuildsParameter);
 
         log.info("Invoking sandbox build {}", command);
         String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
         addBuildNumberInOutputToTestingDone(output);
+    }
+
+    private String createComponentBuildsParameter() {
+        if (StringUtils.isBlank(buildwebConfig.componentBuilds)) {
+            return "";
+        }
+        String componentBuilds = " --component-builds " + buildwebConfig.componentBuilds;
+        componentBuilds = componentBuilds.replace(",", "=");
+        if (componentBuilds.contains(SANDBOX_BUILD_NUMBER)) {
+            String buildNumber = determineSandboxBuildNumber();
+            if (StringUtils.isInteger(buildNumber)) {
+                buildNumber = "sb-" + buildNumber;
+            }
+            componentBuilds = componentBuilds.replace(SANDBOX_BUILD_NUMBER, buildNumber);
+        }
+        return componentBuilds;
     }
 
     private void addBuildNumberInOutputToTestingDone(String output) {

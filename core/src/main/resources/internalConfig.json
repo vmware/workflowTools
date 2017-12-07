@@ -606,6 +606,9 @@
       "AmendCommit"
     ],
     "invokeSandboxBuildWithGitFusion": [
+      "invokeSandboxBuildWithGit"
+    ],
+    "invokeSandboxBuildWithGit": [
       "ReadLastCommit",
       "--changelist-id=head",
       "InvokeSandboxBuild",
