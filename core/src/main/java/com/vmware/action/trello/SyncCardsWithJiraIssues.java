@@ -109,12 +109,17 @@ public class SyncCardsWithJiraIssues extends BaseTrelloAction {
         Swimlane[] swimlanes = trello.getSwimlanesForBoard(selectedBoard);
         Map<Double, Swimlane> storyPointSwimlanes = convertSwimlanesIntoMap(swimlanes);
 
-        Swimlane todoLane = swimlanes[0];
+        Swimlane todoLane = Arrays.stream(swimlanes).filter(swimlane -> swimlane.name.equalsIgnoreCase("To Do"))
+                .findFirst().orElseThrow(() -> new FatalException("No To Do swim lane found!"));
+
         for (Issue issueToAdd : issuesForProcessing) {
             Swimlane swimlaneToUse = todoLane;
             if (issueToAdd.fields.storyPoints != null) {
                 Double storyPointValue = issueToAdd.fields.storyPoints.doubleValue();
                 swimlaneToUse = storyPointSwimlanes.get(storyPointValue);
+                if (swimlaneToUse == null) {
+                    throw new FatalException("No swimlane exists for value " + storyPointValue);
+                }
             }
 
             Card cardToAdd = new Card(swimlaneToUse, issueToAdd, jiraConfig.jiraUrl);
