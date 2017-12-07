@@ -40,4 +40,7 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
     public boolean includeInProgressBuilds;
 
+    @ConfigurableProperty(commandLine = "--build-display-name", help = "Display name to use for the build invoked")
+    public String buildDisplayName;
+
 }

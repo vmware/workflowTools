@@ -19,9 +19,9 @@ public class Job {
     @Expose(serialize = false, deserialize = false)
     public List<JobParameter> parameters = Collections.emptyList();
 
-    public static Job sandboxJob(String url) {
+    public static Job sandboxJob(String url, String jobDisplayName) {
         Job job = new Job(url);
-        job.jobDisplayName = "Sandbox";
+        job.jobDisplayName = jobDisplayName;
         return job;
     }
 

@@ -118,8 +118,8 @@ public abstract class BaseCommitAction extends BaseAction {
         return null;
     }
 
-    protected String determineSandboxBuildNumber() {
-        Job sandboxJob = Job.sandboxJob(buildwebConfig.buildwebUrl);
+    protected String determineSandboxBuildNumber(String buildDisplayName) {
+        Job sandboxJob = Job.sandboxJob(buildwebConfig.buildwebUrl, buildDisplayName);
         JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
         String buildId;
         if (sandboxBuild != null) {
@@ -128,7 +128,7 @@ public abstract class BaseCommitAction extends BaseAction {
                 throw new FatalException("No build number found in url " + sandboxBuild.url);
             }
         } else {
-            buildId = InputUtils.readValueUntilNotBlank("Sandbox build number");
+            buildId = InputUtils.readValueUntilNotBlank(buildDisplayName + " build number");
         }
         return buildId;
     }

@@ -12,12 +12,14 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
+import java.util.regex.Pattern;
+
 import static java.lang.String.format;
 
 @ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
 public class InvokeSandboxBuild extends BaseCommitAction {
 
-    private static final String SANDBOX_BUILD_NUMBER = "$SANDBOX_BUILD";
+    private static final String SANDBOX_BUILD_PREFIX = "$SANDBOX_";
 
     public InvokeSandboxBuild(WorkflowConfig config) {
         super(config);
@@ -47,7 +49,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
                 syncToParameter, buildwebConfig.buildwebBranch,
                 changelistId, storeTreesParamter, componentBuildsParameter);
 
-        log.info("Invoking sandbox build {}", command);
+        log.info("Invoking {} build {}", buildwebConfig.buildDisplayName, command);
         String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
         addBuildNumberInOutputToTestingDone(output);
     }
@@ -58,12 +60,13 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         }
         String componentBuilds = " --component-builds " + buildwebConfig.componentBuilds;
         componentBuilds = componentBuilds.replace(",", "=");
-        if (componentBuilds.contains(SANDBOX_BUILD_NUMBER)) {
-            String buildNumber = determineSandboxBuildNumber();
+        if (componentBuilds.contains(SANDBOX_BUILD_PREFIX)) {
+            String expectedBuildDisplayName = MatcherUtils.singleMatchExpected(componentBuilds, Pattern.quote(SANDBOX_BUILD_PREFIX) + "([\\w_]+)");
+            String buildNumber = determineSandboxBuildNumber(expectedBuildDisplayName);
             if (StringUtils.isInteger(buildNumber)) {
                 buildNumber = "sb-" + buildNumber;
             }
-            componentBuilds = componentBuilds.replace(SANDBOX_BUILD_NUMBER, buildNumber);
+            componentBuilds = componentBuilds.replace(SANDBOX_BUILD_PREFIX + expectedBuildDisplayName, buildNumber);
         }
         return componentBuilds;
     }
@@ -75,7 +78,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         if (buildNumber != null) {
             String buildUrl = commitConfig.buildWebUrl() + "/" + buildNumber;
             log.info("Adding build {} to commit", buildUrl);
-            Job sandboxJob = Job.sandboxJob(commitConfig.buildWebUrl());
+            Job sandboxJob = Job.sandboxJob(commitConfig.buildWebUrl(), buildwebConfig.buildDisplayName);
             draft.updateTestingDoneWithJobBuild(sandboxJob, new JobBuild(sandboxJob.jobDisplayName, buildUrl, BuildResult.BUILDING));
         } else {
             throw new RuntimeException("Unable to parse build url from output using pattern " + buildNumberPattern);
