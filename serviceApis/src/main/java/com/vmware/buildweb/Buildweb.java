@@ -3,7 +3,10 @@ package com.vmware.buildweb;
 import com.vmware.AbstractRestBuildService;
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
-import com.vmware.buildweb.domain.SandboxBuild;
+import com.vmware.buildweb.domain.BuildMachine;
+import com.vmware.buildweb.domain.BuildMachines;
+import com.vmware.buildweb.domain.BuildwebBuild;
+import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.request.body.RequestBodyHandling;
@@ -12,7 +15,6 @@ import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.logging.Padder;
 
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -21,17 +23,20 @@ import java.util.List;
 public class Buildweb extends AbstractRestBuildService {
 
     private final String buildwebUrl;
-    private String buildwebLogsUrlPattern;
+    private String buildwebLogFileName;
 
-    public Buildweb(String buildwebUrl, String buildwebApiUrl, String buildwebLogsUrlPattern, String username) {
+    public Buildweb(String buildwebUrl, String buildwebApiUrl, String buildwebLogFileName, String username) {
         super(buildwebApiUrl, "/", ApiAuthentication.none, username);
         this.buildwebUrl = buildwebUrl;
-        this.buildwebLogsUrlPattern = buildwebLogsUrlPattern;
+        this.buildwebLogFileName = buildwebLogFileName;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
     }
 
-    public SandboxBuild getSandboxBuild(String id) {
-        return connection.get(baseUrl + "sb/build/" + id, SandboxBuild.class);
+    public BuildwebBuild getSandboxBuild(String id) {
+        String[] idParts = id.split("-");
+        String buildType = idParts.length == 2 ? idParts[0] : "sb";
+        String idForBuild = idParts.length == 2 ? idParts[1] : id;
+        return connection.get(baseUrl + buildType + "/build/" + idForBuild, BuildwebBuild.class);
     }
 
     public void logOutputForBuilds(ReviewRequestDraft draft, int linesToShow, BuildResult... results) {
@@ -47,8 +52,17 @@ public class Buildweb extends AbstractRestBuildService {
                 });
     }
 
-    public String getBuildOutput(String buildNumber, int maxLinesToTail) {
-        String logsUrl = String.format(buildwebLogsUrlPattern, buildNumber);
+    public String getBuildOutput(String buildId, int maxLinesToTail) {
+        BuildwebBuild build = getSandboxBuild(buildId);
+        BuildMachines machines = connection.get(baseUrl + build.buildMachinesUrl, BuildMachines.class);
+        BuildMachine buildMachine = machines.realBuildMachine();
+        String logsUrl;
+        if (build.getBuildResult() == BuildResult.BUILDING) {
+            logsUrl = "http://" + buildMachine.hostName + build.relativeBuildTreePath()
+                    + "logs/" + buildwebLogFileName;
+        } else {
+            logsUrl = build.buildTreeUrl + "logs/" + buildMachine.hostType + "/" + buildwebLogFileName;
+        }
         return IOUtils.tail(logsUrl, maxLinesToTail);
     }
 
@@ -68,9 +82,9 @@ public class Buildweb extends AbstractRestBuildService {
 
     @Override
     protected BuildResult getResultForBuild(String url) {
-        String buildNumber = MatcherUtils.singleMatchExpected(url, "/sb/(\\d++)");
-        String buildApiUrl = baseUrl + "sb/build/" + buildNumber;
-        SandboxBuild build = optimisticGet(buildApiUrl, SandboxBuild.class);
+        BuildwebId buildwebId = new BuildwebId(MatcherUtils.singleMatchExpected(url, "/(\\w\\w/\\d++)"));
+        String buildApiUrl = baseUrl + buildwebId.buildApiPath();
+        BuildwebBuild build = optimisticGet(buildApiUrl, BuildwebBuild.class);
         return build.getBuildResult();
     }
 

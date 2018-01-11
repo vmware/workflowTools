@@ -60,6 +60,7 @@
   ],
   "InvokeSandboxBuild": [
     "--tracking-branch",
+    "--buildweb-url",
     "--component-builds",
     "--build-display-name",
     "--buildweb-branch",
@@ -184,7 +185,7 @@
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
-    "--buildweb-logs-url-pattern",
+    "--buildweb-log-file-name",
     "--buildweb-api-url",
     "--buildweb-url"
   ],

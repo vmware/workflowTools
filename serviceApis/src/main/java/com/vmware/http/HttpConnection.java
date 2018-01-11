@@ -312,10 +312,10 @@ public class HttpConnection {
     }
 
     private String parseResponseText() throws IOException {
-        String responseText;
         String currentUrl = activeConnection.getURL().toExternalForm();
         int responseCode = activeConnection.getResponseCode();
-        if (ExceptionChecker.isStatusValid(responseCode)) {
+        String responseText;
+        if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {
             responseText = IOUtils.read(activeConnection.getInputStream());
         } else {
             responseText = IOUtils.read(activeConnection.getErrorStream());

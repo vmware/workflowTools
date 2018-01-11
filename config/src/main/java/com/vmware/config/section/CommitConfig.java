@@ -135,16 +135,12 @@ public class CommitConfig {
         return approvedByLabel.trim() + "\\s*(.+)$";
     }
 
-    public String generateBuildWebNumberPattern() {
-        return "http.+?/sb/(\\d+)/*";
+    public String generateBuildWebIdPattern() {
+        return "http.+?/(\\w\\w/\\d+)/*";
     }
 
     public String generateBuildUrlsPattern() {
         return "((?:" + StringUtils.join(Arrays.asList(buildwebUrl, jenkinsUrl), "|") + ")\\S+)";
-    }
-
-    public String buildWebUrl() {
-        return buildwebUrl + "/sb";
     }
 
     public String getReviewboardUrl() {
