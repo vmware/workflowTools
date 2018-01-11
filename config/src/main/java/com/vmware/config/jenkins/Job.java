@@ -19,7 +19,10 @@ public class Job {
     @Expose(serialize = false, deserialize = false)
     public List<JobParameter> parameters = Collections.emptyList();
 
-    public static Job sandboxJob(String url, String jobDisplayName) {
+    /**
+     * Buildweb jobs can be either sandbox or official builds
+     */
+    public static Job buildwebJob(String url, String jobDisplayName) {
         Job job = new Job(url);
         job.jobDisplayName = jobDisplayName;
         return job;
@@ -35,10 +38,6 @@ public class Job {
         this.name = jobName;
         baseUrl = UrlUtils.addTrailingSlash(baseUrl);
         this.url = baseUrl + "job/" + jobName + "/";
-    }
-
-    public String getBuildUrl() {
-        return url + "build";
     }
 
     public String getBuildWithParametersUrl() {

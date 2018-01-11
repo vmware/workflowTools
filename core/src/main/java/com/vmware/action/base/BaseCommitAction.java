@@ -119,7 +119,7 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     protected String determineSandboxBuildNumber(String buildDisplayName) {
-        Job sandboxJob = Job.sandboxJob(buildwebConfig.buildwebUrl, buildDisplayName);
+        Job sandboxJob = Job.buildwebJob(buildwebConfig.buildwebUrl, buildDisplayName);
         JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
         String buildId;
         if (sandboxBuild != null) {

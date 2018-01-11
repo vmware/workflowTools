@@ -3,6 +3,7 @@ package com.vmware.action.buildweb;
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
+import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.jenkins.Job;
@@ -72,16 +73,19 @@ public class InvokeSandboxBuild extends BaseCommitAction {
     }
 
     private void addBuildNumberInOutputToTestingDone(String output) {
-        String buildNumberPattern = commitConfig.generateBuildWebNumberPattern();
+        String buildIdPattern = commitConfig.generateBuildWebIdPattern();
 
-        String buildNumber = MatcherUtils.singleMatch(output, buildNumberPattern);
-        if (buildNumber != null) {
-            String buildUrl = commitConfig.buildWebUrl() + "/" + buildNumber;
+        String buildIdText = MatcherUtils.singleMatch(output, buildIdPattern);
+        if (buildIdText != null) {
+            BuildwebId buildwebId = new BuildwebId(buildIdText);
+            String buildUrl = commitConfig.buildwebUrl + "/" + buildwebId.buildwebPath();
             log.info("Adding build {} to commit", buildUrl);
-            Job sandboxJob = Job.sandboxJob(commitConfig.buildWebUrl(), buildwebConfig.buildDisplayName);
-            draft.updateTestingDoneWithJobBuild(sandboxJob, new JobBuild(sandboxJob.jobDisplayName, buildUrl, BuildResult.BUILDING));
+            String buildTypeUrl = commitConfig.buildwebUrl + "/" + buildwebId.getBuildType();
+            Job sandboxJob = Job.buildwebJob(buildTypeUrl, buildwebConfig.buildDisplayName);
+            draft.updateTestingDoneWithJobBuild(sandboxJob,
+                    new JobBuild(sandboxJob.jobDisplayName, buildUrl, BuildResult.BUILDING));
         } else {
-            throw new RuntimeException("Unable to parse build url from output using pattern " + buildNumberPattern);
+            throw new RuntimeException("Unable to parse build url from output using pattern " + buildIdPattern);
         }
     }
 

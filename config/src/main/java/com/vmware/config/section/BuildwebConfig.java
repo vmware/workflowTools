@@ -28,8 +28,8 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "--buildweb-api-url", help = "Api Url for buildweb server")
     public String buildwebApiUrl;
 
-    @ConfigurableProperty(commandLine = "--buildweb-logs-url-pattern", help = "Url patter for buildweb logs")
-    public String buildwebLogsUrlPattern;
+    @ConfigurableProperty(commandLine = "--buildweb-log-file-name", help = "Name of log file for buildweb build")
+    public String buildwebLogFileName;
 
     @ConfigurableProperty(commandLine = "--sync-to-branch-latest", help = "By default, files to be synced to the latest in perforce, this flag syncs them to the latest changelist known to the git branch")
     public boolean syncChangelistToLatestInBranch;

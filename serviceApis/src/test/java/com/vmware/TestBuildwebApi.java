@@ -1,11 +1,12 @@
 package com.vmware;
 
 import com.vmware.buildweb.Buildweb;
-import com.vmware.buildweb.domain.SandboxBuild;
+import com.vmware.buildweb.domain.BuildwebBuild;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests Buildweb api calls. This is VMware specific.
@@ -18,26 +19,31 @@ public class TestBuildwebApi extends BaseTests {
     public void init() {
         String url = testProperties.getProperty("buildweb.url");
         String apiUrl = testProperties.getProperty("buildweb.api.url");
-        String logsUrlPattern = testProperties.getProperty("buildweb.logs.url.pattern");
+        String logFileName = testProperties.getProperty("buildweb.log.file.name");
         String username = testProperties.getProperty("buildweb.username");
-        buildweb = new Buildweb(url, apiUrl, logsUrlPattern, username);
+        buildweb = new Buildweb(url, apiUrl, logFileName, username);
     }
 
     @Test
     public void canGetSandboxBuild() {
-        SandboxBuild build = buildweb.getSandboxBuild("7292096");
-        assertEquals(7292096, build.id);
+        BuildwebBuild build = buildweb.getSandboxBuild("13170580");
+        assertEquals(13170580, build.id);
         assertEquals(BuildResult.SUCCESS, build.getBuildResult());
     }
 
     @Test
     public void buildWithCompileErrorStateIsTreatedAsFailed() {
-        SandboxBuild build = buildweb.getSandboxBuild("11330096");
+        BuildwebBuild build = buildweb.getSandboxBuild("11330096");
         assertEquals(11330096, build.id);
         assertEquals(BuildResult.FAILURE, build.getBuildResult());
         String buildOutput = buildweb.getBuildOutput(String.valueOf(build.id), 300);
         System.out.println(buildOutput);
     }
 
-
+    @Test
+    public void getBuildOutput() {
+        String buildOutput = buildweb.getBuildOutput("13174750", 50);
+        assertNotNull(buildOutput);
+    }
+    
 }

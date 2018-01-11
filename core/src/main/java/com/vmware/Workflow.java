@@ -186,7 +186,7 @@ public class Workflow {
         }
 
         String workflowToRun = config.workflowsToRun;
-        if (workflowToRun.equals("abalta") || workflowToRun.equals("anabalta")) {
+        if (Arrays.asList("abalta", "anabalta").contains(workflowToRun)) {
             checkAllActionsCanBeInstantiated(workflowToRun.equals("anabalta"));
             return;
         }
@@ -220,8 +220,8 @@ public class Workflow {
     private void outputTotalExecutionTime(Date startingDate) {
         if (log.isDebugEnabled()) {
             log.info("");
-            long totalElapsedTime = new Date().getTime() - startingDate.getTime();
-            log.debug("Workflow execution time {} ms", totalElapsedTime);
+            long totalElapsedTimeInMs = new Date().getTime() - startingDate.getTime();
+            log.debug("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
         }
     }
 
@@ -230,7 +230,9 @@ public class Workflow {
         ReviewRequestDraft draft = new ReviewRequestDraft();
         ProjectIssues projectIssues = new ProjectIssues();
         WorkflowActions workflowActions = new WorkflowActions(config);
-        for (Class<? extends BaseAction> action : workflowActions.determineActions(StringUtils.join(config.workflows.keySet()))) {
+        List<Class<? extends BaseAction>> workflowActionsClasses =
+                workflowActions.determineActions(StringUtils.join(config.workflows.keySet()));
+        for (Class<? extends BaseAction> action : workflowActionsClasses) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
             BaseAction actionObject = instantiateAction(action);
 
@@ -325,8 +327,8 @@ public class Workflow {
         for (BaseAction action : actionsToRun) {
             while (!actionsSetup.contains(action)) {
                 String actionName = action.getClass().getSimpleName();
-                if (waitTimeInMilliSeconds > 10000) {
-                    log.error(actionName + ".asyncSetup failed to finish in 10 seconds");
+                if (waitTimeInMilliSeconds > 30000) {
+                    log.error(actionName + ".asyncSetup failed to finish in 30 seconds");
                     System.exit(1);
                 }
                 if (waitTimeInMilliSeconds > 0 && waitTimeInMilliSeconds % 1000 == 0) {
