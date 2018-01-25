@@ -17,6 +17,8 @@ import com.vmware.util.logging.Padder;
 
 import java.util.List;
 
+import static com.vmware.util.UrlUtils.addRelativePaths;
+
 /**
  * VMware specific build service.
  */
@@ -36,7 +38,7 @@ public class Buildweb extends AbstractRestBuildService {
         String[] idParts = id.split("-");
         String buildType = idParts.length == 2 ? idParts[0] : "sb";
         String idForBuild = idParts.length == 2 ? idParts[1] : id;
-        return connection.get(baseUrl + buildType + "/build/" + idForBuild, BuildwebBuild.class);
+        return connection.get(addRelativePaths(baseUrl, buildType, "build", idForBuild), BuildwebBuild.class);
     }
 
     public void logOutputForBuilds(ReviewRequestDraft draft, int linesToShow, BuildResult... results) {
@@ -54,14 +56,16 @@ public class Buildweb extends AbstractRestBuildService {
 
     public String getBuildOutput(String buildId, int maxLinesToTail) {
         BuildwebBuild build = getSandboxBuild(buildId);
-        BuildMachines machines = connection.get(baseUrl + build.buildMachinesUrl, BuildMachines.class);
+        if (build.buildResult() == BuildResult.STARTING) {
+            return "";
+        }
+        BuildMachines machines = connection.get(addRelativePaths(baseUrl, build.buildMachinesUrl), BuildMachines.class);
         BuildMachine buildMachine = machines.realBuildMachine();
         String logsUrl;
-        if (build.getBuildResult() == BuildResult.BUILDING) {
-            logsUrl = "http://" + buildMachine.hostName + build.relativeBuildTreePath()
-                    + "logs/" + buildwebLogFileName;
+        if (build.buildResult() == BuildResult.BUILDING) {
+            logsUrl = addRelativePaths("http://" + buildMachine.hostName, build.relativeBuildTreePath(), "logs", buildwebLogFileName);
         } else {
-            logsUrl = build.buildTreeUrl + "logs/" + buildMachine.hostType + "/" + buildwebLogFileName;
+            logsUrl = addRelativePaths(build.buildTreeUrl, "logs", buildMachine.hostType, buildwebLogFileName);
         }
         return IOUtils.tail(logsUrl, maxLinesToTail);
     }
@@ -85,7 +89,7 @@ public class Buildweb extends AbstractRestBuildService {
         BuildwebId buildwebId = new BuildwebId(MatcherUtils.singleMatchExpected(url, "/(\\w\\w/\\d++)"));
         String buildApiUrl = baseUrl + buildwebId.buildApiPath();
         BuildwebBuild build = optimisticGet(buildApiUrl, BuildwebBuild.class);
-        return build.getBuildResult();
+        return build.buildResult();
     }
 
     @Override

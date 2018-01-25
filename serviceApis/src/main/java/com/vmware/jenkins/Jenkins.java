@@ -88,14 +88,14 @@ public class Jenkins extends AbstractRestBuildService {
 
     public void logOutputForBuildsMatchingResult(ReviewRequestDraft draft, int linesToShow, BuildResult... buildTypes) {
         String urlToCheckFor = urlUsedInBuilds();
-        log.debug("Displaying output for failed builds matching url {}", urlToCheckFor);
+        log.debug("Displaying output for builds matching url {} of type {}", urlToCheckFor, Arrays.toString(buildTypes));
         List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
         jobsToCheck.stream().filter(build -> build.matches(buildTypes))
                 .forEach(jobBuild -> {
                     Padder buildPadder = new Padder("Jenkins build {} result {}", jobBuild.id(), jobBuild.result);
                     buildPadder.infoTitle();
-                    String consoleOutupt = IOUtils.tail(jobBuild.getConsoleOutputUrl(), linesToShow);
-                    log.info(consoleOutupt);
+                    String consoleOutput = IOUtils.tail(jobBuild.getConsoleOutputUrl(), linesToShow);
+                    log.info(consoleOutput);
                     buildPadder.infoTitle();
                 });
     }

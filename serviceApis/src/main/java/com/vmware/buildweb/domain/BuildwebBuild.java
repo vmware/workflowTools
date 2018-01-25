@@ -2,8 +2,6 @@ package com.vmware.buildweb.domain;
 
 import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
@@ -12,8 +10,6 @@ import java.net.URI;
  * Can either be an official build or a sandbox build
  */
 public class BuildwebBuild {
-
-    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     public long id;
     public String changeset;
@@ -30,16 +26,8 @@ public class BuildwebBuild {
     @SerializedName("_buildmachines_url")
     public String buildMachinesUrl;
 
-    public BuildResult getBuildResult() {
-        if ("queued".equals(buildState) || "requesting-resources".equals(buildState)
-                || "wait-for-resources".equals(buildState) || "running".equals(buildState)) {
-            return BuildResult.BUILDING;
-        } else if ("succeeded".equals(buildState) || "storing".equals(buildState)) {
-            return BuildResult.SUCCESS;
-        } else {
-            log.info("Treating buildweb build state {} for build {} as a a failure", buildState, id);
-            return BuildResult.FAILURE;
-        }
+    public BuildResult buildResult() {
+        return BuildResult.fromValue(buildState);
     }
 
     public String relativeBuildTreePath() {

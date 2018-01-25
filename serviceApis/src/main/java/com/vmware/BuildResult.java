@@ -4,16 +4,40 @@ import com.vmware.util.StringUtils;
 
 import java.util.EnumSet;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public enum BuildResult {
     SUCCESS,
     UNSTABLE,
     FAILURE,
     ABORTED,
-    BUILDING;
+    BUILDING,
+    STARTING;
 
     public static String generateResultPattern() {
         String patternValues = StringUtils.appendWithDelimiter("", EnumSet.allOf(BuildResult.class), "|");
         return "(" + patternValues + ")";
     }
+
+    public static BuildResult fromValue(String value) {
+        switch (value) {
+            case "starting":
+            case "building-components":
+            case "queued":
+            case "requesting-resources":
+            case "wait-for-resources":
+                return STARTING;
+            case "running":
+                return BUILDING;
+            case "succeeded":
+            case "storing":
+                return SUCCESS;
+            default:
+                getLogger(BuildResult.class).info("Treating buildweb build state {} as a a failure", value);
+                return BuildResult.FAILURE;
+        }
+    }
+
+
 
 }

@@ -68,7 +68,7 @@ public class CommandLineUtils {
         long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds);
         LogLevel elapsedTimeLogLevel = elapsedTimeInSeconds > 1 ? logLevel : LogLevel.DEBUG;
         String plural = elapsedTimeInSeconds == 1 ? "" : "s";
-        dynamicLogger.log(elapsedTimeLogLevel, "Execution time {} second{}", String.valueOf(elapsedTimeInSeconds), plural);
+        dynamicLogger.log(elapsedTimeLogLevel, "Execution time {} second{}", elapsedTimeInSeconds, plural);
         titlePadder.logTitle(logLevel);
         return output;
     }
