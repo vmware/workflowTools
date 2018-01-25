@@ -68,12 +68,9 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         }
 
         log.info("Waiting for build to complete");
-        Callable<Boolean> condition = new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
-                return updatedDetails.building;
-            }
+        Callable<Boolean> condition = () -> {
+            JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
+            return updatedDetails.building;
         };
         ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
 
@@ -96,7 +93,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, Job jobToInvoke) {
-        log.info("Invoking job {}", jobToInvoke.name);
+        log.info("Invoking job {} using display name", jobToInvoke.name, jobToInvoke.jobDisplayName);
 
         JobDetails jobDetails = jenkins.getJobDetails(jobToInvoke);
         JobParameters params = constructParametersForJob(jobToInvoke.parameters, jobDetails.getParameterDefinitions());

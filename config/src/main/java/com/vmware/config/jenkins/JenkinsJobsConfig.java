@@ -3,6 +3,7 @@ package com.vmware.config.jenkins;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,8 @@ import static com.vmware.config.jenkins.JobParameter.USERNAME_PARAM;
 public class JenkinsJobsConfig {
 
     private static final String USERNAME_VALUE = "$USERNAME";
+
+    private static final String BRANCH_NAME = "$BRANCH_NAME";
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -104,10 +107,26 @@ public class JenkinsJobsConfig {
                 throw new FatalException(
                         "Parameter {} for job {} should be of the format name=value", param, jobName);
             }
-            parameters.add(new JobParameter(paramPieces[0], paramPieces[1]));
+            String paramValue = paramPieces[1];
+            if (paramValue.contains(BRANCH_NAME)) {
+                paramValue = replaceBranchNameVariableWithValue(paramValue);
+            }
+            parameters.add(new JobParameter(paramPieces[0], paramValue));
         }
         expandParameterValues(jobName, parameters);
         return parameters;
+    }
+
+    private String replaceBranchNameVariableWithValue(String paramValue) {
+        Git git = new Git();
+        if (git.workingDirectoryIsInGitRepo()) {
+            paramValue = paramValue.replace(BRANCH_NAME, git.currentBranch());
+        } else if (StringUtils.isBlank(paramValue)) {
+            paramValue = "noBranchName";
+        } else {
+            paramValue = paramValue.replace(BRANCH_NAME, "");
+        }
+        return paramValue;
     }
 
     private void expandParameterValues(String jobName, List<JobParameter> parameters) {

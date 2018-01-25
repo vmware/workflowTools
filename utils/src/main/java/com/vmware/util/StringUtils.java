@@ -112,6 +112,7 @@ public class StringUtils {
             if (argument == null) {
                 argument = "";
             }
+            argument = argument.replace("$", "\\$");
             value = value.replaceFirst("\\{\\}", argument);
         }
         return value;

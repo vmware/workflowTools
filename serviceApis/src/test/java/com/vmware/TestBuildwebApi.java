@@ -28,14 +28,14 @@ public class TestBuildwebApi extends BaseTests {
     public void canGetSandboxBuild() {
         BuildwebBuild build = buildweb.getSandboxBuild("13170580");
         assertEquals(13170580, build.id);
-        assertEquals(BuildResult.SUCCESS, build.getBuildResult());
+        assertEquals(BuildResult.SUCCESS, build.buildResult());
     }
 
     @Test
     public void buildWithCompileErrorStateIsTreatedAsFailed() {
         BuildwebBuild build = buildweb.getSandboxBuild("11330096");
         assertEquals(11330096, build.id);
-        assertEquals(BuildResult.FAILURE, build.getBuildResult());
+        assertEquals(BuildResult.FAILURE, build.buildResult());
         String buildOutput = buildweb.getBuildOutput(String.valueOf(build.id), 300);
         System.out.println(buildOutput);
     }
@@ -45,5 +45,5 @@ public class TestBuildwebApi extends BaseTests {
         String buildOutput = buildweb.getBuildOutput("13174750", 50);
         assertNotNull(buildOutput);
     }
-    
+
 }

@@ -98,6 +98,7 @@ public class IOUtils {
 
     public static String tail(String url, int numberOfLinesToTail) {
         try {
+            logger.log(LogLevel.DEBUG, "Tailing {} lines using url {}", numberOfLinesToTail, url);
             URLConnection urlConnection = new URL(url).openConnection();
             Queue<String> lines = new CircularFifoQueue<>(numberOfLinesToTail);
             addLines(urlConnection.getInputStream(), lines);

@@ -13,7 +13,7 @@ public class DynamicLogger {
         this.log = log;
     }
 
-    public void log(LogLevel logLevel, String message, String... params) {
+    public void log(LogLevel logLevel, String message, Object... params) {
         if (logLevel == LogLevel.ERROR) {
             log.error(message, params);
         } else if (logLevel == LogLevel.WARN) {

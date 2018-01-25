@@ -33,13 +33,13 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
         return baseUrl;
     }
 
-
     private boolean checkIfAllBuildsSucceeded(List<JobBuild> buildsToCheck) {
         boolean isSuccess = true;
         for (JobBuild jobBuild : buildsToCheck) {
             String jobUrl = jobBuild.url;
 
-            if (jobBuild.result == null || jobBuild.result == BuildResult.BUILDING) {
+            if (jobBuild.result == null
+                    || jobBuild.result == BuildResult.STARTING || jobBuild.result == BuildResult.BUILDING) {
                 try {
                     jobBuild.result = getResultForBuild(jobUrl);
                     log.info("{}: {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
