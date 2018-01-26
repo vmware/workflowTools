@@ -30,6 +30,7 @@ public class JenkinsJobsConfig {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Map<String, String> jenkinsJobsMappings = new HashMap<>();
+    private String branchName;
 
     private String[] jobsDisplayNames;
     private Map<String, String> presetParameters = new TreeMap<>();
@@ -46,11 +47,13 @@ public class JenkinsJobsConfig {
         return jobs.size();
     }
 
-    public JenkinsJobsConfig(String jenkinsJobsToUse, String[] jobsDisplayNames, Map<String, String> presetParameters, String jenkinsUrl, Map<String, String> jenkinsJobsMappings) {
+    public JenkinsJobsConfig(String jenkinsJobsToUse, String[] jobsDisplayNames, Map<String, String> presetParameters,
+                             String jenkinsUrl, Map<String, String> jenkinsJobsMappings, String branchName) {
         this.presetParameters = presetParameters;
         this.jobsDisplayNames = jobsDisplayNames;
         this.jenkinsUrl = jenkinsUrl;
         this.jenkinsJobsMappings = jenkinsJobsMappings;
+        this.branchName = branchName;
         parseJobsText(jenkinsJobsToUse);
     }
 
@@ -118,13 +121,9 @@ public class JenkinsJobsConfig {
     }
 
     private String replaceBranchNameVariableWithValue(String paramValue) {
-        Git git = new Git();
-        if (git.workingDirectoryIsInGitRepo()) {
-            paramValue = paramValue.replace(BRANCH_NAME, git.currentBranch());
-        } else if (StringUtils.isBlank(paramValue)) {
-            paramValue = "noBranchName";
-        } else {
-            paramValue = paramValue.replace(BRANCH_NAME, "");
+        paramValue = paramValue.replace(BRANCH_NAME, branchName);
+        if (StringUtils.isBlank(paramValue)) {
+            paramValue = "noBranch";
         }
         return paramValue;
     }

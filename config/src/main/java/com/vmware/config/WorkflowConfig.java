@@ -146,7 +146,7 @@ public class WorkflowConfig {
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {
-        return jenkinsConfig.getJenkinsJobsConfig(this.username);
+        return jenkinsConfig.getJenkinsJobsConfig(this.username, gitRepoConfig.determineBranchName());
     }
 
     public WorkflowFields getConfigurableFields() {
