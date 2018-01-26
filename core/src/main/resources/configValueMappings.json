@@ -319,9 +319,6 @@
     "--username",
     "--review-board-date-format"
   ],
-  "ReadLastCommit": [
-    "--branch"
-  ],
   "PushToTrackingBranch": [
     "--tracking-branch"
   ],

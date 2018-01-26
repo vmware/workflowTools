@@ -1,10 +1,16 @@
 package com.vmware.config.section;
 
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.util.StringUtils;
+import com.vmware.util.scm.Git;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.TreeMap;
 
 public class GitRepoConfig {
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @ConfigurableProperty(commandLine = "-tb,--tracking-branch", help = "Tracking branch to use as base for reviews and for pushing commits. Combined with defaultGitRemote if no remote specified.")
     public String trackingBranch;
@@ -40,6 +46,20 @@ public class GitRepoConfig {
             return parentBranch;
         }
         return defaultGitRemote + "/" + parentBranch;
+    }
+
+    public String determineBranchName() {
+        Git git = new Git();
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return "";
+        }
+        String targetBranchValue = git.currentBranch();
+        log.debug("Using local git branch {}", targetBranch);
+        if (StringUtils.isNotBlank(targetBranch)) {
+            log.info("Setting branch property to {} (read from application config)", targetBranch);
+            targetBranchValue = targetBranch;
+        }
+        return targetBranchValue;
     }
 
 }

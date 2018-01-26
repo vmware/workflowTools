@@ -26,7 +26,7 @@ public class ReadLastCommit extends BaseCommitAction {
     public void process() {
         String commitText = readLastChange();
         if (git.workingDirectoryIsInGitRepo()) {
-            draft.branch = determineBranchName();
+            draft.branch = gitRepoConfig.determineBranchName();
         }
         draft.fillValuesFromCommitText(commitText, commitConfig);
         if (git.workingDirectoryIsInGitRepo()) {
@@ -41,13 +41,5 @@ public class ReadLastCommit extends BaseCommitAction {
         titlePadder.debugTitle();
     }
 
-    private String determineBranchName() {
-        String targetBranch = git.currentBranch();
-        log.debug("Using local git branch {}", targetBranch);
-        if (StringUtils.isNotBlank(gitRepoConfig.targetBranch)) {
-            log.info("Setting branch property to {} (read from application config)", targetBranch);
-            targetBranch = gitRepoConfig.targetBranch;
-        }
-        return targetBranch;
-    }
+
 }

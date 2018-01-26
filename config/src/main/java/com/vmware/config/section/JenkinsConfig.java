@@ -66,12 +66,13 @@ public class JenkinsConfig {
         }
     }
 
-    public JenkinsJobsConfig getJenkinsJobsConfig(String username) {
+    public JenkinsJobsConfig getJenkinsJobsConfig(String username, String targetBranch) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
         Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
 
-        return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, presetParams, jenkinsUrl, jobMappings);
+        return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, presetParams, jenkinsUrl,
+                jobMappings, targetBranch);
     }
 
 }
