@@ -14,8 +14,7 @@ public class ExitIfCommitDoesNotHaveAChangelistId extends BaseCommitAction {
     @Override
     public void process() {
         if (StringUtils.isBlank(draft.perforceChangelistId)) {
-            log.info("Changelist id is blank for this commit");
-            System.exit(0);
+            exitWithMessage("changelist id is blank for this commit");
         }
     }
 }

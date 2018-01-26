@@ -23,9 +23,7 @@ public class ExitIfReviewHasNoShipIts extends BaseSetShipItReviewersList {
             return;
         }
 
-        log.info("");
-        log.info("Exiting as the review has no ship its.");
-        System.exit(0);
+        exitWithMessage("the review has no ship its.");
     }
 
 }

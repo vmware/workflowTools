@@ -18,9 +18,7 @@ public class ExitIfNoTrelloBoardSelected extends BaseTrelloAction {
     @Override
     public void process() {
         if (selectedBoard == null) {
-            log.info("");
-            log.info("Exiting as no trello board has been selected or created.");
-            System.exit(0);
+            exitWithMessage("no trello board has been selected or created.");
         }
     }
 }

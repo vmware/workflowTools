@@ -98,9 +98,8 @@ public class ApplyPatch extends BaseCommitAction {
                 result = patch(patchData, false);
                 break;
             default:
-                log.warn("Not applying patch, patch is stored in workflow.patch");
-                System.exit(0);
-        }
+                exitWithWarnMessage("Not applying patch, patch is stored in workflow.patch");
+         }
         return result;
     }
 

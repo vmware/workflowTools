@@ -19,8 +19,7 @@ public class ExitIfNoChangesDetectedByGit extends BaseCommitAction {
     public void process() {
         List<FileChange> changes = git.getAllChanges();
         if (changes.isEmpty()) {
-            log.info("No changes detected by git!");
-            System.exit(0);
+            exitWithMessage("no changes detected by git!");
         }
 
         Padder titlePadder = new Padder("Changes");

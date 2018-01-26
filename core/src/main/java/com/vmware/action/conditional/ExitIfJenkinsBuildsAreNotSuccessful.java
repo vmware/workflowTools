@@ -17,15 +17,10 @@ public class ExitIfJenkinsBuildsAreNotSuccessful extends BaseCommitWithJenkinsBu
             log.info("");
             jenkins.checkStatusOfBuilds(draft);
             if (!draft.jenkinsBuildsAreSuccessful) {
-                exitDueToFailedBuilds();
+                exitWithMessage("one or more jenkins jobs were not successful");
             }
         } else if (!draft.jenkinsBuildsAreSuccessful) {
-            exitDueToFailedBuilds();
+            exitWithMessage("one or more jenkins jobs were not successful");
         }
-    }
-
-    private void exitDueToFailedBuilds() {
-        log.info("One or more jenkins jobs were not successful!");
-        System.exit(0);
     }
 }

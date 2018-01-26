@@ -17,8 +17,6 @@ public class ExitIfTrivialCommit extends BaseCommitAction {
             return;
         }
 
-        log.info("");
-        log.info("Exiting as the commit is trivial");
-        System.exit(0);
+        exitWithMessage("the commit is trivial");
     }
 }

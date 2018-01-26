@@ -14,7 +14,7 @@ public class ExitIfThereAreNoBugsToProcess extends BaseIssuesProcessingAction {
     @Override
     public void process() {
         if (projectIssues.noBugsAdded()) {
-            System.exit(0);
+            exitWithMessage("no bugs to process");
         }
     }
 }

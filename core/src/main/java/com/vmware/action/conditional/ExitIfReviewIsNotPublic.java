@@ -22,8 +22,6 @@ public class ExitIfReviewIsNotPublic extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        log.info("");
-        log.info("Exiting as the review is not public");
-        System.exit(0);
+        exitWithMessage("the review is not public");
     }
 }
