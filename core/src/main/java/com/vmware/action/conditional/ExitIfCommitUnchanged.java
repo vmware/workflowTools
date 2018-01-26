@@ -17,8 +17,6 @@ public class ExitIfCommitUnchanged extends BaseCommitAction {
             return;
         }
 
-        log.info("");
-        log.info("Commit does not have any changes, exiting");
-        System.exit(0);
+        exitWithMessage("commit does not have any changes");
     }
 }

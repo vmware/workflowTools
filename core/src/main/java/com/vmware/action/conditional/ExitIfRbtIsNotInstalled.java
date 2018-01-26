@@ -18,8 +18,6 @@ public class ExitIfRbtIsNotInstalled extends BaseAction {
             return;
         }
 
-        log.info("");
-        log.info("Exiting as rbt is not installed.");
-        System.exit(0);
+        exitWithMessage("rbt is not installed.");
     }
 }

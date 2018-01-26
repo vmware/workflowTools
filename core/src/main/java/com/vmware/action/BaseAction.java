@@ -117,4 +117,22 @@ public abstract class BaseAction {
         this.expectedCommandsToBeAvailable = commands;
     }
 
+    protected void exitWithMessage(String message) {
+        log.info("");
+        log.info("Exiting as {}", message);
+        System.exit(0);
+    }
+
+    protected void exitWithErrorMessage(String message) {
+        log.info("");
+        log.error(message);
+        System.exit(1);
+    }
+
+    protected void exitWithWarnMessage(String message) {
+        log.info("");
+        log.warn(message);
+        System.exit(0);
+    }
+
 }

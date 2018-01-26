@@ -17,8 +17,6 @@ public class ExitIfCommitHasNoBugNumber extends BaseCommitAction {
             return;
         }
 
-        log.info("");
-        log.info("Exiting as commit has no bug number");
-        System.exit(0);
+        exitWithMessage("commit has no bug number");
     }
 }
