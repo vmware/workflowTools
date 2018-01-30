@@ -314,6 +314,9 @@
   "PushToMaster": [
     "--git-remote"
   ],
+  "EnableDisableMergeTo": [
+    "--disable-merge-to"
+  ],
   "BaseSetUsersList": [
     "--search-by-usernames-only",
     "--username",
