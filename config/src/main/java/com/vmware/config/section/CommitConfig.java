@@ -70,6 +70,9 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--set-empty-only", help = "Set values for empty properties only. Ignore properties that already have values")
     public boolean setEmptyPropertiesOnly;
 
+    @ConfigurableProperty(commandLine = "--disable-merge-to", help = "Disable merge to")
+    public boolean disableMergeTo;
+
     public CommitConfig() {}
 
     public CommitConfig(String reviewboardUrl, String buildwebUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,

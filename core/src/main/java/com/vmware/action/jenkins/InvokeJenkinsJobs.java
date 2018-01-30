@@ -93,7 +93,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, Job jobToInvoke) {
-        log.info("Invoking job {} using display name", jobToInvoke.name, jobToInvoke.jobDisplayName);
+        log.info("Invoking job {} using display name {}", jobToInvoke.name, jobToInvoke.jobDisplayName);
 
         JobDetails jobDetails = jenkins.getJobDetails(jobToInvoke);
         JobParameters params = constructParametersForJob(jobToInvoke.parameters, jobDetails.getParameterDefinitions());

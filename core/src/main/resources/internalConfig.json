@@ -461,6 +461,17 @@
       "AddToReviewedBy",
       "AmendCommit"
     ],
+    "enableMergeTo": [
+      "ReadLastCommit",
+      "EnableDisableMergeTo",
+      "AmendCommit"
+    ],
+    "disableMergeTo": [
+      "ReadLastCommit",
+      "EnableDisableMergeTo",
+      "AmendCommit",
+      "--disable-merge-to"
+    ],
     "reopenAndResolveIssues": [
       "LoadCompletedIssuesWithoutResolution",
       "ExitIfThereAreNoIssuesToProcess",
