@@ -21,6 +21,8 @@ public class UrlUtils {
                 url += path;
             } else if (url.endsWith("/") && path.startsWith("/")) {
                 url += path.substring(1);
+            } else if (url.endsWith("/")) {
+                url += path;
             } else {
                 url += "/" + path;
             }

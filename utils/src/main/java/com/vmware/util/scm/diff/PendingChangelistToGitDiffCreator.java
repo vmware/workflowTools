@@ -15,6 +15,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,61 +129,73 @@ public class PendingChangelistToGitDiffCreator {
      */
     private void appendDiffForAddedOrDeletedFiles(List<FileChange> fileChanges, boolean binaryPatch,
                                                   StringBuilder gitCompatibleData) {
+        Queue<String> fileDiffs = new ConcurrentLinkedQueue<>();
+        fileChanges.parallelStream().forEach(fileChange -> {
+            String fileDiff = determineFileDiff(binaryPatch, fileChange);
+            if (fileDiff != null) {
+                fileDiffs.add(fileDiff);
+            }
+        });
+
+        fileDiffs.forEach(fileDiff -> gitCompatibleData.append(fileDiff));
+    }
+
+    private String determineFileDiff(boolean binaryPatch, FileChange fileChange) {
+        FileChangeType changeType = fileChange.getChangeType();
+        if (changeType != deleted && changeType != added && changeType != addedAndModified) {
+            return null;
+        }
+
         File tempEmptyFile = FileUtils.createTempFile("empty", ".file");
         String tempEmptyFilePath = tempEmptyFile.getPath();
 
-        for (FileChange fileChange : fileChanges) {
-            FileChangeType changeType = fileChange.getChangeType();
-            if (changeType != deleted && changeType != added && changeType != addedAndModified) {
-                continue;
-            }
-
-            String firstFile, secondFile;
-            File tempFileForDeleteComparison = null;
-            if (changeType == deleted) {
-                tempFileForDeleteComparison = FileUtils.createTempFile("deleteCompare", ".file");
-                perforce.printToFile(perforce.fullPath(fileChange.getFirstFileAffected()), tempFileForDeleteComparison);
-                firstFile = tempFileForDeleteComparison.getPath();
-                secondFile = tempEmptyFilePath;
-            } else {
-                firstFile = tempEmptyFilePath;
-                secondFile = perforce.fullPath(fileChange.getLastFileAffected());
-            }
-            String fileDiff = gitDiff(firstFile, secondFile, binaryPatch);
-            if (StringUtils.isBlank(fileDiff) && changeType == added) {
-                log.warn("No content in added file {}", fileChange.getLastFileAffected());
-                continue;
-            }
-            if (tempFileForDeleteComparison != null && !tempFileForDeleteComparison.delete()) {
-                log.warn("Failed to delete temporary file created to diff delete for file {}: {}",
-                        fileChange.getFirstFileAffected(), tempFileForDeleteComparison.getPath());
-            }
-            String newFileMode = MatcherUtils.singleMatch(fileDiff, "new mode (\\d+)");
-            String indexPattern = "index\\s+(\\w+)\\.\\.(\\w+)";
-            if (newFileMode == null) {
-                indexPattern += "\\s+(\\d+)";
-            }
-            Matcher indexLineMatcher = Pattern.compile(indexPattern).matcher(fileDiff);
-            if (!indexLineMatcher.find()) {
-                throw new RuntimeException("Failed to match index line in diff\n" + fileDiff);
-            }
-
-            String firstIndex = changeType == deleted ? indexLineMatcher.group(1) : NON_EXISTENT_INDEX_IN_GIT;
-            String secondIndex = changeType == deleted ? NON_EXISTENT_INDEX_IN_GIT : indexLineMatcher.group(2);
-            String fileMode = newFileMode != null ? newFileMode : indexLineMatcher.group(3);
-            fileChange.setFileMode(fileMode);
-            gitCompatibleData.append("\n").append(fileChange.diffGitLine());
-            gitCompatibleData.append("\n").append(format("index %s..%s", firstIndex, secondIndex));
-
-            if (!fileChange.isBinaryFileType()) {
-                gitCompatibleData.append("\n").append(fileChange.createMinusPlusLines());
-            }
-            int indexToStartDiffAt = determineDiffStart(fileDiff);
-            gitCompatibleData.append("\n").append(fileDiff.substring(indexToStartDiffAt));
+        String firstFile, secondFile;
+        File tempFileForDeleteComparison = null;
+        if (changeType == deleted) {
+            tempFileForDeleteComparison = FileUtils.createTempFile("deleteCompare", ".file");
+            perforce.printToFile(perforce.fullPath(fileChange.getFirstFileAffected()), tempFileForDeleteComparison);
+            firstFile = tempFileForDeleteComparison.getPath();
+            secondFile = tempEmptyFilePath;
+        } else {
+            firstFile = tempEmptyFilePath;
+            secondFile = perforce.fullPath(fileChange.getLastFileAffected());
         }
+        String fileDiff = gitDiff(firstFile, secondFile, binaryPatch);
+        if (StringUtils.isBlank(fileDiff) && changeType == added) {
+            log.warn("No content in added file {}", fileChange.getLastFileAffected());
+            return null;
+        }
+        if (tempFileForDeleteComparison != null && !tempFileForDeleteComparison.delete()) {
+            log.warn("Failed to delete temporary file created to diff delete for file {}: {}",
+                    fileChange.getFirstFileAffected(), tempFileForDeleteComparison.getPath());
+        }
+        String newFileMode = MatcherUtils.singleMatch(fileDiff, "new mode (\\d+)");
+        String indexPattern = "index\\s+(\\w+)\\.\\.(\\w+)";
+        if (newFileMode == null) {
+            indexPattern += "\\s+(\\d+)";
+        }
+        Matcher indexLineMatcher = Pattern.compile(indexPattern).matcher(fileDiff);
+        if (!indexLineMatcher.find()) {
+            throw new RuntimeException("Failed to match index line in diff\n" + fileDiff);
+        }
+
+        String firstIndex = changeType == deleted ? indexLineMatcher.group(1) : NON_EXISTENT_INDEX_IN_GIT;
+        String secondIndex = changeType == deleted ? NON_EXISTENT_INDEX_IN_GIT : indexLineMatcher.group(2);
+        String fileMode = newFileMode != null ? newFileMode : indexLineMatcher.group(3);
+        fileChange.setFileMode(fileMode);
+
+        StringBuilder fullDiffBuilder = new StringBuilder();
+        fullDiffBuilder.append("\n").append(fileChange.diffGitLine());
+        fullDiffBuilder.append("\n").append(format("index %s..%s", firstIndex, secondIndex));
+
+        if (!fileChange.isBinaryFileType()) {
+            fullDiffBuilder.append("\n").append(fileChange.createMinusPlusLines());
+        }
+        int indexToStartDiffAt = determineDiffStart(fileDiff);
         if (!tempEmptyFile.delete()) {
             log.warn("Failed to delete temporary empty file created for diffing files, {}", tempEmptyFile.getPath());
         }
+        return fullDiffBuilder.append("\n").append(fileDiff.substring(indexToStartDiffAt)).toString();
     }
 
     private int determineDiffStart(String fileDiff) {
