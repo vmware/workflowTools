@@ -84,7 +84,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        Map<String, String> jenkinsJobsMappings = config.jenkinsConfig.jenkinsJobsMappings;
+        Map<String, String> jenkinsJobsMappings = jenkinsConfig.jenkinsJobsMappings;
         if (jenkinsJobsMappings == null || jenkinsJobsMappings.isEmpty()) {
             jenkinsConfig.jenkinsJobsToUse = InputUtils.readValue("Jenkins jobs");
         } else {

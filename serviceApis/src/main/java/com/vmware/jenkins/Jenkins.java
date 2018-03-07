@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.vmware.http.cookie.ApiAuthentication.jenkins;
 
@@ -82,8 +83,10 @@ public class Jenkins extends AbstractRestBuildService {
         return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
     }
 
-    public void stopJobBuild(JobBuild jobBuildToStop) {
-        optimisticPost(jobBuildToStop.getJenkinsStopUrl(), null);
+    public void abortJobBuild(JobBuild jobBuildToAbort) {
+        log.info("Aborting build {}", jobBuildToAbort.url);
+        optimisticPost(jobBuildToAbort.getJenkinsStopUrl(), null);
+        jobBuildToAbort.result = BuildResult.ABORTED;
     }
 
     public void logOutputForBuildsMatchingResult(ReviewRequestDraft draft, int linesToShow, BuildResult... buildTypes) {
@@ -98,6 +101,20 @@ public class Jenkins extends AbstractRestBuildService {
                     log.info(consoleOutput);
                     buildPadder.infoTitle();
                 });
+    }
+
+    public void abortAllRunningBuilds(ReviewRequestDraft draft) {
+        String urlToCheckFor = urlUsedInBuilds();
+        log.info("Aborting all builds matching url {}", urlToCheckFor);
+        List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
+        List<JobBuild> runningBuilds = jobsToCheck.stream()
+                .filter(jobBuild -> jobBuild.result == BuildResult.BUILDING).collect(Collectors.toList());
+        if (runningBuilds.isEmpty()) {
+            log.info("No builds running");
+            return;
+        }
+        runningBuilds.forEach(this::abortJobBuild);
+        draft.jenkinsBuildsAreSuccessful = false;
     }
 
     @Override
