@@ -239,7 +239,7 @@
     "amendReview": [
       "ExitIfNoChangesDetectedByGit",
       "DisplayLastCommit",
-      "AmendCommitFilesOnly",
+      "AmendCommitAllFilesOnly",
       "review"
     ],
     "diffUploadOnly": [
@@ -381,6 +381,11 @@
     "abortJobs": [
       "ReadLastCommit",
       "AbortJenkinsBuilds",
+      "AmendCommit"
+    ],
+    "abortAllJobs": [
+      "ReadLastCommit",
+      "AbortAllJenkinsBuilds",
       "AmendCommit"
     ],
     "pushable": [

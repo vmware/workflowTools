@@ -5,6 +5,7 @@ import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Superclass for common functionality for rest build services such as Jenkins and Buildweb.

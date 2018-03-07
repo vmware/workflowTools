@@ -36,7 +36,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
-        Map<String, String> jenkinsJobsMappings = config.jenkinsConfig.jenkinsJobsMappings;
+        Map<String, String> jenkinsJobsMappings = jenkinsConfig.jenkinsJobsMappings;
         if (jenkinsJobsMappings == null || jenkinsJobsMappings.isEmpty()) {
             jenkinsConfig.jenkinsJobsToUse = InputUtils.readValue("Jenkins job keys");
         } else {
@@ -56,9 +56,8 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
             return;
         }
 
-        log.info("Aborting build {}", buildToAbort.url);
         try {
-            jenkins.stopJobBuild(buildToAbort);
+            jenkins.abortJobBuild(buildToAbort);
         } catch (NotFoundException e) {
             log.warn("Could not find build to abort. Build might not have started yet");
             return;
