@@ -9,6 +9,7 @@ public enum FileChangeType {
     modified("M", "edit", "modified %s"),
     integrate("I", "integrate", "integrated %s"),
     addedAndModified("AM", "edit", "added and modified %s"),
+    addedAndDeleted("AD", "edit", "added and deleted %s"),
     deleted("D", "delete", "deleted %s"),
     renamed("R", "move/add", "renamed %s to %s"),
     renamedAndModified("RM", "noPerforceVersion", "renamed %s to %s, also modified"),

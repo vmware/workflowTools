@@ -32,8 +32,10 @@ public enum BuildResult {
             case "succeeded":
             case "storing":
                 return SUCCESS;
+            case "compile-error":
+                return BuildResult.FAILURE;
             default:
-                getLogger(BuildResult.class).info("Treating buildweb build state {} as a a failure", value);
+                getLogger(BuildResult.class).info("Treating buildweb build state {} as a failure", value);
                 return BuildResult.FAILURE;
         }
     }
