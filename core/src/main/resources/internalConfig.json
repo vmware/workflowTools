@@ -237,7 +237,9 @@
       "displayReviewUrl"
     ],
     "amendReview": [
-      "amendCommitAll",
+      "ExitIfNoChangesDetectedByGit",
+      "DisplayLastCommit",
+      "AmendCommitFilesOnly",
       "review"
     ],
     "diffUploadOnly": [
