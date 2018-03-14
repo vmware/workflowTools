@@ -43,7 +43,7 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(reviewId));
 
         ReviewRequestDraft reviewAsDraft = reviewRequest.asDraft();
-        if (StringUtils.isBlank(reviewRequest.summary) && StringUtils.isBlank(reviewRequest.description)) { // populate values from draft
+        if (StringUtils.isBlank(reviewAsDraft.summary) && StringUtils.isBlank(reviewAsDraft.description)) { // populate values from draft
             reviewAsDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
         }
         if (draft == null) {
@@ -54,7 +54,7 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         draft.description = StringUtils.addNewLinesIfNeeded(reviewAsDraft.description, commitConfig.maxDescriptionLength, 0);
 
         String fullReviewText = reviewRequest.summary + "\n" + reviewAsDraft.description
-                + "\n" + commitConfig.getTestingDoneLabel() + reviewRequest.testingDone;
+                + "\n" + commitConfig.getTestingDoneLabel() + reviewAsDraft.testingDone;
         ReviewRequestDraft draftConstructedFromReviewDetails = new ReviewRequestDraft(fullReviewText, commitConfig);
 
         String testingDone = draftConstructedFromReviewDetails.testingDone;
