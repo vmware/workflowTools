@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.vmware.jira.domain.FilterableIssueField.epic;
@@ -175,7 +176,7 @@ public class LoadIssues extends BaseBatchJiraAction {
 
     private List<String> getFieldValuesFromIssues(List<Issue> issues, FilterableIssueField fieldType) {
         return issues.stream()
-                .flatMap(issue -> issue.fields.valuesForFilterableField(fieldType).stream()).collect(Collectors.toList());
+                .flatMap(issue -> issue.fields.valuesForFilterableField(fieldType).stream()).distinct().collect(Collectors.toList());
     }
 
     private List<Issue> filterByFieldValues(List<Issue> issues, FilterableIssueField fieldType, List<String> values) {
