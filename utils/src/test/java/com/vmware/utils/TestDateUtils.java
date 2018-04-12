@@ -1,7 +1,9 @@
-package com.vmware.util;
+package com.vmware.utils;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.vmware.util.DateUtils;
 
 import java.util.Calendar;
 import java.util.Date;
