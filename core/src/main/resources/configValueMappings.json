@@ -9,14 +9,14 @@
   "CopyReviewUrlToClipboard": [
     "--reviewboard-url"
   ],
+  "DisplayBuildOutputForBuildwebBuilds": [
+    "--include-in-progress",
+    "--log-line-count"
+  ],
   "BaseCheckstyleAction": [
     "--checkstyle-suppressions-xml-path",
     "--checkstyle-config-xml-path",
     "--checkstyle-jar-path"
-  ],
-  "DisplayBuildOutputForBuildwebBuilds": [
-    "--include-in-progress",
-    "--log-line-count"
   ],
   "LoadGitPatchFile": [
     "--diff-file"
@@ -28,10 +28,6 @@
     "--file-count-ranges",
     "--groups",
     "--review-board-date-format"
-  ],
-  "SyncChangelist": [
-    "--tracking-branch",
-    "--sync-to-branch-latest"
   ],
   "CheckStatusOfLatestBuilds": [
     "--disable-jenkins-login",
@@ -47,6 +43,10 @@
     "--wait-for-jenkins",
     "--ignore-jenkins-job-failure",
     "--job-display-names"
+  ],
+  "SyncChangelist": [
+    "--tracking-branch",
+    "--sync-to-branch-latest"
   ],
   "BaseTransitionJiraIssue": [
     "--username",
@@ -93,11 +93,11 @@
     "--default-jira-project",
     "--bugzilla-query"
   ],
-  "RevertWorkspace": [
-    "--perforce-client"
-  ],
   "SaveChangelistDiffToFile": [
     "--output-file"
+  ],
+  "RevertWorkspace": [
+    "--perforce-client"
   ],
   "LoadReviewPatch": [
     "--username",
@@ -109,11 +109,11 @@
     "--username",
     "--review-board-date-format"
   ],
-  "BaseCommitReadAction": [
-    "--set-empty-only"
-  ],
   "DisplayReviewUrl": [
     "--reviewboard-url"
+  ],
+  "BaseCommitReadAction": [
+    "--set-empty-only"
   ],
   "LoadBugsForQuery": [
     "--bugzilla-query"
@@ -122,16 +122,16 @@
     "--include-in-progress",
     "--log-line-count"
   ],
+  "UpdateReviewDetails": [
+    "--groups",
+    "--disable-markdown"
+  ],
   "GenerateGitCommitStats": [
     "--max-summary",
     "--author-emails",
     "--last-number-of-days",
     "--line-count-ranges",
     "--file-count-ranges"
-  ],
-  "UpdateReviewDetails": [
-    "--groups",
-    "--disable-markdown"
   ],
   "CreateReviewIfNeeded": [
     "--username",
@@ -177,11 +177,11 @@
     "--perforce-client",
     "--changelist-id"
   ],
-  "SetDefaultApprover": [
-    "--default-approver"
-  ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
+  ],
+  "SetDefaultApprover": [
+    "--default-approver"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
@@ -196,15 +196,15 @@
   "BaseCommitCreateAction": [
     "--perforce-client"
   ],
-  "BaseCommitUsingReviewBoardAction": [
-    "--username",
-    "--review-board-date-format"
-  ],
   "SetCommitDetailsFromReview": [
     "--username",
     "--max-description",
     "--max-summary",
     "--review-request-id",
+    "--review-board-date-format"
+  ],
+  "BaseCommitUsingReviewBoardAction": [
+    "--username",
     "--review-board-date-format"
   ],
   "UploadReviewDiff": [
@@ -263,13 +263,13 @@
     "--ssh-site",
     "--ssh-command"
   ],
-  "SubmitToDepot": [
-    "--tracking-branch"
-  ],
   "CreateReview": [
     "--username",
     "--review-board-date-format",
     "--review-board-repo"
+  ],
+  "SubmitToDepot": [
+    "--tracking-branch"
   ],
   "PushToPrecommitBranch": [
     "--git-remote",
@@ -292,21 +292,21 @@
     "--disable-bugzilla",
     "--disable-jira"
   ],
-  "BaseReviewBoardAction": [
-    "--username"
-  ],
   "ApplyChangelistToSeparateGitBranch": [
     "--tracking-branch"
+  ],
+  "BaseReviewBoardAction": [
+    "--username"
   ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
   ],
+  "DiscardUnpublishedReviews": [
+    "--username"
+  ],
   "BaseBatchCloseReviews": [
     "--username",
     "--review-board-date-format"
-  ],
-  "DiscardUnpublishedReviews": [
-    "--username"
   ],
   "RebaseAgainstMaster": [
     "--git-remote"

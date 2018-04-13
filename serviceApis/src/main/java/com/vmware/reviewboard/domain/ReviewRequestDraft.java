@@ -309,7 +309,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public void updateTargetGroupsIfNeeded(String[] targetGroupsArray) {
-        if (this.targetGroups != null) { // added from draft
+        if (StringUtils.isNotBlank(this.targetGroups)) { // added from draft
             return;
         }
 
