@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vmware.action.BaseAction;
+import com.vmware.util.exception.UnknownWorkflowValueException;
 
 /**
  * Used to generate the list of actions to run.
