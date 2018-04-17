@@ -1,9 +1,9 @@
 package com.vmware.jira.domain;
 
-import com.vmware.util.input.InputListSelection;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.vmware.util.input.InputListSelection;
 
 public class MenuItem implements InputListSelection {
 

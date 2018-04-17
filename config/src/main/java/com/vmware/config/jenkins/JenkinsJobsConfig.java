@@ -1,11 +1,7 @@
 package com.vmware.config.jenkins;
 
-import com.vmware.util.FileUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.scm.Git;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.vmware.config.jenkins.JobParameter.NO_USERNAME_PARAMETER;
+import static com.vmware.config.jenkins.JobParameter.USERNAME_PARAM;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,8 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.vmware.config.jenkins.JobParameter.NO_USERNAME_PARAMETER;
-import static com.vmware.config.jenkins.JobParameter.USERNAME_PARAM;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.FileUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 
 /**
  * Encapsulates handling of the jenkins jobs config value.

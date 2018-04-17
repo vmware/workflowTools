@@ -1,10 +1,9 @@
 package com.vmware.util.logging;
 
-import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.logging.Level;
+import com.vmware.util.StringUtils;
 
 /**
  * Used to generate consistent titles.

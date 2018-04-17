@@ -1,12 +1,11 @@
 package com.vmware.jira.domain;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import com.google.gson.annotations.SerializedName;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.util.exception.RuntimeIOException;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 
 public class LoginInfo {
 

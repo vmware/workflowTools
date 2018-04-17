@@ -5,10 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Pushed to the remote branch that this local branch is tracking.")
 public class PushToTrackingBranch extends BaseAction {
 

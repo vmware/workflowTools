@@ -1,11 +1,11 @@
 package com.vmware.action.base;
 
+import java.lang.reflect.Field;
+
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
-
-import java.lang.reflect.Field;
 
 public abstract class BaseCommitReadAction extends BaseCommitAction {
 

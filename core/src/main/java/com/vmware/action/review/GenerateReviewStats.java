@@ -1,5 +1,18 @@
 package com.vmware.action.review;
 
+import static com.vmware.util.StringUtils.pluralize;
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.HOURS;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import com.vmware.action.base.BaseReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -13,19 +26,6 @@ import com.vmware.util.DateUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static com.vmware.util.StringUtils.pluralize;
-import static java.util.concurrent.TimeUnit.DAYS;
-import static java.util.concurrent.TimeUnit.HOURS;
 
 @ActionDescription("Generate review board statistics for specified groups.")
 public class GenerateReviewStats extends BaseReviewBoardAction {

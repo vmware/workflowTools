@@ -5,13 +5,14 @@
  */
 package com.vmware.http.cookie;
 
-import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.StringUtils;
 
 public class Cookie {
     private Logger log = LoggerFactory.getLogger(this.getClass());

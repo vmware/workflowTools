@@ -1,6 +1,5 @@
 package com.vmware.action.git;
 
-import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;

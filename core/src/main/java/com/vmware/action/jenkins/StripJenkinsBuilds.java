@@ -5,11 +5,6 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.util.Iterator;
-
 @ActionDescription("Strips jenkins build text from testing done section of commit.")
 public class StripJenkinsBuilds extends BaseCommitAction {
 

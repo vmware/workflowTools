@@ -1,16 +1,16 @@
 package com.vmware.action.review;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.util.Locale;
+
 import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.util.Locale;
 
 @ActionDescription("Copies the review board url to the clipboard. Handy for pasting it into a browser.")
 public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {

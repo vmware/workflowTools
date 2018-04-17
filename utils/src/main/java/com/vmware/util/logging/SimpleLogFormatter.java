@@ -1,13 +1,11 @@
 package com.vmware.util.logging;
 
-import com.vmware.util.logging.LogLevel;
+import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
 
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
 
 /**
  * JDK Logger formatter. Used to format all log output.

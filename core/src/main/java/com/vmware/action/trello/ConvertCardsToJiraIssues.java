@@ -2,15 +2,15 @@ package com.vmware.action.trello;
 
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueType;
-import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.util.StringUtils;
-import com.vmware.util.logging.Padder;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.logging.Padder;
 
 @ActionDescription("Converts the selected board's cards into a list of jira issues.")
 public class ConvertCardsToJiraIssues extends BaseTrelloAction {

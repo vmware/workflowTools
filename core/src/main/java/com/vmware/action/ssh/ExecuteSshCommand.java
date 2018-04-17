@@ -1,16 +1,19 @@
 package com.vmware.action.ssh;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.vmware.JobBuild;
-import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.config.jenkins.Job;
 import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
@@ -19,12 +22,6 @@ import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Executes the specified ssh command against the specified ssh site.")
 public class ExecuteSshCommand extends BaseCommitAction {

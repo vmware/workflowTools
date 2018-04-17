@@ -1,20 +1,3 @@
-import com.vmware.config.section.CommitConfig;
-import com.vmware.util.scm.FileChange;
-import com.vmware.util.scm.Git;
-import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.IOUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeIOException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import static com.vmware.util.scm.FileChangeType.deleted;
 import static com.vmware.util.scm.FileChangeType.modified;
 import static com.vmware.util.scm.FileChangeType.renamed;
@@ -23,6 +6,24 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.vmware.config.section.CommitConfig;
+import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.Git;
 
 public class TestGit {
 

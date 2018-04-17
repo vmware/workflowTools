@@ -1,10 +1,10 @@
 package com.vmware.http.json;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.FieldNamingStrategy;
-
 import java.lang.reflect.Field;
 import java.util.Map;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.FieldNamingStrategy;
 
 
 public class RuntimeFieldNamingStrategy implements FieldNamingStrategy {

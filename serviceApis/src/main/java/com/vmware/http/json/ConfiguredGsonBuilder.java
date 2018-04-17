@@ -1,5 +1,9 @@
 package com.vmware.http.json;
 
+import java.util.Date;
+import java.util.Map;
+import java.util.TimeZone;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.vmware.config.WorkflowConfig;
@@ -7,10 +11,6 @@ import com.vmware.config.WorkflowConfigMapper;
 import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.jira.domain.IssueResolutionDefinition;
 import com.vmware.jira.domain.IssueStatusDefinition;
-
-import java.util.Date;
-import java.util.Map;
-import java.util.TimeZone;
 
 /**
  * Configure a gson builder with custom type adapters and type adapters.

@@ -1,5 +1,9 @@
 package com.vmware.action.buildweb;
 
+import static java.lang.String.format;
+
+import java.util.regex.Pattern;
+
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
@@ -12,10 +16,6 @@ import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.util.regex.Pattern;
-
-import static java.lang.String.format;
 
 @ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
 public class InvokeSandboxBuild extends BaseCommitAction {

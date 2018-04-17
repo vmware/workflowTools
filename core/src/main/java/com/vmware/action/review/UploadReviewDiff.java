@@ -1,18 +1,18 @@
 package com.vmware.action.review;
 
+import static java.lang.String.format;
+
+import java.io.File;
+
 import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.RepoType;
-import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.io.File;
-
-import static java.lang.String.format;
+import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
 
 @ActionDescription("Uploads a git diff for the review. The parent ref used is defined by the parentBranch config property.")
 public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {

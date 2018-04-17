@@ -1,6 +1,5 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;

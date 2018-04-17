@@ -1,5 +1,8 @@
 package com.vmware.action.perforce;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -8,9 +11,6 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
-
-import java.io.File;
-import java.io.IOException;
 
 @ActionDescription("Applies a diff for the selected changelist to the current git branch. Can be used to apply shelved changelists.")
 public class ApplyChangelistDiffToGitBranch extends BasePerforceCommitUsingGitAction {

@@ -1,16 +1,17 @@
 package com.vmware.http.request.body;
 
-import com.vmware.http.HttpConnection;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.xmlrpc.MapObjectConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.http.HttpConnection;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.xmlrpc.MapObjectConverter;
 
 public class FormEncodedRequestBodyHandler {
 

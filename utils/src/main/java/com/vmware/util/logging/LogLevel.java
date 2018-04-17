@@ -1,8 +1,8 @@
 package com.vmware.util.logging;
 
-import com.vmware.util.exception.FatalException;
-
 import java.util.logging.Level;
+
+import com.vmware.util.exception.FatalException;
 
 /**
  * Using jdk logger to cut down on the size of the packaged jar.

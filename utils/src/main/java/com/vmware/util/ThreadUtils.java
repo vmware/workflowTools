@@ -1,12 +1,11 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ThreadUtils {
 

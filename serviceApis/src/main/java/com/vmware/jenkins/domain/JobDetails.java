@@ -1,10 +1,10 @@
 package com.vmware.jenkins.domain;
 
-import com.vmware.JobBuild;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import com.vmware.JobBuild;
 
 public class JobDetails {
 

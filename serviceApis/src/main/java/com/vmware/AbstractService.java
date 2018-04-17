@@ -1,6 +1,10 @@
 package com.vmware;
 
-import com.vmware.http.RequestParams;
+import java.io.File;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
@@ -8,13 +12,6 @@ import com.vmware.http.exception.NotFoundException;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Base Class for Rest and Non Rest services.

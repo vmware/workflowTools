@@ -1,10 +1,10 @@
 package com.vmware.action.commitInfo;
 
+import java.util.Collections;
+
 import com.vmware.action.base.BaseSetUsersList;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-
-import java.util.Collections;
 
 @ActionDescription("Set the approved by users for a commit.")
 public class SetApprovedBy extends BaseSetUsersList {

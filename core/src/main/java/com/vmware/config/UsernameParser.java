@@ -1,12 +1,13 @@
 package com.vmware.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.scm.Git;
 import com.vmware.util.scm.Perforce;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates determining the username when running a workflow

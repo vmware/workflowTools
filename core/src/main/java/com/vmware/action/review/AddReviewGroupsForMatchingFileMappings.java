@@ -1,11 +1,11 @@
 package com.vmware.action.review;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.scm.FileChange;
-
-import java.util.List;
 
 @ActionDescription("Adds review groups to the commit if they match a file mapping.")
 public class AddReviewGroupsForMatchingFileMappings extends BaseCommitAction{

@@ -1,10 +1,10 @@
 package com.vmware.action.base;
 
+import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
+
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.input.InputUtils;
-
-import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
 
 public abstract class BaseReadMultiLine extends BaseCommitReadAction {
 

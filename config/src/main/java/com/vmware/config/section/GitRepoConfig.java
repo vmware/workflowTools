@@ -1,12 +1,13 @@
 package com.vmware.config.section;
 
-import com.vmware.config.ConfigurableProperty;
-import com.vmware.util.StringUtils;
-import com.vmware.util.scm.Git;
+import java.util.TreeMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.TreeMap;
+import com.vmware.config.ConfigurableProperty;
+import com.vmware.util.StringUtils;
+import com.vmware.util.scm.Git;
 
 public class GitRepoConfig {
 

@@ -1,10 +1,10 @@
 package com.vmware.action.perforce;
 
+import java.util.List;
+
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-
-import java.util.List;
 
 @ActionDescription("Used to revert all pending changelists in a perforce workspace.")
 public class RevertWorkspace extends BasePerforceCommitAction {

@@ -1,12 +1,12 @@
 package com.vmware.config;
 
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.input.InputListSelection;
-import com.vmware.util.input.InputUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputListSelection;
+import com.vmware.util.input.InputUtils;
 
 public enum ActionAfterFailedPatchCheck implements InputListSelection {
 

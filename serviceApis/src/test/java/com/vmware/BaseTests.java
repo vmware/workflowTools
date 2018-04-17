@@ -1,11 +1,12 @@
 package com.vmware;
 
-import com.vmware.http.credentials.UsernamePasswordAsker;
-import com.vmware.util.ClasspathResource;
-import org.junit.BeforeClass;
-
 import java.io.IOException;
 import java.util.Properties;
+
+import org.junit.BeforeClass;
+
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.util.ClasspathResource;
 
 /**
  * Base class for testing rest api.

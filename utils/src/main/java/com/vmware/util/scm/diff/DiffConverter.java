@@ -1,8 +1,8 @@
 package com.vmware.util.scm.diff;
 
-import com.vmware.util.scm.FileChange;
-
 import java.util.List;
+
+import com.vmware.util.scm.FileChange;
 
 public interface DiffConverter {
 

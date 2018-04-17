@@ -1,15 +1,5 @@
 package com.vmware.xmlrpc;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.vmware.http.request.DeserializedName;
-import com.vmware.http.request.PostDeserializeHandler;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.IOUtils;
-import com.vmware.util.complexenum.ComplexEnum;
-import com.vmware.util.complexenum.ComplexEnumSelector;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
-
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -17,7 +7,15 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.String.format;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.vmware.http.request.DeserializedName;
+import com.vmware.http.request.PostDeserializeHandler;
+import com.vmware.util.IOUtils;
+import com.vmware.util.ReflectionUtils;
+import com.vmware.util.complexenum.ComplexEnum;
+import com.vmware.util.complexenum.ComplexEnumSelector;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 /**
  * Constructs an object to and from a map of values.

@@ -1,18 +1,19 @@
 package com.vmware.util.scm;
 
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.logging.LogLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.vmware.util.CommandLineUtils.executeCommand;
+import static com.vmware.util.StringUtils.addArgumentsToValue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import static com.vmware.util.CommandLineUtils.executeCommand;
-import static com.vmware.util.StringUtils.addArgumentsToValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.LogLevel;
 
 /**
  * Common functionality for both git and perforce wrappers can be put in this superclass.

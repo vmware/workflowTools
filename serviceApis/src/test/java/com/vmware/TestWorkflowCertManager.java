@@ -1,8 +1,7 @@
 package com.vmware;
 
-import com.vmware.http.ssl.WorkflowCertificateManager;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +12,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.vmware.http.ssl.WorkflowCertificateManager;
 
 /**
  * Unit tests for workflow cert manager

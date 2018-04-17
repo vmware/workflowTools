@@ -1,5 +1,17 @@
 package com.vmware.action.base;
 
+import static com.vmware.util.StringUtils.isInteger;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.Completer;
+
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Link;
@@ -9,17 +21,6 @@ import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.Completer;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
-import static com.vmware.util.StringUtils.isInteger;
 
 public abstract class BaseSetUsersList extends BaseCommitReadAction {
     private boolean searchReviewBoardForUsers;

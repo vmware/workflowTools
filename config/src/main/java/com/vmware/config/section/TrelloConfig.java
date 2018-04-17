@@ -1,8 +1,8 @@
 package com.vmware.config.section;
 
-import com.vmware.config.ConfigurableProperty;
-
 import java.util.LinkedList;
+
+import com.vmware.config.ConfigurableProperty;
 
 public class TrelloConfig {
 

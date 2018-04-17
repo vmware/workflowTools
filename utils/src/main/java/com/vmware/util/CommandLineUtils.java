@@ -1,22 +1,19 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.logging.DynamicLogger;
-import com.vmware.util.logging.LogLevel;
-import com.vmware.util.logging.Padder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
+import com.vmware.util.logging.Padder;
 
 /**
  * Used for easy use of executing commands

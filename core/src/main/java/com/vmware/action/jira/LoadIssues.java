@@ -5,6 +5,16 @@
  */
 package com.vmware.action.jira;
 
+import static com.vmware.jira.domain.FilterableIssueField.epic;
+import static com.vmware.jira.domain.FilterableIssueField.fixByVersion;
+import static com.vmware.jira.domain.FilterableIssueField.label;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -17,17 +27,6 @@ import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.vmware.jira.domain.FilterableIssueField.epic;
-import static com.vmware.jira.domain.FilterableIssueField.fixByVersion;
-import static com.vmware.jira.domain.FilterableIssueField.label;
 
 @ActionDescription("Loads a list of jira issues for processing.")
 public class LoadIssues extends BaseBatchJiraAction {

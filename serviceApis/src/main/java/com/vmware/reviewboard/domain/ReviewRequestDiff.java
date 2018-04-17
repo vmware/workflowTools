@@ -1,10 +1,10 @@
 package com.vmware.reviewboard.domain;
 
-import com.google.gson.annotations.SerializedName;
-import com.vmware.util.input.InputListSelection;
-
 import java.util.Date;
 import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
+import com.vmware.util.input.InputListSelection;
 
 public class ReviewRequestDiff extends BaseEntity implements InputListSelection {
 

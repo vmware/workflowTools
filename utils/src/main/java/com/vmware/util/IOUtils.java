@@ -1,11 +1,5 @@
 package com.vmware.util;
 
-import com.vmware.util.collection.CircularFifoQueue;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.logging.DynamicLogger;
-import com.vmware.util.logging.LogLevel;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +19,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.collection.CircularFifoQueue;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 
 public class IOUtils {
 

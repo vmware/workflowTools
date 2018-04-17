@@ -1,11 +1,11 @@
 package com.vmware.config.section;
 
+import java.util.Map;
+
 import com.google.gson.annotations.JsonAdapter;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.config.jira.IssueTypesDefinitionMapper;
-
-import java.util.Map;
 
 public class JiraConfig {
 

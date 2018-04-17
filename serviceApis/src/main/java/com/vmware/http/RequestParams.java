@@ -1,19 +1,18 @@
 package com.vmware.http;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
 import com.vmware.util.StringUtils;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.exception.RuntimeIOException;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * Encapsulates a collection of request parameters.

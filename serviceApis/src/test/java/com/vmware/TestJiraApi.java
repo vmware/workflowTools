@@ -1,31 +1,32 @@
 package com.vmware;
 
-import com.vmware.jira.Jira;
-import com.vmware.jira.domain.Issue;
-import com.vmware.jira.domain.IssueResolutionDefinition;
-import com.vmware.jira.domain.IssueStatusDefinition;
-import com.vmware.jira.domain.IssueTransition;
-import com.vmware.jira.domain.IssueTransitions;
-import com.vmware.config.jira.IssueTypeDefinition;
-import com.vmware.jira.domain.IssuesResponse;
-import com.vmware.jira.domain.JiraUser;
-import com.vmware.jira.domain.MenuItem;
-import com.vmware.jira.domain.greenhopper.IssueSummary;
-import com.vmware.jira.domain.greenhopper.RapidView;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.vmware.config.jira.IssueTypeDefinition;
+import com.vmware.jira.Jira;
+import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssueResolutionDefinition;
+import com.vmware.jira.domain.IssueStatusDefinition;
+import com.vmware.jira.domain.IssueTransition;
+import com.vmware.jira.domain.IssueTransitions;
+import com.vmware.jira.domain.IssuesResponse;
+import com.vmware.jira.domain.JiraUser;
+import com.vmware.jira.domain.MenuItem;
+import com.vmware.jira.domain.greenhopper.IssueSummary;
+import com.vmware.jira.domain.greenhopper.RapidView;
 
 public class TestJiraApi extends BaseTests {
 

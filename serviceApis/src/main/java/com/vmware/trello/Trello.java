@@ -5,6 +5,18 @@
  */
 package com.vmware.trello;
 
+import static com.vmware.http.cookie.ApiAuthentication.trello;
+import static com.vmware.http.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
+import static com.vmware.http.request.RequestHeader.aRefererHeader;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.Cookie;
@@ -27,18 +39,6 @@ import com.vmware.trello.domain.TokenApproval;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.vmware.http.cookie.ApiAuthentication.trello;
-import static com.vmware.http.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
-import static com.vmware.http.request.RequestHeader.aRefererHeader;
 
 public class Trello extends AbstractRestService {
 

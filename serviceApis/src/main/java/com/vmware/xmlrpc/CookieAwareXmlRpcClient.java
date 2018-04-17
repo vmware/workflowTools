@@ -3,14 +3,11 @@
  */
 package com.vmware.xmlrpc;
 
-import com.vmware.http.cookie.CookieFileStore;
-import com.vmware.http.exception.InternalServerException;
-import com.vmware.http.exception.NotAuthorizedException;
-import com.vmware.http.exception.NotFoundException;
-import com.vmware.http.ssl.WorkflowCertificateManager;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.exception.RuntimeURISyntaxException;
-import com.vmware.util.input.InputUtils;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -18,11 +15,13 @@ import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import com.vmware.http.cookie.CookieFileStore;
+import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.ssl.WorkflowCertificateManager;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.exception.RuntimeURISyntaxException;
+import com.vmware.util.input.InputUtils;
 
 /**
  * Eine Version {@link XmlRpcClient} mit Cookie-Verwaltung.

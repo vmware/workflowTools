@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Sets the reviewer list for the commit as the list of reviewers who have given the associated review a ship it.")
 public class SetReviewedByAsShipItsList extends BaseSetShipItReviewersList {
     public SetReviewedByAsShipItsList(WorkflowConfig config) {

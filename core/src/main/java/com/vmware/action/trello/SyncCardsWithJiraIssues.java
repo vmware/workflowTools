@@ -1,5 +1,11 @@
 package com.vmware.action.trello;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
@@ -7,12 +13,6 @@ import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.Padder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @ActionDescription("Syncs trello cards with list of loaded jira issues. " +
         "Adds / Deletes trello cards to ensure board matches loaded list.")

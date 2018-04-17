@@ -4,10 +4,6 @@ import com.vmware.action.base.BaseBatchCloseReviews;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Checks review board for assigned reviews that have at least one ship it." +
         "\nReviews older in days than the config property value closeOldShipItReviewsAfter are marked as submitted.")
 public class HardSubmitOldShipItReviews extends BaseBatchCloseReviews {

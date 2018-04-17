@@ -1,17 +1,18 @@
 package com.vmware.mapping;
 
-import com.vmware.action.BaseAction;
-import com.vmware.config.WorkflowActions;
-import com.vmware.config.WorkflowValuesParser;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.util.input.ArgumentListAware;
-import com.vmware.util.input.ImprovedStringsCompleter;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.Completer;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.Completer;
+
+import com.vmware.action.BaseAction;
+import com.vmware.config.WorkflowActions;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowValuesParser;
+import com.vmware.util.input.ArgumentListAware;
+import com.vmware.util.input.ImprovedStringsCompleter;
 
 /**
  * Completer for JLine2.

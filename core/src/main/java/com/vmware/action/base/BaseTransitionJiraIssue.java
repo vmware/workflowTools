@@ -1,5 +1,8 @@
 package com.vmware.action.base;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.vmware.IssueInfo;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
@@ -8,9 +11,6 @@ import com.vmware.jira.domain.IssueFields;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransitions;
 import com.vmware.jira.domain.JiraUser;
-
-import java.util.Arrays;
-import java.util.List;
 
 public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 

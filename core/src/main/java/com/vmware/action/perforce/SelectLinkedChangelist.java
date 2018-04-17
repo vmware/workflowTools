@@ -1,12 +1,12 @@
 package com.vmware.action.perforce;
 
+import java.util.List;
+
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-
-import java.util.List;
 
 @ActionDescription("Attempts to find a linked changelist by git tag.")
 public class SelectLinkedChangelist extends BasePerforceCommitUsingGitAction {

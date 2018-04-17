@@ -1,9 +1,10 @@
 package com.vmware.trello.domain;
 
-import com.vmware.jira.domain.Issue;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import com.vmware.jira.domain.Issue;
 
 /**
  * Test Card object.

@@ -1,5 +1,9 @@
 package com.vmware.action.info;
 
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
@@ -9,13 +13,8 @@ import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
-
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.Map;
+import com.vmware.util.logging.Padder;
 
 @ActionDescription("Displays a list of configuration options that can be set.")
 public class DisplayConfigOptions extends BaseAction {

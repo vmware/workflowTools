@@ -1,10 +1,10 @@
 package com.vmware;
 
-import com.vmware.util.StringUtils;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.EnumSet;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import com.vmware.util.StringUtils;
 
 public enum BuildResult {
     SUCCESS,

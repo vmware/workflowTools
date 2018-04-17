@@ -1,18 +1,14 @@
 package com.vmware.action.jira;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssuesResponse;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @ActionDescription("Convenience operation for batch updating the estimate value for all jira tasks reported by or assigned to the configured user.")
 public class UpdateTaskEstimates extends BaseAction {

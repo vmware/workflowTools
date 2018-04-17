@@ -1,5 +1,19 @@
 package com.vmware;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.cookie.CookieFileStore;
 import com.vmware.http.exception.NotFoundException;
@@ -13,21 +27,6 @@ import com.vmware.reviewboard.domain.ReviewRequests;
 import com.vmware.reviewboard.domain.ReviewUser;
 import com.vmware.reviewboard.domain.RootList;
 import com.vmware.reviewboard.domain.UserReview;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class TestReviewBoardApi extends BaseTests {
 

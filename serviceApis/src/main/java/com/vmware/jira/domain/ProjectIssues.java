@@ -1,12 +1,12 @@
 package com.vmware.jira.domain;
 
-import com.vmware.bugzilla.domain.Bug;
-import com.vmware.util.collection.OverwritableSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import com.vmware.bugzilla.domain.Bug;
+import com.vmware.util.collection.OverwritableSet;
 
 /**
  * Represents project issues

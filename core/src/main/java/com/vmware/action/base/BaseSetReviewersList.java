@@ -1,9 +1,9 @@
 package com.vmware.action.base;
 
-import com.vmware.config.WorkflowConfig;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import com.vmware.config.WorkflowConfig;
 
 public abstract class BaseSetReviewersList extends BaseSetUsersList {
 

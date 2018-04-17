@@ -1,11 +1,11 @@
 package com.vmware.buildweb.domain;
 
+import java.net.URI;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
-
-import java.net.URI;
 
 /**
  * Represents information on a buildweb build.

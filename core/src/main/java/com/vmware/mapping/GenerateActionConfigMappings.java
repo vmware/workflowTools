@@ -1,19 +1,6 @@
 package com.vmware.mapping;
 
-import com.google.gson.Gson;
-import com.vmware.config.ConfigurableProperty;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.config.WorkflowField;
-import com.vmware.config.WorkflowFields;
-import com.vmware.config.section.SectionConfig;
-import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.util.FileUtils;
-import com.vmware.util.IOUtils;
-import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.logging.SimpleLogFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Collections.singletonList;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -33,7 +20,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.singletonList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
+import com.vmware.config.section.SectionConfig;
+import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.util.FileUtils;
+import com.vmware.util.IOUtils;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.logging.SimpleLogFormatter;
 
 /**
  * This class in run by the build to generate the action config mappings.

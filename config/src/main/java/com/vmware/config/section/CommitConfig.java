@@ -1,9 +1,9 @@
 package com.vmware.config.section;
 
+import java.util.Arrays;
+
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
-
-import java.util.Arrays;
 
 /**
  * Configuration information for a commit. Used as a transport class for a review request draft;

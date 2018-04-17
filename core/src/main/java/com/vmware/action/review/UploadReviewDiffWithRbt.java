@@ -1,12 +1,10 @@
 package com.vmware.action.review;
 
+import java.io.File;
+
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.RepoType;
-
-import java.io.File;
-
-import static java.lang.String.format;
 
 @ActionDescription("Uses rbt post to upload a diff to reviewboard.")
 public class UploadReviewDiffWithRbt extends UploadReviewDiff {

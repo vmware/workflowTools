@@ -1,11 +1,11 @@
 package com.vmware.action.bugzilla;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-
-import java.util.List;
 
 @ActionDescription("Adds bugs for a named query in Bugzilla.")
 public class LoadBugsForQuery extends BaseBatchBugzillaAction {

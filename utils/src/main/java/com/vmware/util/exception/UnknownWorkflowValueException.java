@@ -1,4 +1,4 @@
-package com.vmware.config;
+package com.vmware.util.exception;
 
 import java.util.List;
 

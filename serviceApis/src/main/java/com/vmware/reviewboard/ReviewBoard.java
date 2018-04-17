@@ -1,13 +1,28 @@
 package com.vmware.reviewboard;
 
+import static com.vmware.http.cookie.ApiAuthentication.reviewBoard;
+import static com.vmware.http.request.RequestHeader.anAcceptHeader;
+import static com.vmware.reviewboard.domain.ReviewRequestDraft.anEmptyDraftForPublishingAReview;
+import static com.vmware.reviewboard.domain.ReviewRequestStatus.all;
+import static com.vmware.reviewboard.domain.ReviewRequestStatus.pending;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.credentials.UsernamePasswordAsker;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
-import com.vmware.http.credentials.UsernamePasswordAsker;
-import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.Link;
@@ -29,20 +44,6 @@ import com.vmware.reviewboard.domain.ServerInfo;
 import com.vmware.reviewboard.domain.ServerInfoResponse;
 import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.reviewboard.domain.UserReviewsResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
-import static com.vmware.http.cookie.ApiAuthentication.reviewBoard;
-import static com.vmware.http.request.RequestHeader.anAcceptHeader;
-import static com.vmware.reviewboard.domain.ReviewRequestDraft.anEmptyDraftForPublishingAReview;
-import static com.vmware.reviewboard.domain.ReviewRequestStatus.all;
-import static com.vmware.reviewboard.domain.ReviewRequestStatus.pending;
 
 public class ReviewBoard extends AbstractRestService {
     private ServerInfo cachedServerInfo = null;

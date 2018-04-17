@@ -1,5 +1,11 @@
 package com.vmware.config;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,12 +18,6 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class WorkflowConfigMapper implements JsonDeserializer<WorkflowConfig>, JsonSerializer<WorkflowConfig> {
     @Override

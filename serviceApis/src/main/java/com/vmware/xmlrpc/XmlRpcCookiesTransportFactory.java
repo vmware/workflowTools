@@ -1,11 +1,12 @@
 package com.vmware.xmlrpc;
 
-import com.vmware.http.cookie.CookieFileStore;
+import java.net.CookieStore;
+
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
 import org.apache.xmlrpc.client.XmlRpcTransport;
 
-import java.net.CookieStore;
+import com.vmware.http.cookie.CookieFileStore;
 
 /**
  * A cookie-aware implementation of an

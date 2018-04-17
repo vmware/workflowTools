@@ -1,5 +1,8 @@
 package com.vmware.action.base;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
@@ -7,9 +10,6 @@ import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestStatus;
 import com.vmware.util.DateUtils;
 import com.vmware.util.logging.Padder;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public abstract class BaseBatchCloseReviews extends BaseAction {
 
