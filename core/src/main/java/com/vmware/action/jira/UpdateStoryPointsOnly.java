@@ -1,13 +1,13 @@
 package com.vmware.action.jira;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jira.domain.Issue;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.jira.domain.Issue;
 import com.vmware.util.StringUtils;
-
-import java.util.List;
 
 @ActionDescription("Bulk update the story points for jira issues.")
 public class UpdateStoryPointsOnly extends BaseBatchJiraAction {

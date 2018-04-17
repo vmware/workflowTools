@@ -1,15 +1,14 @@
 package com.vmware.reviewboard.domain;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.vmware.util.StringUtils;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.vmware.util.StringUtils;
 
 public class ReviewRequest extends BaseEntity {
 

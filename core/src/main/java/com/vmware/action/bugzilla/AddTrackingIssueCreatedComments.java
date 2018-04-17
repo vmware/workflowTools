@@ -1,12 +1,12 @@
 package com.vmware.action.bugzilla;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
-
-import java.util.List;
 
 @ActionDescription("Adds comment to bugs in Bugzilla with the url for the matching issue in Jira.")
 public class AddTrackingIssueCreatedComments extends BaseBatchBugzillaAction {

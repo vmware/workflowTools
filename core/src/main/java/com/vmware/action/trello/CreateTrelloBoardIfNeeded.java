@@ -4,8 +4,8 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Member;
-import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Creates a trello board if the project name doesn't match an open trello board.")
 public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {

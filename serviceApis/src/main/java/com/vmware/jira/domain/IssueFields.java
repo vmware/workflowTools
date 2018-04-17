@@ -1,15 +1,14 @@
 package com.vmware.jira.domain;
 
-import com.vmware.http.json.RuntimeFieldName;
-import com.vmware.util.StringUtils;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.vmware.util.exception.FatalException;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.vmware.http.json.RuntimeFieldName;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 
 public class IssueFields {
     public Project project;

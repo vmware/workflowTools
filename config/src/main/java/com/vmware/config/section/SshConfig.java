@@ -1,12 +1,12 @@
 package com.vmware.config.section;
 
-import com.vmware.config.ConfigurableProperty;
-import com.vmware.config.ssh.SiteConfig;
-import com.vmware.util.StringUtils;
+import static com.vmware.util.StringUtils.isBlank;
 
 import java.util.TreeMap;
 
-import static com.vmware.util.StringUtils.isBlank;
+import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.ssh.SiteConfig;
+import com.vmware.util.StringUtils;
 
 public class SshConfig {
 

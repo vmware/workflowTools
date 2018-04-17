@@ -1,11 +1,8 @@
 package com.vmware.bugzilla.domain;
 
-import com.google.gson.annotations.SerializedName;
-import com.vmware.util.StringUtils;
-
-import java.io.IOException;
 import java.util.Date;
-import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Represents a comment on a bug.

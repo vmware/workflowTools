@@ -1,14 +1,14 @@
 package com.vmware.util.input;
 
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.Completer;
-import jline.internal.Log;
+import static jline.internal.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jline.internal.Preconditions.checkNotNull;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.Completer;
+import jline.internal.Log;
 
 public class ImprovedArgumentCompleter extends ArgumentCompleter {
 

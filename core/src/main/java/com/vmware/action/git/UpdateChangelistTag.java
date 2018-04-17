@@ -1,12 +1,11 @@
 package com.vmware.action.git;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.util.List;
 
 @ActionDescription("Updates matching changelist tag if not set or revision is different.")
 public class UpdateChangelistTag extends BaseLinkedPerforceCommitUsingGitAction {

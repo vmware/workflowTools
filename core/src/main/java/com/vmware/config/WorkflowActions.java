@@ -1,12 +1,13 @@
 package com.vmware.config;
 
-import com.vmware.action.BaseAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.action.BaseAction;
 
 /**
  * Used to generate the list of actions to run.

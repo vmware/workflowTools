@@ -1,29 +1,29 @@
 package com.vmware.config;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.vmware.config.commandLine.CommandLineArgumentsParser;
-import com.vmware.config.section.PerforceClientConfig;
-import com.vmware.util.scm.Git;
-import com.vmware.util.scm.Perforce;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.logging.SimpleLogFormatter;
-import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.util.ClasspathResource;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.logging.LogLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.vmware.config.commandLine.CommandLineArgumentsParser;
+import com.vmware.config.section.PerforceClientConfig;
+import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.LogLevel;
+import com.vmware.util.logging.SimpleLogFormatter;
+import com.vmware.util.scm.Git;
+import com.vmware.util.scm.Perforce;
 
 /**
  * Parses the workflow config from the source config files

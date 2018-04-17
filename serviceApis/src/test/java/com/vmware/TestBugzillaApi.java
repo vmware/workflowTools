@@ -1,26 +1,21 @@
 package com.vmware;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.google.gson.Gson;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugResolutionType;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
-import com.vmware.util.IOUtils;
-import org.apache.xmlrpc.XmlRpcException;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests bugzilla api.

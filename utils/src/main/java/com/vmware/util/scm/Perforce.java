@@ -1,13 +1,12 @@
 package com.vmware.util.scm;
 
-import com.vmware.util.scm.diff.PendingChangelistToGitDiffCreator;
-import com.vmware.util.CommandLineUtils;
-import com.vmware.util.IOUtils;
-import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.input.InputUtils;
-import com.vmware.util.logging.LogLevel;
+import static com.vmware.util.StringUtils.appendWithDelimiter;
+import static com.vmware.util.logging.LogLevel.DEBUG;
+import static com.vmware.util.logging.LogLevel.INFO;
+import static com.vmware.util.scm.FileChangeType.deletedAfterRename;
+import static com.vmware.util.scm.FileChangeType.renamed;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,13 +19,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.util.scm.FileChangeType.deletedAfterRename;
-import static com.vmware.util.scm.FileChangeType.renamed;
-import static com.vmware.util.StringUtils.appendWithDelimiter;
-import static com.vmware.util.logging.LogLevel.DEBUG;
-import static com.vmware.util.logging.LogLevel.INFO;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import com.vmware.util.CommandLineUtils;
+import com.vmware.util.IOUtils;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.LogLevel;
+import com.vmware.util.scm.diff.PendingChangelistToGitDiffCreator;
 
 /**
  * Wrapper around p4 commands

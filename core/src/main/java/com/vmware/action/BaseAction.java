@@ -1,5 +1,8 @@
 package com.vmware.action;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BugzillaConfig;
@@ -18,8 +21,6 @@ import com.vmware.config.section.TrelloConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.scm.Git;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class BaseAction {
 

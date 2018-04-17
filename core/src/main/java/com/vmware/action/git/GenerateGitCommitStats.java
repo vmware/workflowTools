@@ -1,12 +1,6 @@
 package com.vmware.action.git;
 
-import com.vmware.action.BaseAction;
-import com.vmware.config.ActionDescription;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.config.section.CommitStatsConfig;
-import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.StringUtils;
-import com.vmware.util.logging.Padder;
+import static com.vmware.util.StringUtils.pluralize;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +13,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.vmware.util.StringUtils.pluralize;
+import com.vmware.action.BaseAction;
+import com.vmware.config.ActionDescription;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.config.section.CommitStatsConfig;
+import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.StringUtils;
+import com.vmware.util.logging.Padder;
 
 @ActionDescription(value = "Generates stats for git commits.", ignoreConfigValuesInSuperclass = true)
 public class GenerateGitCommitStats extends BaseAction {

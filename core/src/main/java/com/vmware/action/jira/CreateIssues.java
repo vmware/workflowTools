@@ -1,12 +1,12 @@
 package com.vmware.action.jira;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.exception.FatalException;
-
-import java.util.List;
 
 @ActionDescription("Bulk create Jira issues.")
 public class CreateIssues extends BaseBatchJiraAction {

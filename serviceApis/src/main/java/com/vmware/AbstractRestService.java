@@ -1,14 +1,12 @@
 package com.vmware;
 
+import java.net.URI;
+
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
-import com.vmware.http.request.RequestParam;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.vmware.http.request.RequestParam;
 
 /**
  * Base class for all rest services.

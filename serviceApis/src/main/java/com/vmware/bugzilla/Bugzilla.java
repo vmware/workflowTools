@@ -1,5 +1,14 @@
 package com.vmware.bugzilla;
 
+import static java.lang.String.format;
+
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import com.vmware.AbstractService;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugKnobType;
@@ -15,16 +24,6 @@ import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapObjectConverter;
 import com.vmware.xmlrpc.RuntimeXmlRpcException;
-
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import static java.lang.String.format;
 
 
 /**

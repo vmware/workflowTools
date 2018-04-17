@@ -5,8 +5,14 @@
 
 package com.vmware.xmlrpc;
 
-import com.vmware.http.cookie.CookieFileStore;
-import com.vmware.util.IOUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLConnection;
+import java.util.zip.GZIPInputStream;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -21,13 +27,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLConnection;
-import java.util.zip.GZIPInputStream;
+import com.vmware.http.cookie.CookieFileStore;
+import com.vmware.util.IOUtils;
 
 /**
  * The implementation is to fix the Search.get_saved_query issue of Bugzilla web

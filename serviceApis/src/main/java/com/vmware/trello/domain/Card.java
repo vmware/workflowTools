@@ -1,15 +1,14 @@
 package com.vmware.trello.domain;
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 import com.google.gson.annotations.Expose;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueFields;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.http.RequestParams;
 import com.vmware.util.UrlUtils;
-
-import java.util.Arrays;
-import java.util.regex.Pattern;
 
 public class Card {
     public String idList;

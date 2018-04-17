@@ -1,13 +1,13 @@
 package com.vmware.xmlrpc;
 
-import org.apache.xmlrpc.parser.AtomicParser;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import static java.lang.String.format;
 
 import java.text.Format;
 import java.text.ParseException;
 
-import static java.lang.String.format;
+import org.apache.xmlrpc.parser.AtomicParser;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Handle multiple date formats.

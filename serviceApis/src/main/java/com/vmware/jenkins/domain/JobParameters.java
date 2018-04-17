@@ -1,13 +1,14 @@
 package com.vmware.jenkins.domain;
 
-import com.vmware.config.jenkins.JobParameter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.config.jenkins.JobParameter;
 
 public class JobParameters {
     private Logger log = LoggerFactory.getLogger(this.getClass());

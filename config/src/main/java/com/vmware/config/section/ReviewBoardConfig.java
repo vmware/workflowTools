@@ -1,11 +1,11 @@
 package com.vmware.config.section;
 
-import com.vmware.config.ConfigurableProperty;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
+
+import com.vmware.config.ConfigurableProperty;
 
 public class ReviewBoardConfig {
 

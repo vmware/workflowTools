@@ -1,21 +1,22 @@
 package com.vmware.util.input;
 
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.logging.Padder;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeIOException;
-import jline.console.ConsoleReader;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.Completer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jline.console.ConsoleReader;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.Completer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.Padder;
 
 public class InputUtils {
 

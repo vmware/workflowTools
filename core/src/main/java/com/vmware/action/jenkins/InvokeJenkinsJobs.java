@@ -1,13 +1,19 @@
 package com.vmware.action.jenkins;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.jenkins.Job;
 import com.vmware.config.jenkins.JobParameter;
-import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;
@@ -15,14 +21,7 @@ import com.vmware.jenkins.domain.ParameterDefinition;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
-import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Invokes the jenkins jobs specified by the jenkinsJobsToUse config property. Adds or replaces jenkins job urls to testing done section.")
 public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {

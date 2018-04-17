@@ -3,11 +3,8 @@ package com.vmware.action.commitInfo;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
+import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Sets the summary field. Replaces existing value if there is one.")
 public class SetSummary extends BaseCommitAction {

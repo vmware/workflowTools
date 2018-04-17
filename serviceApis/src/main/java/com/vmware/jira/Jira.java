@@ -1,13 +1,30 @@
 package com.vmware.jira;
 
+import static com.vmware.config.jira.IssueTypeDefinition.Bug;
+import static com.vmware.config.jira.IssueTypeDefinition.Feature;
+import static com.vmware.config.jira.IssueTypeDefinition.Improvement;
+import static com.vmware.config.jira.IssueTypeDefinition.TechComm;
+import static com.vmware.http.cookie.ApiAuthentication.jira;
+import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
+import static com.vmware.jira.domain.IssueStatusDefinition.InReview;
+import static com.vmware.jira.domain.IssueStatusDefinition.Open;
+import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.NotFoundException;
-import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.request.UrlParam;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueResolution;
 import com.vmware.jira.domain.IssueResolutionDefinition;
@@ -25,22 +42,6 @@ import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.trello.domain.StringValue;
 import com.vmware.util.complexenum.ComplexEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.vmware.http.cookie.ApiAuthentication.jira;
-import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
-import static com.vmware.jira.domain.IssueStatusDefinition.InReview;
-import static com.vmware.jira.domain.IssueStatusDefinition.Open;
-import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
-import static com.vmware.config.jira.IssueTypeDefinition.Bug;
-import static com.vmware.config.jira.IssueTypeDefinition.Feature;
-import static com.vmware.config.jira.IssueTypeDefinition.Improvement;
-import static com.vmware.config.jira.IssueTypeDefinition.TechComm;
 
 public class Jira extends AbstractRestService {
 

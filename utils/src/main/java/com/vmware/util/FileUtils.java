@@ -1,8 +1,5 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -15,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
 
 public class FileUtils {
 

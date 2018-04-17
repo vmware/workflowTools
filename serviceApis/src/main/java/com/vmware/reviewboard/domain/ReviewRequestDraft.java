@@ -1,20 +1,12 @@
 package com.vmware.reviewboard.domain;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
-import com.vmware.BuildResult;
-import com.vmware.IssueInfo;
-import com.vmware.JobBuild;
-import com.vmware.config.section.CommitConfig;
-import com.vmware.config.jenkins.Job;
-import com.vmware.jira.domain.Issue;
-import com.vmware.util.DateUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.logging.DynamicLogger;
-import com.vmware.util.logging.LogLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.vmware.util.StringUtils.appendCsvValue;
+import static com.vmware.util.StringUtils.isBlank;
+import static com.vmware.util.StringUtils.isNotBlank;
+import static com.vmware.util.StringUtils.pluralize;
+import static com.vmware.util.StringUtils.truncateStringIfNeeded;
+import static com.vmware.util.UrlUtils.addTrailingSlash;
+import static com.vmware.util.logging.LogLevel.DEBUG;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,13 +19,22 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.util.StringUtils.appendCsvValue;
-import static com.vmware.util.StringUtils.isBlank;
-import static com.vmware.util.StringUtils.isNotBlank;
-import static com.vmware.util.StringUtils.pluralize;
-import static com.vmware.util.StringUtils.truncateStringIfNeeded;
-import static com.vmware.util.UrlUtils.addTrailingSlash;
-import static com.vmware.util.logging.LogLevel.DEBUG;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import com.vmware.BuildResult;
+import com.vmware.IssueInfo;
+import com.vmware.JobBuild;
+import com.vmware.config.jenkins.Job;
+import com.vmware.config.section.CommitConfig;
+import com.vmware.jira.domain.Issue;
+import com.vmware.util.DateUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 
 public class ReviewRequestDraft extends BaseEntity {
     @Expose(serialize = false, deserialize = false)

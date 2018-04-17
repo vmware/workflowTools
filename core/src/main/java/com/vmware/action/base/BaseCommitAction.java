@@ -5,6 +5,9 @@
  */
 package com.vmware.action.base;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
@@ -17,9 +20,6 @@ import com.vmware.util.input.InputUtils;
 import com.vmware.util.scm.FileChange;
 import com.vmware.util.scm.NoPerforceClientForDirectoryException;
 import com.vmware.util.scm.Perforce;
-
-import java.util.Collections;
-import java.util.List;
 
 public abstract class BaseCommitAction extends BaseAction {
 

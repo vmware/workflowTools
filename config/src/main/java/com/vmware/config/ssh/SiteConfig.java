@@ -1,7 +1,5 @@
 package com.vmware.config.ssh;
 
-import com.vmware.util.StringUtils;
-
 import static com.vmware.util.StringUtils.throwFatalExceptionIfBlank;
 
 public class SiteConfig {

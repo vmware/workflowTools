@@ -1,12 +1,13 @@
 package com.vmware.util.complexenum;
 
-import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.vmware.util.complexenum.ComplexEnum.UNKNOWN_VALUE_NAME;
 
 import java.util.EnumSet;
 
-import static com.vmware.util.complexenum.ComplexEnum.UNKNOWN_VALUE_NAME;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.StringUtils;
 
 /**
  * Util methods for enum classes.

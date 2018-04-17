@@ -1,22 +1,23 @@
 package com.vmware;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.vmware.jira.domain.Issue;
 import com.vmware.trello.Trello;
 import com.vmware.trello.domain.Board;
 import com.vmware.trello.domain.Card;
 import com.vmware.trello.domain.Member;
 import com.vmware.trello.domain.Swimlane;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class TestTrelloApi extends BaseTests {
 

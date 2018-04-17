@@ -1,5 +1,8 @@
 package com.vmware.action.review;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
@@ -9,9 +12,6 @@ import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
-
-import java.util.List;
-import java.util.Optional;
 
 @ActionDescription("Sets the git commit details from the associated review request. Uses published review info only.")
 public class SetCommitDetailsFromReview extends BaseCommitAction {

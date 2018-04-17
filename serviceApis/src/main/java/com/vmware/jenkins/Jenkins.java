@@ -1,8 +1,21 @@
 package com.vmware.jenkins;
 
+import static com.vmware.http.cookie.ApiAuthentication.jenkins;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.AbstractRestBuildService;
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
+import com.vmware.config.jenkins.Job;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
@@ -12,7 +25,6 @@ import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.jenkins.domain.CsrfCrumb;
-import com.vmware.config.jenkins.Job;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;
@@ -21,17 +33,6 @@ import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.logging.Padder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.vmware.http.cookie.ApiAuthentication.jenkins;
 
 public class Jenkins extends AbstractRestBuildService {
 

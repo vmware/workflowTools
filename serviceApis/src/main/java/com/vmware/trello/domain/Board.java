@@ -2,9 +2,9 @@ package com.vmware.trello.domain;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputListSelection;
-import com.vmware.util.StringUtils;
 
 public class Board implements InputListSelection {
     public String name;

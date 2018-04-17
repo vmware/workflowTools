@@ -1,5 +1,7 @@
 package com.vmware.xmlrpc;
 
+import java.util.TimeZone;
+
 import org.apache.ws.commons.util.NamespaceContextImpl;
 import org.apache.xmlrpc.common.TypeFactoryImpl;
 import org.apache.xmlrpc.common.XmlRpcController;
@@ -8,8 +10,6 @@ import org.apache.xmlrpc.parser.DateParser;
 import org.apache.xmlrpc.parser.I4Parser;
 import org.apache.xmlrpc.parser.TypeParser;
 import org.apache.xmlrpc.util.XmlRpcDateTimeDateFormat;
-
-import java.util.TimeZone;
 
 /**
  * Provides parsers that don't barf as easily as the defaults

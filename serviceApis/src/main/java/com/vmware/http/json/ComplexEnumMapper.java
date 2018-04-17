@@ -1,5 +1,10 @@
 package com.vmware.http.json;
 
+import java.lang.reflect.Type;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -9,10 +14,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.vmware.util.complexenum.ComplexEnum;
 import com.vmware.util.complexenum.ComplexEnumSelector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Type;
 
 public class ComplexEnumMapper implements JsonDeserializer<ComplexEnum>, JsonSerializer<ComplexEnum> {
     private static Logger log  = LoggerFactory.getLogger(ComplexEnumMapper.class);

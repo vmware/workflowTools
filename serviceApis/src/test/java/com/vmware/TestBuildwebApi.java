@@ -1,12 +1,13 @@
 package com.vmware;
 
-import com.vmware.buildweb.Buildweb;
-import com.vmware.buildweb.domain.BuildwebBuild;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import com.vmware.buildweb.Buildweb;
+import com.vmware.buildweb.domain.BuildwebBuild;
 
 /**
  * Tests Buildweb api calls. This is VMware specific.

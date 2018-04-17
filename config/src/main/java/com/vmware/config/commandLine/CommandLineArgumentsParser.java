@@ -1,16 +1,16 @@
 package com.vmware.config.commandLine;
 
-import com.vmware.config.ConfigurableProperty;
-import com.vmware.util.ArrayUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.vmware.config.ConfigurableProperty;
+import com.vmware.util.ArrayUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 
 /**
  * Parsed command line arguments.

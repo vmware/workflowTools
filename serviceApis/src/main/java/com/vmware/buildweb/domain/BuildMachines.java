@@ -1,8 +1,8 @@
 package com.vmware.buildweb.domain;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.Arrays;
+
+import com.google.gson.annotations.SerializedName;
 
 public class BuildMachines {
 

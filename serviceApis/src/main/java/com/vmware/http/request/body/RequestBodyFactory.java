@@ -5,14 +5,12 @@
  */
 package com.vmware.http.request.body;
 
-import com.vmware.http.HttpConnection;
-import com.vmware.util.exception.RuntimeIOException;
+import java.lang.reflect.Field;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
+import com.vmware.http.HttpConnection;
 
 public class RequestBodyFactory {
     private static final Logger log = LoggerFactory.getLogger(RequestBodyFactory.class);

@@ -1,14 +1,15 @@
 package com.vmware.http.credentials;
 
-import com.vmware.http.cookie.ApiAuthentication;
-import com.vmware.util.input.InputUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.util.input.InputUtils;
 
 public class UsernamePasswordAsker {
 

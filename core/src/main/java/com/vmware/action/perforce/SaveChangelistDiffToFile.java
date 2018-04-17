@@ -1,13 +1,13 @@
 package com.vmware.action.perforce;
 
+import java.io.File;
+
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.io.File;
 
 @ActionDescription("Saves a git compatible diff of the specified changelist to a file.")
 public class SaveChangelistDiffToFile extends BasePerforceCommitAction {

@@ -1,13 +1,6 @@
 package com.vmware.util.scm;
 
-import com.vmware.util.CommandLineUtils;
-import com.vmware.util.FileUtils;
-import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.logging.LogLevel;
-import com.vmware.util.logging.SimpleLogFormatter;
+import static com.vmware.util.CommandLineUtils.isCommandAvailable;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +19,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.util.CommandLineUtils.isCommandAvailable;
+import com.vmware.util.CommandLineUtils;
+import com.vmware.util.FileUtils;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.LogLevel;
 
 /**
  * Wrapper class around the git command line command.

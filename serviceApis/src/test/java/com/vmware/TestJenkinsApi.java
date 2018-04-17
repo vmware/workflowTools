@@ -1,23 +1,24 @@
 package com.vmware;
 
-import com.vmware.jenkins.Jenkins;
-import com.vmware.config.jenkins.Job;
-import com.vmware.jenkins.domain.JobBuildDetails;
-import com.vmware.jenkins.domain.JobDetails;
-import com.vmware.config.jenkins.JobParameter;
-import com.vmware.jenkins.domain.JobParameters;
-import com.vmware.jenkins.domain.JobsList;
-import com.vmware.http.exception.NotFoundException;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.vmware.config.jenkins.Job;
+import com.vmware.config.jenkins.JobParameter;
+import com.vmware.http.exception.NotFoundException;
+import com.vmware.jenkins.Jenkins;
+import com.vmware.jenkins.domain.JobBuildDetails;
+import com.vmware.jenkins.domain.JobDetails;
+import com.vmware.jenkins.domain.JobParameters;
+import com.vmware.jenkins.domain.JobsList;
 
 public class TestJenkinsApi extends BaseTests {
 

@@ -1,5 +1,10 @@
 package com.vmware.action.jira;
 
+import static com.vmware.jira.domain.IssueResolutionDefinition.Fixed;
+import static com.vmware.jira.domain.IssueStatusDefinition.Closed;
+import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
+import static com.vmware.jira.domain.IssueStatusDefinition.Resolved;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -7,11 +12,6 @@ import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssueTransition;
 import com.vmware.jira.domain.IssueTransitions;
-
-import static com.vmware.jira.domain.IssueResolutionDefinition.Fixed;
-import static com.vmware.jira.domain.IssueStatusDefinition.Closed;
-import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
-import static com.vmware.jira.domain.IssueStatusDefinition.Resolved;
 
 @ActionDescription("Reopens specified issues that have no resolution and resolve them.")
 public class ReopenAndResolveIssues extends BaseBatchJiraAction{

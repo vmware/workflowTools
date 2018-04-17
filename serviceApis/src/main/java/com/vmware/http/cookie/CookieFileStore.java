@@ -1,10 +1,6 @@
 package com.vmware.http.cookie;
 
-import com.vmware.util.ClasspathResource;
-import com.vmware.util.IOUtils;
-import com.vmware.util.exception.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.vmware.util.StringUtils.appendWithDelimiter;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +14,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.util.StringUtils.appendWithDelimiter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.IOUtils;
+import com.vmware.util.exception.RuntimeIOException;
 
 public class CookieFileStore {
     private Logger log = LoggerFactory.getLogger(this.getClass());

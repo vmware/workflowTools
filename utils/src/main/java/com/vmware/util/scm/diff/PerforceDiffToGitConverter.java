@@ -1,11 +1,6 @@
 package com.vmware.util.scm.diff;
 
-import com.vmware.util.scm.FileChange;
-import com.vmware.util.scm.FileChangeType;
-import com.vmware.util.scm.Git;
-import com.vmware.util.scm.ScmType;
-import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
+import static java.lang.String.format;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -18,7 +13,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.String.format;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.FileChangeType;
+import com.vmware.util.scm.Git;
+import com.vmware.util.scm.ScmType;
 
 /**
  * Converts a perforce diff to a git diff.

@@ -8,9 +8,9 @@ import com.vmware.config.section.JenkinsConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.trello.Trello;
 import com.vmware.util.scm.Git;
 import com.vmware.util.scm.Perforce;
-import com.vmware.trello.Trello;
 
 /**
  * Centralized locator for git, perforce, jenkins, jira, reviewboard and trello instances.

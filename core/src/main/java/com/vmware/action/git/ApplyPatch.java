@@ -1,23 +1,23 @@
 package com.vmware.action.git;
 
+import java.io.File;
+import java.util.List;
+
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionAfterFailedPatchCheck;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.RepoType;
-import com.vmware.util.scm.FileChange;
-import com.vmware.util.scm.Perforce;
-import com.vmware.util.scm.diff.DiffConverter;
-import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
-import com.vmware.util.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
-
-import java.io.File;
-import java.util.List;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.Perforce;
+import com.vmware.util.scm.diff.DiffConverter;
+import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
+import com.vmware.util.scm.diff.PerforceDiffToGitConverter;
 
 @ActionDescription("Used to apply patch data.")
 public class ApplyPatch extends BaseCommitAction {

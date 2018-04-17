@@ -1,5 +1,9 @@
 package com.vmware.buildweb;
 
+import static com.vmware.util.UrlUtils.addRelativePaths;
+
+import java.util.List;
+
 import com.vmware.AbstractRestBuildService;
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
@@ -14,10 +18,6 @@ import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.logging.Padder;
-
-import java.util.List;
-
-import static com.vmware.util.UrlUtils.addRelativePaths;
 
 /**
  * VMware specific build service.

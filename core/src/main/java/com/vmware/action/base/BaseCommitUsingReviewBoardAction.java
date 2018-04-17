@@ -7,7 +7,6 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
-import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;

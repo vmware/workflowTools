@@ -1,8 +1,11 @@
 package com.vmware.util.scm;
 
-import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.vmware.util.scm.FileChangeType.added;
+import static com.vmware.util.scm.FileChangeType.addedAndModified;
+import static com.vmware.util.scm.FileChangeType.copied;
+import static com.vmware.util.scm.FileChangeType.renamed;
+import static com.vmware.util.scm.FileChangeType.renamedAndModified;
+import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,13 +13,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static com.vmware.util.scm.FileChangeType.added;
-import static com.vmware.util.scm.FileChangeType.copied;
-import static com.vmware.util.scm.FileChangeType.deleted;
-import static com.vmware.util.scm.FileChangeType.addedAndModified;
-import static com.vmware.util.scm.FileChangeType.renamed;
-import static com.vmware.util.scm.FileChangeType.renamedAndModified;
-import static java.lang.String.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.StringUtils;
 
 public class FileChange {
 

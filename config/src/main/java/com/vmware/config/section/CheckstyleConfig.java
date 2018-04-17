@@ -1,8 +1,8 @@
 package com.vmware.config.section;
 
-import com.vmware.config.ConfigurableProperty;
-
 import java.util.List;
+
+import com.vmware.config.ConfigurableProperty;
 
 public class CheckstyleConfig {
 

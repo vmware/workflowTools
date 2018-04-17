@@ -1,12 +1,12 @@
 package com.vmware.action.jira;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.jira.domain.Issue;
-
-import java.util.List;
 
 @ActionDescription("Bulk updates Jira issues.")
 public class UpdateIssues extends BaseBatchJiraAction {

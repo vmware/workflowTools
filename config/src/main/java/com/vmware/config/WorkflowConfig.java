@@ -1,5 +1,13 @@
 package com.vmware.config;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.annotations.Expose;
 import com.vmware.config.commandLine.CommandLineArgumentsParser;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
@@ -19,13 +27,6 @@ import com.vmware.config.section.SectionConfig;
 import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Workflow configuration.

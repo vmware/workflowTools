@@ -5,10 +5,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.trello.domain.Board;
 import com.vmware.util.input.InputUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Selects an existing open trello board.")
 public class SelectTrelloBoard  extends BaseTrelloAction {
 

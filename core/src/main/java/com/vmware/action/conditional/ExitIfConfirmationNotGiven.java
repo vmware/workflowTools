@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.InputUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Exit if the user does not confirm, can be used for confirming commit changes.")
 public class ExitIfConfirmationNotGiven extends BaseAction {
 

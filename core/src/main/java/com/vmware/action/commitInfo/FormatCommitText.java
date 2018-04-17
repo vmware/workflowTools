@@ -1,11 +1,11 @@
 package com.vmware.action.commitInfo;
 
+import static com.vmware.util.StringUtils.addNewLinesIfNeeded;
+
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.exception.FatalException;
-
-import static com.vmware.util.StringUtils.addNewLinesIfNeeded;
 
 @ActionDescription("Formats commit lines to match max lengths.")
 public class FormatCommitText extends BaseCommitAction {

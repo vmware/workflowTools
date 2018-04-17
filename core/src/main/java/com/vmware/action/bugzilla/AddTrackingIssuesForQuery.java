@@ -1,12 +1,12 @@
 package com.vmware.action.bugzilla;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchBugzillaAction;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.Issue;
-
-import java.util.List;
 
 @ActionDescription("Adds tracking issues for bugs in a Bugzilla named query. Bugs that already have a tracking issue are skipped.")
 public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {

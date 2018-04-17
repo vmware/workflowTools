@@ -1,5 +1,9 @@
 package com.vmware.action.jira;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -7,10 +11,6 @@ import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueResolutionDefinition;
 import com.vmware.jira.domain.IssueStatusDefinition;
 import com.vmware.jira.domain.IssuesResponse;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @ActionDescription("Load closed issues assigned to the user that have no resolution.")
 public class LoadCompletedIssuesWithoutResolution extends BaseBatchJiraAction {

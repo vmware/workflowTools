@@ -1,11 +1,5 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.FatalException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.util.exception.FatalException;
 
 public class StringUtils {
     public static final String NEW_LINE_CHAR = "\n";

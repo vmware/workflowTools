@@ -1,12 +1,12 @@
 package com.vmware.action.gitchangeset;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
 
 @ActionDescription("Adds the git config value changesetsync.checkoutdir to reference the client root directory if needed.")
 public class AddGitChangesetConfigValueIfNeeded extends BaseLinkedPerforceCommitUsingGitAction {

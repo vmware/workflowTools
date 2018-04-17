@@ -8,10 +8,6 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Read a review id from the user. Set that review id as the review id for the commit.")
 public class SetReviewId extends BaseCommitAction {
 

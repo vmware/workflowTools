@@ -1,14 +1,10 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
-import com.vmware.config.ActionDescription;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.util.scm.FileChange;
-import com.vmware.util.scm.FileChangeType;
-import com.vmware.util.scm.GitChangelistRef;
-import com.vmware.util.scm.diff.PendingChangelistToGitDiffCreator;
-import com.vmware.util.StringUtils;
-import com.vmware.util.logging.LogLevel;
+import static com.vmware.util.StringUtils.stripLinesStartingWith;
+import static com.vmware.util.scm.FileChange.containsChangesOfType;
+import static com.vmware.util.scm.FileChangeType.added;
+import static com.vmware.util.scm.FileChangeType.addedAndModified;
+import static com.vmware.util.scm.FileChangeType.deleted;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,11 +17,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.vmware.util.scm.FileChange.containsChangesOfType;
-import static com.vmware.util.scm.FileChangeType.added;
-import static com.vmware.util.scm.FileChangeType.addedAndModified;
-import static com.vmware.util.scm.FileChangeType.deleted;
-import static com.vmware.util.StringUtils.stripLinesStartingWith;
+import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
+import com.vmware.config.ActionDescription;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
+import com.vmware.util.logging.LogLevel;
+import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.FileChangeType;
+import com.vmware.util.scm.GitChangelistRef;
+import com.vmware.util.scm.diff.PendingChangelistToGitDiffCreator;
 
 @ActionDescription("Creates a diff for the changelist and compares it to a diff of the current git branch.")
 public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCommitUsingGitAction {

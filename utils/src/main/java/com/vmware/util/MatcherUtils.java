@@ -1,11 +1,11 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.FatalException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.vmware.util.exception.FatalException;
 
 public class MatcherUtils {
 

@@ -1,12 +1,12 @@
 package com.vmware.action.buildweb;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import com.vmware.action.base.BaseCommitWithBuildwebBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.ThreadUtils;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Waits the configured amount of time for all buildweb builds in the commit to complete.")
 public class WaitForBuildwebBuildsToComplete extends BaseCommitWithBuildwebBuildsAction {

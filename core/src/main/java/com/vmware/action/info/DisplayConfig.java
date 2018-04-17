@@ -1,20 +1,18 @@
 package com.vmware.action.info;
 
-import com.vmware.action.BaseAction;
-import com.vmware.config.ActionDescription;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.config.WorkflowField;
-import com.vmware.config.WorkflowFields;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.logging.Padder;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.vmware.action.BaseAction;
+import com.vmware.config.ActionDescription;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
+import com.vmware.util.StringUtils;
+import com.vmware.util.logging.Padder;
 
 @ActionDescription("Displays the current workflow configuration.")
 public class DisplayConfig extends BaseAction {

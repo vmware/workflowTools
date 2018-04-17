@@ -1,18 +1,16 @@
 package com.vmware.mapping;
 
-import com.vmware.action.BaseAction;
-import com.vmware.action.git.GenerateGitCommitStats;
-import com.vmware.config.ActionDescription;
-import com.vmware.util.ClasspathResource;
-
-import com.google.gson.Gson;
-
 import java.io.Reader;
-import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.gson.Gson;
+import com.vmware.action.BaseAction;
+import com.vmware.action.git.GenerateGitCommitStats;
+import com.vmware.config.ActionDescription;
+import com.vmware.util.ClasspathResource;
 
 /**
  * Represents the mapping of config values to a workflow action.

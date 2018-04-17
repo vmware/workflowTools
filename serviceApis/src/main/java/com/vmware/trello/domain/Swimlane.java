@@ -5,10 +5,10 @@
  */
 package com.vmware.trello.domain;
 
-import com.google.gson.annotations.Expose;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.gson.annotations.Expose;
 
 public class Swimlane {
     public static String STORY_POINTS_SUFFIX = " Story Point(s)";

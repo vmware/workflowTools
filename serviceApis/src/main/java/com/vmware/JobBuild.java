@@ -1,11 +1,10 @@
 package com.vmware;
 
+import java.util.Arrays;
+
 import com.google.gson.annotations.Expose;
 import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
-
-import java.util.Arrays;
 
 public class JobBuild {
     @Expose(serialize = false, deserialize = false)

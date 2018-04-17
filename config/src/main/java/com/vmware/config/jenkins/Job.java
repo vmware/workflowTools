@@ -1,10 +1,10 @@
 package com.vmware.config.jenkins;
 
-import com.google.gson.annotations.Expose;
-import com.vmware.util.UrlUtils;
-
 import java.util.Collections;
 import java.util.List;
+
+import com.google.gson.annotations.Expose;
+import com.vmware.util.UrlUtils;
 
 public class Job {
     /**

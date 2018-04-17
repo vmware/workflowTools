@@ -1,15 +1,15 @@
 package com.vmware.utils;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.vmware.util.DateUtils;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.vmware.util.DateUtils;
 
 public class TestDateUtils {
 

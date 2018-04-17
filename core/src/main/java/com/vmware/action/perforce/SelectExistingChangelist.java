@@ -1,12 +1,12 @@
 package com.vmware.action.perforce;
 
+import java.util.List;
+
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
-
-import java.util.List;
 
 @ActionDescription("If only one changelist exists, that is selected by default. Otherwise the user is asked to select a changelist.")
 public class SelectExistingChangelist extends BasePerforceCommitUsingGitAction {

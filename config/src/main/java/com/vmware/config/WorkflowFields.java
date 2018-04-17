@@ -1,11 +1,5 @@
 package com.vmware.config;
 
-import com.google.gson.annotations.Expose;
-import com.vmware.config.section.SectionConfig;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import com.google.gson.annotations.Expose;
+import com.vmware.config.section.SectionConfig;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 
 /**
  * Encapsulates a list of workflow fields.

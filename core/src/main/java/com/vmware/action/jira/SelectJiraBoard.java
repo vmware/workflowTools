@@ -1,13 +1,13 @@
 package com.vmware.action.jira;
 
+import java.util.List;
+
 import com.vmware.action.base.BaseBatchJiraAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.MenuItem;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
-
-import java.util.List;
 
 @ActionDescription("Select a board on JIRA to use.")
 public class SelectJiraBoard extends BaseBatchJiraAction {

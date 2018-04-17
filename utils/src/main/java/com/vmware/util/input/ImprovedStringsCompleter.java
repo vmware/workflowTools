@@ -1,6 +1,6 @@
 package com.vmware.util.input;
 
-import jline.console.completer.Completer;
+import static jline.internal.Preconditions.checkNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,7 +9,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import static jline.internal.Preconditions.checkNotNull;
+import jline.console.completer.Completer;
 
 /**
  * Based on existing StringsCompleter in JLine2.

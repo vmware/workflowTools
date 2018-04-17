@@ -1,7 +1,5 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 /**
  * Util methods for invoking reflection methods and wrapping the exceptions with runtime exceptions.

@@ -1,16 +1,14 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
+import static java.lang.String.format;
+
+import java.io.File;
+
 import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
-
-import java.io.File;
-
-import static java.lang.String.format;
 
 @ActionDescription("Uses rbt post to upload a changelist as a diff to reviewboard, only for perforce.")
 public class UploadReviewDiffFromChangelist extends BaseLinkedPerforceCommitAction {

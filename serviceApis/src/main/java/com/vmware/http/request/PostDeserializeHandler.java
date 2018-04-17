@@ -1,8 +1,8 @@
 package com.vmware.http.request;
 
-import com.vmware.util.ReflectionUtils;
-
 import java.lang.reflect.Method;
+
+import com.vmware.util.ReflectionUtils;
 
 public class PostDeserializeHandler {
 

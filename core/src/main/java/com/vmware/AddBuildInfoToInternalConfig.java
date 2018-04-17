@@ -1,14 +1,5 @@
 package com.vmware;
 
-import com.google.gson.Gson;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.util.scm.Git;
-import com.vmware.util.IOUtils;
-import com.vmware.util.logging.SimpleLogFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,6 +7,16 @@ import java.util.Date;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.util.IOUtils;
+import com.vmware.util.logging.SimpleLogFormatter;
+import com.vmware.util.scm.Git;
 
 /**
  * Add last commit info from commit to the internal config json file.

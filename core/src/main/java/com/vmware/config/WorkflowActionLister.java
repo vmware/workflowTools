@@ -5,10 +5,6 @@
  */
 package com.vmware.config;
 
-import com.vmware.action.BaseAction;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.exception.RuntimeIOException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +16,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import com.vmware.action.BaseAction;
+import com.vmware.util.ReflectionUtils;
+import com.vmware.util.exception.RuntimeIOException;
 
 /**
  * Used to list all workflow action classes.

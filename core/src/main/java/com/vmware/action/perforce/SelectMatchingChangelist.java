@@ -1,14 +1,14 @@
 package com.vmware.action.perforce;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @ActionDescription("Attempts based on summary to match the current commit to a perforce changelist.")
 public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {

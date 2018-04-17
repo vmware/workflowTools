@@ -1,15 +1,16 @@
 package com.vmware.config;
 
-import com.vmware.config.jira.IssueTypeDefinition;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vmware.config.jira.IssueTypeDefinition;
+import com.vmware.util.ReflectionUtils;
+import com.vmware.util.StringUtils;
 
 /**
  * Used for determining the valid value for a workflow config field.

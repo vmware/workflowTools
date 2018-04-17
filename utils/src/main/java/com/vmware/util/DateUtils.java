@@ -1,12 +1,12 @@
 package com.vmware.util;
 
-import org.slf4j.LoggerFactory;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.LoggerFactory;
 
 public class DateUtils {
 
