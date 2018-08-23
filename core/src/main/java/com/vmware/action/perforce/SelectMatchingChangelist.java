@@ -1,6 +1,6 @@
 package com.vmware.action.perforce;
 
-import com.vmware.action.base.BasePerforceCommitUsingGitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @ActionDescription("Attempts based on summary to match the current commit to a perforce changelist.")
-public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {
+public class SelectMatchingChangelist extends BasePerforceCommitAction {
     public SelectMatchingChangelist(WorkflowConfig config) {
         super(config);
     }
@@ -32,7 +32,7 @@ public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {
             String changelistDescription = perforce.readChangelist(changelistId);
             ReviewRequestDraft potentialMatch = new ReviewRequestDraft(changelistDescription, commitConfig);
             potentialMatch.perforceChangelistId = changelistId;
-            if (descriptionMatches(potentialMatch) || reviewNumberMatches(potentialMatch)) {
+            if (summaryMatches(potentialMatch) || reviewNumberMatches(potentialMatch)) {
                 draft.perforceChangelistId = changelistId;
                 return;
             }
@@ -48,7 +48,7 @@ public class SelectMatchingChangelist extends BasePerforceCommitUsingGitAction {
         }
     }
 
-    private boolean descriptionMatches(ReviewRequestDraft potentialMatch) {
+    private boolean summaryMatches(ReviewRequestDraft potentialMatch) {
         if (StringUtils.equals(draft.summary, potentialMatch.summary)) {
             log.info("Using changelist {} as summary matches commit summary", potentialMatch.perforceChangelistId);
             return true;

@@ -43,4 +43,7 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "--build-display-name", help = "Display name to use for the build invoked")
     public String buildDisplayName;
 
+
+    @ConfigurableProperty(commandLine = "--exclude-sync-to", help = "Exclude sync-to parameter in gobuild command")
+    public boolean excludeSyncTo;
 }

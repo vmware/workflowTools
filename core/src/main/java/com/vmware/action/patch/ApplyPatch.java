@@ -1,4 +1,4 @@
-package com.vmware.action.git;
+package com.vmware.action.patch;
 
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionAfterFailedPatchCheck;
@@ -51,6 +51,7 @@ public class ApplyPatch extends BaseCommitAction {
             patchData = diffConverter.convert(patchData);
         } else if (isPerforceClient){
             diffConverter = new GitDiffToPerforceConverter(getLoggedInPerforceClient(), "");
+            diffConverter.convert(patchData); // used to generate file changes
         }
 
         if (diffConverter != null) {
@@ -70,8 +71,8 @@ public class ApplyPatch extends BaseCommitAction {
         patchFile.delete();
         IOUtils.write(patchFile, patchData);
 
-        PatchCheckResult patchCheckResult = checkIfPatchApplies(patchData);
-        String result = applyPatch(patchData, patchCheckResult);
+        PatchCheckResult patchCheckResult = checkIfPatchApplies(patchFile);
+        String result = applyPatch(patchFile, patchCheckResult);
 
         if (StringUtils.isBlank(result.trim())) {
             log.info("Patch successfully applied, patch is stored in workflow.patch");
@@ -83,19 +84,19 @@ public class ApplyPatch extends BaseCommitAction {
         }
     }
 
-    protected String applyPatch(String patchData, PatchCheckResult patchCheckResult) {
+    protected String applyPatch(File patchFile, PatchCheckResult patchCheckResult) {
         log.info("Applying patch");
         String result = "";
         switch (patchCheckResult) {
             case applyPatchUsingGitApply:
-                result = git.applyPatch(patchData, false);
+                result = git.applyPatchFile(patchFile, false);
                 break;
             case applyPartialPatchUsingGitApply:
-                result = git.applyPartialPatch(patchData);
+                result = git.applyPartialPatchFile(patchFile);
                 break;
             case applyPartialPatchUsingPatchCommand:
             case applyPatchUsingPatchCommand:
-                result = patch(patchData, false);
+                result = patch(patchFile, false);
                 break;
             default:
                 exitWithWarnMessage("Not applying patch, patch is stored in workflow.patch");
@@ -110,9 +111,9 @@ public class ApplyPatch extends BaseCommitAction {
         }
     }
 
-    private PatchCheckResult checkIfPatchApplies(String patchData) {
+    private PatchCheckResult checkIfPatchApplies(File patchFile) {
         log.info("Checking if patch applies");
-        String checkResult = patchConfig.usePatchCommand ? patch(patchData, true) : git.applyPatch(patchData, true);
+        String checkResult = patchConfig.usePatchCommand ? patch(patchFile, true) : git.applyPatchFile(patchFile, true);
         String checkCommand = patchConfig.usePatchCommand ? patchConfig.patchCommand + " --dry-run"
                 : "git apply --ignore-whitespace -3 --check";
         if (StringUtils.isBlank(checkResult)) {
@@ -134,7 +135,7 @@ public class ApplyPatch extends BaseCommitAction {
                     return PatchCheckResult.nothing;
                 }
                 patchConfig.usePatchCommand = true;
-                return checkIfPatchApplies(patchData);
+                return checkIfPatchApplies(patchFile);
             default:
                 return PatchCheckResult.nothing;
         }
@@ -156,13 +157,14 @@ public class ApplyPatch extends BaseCommitAction {
         padder.warnTitle();
     }
 
-    private String patch(String patchData, boolean dryRun) {
+    private String patch(File patchFile, boolean dryRun) {
         String command = patchConfig.patchCommand;
         if (dryRun) {
             command += " --dry-run";
         }
+        command += " < " + patchFile.getPath();
         LogLevel logLevel = dryRun ? LogLevel.DEBUG : LogLevel.INFO;
-        return CommandLineUtils.executeCommand(null, command, patchData, logLevel);
+        return CommandLineUtils.executeCommand(null, command, null, logLevel);
     }
 
     private enum PatchCheckResult {

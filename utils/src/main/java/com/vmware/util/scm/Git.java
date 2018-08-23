@@ -63,8 +63,13 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("checkout -b {} {}", branchName, trackingBranch);
     }
 
-    public String applyPartialPatch(String patchData) {
-        return executeScmCommand("apply --ignore-whitespace -3 --reject", patchData, LogLevel.DEBUG);
+    public String applyPartialPatchFile(File patchFile) {
+        return executeScmCommand("apply --ignore-whitespace --reject " + patchFile.getPath(), LogLevel.DEBUG);
+    }
+
+    public String applyPatchFile(File patchFile, boolean check) {
+        String checkString = check ? " --check" : "";
+        return executeScmCommand("apply --ignore-whitespace {} " + patchFile.getPath(), LogLevel.DEBUG, checkString);
     }
 
     public String applyPatch(String patchData, boolean check) {

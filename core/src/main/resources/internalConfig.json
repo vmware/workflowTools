@@ -283,10 +283,11 @@
       "ApplyPatch",
       "--use-patch-command"
     ],
-    "applyReviewPatchToNewChangelist": [
+    "applyReviewPatchToChangelist": [
+      "SetCommitDetailsFromReview",
+      "SelectMatchingChangelist",
       "CreatePendingChangelistIfNeeded",
       "applyReviewPatch",
-      "SetCommitDetailsFromReview",
       "AmendCommit"
     ],
     "applyReviewPatchAsGitCommit": [
@@ -297,15 +298,22 @@
     ],
     "applyChangelistAsGitDiff": [
       "SelectExistingChangelist",
-      "ApplyChangelistAsGitDiff"
+      "ReadChangelistDiffAsGitPatch",
+      "ApplyPatch"
     ],
     "applyChangelistAsGitCommit": [
-      "SelectExistingChangelist",
-      "ReadPendingChangelist",
-      "ApplyChangelistAsGitDiff",
+      "applyChangelistAsGitDiff",
       "CommitAll",
       "DisplayLastCommit",
       "ExitIfChangelistDoesNotMatchGitBranch"
+    ],
+    "applyGitDiffToChangelist": [
+      "ReadLastCommit",
+      "SelectMatchingChangelist",
+      "CreatePendingChangelistIfNeeded",
+      "ReadGitDiffAsGitPatch",
+      "ApplyPatch",
+      "AmendCommit"
     ],
     "prepareCommitForPush": [
       "ReadLastCommit",

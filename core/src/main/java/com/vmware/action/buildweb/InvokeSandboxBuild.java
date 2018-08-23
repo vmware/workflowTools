@@ -43,7 +43,9 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             log.info("Assuming changelist id {} is a git ref, using tracking branch {} as syncTo value",
                     changelistId, gitRepoConfig.trackingBranchPath());
             changelistId = git.revParse(changelistId);
-            syncToParameter = ""; // --accept-defaults handles it correctly
+            if (buildwebConfig.excludeSyncTo) {
+                syncToParameter = ""; // rely on --accept-defaults to handle it correctly
+            }
         }
         String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s%s%s --accept-defaults",
                 buildwebConfig.goBuildBinPath, buildwebConfig.buildwebProject, buildwebConfig.buildType,

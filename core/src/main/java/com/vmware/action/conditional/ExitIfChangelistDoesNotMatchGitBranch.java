@@ -191,13 +191,13 @@ public class ExitIfChangelistDoesNotMatchGitBranch extends BaseLinkedPerforceCom
 
     private void addFollowingLines(List<String> lines, Iterator<String> diffIterator) {
         int count = 0;
-        while (count++ < 3 && diffIterator.hasNext()) {
+        while (count++ < 10 && diffIterator.hasNext()) {
             lines.add(diffIterator.next());
         }
     }
 
     private void addDiffLine(List<String> lines, String line) {
-        if (lines.size() >= 3) {
+        if (lines.size() >= 10) {
             lines.remove(0);
         }
         lines.add(line);

@@ -67,6 +67,7 @@
     "--build-type",
     "--buildweb-project",
     "--gobuild-bin-path",
+    "--exclude-sync-to",
     "--store-trees",
     "--changelist-id"
   ],
@@ -92,9 +93,6 @@
     "--bugzilla-url",
     "--default-jira-project",
     "--bugzilla-query"
-  ],
-  "SaveChangelistDiffToFile": [
-    "--output-file"
   ],
   "RevertWorkspace": [
     "--perforce-client"
@@ -156,6 +154,9 @@
     "--tracking-branch",
     "--sync-to-branch-latest"
   ],
+  "ReadGitDiffAsGitPatch": [
+    "--parent"
+  ],
   "PushToDevelop": [
     "--git-remote"
   ],
@@ -182,6 +183,9 @@
   ],
   "SetDefaultApprover": [
     "--default-approver"
+  ],
+  "SaveDiffToFile": [
+    "--output-file"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
@@ -231,13 +235,13 @@
     "--default-jira-project",
     "--disable-bugzilla"
   ],
-  "BaseSetReviewersList": [
-    "--always-include-review-url"
-  ],
   "ApplyPatch": [
     "--action-after-failed-patch-check",
     "--patch-command",
     "--use-patch-command"
+  ],
+  "BaseSetReviewersList": [
+    "--always-include-review-url"
   ],
   "SetSummary": [
     "--max-summary",
@@ -291,9 +295,6 @@
     "--bugzilla-query",
     "--disable-bugzilla",
     "--disable-jira"
-  ],
-  "ApplyChangelistToSeparateGitBranch": [
-    "--tracking-branch"
   ],
   "BaseReviewBoardAction": [
     "--username"

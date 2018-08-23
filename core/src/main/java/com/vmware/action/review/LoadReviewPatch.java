@@ -10,6 +10,8 @@ import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
+import static com.vmware.util.input.InputUtils.readValueUntilValidInt;
+
 @ActionDescription("Loads diff data for the specified review.")
 public class LoadReviewPatch extends BaseCommitAction {
 
@@ -33,7 +35,7 @@ public class LoadReviewPatch extends BaseCommitAction {
     public void process() {
         if (reviewBoardConfig.reviewRequestId == null) {
             log.info("No review request id specified as source for patch");
-            reviewBoardConfig.reviewRequestId = String.valueOf(InputUtils.readValueUntilValidInt("Review request id for patch"));
+            reviewBoardConfig.reviewRequestId = String.valueOf(readValueUntilValidInt("Review request id for patch"));
         }
         int reviewId = Integer.parseInt(reviewBoardConfig.reviewRequestId);
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(reviewId);

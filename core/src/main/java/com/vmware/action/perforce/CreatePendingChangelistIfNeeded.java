@@ -29,6 +29,8 @@ public class CreatePendingChangelistIfNeeded extends BasePerforceCommitAction {
         log.info("Created changelist with id {}", changelistId);
         draft.perforceChangelistId = changelistId;
         log.info("Adding tag changeset-{}", changelistId);
-        git.updateTag("changeset-" + changelistId, LogLevel.DEBUG);
+        if (git.workingDirectoryIsInGitRepo()) {
+            git.updateTag("changeset-" + changelistId, LogLevel.DEBUG);
+        }
     }
 }
