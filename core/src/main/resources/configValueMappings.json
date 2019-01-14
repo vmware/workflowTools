@@ -275,6 +275,9 @@
   "SubmitToDepot": [
     "--tracking-branch"
   ],
+  "RemoveSelectedBuilds": [
+    "--jenkins-url"
+  ],
   "PushToPrecommitBranch": [
     "--git-remote",
     "--username"

@@ -476,6 +476,11 @@
       "AddToReviewedBy",
       "AmendCommit"
     ],
+    "removeSelectedBuilds": [
+      "ReadLastCommit",
+      "RemoveSelectedBuilds",
+      "AmendCommit"
+    ],
     "enableMergeTo": [
       "ReadLastCommit",
       "EnableDisableMergeTo",

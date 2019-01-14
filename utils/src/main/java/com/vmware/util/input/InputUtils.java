@@ -57,9 +57,9 @@ public class InputUtils {
                 log.info("Please enter a valid number");
             } else {
                 selections = selectionValues.stream().map((Integer::parseInt)).collect(Collectors.toList());
-                boolean invalidSelectino = selections.stream()
+                boolean invalidSelection = selections.stream()
                         .anyMatch(selection -> selection < 1 || selection > choices.size());
-                if (invalidSelectino) {
+                if (invalidSelection) {
                     log.info("Please enter a number between {} and {}", 1, choices.size());
                     selections = null;
                 }
