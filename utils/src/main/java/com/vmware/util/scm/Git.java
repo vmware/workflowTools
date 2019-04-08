@@ -427,7 +427,7 @@ public class Git extends BaseScmWrapper {
             return null;
         }
 
-        if (gitOutput.trim().startsWith("fatal: Not a git repository")) {
+        if (gitOutput.trim().startsWith("fatal:")) {
             return System.getProperty("user.dir") + " is not in a git repository";
         }
         return null;
