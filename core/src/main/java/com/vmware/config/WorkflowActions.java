@@ -28,8 +28,7 @@ public class WorkflowActions {
     }
 
     public List<Class<? extends BaseAction>> determineActions(String workflowString) {
-        Map<String, List<String>> workflows = workflowConfig.workflows;
-        List<String> possibleActions = workflows.get(workflowString);
+        List<String> possibleActions = workflowConfig.workflows.get(workflowString);
         if (possibleActions != null) {
             log.info("Using workflow {}", workflowString);
             log.debug("Using workflow values {}", possibleActions.toString());
@@ -39,7 +38,7 @@ public class WorkflowActions {
         }
         log.info("");
 
-        WorkflowValuesParser valuesParser = new WorkflowValuesParser(workflows, workflowActions);
+        WorkflowValuesParser valuesParser = new WorkflowValuesParser(workflowConfig, workflowActions);
         valuesParser.parse(possibleActions);
         workflowConfig.applyConfigValues(valuesParser.getConfigValues(), "Config in Workflow", false);
         if (!valuesParser.getUnknownActions().isEmpty()) {

@@ -2,11 +2,13 @@ package com.vmware.config;
 
 import com.vmware.action.BaseAction;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
+import com.vmware.config.section.JenkinsConfig;
 import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,16 +24,18 @@ import java.util.Set;
 public class WorkflowValuesParser {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-    private List<Class<? extends BaseAction>> actionClasses = new ArrayList<Class<? extends BaseAction>>();
-    private Map<String, String> configValues = new HashMap<String, String>();
-    private List<String> unknownActions = new ArrayList<String>();
+    private List<Class<? extends BaseAction>> actionClasses = new ArrayList<>();
+    private Map<String, String> configValues = new HashMap<>();
+    private List<String> unknownActions = new ArrayList<>();
 
     private Map<String, List<String>> workflows;
     private List<Class<? extends BaseAction>> workflowActions;
+    private JenkinsConfig jenkinsConfig;
 
-    public WorkflowValuesParser(Map<String, List<String>> workflows, List<Class<? extends BaseAction>> workflowActions) {
-        this.workflows = workflows;
+    public WorkflowValuesParser(WorkflowConfig workflowConfig, List<Class<? extends BaseAction>> workflowActions) {
+        this.workflows = workflowConfig.workflows;
         this.workflowActions = workflowActions;
+        this.jenkinsConfig = workflowConfig.jenkinsConfig;
     }
 
     public void reset() {
@@ -86,7 +90,20 @@ public class WorkflowValuesParser {
         if (StringUtils.isBlank(jenkinsJobsToCall)) {
             return Collections.emptyList();
         }
-        String[] jenkinsJobPieces = jenkinsJobsToCall.split("&");
+        String[] jenkinsJobs = jenkinsJobsToCall.split(",");
+        Set<String> jenkinsParameterConfigValues = new HashSet<>();
+        for (String job : jenkinsJobs) {
+            jenkinsParameterConfigValues.addAll(determineParametersForJob(job));
+        }
+
+        return jenkinsParameterConfigValues;
+    }
+
+    private Collection<? extends String> determineParametersForJob(String jobText) {
+        if (jenkinsConfig.jenkinsJobsMappings.containsKey(jobText)) {
+            jobText = jenkinsConfig.jenkinsJobsMappings.get(jobText);
+        }
+        String[] jenkinsJobPieces = jobText.split("&");
         if (jenkinsJobPieces.length < 2) {
             return Collections.emptyList();
         }

@@ -293,6 +293,7 @@
     "applyReviewPatchAsGitCommit": [
       "applyReviewPatch",
       "SetCommitDetailsFromReview",
+      "ExitIfNoChangesDetectedByGit",
       "CommitAll",
       "DisplayLastCommit"
     ],
@@ -303,6 +304,7 @@
     ],
     "applyChangelistAsGitCommit": [
       "applyChangelistAsGitDiff",
+      "ExitIfNoChangesDetectedByGit",
       "CommitAll",
       "DisplayLastCommit",
       "ExitIfChangelistDoesNotMatchGitBranch"
@@ -634,6 +636,11 @@
     ],
     "invokeSandboxBuildWithGitChangeset": [
       "updateWithGitChangeset",
+      "InvokeSandboxBuild",
+      "AmendCommit"
+    ],
+    "invokeSandboxBuildWithFileSync": [
+      "updateMatchingChangelistWithFileSync",
       "InvokeSandboxBuild",
       "AmendCommit"
     ],

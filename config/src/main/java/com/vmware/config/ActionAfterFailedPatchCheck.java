@@ -11,8 +11,9 @@ import java.util.List;
 public enum ActionAfterFailedPatchCheck implements InputListSelection {
 
     nothing("Nothing"),
-    partial("Partially apply patch"),
-    usePatchCommand("Use patch command");
+    partialWithGit("Partially apply patch using git"),
+    usePatchCommand("Use patch command if cleanly applies"),
+    partialWithPatch("Partially apply patch using patch command");
 
     ActionAfterFailedPatchCheck(String description) {
         this.description = description;
@@ -34,10 +35,11 @@ public enum ActionAfterFailedPatchCheck implements InputListSelection {
     }
 
     public static ActionAfterFailedPatchCheck askForAction(boolean usePatchCommand) {
-        List<InputListSelection> actions = new ArrayList<>();
-        actions.addAll(Arrays.asList(ActionAfterFailedPatchCheck.values()));
+        List<InputListSelection> actions = new ArrayList<>(Arrays.asList(ActionAfterFailedPatchCheck.values()));
         if (usePatchCommand) {
             actions.remove(ActionAfterFailedPatchCheck.usePatchCommand);
+        } else {
+            actions.remove(ActionAfterFailedPatchCheck.partialWithPatch);
         }
         int selection = InputUtils.readSelection(actions, "Action after failed check");
         return (ActionAfterFailedPatchCheck) actions.get(selection);

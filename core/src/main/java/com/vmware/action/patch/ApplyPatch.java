@@ -122,18 +122,14 @@ public class ApplyPatch extends BaseCommitAction {
         }
 
         printCheckOutput(checkResult, checkCommand);
-        if (patchConfig.actionAfterFailedPatchCheck == null) {
-            patchConfig.actionAfterFailedPatchCheck = ActionAfterFailedPatchCheck.askForAction(patchConfig.usePatchCommand);
-        }
+        patchConfig.actionAfterFailedPatchCheck = ActionAfterFailedPatchCheck.askForAction(patchConfig.usePatchCommand);
 
         switch (patchConfig.actionAfterFailedPatchCheck) {
-            case partial:
-                return patchConfig.usePatchCommand ? PatchCheckResult.applyPartialPatchUsingPatchCommand :
-                        PatchCheckResult.applyPatchUsingGitApply;
+            case partialWithGit:
+                return PatchCheckResult.applyPartialPatchUsingGitApply;
+            case partialWithPatch:
+                return PatchCheckResult.applyPartialPatchUsingPatchCommand;
             case usePatchCommand:
-                if (patchConfig.usePatchCommand) {
-                    return PatchCheckResult.nothing;
-                }
                 patchConfig.usePatchCommand = true;
                 return checkIfPatchApplies(patchFile);
             default:
@@ -162,9 +158,8 @@ public class ApplyPatch extends BaseCommitAction {
         if (dryRun) {
             command += " --dry-run";
         }
-        command += " < " + patchFile.getPath();
         LogLevel logLevel = dryRun ? LogLevel.DEBUG : LogLevel.INFO;
-        return CommandLineUtils.executeCommand(null, command, null, logLevel);
+        return CommandLineUtils.executeCommand(null, command, IOUtils.read(patchFile) + "\n", logLevel);
     }
 
     private enum PatchCheckResult {

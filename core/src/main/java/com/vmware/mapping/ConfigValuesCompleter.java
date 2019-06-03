@@ -38,7 +38,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         }
 
         String workflowString = argumentList.getArguments()[0];
-        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config.workflows, workflowActions);
+        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config, workflowActions);
         valuesParser.parse(Arrays.asList(workflowString.split(",")));
         values.clear();
         valuesShownWhenNoBuffer.clear();
