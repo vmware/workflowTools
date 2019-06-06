@@ -20,6 +20,6 @@ public class ClasspathResource {
     }
 
     public InputStreamReader getReader() {
-        return new InputStreamReader(ClassLoader.class.getResourceAsStream(fileName));
+        return new InputStreamReader(ClasspathResource.class.getResourceAsStream(fileName));
     }
 }
