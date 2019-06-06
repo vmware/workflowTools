@@ -1,18 +1,19 @@
 package com.vmware.util;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ClasspathResource {
 
-    private String fileName;
+    private final String fileName;
+    private final Class classToUseAsLoader;
 
-    public ClasspathResource(String fileName) {
+    public ClasspathResource(String fileName, Class classToUseAsLoader) {
         this.fileName = fileName;
+        this.classToUseAsLoader = classToUseAsLoader;
     }
 
     public String getText() {
-        return IOUtils.read(ClassLoader.class.getResourceAsStream(fileName));
+        return IOUtils.read(classToUseAsLoader.getResourceAsStream(fileName));
     }
 
     public byte[] getBytes() {
@@ -20,6 +21,6 @@ public class ClasspathResource {
     }
 
     public InputStreamReader getReader() {
-        return new InputStreamReader(ClasspathResource.class.getResourceAsStream(fileName));
+        return new InputStreamReader(classToUseAsLoader.getResourceAsStream(fileName));
     }
 }

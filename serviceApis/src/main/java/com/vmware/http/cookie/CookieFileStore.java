@@ -141,7 +141,7 @@ public class CookieFileStore {
 
         File cookieFile = new File(homeFolder + "/" + cookieFileName);
         if (existingCookie == null || !cookieFile.exists()) {
-            String cookieSample = new ClasspathResource("/CookieFileStructure.txt").getText();
+            String cookieSample = new ClasspathResource("/CookieFileStructure.txt", this.getClass()).getText();
             updatedCookieText = cookieSample.replace("[cookie]", updatedCookieText);
             IOUtils.write(cookieFile, updatedCookieText + "\n");
             return;

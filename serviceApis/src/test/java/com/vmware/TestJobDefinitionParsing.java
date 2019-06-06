@@ -13,7 +13,7 @@ public class TestJobDefinitionParsing extends BaseTests {
 
     @Test
     public void canParseDefinition() {
-        String definitionText = new ClasspathResource("/jobDefinition.json").getText();
+        String definitionText = new ClasspathResource("/jobDefinition.json", this.getClass()).getText();
         Gson gson = new ConfiguredGsonBuilder().build();
         JobDetails jobDefinition = gson.fromJson(definitionText, JobDetails.class);
         assertNotNull(jobDefinition);

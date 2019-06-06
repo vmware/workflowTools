@@ -72,7 +72,7 @@ public class TestBugzillaApi extends BaseTests {
     // if the switch to the bugzilla rest api ever happens
     @Test
     public void canDeserializeBugFromJson() {
-        String bugJsonText = new ClasspathResource("/bugAsJson.json").getText();
+        String bugJsonText = new ClasspathResource("/bugAsJson.json", this.getClass()).getText();
         Gson gson = new ConfiguredGsonBuilder().build();
         Bug deserializedBug = gson.fromJson(bugJsonText, Bug.class);
         assertFalse("Bug should be found", deserializedBug.isNotFound());

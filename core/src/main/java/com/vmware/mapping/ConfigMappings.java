@@ -23,7 +23,7 @@ public class ConfigMappings {
     private Map<String, List<String>> mappings;
 
     public ConfigMappings() {
-        Reader reader = new ClasspathResource("/configValueMappings.json").getReader();
+        Reader reader = new ClasspathResource("/configValueMappings.json", this.getClass()).getReader();
         this.mappings = new Gson().fromJson(reader, Map.class);
     }
 

@@ -29,7 +29,7 @@ public class DisplayConfigOptions extends BaseAction {
 
     @Override
     public void process() {
-        Reader reader = new ClasspathResource("/internalConfig.json").getReader();
+        Reader reader = new ClasspathResource("/internalConfig.json", this.getClass()).getReader();
         WorkflowConfig defaultConfig = gson.fromJson(reader, WorkflowConfig.class);
         log.info("");
         log.info("Printing configuration options");

@@ -19,7 +19,7 @@ public class BaseTests {
     @BeforeClass
     public static void initProperties() throws IOException {
         testProperties = new Properties();
-        testProperties.load(new ClasspathResource("/test.properties").getReader());
+        testProperties.load(new ClasspathResource("/test.properties", BaseTests.class).getReader());
         UsernamePasswordAsker.setTestCredentials();
     }
 }

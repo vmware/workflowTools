@@ -194,7 +194,7 @@ public class WorkflowConfigParser {
     }
 
     private WorkflowConfig readInternalConfig() {
-        Reader reader = new ClasspathResource("/internalConfig.json").getReader();
+        Reader reader = new ClasspathResource("/internalConfig.json", this.getClass()).getReader();
         return gson.fromJson(reader, WorkflowConfig.class);
     }
 
