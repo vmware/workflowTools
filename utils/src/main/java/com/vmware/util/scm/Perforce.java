@@ -375,6 +375,12 @@ public class Perforce extends BaseScmWrapper {
 
     public String markForDelete(String changelistId, String fileName) {
         String output = executeScmCommand("delete -c {} {}", changelistId, fileName);
+        if (output.contains("can't delete (already opened for edit)")) {
+            log.info("Revert file {} as it is already opened for edit", fileName);
+            revertFiles(Collections.singletonList(fileName));
+            return markForDelete(changelistId, fileName);
+        }
+
         String otherChangelistId = MatcherUtils.singleMatch(output, "change from change (\\d+)");
         if (otherChangelistId != null) {
             log.info("Reopening file {} from changelist {} as it has already been deleted", fileName, otherChangelistId);
