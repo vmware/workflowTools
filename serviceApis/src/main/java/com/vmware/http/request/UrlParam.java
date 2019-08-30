@@ -20,6 +20,10 @@ public class UrlParam extends RequestParam {
         return new UrlParam(paramPieces[0], paramPieces[1]);
     }
 
+    public static UrlParam forceParam(boolean force) {
+        return fromText("force=" + force);
+    }
+
     @Override
     public String toString() {
         return name + "=" + value;

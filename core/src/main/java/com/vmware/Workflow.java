@@ -1,40 +1,6 @@
 package com.vmware;
 
-import com.vmware.action.BaseAction;
-import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseIssuesProcessingAction;
-import com.vmware.action.trello.BaseTrelloAction;
-import com.vmware.config.ActionDescription;
-import com.vmware.config.ConfigurableProperty;
-import com.vmware.config.UnknownWorkflowValueException;
-import com.vmware.config.WorkflowActionValues;
-import com.vmware.config.WorkflowActions;
-import com.vmware.config.WorkflowConfig;
-import com.vmware.config.WorkflowConfigParser;
-import com.vmware.config.WorkflowField;
-import com.vmware.config.WorkflowFields;
-import com.vmware.jira.domain.ProjectIssues;
-import com.vmware.mapping.ConfigMappings;
-import com.vmware.mapping.ConfigValuesCompleter;
-import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.scm.Git;
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.IOUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.ThreadUtils;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
-import com.vmware.util.input.CommaArgumentDelimeter;
-import com.vmware.util.input.ImprovedArgumentCompleter;
-import com.vmware.util.input.ImprovedStringsCompleter;
-import com.vmware.util.input.InputUtils;
-import com.vmware.util.logging.Padder;
-import jline.console.completer.ArgumentCompleter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +15,39 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.vmware.action.BaseAction;
+import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BaseIssuesProcessingAction;
+import com.vmware.action.base.BaseVappAction;
+import com.vmware.action.trello.BaseTrelloAction;
+import com.vmware.config.ActionDescription;
+import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.UnknownWorkflowValueException;
+import com.vmware.config.WorkflowActionValues;
+import com.vmware.config.WorkflowActions;
+import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowConfigParser;
+import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
+import com.vmware.mapping.ConfigMappings;
+import com.vmware.mapping.ConfigValuesCompleter;
+import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
+import com.vmware.util.input.CommaArgumentDelimeter;
+import com.vmware.util.input.ImprovedArgumentCompleter;
+import com.vmware.util.input.ImprovedStringsCompleter;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.Padder;
+import com.vmware.util.scm.Git;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jline.console.completer.ArgumentCompleter;
+
 /**
  * Main class for running the workflow application.
  */
@@ -62,6 +61,10 @@ public class Workflow {
 
     public static final List<String> PERFORCE_MAIN_WORKFLOWS = Collections.unmodifiableList(
             Arrays.asList("moveOpenFilesToPendingChangelist", "review", "pushable", "submitChangelist")
+    );
+
+    public static final List<String> VAPP_MAIN_WORKFLOWS = Collections.unmodifiableList(
+            Arrays.asList("deleteVapp", "renameVapp", "updateVappLease", "tailVappLogFile", "displayVappJson", "openVappProviderUrl")
     );
 
     private static final String EXIT_WORKFLOW = "exit";
@@ -227,20 +230,22 @@ public class Workflow {
 
     private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods) {
         log.info("Checking that each action value in the workflows is valid");
-        ReviewRequestDraft draft = new ReviewRequestDraft();
-        ProjectIssues projectIssues = new ProjectIssues();
         WorkflowActions workflowActions = new WorkflowActions(config);
         List<Class<? extends BaseAction>> workflowActionsClasses =
                 workflowActions.determineActions(StringUtils.join(config.workflows.keySet()));
+        WorkflowActionValues actionValues = new WorkflowActionValues();
         for (Class<? extends BaseAction> action : workflowActionsClasses) {
             log.info("Instantiating constructor for {}", action.getSimpleName());
             BaseAction actionObject = instantiateAction(action);
 
             if (actionObject instanceof BaseCommitAction) {
-                ((BaseCommitAction) actionObject).setDraft(draft);
+                ((BaseCommitAction) actionObject).setDraft(actionValues.getDraft());
             }
             if (actionObject instanceof BaseIssuesProcessingAction) {
-                ((BaseIssuesProcessingAction) actionObject).setProjectIssues(projectIssues);
+                ((BaseIssuesProcessingAction) actionObject).setProjectIssues(actionValues.getProjectIssues());
+            }
+            if (actionObject instanceof BaseVappAction) {
+                ((BaseVappAction) actionObject).setVappData(actionValues.getVappData());
             }
             if (runAllHelperMethods) {
                 log.info("Running asyncSetup");
@@ -391,6 +396,9 @@ public class Workflow {
         }
         if (action instanceof BaseTrelloAction) {
             ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
+        }
+        if (action instanceof BaseVappAction) {
+            ((BaseVappAction) action).setVappData(values.getVappData());
         }
     }
 

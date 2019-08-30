@@ -31,6 +31,15 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--ssh-command", help = "Ssh command to execute")
     public String sshCommand;
 
+    @ConfigurableProperty(commandLine = "--log-file", help = "Log file to tail")
+    public String logFile;
+
+    @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
+    public int logLineCount;
+
+    @ConfigurableProperty(commandLine = "--log-continuous", help = "Using tail -f")
+    public boolean continuousTailing;
+
     public SiteConfig commandLineSite() {
         return new SiteConfig(sshHost, sshPort, sshUsername, sshPassword);
     }

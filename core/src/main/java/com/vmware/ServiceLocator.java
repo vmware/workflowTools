@@ -5,12 +5,14 @@ import com.vmware.buildweb.Buildweb;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.JenkinsConfig;
+import com.vmware.config.section.VcdConfig;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.util.scm.Git;
 import com.vmware.util.scm.Perforce;
 import com.vmware.trello.Trello;
+import com.vmware.vcd.Vcd;
 
 /**
  * Centralized locator for git, perforce, jenkins, jira, reviewboard and trello instances.
@@ -33,6 +35,8 @@ public class ServiceLocator {
     private Buildweb buildweb;
 
     private Trello trello;
+
+    private Vcd vcd;
 
     private WorkflowConfig config;
 
@@ -79,6 +83,14 @@ public class ServiceLocator {
                     buildwebConfig.buildwebLogFileName, config.username);
         }
         return buildweb;
+    }
+
+    public Vcd getVcd() {
+        if (vcd == null) {
+            VcdConfig vcdConfig = config.vcdConfig;
+            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg);
+        }
+        return vcd;
     }
 
     public Trello getTrello() {

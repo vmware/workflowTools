@@ -1,6 +1,7 @@
 package com.vmware.http.credentials;
 
 import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,12 @@ public class UsernamePasswordAsker {
     private static Logger log = LoggerFactory.getLogger(UsernamePasswordAsker.class.getName());
 
 
-    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingCookie) {
+    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingApiToken) {
+        return askUserForUsernameAndPassword(missingApiToken, null);
+
+    }
+
+    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingCookie, String orgName) {
         if (testCredentials != null) {
             log.info("Using test credentials");
             return testCredentials;
@@ -26,6 +32,11 @@ public class UsernamePasswordAsker {
 
         String username = InputUtils.readValue("Username");
         String password = InputUtils.readPassword("Password");
+
+        if (StringUtils.isNotBlank(orgName) && !username.contains("@")) {
+            log.info("Appending org name {} to username {}", orgName, username);
+            username += "@" + orgName;
+        }
         return new UsernamePasswordCredentials(username, password);
     }
 

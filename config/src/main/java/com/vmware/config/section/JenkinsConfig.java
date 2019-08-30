@@ -3,6 +3,8 @@ package com.vmware.config.section;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.jenkins.JobParameter;
+import com.vmware.util.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,12 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
     public boolean includeInProgressBuilds;
 
+    @ConfigurableProperty(help = "Name for Vapp metadata json Jenkins parameter")
+    public String vappJsonParameter;
+
+    @ConfigurableProperty(commandLine = "--use-vapp-json", help = "Use json metadata from Vapp")
+    public boolean useVappJsonParameter;
+
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith("--J")) {
@@ -68,11 +76,15 @@ public class JenkinsConfig {
 
     public JenkinsJobsConfig getJenkinsJobsConfig(String username, String targetBranch) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
-        Map<String, String> presetParams = Collections.unmodifiableMap(jenkinsJobParameters);
+
+        Map<String, String> presetParams = new HashMap<>(jenkinsJobParameters);
+        if (useVappJsonParameter) {
+            presetParams.put(vappJsonParameter, JenkinsJobsConfig.VAPP_JSON_VALUE);
+        }
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
 
-        return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, presetParams, jenkinsUrl,
-                jobMappings, targetBranch);
+        return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, Collections.unmodifiableMap(presetParams), jenkinsUrl,
+                jobMappings, targetBranch, vappJsonParameter);
     }
 
 }

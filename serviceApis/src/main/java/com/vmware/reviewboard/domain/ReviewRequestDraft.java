@@ -84,7 +84,8 @@ public class ReviewRequestDraft extends BaseEntity {
     public String draftPatchData;
     @Expose(serialize = false, deserialize = false)
     public Set<String> extraTargetGroupsToAdd = new TreeSet<>();
-
+    @Expose(serialize = false, deserialize = false)
+    public String vappJsonForJenkinsJob;
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.

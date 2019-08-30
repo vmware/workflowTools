@@ -41,8 +41,10 @@ public class WorkflowActions {
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(workflowConfig, workflowActions);
         valuesParser.parse(possibleActions);
         workflowConfig.applyConfigValues(valuesParser.getConfigValues(), "Config in Workflow", false);
-        if (!valuesParser.getUnknownActions().isEmpty()) {
+        if (!valuesParser.getUnknownActions().isEmpty() && !workflowConfig.ignoreUnknownActions) {
             throw new UnknownWorkflowValueException(valuesParser.getUnknownActions());
+        } else if (!valuesParser.getUnknownActions().isEmpty()) {
+            log.warn("Ignoring unknown workflow actions {}", valuesParser.getUnknownActions());
         }
         return valuesParser.getActionClasses();
     }

@@ -27,10 +27,13 @@ public class JenkinsJobsConfig {
 
     private static final String BRANCH_NAME = "$BRANCH_NAME";
 
+    public static final String VAPP_JSON_VALUE = "$VAPP_JSON";
+
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Map<String, String> jenkinsJobsMappings = new HashMap<>();
     private String branchName;
+    private String vappJsonParameter;
 
     private String[] jobsDisplayNames;
     private Map<String, String> presetParameters = new TreeMap<>();
@@ -48,12 +51,13 @@ public class JenkinsJobsConfig {
     }
 
     public JenkinsJobsConfig(String jenkinsJobsToUse, String[] jobsDisplayNames, Map<String, String> presetParameters,
-                             String jenkinsUrl, Map<String, String> jenkinsJobsMappings, String branchName) {
+                             String jenkinsUrl, Map<String, String> jenkinsJobsMappings, String branchName, String vappJsonParameter) {
         this.presetParameters = presetParameters;
         this.jobsDisplayNames = jobsDisplayNames;
         this.jenkinsUrl = jenkinsUrl;
         this.jenkinsJobsMappings = jenkinsJobsMappings;
         this.branchName = branchName;
+        this.vappJsonParameter = vappJsonParameter;
         parseJobsText(jenkinsJobsToUse);
     }
 
@@ -169,6 +173,11 @@ public class JenkinsJobsConfig {
         if (setDefaultUsernameParam) {
             log.debug("Adding default user parameter {} with value {}", USERNAME_PARAM, presetParameters.get(USERNAME_PARAM));
             parameters.add(0, new JobParameter(USERNAME_PARAM, presetParameters.get(USERNAME_PARAM)));
+        }
+
+        if (vappJsonParameter != null && presetParameters.containsKey(vappJsonParameter)) {
+            log.debug("Adding Vapp json parameter {}", vappJsonParameter, presetParameters.get(vappJsonParameter));
+            parameters.add(new JobParameter(vappJsonParameter, presetParameters.get(vappJsonParameter)));
         }
     }
 

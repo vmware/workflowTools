@@ -18,6 +18,7 @@ import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.TrelloConfig;
+import com.vmware.config.section.VcdConfig;
 import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,10 +78,13 @@ public class WorkflowConfig {
     @SectionConfig
     public SshConfig sshConfig;
 
+    @SectionConfig
+    public VcdConfig vcdConfig;
+
     @ConfigurableProperty(help = "Information about the the git commit that this version of workflow tools was built from")
     public Map<String, String> buildInfo;
 
-    @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira and review board")
+    @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira, review board and vcd")
     public String username;
 
     @ConfigurableProperty(help = "Order of services to check against for bug number")
@@ -103,6 +107,9 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time in seconds for blocking workflow action to complete.")
     public int waitTimeForBlockingWorkflowAction;
+
+    @ConfigurableProperty(commandLine = "--ignore-unknown-actions", help = "Ignore unknown workflow actions")
+    public boolean ignoreUnknownActions;
 
     @Expose(serialize = false, deserialize = false)
     private WorkflowFields configurableFields;

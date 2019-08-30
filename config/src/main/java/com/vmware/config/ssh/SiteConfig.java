@@ -31,4 +31,9 @@ public class SiteConfig {
         throwFatalExceptionIfBlank(host, "host");
         throwFatalExceptionIfBlank(username, "username");
     }
+
+    @Override
+    public String toString() {
+        return "SiteConfig{" + "host='" + host + '\'' + ", portNumber=" + portNumber + ", username='" + username + '\'' + '}';
+    }
 }

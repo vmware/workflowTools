@@ -3,6 +3,12 @@
     "--username",
     " --remote-branch"
   ],
+  "TailVappLogFile": [
+    "--log-line-count",
+    "--ssh-command",
+    "--log-continuous",
+    "--log-file"
+  ],
   "AddTrackingIssueCreatedComments": [
     "--bugzilla-url"
   ],
@@ -80,7 +86,10 @@
     "--bugzilla-test-bug",
     "--username",
     "--bugzilla-url",
-    "--trello-url"
+    "--trello-url",
+    "--default-vcd-org",
+    "--vcd-api-version",
+    "--vcd-url"
   ],
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
@@ -97,6 +106,10 @@
   "RevertWorkspace": [
     "--perforce-client"
   ],
+  "DeleteVappIfQuotaReached": [
+    "--vcd-vm-quota",
+    "--use-vapp-json"
+  ],
   "LoadReviewPatch": [
     "--username",
     "--latest-diff",
@@ -106,6 +119,9 @@
   "SetReviewId": [
     "--username",
     "--review-board-date-format"
+  ],
+  "ExecuteSshCommandUsingVapp": [
+    "--ssh-command"
   ],
   "DisplayReviewUrl": [
     "--reviewboard-url"
@@ -140,6 +156,10 @@
     "--username",
     "--estimate"
   ],
+  "LoadVappsIfNeeded": [
+    "--use-vapp-json",
+    "--vcd-check-quota"
+  ],
   "BaseBatchJiraAction": [
     "--username",
     "--disable-jira"
@@ -172,11 +192,22 @@
   "PublishReview": [
     "--reviewboard-url"
   ],
+  "SelectVappIfNeeded": [
+    "--vcd-vm-quota",
+    "--vcd-check-quota",
+    "--use-vapp-json"
+  ],
   "BaseCommitAction": [
     "--username",
     "--buildweb-url",
     "--perforce-client",
     "--changelist-id"
+  ],
+  "LoadVapps": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url"
   ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
@@ -211,6 +242,15 @@
     "--username",
     "--review-board-date-format"
   ],
+  "UpdateVappLease": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url"
+  ],
+  "LoadVappJsonIfNeeded": [
+    "--use-vapp-json"
+  ],
   "UploadReviewDiff": [
     "--parent",
     "--tracking-branch",
@@ -243,6 +283,12 @@
   "BaseSetReviewersList": [
     "--always-include-review-url"
   ],
+  "RenameVapp": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url"
+  ],
   "SetSummary": [
     "--max-summary",
     "--set-empty-only"
@@ -255,6 +301,14 @@
     "--bugzilla-url",
     "--default-jira-project"
   ],
+  "DeleteVapp": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url",
+    "--wait-time",
+    "--wait-for-vapp-delete"
+  ],
   "MarkBugAsResolved": [
     "--username"
   ],
@@ -266,6 +320,12 @@
     "--build-display-name",
     "--ssh-site",
     "--ssh-command"
+  ],
+  "LoadVappJson": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url"
   ],
   "CreateReview": [
     "--username",

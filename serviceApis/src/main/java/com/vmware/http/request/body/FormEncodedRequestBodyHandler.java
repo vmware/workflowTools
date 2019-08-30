@@ -43,7 +43,9 @@ public class FormEncodedRequestBodyHandler {
     }
 
     private void writeValuesAsFormEncoded(HttpConnection connection, Map<String, Object> valuesToWrite) throws IOException {
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        if (!connection.containsRequestHeader("Content-Type")) {
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        }
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
         String contentToWrite = "";
         for (String name : valuesToWrite.keySet()) {

@@ -31,14 +31,14 @@ public class ConfiguredGsonBuilder {
         this(serverTimezone, dateFormat, null);
     }
 
-    private ConfiguredGsonBuilder(TimeZone serverTimezone, String dateFormat, Map<String, String> customFieldNames) {
+    private ConfiguredGsonBuilder(TimeZone timeZone, String dateFormat, Map<String, String> customFieldNames) {
         ImprovedExclusionStrategy serializationExclusionStrategy = new ImprovedExclusionStrategy(true);
         ImprovedExclusionStrategy deserializationExclusionStrategy = new ImprovedExclusionStrategy(false);
         this.builder = new GsonBuilder()
                 .addSerializationExclusionStrategy(serializationExclusionStrategy)
                 .addDeserializationExclusionStrategy(deserializationExclusionStrategy)
                 .registerTypeAdapterFactory(new PostDeserializeTypeAdapterFactory())
-                .registerTypeAdapter(Date.class, new DateWithTimezoneMapper(dateFormat, serverTimezone))
+                .registerTypeAdapter(Date.class, new DateWithTimezoneMapper(dateFormat, timeZone))
                 .registerTypeAdapter(IssueStatusDefinition.class, new ComplexEnumMapper())
                 .registerTypeAdapter(IssueResolutionDefinition.class, new ComplexEnumMapper())
                 .registerTypeAdapter(IssueTypeDefinition.class, new ComplexEnumMapper())

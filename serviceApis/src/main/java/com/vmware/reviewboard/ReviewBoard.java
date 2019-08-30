@@ -232,7 +232,7 @@ public class ReviewBoard extends AbstractRestService {
 
     public void updateServerTimeZone(String serverDateFormat) {
         String serverTimeZone = getServerInfo().site.serverTimeZone;
-        connection.updateServerTimeZone(TimeZone.getTimeZone(serverTimeZone), serverDateFormat);
+        connection.updateTimezoneAndFormat(TimeZone.getTimeZone(serverTimeZone), serverDateFormat);
     }
 
     public void setupAuthenticatedConnectionWithLocalTimezone(String reviewBoardDateFormat) {

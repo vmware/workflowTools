@@ -32,9 +32,12 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -76,17 +79,24 @@ public class HttpConnection {
         requestParams = new RequestParams();
     }
 
-    public void updateServerTimeZone(TimeZone serverTimezone, String serverDateFormat) {
+    public void updateTimezoneAndFormat(TimeZone serverTimezone, String serverDateFormat) {
         this.gson = new ConfiguredGsonBuilder(serverTimezone, serverDateFormat).build();
     }
 
     public void setupBasicAuthHeader(final UsernamePasswordCredentials credentials) {
-        String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
-        requestParams.addStatefulParam(aBasicAuthHeader(basicCredentials));
+        requestParams.addStatefulParam(aBasicAuthHeader(credentials));
     }
 
     public void addStatefulParams(List<? extends RequestParam> params) {
         requestParams.addAllStatefulParams(params);
+    }
+
+    public void addStatefulParam(RequestParam requestParam) {
+        requestParams.addStatefulParam(requestParam);
+    }
+
+    public void removeStatefulParam(String paramName) {
+        requestParams.removeStatefulParam(paramName);
     }
 
     public void addStatefulParamsFromUrlFragment(String urlFragment) {
@@ -131,8 +141,12 @@ public class HttpConnection {
     }
 
     public <T> T delete(String url, RequestParam... params) {
+        return delete(url, null, params);
+    }
+
+    public <T> T delete(String url, Class<T> responseConversionClass, RequestParam... params) {
         setupConnection(url, DELETE, params);
-        return handleServerResponse(null, DELETE, params);
+        return handleServerResponse(responseConversionClass, DELETE, params);
     }
 
     public boolean isUriTrusted(URI uri) {
@@ -172,12 +186,18 @@ public class HttpConnection {
         return gson.toJson(value);
     }
 
+    public boolean containsRequestHeader(String name) {
+        return requestParams.requestHeaders().stream().anyMatch(header -> header.getName().equalsIgnoreCase(name));
+    }
+
     private void setupConnection(String requestUrl, HttpMethodType methodType, RequestParam... statelessParams) {
         requestParams.clearStatelessParams();
         // add default application json header, can be overridden by stateless headers
         requestParams.addStatelessParam(anAcceptHeader("application/json"));
 
-        List<RequestParam> statelessParamsList = Arrays.asList(statelessParams);
+        List<RequestParam> statelessParamsList = statelessParams != null ?
+                new ArrayList<>(Arrays.asList(statelessParams)) : Collections.emptyList();
+        statelessParamsList.removeIf(Objects::isNull);
         requestParams.addAllStatelessParams(statelessParamsList);
         String fullUrl = requestParams.buildUrl(requestUrl);
         URI uri = URI.create(fullUrl);
@@ -210,6 +230,9 @@ public class HttpConnection {
 
     private <T> T handleServerResponse(final Class<T> responseConversionClass, HttpMethodType methodTypes, RequestParam[] params) {
         String responseText = getResponseText(0, methodTypes, params);
+        if (responseConversionClass == HttpResponse.class) {
+            return (T) new HttpResponse(responseText, activeConnection.getHeaderFields());
+        }
         activeConnection.disconnect();
         if (responseText.isEmpty() || responseConversionClass == null) {
             return null;

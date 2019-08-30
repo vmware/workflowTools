@@ -1,5 +1,9 @@
 package com.vmware.http.request;
 
+import javax.xml.bind.DatatypeConverter;
+
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+
 /**
  * Will be added as request headers to a request.
  */
@@ -13,8 +17,13 @@ public class RequestHeader extends RequestParam {
         return new RequestHeader("Accept", value);
     }
 
-    public static RequestHeader aBasicAuthHeader(String credentials) {
-        return new RequestHeader("Authorization", "Basic " + credentials);
+    public static RequestHeader aContentTypeHeader(String value) {
+        return new RequestHeader("Content-Type", value);
+    }
+
+    public static RequestHeader aBasicAuthHeader(UsernamePasswordCredentials credentials) {
+        String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
+        return new RequestHeader("Authorization", "Basic " + basicCredentials);
     }
 
     public static RequestHeader aRefererHeader(String value) {

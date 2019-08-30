@@ -8,6 +8,7 @@ import com.jcraft.jsch.Session;
 import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.jenkins.Job;
@@ -27,7 +28,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Executes the specified ssh command against the specified ssh site.")
-public class ExecuteSshCommand extends BaseCommitAction {
+public class ExecuteSshCommand extends BaseVappAction {
 
     private static final String SANDBOX_BUILD_NUMBER = "$SANDBOX_BUILD";
 
@@ -66,8 +67,8 @@ public class ExecuteSshCommand extends BaseCommitAction {
         }
     }
 
-    private String expandParametersInCommand(String sshCommand) {
-        List<String> parameterNamesInCommand = MatcherUtils.allMatches(sshCommand, "($[_\\w]+)");
+    protected String expandParametersInCommand(String sshCommand) {
+        List<String> parameterNamesInCommand = MatcherUtils.allMatches(sshCommand, "(\\$[_\\w]+)");
         for (String parameterName : parameterNamesInCommand) {
             if (parameterName.equals(SANDBOX_BUILD_NUMBER)) {
                 sshCommand = sshCommand.replace(parameterName, determineSandboxBuildNumber(buildwebConfig.buildDisplayName));

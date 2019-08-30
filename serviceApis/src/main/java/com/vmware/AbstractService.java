@@ -8,6 +8,8 @@ import com.vmware.http.exception.NotFoundException;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.exception.FatalException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,9 @@ public abstract class AbstractService {
     protected Boolean connectionIsAuthenticated = null;
 
     protected AbstractService(String baseUrl, String apiPath, ApiAuthentication credentialsType, String username) {
+        if (StringUtils.isBlank(baseUrl)) {
+            throw new FatalException("No url set for service {}", this.getClass().getSimpleName());
+        }
         this.baseUrl = UrlUtils.addTrailingSlash(baseUrl);
         this.apiUrl = this.baseUrl + apiPath;
         this.credentialsType = credentialsType;

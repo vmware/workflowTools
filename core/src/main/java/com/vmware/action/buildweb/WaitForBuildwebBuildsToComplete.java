@@ -24,12 +24,9 @@ public class WaitForBuildwebBuildsToComplete extends BaseCommitWithBuildwebBuild
 
     @Override
     public void process() {
-        Callable<Boolean> condition = new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                buildweb.checkStatusOfBuilds(draft);
-                return draft.allJobBuildsMatchingUrlAreComplete(buildwebConfig.buildwebUrl);
-            }
+        Callable<Boolean> condition = () -> {
+            buildweb.checkStatusOfBuilds(draft);
+            return draft.allJobBuildsMatchingUrlAreComplete(buildwebConfig.buildwebUrl);
         };
         log.info("Waiting for all buildweb builds to complete");
         ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);

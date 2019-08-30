@@ -24,12 +24,9 @@ public class WaitForJenkinsBuildsToComplete extends BaseCommitWithJenkinsBuildsA
 
     @Override
     public void process() {
-        Callable<Boolean> condition = new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                jenkins.checkStatusOfBuilds(draft);
-                return draft.allJobBuildsMatchingUrlAreComplete(jenkinsConfig.jenkinsUrl);
-            }
+        Callable<Boolean> condition = () -> {
+            jenkins.checkStatusOfBuilds(draft);
+            return draft.allJobBuildsMatchingUrlAreComplete(jenkinsConfig.jenkinsUrl);
         };
         log.info("Waiting for all jenkins builds to complete");
         ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);

@@ -15,6 +15,7 @@ import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.TrelloConfig;
+import com.vmware.config.section.VcdConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.scm.Git;
@@ -39,6 +40,7 @@ public abstract class BaseAction {
     protected final PatchConfig patchConfig;
     protected final BuildwebConfig buildwebConfig;
     protected SshConfig sshConfig;
+    protected VcdConfig vcdConfig;
 
     protected ServiceLocator serviceLocator;
 
@@ -64,6 +66,7 @@ public abstract class BaseAction {
         this.patchConfig = config.patchConfig;
         this.buildwebConfig = config.buildwebConfig;
         this.sshConfig = config.sshConfig;
+        this.vcdConfig = config.vcdConfig;
     }
 
     /**

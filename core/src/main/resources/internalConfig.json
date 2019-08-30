@@ -23,6 +23,9 @@
   "buildwebProject": "vcloud",
   "buildwebBranch": "sp-main",
   "buildType": "opt",
+  "vcdApiVersion": "32.0",
+  "vcdVmQuota": 30,
+  "vappJsonParameter": "TESTBED_JSON",
   "defaultGitRemote": "origin",
   "remoteBranches": {
     "precommit": "topic/$USERNAME/pre-commit",
@@ -653,6 +656,42 @@
       "InvokeSandboxBuild",
       "AmendCommit"
     ],
+    "deleteVapp": [
+      "selectVapp",
+      "DeleteVapp"
+    ],
+    "renameVapp": [
+      "selectVapp",
+      "RenameVapp"
+    ],
+    "updateVappLease": [
+      "selectVapp",
+      "UpdateVappLease"
+    ],
+    "displayVappJson": [
+      "loadVappJson",
+      "DisplayVappJson"
+    ],
+    "openVappProviderUrl": [
+      "loadVappJson",
+      "OpenVcdProviderApp"
+    ],
+    "executeSshVapp": [
+      "ExecuteSshCommandUsingVapp"
+    ],
+    "tailVappLogFile": [
+      "loadVappJson",
+      "TailVappLogFile"
+    ],
+    "loadVappJson": [
+      "selectVapp",
+      "LoadVappJson"
+    ],
+    "selectVapp": [
+      "LoadVapps",
+      "SelectVapp",
+      "LoadVappJson"
+    ],
     "displayWorkflowBuildInfo": [
       "DisplayConfig",
       "--specific-properties=buildInfo"
@@ -678,6 +717,8 @@
     "setCommitDetails",
     "setCommitDetailsOffline",
     "setReviewDetails",
-    "setReviewDetailsAndDiff"
+    "setReviewDetailsAndDiff",
+    "loadVappJson",
+    "selectVapp"
   ]
 }

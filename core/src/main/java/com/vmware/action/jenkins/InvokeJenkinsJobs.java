@@ -18,6 +18,7 @@ import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private JobParameters constructParametersForJob(List<JobParameter> parameters, List<ParameterDefinition> parameterDefinitions) {
+        List<JobParameter> paramsToUse = new ArrayList<>();
         for (JobParameter parameter : parameters) {
             String paramName = parameter.name;
             String paramValue = parameter.value;
@@ -139,10 +141,19 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             }
 
             log.info("Setting job param {} to {}", paramName, paramValue);
+
+            if (paramValue.equals(JenkinsJobsConfig.VAPP_JSON_VALUE)) {
+                if (StringUtils.isBlank(draft.vappJsonForJenkinsJob)) {
+                    throw new FatalException("useVappJsonParameter is set to true but no Vapp Json data set");
+                }
+                paramValue = draft.vappJsonForJenkinsJob;
+            }
+
             parameter.value = paramValue;
+            paramsToUse.add(parameter);
         }
 
-        return new JobParameters(parameters);
+        return new JobParameters(paramsToUse);
     }
 
     private ParameterDefinition getDefinitionByName(List<ParameterDefinition> parameterDefinitions, String name) {

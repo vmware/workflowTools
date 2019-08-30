@@ -41,8 +41,14 @@ public class RequestParams {
     }
 
     public void addStatefulParam(RequestParam requestParam) {
+        statefulParams.removeIf(param -> param.getName().equals(requestParam.getName()));
         statefulParams.add(requestParam);
+        allParams.removeIf(param -> param.getName().equals(requestParam.getName()));
         allParams.add(requestParam);
+    }
+
+    public void removeStatefulParam(String paramName) {
+        statefulParams.removeIf(param -> param.getName().equalsIgnoreCase(paramName));
     }
 
     public void addStatelessParam(RequestParam requestParam) {

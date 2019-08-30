@@ -9,6 +9,8 @@ import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.trello.Trello;
+import com.vmware.util.StringUtils;
+import com.vmware.vcd.Vcd;
 
 @ActionDescription("Ensures that all apis have a valid token / cookie. Primarily for testing.")
 public class AuthenticateAllApis extends BaseAction {
@@ -19,6 +21,7 @@ public class AuthenticateAllApis extends BaseAction {
 
     @Override
     public void process() {
+        checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg));
         checkAuthentication(new Trello(trelloConfig.trelloUrl));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
@@ -27,6 +30,9 @@ public class AuthenticateAllApis extends BaseAction {
     }
 
     private void checkAuthentication(AbstractService restService) {
+        if (StringUtils.isBlank(restService.baseUrl)) {
+            log.info("Skipping check of service {} as the base url is blank", restService.getClass().getSimpleName());
+        }
         String serviceName = restService.getClass().getSimpleName();
         log.info("Checking authentication for service {}", serviceName);
         restService.setupAuthenticatedConnection();
