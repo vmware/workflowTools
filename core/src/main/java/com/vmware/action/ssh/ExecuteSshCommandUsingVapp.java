@@ -26,10 +26,10 @@ public class ExecuteSshCommandUsingVapp extends ExecuteSshCommand {
 
     @Override
     public void process() {
-        log.info("Selected Vapp {}", vappData.getSelectedVapp());
+        log.info("Selected Vapp {}", vappData.getSelectedVapp().name);
         Gson gson = new ConfiguredGsonBuilder().build();
         Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
-        SiteConfig sshSiteConfig = vcdSites.firsCellSshConfig();
+        SiteConfig sshSiteConfig = vcdSites.siteSshConfig(vcdConfig.vcdSiteIndex, vcdConfig.vcdCellIndex);
         log.info("Site config {}", sshSiteConfig);
         sshSiteConfig.validate();
 

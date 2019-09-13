@@ -29,7 +29,7 @@ public class OpenVcdProviderApp extends BaseSingleVappAction {
 
     @Override
     public void process() {
-        log.info("Selected Vapp {}", vappData.getSelectedVapp());
+        log.info("Selected Vapp {}", vappData.getSelectedVapp().name);
         Gson gson = new ConfiguredGsonBuilder().build();
         Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
         String cellUrl = vcdSites.firstCellUrl() + "/provider";

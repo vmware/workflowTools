@@ -25,6 +25,8 @@
   "buildType": "opt",
   "vcdApiVersion": "32.0",
   "vcdVmQuota": 30,
+  "vcdSiteIndex": "1",
+  "vcdCellIndex": "1",
   "vappJsonParameter": "TESTBED_JSON",
   "defaultGitRemote": "origin",
   "remoteBranches": {

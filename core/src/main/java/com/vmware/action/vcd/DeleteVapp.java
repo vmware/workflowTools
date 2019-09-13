@@ -21,8 +21,8 @@ public class DeleteVapp extends BaseSingleVappAction {
     @Override
     public void process() {
         QueryResultVappType vappToDelete = vappData.getSelectedVapp();
-        String confirmation = InputUtils.readValue("Confirm deletion of " + vappToDelete.name + ": Type Yes to confirm");
-        if (!confirmation.equalsIgnoreCase("Yes")) {
+        String confirmation = InputUtils.readValue("Confirm deletion of " + vappToDelete.name + ": Type yes to confirm");
+        if (!confirmation.equalsIgnoreCase("yes")) {
             log.info("Aborting deletion of vapp {}", vappToDelete.name);
         }
 

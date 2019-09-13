@@ -121,7 +121,9 @@
     "--review-board-date-format"
   ],
   "ExecuteSshCommandUsingVapp": [
-    "--ssh-command"
+    "--ssh-command",
+    "--vcd-cell-index",
+    "--vcd-site-index"
   ],
   "DisplayReviewUrl": [
     "--reviewboard-url"

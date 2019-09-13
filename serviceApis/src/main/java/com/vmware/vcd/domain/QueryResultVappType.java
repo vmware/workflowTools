@@ -29,7 +29,4 @@ public class QueryResultVappType extends ResourceType implements InputListSelect
 
         public Date autoUndeployDate;
     }
-
-
-
 }
