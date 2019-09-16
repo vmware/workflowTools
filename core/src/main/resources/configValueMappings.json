@@ -6,7 +6,7 @@
   "TailVappLogFile": [
     "--log-line-count",
     "--ssh-command",
-    "--log-continuous",
+    "--tail-continuous",
     "--log-file"
   ],
   "AddTrackingIssueCreatedComments": [
@@ -248,7 +248,8 @@
     "--default-vcd-org",
     "--username",
     "--vcd-api-version",
-    "--vcd-url"
+    "--vcd-url",
+    "--vapp-lease"
   ],
   "LoadVappJsonIfNeeded": [
     "--use-vapp-json"

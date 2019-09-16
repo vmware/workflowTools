@@ -21,10 +21,15 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--wait-for-vapp-delete", help = "Wait for Vapp deletion task to complete")
     public boolean waitForDeleteTaskCompletion;
 
+    @ConfigurableProperty(commandLine = "--vapp-lease", help = "Lease value in days for the selected Vapp")
+    public int vappLeaseValue;
+
     @ConfigurableProperty(commandLine = "--vcd-site-index", help = "Vcd site index in testbed json to use for ssh commands. Default is 1.")
     public int vcdSiteIndex;
 
     @ConfigurableProperty(commandLine = "--vcd-cell-index", help = "Vcd cell index in testbed json to use for ssh commands. Default is 1.")
     public int vcdCellIndex;
+
+
 
 }

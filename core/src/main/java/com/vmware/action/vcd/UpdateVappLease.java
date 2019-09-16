@@ -21,15 +21,13 @@ public class UpdateVappLease extends BaseSingleVappAction {
 
     @Override
     public void process() {
-        int timeUnitValue = InputUtils.readSelection(Arrays.asList("Days", "Hours"),
-                "Select time unit to use for setting runtime lease");
-        TimeUnit timeUnitToUse = timeUnitForSelection(timeUnitValue);
-        int leaseExtensionValue = InputUtils.readValueUntilValidInt("Enter extension value in " + timeUnitToUse.name().toLowerCase());
+        TimeUnit timeUnitToUse = determineTimeUnit();
+        int leaseValue = determineLeaseValue(timeUnitToUse);
 
         LeaseSection leaseSection = new LeaseSection();
-        leaseSection.deploymentLeaseInSeconds = timeUnitToUse.toSeconds(leaseExtensionValue);
+        leaseSection.deploymentLeaseInSeconds = timeUnitToUse.toSeconds(leaseValue);
 
-        log.info("Deployment lease in hours {}", timeUnitToUse.toHours(leaseExtensionValue));
+        log.info("Deployment lease in hours {}", timeUnitToUse.toHours(leaseValue));
         long leaseInMilliseconds = TimeUnit.SECONDS.toMillis(leaseSection.deploymentLeaseInSeconds);
         Date updatedUndeployDate = new Date(new Date().getTime() + leaseInMilliseconds);
         log.info("Runtime lease will be updated to {}", updatedUndeployDate);
@@ -39,6 +37,22 @@ public class UpdateVappLease extends BaseSingleVappAction {
         TaskType leaseUpdateTask = vcd.updateResource(leaseUrl, leaseSection);
         vcd.waitForTaskToComplete(leaseUpdateTask.href, 30, TimeUnit.SECONDS);
         vappData.getSelectedVapp().otherAttributes.autoUndeployDate = updatedUndeployDate;
+    }
+
+    private int determineLeaseValue(TimeUnit timeUnitToUse) {
+        if (vcdConfig.vappLeaseValue > 0) {
+            return vcdConfig.vappLeaseValue;
+        }
+        return InputUtils.readValueUntilValidInt("Enter lease value in " + timeUnitToUse.name().toLowerCase());
+    }
+
+    private TimeUnit determineTimeUnit() {
+        if (vcdConfig.vappLeaseValue > 0) {
+            return TimeUnit.DAYS;
+        }
+        int timeUnitValue = InputUtils.readSelection(Arrays.asList("Days", "Hours"),
+                "Select time unit to use for setting runtime lease");
+        return timeUnitForSelection(timeUnitValue);
     }
 
     private TimeUnit timeUnitForSelection(int value) {
