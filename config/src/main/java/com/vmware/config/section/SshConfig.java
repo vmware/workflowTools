@@ -37,7 +37,7 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
     public int logLineCount;
 
-    @ConfigurableProperty(commandLine = "--tail-continuous", help = "Using tail -f")
+    @ConfigurableProperty(commandLine = "--tail-follow", help = "Using tail -f")
     public boolean continuousTailing;
 
     public SiteConfig commandLineSite() {

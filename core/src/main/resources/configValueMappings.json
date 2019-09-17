@@ -6,7 +6,7 @@
   "TailVappLogFile": [
     "--log-line-count",
     "--ssh-command",
-    "--tail-continuous",
+    "--tail-follow",
     "--log-file"
   ],
   "AddTrackingIssueCreatedComments": [
