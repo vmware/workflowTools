@@ -20,12 +20,18 @@ import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -158,5 +164,17 @@ public class WorkflowConfig {
 
     public WorkflowFields getConfigurableFields() {
         return configurableFields;
+    }
+
+    public Object sectionConfigForClass(Class clazz) {
+        Optional<Field> matchingField = Arrays.stream(this.getClass().getFields()).filter(field -> field.getType().equals(clazz)).findFirst();
+        if (!matchingField.isPresent()) {
+            throw new FatalException("No match for config class {}", clazz.getName());
+        }
+        try {
+            return matchingField.get().get(this);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
     }
 }

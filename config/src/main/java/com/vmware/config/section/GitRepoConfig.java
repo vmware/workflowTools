@@ -1,5 +1,6 @@
 package com.vmware.config.section;
 
+import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
 import com.vmware.util.scm.Git;
@@ -12,7 +13,9 @@ public class GitRepoConfig {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @ConfigurableProperty(commandLine = "-tb,--tracking-branch", help = "Tracking branch to use as base for reviews and for pushing commits. Combined with defaultGitRemote if no remote specified.")
+    @ConfigurableProperty(commandLine = "-tb,--tracking-branch",
+            help = "Tracking branch to use as base for reviews and for pushing commits. Combined with defaultGitRemote if no remote specified.",
+            methodNameForValueCalculation = "determineTrackingBranchPath")
     public String trackingBranch;
 
     @ConfigurableProperty(commandLine = "-p,--parent", help = "Parent branch to use for the git diff to upload to review board. Combined with defaultGitRemote if no remote specified.")
@@ -34,16 +37,20 @@ public class GitRepoConfig {
     public boolean useGitTrackingBranch;
 
     public String trackingBranchPath() {
+        return determineTrackingBranchPath().getValue();
+    }
+
+    public CalculatedProperty determineTrackingBranchPath() {
         if (useGitTrackingBranch) {
             String gitTrackingBranch = getGitTrackingBranch();
             if (gitTrackingBranch != null) {
-                return gitTrackingBranch;
+                return new CalculatedProperty(gitTrackingBranch, "git tracking branch");
             }
         }
         if (trackingBranch.contains("/")) {
-            return trackingBranch;
+            return new CalculatedProperty(trackingBranch, "trackingBranch");
         }
-        return defaultGitRemote + "/" + trackingBranch;
+        return new CalculatedProperty(defaultGitRemote + "/" + trackingBranch, "trackingBranch");
     }
 
     private String getGitTrackingBranch() {

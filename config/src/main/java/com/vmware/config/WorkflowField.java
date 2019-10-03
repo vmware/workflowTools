@@ -87,4 +87,8 @@ public class WorkflowField {
     public Class<?> getType() {
         return field.getType();
     }
+
+    public Class getConfigClassContainingField() {
+        return field.getDeclaringClass();
+    }
 }

@@ -2,9 +2,17 @@ package com.vmware.config.section;
 
 import java.util.Map;
 
+import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.util.StringUtils;
+import com.vmware.util.scm.Git;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BuildwebConfig {
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @ConfigurableProperty(commandLine = "--buildweb-url", help = "Url for buildweb server")
     public String buildwebUrl;
@@ -15,7 +23,9 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox buikd, this is for a VMware specific tool")
     public String buildwebProject;
 
-    @ConfigurableProperty(commandLine = "--buildweb-branch", help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool")
+    @ConfigurableProperty(commandLine = "--buildweb-branch",
+            help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool",
+            methodNameForValueCalculation = "determineBuildwebBranch")
     public String buildwebBranch;
 
     @ConfigurableProperty(commandLine = "--build-type", help = "Buildweb build type to use, this is for a VMware specific tool")
@@ -50,4 +60,33 @@ public class BuildwebConfig {
 
     @ConfigurableProperty(help = "Git tracking branch mappings to buildweb branches")
     public Map<String, String> gitTrackingBranchMappings;
+
+    @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review")
+    public boolean useGitTrackingBranch;
+
+    public CalculatedProperty determineBuildwebBranch() {
+        Git git = new Git();
+        if (!git.workingDirectoryIsInGitRepo()) {
+            return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+        }
+
+        String trackingBranch = git.getTrackingBranch();
+        if (StringUtils.isBlank(trackingBranch)) {
+            return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+        }
+        String trackingBranchWithoutOrigin = trackingBranch.substring(trackingBranch.indexOf("/") + 1);
+        log.debug("Parsed branch name {} from tracking branch {}", trackingBranchWithoutOrigin, trackingBranch);
+        if (gitTrackingBranchMappings != null && gitTrackingBranchMappings.containsKey(trackingBranchWithoutOrigin)) {
+            log.debug("Using mapping value {} for branch name {}",
+                    gitTrackingBranchMappings.get(trackingBranchWithoutOrigin), trackingBranchWithoutOrigin);
+            return new CalculatedProperty(gitTrackingBranchMappings.get(trackingBranchWithoutOrigin), "git tracking branch mapping");
+        }
+
+        if (useGitTrackingBranch) {
+            log.debug("Using tracking branch name {} as buildweb branch since useGitTrackingBranch is set to true", trackingBranchWithoutOrigin);
+            return new CalculatedProperty(trackingBranchWithoutOrigin, "git tracking branch");
+        }
+
+        return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+    }
 }

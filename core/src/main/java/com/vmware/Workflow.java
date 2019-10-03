@@ -2,6 +2,7 @@ package com.vmware;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
+import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowActionValues;
@@ -298,13 +300,22 @@ public class Workflow {
                 ConfigurableProperty matchingProperty = matchingField.configAnnotation();
                 String matchingPropertyText = matchingProperty != null ? matchingProperty.help() : "Unknown config option";
                 String matchingValueText;
+                String source = null;
                 if (configOption.equals("--jenkins-jobs")) {
                     matchingValueText = config.getJenkinsJobsConfig().toString();
+                } else if (matchingProperty != null && StringUtils.isNotBlank(matchingProperty.methodNameForValueCalculation())) {
+                    CalculatedProperty property = calculateProperty(matchingField, matchingProperty);
+                    matchingValueText = property.getValue();
+                    if (!property.getSource().equals(matchingField.getName())) {
+                        source = property.getSource();
+                    }
                 } else {
                     Object matchingValue = matchingField.getValue(config);
                     matchingValueText = StringUtils.convertObjectToString(matchingValue);
                 }
-                String source = configurableFields.getFieldValueSource(matchingField.getName());
+                if (source == null) {
+                    source = configurableFields.getFieldValueSource(matchingField.getName());
+                }
                 String gitConfigValue = "";
                 if (git.isGitInstalled()) {
                     gitConfigValue = "[" + matchingField.getName() + "]";
@@ -313,6 +324,16 @@ public class Workflow {
             }
         }
         configPadder.infoTitle();
+    }
+
+    private CalculatedProperty calculateProperty(WorkflowField matchingField, ConfigurableProperty matchingProperty) {
+        Class sectionConfigClass = matchingField.getConfigClassContainingField();
+        try {
+            Method methodToExecute = sectionConfigClass.getMethod(matchingProperty.methodNameForValueCalculation());
+            return (CalculatedProperty) methodToExecute.invoke(config.sectionConfigForClass(sectionConfigClass));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
     }
 
     private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) {

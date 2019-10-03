@@ -49,6 +49,7 @@ public class GenerateActionConfigMappings {
         methodNameToConfigValueMappings.put("parentBranchPath", singletonList("parentBranch"));
         methodNameToConfigValueMappings.put("trackingBranchPath", singletonList("trackingBranch"));
         methodNameToConfigValueMappings.put("commandLineSite", Arrays.asList("sshHost", "sshPort", "sshUsername", "sshPassword"));
+        methodNameToConfigValueMappings.put("determineBuildwebBranch", Arrays.asList("buildwebBranch", "useGitTrackingBranch"));
     }
 
     private static final Logger log = LoggerFactory.getLogger(GenerateActionConfigMappings.class);

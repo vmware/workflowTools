@@ -70,10 +70,11 @@
   ],
   "InvokeSandboxBuild": [
     "--tracking-branch",
+    "--use-git-tracking-branch",
+    "--buildweb-branch",
     "--buildweb-url",
     "--component-builds",
     "--build-display-name",
-    "--buildweb-branch",
     "--build-type",
     "--buildweb-project",
     "--gobuild-bin-path",

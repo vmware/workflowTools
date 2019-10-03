@@ -17,5 +17,6 @@ public @interface ConfigurableProperty {
     String commandLine() default NO_COMMAND_LINE_OVERRIDES;
     String help();
     String gitConfigProperty() default "";
+    String methodNameForValueCalculation() default "";
 
 }

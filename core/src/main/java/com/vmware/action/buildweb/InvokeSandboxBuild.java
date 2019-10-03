@@ -49,7 +49,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         }
         String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s%s%s --accept-defaults",
                 buildwebConfig.goBuildBinPath, buildwebConfig.buildwebProject, buildwebConfig.buildType,
-                syncToParameter, buildwebConfig.buildwebBranch,
+                syncToParameter, buildwebConfig.determineBuildwebBranch().getValue(),
                 changelistId, storeTreesParamter, componentBuildsParameter);
 
         log.info("Invoking {} build {}", buildwebConfig.buildDisplayName, command);
