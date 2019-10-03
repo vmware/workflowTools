@@ -95,7 +95,7 @@ public class Vcd extends AbstractRestService {
     protected void loginManually() {
         connection.removeStatefulParam(AUTHORIZATION_HEADER);
         if (StringUtils.isNotBlank(vcdOrg)) {
-            log.info("Using default org {}, enter username as username@[org name] to use a different org");
+            log.info("Using default org {}, enter username as username@[org name] to use a different org", vcdOrg);
         } else {
             log.info("Enter username as username@[org name]");
         }
