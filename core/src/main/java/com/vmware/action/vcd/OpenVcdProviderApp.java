@@ -32,7 +32,7 @@ public class OpenVcdProviderApp extends BaseSingleVappAction {
         log.info("Selected Vapp {}", vappData.getSelectedVapp().name);
         Gson gson = new ConfiguredGsonBuilder().build();
         Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
-        String cellUrl = vcdSites.firstCellUrl() + "/provider";
+        String cellUrl = vcdSites.uiUrlForProvider() + "/provider";
 
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             log.info("Opening uri {}", cellUrl);

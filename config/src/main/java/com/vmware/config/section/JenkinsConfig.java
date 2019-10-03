@@ -59,6 +59,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--use-vapp-json", help = "Use json metadata from Vapp")
     public boolean useVappJsonParameter;
 
+    @ConfigurableProperty(commandLine = "--testbed-parameter-name", help = "Name of the Jenkins parameter used for testbed template")
+    public String testbedParameter;
+
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith("--J")) {

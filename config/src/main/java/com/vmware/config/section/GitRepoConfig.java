@@ -30,11 +30,29 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "-rb, --remote-branch", help = "Remote branch name to use")
     public String remoteBranchToUse;
 
+    @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review")
+    public boolean useGitTrackingBranch;
+
     public String trackingBranchPath() {
+        if (useGitTrackingBranch) {
+            String gitTrackingBranch = getGitTrackingBranch();
+            if (gitTrackingBranch != null) {
+                return gitTrackingBranch;
+            }
+        }
         if (trackingBranch.contains("/")) {
             return trackingBranch;
         }
         return defaultGitRemote + "/" + trackingBranch;
+    }
+
+    private String getGitTrackingBranch() {
+        Git git = new Git();
+        if (git.workingDirectoryIsInGitRepo()) {
+            return git.getTrackingBranch();
+        } else {
+            return null;
+        }
     }
 
     public String parentBranchPath() {
@@ -54,7 +72,7 @@ public class GitRepoConfig {
             return "";
         }
         String targetBranchValue = git.currentBranch();
-        log.debug("Using local git branch {}", targetBranch);
+        log.debug("Using local git branch {}", targetBranchValue);
         if (StringUtils.isNotBlank(targetBranch)) {
             log.info("Setting branch property to {} (read from application config)", targetBranch);
             targetBranchValue = targetBranch;

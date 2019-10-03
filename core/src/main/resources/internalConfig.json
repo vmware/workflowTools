@@ -24,9 +24,10 @@
   "buildwebBranch": "sp-main",
   "buildType": "opt",
   "vcdApiVersion": "32.0",
-  "vcdVmQuota": 30,
+  "vcdVmQuota": 40,
   "vcdSiteIndex": "1",
   "vcdCellIndex": "1",
+  "testbedParameter": "TESTBED_DESCRIPTOR_NAME",
   "vappJsonParameter": "TESTBED_JSON",
   "defaultGitRemote": "origin",
   "remoteBranches": {
@@ -35,7 +36,8 @@
   },
   "remoteBranchToUse": "precommit",
   "trackingBranch": "master",
-  "parentBranch": "master",
+  "parentBranch": "head~1",
+  "useGitTrackingBranch": true,
   "disableMarkdown": false,
   "issueTypesToInclude": [
     8
@@ -641,11 +643,13 @@
     ],
     "invokeSandboxBuildWithGitChangeset": [
       "updateWithGitChangeset",
+      "ExitIfCommitFailsCheckstyle",
       "InvokeSandboxBuild",
       "AmendCommit"
     ],
     "invokeSandboxBuildWithFileSync": [
       "updateMatchingChangelistWithFileSync",
+      "ExitIfCommitFailsCheckstyle",
       "InvokeSandboxBuild",
       "AmendCommit"
     ],
@@ -655,6 +659,7 @@
     "invokeSandboxBuildWithGit": [
       "ReadLastCommit",
       "--changelist-id=head",
+      "ExitIfCommitFailsCheckstyle",
       "InvokeSandboxBuild",
       "AmendCommit"
     ],

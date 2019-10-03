@@ -24,6 +24,10 @@
     "--checkstyle-config-xml-path",
     "--checkstyle-jar-path"
   ],
+  "ExitIfVcdVmQuotaExceeded": [
+    "--vcd-vm-quota",
+    "--use-vapp-json"
+  ],
   "LoadGitPatchFile": [
     "--diff-file"
   ],
@@ -105,10 +109,6 @@
   ],
   "RevertWorkspace": [
     "--perforce-client"
-  ],
-  "DeleteVappIfQuotaReached": [
-    "--vcd-vm-quota",
-    "--use-vapp-json"
   ],
   "LoadReviewPatch": [
     "--username",
@@ -195,8 +195,6 @@
     "--reviewboard-url"
   ],
   "SelectVappIfNeeded": [
-    "--vcd-vm-quota",
-    "--vcd-check-quota",
     "--use-vapp-json"
   ],
   "BaseCommitAction": [
@@ -395,6 +393,10 @@
   "FormatCommitText": [
     "--max-description",
     "--max-summary"
+  ],
+  "ComputeTestbedVmCountIfNeeded": [
+    "--testbed-parameter-name",
+    "--vcd-check-quota"
   ],
   "ReadPendingChangelist": [
     "--username",

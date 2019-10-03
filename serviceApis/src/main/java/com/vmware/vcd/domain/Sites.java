@@ -14,8 +14,12 @@ public class Sites {
 
     public List<Site> sites;
 
-    public String firstCellUrl() {
-        return sites.get(0).cells.get(0).endPointURI;
+    public String uiUrlForProvider() {
+        Site firstSite = sites.get(0);
+        if (firstSite.loadBalancer != null) {
+            return firstSite.loadBalancer.endPointURI;
+        }
+        return firstSite.cells.get(0).endPointURI;
     }
 
     public SiteConfig siteSshConfig(int siteIndex, int cellIndex) {
@@ -36,6 +40,7 @@ public class Sites {
     }
 
     private class Site {
+        public Cell loadBalancer;
         public List<Cell> cells;
     }
 

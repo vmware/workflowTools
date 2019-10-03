@@ -180,6 +180,16 @@ public class StringUtils {
         return index;
     }
 
+    public static int occurenceCount(String text, String searchText) {
+        int index = text.indexOf(searchText);
+        int counter = 0;
+        while (index != -1) {
+            index = text.indexOf(searchText, index + 1);
+            counter++;
+        }
+        return counter;
+    }
+
     public static String repeat(int length, String value) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -197,12 +207,12 @@ public class StringUtils {
             return Arrays.toString((Object[]) value);
         } else if (value instanceof Map) {
             Map values = (Map) value;
-            String displayText = "";
+            StringBuilder displayText = new StringBuilder();
             for (Object key : values.keySet()) {
                 Object displayValue = convertObjectToString(values.get(key));
-                displayText += "\n" + key + ": " + displayValue;
+                displayText.append("\n").append(key).append(": ").append(displayValue);
             }
-            return displayText;
+            return displayText.toString();
         } else {
             return value.toString();
         }

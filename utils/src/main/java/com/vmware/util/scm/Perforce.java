@@ -48,12 +48,13 @@ public class Perforce extends BaseScmWrapper {
     public Perforce(String clientName, String clientDirectory) {
         super(ScmType.perforce);
         if (!CommandLineUtils.isCommandAvailable("p4")) {
-            super.setWorkingDirectory(workingDirectory);
+            super.setWorkingDirectory(System.getProperty("user.dir"));
             return;
         }
         this.username = checkIfLoggedIn();
         this.loggedIn = username != null;
         if (!loggedIn) {
+            super.setWorkingDirectory(System.getProperty("user.dir"));
             return;
         }
         if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {

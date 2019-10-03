@@ -33,11 +33,11 @@ public class CommandLineUtils {
             return false;
         } else if (osName.startsWith("Windows")) {
             String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
-            log.debug("{} {} where check [{}]", osName, command, whereCheck);
+            log.debug("{} where check [{}]", command, whereCheck);
             return !whereCheck.contains("Could not find files");
         } else {
             String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
-            log.debug("{} {} which check [{}]", osName, command, whichCheck);
+            log.debug("{} which check [{}]", command, whichCheck);
             return !whichCheck.trim().isEmpty();
         }
     }
@@ -45,7 +45,6 @@ public class CommandLineUtils {
     public static String executeCommand(String command, LogLevel logLevel) {
         return executeCommand(null, command, null, logLevel);
     }
-
 
     public static String executeCommand(File workingDirectory, String command, String inputText, LogLevel logLevel) {
         return executeCommand(workingDirectory, null, command, inputText, logLevel);

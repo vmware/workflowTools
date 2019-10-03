@@ -10,6 +10,8 @@ public class VappData {
 
     private QueryResultVappType selectedVapp;
 
+    private int testbedTemplateVmCount;
+
     public VappData () {
         this.ownedVapps = new ArrayList<>();
     }
@@ -45,5 +47,13 @@ public class VappData {
         if (index < ownedVapps.size()) {
             this.setSelectedVapp(ownedVapps.get(index));
         }
+    }
+
+    public int getTestbedTemplateVmCount() {
+        return testbedTemplateVmCount;
+    }
+
+    public void setTestbedTemplateVmCount(int testbedTemplateVmCount) {
+        this.testbedTemplateVmCount = testbedTemplateVmCount;
     }
 }

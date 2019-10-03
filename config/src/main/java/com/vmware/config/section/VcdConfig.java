@@ -30,6 +30,6 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-cell-index", help = "Vcd cell index in testbed json to use for ssh commands. Default is 1.")
     public int vcdCellIndex;
 
-
-
+    @ConfigurableProperty(help = "Directory to search for testbed templates")
+    public String testbedTemplateDirectory;
 }
