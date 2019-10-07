@@ -159,6 +159,9 @@
     "--username",
     "--estimate"
   ],
+  "OpenVcdTenantApp": [
+    "--vcd-tenant"
+  ],
   "LoadVappsIfNeeded": [
     "--use-vapp-json",
     "--vcd-check-quota"
@@ -350,6 +353,9 @@
   "SyncCardsWithJiraIssues": [
     "--jira-url",
     "--keep-missing-cards"
+  ],
+  "OpenBuildConsolePage": [
+    "--jenkins-url"
   ],
   "BaseReadMultiLine": [
     "--max-description"

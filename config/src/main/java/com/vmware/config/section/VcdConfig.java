@@ -32,4 +32,7 @@ public class VcdConfig {
 
     @ConfigurableProperty(help = "Directory to search for testbed templates")
     public String testbedTemplateDirectory;
+
+    @ConfigurableProperty(commandLine = "--vcd-tenant", help = "Name of tenant to open UI page for")
+    public String vcdTenant;
 }

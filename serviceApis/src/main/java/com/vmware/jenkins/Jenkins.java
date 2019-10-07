@@ -132,7 +132,7 @@ public class Jenkins extends AbstractRestBuildService {
     @Override
     protected void checkAuthenticationAgainstServer() {
         if (disableLogin) {
-            log.info("Login is disabled for jenkins");
+            log.debug("Login is disabled for jenkins");
             return;
         }
         String apiToken = scrapeUIForToken();

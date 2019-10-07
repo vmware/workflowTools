@@ -144,7 +144,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
             if (paramValue.equals(JenkinsJobsConfig.VAPP_JSON_VALUE)) {
                 if (StringUtils.isBlank(draft.vappJsonForJenkinsJob)) {
-                    throw new FatalException("useVappJsonParameter is set to true but no Vapp Json data set");
+                    throw new FatalException("$VAPP_JSON paramter used but no Vapp Json loaded");
                 }
                 paramValue = draft.vappJsonForJenkinsJob;
             }

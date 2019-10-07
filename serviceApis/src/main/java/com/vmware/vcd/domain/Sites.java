@@ -14,7 +14,7 @@ public class Sites {
 
     public List<Site> sites;
 
-    public String uiUrlForProvider() {
+    public String uiUrl() {
         Site firstSite = sites.get(0);
         if (firstSite.loadBalancer != null) {
             return firstSite.loadBalancer.endPointURI;

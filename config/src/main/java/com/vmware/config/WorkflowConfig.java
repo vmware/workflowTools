@@ -149,7 +149,7 @@ public class WorkflowConfig {
             return;
         }
 
-        log.debug("Setting git remote value {} as the reviewboard repository", gitRemoteValue);
+        log.debug("Setting git remote value {} as the reviewboard repository, will be overridden if a config value is specified", gitRemoteValue);
         reviewBoardConfig.reviewBoardRepository = gitRemoteValue;
     }
 

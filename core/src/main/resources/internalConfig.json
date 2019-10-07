@@ -490,6 +490,10 @@
       "RemoveSelectedBuilds",
       "AmendCommit"
     ],
+    "openBuildConsolePage": [
+      "ReadLastCommit",
+      "OpenBuildConsolePage"
+    ],
     "enableMergeTo": [
       "ReadLastCommit",
       "EnableDisableMergeTo",
@@ -682,6 +686,10 @@
     "openVappProviderUrl": [
       "loadVappJson",
       "OpenVcdProviderApp"
+    ],
+    "openVappTenantUrl": [
+      "loadVappJson",
+      "OpenVcdTenantApp"
     ],
     "executeSshVapp": [
       "ExecuteSshCommandUsingVapp"

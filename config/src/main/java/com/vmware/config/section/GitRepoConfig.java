@@ -33,7 +33,7 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "-rb, --remote-branch", help = "Remote branch name to use")
     public String remoteBranchToUse;
 
-    @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review")
+    @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review and sandbox")
     public boolean useGitTrackingBranch;
 
     public String trackingBranchPath() {
