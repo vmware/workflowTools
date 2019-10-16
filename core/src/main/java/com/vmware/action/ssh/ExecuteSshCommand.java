@@ -38,33 +38,14 @@ public class ExecuteSshCommand extends BaseVappAction {
 
     @Override
     public void process() {
-        SiteConfig siteConfigToUse = createSiteConfig();
+        SiteConfig siteConfigToUse = createSshSiteConfig();
         siteConfigToUse.validate();
 
         String sshCommand = sshConfig.sshCommand;
         if (StringUtils.isBlank(sshCommand)) {
             sshCommand = InputUtils.readValueUntilNotBlank("Ssh command");
         }
-
-        sshCommand = expandParametersInCommand(sshCommand);
-
         executeSshCommand(siteConfigToUse, sshCommand);
-    }
-
-    private SiteConfig createSiteConfig() {
-        if (sshConfig.useSshSite()) {
-            String sshSite = sshConfig.sshSite;
-            TreeMap<String, SiteConfig> sshSiteConfigs = sshConfig.sshSiteConfigs;
-            if (StringUtils.isBlank(sshSite)) {
-                sshSite = InputUtils.readValueUntilNotBlank("Ssh site", sshSiteConfigs.keySet());
-            }
-            if (!sshSiteConfigs.containsKey(sshSite)) {
-                throw new FatalException("Ssh site {} is not present in list {}", sshSite, sshSiteConfigs.keySet().toString());
-            }
-            return sshSiteConfigs.get(sshSite);
-        } else {
-            return sshConfig.commandLineSite();
-        }
     }
 
     protected String expandParametersInCommand(String sshCommand) {
@@ -83,7 +64,7 @@ public class ExecuteSshCommand extends BaseVappAction {
     }
 
     protected void executeSshCommand(SiteConfig siteConfig, String command) {
-        log.info("Executing ssh command {}", command);
+        log.info("Executing ssh command {} for {}@{}", command, siteConfig.username, siteConfig.host);
         JSch jsch = new JSch();
         Session session = null;
         Channel channel = null;

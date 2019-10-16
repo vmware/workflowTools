@@ -39,7 +39,7 @@ public class OpenVcdTenantApp extends BaseSingleVappAction {
 
         Gson gson = new ConfiguredGsonBuilder().build();
         Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
-        String uiUrl = vcdSites.uiUrl() + "/tenant/" + vcdTenant;
+        String uiUrl = vcdSites.uiUrl(vcdConfig.vcdSiteIndex, vcdConfig.vcdCellIndex) + "/tenant/" + vcdTenant;
         BrowserUtils.openUrl(uiUrl);
     }
 }

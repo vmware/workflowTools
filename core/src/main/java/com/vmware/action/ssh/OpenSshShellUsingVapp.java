@@ -1,17 +1,15 @@
-package com.vmware.action.vcd;
+package com.vmware.action.ssh;
 
 import com.google.gson.Gson;
-import com.vmware.action.base.BaseSingleVappAction;
-import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.ssh.SiteConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.util.BrowserUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.Sites;
 
-@ActionDescription("Opens the specified vcd provider endpoint in the Vapp Json")
-public class OpenVcdProviderApp extends BaseSingleVappAction {
-    public OpenVcdProviderApp(WorkflowConfig config) {
+public class OpenSshShellUsingVapp extends OpenSshShell {
+    public OpenSshShellUsingVapp(WorkflowConfig config) {
         super(config);
     }
 
@@ -28,7 +26,12 @@ public class OpenVcdProviderApp extends BaseSingleVappAction {
         log.info("Selected Vapp {}", vappData.getSelectedVapp().name);
         Gson gson = new ConfiguredGsonBuilder().build();
         Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
-        String uiUrl = vcdSites.uiUrl(vcdConfig.vcdSiteIndex, vcdConfig.vcdCellIndex) + "/provider";
-        BrowserUtils.openUrl(uiUrl);
+        SiteConfig sshSiteConfig = vcdSites.siteSshConfig(vcdConfig.vcdSiteIndex, vcdConfig.vcdCellIndex);
+
+        log.info("Site config {}", sshSiteConfig);
+        sshSiteConfig.validate();
+        openSshShell(sshSiteConfig);
     }
+
+
 }

@@ -25,10 +25,10 @@ public class VcdConfig {
     public int vappLeaseValue;
 
     @ConfigurableProperty(commandLine = "--vcd-site-index", help = "Vcd site index in testbed json to use for ssh commands. Default is 1.")
-    public int vcdSiteIndex;
+    public Integer vcdSiteIndex;
 
     @ConfigurableProperty(commandLine = "--vcd-cell-index", help = "Vcd cell index in testbed json to use for ssh commands. Default is 1.")
-    public int vcdCellIndex;
+    public Integer vcdCellIndex;
 
     @ConfigurableProperty(help = "Directory to search for testbed templates")
     public String testbedTemplateDirectory;

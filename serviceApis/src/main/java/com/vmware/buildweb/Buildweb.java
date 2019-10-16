@@ -55,9 +55,14 @@ public class Buildweb extends AbstractRestBuildService {
     }
 
     public String getBuildOutput(String buildId, int maxLinesToTail) {
+        String logsUrl = getLogsUrl(buildId);
+        return logsUrl != null ? IOUtils.tail(logsUrl, maxLinesToTail) : "";
+    }
+
+    public String getLogsUrl(String buildId) {
         BuildwebBuild build = getSandboxBuild(buildId);
         if (build.buildResult == BuildResult.STARTING) {
-            return "";
+            return null;
         }
         BuildMachines machines = connection.get(addRelativePaths(baseUrl, build.buildMachinesUrl), BuildMachines.class);
         BuildMachine buildMachine = machines.realBuildMachine();
@@ -67,7 +72,7 @@ public class Buildweb extends AbstractRestBuildService {
         } else {
             logsUrl = addRelativePaths(build.buildTreeUrl, "logs", buildMachine.hostType, buildwebLogFileName);
         }
-        return IOUtils.tail(logsUrl, maxLinesToTail);
+        return logsUrl;
     }
 
     @Override

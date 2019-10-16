@@ -40,14 +40,12 @@ public class WorkflowField {
                 intValues[i] = Integer.parseInt(values[i].trim());
             }
             validValue = intValues;
-        } else if (fieldType == int.class) {
+        } else if (fieldType == int.class || fieldType == Integer.class) {
             validValue = Integer.parseInt(sourceValue);
-        } else if (fieldType == long.class) {
+        } else if (fieldType == long.class || fieldType == Long.class) {
             validValue = Long.parseLong(sourceValue);
-        } else if (fieldType == boolean.class) {
+        } else if (fieldType == boolean.class || fieldType == Boolean.class) {
             validValue = Boolean.valueOf(sourceValue);
-        } else if (fieldType == String[].class) {
-            validValue = sourceValue.split(",");
         } else if (fieldType == SortedSet.class) {
             validValue = new TreeSet<String>();
             ((SortedSet) validValue).addAll(Arrays.asList(sourceValue.split(",")));

@@ -16,18 +16,15 @@ public class UrlUtils {
         if (paths.length == 0) {
             return url;
         }
+        String urlWithTrailingSlash = addTrailingSlash(url);
+        StringBuilder urlBuilder = new StringBuilder(urlWithTrailingSlash);
         for (String path : paths) {
-            if (!url.endsWith("/") && path.startsWith("/")) {
-                url += path;
-            } else if (url.endsWith("/") && path.startsWith("/")) {
-                url += path.substring(1);
-            } else if (url.endsWith("/")) {
-                url += path;
+            if (path.startsWith("/")) {
+                urlBuilder.append(path.substring(1));
             } else {
-                url += "/" + path;
+                urlBuilder.append("/").append(path);
             }
         }
-
-        return url;
+        return urlBuilder.toString();
     }
 }

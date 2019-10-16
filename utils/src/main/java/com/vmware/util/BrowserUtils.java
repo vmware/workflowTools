@@ -14,6 +14,11 @@ public class BrowserUtils {
     private static Logger log = LoggerFactory.getLogger(BrowserUtils.class);
 
     public static void openUrl(String url) {
+        if (StringUtils.isBlank(url)) {
+            log.error("Not opening url as it is blank");
+            return;
+        }
+
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             log.info("Opening url {}", url);
             try {

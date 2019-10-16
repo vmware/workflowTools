@@ -25,8 +25,6 @@
   "buildType": "opt",
   "vcdApiVersion": "32.0",
   "vcdVmQuota": 40,
-  "vcdSiteIndex": "1",
-  "vcdCellIndex": "1",
   "testbedParameter": "TESTBED_DESCRIPTOR_NAME",
   "vappJsonParameter": "TESTBED_JSON",
   "defaultGitRemote": "origin",
@@ -114,6 +112,10 @@
     "readPendingChangelist": [
       "ReadPendingChangelist",
       "ExitIfCommitDoesNotHaveAChangelistId"
+    ],
+    "openReviewUrl": [
+      "readNonTrivialCommit",
+      "OpenReviewUrl"
     ],
     "displayReviewUrl": [
       "DisplayReviewUrl",
@@ -490,6 +492,10 @@
       "RemoveSelectedBuilds",
       "AmendCommit"
     ],
+    "openSandboxLogPage": [
+      "ReadLastCommit",
+      "OpenSandboxLogPage"
+    ],
     "openBuildConsolePage": [
       "ReadLastCommit",
       "OpenBuildConsolePage"
@@ -683,6 +689,10 @@
       "loadVappJson",
       "DisplayVappJson"
     ],
+    "openVCenterUrl": [
+      "loadVappJson",
+      "OpenVCenterApp"
+    ],
     "openVappProviderUrl": [
       "loadVappJson",
       "OpenVcdProviderApp"
@@ -692,7 +702,12 @@
       "OpenVcdTenantApp"
     ],
     "executeSshVapp": [
+      "loadVappJson",
       "ExecuteSshCommandUsingVapp"
+    ],
+    "openSshShellVapp": [
+      "loadVappJson",
+      "OpenSshShellUsingVapp"
     ],
     "tailVappLogFile": [
       "loadVappJson",

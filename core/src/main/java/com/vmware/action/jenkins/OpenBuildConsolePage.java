@@ -4,36 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vmware.JobBuild;
-import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.BrowserUtils;
 import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Opens the console page for a Jenkins Build")
-public class OpenBuildConsolePage extends BaseCommitAction {
+public class OpenBuildConsolePage extends BaseCommitWithJenkinsBuildsAction {
 
     public OpenBuildConsolePage(WorkflowConfig config) {
         super(config);
     }
 
     @Override
-    public String cannotRunAction() {
-        if (draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl).isEmpty()) {
-            return "commit has no Jenkins builds";
-        }
-        return super.cannotRunAction();
-    }
-
-    @Override
     public void process() {
         List<JobBuild> matchingBuilds = draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl);
 
-        List<String> choices = new ArrayList<>();
-        matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.buildDisplayName));
-        int selection = InputUtils.readSelection(choices, "Select jenkins builds to remove from commit");
+        if (matchingBuilds.size() == 1) {
+            log.info("Opening build {} as it is the only Jenkins build", matchingBuilds.get(0).buildDisplayName);
+            String consoleUrl = matchingBuilds.get(0).url + "/console";
+            BrowserUtils.openUrl(consoleUrl);
+        } else {
+            List<String> choices = new ArrayList<>();
+            matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.buildDisplayName));
+            int selection = InputUtils.readSelection(choices, "Select jenkins builds to open console page for");
 
-        String consoleUrl = matchingBuilds.get(selection).url + "/console";
-        BrowserUtils.openUrl(consoleUrl);
+            String consoleUrl = matchingBuilds.get(selection).url + "/console";
+            BrowserUtils.openUrl(consoleUrl);
+        }
     }
 }

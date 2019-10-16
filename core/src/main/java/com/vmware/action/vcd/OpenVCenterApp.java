@@ -9,9 +9,9 @@ import com.vmware.util.BrowserUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.vcd.domain.Sites;
 
-@ActionDescription("Opens the specified vcd provider endpoint in the Vapp Json")
-public class OpenVcdProviderApp extends BaseSingleVappAction {
-    public OpenVcdProviderApp(WorkflowConfig config) {
+@ActionDescription("Opens the selected VCenter management page")
+public class OpenVCenterApp extends BaseSingleVappAction {
+    public OpenVCenterApp(WorkflowConfig config) {
         super(config);
     }
 
@@ -28,7 +28,7 @@ public class OpenVcdProviderApp extends BaseSingleVappAction {
         log.info("Selected Vapp {}", vappData.getSelectedVapp().name);
         Gson gson = new ConfiguredGsonBuilder().build();
         Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
-        String uiUrl = vcdSites.uiUrl(vcdConfig.vcdSiteIndex, vcdConfig.vcdCellIndex) + "/provider";
-        BrowserUtils.openUrl(uiUrl);
+        String vcServerUrl = vcdSites.vcServerUrl(vcdConfig.vcdSiteIndex);
+        BrowserUtils.openUrl(vcServerUrl);
     }
 }

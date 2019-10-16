@@ -32,7 +32,7 @@ import static com.vmware.util.StringUtils.isBlank;
 import static com.vmware.util.StringUtils.isNotBlank;
 import static com.vmware.util.StringUtils.pluralize;
 import static com.vmware.util.StringUtils.truncateStringIfNeeded;
-import static com.vmware.util.UrlUtils.addTrailingSlash;
+import static com.vmware.util.UrlUtils.addRelativePaths;
 import static com.vmware.util.logging.LogLevel.DEBUG;
 
 public class ReviewRequestDraft extends BaseEntity {
@@ -395,7 +395,7 @@ public class ReviewRequestDraft extends BaseEntity {
         }
         if (hasReviewNumber()) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
-                    .append(addTrailingSlash(commitConfig.getReviewboardUrl())).append("r/").append(id);
+                    .append(addRelativePaths(commitConfig.getReviewboardUrl(), "r", id));
         } else if (isNotBlank(id)) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel()).append(id);
         }

@@ -3,12 +3,6 @@
     "--username",
     " --remote-branch"
   ],
-  "TailVappLogFile": [
-    "--log-line-count",
-    "--ssh-command",
-    "--tail-follow",
-    "--log-file"
-  ],
   "AddTrackingIssueCreatedComments": [
     "--bugzilla-url"
   ],
@@ -24,13 +18,6 @@
     "--checkstyle-config-xml-path",
     "--checkstyle-jar-path"
   ],
-  "ExitIfVcdVmQuotaExceeded": [
-    "--vcd-vm-quota",
-    "--use-vapp-json"
-  ],
-  "LoadGitPatchFile": [
-    "--diff-file"
-  ],
   "AddGitChangesetConfigValueIfNeeded": [
     "--perforce-client"
   ],
@@ -38,13 +25,6 @@
     "--file-count-ranges",
     "--groups",
     "--review-board-date-format"
-  ],
-  "CheckStatusOfLatestBuilds": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--jenkins-url",
-    "--username",
-    "--jenkins-jobs"
   ],
   "InvokeJenkinsJobs": [
     "--build-display-name",
@@ -57,13 +37,6 @@
   "SyncChangelist": [
     "--tracking-branch",
     "--sync-to-branch-latest"
-  ],
-  "BaseTransitionJiraIssue": [
-    "--username",
-    "--disable-jira"
-  ],
-  "ConvertCardsToJiraIssues": [
-    "--jira-url"
   ],
   "AddGitChangesToChangelist": [
     "--tracking-branch"
@@ -99,10 +72,6 @@
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
   ],
-  "ResolveBugsWithResolvedTrackingIssues": [
-    "--username",
-    "--disable-jira"
-  ],
   "AddTrackingIssuesForQuery": [
     "--bugzilla-url",
     "--default-jira-project",
@@ -117,23 +86,8 @@
     "--review-request-id",
     "--review-board-date-format"
   ],
-  "SetReviewId": [
-    "--username",
-    "--review-board-date-format"
-  ],
-  "ExecuteSshCommandUsingVapp": [
-    "--ssh-command",
-    "--vcd-cell-index",
-    "--vcd-site-index"
-  ],
-  "DisplayReviewUrl": [
-    "--reviewboard-url"
-  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
-  ],
-  "LoadBugsForQuery": [
-    "--bugzilla-query"
   ],
   "DisplayBuildOutputForJenkinsJobs": [
     "--include-in-progress",
@@ -142,13 +96,6 @@
   "UpdateReviewDetails": [
     "--groups",
     "--disable-markdown"
-  ],
-  "GenerateGitCommitStats": [
-    "--max-summary",
-    "--author-emails",
-    "--last-number-of-days",
-    "--line-count-ranges",
-    "--file-count-ranges"
   ],
   "CreateReviewIfNeeded": [
     "--username",
@@ -159,22 +106,13 @@
     "--username",
     "--estimate"
   ],
-  "OpenVcdTenantApp": [
-    "--vcd-tenant"
-  ],
-  "LoadVappsIfNeeded": [
-    "--use-vapp-json",
-    "--vcd-check-quota"
-  ],
   "BaseBatchJiraAction": [
     "--username",
     "--disable-jira"
   ],
-  "DisplayConfig": [
-    "--specific-properties"
-  ],
-  "StripJenkinsBuilds": [
-    "--jenkins-url"
+  "OpenSshShellUsingVapp": [
+    "--vcd-cell-index",
+    "--vcd-site-index"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -183,29 +121,8 @@
   "ReadGitDiffAsGitPatch": [
     "--parent"
   ],
-  "PushToDevelop": [
-    "--git-remote"
-  ],
-  "LoadIssues": [
-    "--use-epics",
-    "--use-fix-version",
-    "--use-label",
-    "--include-estimated",
-    "--include-sprint-stories",
-    "--include-issue-types",
-    "--include-all-issue-types"
-  ],
   "PublishReview": [
     "--reviewboard-url"
-  ],
-  "SelectVappIfNeeded": [
-    "--use-vapp-json"
-  ],
-  "BaseCommitAction": [
-    "--username",
-    "--buildweb-url",
-    "--perforce-client",
-    "--changelist-id"
   ],
   "LoadVapps": [
     "--default-vcd-org",
@@ -235,6 +152,192 @@
   "BaseCommitCreateAction": [
     "--perforce-client"
   ],
+  "UploadReviewDiff": [
+    "--parent",
+    "--tracking-branch",
+    "--perforce-client"
+  ],
+  "BaseCommitWithJenkinsBuildsAction": [
+    "--disable-jenkins-login",
+    "--jenkins-uses-csrf",
+    "--username",
+    "--jenkins-url"
+  ],
+  "BaseBatchBugzillaAction": [
+    "--username",
+    "--default-jira-component",
+    "--default-jira-project",
+    "--disable-bugzilla"
+  ],
+  "RenameVapp": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url"
+  ],
+  "SetSummary": [
+    "--max-summary",
+    "--set-empty-only"
+  ],
+  "WaitForBuildwebBuildsToComplete": [
+    "--wait-time",
+    "--buildweb-url"
+  ],
+  "DeleteVapp": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url",
+    "--wait-time",
+    "--wait-for-vapp-delete"
+  ],
+  "MarkBugAsResolved": [
+    "--username"
+  ],
+  "ExecuteSshCommand": [
+    "--build-display-name",
+    "--ssh-command"
+  ],
+  "LoadVappJson": [
+    "--default-vcd-org",
+    "--username",
+    "--vcd-api-version",
+    "--vcd-url"
+  ],
+  "CreateReview": [
+    "--username",
+    "--review-board-date-format",
+    "--review-board-repo"
+  ],
+  "SubmitToDepot": [
+    "--tracking-branch"
+  ],
+  "PushToPrecommitBranch": [
+    "--git-remote",
+    "--username"
+  ],
+  "LoadCompletedIssuesWithoutResolution": [
+    "--username"
+  ],
+  "OpenBuildConsolePage": [
+    "--jenkins-url"
+  ],
+  "BaseReadMultiLine": [
+    "--max-description"
+  ],
+  "PushToMaster": [
+    "--git-remote"
+  ],
+  "EnableDisableMergeTo": [
+    "--disable-merge-to"
+  ],
+  "OpenSandboxLogPage": [
+    "--buildweb-url"
+  ],
+  "FormatCommitText": [
+    "--max-description",
+    "--max-summary"
+  ],
+  "TailVappLogFile": [
+    "--log-line-count",
+    "--ssh-command",
+    "--tail-follow",
+    "--log-file"
+  ],
+  "ExitIfVcdVmQuotaExceeded": [
+    "--vcd-vm-quota",
+    "--use-vapp-json"
+  ],
+  "LoadGitPatchFile": [
+    "--diff-file"
+  ],
+  "CheckStatusOfLatestBuilds": [
+    "--disable-jenkins-login",
+    "--jenkins-uses-csrf",
+    "--jenkins-url",
+    "--username",
+    "--jenkins-jobs"
+  ],
+  "BaseTransitionJiraIssue": [
+    "--username",
+    "--disable-jira"
+  ],
+  "ConvertCardsToJiraIssues": [
+    "--jira-url"
+  ],
+  "OpenVcdProviderApp": [
+    "--vcd-cell-index",
+    "--vcd-site-index"
+  ],
+  "BaseVappAction": [
+    "--ssh-password",
+    "--ssh-username",
+    "--ssh-port",
+    "--ssh-host",
+    "--ssh-site"
+  ],
+  "ResolveBugsWithResolvedTrackingIssues": [
+    "--username",
+    "--disable-jira"
+  ],
+  "SetReviewId": [
+    "--username",
+    "--review-board-date-format"
+  ],
+  "ExecuteSshCommandUsingVapp": [
+    "--ssh-command",
+    "--vcd-cell-index",
+    "--vcd-site-index"
+  ],
+  "DisplayReviewUrl": [
+    "--reviewboard-url"
+  ],
+  "LoadBugsForQuery": [
+    "--bugzilla-query"
+  ],
+  "GenerateGitCommitStats": [
+    "--max-summary",
+    "--author-emails",
+    "--last-number-of-days",
+    "--line-count-ranges",
+    "--file-count-ranges"
+  ],
+  "OpenVcdTenantApp": [
+    "--vcd-cell-index",
+    "--vcd-site-index",
+    "--vcd-tenant"
+  ],
+  "LoadVappsIfNeeded": [
+    "--use-vapp-json",
+    "--vcd-check-quota"
+  ],
+  "DisplayConfig": [
+    "--specific-properties"
+  ],
+  "StripJenkinsBuilds": [
+    "--jenkins-url"
+  ],
+  "PushToDevelop": [
+    "--git-remote"
+  ],
+  "LoadIssues": [
+    "--use-epics",
+    "--use-fix-version",
+    "--use-label",
+    "--include-estimated",
+    "--include-sprint-stories",
+    "--include-issue-types",
+    "--include-all-issue-types"
+  ],
+  "SelectVappIfNeeded": [
+    "--use-vapp-json"
+  ],
+  "BaseCommitAction": [
+    "--username",
+    "--buildweb-url",
+    "--perforce-client",
+    "--changelist-id"
+  ],
   "SetCommitDetailsFromReview": [
     "--username",
     "--max-description",
@@ -256,29 +359,12 @@
   "LoadVappJsonIfNeeded": [
     "--use-vapp-json"
   ],
-  "UploadReviewDiff": [
-    "--parent",
-    "--tracking-branch",
-    "--perforce-client"
-  ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",
     "--sync-to-branch-latest"
   ],
-  "BaseCommitWithJenkinsBuildsAction": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--username",
-    "--jenkins-url"
-  ],
   "LoadPerforcePatchFile": [
     "--diff-file"
-  ],
-  "BaseBatchBugzillaAction": [
-    "--username",
-    "--default-jira-component",
-    "--default-jira-project",
-    "--disable-bugzilla"
   ],
   "ApplyPatch": [
     "--action-after-failed-patch-check",
@@ -288,77 +374,16 @@
   "BaseSetReviewersList": [
     "--always-include-review-url"
   ],
-  "RenameVapp": [
-    "--default-vcd-org",
-    "--username",
-    "--vcd-api-version",
-    "--vcd-url"
-  ],
-  "SetSummary": [
-    "--max-summary",
-    "--set-empty-only"
-  ],
-  "WaitForBuildwebBuildsToComplete": [
-    "--wait-time",
-    "--buildweb-url"
-  ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",
     "--default-jira-project"
   ],
-  "DeleteVapp": [
-    "--default-vcd-org",
-    "--username",
-    "--vcd-api-version",
-    "--vcd-url",
-    "--wait-time",
-    "--wait-for-vapp-delete"
-  ],
-  "MarkBugAsResolved": [
-    "--username"
-  ],
-  "ExecuteSshCommand": [
-    "--ssh-password",
-    "--ssh-username",
-    "--ssh-port",
-    "--ssh-host",
-    "--build-display-name",
-    "--ssh-site",
-    "--ssh-command"
-  ],
-  "LoadVappJson": [
-    "--default-vcd-org",
-    "--username",
-    "--vcd-api-version",
-    "--vcd-url"
-  ],
-  "CreateReview": [
-    "--username",
-    "--review-board-date-format",
-    "--review-board-repo"
-  ],
-  "SubmitToDepot": [
-    "--tracking-branch"
-  ],
   "RemoveSelectedBuilds": [
     "--jenkins-url"
-  ],
-  "PushToPrecommitBranch": [
-    "--git-remote",
-    "--username"
-  ],
-  "LoadCompletedIssuesWithoutResolution": [
-    "--username"
   ],
   "SyncCardsWithJiraIssues": [
     "--jira-url",
     "--keep-missing-cards"
-  ],
-  "OpenBuildConsolePage": [
-    "--jenkins-url"
-  ],
-  "BaseReadMultiLine": [
-    "--max-description"
   ],
   "SetBugNumbers": [
     "--username",
@@ -383,11 +408,8 @@
   "RebaseAgainstMaster": [
     "--git-remote"
   ],
-  "PushToMaster": [
-    "--git-remote"
-  ],
-  "EnableDisableMergeTo": [
-    "--disable-merge-to"
+  "OpenVCenterApp": [
+    "--vcd-site-index"
   ],
   "BaseSetUsersList": [
     "--search-by-usernames-only",
@@ -396,10 +418,6 @@
   ],
   "PushToTrackingBranch": [
     "--tracking-branch"
-  ],
-  "FormatCommitText": [
-    "--max-description",
-    "--max-summary"
   ],
   "ComputeTestbedVmCountIfNeeded": [
     "--testbed-parameter-name",
