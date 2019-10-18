@@ -77,11 +77,7 @@ public class IOUtils {
 
     public static String readWithoutClosing(InputStream inputStream) {
         InputStreamReader reader = new InputStreamReader(inputStream);
-        try {
-            return read(reader, false, null);
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
+        return read(reader, false, null);
     }
 
     public static String read(InputStream inputStream) {
@@ -129,28 +125,31 @@ public class IOUtils {
                 lines.add(line);
                 line = reader.readLine();
             }
-            reader.close();
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
     }
 
-    private static String read(Reader input, boolean readUntilStreamClosed, LogLevel printLinesLevel) throws IOException {
+    private static String read(Reader input, boolean readUntilStreamClosed, LogLevel printLinesLevel) {
         StringWriter writer = new StringWriter();
         char[] buffer = new char[DEFAULT_BUFFER_SIZE];
 
         int lastReadCount;
-        String alreadyWrittenOutput = null;
+        StringBuilder alreadyWrittenOutput = null;
         do {
-            lastReadCount = input.read(buffer);
+            try {
+                lastReadCount = input.read(buffer);
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
             if (lastReadCount != -1) {
                 writer.write(buffer, 0, lastReadCount);
                 String outputToWrite = writer.toString();
                 if (alreadyWrittenOutput == null) {
-                    alreadyWrittenOutput = writer.toString();
+                    alreadyWrittenOutput = new StringBuilder(writer.toString());
                 } else {
                     outputToWrite = outputToWrite.substring(alreadyWrittenOutput.length());
-                    alreadyWrittenOutput += outputToWrite;
+                    alreadyWrittenOutput.append(outputToWrite);
                 }
                 if (printLinesLevel != null) {
                     logger.log(printLinesLevel, outputToWrite.trim());
@@ -164,11 +163,15 @@ public class IOUtils {
         return output;
     }
 
-    private static boolean canRead(Reader reader, boolean readUntilStreamClosed, int lastReadCount) throws IOException {
+    private static boolean canRead(Reader reader, boolean readUntilStreamClosed, int lastReadCount) {
         if (readUntilStreamClosed) {
             return lastReadCount != -1;
         } else {
-            return reader.ready();
+            try {
+                return reader.ready();
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
         }
     }
 }

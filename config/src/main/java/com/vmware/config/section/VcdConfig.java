@@ -24,6 +24,9 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vapp-lease", help = "Lease value in days for the selected Vapp")
     public int vappLeaseValue;
 
+    @ConfigurableProperty(commandLine = "--vapp-name", help = "Specicy vapp name to use, mainly used for scripting")
+    public String vappName;
+
     @ConfigurableProperty(commandLine = "--vcd-site-index", help = "Vcd site index in testbed json to use for ssh commands. Default is 1.")
     public Integer vcdSiteIndex;
 

@@ -124,6 +124,9 @@
   "PublishReview": [
     "--reviewboard-url"
   ],
+  "SelectVapp": [
+    "--vapp-name"
+  ],
   "LoadVapps": [
     "--default-vcd-org",
     "--username",
@@ -195,6 +198,7 @@
     "--username"
   ],
   "ExecuteSshCommand": [
+    "--ssh-strict-host-checking",
     "--build-display-name",
     "--ssh-command"
   ],
@@ -233,6 +237,9 @@
   ],
   "OpenSandboxLogPage": [
     "--buildweb-url"
+  ],
+  "OpenSshShell": [
+    "--ssh-strict-host-checking"
   ],
   "FormatCommitText": [
     "--max-description",

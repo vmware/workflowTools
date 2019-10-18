@@ -2,7 +2,10 @@ package com.vmware.vcd.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.vmware.util.exception.FatalException;
 
 public class VappData {
 
@@ -47,6 +50,15 @@ public class VappData {
         if (index < ownedVapps.size()) {
             this.setSelectedVapp(ownedVapps.get(index));
         }
+    }
+
+    public void setSelectedVappByName(String name) {
+        List<String> vappNames = ownedVapps.stream().map(vapp -> vapp.name).collect(Collectors.toList());
+        int vappIndex = vappNames.indexOf(name);
+        if (vappIndex == -1) {
+            throw new FatalException("Vapp name {} not found in vapp list {}", name, vappNames.toString());
+        }
+        setSelectedVapp(ownedVapps.get(vappIndex));
     }
 
     public int getTestbedTemplateVmCount() {

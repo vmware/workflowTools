@@ -14,7 +14,6 @@ public enum LogLevel {
     INFO(Level.INFO),
     DEBUG(Level.FINE),
     TRACE(Level.FINEST);
-
     private Level level;
 
     LogLevel(Level level) {
@@ -32,5 +31,17 @@ public enum LogLevel {
             }
         }
         throw new FatalException("No log level found for level " + level.getName());
+    }
+
+    public static LogLevel fromJschLevel(int level) {
+        switch (level) {
+        case 2:
+            return WARN;
+        case 3:
+        case 4:
+            return ERROR;
+        default:
+            return DEBUG;
+        }
     }
 }

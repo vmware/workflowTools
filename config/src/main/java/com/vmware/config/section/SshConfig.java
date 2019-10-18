@@ -31,6 +31,9 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--ssh-command", help = "Ssh command to execute")
     public String sshCommand;
 
+    @ConfigurableProperty(commandLine = "--ssh-strict-host-checking", help = "Whether to enforce strict host checking for ssh")
+    public boolean sshStrictHostChecking;
+
     @ConfigurableProperty(commandLine = "--log-file", help = "Log file to tail")
     public String logFile;
 

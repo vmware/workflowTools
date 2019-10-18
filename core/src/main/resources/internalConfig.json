@@ -236,6 +236,13 @@
       "setReviewDetailsAndDiff",
       "displayReviewUrl"
     ],
+    "reviewAndOpen": [
+      "readNonTrivialCommit",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "setReviewDetailsAndDiff",
+      "OpenReviewUrl"
+    ],
     "reviewCommitWithMatchingChangelist": [
       "updateMatchingChangelist",
       "CreateReviewIfNeeded",
