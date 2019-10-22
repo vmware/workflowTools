@@ -24,11 +24,12 @@ public class BrowserUtils {
         String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         boolean isOsx = osName.contains("mac") || osName.contains("darwin");
 
+        log.info("Opening url {}", url);
         if (isOsx && CommandLineUtils.isCommandAvailable("pbcopy")) {
-            log.info("Opening url using osx open command");
+            log.debug("Opening url using osx open command");
             CommandLineUtils.executeCommand(null, "open " + url, null, LogLevel.DEBUG);
         } else if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            log.info("Opening url {}", url);
+            log.debug("Opening url using java desktop support");
             try {
                 Desktop.getDesktop().browse(URI.create(url));
             } catch (IOException e) {

@@ -117,9 +117,9 @@
       "readNonTrivialCommit",
       "OpenReviewUrl"
     ],
-    "displayReviewUrl": [
-      "DisplayReviewUrl",
-      "CopyReviewUrlToClipboard"
+    "openReviewDiff": [
+      "readNonTrivialCommit",
+      "OpenReviewDiff"
     ],
     "setCommitDetailsWithoutConfirmation": [
       "SetSummary",
@@ -227,14 +227,14 @@
       "CreateReview",
       "AmendCommit",
       "setReviewDetailsAndDiff",
-      "displayReviewUrl"
+      "CopyReviewUrlToClipboard"
     ],
     "review": [
       "readNonTrivialCommit",
       "CreateReviewIfNeeded",
       "AmendCommit",
       "setReviewDetailsAndDiff",
-      "displayReviewUrl"
+      "CopyReviewUrlToClipboard"
     ],
     "reviewAndOpen": [
       "readNonTrivialCommit",
@@ -250,7 +250,7 @@
       "AddReviewGroupsForMatchingFileMappings",
       "setReviewDetails",
       "UploadReviewDiffFromChangelist",
-      "displayReviewUrl"
+      "CopyReviewUrlToClipboard"
     ],
     "amendReview": [
       "ExitIfNoChangesDetectedByGit",
@@ -263,14 +263,14 @@
       "CreateReviewIfNeeded",
       "AmendCommit",
       "UploadReviewDiff",
-      "displayReviewUrl"
+      "CopyReviewUrlToClipboard"
     ],
     "detailsUpdateOnly": [
       "readNonTrivialCommit",
       "CreateReviewIfNeeded",
       "AmendCommit",
       "setReviewDetails",
-      "displayReviewUrl"
+      "CopyReviewUrlToClipboard"
     ],
     "publishReview": [
       "readNonTrivialCommit",
@@ -641,7 +641,7 @@
       "AmendCommit",
       "UploadReviewDiffFromChangelist",
       "setReviewDetails",
-      "displayReviewUrl"
+      "CopyReviewUrlToClipboard"
     ],
     "submitWithGitChangeset": [
       "prepareCommitForPush",
@@ -708,11 +708,11 @@
       "loadVappJson",
       "OpenVcdTenantApp"
     ],
-    "executeSshVapp": [
+    "executeVappSsh": [
       "loadVappJson",
       "ExecuteSshCommandUsingVapp"
     ],
-    "openSshShellVapp": [
+    "openVappSshShell": [
       "loadVappJson",
       "OpenSshShellUsingVapp"
     ],

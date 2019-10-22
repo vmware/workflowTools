@@ -26,14 +26,15 @@ public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {
         String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         boolean isOsx = osName.contains("mac") || osName.contains("darwin");
 
+        log.info("Copying review url {} to clipboard", reviewUrl);
         if (isOsx && CommandLineUtils.isCommandAvailable("pbcopy")) {
-            log.debug("Using pbcopy command to copy review url to clipboard as it doesn't cause terminal in full screen mode to jump back to the desktop view");
+            log.debug("Using osx pbcopy command to copy review url to clipboard as it doesn't cause terminal in full screen mode to jump back to the desktop view");
             CommandLineUtils.executeCommand(null, "pbcopy", reviewUrl, LogLevel.DEBUG);
         } else {
+            log.debug("Using Java clipboard support to copy review url");
             StringSelection stringSelection = new StringSelection(reviewUrl);
             Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbrd.setContents(stringSelection, null);
         }
-        log.info("Copied review url to clipboard");
     }
 }
