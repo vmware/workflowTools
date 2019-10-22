@@ -3,8 +3,10 @@ package com.vmware.util;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Locale;
 
 import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.LogLevel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,13 @@ public class BrowserUtils {
             return;
         }
 
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        boolean isOsx = osName.contains("mac") || osName.contains("darwin");
+
+        if (isOsx && CommandLineUtils.isCommandAvailable("pbcopy")) {
+            log.info("Opening url using osx open command");
+            CommandLineUtils.executeCommand(null, "open " + url, null, LogLevel.DEBUG);
+        } else if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             log.info("Opening url {}", url);
             try {
                 Desktop.getDesktop().browse(URI.create(url));

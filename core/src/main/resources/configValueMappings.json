@@ -156,8 +156,8 @@
     "--perforce-client"
   ],
   "UploadReviewDiff": [
-    "--parent",
     "--tracking-branch",
+    "--parent",
     "--perforce-client"
   ],
   "BaseCommitWithJenkinsBuildsAction": [

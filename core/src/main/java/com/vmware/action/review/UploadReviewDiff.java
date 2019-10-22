@@ -74,15 +74,17 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private DiffToUpload createReviewRequestDiff() {
-        log.info("Creating git diff against parent {}", gitRepoConfig.parentBranchPath());
+        String trackingBranchPath = gitRepoConfig.trackingBranchPath();
+        String parentPath = gitRepoConfig.parentBranchPath();
+        log.info("Creating git diff using tracking branch {} against parent {}", trackingBranchPath, parentPath);
         String reviewBoardVersion = reviewBoard.getVersion();
         boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
 
         DiffToUpload diff = new DiffToUpload();
-        String mergeBase = git.mergeBase(gitRepoConfig.trackingBranchPath(), "HEAD");
-        diff.path = git.diffAsByteArray(gitRepoConfig.parentBranchPath(), "HEAD", supportsDiffWithRenames);
-        diff.parent_diff_path = git.diffAsByteArray(mergeBase, gitRepoConfig.parentBranchPath(), supportsDiffWithRenames);
+        String mergeBase = git.mergeBase(trackingBranchPath, "HEAD");
+        diff.path = git.diffAsByteArray(parentPath, "HEAD", supportsDiffWithRenames);
+        diff.parent_diff_path = git.diffAsByteArray(mergeBase, parentPath, supportsDiffWithRenames);
         return diff;
     }
 

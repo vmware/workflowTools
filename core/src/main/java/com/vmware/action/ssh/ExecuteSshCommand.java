@@ -70,6 +70,7 @@ public class ExecuteSshCommand extends BaseVappAction {
             session.connect((int) TimeUnit.SECONDS.toMillis(30));
 
             channel = (ChannelExec) session.openChannel("exec");
+            channel.setInputStream(null);
             channel.setCommand(command);
 
             readCommandOutput(channel, command);
