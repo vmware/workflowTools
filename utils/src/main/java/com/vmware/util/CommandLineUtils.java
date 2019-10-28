@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -26,20 +27,37 @@ public class CommandLineUtils {
     private static Logger log = LoggerFactory.getLogger(CommandLineUtils.class);
     private static DynamicLogger dynamicLogger = new DynamicLogger(log);
 
+    public static boolean isOsxCommandAvailable(String command) {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        boolean isOsx = osName.contains("mac") || osName.contains("darwin");
+        if (!isOsx) {
+            return false;
+        }
+        return checkForCommandUsingWhich(command);
+    }
+
     public static boolean isCommandAvailable(String command) {
         String osName = System.getProperty("os.name");
         log.debug("Os name {}", osName);
         if (osName == null) {
             return false;
         } else if (osName.startsWith("Windows")) {
-            String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
-            log.debug("{} where check [{}]", command, whereCheck);
-            return !whereCheck.contains("Could not find files");
+            return checkForCommandUsingWhere(command);
         } else {
-            String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
-            log.debug("{} which check [{}]", command, whichCheck);
-            return !whichCheck.trim().isEmpty();
+            return checkForCommandUsingWhich(command);
         }
+    }
+
+    private static boolean checkForCommandUsingWhere(String command) {
+        String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
+        log.debug("{} where check [{}]", command, whereCheck);
+        return !whereCheck.contains("Could not find files");
+    }
+
+    private static boolean checkForCommandUsingWhich(String command) {
+        String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
+        log.debug("{} which check [{}]", command, whichCheck);
+        return !whichCheck.trim().isEmpty();
     }
 
     public static String executeCommand(String command, LogLevel logLevel) {

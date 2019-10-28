@@ -1,6 +1,5 @@
 package com.vmware.vcd.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,25 +30,37 @@ public class Sites {
         }
     }
 
+    public String nsxTManagerUrl(Integer siteIndex) {
+        Site selectedSite = determineSite(siteIndex);
+        if (selectedSite.nsxManagers.size() == 1) {
+            log.info("Using first NSX-T Manager {} as there is only one NSX-T manager", selectedSite.nsxManagers.get(0).name);
+            return selectedSite.nsxManagers.get(0).endPointURI;
+        } else {
+            List<InputListSelection> values = selectedSite.nsxManagers.stream().map(vc -> ((InputListSelection) vc)).collect(Collectors.toList());
+            int selection = InputUtils.readSelection(values, "Select NSX-T Manager");
+            return selectedSite.nsxManagers.get(selection).endPointURI;
+        }
+    }
+
     public String uiUrl(Integer siteIndex, Integer cellIndex) {
         Site selectedSite = determineSite(siteIndex);
         if (selectedSite.loadBalancer != null) {
             log.info("Using loadbalancer url {}", selectedSite.loadBalancer.endPointURI);
             return selectedSite.loadBalancer.endPointURI;
         }
-        Cell cell = determineCell(selectedSite, cellIndex);
+        DeployedVM cell = determineCell(selectedSite, cellIndex);
         return cell.endPointURI;
     }
 
     public SiteConfig siteSshConfig(Integer siteIndex, Integer cellIndex) {
         Site site = determineSite(siteIndex);
 
-        Cell cell = determineCell(site, cellIndex);
+        DeployedVM cell = determineCell(site, cellIndex);
         OvfProperties ovfProperties = cell.deployment.ovfProperties;
         return new SiteConfig(ovfProperties.hostname, 22, cell.osCredentials.username, cell.osCredentials.password);
     }
 
-    private Cell determineCell(Site site, Integer cellIndex) {
+    private DeployedVM determineCell(Site site, Integer cellIndex) {
         if (cellIndex == null && site.cells.size() == 1) {
             log.info("Using first cell as there is only one cell");
             cellIndex = 0;
@@ -86,12 +97,13 @@ public class Sites {
     }
 
     private class Site {
-        public Cell loadBalancer;
-        public List<Cell> cells;
-        public List<Cell> vcServers;
+        public DeployedVM loadBalancer;
+        public List<DeployedVM> cells;
+        public List<DeployedVM> vcServers;
+        public List<DeployedVM> nsxManagers;
     }
 
-    private class Cell implements InputListSelection {
+    private class DeployedVM implements InputListSelection {
         public String name;
 
         public String endPointURI;

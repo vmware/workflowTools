@@ -40,10 +40,12 @@ public class InvokeSandboxBuild extends BaseCommitAction {
         String componentBuildsParameter = createComponentBuildsParameter();
 
         if (changelistId.toLowerCase().contains("head")) {
-            log.info("Assuming changelist id {} is a git ref, using tracking branch {} as syncTo value",
-                    changelistId, gitRepoConfig.trackingBranchPath());
+            String originalChangelistIdValue = changelistId;
             changelistId = git.revParse(changelistId);
+            log.info("Assuming changelist id {} is a git ref, using commit ref {} as changeset value",
+                    originalChangelistIdValue, changelistId);
             if (buildwebConfig.excludeSyncTo) {
+                log.info("Excluding syncto parameter as excludeSyncTo is set to true");
                 syncToParameter = ""; // rely on --accept-defaults to handle it correctly
             }
         }

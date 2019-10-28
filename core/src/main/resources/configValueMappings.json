@@ -18,6 +18,12 @@
     "--checkstyle-config-xml-path",
     "--checkstyle-jar-path"
   ],
+  "OpenNsxTManagerApp": [
+    "--vcd-site-index"
+  ],
+  "OpenBuildPage": [
+    "--jenkins-url"
+  ],
   "AddGitChangesetConfigValueIfNeeded": [
     "--perforce-client"
   ],
@@ -42,7 +48,6 @@
     "--tracking-branch"
   ],
   "InvokeSandboxBuild": [
-    "--tracking-branch",
     "--use-git-tracking-branch",
     "--buildweb-branch",
     "--buildweb-url",

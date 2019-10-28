@@ -503,6 +503,10 @@
       "ReadLastCommit",
       "OpenSandboxLogPage"
     ],
+    "openBuildPage": [
+      "ReadLastCommit",
+      "OpenBuildPage"
+    ],
     "openBuildConsolePage": [
       "ReadLastCommit",
       "OpenBuildConsolePage"
@@ -699,6 +703,10 @@
     "openVCenterUrl": [
       "loadVappJson",
       "OpenVCenterApp"
+    ],
+    "openNsxTManagerUrl": [
+      "loadVappJson",
+      "OpenNsxTManagerApp"
     ],
     "openVappProviderUrl": [
       "loadVappJson",
