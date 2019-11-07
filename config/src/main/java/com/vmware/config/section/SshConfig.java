@@ -43,6 +43,18 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--tail-follow", help = "Using tail -f")
     public boolean continuousTailing;
 
+    @ConfigurableProperty(commandLine = "--rsync-flags", help = "Flags to use for rsync command")
+    public String rsyncFlags;
+
+    @ConfigurableProperty(commandLine = "--rsync-source", help = "Source path for to use for rsync command")
+    public String rsyncSourcePath;
+
+    @ConfigurableProperty(commandLine = "--rsync-destination", help = "Destination path for to use for rsync command")
+    public String rsyncDestinationPath;
+
+    @ConfigurableProperty(commandLine = "--rsync-delete", help = "Delete files not in the source path from the destination")
+    public boolean rsyncDeleteRemovedFiles;
+
     public SiteConfig commandLineSite() {
         return new SiteConfig(sshHost, sshPort, sshUsername, sshPassword);
     }

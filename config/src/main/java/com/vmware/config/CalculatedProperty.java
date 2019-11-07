@@ -1,16 +1,16 @@
 package com.vmware.config;
 
 public class CalculatedProperty {
-    private String value;
+    private Object value;
 
     private String source;
 
-    public CalculatedProperty(String value, String source) {
+    public CalculatedProperty(Object value, String source) {
         this.value = value;
         this.source = source;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 

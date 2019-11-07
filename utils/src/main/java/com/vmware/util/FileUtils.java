@@ -2,6 +2,7 @@ package com.vmware.util;
 
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.scm.Git;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -16,7 +17,23 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileUtils {
+
+    private static Logger log = LoggerFactory.getLogger(FileUtils.class);
+
+    public static File determineFullPath(String path) {
+        File startingFile = new File(path);
+        if (startingFile.isAbsolute()) {
+            return startingFile;
+        }
+        Git git = new Git();
+        File rootDirectory = git.workingDirectoryIsInGitRepo() ? git.getRootDirectory() : new File("");
+        log.debug("Assuming path {} is relative, prepending root path {}", path, rootDirectory.getPath());
+        return new File(rootDirectory.getPath() + File.separator + path);
+    }
 
     public static File createTempFile(String prefix, String suffix) {
         try {

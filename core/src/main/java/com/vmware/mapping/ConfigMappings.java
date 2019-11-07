@@ -1,18 +1,15 @@
 package com.vmware.mapping;
 
-import com.vmware.action.BaseAction;
-import com.vmware.action.git.GenerateGitCommitStats;
-import com.vmware.config.ActionDescription;
-import com.vmware.util.ClasspathResource;
-
-import com.google.gson.Gson;
-
 import java.io.Reader;
-import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.gson.Gson;
+import com.vmware.config.WorkflowAction;
+import com.vmware.config.WorkflowParameter;
+import com.vmware.util.ClasspathResource;
 
 /**
  * Represents the mapping of config values to a workflow action.
@@ -36,21 +33,13 @@ public class ConfigMappings {
         return mappings.keySet();
     }
 
-    public Set<String> getConfigValuesForAction(Class<? extends BaseAction> foundAction) {
-        Set<String> configValues = new HashSet<String>();
-        Class classToGetValuesFor = foundAction;
-        while (classToGetValuesFor != Object.class) {
-            List<String> configValuesForClass = mappings.get(classToGetValuesFor.getSimpleName());
-            if (configValuesForClass != null) {
-                configValues.addAll(configValuesForClass);
-            }
-            boolean ignoreSuperClass = false;
-            if (classToGetValuesFor != BaseAction.class && classToGetValuesFor.isAnnotationPresent(ActionDescription.class)) {
-                Class<? extends BaseAction> actionClass = classToGetValuesFor;
-                ignoreSuperClass = actionClass.getAnnotation(ActionDescription.class).ignoreConfigValuesInSuperclass();
-            }
-            classToGetValuesFor = ignoreSuperClass ? Object.class : classToGetValuesFor.getSuperclass();
-        }
+    public List<WorkflowParameter> getRelevantOverriddenConfigValues(WorkflowAction action) {
+        Set<String> relevantConfigValues = getConfigValuesForAction(action);
+        return action.getRelevantOverriddenConfigValues(relevantConfigValues);
+    }
+
+    public Set<String> getConfigValuesForAction(WorkflowAction action) {
+        Set<String> configValues = action.getConfigValues(mappings);
         // add global values
         configValues.add("--username");
         configValues.add("--dry-run");
@@ -67,8 +56,4 @@ public class ConfigMappings {
         return configValues;
     }
 
-    public static void main(String[] args) {
-        ConfigMappings configMappings = new ConfigMappings();
-        System.out.println(configMappings.getConfigValuesForAction(GenerateGitCommitStats.class));
-    }
 }

@@ -14,14 +14,32 @@ import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
+import com.vmware.vcd.domain.Sites;
 import com.vmware.vcd.domain.VappData;
 
 public abstract class BaseVappAction extends BaseCommitAction {
+    protected boolean checkVappJson;
+    protected boolean checkIfSiteSelected;
+    protected boolean checkIfCellSelected;
     protected VappData vappData;
 
     public BaseVappAction(WorkflowConfig config) {
         super(config);
         JSch.setLogger(new SshLogger(log));
+    }
+
+    @Override
+    public String failWorkflowIfConditionNotMet() {
+        if (checkVappJson && StringUtils.isBlank(draft.vappJsonForJenkinsJob)) {
+            return "no Vapp json loaded";
+        }
+        if ((checkIfSiteSelected || checkIfSiteSelected) && vappData.getSelectedSite() == null) {
+            return "no vcd site selected";
+        }
+        if (checkIfCellSelected && vappData.getSelectedVcdCell() == null) {
+            return "no vcd cell selected";
+        }
+        return super.failWorkflowIfConditionNotMet();
     }
 
     public void setVappData(VappData vappData) {
@@ -35,7 +53,11 @@ public abstract class BaseVappAction extends BaseCommitAction {
     }
 
     protected SiteConfig createSshSiteConfig() {
-        if (sshConfig.useSshSite()) {
+        if (vappData.getSelectedVcdCell() != null) {
+            Sites.DeployedVM cell = vappData.getSelectedVcdCell();
+            Sites.OvfProperties ovfProperties = cell.deployment.ovfProperties;
+            return new SiteConfig(ovfProperties.hostname, 22, cell.osCredentials.username, cell.osCredentials.password);
+        } else if (sshConfig.useSshSite()) {
             String sshSite = sshConfig.sshSite;
             TreeMap<String, SiteConfig> sshSiteConfigs = sshConfig.sshSiteConfigs;
             if (StringUtils.isBlank(sshSite)) {

@@ -25,6 +25,8 @@ public class SelectVapp extends BaseVappAction {
         if (StringUtils.isNotBlank(vcdConfig.vappName)) {
             log.info("Using specified Vapp name {}", vcdConfig.vappName);
             vappData.setSelectedVappByName(vcdConfig.vappName);
+        } else if (vappData.getSelectedVapp() != null) {
+            log.info("Using already selected Vapp {}", vappData.getSelectedVapp().getLabel());
         } else {
             int selectedVapp = InputUtils.readSelection(vappData.ownedVappLabels(),
                     "Select Vapp (Total powered on VM count " + vappData.poweredOnVmCount() + ")");

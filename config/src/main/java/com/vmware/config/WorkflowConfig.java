@@ -22,16 +22,21 @@ import com.vmware.config.section.VcdConfig;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
+import com.vmware.util.logging.LogLevel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -108,7 +113,7 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-dr,--dry-run", help = "Shows the workflow actions that would be run")
     public boolean dryRun;
 
-    @ConfigurableProperty(commandLine = "-cp,--specific-properties", help = "Show value for just the specified config properties")
+    @ConfigurableProperty(commandLine = "-sp,--specific-properties", help = "Show value for just the specified config properties")
     public String configPropertiesToDisplay;
 
     @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time in seconds for blocking workflow action to complete.")
@@ -124,6 +129,13 @@ public class WorkflowConfig {
         this.configurableFields = new WorkflowFields(this);
     }
 
+    public void setupLogLevel() {
+        java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
+        LogLevel logLevelToUse = loggingConfig.determineLogLevel();
+        globalLogger.setLevel(logLevelToUse.getLevel());
+        log.debug("Using log level {}", logLevelToUse);
+    }
+
     public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
         List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), "Command Line", true);
         if (argsParser.containsArgument("--possible-workflow")) {
@@ -133,12 +145,36 @@ public class WorkflowConfig {
         argsParser.checkForUnrecognizedArguments(commandLineProperties);
     }
 
+    public Map<String, CalculatedProperty> getExistingValues(Set<String> configValues) {
+        Map<String, CalculatedProperty> existingValues = new HashMap<>();
+        for (String configValueName : configValues) {
+            if (configValueName.startsWith("--J")) {
+                if (!existingValues.containsKey("jenkinsJobParameters")) {
+                    existingValues.put("jenkinsJobParameters", new CalculatedProperty(new HashMap<>(jenkinsConfig.jenkinsJobParameters),
+                            configurableFields.getFieldValueSource("jenkinsJobParameters")));
+                }
+                continue;
+            }
+            List<WorkflowField> matchingFields = configurableFields.findWorkflowFieldsByConfigValue(configValueName);
+            for (WorkflowField matchingField : matchingFields) {
+                if (!existingValues.containsKey(matchingField.getName())) {
+                    existingValues.put(matchingField.getName(), valueForField(matchingField));
+                }
+            }
+        }
+        return existingValues;
+    }
+
     public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
         }
         jenkinsConfig.addJenkinsParametersFromConfigValues(configValues, overwriteJenkinsParameters);
         return configurableFields.applyConfigValues(configValues, source);
+    }
+
+    public void applyValuesWithSource(Map<String, CalculatedProperty> values) {
+        values.forEach((key, value) -> configurableFields.setFieldValue(key, value.getValue(), value.getSource()));
     }
 
     /**
@@ -166,7 +202,22 @@ public class WorkflowConfig {
         return configurableFields;
     }
 
-    public Object sectionConfigForClass(Class clazz) {
+    public CalculatedProperty valueForField(WorkflowField matchingField) {
+        ConfigurableProperty configurableProperty = matchingField.configAnnotation();
+        if (StringUtils.isBlank(configurableProperty.methodNameForValueCalculation())) {
+            Object value = matchingField.getValue(this);
+            return new CalculatedProperty(value, configurableFields.getFieldValueSource(matchingField.getName()));
+        }
+        Class sectionConfigClass = matchingField.getConfigClassContainingField();
+        try {
+            Method methodToExecute = sectionConfigClass.getMethod(configurableProperty.methodNameForValueCalculation());
+            return (CalculatedProperty) methodToExecute.invoke(sectionConfigForClass(sectionConfigClass));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
+    }
+
+    private Object sectionConfigForClass(Class clazz) {
         Optional<Field> matchingField = Arrays.stream(this.getClass().getFields()).filter(field -> field.getType().equals(clazz)).findFirst();
         if (!matchingField.isPresent()) {
             throw new FatalException("No match for config class {}", clazz.getName());

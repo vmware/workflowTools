@@ -2,7 +2,6 @@ package com.vmware.config;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.config.section.SectionConfig;
-import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 
@@ -13,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -38,24 +38,31 @@ public class WorkflowFields {
 
     public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source) {
         List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
+        for (String configValueName : configValues.keySet()) {
+            List<WorkflowField> matchingFields = findWorkflowFieldsByConfigValue(configValueName);
+            if (!matchingFields.isEmpty()) {
+                propertiesAffected.add(matchingFields.get(0).configAnnotation());
+                String value = configValues.get(configValueName);
+                matchingFields.forEach(matchingField -> setFieldValue(matchingField, value, source)); ;
+            }
+        }
+        return propertiesAffected;
+    }
+
+    public List<WorkflowField> findWorkflowFieldsByConfigValue(String configValueName) {
+        List<WorkflowField> matchingFields = new ArrayList<>();
         for (WorkflowField field : configurableFields) {
             ConfigurableProperty configurableProperty = field.configAnnotation();
             if (configurableProperty.commandLine().equals(ConfigurableProperty.NO_COMMAND_LINE_OVERRIDES)) {
                 continue;
             }
-            for (String configValue : configValues.keySet()) {
-                List<String> commandLineArguments = StringUtils.splitAndTrim(configurableProperty.commandLine(), ",");
-                if (commandLineArguments.contains(configValue)) {
-                    propertiesAffected.add(configurableProperty);
-                    String value = configValues.get(configValue);
-                    if (value == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
-                        value = Boolean.TRUE.toString();
-                    }
-                    setFieldValue(field, value, source);
-                }
+            List<String> commandLineArguments = StringUtils.splitAndTrim(configurableProperty.commandLine(), ",");
+
+            if (commandLineArguments.contains(configValueName)) {
+                matchingFields.add(field);
             }
         }
-        return propertiesAffected;
+        return matchingFields;
     }
 
     public void overrideValues(WorkflowConfig overriddenConfig, String configFileName) {
@@ -72,7 +79,7 @@ public class WorkflowFields {
                 if (valueMap.isEmpty()) {
                     continue;
                 }
-                Map existingValues = (Map) existingValue;
+                Map  existingValues = (Map) existingValue;
                 String existingConfigValue = overriddenConfigSources.get(field.getName());
                 String updatedConfigValue;
                 if (existingConfigValue == null && !existingValues.isEmpty()) {
@@ -118,8 +125,9 @@ public class WorkflowFields {
                 sourceConfigProperty = workflowConfigPropertyName;
                 valueToSet = gitConfigValues.get(workflowConfigPropertyName);
             }
-
-            setFieldValue(field, valueToSet, "Git " + sourceConfigProperty);
+            if (valueToSet != null) {
+                setFieldValue(field, valueToSet, "Git " + sourceConfigProperty);
+            }
         }
     }
 
@@ -148,19 +156,19 @@ public class WorkflowFields {
         overriddenConfigSources.put(fieldName, source);
     }
 
-    public void setFieldValue(String fieldName, String value, String source) {
-        WorkflowField matchingField = configurableFields.stream()
-                .filter(field -> field.getName().equals(fieldName)).findFirst()
-                .orElseThrow(() -> new FatalException("No configurable field found matching name " + fieldName));
-        setFieldValue(matchingField, value, source);
+    public void setFieldValue(String fieldName, Object value, String source) {
+        List<WorkflowField> matchingFields = configurableFields.stream()
+                .filter(field -> field.getName().equals(fieldName)).collect(Collectors.toList());
+        if (matchingFields.isEmpty()) {
+            throw new FatalException("No configurable field found matching name " + fieldName);
+        }
+        matchingFields.forEach(matchingField -> setFieldValue(matchingField, value, source));
     }
 
-    public void setFieldValue(WorkflowField field, String value, String source) {
+    public void setFieldValue(WorkflowField field, Object value, String source) {
         Object validValue = field.determineValue(value);
-        if (validValue != null) {
-            overriddenConfigSources.put(field.getName(), source);
-            field.setValue(workflowConfig, validValue);
-        }
+        overriddenConfigSources.put(field.getName(), source);
+        field.setValue(workflowConfig, validValue);
     }
 
     public String loadedConfigFilesText() {

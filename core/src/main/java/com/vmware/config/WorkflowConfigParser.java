@@ -44,7 +44,7 @@ public class WorkflowConfigParser {
 
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
-        setLogLevel(config);
+        config.setupLogLevel();
 
         String gitRemoteValue = git.configValue(String.format("remote.%s.url", config.gitRepoConfig.defaultGitRemote));
         config.setGitRemoteUrlAsReviewBoardRepo(gitRemoteValue);
@@ -56,7 +56,7 @@ public class WorkflowConfigParser {
         applyGitConfigValuesAsWorkflowConfigValues(config);
 
         applyRuntimeArguments(config);
-        setLogLevel(config);
+        config.setupLogLevel();
 
         log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
 
@@ -104,7 +104,7 @@ public class WorkflowConfigParser {
     public void updateWithRuntimeArguments(WorkflowConfig config, String[] args) {
         argsParser.generateArgumentMap(args);
         applyRuntimeArguments(config);
-        setLogLevel(config);
+        config.setupLogLevel();
     }
 
     public String getRuntimeArgumentsText() {
@@ -119,13 +119,6 @@ public class WorkflowConfigParser {
             log.error(iae.getMessage());
             System.exit(1);
         }
-    }
-
-    private void setLogLevel(WorkflowConfig internalConfig) {
-        java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        LogLevel logLevelToUse = internalConfig.loggingConfig.determineLogLevel();
-        globalLogger.setLevel(logLevelToUse.getLevel());
-        log.debug("Using log level {}", logLevelToUse);
     }
 
     /**

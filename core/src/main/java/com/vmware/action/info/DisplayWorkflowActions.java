@@ -46,7 +46,7 @@ public class DisplayWorkflowActions extends BaseAction {
 
     private Map<String, List<Class<? extends BaseAction>>> generateClassMap() {
         Map<String, List<Class<? extends BaseAction>>> classes = new TreeMap<String, List<Class<? extends BaseAction>>>();
-        List<Class<? extends BaseAction>> workflowActions = new WorkflowActions(config).getWorkflowActions();
+        List<Class<? extends BaseAction>> workflowActions = new WorkflowActions(config).getWorkflowActionClasses();
         for (int i = 0; i < workflowActions.size(); i ++) {
             Class<? extends BaseAction> action = workflowActions.get(i);
             String[] pieces = action.getName().split("\\.");

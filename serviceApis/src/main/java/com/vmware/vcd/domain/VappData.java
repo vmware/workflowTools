@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.exception.FatalException;
 
 public class VappData {
@@ -12,6 +13,10 @@ public class VappData {
     private List<QueryResultVappType> ownedVapps;
 
     private QueryResultVappType selectedVapp;
+
+    private Sites.Site selectedSite;
+
+    private Sites.DeployedVM selectedVcdCell;
 
     private int testbedTemplateVmCount;
 
@@ -67,5 +72,21 @@ public class VappData {
 
     public void setTestbedTemplateVmCount(int testbedTemplateVmCount) {
         this.testbedTemplateVmCount = testbedTemplateVmCount;
+    }
+
+    public Sites.Site getSelectedSite() {
+        return selectedSite;
+    }
+
+    public void setSelectedSite(Sites.Site selectedSite) {
+        this.selectedSite = selectedSite;
+    }
+
+    public Sites.DeployedVM getSelectedVcdCell() {
+        return selectedVcdCell;
+    }
+
+    public void setSelectedVcdCell(Sites.DeployedVM selectedVcdCell) {
+        this.selectedVcdCell = selectedVcdCell;
     }
 }

@@ -1,8 +1,6 @@
 package com.vmware;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,28 +14,24 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.vmware.action.BaseAction;
-import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseIssuesProcessingAction;
-import com.vmware.action.base.BaseVappAction;
-import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.UnknownWorkflowValueException;
+import com.vmware.config.WorkflowAction;
 import com.vmware.config.WorkflowActionValues;
 import com.vmware.config.WorkflowActions;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowConfigParser;
 import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
+import com.vmware.config.WorkflowParameter;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
 import com.vmware.util.input.ImprovedStringsCompleter;
@@ -169,7 +163,7 @@ public class Workflow {
         }
         WorkflowActions workflowActions = new WorkflowActions(config);
         // ! means that it won't show up if nothing is entered
-        autocompleteList.addAll(workflowActions.getWorkflowActions()
+        autocompleteList.addAll(workflowActions.getWorkflowActionClasses()
                 .stream().map(workflowAction -> "!" + workflowAction.getSimpleName()).collect(Collectors.toList()));
         ImprovedStringsCompleter workflowCompleter = new ImprovedStringsCompleter(autocompleteList);
         workflowCompleter.setDelimeterText("");
@@ -198,7 +192,7 @@ public class Workflow {
 
         try {
             WorkflowActions workflowActions = new WorkflowActions(config);
-            List<Class<? extends BaseAction>> actions = workflowActions.determineActions(workflowToRun);
+            List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
             if (config.dryRun) {
@@ -233,39 +227,31 @@ public class Workflow {
     private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods) {
         log.info("Checking that each action value in the workflows is valid");
         WorkflowActions workflowActions = new WorkflowActions(config);
-        List<Class<? extends BaseAction>> workflowActionsClasses =
+        List<WorkflowAction> actions =
                 workflowActions.determineActions(StringUtils.join(config.workflows.keySet()));
         WorkflowActionValues actionValues = new WorkflowActionValues();
-        for (Class<? extends BaseAction> action : workflowActionsClasses) {
-            log.info("Instantiating constructor for {}", action.getSimpleName());
-            BaseAction actionObject = instantiateAction(action);
+        for (WorkflowAction action : actions) {
+            log.info("Instantiating constructor for {}", action.getActionClassName());
+            action.instantiateAction(config, serviceLocator);
 
-            if (actionObject instanceof BaseCommitAction) {
-                ((BaseCommitAction) actionObject).setDraft(actionValues.getDraft());
-            }
-            if (actionObject instanceof BaseIssuesProcessingAction) {
-                ((BaseIssuesProcessingAction) actionObject).setProjectIssues(actionValues.getProjectIssues());
-            }
-            if (actionObject instanceof BaseVappAction) {
-                ((BaseVappAction) actionObject).setVappData(actionValues.getVappData());
-            }
+            action.setWorkflowValuesOnAction(actionValues);
             if (runAllHelperMethods) {
                 log.info("Running asyncSetup");
-                actionObject.asyncSetup();
+                action.asyncSetup();
                 log.info("Running failWorkflowIfConditionNotMet");
-                actionObject.failWorkflowIfConditionNotMet();
+                action.failWorkflowIfConditionNotMet();
                 log.info("Running cannotRunAction method");
-                actionObject.cannotRunAction();
+                action.cannotRunAction();
                 log.info("Running preprocess method");
-                actionObject.preprocess();
+                action.preprocess();
             } else {
                 log.info("Running asyncSetup");
-                actionObject.asyncSetup();
+                action.asyncSetup();
             }
         }
     }
 
-    private void dryRunActions(List<Class<? extends BaseAction>> actions) {
+    private void dryRunActions(List<WorkflowAction> actions) {
         log.info("Executing in dry run mode");
         log.info("Showing workflow actions that would have run for workflow argument [{}]", config.workflowsToRun);
 
@@ -274,14 +260,17 @@ public class Workflow {
 
         ConfigMappings configMappings = new ConfigMappings();
         Set<String> configOptions = new HashSet<>();
-        for (Class<? extends BaseAction> action : actions) {
-            ActionDescription description = action.getAnnotation(ActionDescription.class);
+        for (WorkflowAction action : actions) {
+            ActionDescription description = action.getActionDescription();
             if (description == null) {
-                throw new RuntimeException("Please add a action description annotation for " + action.getSimpleName());
+                throw new RuntimeException("Please add a action description annotation for " + action.getActionClassName());
             }
             configOptions.addAll(configMappings.getConfigValuesForAction(action));
-            String helpText = "- " + description.value();
-            log.info(action.getSimpleName() + " " + helpText);
+            log.info(action.getActionClassName() + " - " + description.value());
+            for (WorkflowParameter parameter : configMappings.getRelevantOverriddenConfigValues(action)) {
+                log.info("{}   {}={}", StringUtils.repeat(action.getActionClassName().length(), " "),
+                        parameter.getName(), parameter.getValue());
+            }
         }
         actionsPadder.infoTitle();
 
@@ -303,15 +292,12 @@ public class Workflow {
                 String source = null;
                 if (configOption.equals("--jenkins-jobs")) {
                     matchingValueText = config.getJenkinsJobsConfig().toString();
-                } else if (matchingProperty != null && StringUtils.isNotBlank(matchingProperty.methodNameForValueCalculation())) {
-                    CalculatedProperty property = calculateProperty(matchingField, matchingProperty);
-                    matchingValueText = property.getValue();
-                    if (!property.getSource().equals(matchingField.getName())) {
+                } else {
+                    CalculatedProperty property = config.valueForField(matchingField);
+                    matchingValueText = StringUtils.convertObjectToString(property.getValue());
+                    if (property.getSource() != null && !property.getSource().equals(matchingField.getName())) {
                         source = property.getSource();
                     }
-                } else {
-                    Object matchingValue = matchingField.getValue(config);
-                    matchingValueText = StringUtils.convertObjectToString(matchingValue);
                 }
                 if (source == null) {
                     source = configurableFields.getFieldValueSource(matchingField.getName());
@@ -320,39 +306,28 @@ public class Workflow {
                 if (git.isGitInstalled()) {
                     gitConfigValue = "[" + matchingField.getName() + "]";
                 }
-                log.info("{}{}={} source=[{}] - {}", configOption, gitConfigValue, matchingValueText, source, matchingPropertyText);
+                if (StringUtils.isNotBlank(matchingValueText)) {
+                    log.info("{}{}={} source=[{}] - {}", configOption, gitConfigValue, matchingValueText, source, matchingPropertyText);
+                }
             }
         }
         configPadder.infoTitle();
     }
 
-    private CalculatedProperty calculateProperty(WorkflowField matchingField, ConfigurableProperty matchingProperty) {
-        Class sectionConfigClass = matchingField.getConfigClassContainingField();
-        try {
-            Method methodToExecute = sectionConfigClass.getMethod(matchingProperty.methodNameForValueCalculation());
-            return (CalculatedProperty) methodToExecute.invoke(config.sectionConfigForClass(sectionConfigClass));
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
-    }
-
-    private void runActions(List<Class<? extends BaseAction>> actions, WorkflowActionValues values) {
-        List<BaseAction> actionsToRun = new ArrayList<>();
-        for (Class<? extends BaseAction> action : actions) {
-            actionsToRun.add(instantiateAction(action));
-        }
+    private void runActions(List<WorkflowAction> actions, WorkflowActionValues values) {
+        actions.forEach(action -> action.instantiateAction(config, serviceLocator));
 
 
-        ConcurrentLinkedQueue<BaseAction> actionsSetup = new ConcurrentLinkedQueue<>();
-        SetupActions setupActions = new SetupActions(actionsToRun, actionsSetup);
+        ConcurrentLinkedQueue<WorkflowAction> actionsSetup = new ConcurrentLinkedQueue<>();
+        SetupActions setupActions = new SetupActions(actions, actionsSetup);
         new Thread(setupActions).start();
         ThreadUtils.sleep(10, TimeUnit.MILLISECONDS);
 
         int waitTimeInMilliSeconds = 0;
         Map<String, Long> executionTimesPerAction = new LinkedHashMap<>();
-        for (BaseAction action : actionsToRun) {
+        for (WorkflowAction action : actions) {
             while (!actionsSetup.contains(action)) {
-                String actionName = action.getClass().getSimpleName();
+                String actionName = action.getActionClassName();
                 if (waitTimeInMilliSeconds > 30000) {
                     log.error(actionName + ".asyncSetup failed to finish in 30 seconds");
                     System.exit(1);
@@ -384,10 +359,10 @@ public class Workflow {
     }
 
 
-    private void runAction(BaseAction action, WorkflowActionValues values) {
-        String actionName = action.getClass().getSimpleName();
+    private void runAction(WorkflowAction action, WorkflowActionValues values) {
+        String actionName = action.getActionClassName();
         log.debug("Executing workflow action {}", actionName);
-        setWorkflowValuesOnAction(action, values);
+        action.setWorkflowValuesOnAction(values);
 
         String reasonForNotRunningAction = action.cannotRunAction();
 
@@ -403,50 +378,23 @@ public class Workflow {
             action.process();
         }
 
-        if (action instanceof BaseTrelloAction) {
-            values.setTrelloBoard(((BaseTrelloAction) action).getSelectedBoard());
-        }
-    }
-
-    private void setWorkflowValuesOnAction(BaseAction action, WorkflowActionValues values) {
-        if (action instanceof BaseCommitAction) {
-            ((BaseCommitAction) action).setDraft(values.getDraft());
-        }
-        if (action instanceof BaseIssuesProcessingAction) {
-            ((BaseIssuesProcessingAction) action).setProjectIssues(values.getProjectIssues());
-        }
-        if (action instanceof BaseTrelloAction) {
-            ((BaseTrelloAction) action).setSelectedBoard(values.getTrelloBoard());
-        }
-        if (action instanceof BaseVappAction) {
-            ((BaseVappAction) action).setVappData(values.getVappData());
-        }
-    }
-
-    private BaseAction instantiateAction(Class<? extends BaseAction> actionToInstantiate) {
-        try {
-            BaseAction action = actionToInstantiate.getConstructor(WorkflowConfig.class).newInstance(config);
-            action.setServiceLocator(serviceLocator);
-            return action;
-        } catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
+        action.updateWorkflowValues(values);
     }
 
     private class SetupActions implements Runnable {
 
-        private ConcurrentLinkedQueue<BaseAction> actionsRun;
-        private List<BaseAction> actionsToRun;
+        private ConcurrentLinkedQueue<WorkflowAction> actionsRun;
+        private List<WorkflowAction> actionsToRun;
 
-        SetupActions(List<BaseAction> actionsToRun, ConcurrentLinkedQueue<BaseAction> actionsRun) {
+        SetupActions(List<WorkflowAction> actionsToRun, ConcurrentLinkedQueue<WorkflowAction> actionsRun) {
             this.actionsToRun = actionsToRun;
             this.actionsRun = actionsRun;
         }
 
         @Override
         public void run() {
-            for (BaseAction action : actionsToRun) {
-                log.debug("Preprocessing {}", action.getClass().getSimpleName());
+            for (WorkflowAction action : actionsToRun) {
+                log.debug("Preprocessing {}", action.getActionClassName());
                 try {
                     action.asyncSetup();
                 } catch (Exception e) {

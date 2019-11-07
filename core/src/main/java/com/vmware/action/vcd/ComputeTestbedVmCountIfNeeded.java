@@ -8,11 +8,10 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.jenkins.Job;
 import com.vmware.config.jenkins.JobParameter;
-import com.vmware.config.section.PerforceClientConfig;
+import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.scm.Perforce;
 
 @ActionDescription("Computes the testbed to be deployed vm count if applicable")
 public class ComputeTestbedVmCountIfNeeded extends BaseVappAction {
@@ -40,20 +39,9 @@ public class ComputeTestbedVmCountIfNeeded extends BaseVappAction {
             return 0;
         }
 
-        final File testbedDirectory = determineTestbedTemplateDirectory();
+        final File testbedDirectory = FileUtils.determineFullPath(vcdConfig.testbedTemplateDirectory);
         return config.getJenkinsJobsConfig().jobs().stream()
                 .map(job -> countVmsUsedInJob(testbedDirectory, job)).reduce(Integer::sum).orElse(0);
-    }
-
-    private File determineTestbedTemplateDirectory() {
-        File testbedDirectory = new File(vcdConfig.testbedTemplateDirectory);
-        if (testbedDirectory.isAbsolute()) {
-            return testbedDirectory;
-        }
-
-        File rootDirectory = git.workingDirectoryIsInGitRepo() ? git.getRootDirectory() : new File("");
-        log.debug("Assuming path {} is relative, prepending root path {}", vcdConfig.testbedTemplateDirectory, rootDirectory.getPath());
-        return new File(rootDirectory.getPath() + File.separator + vcdConfig.testbedTemplateDirectory);
     }
 
     private File determineRootDirectory() {

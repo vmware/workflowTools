@@ -22,7 +22,7 @@ import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseAction {
+public abstract class BaseAction implements Action {
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -39,8 +39,8 @@ public abstract class BaseAction {
     protected final CheckstyleConfig checkstyleConfig;
     protected final PatchConfig patchConfig;
     protected final BuildwebConfig buildwebConfig;
-    protected SshConfig sshConfig;
-    protected VcdConfig vcdConfig;
+    protected final SshConfig sshConfig;
+    protected final VcdConfig vcdConfig;
 
     protected ServiceLocator serviceLocator;
 
@@ -69,9 +69,6 @@ public abstract class BaseAction {
         this.vcdConfig = config.vcdConfig;
     }
 
-    /**
-     * @return Reason why the workflow should fail, null if it should continue
-     */
     public String failWorkflowIfConditionNotMet() {
         if (expectedCommandsToBeAvailable == null) {
             return null;
@@ -90,22 +87,16 @@ public abstract class BaseAction {
         return null;
     }
 
-    /**
-     * Setup method that will run asynchonrously, useful for setting up rest services
-     */
+    @Override
     public void asyncSetup() {
     }
 
-    /**
-     * @return Reason for why this action should not be run, null if it should be run
-     */
+    @Override
     public String cannotRunAction() {
         return null;
     }
 
-    /**
-     * Override if any setup is needed before the process method is called
-     */
+    @Override
     public void preprocess() {
     }
 
@@ -113,8 +104,6 @@ public abstract class BaseAction {
         this.serviceLocator = serviceLocator;
         this.git = serviceLocator.getGit();
     }
-
-    public abstract void process();
 
     protected void setExpectedCommandsToBeAvailable(String... commands) {
         this.expectedCommandsToBeAvailable = commands;

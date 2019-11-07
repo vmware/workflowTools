@@ -234,6 +234,18 @@ public class StringUtils {
         }
     }
 
+    public static String[] splitOnlyOnce(String value, String delimeter) {
+        if (value == null) {
+            return null;
+        }
+        int firstIndex = value.indexOf(delimeter);
+        if (firstIndex == -1) {
+            return new String[] { value };
+        } else {
+            return new String[] {value.substring(0, firstIndex), value.substring(firstIndex + 1)};
+        }
+    }
+
     public static List<String> splitAndTrim(String value, String delimeter) {
         if (value == null) {
             return Collections.emptyList();

@@ -23,7 +23,7 @@ public class OpenSshShell extends BaseVappAction {
         openSshShell(siteConfigToUse);
     }
 
-    protected void openSshShell(SiteConfig siteConfig) {
+    private void openSshShell(SiteConfig siteConfig) {
         log.info("Opening ssh shell for {}@{}", siteConfig.username, siteConfig.host);
         JSch jsch = new JSch();
         Session session = null;

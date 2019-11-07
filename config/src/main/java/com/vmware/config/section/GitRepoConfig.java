@@ -37,7 +37,7 @@ public class GitRepoConfig {
     public boolean useGitTrackingBranch;
 
     public String trackingBranchPath() {
-        return determineTrackingBranchPath().getValue();
+        return String.valueOf(determineTrackingBranchPath().getValue());
     }
 
     public CalculatedProperty determineTrackingBranchPath() {

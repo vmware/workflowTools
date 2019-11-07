@@ -4,10 +4,10 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Tails the specified log file on the select Vapp")
-public class TailVappLogFile extends ExecuteSshCommandUsingVapp {
+@ActionDescription("Tails the specified log file on the remote site")
+public class TailLogFile extends ExecuteSshCommand {
 
-    public TailVappLogFile(WorkflowConfig config) {
+    public TailLogFile(WorkflowConfig config) {
         super(config);
     }
 

@@ -19,18 +19,23 @@ public class WorkflowField {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Field field;
-    private Class<?> type;
 
     public WorkflowField(Field field) {
         this.field = field;
     }
 
-    public Object determineValue(String sourceValue) {
-        if (sourceValue == null) {
+    public Object determineValue(Object value) {
+        Class fieldType = field.getType();
+        if ((value == null || StringUtils.isBlank(String.valueOf(value))) && (fieldType == Boolean.class || fieldType == boolean.class)) {
+            return Boolean.TRUE;
+        } else if (value == null) {
             return null;
         }
+        if (!(value instanceof String)) {
+            return value;
+        }
         Object validValue = null;
-        Class fieldType = field.getType();
+        String sourceValue = value.toString();
         if (fieldType == String[].class) {
             validValue = sourceValue.split(",");
         } else if (fieldType == int[].class) {

@@ -1,34 +1,36 @@
 package com.vmware.action.vcd;
 
 import com.google.gson.Gson;
-import com.vmware.action.base.BaseSingleVappAction;
+import com.vmware.action.base.BaseSingleVappJsonAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.BrowserUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.vcd.domain.Sites;
 
 @ActionDescription("Opens the specified vcd provider endpoint in the Vapp Json")
-public class OpenVcdProviderApp extends BaseSingleVappAction {
+public class OpenVcdProviderApp extends BaseSingleVappJsonAction {
     public OpenVcdProviderApp(WorkflowConfig config) {
         super(config);
-    }
-
-    @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(draft.vappJsonForJenkinsJob)) {
-            return "no Vapp json loaded";
-        }
-        return super.failWorkflowIfConditionNotMet();
+        super.checkIfSiteSelected = true;
     }
 
     @Override
     public void process() {
-        log.info("Selected Vapp {}", vappData.getSelectedVapp().name);
-        Gson gson = new ConfiguredGsonBuilder().build();
-        Sites vcdSites = gson.fromJson(draft.vappJsonForJenkinsJob, Sites.class);
-        String uiUrl = vcdSites.uiUrl(vcdConfig.vcdSiteIndex, vcdConfig.vcdCellIndex) + "/provider";
+        String uiUrl = uiUrl() + "/provider";
         BrowserUtils.openUrl(uiUrl);
+    }
+
+    protected String uiUrl() {
+        Sites.Site selectedSite = vappData.getSelectedSite();
+        if (selectedSite.loadBalancer != null) {
+            log.info("Using loadbalancer url {}", selectedSite.loadBalancer.endPointURI);
+            return selectedSite.loadBalancer.endPointURI;
+        }
+        if (vappData.getSelectedVcdCell() == null) {
+            selectVcdCell(selectedSite, vcdConfig.vcdCellIndex);
+        }
+        Sites.DeployedVM selectedCell = vappData.getSelectedVcdCell();
+        return selectedCell.endPointURI;
     }
 }

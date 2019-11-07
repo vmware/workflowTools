@@ -27,6 +27,7 @@
   "vcdVmQuota": 40,
   "testbedParameter": "TESTBED_DESCRIPTOR_NAME",
   "vappJsonParameter": "TESTBED_JSON",
+  "rsyncFlags": "azvh",
   "defaultGitRemote": "origin",
   "remoteBranches": {
     "precommit": "topic/$USERNAME/pre-commit",
@@ -391,18 +392,11 @@
       "PushToPrecommitBranch",
       "invokeJobs"
     ],
-    "restartJobs": [
-      "PushToPrecommitBranch",
-      "invokeJobs"
-    ],
     "invokeJobs": [
       "ReadLastCommit",
       "AbortJenkinsBuilds",
       "InvokeJenkinsJobs",
       "AmendCommit"
-    ],
-    "restartJobsWithoutUpdate": [
-      "invokeJobs"
     ],
     "abortJobs": [
       "ReadLastCommit",
@@ -659,6 +653,7 @@
     "sandbox": [
       "updateMatchingChangelistWithFileSync",
       "ExitIfCommitFailsCheckstyle",
+      "ExitIfPerforceUserNotLoggedIn",
       "InvokeSandboxBuild",
       "AmendCommit"
     ],
@@ -681,6 +676,7 @@
       "ReadLastCommit",
       "--changelist-id=head",
       "ExitIfCommitFailsCheckstyle",
+      "ExitIfPerforceUserNotLoggedIn",
       "InvokeSandboxBuild",
       "AmendCommit"
     ],
@@ -697,45 +693,52 @@
       "UpdateVappLease"
     ],
     "displayVappJson": [
-      "loadVappJson",
+      "selectVcdCell",
       "DisplayVappJson"
     ],
     "openVCenterUrl": [
-      "loadVappJson",
+      "selectVcdSite",
       "OpenVCenterApp"
     ],
     "openNsxTManagerUrl": [
-      "loadVappJson",
+      "selectVcdSite",
       "OpenNsxTManagerApp"
     ],
     "openVappProviderUrl": [
-      "loadVappJson",
+      "selectVcdSite",
       "OpenVcdProviderApp"
     ],
     "openVappTenantUrl": [
-      "loadVappJson",
+      "selectVcdSite",
       "OpenVcdTenantApp"
     ],
     "executeVappSsh": [
-      "loadVappJson",
-      "ExecuteSshCommandUsingVapp"
+      "selectVcdCell",
+      "ExecuteSshCommand"
     ],
     "openVappSshShell": [
-      "loadVappJson",
-      "OpenSshShellUsingVapp"
+      "selectVcdCell",
+      "OpenSshShell"
     ],
     "tailVappLogFile": [
-      "loadVappJson",
-      "TailVappLogFile"
+      "selectVcdCell",
+      "TailLogFile"
     ],
     "loadVappJson": [
       "selectVapp",
       "LoadVappJson"
     ],
+    "selectVcdSite": [
+      "loadVappJson",
+      "SelectVcdSite"
+    ],
+    "selectVcdCell": [
+      "selectVcdSite",
+      "SelectVcdCell"
+    ],
     "selectVapp": [
       "LoadVapps",
-      "SelectVapp",
-      "LoadVappJson"
+      "SelectVapp"
     ],
     "displayWorkflowBuildInfo": [
       "DisplayConfig",
@@ -764,6 +767,7 @@
     "setReviewDetails",
     "setReviewDetailsAndDiff",
     "loadVappJson",
-    "selectVapp"
+    "selectVapp",
+    "selectVcdCell"
   ]
 }

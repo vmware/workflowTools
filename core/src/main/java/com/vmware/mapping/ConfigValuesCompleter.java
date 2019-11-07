@@ -1,6 +1,7 @@
 package com.vmware.mapping;
 
 import com.vmware.action.BaseAction;
+import com.vmware.config.WorkflowAction;
 import com.vmware.config.WorkflowActions;
 import com.vmware.config.WorkflowValuesParser;
 import com.vmware.config.WorkflowConfig;
@@ -10,6 +11,7 @@ import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +29,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
     public ConfigValuesCompleter(WorkflowConfig config) {
         this.configMappings = new ConfigMappings();
         this.config = config;
-        this.workflowActions = new WorkflowActions(config).getWorkflowActions();
+        this.workflowActions = new WorkflowActions(config).getWorkflowActionClasses();
         super.values.addAll(configMappings.allConfigValues());
     }
 
@@ -39,10 +41,10 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
 
         String workflowString = argumentList.getArguments()[0];
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(config, workflowActions);
-        valuesParser.parse(Arrays.asList(workflowString.split(",")));
+        valuesParser.parse(Arrays.asList(workflowString.split(",")), Collections.emptyList());
         values.clear();
         valuesShownWhenNoBuffer.clear();
-        for (Class<? extends BaseAction> foundAction : valuesParser.getActionClasses()) {
+        for (WorkflowAction foundAction : valuesParser.getWorkflowActions()) {
             Set<String> matchingConfigValues = configMappings.getConfigValuesForAction(foundAction);
             values.addAll(matchingConfigValues);
         }

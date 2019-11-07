@@ -18,9 +18,6 @@
     "--checkstyle-config-xml-path",
     "--checkstyle-jar-path"
   ],
-  "OpenNsxTManagerApp": [
-    "--vcd-site-index"
-  ],
   "OpenBuildPage": [
     "--jenkins-url"
   ],
@@ -111,13 +108,21 @@
     "--username",
     "--estimate"
   ],
+  "RsyncCommand": [
+    "--rsync-flags",
+    "--rsync-delete",
+    "--rsync-destination",
+    "--rsync-source"
+  ],
   "BaseBatchJiraAction": [
     "--username",
     "--disable-jira"
   ],
-  "OpenSshShellUsingVapp": [
-    "--vcd-cell-index",
-    "--vcd-site-index"
+  "TailLogFile": [
+    "--log-line-count",
+    "--ssh-command",
+    "--tail-follow",
+    "--log-file"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -250,12 +255,6 @@
     "--max-description",
     "--max-summary"
   ],
-  "TailVappLogFile": [
-    "--log-line-count",
-    "--ssh-command",
-    "--tail-follow",
-    "--log-file"
-  ],
   "ExitIfVcdVmQuotaExceeded": [
     "--vcd-vm-quota",
     "--use-vapp-json"
@@ -278,8 +277,7 @@
     "--jira-url"
   ],
   "OpenVcdProviderApp": [
-    "--vcd-cell-index",
-    "--vcd-site-index"
+    "--vcd-cell-index"
   ],
   "BaseVappAction": [
     "--ssh-password",
@@ -296,11 +294,6 @@
     "--username",
     "--review-board-date-format"
   ],
-  "ExecuteSshCommandUsingVapp": [
-    "--ssh-command",
-    "--vcd-cell-index",
-    "--vcd-site-index"
-  ],
   "DisplayReviewUrl": [
     "--reviewboard-url"
   ],
@@ -315,8 +308,6 @@
     "--file-count-ranges"
   ],
   "OpenVcdTenantApp": [
-    "--vcd-cell-index",
-    "--vcd-site-index",
     "--vcd-tenant"
   ],
   "LoadVappsIfNeeded": [
@@ -420,7 +411,10 @@
   "RebaseAgainstMaster": [
     "--git-remote"
   ],
-  "OpenVCenterApp": [
+  "SelectVcdCell": [
+    "--vcd-cell-index"
+  ],
+  "SelectVcdSite": [
     "--vcd-site-index"
   ],
   "BaseSetUsersList": [

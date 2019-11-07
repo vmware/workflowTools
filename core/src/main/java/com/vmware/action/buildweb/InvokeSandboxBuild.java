@@ -3,6 +3,7 @@ package com.vmware.action.buildweb;
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
+import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -10,6 +11,7 @@ import com.vmware.config.jenkins.Job;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.LogLevel;
 
@@ -18,7 +20,7 @@ import java.util.regex.Pattern;
 import static java.lang.String.format;
 
 @ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
-public class InvokeSandboxBuild extends BaseCommitAction {
+public class InvokeSandboxBuild extends BasePerforceCommitAction {
 
     private static final String SANDBOX_BUILD_PREFIX = "$SANDBOX_";
 
@@ -54,9 +56,17 @@ public class InvokeSandboxBuild extends BaseCommitAction {
                 syncToParameter, buildwebConfig.determineBuildwebBranch().getValue(),
                 changelistId, storeTreesParamter, componentBuildsParameter);
 
+        String output = null;
         log.info("Invoking {} build {}", buildwebConfig.buildDisplayName, command);
-        String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
+        output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
+        checkIfOutputContainsP4PasswordError(output);
         addBuildNumberInOutputToTestingDone(output);
+    }
+
+    private void checkIfOutputContainsP4PasswordError(String output) {
+        if (output != null && output.contains("Perforce password (P4PASSWD) invalid or unset")) {
+            throw new FatalException("Cannot invoke sandbox build as user is not logged into Perforce");
+        }
     }
 
     private String createComponentBuildsParameter() {

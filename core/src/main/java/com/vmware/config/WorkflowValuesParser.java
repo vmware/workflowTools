@@ -1,12 +1,5 @@
 package com.vmware.config;
 
-import com.vmware.action.BaseAction;
-import com.vmware.config.jenkins.JenkinsJobsConfig;
-import com.vmware.config.section.JenkinsConfig;
-import com.vmware.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,8 +8,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.vmware.action.BaseAction;
+import com.vmware.config.section.JenkinsConfig;
+import com.vmware.util.StringUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to parse actions and config values from workflow arguments.
@@ -24,54 +26,56 @@ import java.util.Set;
 public class WorkflowValuesParser {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-    private List<Class<? extends BaseAction>> actionClasses = new ArrayList<>();
     private Map<String, String> configValues = new HashMap<>();
     private List<String> unknownActions = new ArrayList<>();
 
+    private final WorkflowConfig config;
     private Map<String, List<String>> workflows;
-    private List<Class<? extends BaseAction>> workflowActions;
+    private List<WorkflowAction> workflowActions = new ArrayList<>();
+    private List<Class<? extends BaseAction>> workflowActionClasses;
     private JenkinsConfig jenkinsConfig;
 
-    public WorkflowValuesParser(WorkflowConfig workflowConfig, List<Class<? extends BaseAction>> workflowActions) {
+    public WorkflowValuesParser(WorkflowConfig workflowConfig, List<Class<? extends BaseAction>> workflowActionClasses) {
+        this.config = workflowConfig;
         this.workflows = workflowConfig.workflows;
-        this.workflowActions = workflowActions;
+        this.workflowActionClasses = workflowActionClasses;
         this.jenkinsConfig = workflowConfig.jenkinsConfig;
     }
 
-    public void reset() {
-        actionClasses.clear();
-        configValues.clear();
-        unknownActions.clear();
-    }
-
-    public void parse(List<String> workflowValues) {
+    public void parse(List<String> workflowValues, List<WorkflowParameter> workflowParameters) {
         for (String workflowValue : workflowValues) {
-            if (workflowValue.startsWith("-")) {
-                int equalsIndex = workflowValue.indexOf("=");
-                String[] configPieces = workflowValue.split("=");
+            String[] workflowPieces = workflowValue.split("&&-");
+            String workflowName = workflowPieces[0];
+            workflowPieces[0] = null;
+            List<WorkflowParameter> parameters = Arrays.stream(workflowPieces).filter(Objects::nonNull)
+                    .map(value -> "-" + value).map(WorkflowParameter::new).collect(Collectors.toList());
+            parameters.addAll(workflowParameters);
 
-                // assuming that the config value is boolean if no value specified
-                String fieldValue = equalsIndex == -1 ? Boolean.TRUE.toString() : workflowValue.substring(equalsIndex + 1);
-                configValues.put(configPieces[0], fieldValue);
+            if (workflowName.startsWith("-")) {
+                WorkflowParameter parameter = new WorkflowParameter(workflowName);
+                configValues.put(parameter.getName(), parameter.getValue());
+                parameters.forEach(param -> configValues.put(param.getName(), param.getValue()));
                 continue;
             }
 
-            if (workflows.containsKey(workflowValue)) {
-                parse(workflows.get(workflowValue));
+            if (workflows.containsKey(workflowName)) {
+                parse(workflows.get(workflowName), parameters);
                 continue;
             }
-            Optional<Class<? extends BaseAction>> matchingAction = workflowActions.stream().filter(action -> action.getSimpleName().equals(workflowValue)).findFirst();
+
+            Optional<Class<? extends BaseAction>> matchingAction = workflowActionClasses.stream()
+                    .filter(action -> action.getSimpleName().equals(workflowName)).findFirst();
             if (matchingAction.isPresent()) {
-                actionClasses.add(matchingAction.get());
-                log.trace("Found action class {}", workflowValue);
+                workflowActions.add(new WorkflowAction(config, matchingAction.get(), parameters));
+                log.trace("Found action class {}", workflowName);
             } else {
-                unknownActions.add(workflowValue);
+                unknownActions.add(workflowName);
             }
         }
     }
 
-    public List<Class<? extends BaseAction>> getActionClasses() {
-        return actionClasses;
+    public List<WorkflowAction> getWorkflowActions() {
+        return workflowActions;
     }
 
     public Map<String, String> getConfigValues() {
@@ -110,7 +114,7 @@ public class WorkflowValuesParser {
         Set<String> jenkinsParameterConfigValues = new HashSet<>();
         for (int i = 1; i < jenkinsJobPieces.length; i++) {
             String jenkinsParameter = jenkinsJobPieces[i];
-            String[] jenkinsParameterPieces = jenkinsParameter.split("=");
+            String[] jenkinsParameterPieces = StringUtils.splitOnlyOnce(jenkinsParameter, "=");
             if (jenkinsParameterPieces.length != 2) {
                 continue;
             }
