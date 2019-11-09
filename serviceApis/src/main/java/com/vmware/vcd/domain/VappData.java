@@ -2,15 +2,13 @@ package com.vmware.vcd.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.exception.FatalException;
 
 public class VappData {
 
-    private List<QueryResultVappType> ownedVapps;
+    private List<QueryResultVappType> vapps;
 
     private QueryResultVappType selectedVapp;
 
@@ -21,15 +19,15 @@ public class VappData {
     private int testbedTemplateVmCount;
 
     public VappData () {
-        this.ownedVapps = new ArrayList<>();
+        this.vapps = new ArrayList<>();
     }
 
-    public void setOwnedVapps(List<QueryResultVappType> ownedVapps) {
-        this.ownedVapps = ownedVapps;
+    public void setVapps(List<QueryResultVappType> vapps) {
+        this.vapps = vapps;
     }
 
-    public List<QueryResultVappType> getOwnedVapps() {
-        return ownedVapps;
+    public List<QueryResultVappType> getVapps() {
+        return vapps;
     }
 
     public void setSelectedVapp(QueryResultVappType selectedVapp) {
@@ -40,30 +38,31 @@ public class VappData {
         return selectedVapp;
     }
 
-    public List<String> ownedVappLabels() {
-        List<String> values = ownedVapps.stream().map(QueryResultVappType::getLabel).collect(Collectors.toList());
+    public List<String> vappLabels() {
+        List<String> values = vapps.stream()
+                .map(QueryResultVappType::getLabel).collect(Collectors.toList());
         values.add("None");
         return values;
     }
 
     public int poweredOnVmCount() {
-        return getOwnedVapps().stream()
+        return getVapps().stream().filter(QueryResultVappType::isOwnedByWorkflowUser)
                 .map(QueryResultVappType::poweredOnVmCount).reduce(Integer::sum).orElse(0);
     }
 
     public void setSelectedVappByIndex(int index) {
-        if (index < ownedVapps.size()) {
-            this.setSelectedVapp(ownedVapps.get(index));
+        if (index < vapps.size()) {
+            this.setSelectedVapp(vapps.get(index));
         }
     }
 
     public void setSelectedVappByName(String name) {
-        List<String> vappNames = ownedVapps.stream().map(vapp -> vapp.name).collect(Collectors.toList());
+        List<String> vappNames = vapps.stream().map(vapp -> vapp.name).collect(Collectors.toList());
         int vappIndex = vappNames.indexOf(name);
         if (vappIndex == -1) {
             throw new FatalException("Vapp name {} not found in vapp list {}", name, vappNames.toString());
         }
-        setSelectedVapp(ownedVapps.get(vappIndex));
+        setSelectedVapp(vapps.get(vappIndex));
     }
 
     public int getTestbedTemplateVmCount() {

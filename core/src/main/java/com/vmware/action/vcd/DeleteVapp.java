@@ -32,7 +32,7 @@ public class DeleteVapp extends BaseSingleVappAction {
 
         log.info("Task {} created for deleting vapp {}", deleteTask.href, vappToDelete.name);
 
-        if (vcdConfig.waitForDeleteTaskCompletion) {
+        if (config.waitForBlockingWorkflowAction) {
             vcd.waitForTaskToComplete(deleteTask.href, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
         }
     }

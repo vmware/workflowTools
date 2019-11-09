@@ -33,7 +33,7 @@
     "--build-display-name",
     "--jenkins-jobs",
     "--wait-time",
-    "--wait-for-jenkins",
+    "--wait-for-action",
     "--ignore-jenkins-job-failure",
     "--job-display-names"
   ],
@@ -186,7 +186,8 @@
     "--default-vcd-org",
     "--username",
     "--vcd-api-version",
-    "--vcd-url"
+    "--vcd-url",
+    "--wait-time"
   ],
   "SetSummary": [
     "--max-summary",
@@ -202,7 +203,7 @@
     "--vcd-api-version",
     "--vcd-url",
     "--wait-time",
-    "--wait-for-vapp-delete"
+    "--wait-for-action"
   ],
   "MarkBugAsResolved": [
     "--username"
@@ -357,7 +358,8 @@
     "--username",
     "--vcd-api-version",
     "--vcd-url",
-    "--vapp-lease"
+    "--vapp-lease",
+    "--wait-time"
   ],
   "LoadVappJsonIfNeeded": [
     "--use-vapp-json"

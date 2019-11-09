@@ -13,7 +13,7 @@
   "buildwebLogFileName": "gobuilds.log",
   "logLineCount": 100,
   "jenkinsUsesCsrf": false,
-  "waitForJenkinsJobCompletion": false,
+  "waitForBlockingWorkflowAction": false,
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 10,
   "goBuildBinPath": "/build/apps/bin/gobuild",
@@ -738,7 +738,8 @@
     ],
     "selectVapp": [
       "LoadVapps",
-      "SelectVapp"
+      "SelectVapp",
+      "ExitIfNoVappSelected"
     ],
     "displayWorkflowBuildInfo": [
       "DisplayConfig",

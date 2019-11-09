@@ -64,7 +64,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private boolean waitForBuildToCompleteIfNecessary(final JobBuild newBuild) {
-        if (!jenkinsConfig.waitForJenkinsJobCompletion) {
+        if (!config.waitForBlockingWorkflowAction) {
             return true;
         }
 

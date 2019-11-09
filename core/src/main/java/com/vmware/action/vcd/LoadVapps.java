@@ -15,6 +15,6 @@ public class LoadVapps extends BaseVappAction {
     @Override
     public void process() {
         QueryResultVappsType vappRecords = serviceLocator.getVcd().getVapps();
-        vappData.setOwnedVapps(vappRecords.record);
+        vappData.setVapps(vappRecords.record);
     }
 }

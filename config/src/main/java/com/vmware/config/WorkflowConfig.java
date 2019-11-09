@@ -116,6 +116,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-sp,--specific-properties", help = "Show value for just the specified config properties")
     public String configPropertiesToDisplay;
 
+    @ConfigurableProperty(commandLine = "-wait,--wait-for-action", help = "Wait for blocking workflow action to complete")
+    public boolean waitForBlockingWorkflowAction;
+
     @ConfigurableProperty(commandLine = "--wait-time", help = "Wait time in seconds for blocking workflow action to complete.")
     public int waitTimeForBlockingWorkflowAction;
 

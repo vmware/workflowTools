@@ -18,9 +18,6 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-vm-quota", help = "User VM quota count for Vcloud Director")
     public int vcdVmQuota;
 
-    @ConfigurableProperty(commandLine = "--wait-for-vapp-delete", help = "Wait for Vapp deletion task to complete")
-    public boolean waitForDeleteTaskCompletion;
-
     @ConfigurableProperty(commandLine = "--vapp-lease", help = "Lease value in days for the selected Vapp")
     public int vappLeaseValue;
 

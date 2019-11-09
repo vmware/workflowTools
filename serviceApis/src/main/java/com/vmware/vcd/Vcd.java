@@ -1,8 +1,10 @@
 package com.vmware.vcd;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
@@ -18,6 +20,7 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
+import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
 import com.vmware.vcd.domain.ResourceType;
 import com.vmware.vcd.domain.TaskType;
@@ -60,8 +63,16 @@ public class Vcd extends AbstractRestService {
     }
 
     public QueryResultVappsType getVapps() {
-        return optimisticGet(apiUrl + "/query?type=vApp&links=true",
-                QueryResultVappsType.class, acceptHeader(QueryResultVappsType.class));
+        QueryResultVappsType vapps = optimisticGet(apiUrl + "/query?type=vApp&links=true", QueryResultVappsType.class,
+                acceptHeader(QueryResultVappsType.class));
+        if (vapps.record != null) {
+            String username = getUsername();
+            vapps.record.forEach(vapp -> vapp.setOwnedByWorkflowUser(username.equalsIgnoreCase(vapp.ownerName)));
+            Comparator<QueryResultVappType> vappSorter = Comparator.comparing(QueryResultVappType::isOwnedByWorkflowUser)
+                    .reversed().thenComparing(QueryResultVappType::getLabel);
+            vapps.record.sort(vappSorter);
+        }
+        return vapps;
     }
 
     public MetaDatasType getVappMetaData(LinkType metadataLink) {

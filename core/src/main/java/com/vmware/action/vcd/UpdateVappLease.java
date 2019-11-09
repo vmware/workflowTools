@@ -35,7 +35,7 @@ public class UpdateVappLease extends BaseSingleVappAction {
         String leaseUrl = vappData.getSelectedVapp().href + "/leaseSettingsSection/";
         Vcd vcd = serviceLocator.getVcd();
         TaskType leaseUpdateTask = vcd.updateResource(leaseUrl, leaseSection);
-        vcd.waitForTaskToComplete(leaseUpdateTask.href, 30, TimeUnit.SECONDS);
+        vcd.waitForTaskToComplete(leaseUpdateTask.href, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
         vappData.getSelectedVapp().otherAttributes.autoUndeployDate = updatedUndeployDate;
     }
 

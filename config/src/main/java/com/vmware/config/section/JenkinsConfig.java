@@ -23,9 +23,6 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
     public boolean jenkinsUsesCsrf;
 
-    @ConfigurableProperty(commandLine = "-waitForJenkins,--wait-for-jenkins", help = "Waits for jenkins job to complete, when running multiple jobs, waits for previous one to complete before starting next one")
-    public boolean waitForJenkinsJobCompletion;
-
     @ConfigurableProperty(commandLine = "-ignoreJobFailure,--ignore-jenkins-job-failure", help = "If wait for Jenkins job result is set, then ignore job failure and run the next build")
     public boolean ignoreJenkinsJobFailure;
 

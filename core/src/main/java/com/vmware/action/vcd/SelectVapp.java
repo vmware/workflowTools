@@ -14,7 +14,7 @@ public class SelectVapp extends BaseVappAction {
 
     @Override
     public String failWorkflowIfConditionNotMet() {
-        if (vappData.getOwnedVapps().isEmpty()) {
+        if (vappData.getVapps().isEmpty()) {
             return "no vapps loaded";
         }
         return super.failWorkflowIfConditionNotMet();
@@ -28,8 +28,8 @@ public class SelectVapp extends BaseVappAction {
         } else if (vappData.getSelectedVapp() != null) {
             log.info("Using already selected Vapp {}", vappData.getSelectedVapp().getLabel());
         } else {
-            int selectedVapp = InputUtils.readSelection(vappData.ownedVappLabels(),
-                    "Select Vapp (Total powered on VM count " + vappData.poweredOnVmCount() + ")");
+            int selectedVapp = InputUtils.readSelection(vappData.vappLabels(),
+                    "Select Vapp (Total powered on owned VM count " + vappData.poweredOnVmCount() + ")");
             vappData.setSelectedVappByIndex(selectedVapp);
         }
     }
