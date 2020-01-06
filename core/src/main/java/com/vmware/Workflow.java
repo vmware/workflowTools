@@ -71,6 +71,7 @@ public class Workflow {
     private WorkflowConfig config;
     private ServiceLocator serviceLocator;
     private boolean firstTime = true;
+    private boolean displayedShellInfoMessage = false;
     private String username = null;
     private String[] args;
 
@@ -81,9 +82,6 @@ public class Workflow {
         config = configParser.parseWorkflowConfig(username, args);
         username = config.username;
         serviceLocator = new ServiceLocator(config);
-        if (firstTime && config.shellMode) {
-            log.info("Running in shell mode");
-        }
         askForWorkflowIfEmpty(firstTime);
         firstTime = false;
     }
@@ -114,6 +112,7 @@ public class Workflow {
 
     private void askForWorkflowIfEmpty(boolean firstTime) {
         if (StringUtils.isNotBlank(config.workflowsToRun)) {
+            displayShellInfoMessageIfNeeded();
             return;
         }
 
@@ -121,6 +120,7 @@ public class Workflow {
     }
 
     private void askForWorkflow(boolean firstTime) {
+        displayShellInfoMessageIfNeeded();
         if (firstTime) {
             log.info("Press ENTER for getting started info");
             log.info("");
@@ -138,6 +138,13 @@ public class Workflow {
         }
         String[] workflowTextPieces = splitWorkflowTextIntoArguments(workFlowText);
         configParser.updateWithRuntimeArguments(config, workflowTextPieces);
+    }
+
+    private void displayShellInfoMessageIfNeeded() {
+        if (!displayedShellInfoMessage && config.shellMode) {
+            log.info("Running in shell mode");
+            displayedShellInfoMessage = true;
+        }
     }
 
     private String[] splitWorkflowTextIntoArguments(String workFlowText) {
