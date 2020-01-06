@@ -125,6 +125,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--ignore-unknown-actions", help = "Ignore unknown workflow actions")
     public boolean ignoreUnknownActions;
 
+    @ConfigurableProperty(commandLine = "-s,--shell", help = "Run workflow in shell mode, will allow additional commands to be run")
+    public boolean shellMode;
+
     @Expose(serialize = false, deserialize = false)
     private WorkflowFields configurableFields;
 
@@ -184,7 +187,7 @@ public class WorkflowConfig {
      * Set separate to other git config values as it shouldn't override a specific workflow file configuration.
      */
     public void setGitRemoteUrlAsReviewBoardRepo(String gitRemoteValue) {
-        if (StringUtils.isBlank(gitRemoteValue)) {
+        if (StringUtils.isEmpty(gitRemoteValue)) {
             return;
         }
 
@@ -207,7 +210,7 @@ public class WorkflowConfig {
 
     public CalculatedProperty valueForField(WorkflowField matchingField) {
         ConfigurableProperty configurableProperty = matchingField.configAnnotation();
-        if (StringUtils.isBlank(configurableProperty.methodNameForValueCalculation())) {
+        if (StringUtils.isEmpty(configurableProperty.methodNameForValueCalculation())) {
             Object value = matchingField.getValue(this);
             return new CalculatedProperty(value, configurableFields.getFieldValueSource(matchingField.getName()));
         }

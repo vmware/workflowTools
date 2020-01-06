@@ -32,7 +32,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private void askForJenkinsJobKeysIfBlank() {
-        if (StringUtils.isNotBlank(jenkinsConfig.jenkinsJobsToUse)) {
+        if (StringUtils.isNotEmpty(jenkinsConfig.jenkinsJobsToUse)) {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");

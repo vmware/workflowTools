@@ -10,6 +10,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.Vcd;
 import com.vmware.vcd.domain.LeaseSection;
+import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.TaskType;
 
 @ActionDescription("Updates a Vapp runtime lease")
@@ -32,9 +33,9 @@ public class UpdateVappLease extends BaseSingleVappAction {
         Date updatedUndeployDate = new Date(new Date().getTime() + leaseInMilliseconds);
         log.info("Runtime lease will be updated to {}", updatedUndeployDate);
 
-        String leaseUrl = vappData.getSelectedVapp().href + "/leaseSettingsSection/";
+        String leaseUrl = vappData.getSelectedVapp().getSelfLink().href + "/leaseSettingsSection/";
         Vcd vcd = serviceLocator.getVcd();
-        TaskType leaseUpdateTask = vcd.updateResource(leaseUrl, leaseSection);
+        TaskType leaseUpdateTask = vcd.updateResource(new LinkType(leaseUrl), leaseSection);
         vcd.waitForTaskToComplete(leaseUpdateTask.href, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
         vappData.getSelectedVapp().otherAttributes.autoUndeployDate = updatedUndeployDate;
     }
@@ -56,10 +57,9 @@ public class UpdateVappLease extends BaseSingleVappAction {
     }
 
     private TimeUnit timeUnitForSelection(int value) {
-        switch (value) {
-        case 0:
+        if (value == 0) {
             return TimeUnit.DAYS;
-        default:
+        } else {
             return TimeUnit.HOURS;
         }
     }

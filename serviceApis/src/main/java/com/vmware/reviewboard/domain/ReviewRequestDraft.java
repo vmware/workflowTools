@@ -28,8 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.vmware.util.StringUtils.appendCsvValue;
-import static com.vmware.util.StringUtils.isBlank;
-import static com.vmware.util.StringUtils.isNotBlank;
+import static com.vmware.util.StringUtils.isEmpty;
+import static com.vmware.util.StringUtils.isNotEmpty;
 import static com.vmware.util.StringUtils.pluralize;
 import static com.vmware.util.StringUtils.truncateStringIfNeeded;
 import static com.vmware.util.UrlUtils.addRelativePaths;
@@ -84,8 +84,6 @@ public class ReviewRequestDraft extends BaseEntity {
     public String draftPatchData;
     @Expose(serialize = false, deserialize = false)
     public Set<String> extraTargetGroupsToAdd = new TreeSet<>();
-    @Expose(serialize = false, deserialize = false)
-    public String vappJsonForJenkinsJob;
 
     /**
      * Boolean object as review board 1.7 treats any value for isPublic as true.
@@ -149,17 +147,17 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public void fillValuesFromCommitText(String commitText, CommitConfig commitConfig) {
-        if (isBlank(commitText)) {
+        if (isEmpty(commitText)) {
             log.warn("Text is blank, can't extract commit values!");
             return;
         }
         this.perforceChangelistId = parseSingleLineFromText(commitText, "^Change\\s+(\\d+)", "Perforce Changelist Id", DEBUG);
-        if (isNotBlank(perforceChangelistId)) {
+        if (isNotEmpty(perforceChangelistId)) {
             log.debug("Matched first line of perforce changelist, id was {}", perforceChangelistId);
             commitText = commitText.substring(commitText.indexOf('\n')).trim();
         } else {
             this.perforceChangelistId = parseSingleLineFromText(commitText, "\\[git-p4:\\s+depot-paths.+?change\\s+=\\s+(\\d+)\\]", "Git P4 Changelist Id", DEBUG);
-            if (isBlank(this.perforceChangelistId)) {
+            if (isEmpty(this.perforceChangelistId)) {
                 this.perforceChangelistId = parseSingleLineFromText(commitText, "^\\s*Change:\\s*(\\d+)", "Git Fusion Changelist Id", DEBUG);
             }
         }
@@ -168,7 +166,7 @@ public class ReviewRequestDraft extends BaseEntity {
         this.authorName = parseSingleLineFromText(commitText, "^Author:\\s+(.+) <", "Git Commit Author Name", DEBUG);
         this.authorEmail = parseSingleLineFromText(commitText, "^Author:.+<(.+)>", "Git Commit Author Email", DEBUG);
         String commitDateAsString = parseSingleLineFromText(commitText, "^Date:\\s+(.+)", "Git Commit Date", DEBUG);
-        if (isNotBlank(commitDateAsString)) {
+        if (isNotEmpty(commitDateAsString)) {
             commitText = commitText.substring(commitText.indexOf(commitDateAsString) + commitDateAsString.length());
             this.commitDate = DateUtils.parseDate(commitDateAsString);
         }
@@ -208,7 +206,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public boolean hasBugNumber(String noBugNumberLabel) {
-        return isNotBlank(bugNumbers) && !bugNumbers.equals(noBugNumberLabel);
+        return isNotEmpty(bugNumbers) && !bugNumbers.equals(noBugNumberLabel);
     }
 
     public boolean isTrivialCommit(String trivialReviewerLabel) {
@@ -310,7 +308,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public void updateTargetGroupsIfNeeded(String[] targetGroupsArray) {
-        if (StringUtils.isNotBlank(this.targetGroups)) { // added from draft
+        if (StringUtils.isNotEmpty(this.targetGroups)) { // added from draft
             return;
         }
 
@@ -354,7 +352,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public boolean hasReviewers() {
-        return isNotBlank(reviewedBy);
+        return isNotEmpty(reviewedBy);
     }
 
     /**
@@ -362,11 +360,11 @@ public class ReviewRequestDraft extends BaseEntity {
      */
     public boolean hasData() {
         boolean hasData = false;
-        hasData = isNotBlank(summary);
-        hasData = isNotBlank(description) || hasData;
-        hasData = isNotBlank(testingDone) || hasData;
+        hasData = isNotEmpty(summary);
+        hasData = isNotEmpty(description) || hasData;
+        hasData = isNotEmpty(testingDone) || hasData;
         hasData = !jobBuilds.isEmpty() || hasData;
-        hasData = isNotBlank(bugNumbers) || hasData;
+        hasData = isNotEmpty(bugNumbers) || hasData;
         hasData = hasReviewers() || hasData;
         hasData = hasReviewNumber() || hasData;
         return hasData;
@@ -380,23 +378,23 @@ public class ReviewRequestDraft extends BaseEntity {
         StringBuilder builder = new StringBuilder();
         builder.append(summary).append("\n\n");
 
-        if (isNotBlank(description)) {
+        if (isNotEmpty(description)) {
             builder.append(description).append("\n");
         }
         String testingDoneSection = fullTestingDoneSection(includeJobResults);
-        if (isNotBlank(testingDoneSection)) {
+        if (isNotEmpty(testingDoneSection)) {
             builder.append("\n").append(commitConfig.getTestingDoneLabel()).append(testingDoneSection);
         }
-        if (isNotBlank(bugNumbers)) {
+        if (isNotEmpty(bugNumbers)) {
             builder.append("\n").append(commitConfig.getBugNumberLabel()).append(bugNumbers);
         }
-        if (isNotBlank(reviewedBy)) {
+        if (isNotEmpty(reviewedBy)) {
             builder.append("\n").append(commitConfig.getReviewedByLabel()).append(reviewedBy);
         }
         if (hasReviewNumber()) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel())
                     .append(addRelativePaths(commitConfig.getReviewboardUrl(), "r", id));
-        } else if (isNotBlank(id)) {
+        } else if (isNotEmpty(id)) {
             builder.append("\n").append(commitConfig.getReviewUrlLabel()).append(id);
         }
         if (mergeToValues.length == 0 && commitConfig.getMergeToValues() != null) {
@@ -405,7 +403,7 @@ public class ReviewRequestDraft extends BaseEntity {
         for (String mergeToValue : mergeToValues) {
             builder.append("\n").append(commitConfig.getMergeToLabel()).append(mergeToValue);
         }
-        if (isNotBlank(approvedBy)) {
+        if (isNotEmpty(approvedBy)) {
             builder.append("\n").append(commitConfig.getApprovedByLabel()).append(approvedBy);
         }
         return builder.toString();
@@ -428,7 +426,7 @@ public class ReviewRequestDraft extends BaseEntity {
 
     private int parseValueFromText(String text, String pattern, String description) {
         String valueAsString = parseSingleLineFromText(text, pattern, description);
-        return isNotBlank(valueAsString) ? Integer.parseInt(valueAsString) : 0;
+        return isNotEmpty(valueAsString) ? Integer.parseInt(valueAsString) : 0;
     }
 
     private String parseSingleLineFromText(String text, String pattern, String description) {

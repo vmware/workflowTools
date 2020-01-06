@@ -6,7 +6,7 @@ import com.vmware.jenkins.Jenkins;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public abstract class BaseCommitWithJenkinsBuildsAction extends BaseCommitAction {
+public abstract class BaseCommitWithJenkinsBuildsAction extends BaseVappAction {
 
     protected Jenkins jenkins;
 

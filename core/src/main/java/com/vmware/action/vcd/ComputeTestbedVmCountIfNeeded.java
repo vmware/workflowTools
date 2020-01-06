@@ -35,7 +35,7 @@ public class ComputeTestbedVmCountIfNeeded extends BaseVappAction {
     }
 
     private int testbedTemplateVmCount() {
-        if (StringUtils.isBlank(vcdConfig.testbedTemplateDirectory)) {
+        if (StringUtils.isEmpty(vcdConfig.testbedTemplateDirectory)) {
             return 0;
         }
 
@@ -67,7 +67,7 @@ public class ComputeTestbedVmCountIfNeeded extends BaseVappAction {
             throw new FatalException("Failed to find template file {}", testbedTemplateFile.getPath());
         }
         String templateText = IOUtils.read(testbedTemplateFile);
-        int vmCount = StringUtils.occurenceCount(templateText, "\"deployment\":");
+        int vmCount = StringUtils.occurenceCount(templateText, "\"deployment\"");
         log.info("Vm count of {} for testbed template {}", vmCount, matchingParameter.get().value);
         return vmCount;
     }

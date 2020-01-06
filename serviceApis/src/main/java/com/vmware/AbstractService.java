@@ -1,6 +1,5 @@
 package com.vmware;
 
-import com.vmware.http.RequestParams;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
@@ -14,9 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Base Class for Rest and Non Rest services.
@@ -35,7 +31,7 @@ public abstract class AbstractService {
     protected Boolean connectionIsAuthenticated = null;
 
     protected AbstractService(String baseUrl, String apiPath, ApiAuthentication credentialsType, String username) {
-        if (StringUtils.isBlank(baseUrl)) {
+        if (StringUtils.isEmpty(baseUrl)) {
             throw new FatalException("No url set for service {}", this.getClass().getSimpleName());
         }
         this.baseUrl = UrlUtils.addTrailingSlash(baseUrl);
@@ -77,7 +73,7 @@ public abstract class AbstractService {
     public abstract boolean isBaseUriTrusted();
 
     public String getUsername() {
-        if (StringUtils.isBlank(username)) {
+        if (StringUtils.isEmpty(username)) {
             throw new RuntimeException("Username is empty, please set workflow config value username or git config --global user.email [your email address]");
         }
         return username;

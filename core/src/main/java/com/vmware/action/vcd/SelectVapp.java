@@ -13,19 +13,27 @@ public class SelectVapp extends BaseVappAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (vappData.getVapps().isEmpty()) {
-            return "no vapps loaded";
+    public String cannotRunAction() {
+        if (StringUtils.isNotEmpty(vcdConfig.vappJsonFile)) {
+            return "vappJsonFile has been specified";
         }
-        return super.failWorkflowIfConditionNotMet();
+        return super.cannotRunAction();
+    }
+
+    @Override
+    protected void failWorkflowIfConditionNotMet() {
+        super.failWorkflowIfConditionNotMet();
+        if (vappData.getVapps().isEmpty()) {
+            exitDueToFailureCheck("no vapps loaded");
+        }
     }
 
     @Override
     public void process() {
-        if (StringUtils.isNotBlank(vcdConfig.vappName)) {
+        if (StringUtils.isNotEmpty(vcdConfig.vappName)) {
             log.info("Using specified Vapp name {}", vcdConfig.vappName);
             vappData.setSelectedVappByName(vcdConfig.vappName);
-        } else if (vappData.getSelectedVapp() != null) {
+        } else if (!vappData.noVappSelected()) {
             log.info("Using already selected Vapp {}", vappData.getSelectedVapp().getLabel());
         } else {
             int selectedVapp = InputUtils.readSelection(vappData.vappLabels(),

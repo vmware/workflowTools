@@ -1,5 +1,7 @@
 package com.vmware.config.section;
 
+import java.util.List;
+
 import com.vmware.config.ConfigurableProperty;
 
 public class VcdConfig {
@@ -35,4 +37,10 @@ public class VcdConfig {
 
     @ConfigurableProperty(commandLine = "--vcd-tenant", help = "Name of tenant to open UI page for")
     public String vcdTenant;
+
+    @ConfigurableProperty(help = "Preset list of vapp json files")
+    public List<String> vappJsonFiles;
+
+    @ConfigurableProperty(commandLine = "--vapp-json-file", help = "Name of file to load json from")
+    public String vappJsonFile;
 }

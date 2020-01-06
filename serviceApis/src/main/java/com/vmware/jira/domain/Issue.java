@@ -2,7 +2,6 @@ package com.vmware.jira.domain;
 
 import com.vmware.IssueInfo;
 import com.vmware.config.jira.IssueTypeDefinition;
-import com.vmware.util.ArrayUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 
@@ -72,7 +71,7 @@ public class Issue implements IssueInfo {
     }
 
     public boolean isFromJira() {
-        return StringUtils.isNotBlank(key);
+        return StringUtils.isNotEmpty(key);
     }
 
     @Override

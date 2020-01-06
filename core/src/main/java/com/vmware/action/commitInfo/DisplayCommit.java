@@ -18,7 +18,7 @@ public class DisplayCommit extends BaseCommitAction {
         Padder titlePadder = new Padder("Commit Details");
         titlePadder.infoTitle();
         log.info(draft.toText(commitConfig));
-        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
             log.info("Perforce Changelist Id: {}", draft.perforceChangelistId);
         }
         titlePadder.infoTitle();

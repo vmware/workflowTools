@@ -29,17 +29,20 @@ public abstract class BaseVappAction extends BaseCommitAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (checkVappJson && StringUtils.isBlank(draft.vappJsonForJenkinsJob)) {
-            return "no Vapp json loaded";
+    protected void failWorkflowIfConditionNotMet() {
+        if (checkVappJson && vappData.noVappSelected()) {
+            exitDueToFailureCheck("no Vapp selected");
         }
-        if ((checkIfSiteSelected || checkIfSiteSelected) && vappData.getSelectedSite() == null) {
-            return "no vcd site selected";
+
+        if (checkVappJson && !vappData.jsonDataLoaded()) {
+            exitDueToFailureCheck("no Vapp json loaded");
+        }
+        if ((checkIfSiteSelected || checkIfCellSelected) && vappData.getSelectedSite() == null) {
+            exitDueToFailureCheck("no vcd site selected");
         }
         if (checkIfCellSelected && vappData.getSelectedVcdCell() == null) {
-            return "no vcd cell selected";
+            exitDueToFailureCheck("no vcd cell selected");
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     public void setVappData(VappData vappData) {
@@ -60,7 +63,7 @@ public abstract class BaseVappAction extends BaseCommitAction {
         } else if (sshConfig.useSshSite()) {
             String sshSite = sshConfig.sshSite;
             TreeMap<String, SiteConfig> sshSiteConfigs = sshConfig.sshSiteConfigs;
-            if (StringUtils.isBlank(sshSite)) {
+            if (StringUtils.isEmpty(sshSite)) {
                 sshSite = InputUtils.readValueUntilNotBlank("Ssh site", sshSiteConfigs.keySet());
             }
             if (!sshSiteConfigs.containsKey(sshSite)) {

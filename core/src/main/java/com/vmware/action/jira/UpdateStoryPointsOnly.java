@@ -39,7 +39,7 @@ public class UpdateStoryPointsOnly extends BaseBatchJiraAction {
                             , issueToUpdate.getKey(), pointsDisplayValue);
                     continue;
                 }
-                if (StringUtils.isNotBlank(projectIssues.boardId)) {
+                if (StringUtils.isNotEmpty(projectIssues.boardId)) {
                     jira.updateIssueStoryPointsUsingAgileApi(issueToUpdate, projectIssues.boardId);
                 } else {
                     jira.updateIssueStoryPointsOnly(issueToUpdate);

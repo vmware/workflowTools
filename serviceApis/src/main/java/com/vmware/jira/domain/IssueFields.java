@@ -85,7 +85,7 @@ public class IssueFields {
                 return fixVersions != null
                         ? fixVersions.stream().map(fixVersion -> fixVersion.name).collect(Collectors.toList()) : Collections.emptyList();
             case epic:
-                return StringUtils.isNotBlank(parentEpic) ? Collections.singletonList(parentEpic) : Collections.emptyList();
+                return StringUtils.isNotEmpty(parentEpic) ? Collections.singletonList(parentEpic) : Collections.emptyList();
             default:
                 throw new FatalException("No handling for filterable field " + field);
         }

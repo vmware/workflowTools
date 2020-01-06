@@ -35,7 +35,7 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (StringUtils.isBlank(reviewBoardConfig.reviewBoardRepository)) {
+        if (StringUtils.isEmpty(reviewBoardConfig.reviewBoardRepository)) {
             throw new RuntimeException("no reviewboard repository is configured, set a config value for reviewBoardRepository");
         }
         log.info("Creating new review against repository {}", reviewBoardConfig.reviewBoardRepository);

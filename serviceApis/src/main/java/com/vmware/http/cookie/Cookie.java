@@ -122,7 +122,7 @@ public class Cookie {
     }
 
     public boolean isValidForHost(String host) {
-        if (StringUtils.isBlank(domain)) {
+        if (StringUtils.isEmpty(domain)) {
             return true;
         }
 

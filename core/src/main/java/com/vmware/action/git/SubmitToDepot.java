@@ -1,6 +1,5 @@
 package com.vmware.action.git;
 
-import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -13,11 +12,10 @@ public class SubmitToDepot extends BaseCommitAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(git.configValue("git-p4.skipsubmitedit"))) {
-            return "git config value git-p4.skipsubmitedit needs to be set to true, run [git config git-p4.skipsubmitedit true]";
+    protected void failWorkflowIfConditionNotMet() {
+        if (StringUtils.isEmpty(git.configValue("git-p4.skipsubmitedit"))) {
+            exitDueToFailureCheck("git config value git-p4.skipsubmitedit needs to be set to true, run [git config git-p4.skipsubmitedit true]");
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

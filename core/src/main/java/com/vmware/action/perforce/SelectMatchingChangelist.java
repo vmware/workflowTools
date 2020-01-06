@@ -18,7 +18,7 @@ public class SelectMatchingChangelist extends BasePerforceCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }
         return super.cannotRunAction();
@@ -58,7 +58,7 @@ public class SelectMatchingChangelist extends BasePerforceCommitAction {
     }
 
     private boolean reviewNumberMatches(ReviewRequestDraft potentialMatch) {
-        if (StringUtils.isNotBlank(draft.id) && draft.id.equals(potentialMatch.id)) {
+        if (StringUtils.isNotEmpty(draft.id) && draft.id.equals(potentialMatch.id)) {
             log.info("Using changelist {} as review number {} matches commit", potentialMatch.perforceChangelistId, draft.id);
             return true;
         } else {

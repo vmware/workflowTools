@@ -88,10 +88,10 @@ public class WorkflowValuesParser {
 
     public Collection<? extends String> calculateJenkinsParameterConfigValues() {
         String jenkinsJobsToCall = configValues.get("-j");
-        if (StringUtils.isBlank(jenkinsJobsToCall)) {
+        if (StringUtils.isEmpty(jenkinsJobsToCall)) {
             jenkinsJobsToCall = configValues.get("--jenkins-jobs");
         }
-        if (StringUtils.isBlank(jenkinsJobsToCall)) {
+        if (StringUtils.isEmpty(jenkinsJobsToCall)) {
             return Collections.emptyList();
         }
         String[] jenkinsJobs = jenkinsJobsToCall.split(",");

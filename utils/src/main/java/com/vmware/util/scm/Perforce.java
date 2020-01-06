@@ -57,13 +57,13 @@ public class Perforce extends BaseScmWrapper {
             super.setWorkingDirectory(System.getProperty("user.dir"));
             return;
         }
-        if (StringUtils.isNotBlank(clientName) && StringUtils.isNotBlank(clientDirectory)) {
+        if (StringUtils.isNotEmpty(clientName) && StringUtils.isNotEmpty(clientDirectory)) {
             this.clientName = clientName;
             super.setWorkingDirectory(clientDirectory);
-        } else if (StringUtils.isNotBlank(clientName)) {
+        } else if (StringUtils.isNotEmpty(clientName)) {
             this.clientName = clientName;
             super.setWorkingDirectory(determineClientDirectoryForClientName());
-        } else if (StringUtils.isNotBlank(clientDirectory)) {
+        } else if (StringUtils.isNotEmpty(clientDirectory)) {
             super.setWorkingDirectory(clientDirectory);
         } else {
             Map<String, String> infoValues = info();
@@ -84,7 +84,7 @@ public class Perforce extends BaseScmWrapper {
 
     private List<String> getPendingChangelists(boolean includeSummary) {
         String changeListText = executeScmCommand("changes -c {} -L -s pending", getClientName());
-        if (StringUtils.isBlank(changeListText)) {
+        if (StringUtils.isEmpty(changeListText)) {
             return Collections.emptyList();
         }
         Iterator<String> changelistsIterator = asList(changeListText.split("\n")).iterator();
@@ -92,12 +92,12 @@ public class Perforce extends BaseScmWrapper {
         while (changelistsIterator.hasNext()) {
             String line = changelistsIterator.next();
             String changelist = MatcherUtils.singleMatch(line, "Change\\s+(\\d+)\\s+on");
-            if (StringUtils.isBlank(changelist)) {
+            if (StringUtils.isEmpty(changelist)) {
                 continue;
             }
             if (includeSummary) {
                 String summary = null;
-                while (changelistsIterator.hasNext() && StringUtils.isBlank(summary)) {
+                while (changelistsIterator.hasNext() && StringUtils.isEmpty(summary)) {
                     summary = changelistsIterator.next();
                 }
                 if (summary != null) {
@@ -347,7 +347,7 @@ public class Perforce extends BaseScmWrapper {
     }
 
     public String sync(List<String> filesToSync, String syncChangelistId) {
-        String syncVersion = StringUtils.isBlank(syncChangelistId) ? "" : "@" + syncChangelistId;
+        String syncVersion = StringUtils.isEmpty(syncChangelistId) ? "" : "@" + syncChangelistId;
         String fileNames = appendWithDelimiter("", filesToSync, syncVersion + " ") + syncVersion;
         return executeScmCommand("sync -f {}", fileNames);
     }
@@ -443,7 +443,7 @@ public class Perforce extends BaseScmWrapper {
             }
 
             String fullPath = fullPath(diffChange.getFirstFileAffected());
-            if (StringUtils.isNotBlank(diffChange.getPerforceChangelistId())) {
+            if (StringUtils.isNotEmpty(diffChange.getPerforceChangelistId())) {
                 log.info("Moving file {} from changelist {}", diffChange.getFirstFileAffected(),
                         diffChange.getPerforceChangelistId());
                 filesToMoveToChangelist.add(fullPath);

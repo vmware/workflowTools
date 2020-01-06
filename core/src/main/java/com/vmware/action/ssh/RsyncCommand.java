@@ -1,8 +1,6 @@
 package com.vmware.action.ssh;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Map;
 
 import com.vmware.action.base.BaseSingleVappJsonAction;
 import com.vmware.config.ActionDescription;
@@ -20,14 +18,14 @@ public class RsyncCommand extends BaseSingleVappJsonAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(sshConfig.rsyncSourcePath)) {
-            return "no rsync source path set";
+    public void failWorkflowIfConditionNotMet() {
+        super.failWorkflowIfConditionNotMet();
+        if (StringUtils.isEmpty(sshConfig.rsyncSourcePath)) {
+            exitDueToFailureCheck("no rsync source path set");
         }
-        if (StringUtils.isBlank(sshConfig.rsyncDestinationPath)) {
-            return "no rsync destination path set";
+        if (StringUtils.isEmpty(sshConfig.rsyncDestinationPath)) {
+            exitDueToFailureCheck("no rsync destination path set");
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

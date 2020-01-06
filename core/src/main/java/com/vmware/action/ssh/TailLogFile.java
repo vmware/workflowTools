@@ -12,11 +12,11 @@ public class TailLogFile extends ExecuteSshCommand {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(sshConfig.logFile)) {
-            return "no log file specified";
+    public void failWorkflowIfConditionNotMet() {
+        super.failWorkflowIfConditionNotMet();
+        if (StringUtils.isEmpty(sshConfig.logFile)) {
+            exitDueToFailureCheck("no log file specified");
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

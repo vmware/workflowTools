@@ -6,9 +6,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Sets the summary field. Replaces existing value if there is one.")
 public class SetSummary extends BaseCommitAction {
 
@@ -18,7 +15,7 @@ public class SetSummary extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isBlank(draft.summary)) {
+        if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isEmpty(draft.summary)) {
             return super.cannotRunAction();
         }
 
@@ -27,7 +24,7 @@ public class SetSummary extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (StringUtils.isNotBlank(draft.summary)) {
+        if (StringUtils.isNotEmpty(draft.summary)) {
             log.info("Existing Summary\n" + draft.summary);
         }
 

@@ -63,20 +63,29 @@ public class Workflow {
             Arrays.asList("deleteVapp", "renameVapp", "updateVappLease", "tailVappLogFile", "displayVappJson", "openVappProviderUrl")
     );
 
-    private static final String EXIT_WORKFLOW = "exit";
+    private static final String QUIT_WORKFLOW = "q";
     private final Git git = new Git();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final WorkflowConfigParser configParser = new WorkflowConfigParser();
     private List<String> workflowHistory;
     private WorkflowConfig config;
     private ServiceLocator serviceLocator;
+    private boolean firstTime = true;
+    private String username = null;
+    private String[] args;
 
     public void init(String[] args) {
+        this.args = args;
         readWorkflowHistoryFile();
 
-        config = configParser.parseWorkflowConfig(args);
+        config = configParser.parseWorkflowConfig(username, args);
+        username = config.username;
         serviceLocator = new ServiceLocator(config);
-        askForWorkflowIfEmpty();
+        if (firstTime && config.shellMode) {
+            log.info("Running in shell mode");
+        }
+        askForWorkflowIfEmpty(firstTime);
+        firstTime = false;
     }
 
     private void updateWorkflowHistoryFile() {
@@ -103,26 +112,28 @@ public class Workflow {
     }
 
 
-    private void askForWorkflowIfEmpty() {
+    private void askForWorkflowIfEmpty(boolean firstTime) {
         if (StringUtils.isNotBlank(config.workflowsToRun)) {
             return;
         }
 
-        askForWorkflow();
+        askForWorkflow(firstTime);
     }
 
-    private void askForWorkflow() {
-        log.info("Press ENTER for getting started info");
-        log.info("");
+    private void askForWorkflow(boolean firstTime) {
+        if (firstTime) {
+            log.info("Press ENTER for getting started info");
+            log.info("");
 
-        log.info("Press tab to see a list of available workflows, up to see previously entered workflows");
+            log.info("Press tab to see a list of available workflows, up to see previously entered workflows");
+        }
 
         ArgumentCompleter argumentsCompleter = createWorkflowCompleter();
 
-        String workFlowText = InputUtils.readValue("Workflow(Type " + EXIT_WORKFLOW + " to exit)",
+        String workFlowText = InputUtils.readValue("Workflow(type " + QUIT_WORKFLOW + " to quit)",
                 argumentsCompleter, workflowHistory).trim();
-        if (workFlowText.equals(EXIT_WORKFLOW)) {
-            log.info("Exiting");
+        if (workFlowText.equals(QUIT_WORKFLOW) || workFlowText.equalsIgnoreCase("exit")) {
+            log.debug("Quitting");
             System.exit(0);
         }
         String[] workflowTextPieces = splitWorkflowTextIntoArguments(workFlowText);
@@ -147,7 +158,7 @@ public class Workflow {
                 workflowTextPieces.add(quotedTextPieces[i]);
             }
         }
-        return workflowTextPieces.toArray(new String[workflowTextPieces.size()]);
+        return workflowTextPieces.toArray(new String[0]);
     }
 
     private ArgumentCompleter createWorkflowCompleter() {
@@ -167,7 +178,7 @@ public class Workflow {
                 .stream().map(workflowAction -> "!" + workflowAction.getSimpleName()).collect(Collectors.toList()));
         ImprovedStringsCompleter workflowCompleter = new ImprovedStringsCompleter(autocompleteList);
         workflowCompleter.setDelimeterText("");
-        workflowCompleter.addValue("!" + EXIT_WORKFLOW);
+        workflowCompleter.addValue("!" + QUIT_WORKFLOW);
         ArgumentCompleter workflowArgumentCompleter = new ImprovedArgumentCompleter(new CommaArgumentDelimeter(), workflowCompleter);
         workflowArgumentCompleter.setStrict(false);
 
@@ -179,7 +190,10 @@ public class Workflow {
     }
 
     public void runWorkflow() {
-        if (StringUtils.isBlank(config.workflowsToRun)) {
+        if (StringUtils.isEmpty(config.workflowsToRun) && config.shellMode) {
+            askForWorkflow(false);
+            runWorkflow();
+        } else if (StringUtils.isEmpty(config.workflowsToRun)) {
             // default workflow
             config.workflowsToRun = "intro";
         }
@@ -202,9 +216,13 @@ public class Workflow {
                 runActions(actions, new WorkflowActionValues());
                 outputTotalExecutionTime(startingDate);
             }
+            if (config.shellMode) {
+                init(args);
+                runWorkflow();
+            }
         } catch (UnknownWorkflowValueException e) {
             log.error(e.getMessage());
-            askForWorkflow();
+            askForWorkflow(true);
             runWorkflow();
         } catch (FatalException iie) {
             log.info("");
@@ -238,8 +256,8 @@ public class Workflow {
             if (runAllHelperMethods) {
                 log.info("Running asyncSetup");
                 action.asyncSetup();
-                log.info("Running failWorkflowIfConditionNotMet");
-                action.failWorkflowIfConditionNotMet();
+                log.info("Running checkIfWorkflowShouldBeFailed");
+                action.checkIfWorkflowShouldBeFailed();
                 log.info("Running cannotRunAction method");
                 action.cannotRunAction();
                 log.info("Running preprocess method");
@@ -281,7 +299,9 @@ public class Workflow {
         }
 
         WorkflowFields configurableFields = config.getConfigurableFields();
-        for (String configOption : configOptions) {
+        List<String> sortedConfigOptions = configOptions.stream().sorted().collect(Collectors.toList());
+        int counter = 0;
+        for (String configOption : sortedConfigOptions) {
             WorkflowField matchingField = configurableFields.getMatchingField(configOption);
             if (matchingField == null) {
                 log.info("{} - {}", configOption, "Unknown config option");
@@ -306,7 +326,10 @@ public class Workflow {
                 if (git.isGitInstalled()) {
                     gitConfigValue = "[" + matchingField.getName() + "]";
                 }
-                if (StringUtils.isNotBlank(matchingValueText)) {
+                if (StringUtils.isNotEmpty(matchingValueText)) {
+                    if (counter++ >= 5 && counter++ % 5 == 1) {
+                        log.info("");
+                    }
                     log.info("{}{}={} source=[{}] - {}", configOption, gitConfigValue, matchingValueText, source, matchingPropertyText);
                 }
             }
@@ -369,11 +392,7 @@ public class Workflow {
         if (reasonForNotRunningAction != null) {
             log.info("Skipping running of action {} as {}", actionName, reasonForNotRunningAction);
         } else {
-            String reasonForFailingAction = action.failWorkflowIfConditionNotMet();
-            if (reasonForFailingAction != null) {
-                log.error("Workflow failed by action {} as {}", actionName, reasonForFailingAction);
-                System.exit(1);
-            }
+            action.checkIfWorkflowShouldBeFailed();
             action.preprocess();
             action.process();
         }

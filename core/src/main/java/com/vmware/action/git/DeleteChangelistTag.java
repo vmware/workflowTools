@@ -15,7 +15,7 @@ public class DeleteChangelistTag extends BaseLinkedPerforceCommitUsingGitAction 
     @Override
     public String cannotRunAction() {
         String actionCannotBeRun = super.cannotRunAction();
-        if (StringUtils.isNotBlank(actionCannotBeRun)) {
+        if (StringUtils.isNotEmpty(actionCannotBeRun)) {
             return actionCannotBeRun;
         }
         String expectedTagName = "changeset-" + draft.perforceChangelistId;

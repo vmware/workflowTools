@@ -13,7 +13,7 @@ public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBo
 
     protected void checkShipItsForReview(ReviewRequestDraft draft) {
         // reuse the result from other actions like ExitIfReviewHasNoShipIts or CheckStatusOfReviewShipIts
-        if (StringUtils.isNotBlank(draft.shipItReviewers)) {
+        if (StringUtils.isNotEmpty(draft.shipItReviewers)) {
             return;
         }
 

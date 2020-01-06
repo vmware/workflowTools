@@ -38,6 +38,22 @@ public class VappData {
         return selectedVapp;
     }
 
+    public String getSelectedVappName() {
+        return selectedVapp != null ? selectedVapp.name : null;
+    }
+
+    public boolean noVappSelected() {
+        return selectedVapp == null;
+    }
+
+    public boolean jsonDataLoaded() {
+        return selectedVapp != null && selectedVapp.jsonDataLoaded();
+    }
+
+    public String getJsonData() {
+        return selectedVapp != null ? selectedVapp.getJsonData() : null;
+    }
+
     public List<String> vappLabels() {
         List<String> values = vapps.stream()
                 .map(QueryResultVappType::getLabel).collect(Collectors.toList());

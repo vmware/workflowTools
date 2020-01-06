@@ -8,10 +8,6 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-
 @ActionDescription("Read a review id from the user. Set that review id as the review id for the commit.")
 public class SetReviewId extends BaseCommitAction {
 
@@ -41,14 +37,14 @@ public class SetReviewId extends BaseCommitAction {
         draft.id = String.valueOf(reviewId);
         draft.reviewRequest = reviewBoard.getReviewRequestById(reviewId);
         String summary = draft.reviewRequest.summary;
-        if (StringUtils.isBlank(summary)) {
+        if (StringUtils.isEmpty(summary)) {
             try {
                 summary = reviewBoard.getReviewRequestDraft(draft.reviewRequest.getDraftLink()).summary;
             } catch (NotFoundException nfe) {
                 log.warn("Summary was blank, and no draft was present");
             }
         }
-        if (StringUtils.isNotBlank(summary)) {
+        if (StringUtils.isNotEmpty(summary)) {
             summary = " - " + summary;
         }
         log.info("Using review {}{}", reviewId, summary);

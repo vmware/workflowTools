@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -103,14 +102,14 @@ public class WorkflowFields {
         if (gitConfigValues.isEmpty()) {
             return;
         }
-        String configPrefixText = StringUtils.isBlank(configPrefix) ? "" : configPrefix + ".";
+        String configPrefixText = StringUtils.isEmpty(configPrefix) ? "" : configPrefix + ".";
         String sourceConfigProperty;
         for (WorkflowField field : configurableFields) {
             ConfigurableProperty configurableProperty = field.configAnnotation();
             String workflowConfigPropertyName = "workflow." + configPrefixText + field.getName().toLowerCase();
             String gitConfigPropertyName = configurableProperty.gitConfigProperty();
             String valueToSet;
-            if (!gitConfigPropertyName.isEmpty() && StringUtils.isBlank(configPrefix)) {
+            if (!gitConfigPropertyName.isEmpty() && StringUtils.isEmpty(configPrefix)) {
                 String valueByGitConfig = gitConfigValues.get(gitConfigPropertyName);
                 String valueByWorkflowProperty = gitConfigValues.get(workflowConfigPropertyName);
                 if (valueByGitConfig != null && valueByWorkflowProperty != null && !valueByGitConfig.equals(valueByWorkflowProperty)) {

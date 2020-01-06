@@ -31,7 +31,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
 
         String checkOutput = git.applyDiffToPerforce(perforce.getWorkingDirectory() + File.separator, diffData, true);
 
-        if (StringUtils.isNotBlank(checkOutput)) {
+        if (StringUtils.isNotEmpty(checkOutput)) {
             log.debug("Failed diff\n{}", diffData);
             throw new FatalException("Check of git diff failed!\n" + checkOutput);
         }
@@ -39,7 +39,7 @@ public class SyncChangelistWithGitDiff extends BaseLinkedPerforceCommitUsingGitA
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, gitDiffChanges);
 
         String output = git.applyDiffToPerforce(perforce.getWorkingDirectory() + File.separator, diffData, false);
-        if (StringUtils.isNotBlank(output)) {
+        if (StringUtils.isNotEmpty(output)) {
             perforce.revertChangesInPendingChangelist(draft.perforceChangelistId);
             perforce.clean();
             throw new FatalException("Unexpected output when applying git diff!\n" + output);

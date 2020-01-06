@@ -5,11 +5,9 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
-import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,7 +27,7 @@ public class DisplayConfig extends BaseAction {
         Padder titlePadder = new Padder("Workflow Configuration");
         titlePadder.infoTitle();
         List<String> specifiedPropertiesToDisplay = new ArrayList<>();
-        if (StringUtils.isNotBlank(config.configPropertiesToDisplay)) {
+        if (StringUtils.isNotEmpty(config.configPropertiesToDisplay)) {
             specifiedPropertiesToDisplay.addAll(Arrays.asList(config.configPropertiesToDisplay.split(",")));
         }
         boolean printingFirstValue = false;

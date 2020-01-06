@@ -55,6 +55,9 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--merge-to", help = "Comma separate values for merge to property")
     public String[] mergeToValues;
 
+    @ConfigurableProperty(commandLine = "--merge-to-default", help = "Default value for merge to property if none set")
+    public String mergeToDefault;
+
     @ConfigurableProperty(help = "Default value to set for topic if none entered")
     public String defaultTopic;
 

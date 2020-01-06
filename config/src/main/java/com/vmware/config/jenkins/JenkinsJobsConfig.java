@@ -3,7 +3,7 @@ package com.vmware.config.jenkins;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.scm.Git;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +126,7 @@ public class JenkinsJobsConfig {
 
     private String replaceBranchNameVariableWithValue(String paramValue) {
         paramValue = paramValue.replace(BRANCH_NAME, branchName);
-        if (StringUtils.isBlank(paramValue)) {
+        if (StringUtils.isEmpty(paramValue)) {
             paramValue = "noBranch";
         }
         return paramValue;

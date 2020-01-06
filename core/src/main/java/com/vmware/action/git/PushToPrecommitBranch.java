@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Performs a git push origin HEAD:topic/[username config property]/pre-commit -f.")
 public class PushToPrecommitBranch extends BaseAction {
 
@@ -19,7 +16,7 @@ public class PushToPrecommitBranch extends BaseAction {
     public void process() {
         String remoteBranchName = "precommit";
         String remoteBranchPath = gitRepoConfig.remoteBranches.get(remoteBranchName);
-        if (StringUtils.isBlank(remoteBranchPath)) {
+        if (StringUtils.isEmpty(remoteBranchPath)) {
             remoteBranchPath = "topic/$USERNAME/pre-commit";
         }
 

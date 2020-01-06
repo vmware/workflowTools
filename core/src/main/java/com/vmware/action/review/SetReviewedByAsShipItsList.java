@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Sets the reviewer list for the commit as the list of reviewers who have given the associated review a ship it.")
 public class SetReviewedByAsShipItsList extends BaseSetShipItReviewersList {
     public SetReviewedByAsShipItsList(WorkflowConfig config) {
@@ -17,7 +14,7 @@ public class SetReviewedByAsShipItsList extends BaseSetShipItReviewersList {
     @Override
     public void process() {
         // reuse the result from other actions like ExitIfReviewHasNoShipIts or CheckStatusOfReviewShipIts
-        if (StringUtils.isNotBlank(draft.shipItReviewers)) {
+        if (StringUtils.isNotEmpty(draft.shipItReviewers)) {
             draft.reviewedBy = draft.shipItReviewers;
             draft.shipItReviewers = null;
             return;
@@ -25,7 +22,7 @@ public class SetReviewedByAsShipItsList extends BaseSetShipItReviewersList {
 
         checkShipItsForReview(draft);
 
-        if (StringUtils.isNotBlank(draft.shipItReviewers)) {
+        if (StringUtils.isNotEmpty(draft.shipItReviewers)) {
             draft.reviewedBy = draft.shipItReviewers;
         }
     }

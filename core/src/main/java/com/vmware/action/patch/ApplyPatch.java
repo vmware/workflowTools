@@ -27,11 +27,10 @@ public class ApplyPatch extends BaseCommitAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        if (StringUtils.isBlank(draft.draftPatchData)) {
-            return "no patch data loaded";
+    protected void failWorkflowIfConditionNotMet() {
+        if (StringUtils.isEmpty(draft.draftPatchData)) {
+            exitDueToFailureCheck("no patch data loaded");
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override
@@ -74,7 +73,7 @@ public class ApplyPatch extends BaseCommitAction {
         PatchCheckResult patchCheckResult = checkIfPatchApplies(patchFile);
         String result = applyPatch(patchFile, patchCheckResult);
 
-        if (StringUtils.isBlank(result.trim())) {
+        if (StringUtils.isEmpty(result.trim())) {
             log.info("Patch successfully applied, patch is stored in workflow.patch");
         } else {
             printPatchResult(result);
@@ -116,7 +115,7 @@ public class ApplyPatch extends BaseCommitAction {
         String checkResult = patchConfig.usePatchCommand ? patch(patchFile, true) : git.applyPatchFile(patchFile, true);
         String checkCommand = patchConfig.usePatchCommand ? patchConfig.patchCommand + " --dry-run"
                 : "git apply --ignore-whitespace -3 --check";
-        if (StringUtils.isBlank(checkResult)) {
+        if (StringUtils.isEmpty(checkResult)) {
             return patchConfig.usePatchCommand ? PatchCheckResult.applyPatchUsingPatchCommand :
                     PatchCheckResult.applyPatchUsingGitApply;
         }

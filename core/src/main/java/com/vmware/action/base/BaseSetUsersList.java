@@ -56,7 +56,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
             log.info("After entering 3 characters, reviewboard is searched for a user");
         }
         String users = InputUtils.readValue(userDescription, argumentCompleter);
-        String existingUsers = addToReviewerList && StringUtils.isNotBlank(draft.reviewedBy) ? existingUserTest + "," : "";
+        String existingUsers = addToReviewerList && StringUtils.isNotEmpty(draft.reviewedBy) ? existingUserTest + "," : "";
         return generateUserList(existingUsers + users);
     }
 
@@ -148,7 +148,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
 
         @Override
         public int complete(String buffer, int cursor, List<CharSequence> candidates) {
-            if (StringUtils.isBlank(buffer)) {
+            if (StringUtils.isEmpty(buffer)) {
                 return super.complete(buffer, cursor, candidates);
             }
             values.addAll(valuesShownWhenNoBuffer);

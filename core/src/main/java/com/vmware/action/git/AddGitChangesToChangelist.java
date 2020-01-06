@@ -17,7 +17,7 @@ public class AddGitChangesToChangelist extends BasePerforceCommitAction {
                 gitRepoConfig.trackingBranchPath());
         git.addChangesToDefaultChangelist(gitRepoConfig.trackingBranchPath());
 
-        if (StringUtils.isBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isEmpty(draft.perforceChangelistId)) {
             log.warn("No changelist associated with commit, leaving changes in default changelist");
             return;
         }

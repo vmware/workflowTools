@@ -26,7 +26,7 @@ public class RenameVapp extends BaseSingleVappAction {
         vappTypeForUpdate.description = "Updated by workflows tools on " + new Date().toString();
 
         Vcd vcd = serviceLocator.getVcd();
-        TaskType updatedVappTask = vcd.updateResource(vappData.getSelectedVapp().href, vappTypeForUpdate);
+        TaskType updatedVappTask = vcd.updateResource(vappData.getSelectedVapp().getSelfLink(), vappTypeForUpdate);
         vcd.waitForTaskToComplete(updatedVappTask.href, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
         vappData.getSelectedVapp().name = newName;
     }

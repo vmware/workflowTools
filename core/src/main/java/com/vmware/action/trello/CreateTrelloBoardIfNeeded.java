@@ -27,7 +27,7 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
     public void process() {
         String boardName = projectIssues.projectName;
 
-        if (StringUtils.isBlank(boardName)) {
+        if (StringUtils.isEmpty(boardName)) {
             boardName = InputUtils.readValueUntilNotBlank("Enter trello board name");
         }
 

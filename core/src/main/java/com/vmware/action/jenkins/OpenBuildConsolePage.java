@@ -7,7 +7,7 @@ import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.BrowserUtils;
+import com.vmware.util.SystemUtils;
 import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Opens the console web page for a Jenkins Build")
@@ -24,14 +24,14 @@ public class OpenBuildConsolePage extends BaseCommitWithJenkinsBuildsAction {
         if (matchingBuilds.size() == 1) {
             log.info("Opening build {} as it is the only Jenkins build", matchingBuilds.get(0).buildDisplayName);
             String consoleUrl = matchingBuilds.get(0).url + "/console";
-            BrowserUtils.openUrl(consoleUrl);
+            SystemUtils.openUrl(consoleUrl);
         } else {
             List<String> choices = new ArrayList<>();
             matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.buildDisplayName));
             int selection = InputUtils.readSelection(choices, "Select jenkins builds to open console web page for");
 
             String consoleUrl = matchingBuilds.get(selection).url + "/console";
-            BrowserUtils.openUrl(consoleUrl);
+            SystemUtils.openUrl(consoleUrl);
         }
     }
 }

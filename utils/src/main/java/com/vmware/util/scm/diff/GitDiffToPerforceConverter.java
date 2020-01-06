@@ -189,7 +189,7 @@ public class GitDiffToPerforceConverter implements DiffConverter {
                 if (!filesListToCheck.isEmpty()) {
                     filesListToCheck += " ";
                 }
-                String fileVersion = StringUtils.isNotBlank(lastSubmittedChangelist) ? "@" + lastSubmittedChangelist : "";
+                String fileVersion = StringUtils.isNotEmpty(lastSubmittedChangelist) ? "@" + lastSubmittedChangelist : "";
                 filesListToCheck += format("%s%s", depotFileToCheck, fileVersion);
             }
             String depotFilesInfo = perforce.getFileInfo(filesListToCheck);

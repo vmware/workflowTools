@@ -14,12 +14,8 @@ public class ReadLastCommit extends BaseCommitAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        String reasonForFailing = gitRepoOrPerforceClientCannotBeUsed();
-        if (StringUtils.isNotBlank(reasonForFailing)) {
-            return reasonForFailing;
-        }
-        return super.failWorkflowIfConditionNotMet();
+    protected void failWorkflowIfConditionNotMet() {
+        failIfGitRepoOrPerforceClientCannotBeUsed();
     }
 
     @Override

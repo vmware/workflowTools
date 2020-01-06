@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Exits if a non trivial review does not have review ship its or a review URL.")
 public class ExitIfReviewHasNoShipIts extends BaseSetShipItReviewersList {
 
@@ -19,7 +16,7 @@ public class ExitIfReviewHasNoShipIts extends BaseSetShipItReviewersList {
     public void process() {
         checkShipItsForReview(draft);
 
-        if (StringUtils.isNotBlank(draft.shipItReviewers)) {
+        if (StringUtils.isNotEmpty(draft.shipItReviewers)) {
             return;
         }
 

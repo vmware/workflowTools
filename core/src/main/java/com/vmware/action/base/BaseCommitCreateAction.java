@@ -12,12 +12,8 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        String reasonForFailing = gitRepoOrPerforceClientCannotBeUsed();
-        if (StringUtils.isNotBlank(reasonForFailing)) {
-            return reasonForFailing;
-        }
-        return super.failWorkflowIfConditionNotMet();
+    protected void failWorkflowIfConditionNotMet() {
+        failIfGitRepoOrPerforceClientCannotBeUsed();
     }
 
     @Override
@@ -33,7 +29,7 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
         String description = draft.toText(commitConfig);
         if (git.workingDirectoryIsInGitRepo()) {
             commitUsingGit(description);
-        } else if (StringUtils.isNotBlank(perforceClientConfig.perforceClientName)) {
+        } else if (StringUtils.isNotEmpty(perforceClientConfig.perforceClientName)) {
             commitUsingPerforce(description);
         }
     }

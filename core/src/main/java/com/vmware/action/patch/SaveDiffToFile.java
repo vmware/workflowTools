@@ -17,7 +17,7 @@ public class SaveDiffToFile extends BasePerforceCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isBlank(draft.draftPatchData)) {
+        if (StringUtils.isEmpty(draft.draftPatchData)) {
             return "no patch data to save";
         }
         return super.cannotRunAction();
@@ -26,7 +26,7 @@ public class SaveDiffToFile extends BasePerforceCommitAction {
     @Override
     public void process() {
         String changelistIdToUse = determineChangelistIdToUse();
-        String outputFilePath = StringUtils.isNotBlank(patchConfig.outputFileForContent) ? patchConfig.outputFileForContent
+        String outputFilePath = StringUtils.isNotEmpty(patchConfig.outputFileForContent) ? patchConfig.outputFileForContent
                 : "workflowPatch.patch";
         String content = perforce.diffChangelistInGitFormat(changelistIdToUse, LogLevel.TRACE);
         File outputFile = new File(outputFilePath);

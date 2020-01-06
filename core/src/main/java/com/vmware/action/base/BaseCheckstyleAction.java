@@ -30,11 +30,11 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isBlank(checkstyleConfig.checkstyleJarPath)) {
+        if (StringUtils.isEmpty(checkstyleConfig.checkstyleJarPath)) {
             return "checkstyleJarPath is not set";
-        } else if (StringUtils.isBlank(checkstyleConfig.checkstyleConfigXmlPath)) {
+        } else if (StringUtils.isEmpty(checkstyleConfig.checkstyleConfigXmlPath)) {
             return "checkstyleConfigXmlPath is not set";
-        } else if (StringUtils.isBlank(checkstyleConfig.checkstyleSuppressionsXmlPath)) {
+        } else if (StringUtils.isEmpty(checkstyleConfig.checkstyleSuppressionsXmlPath)) {
             return "checkstyleSuppressionsXmlPath is not set";
         } else {
             return super.cannotRunAction();
@@ -62,7 +62,7 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
         for (String filePath : filePathsToCheck) {
             fileCheckText = appendWithDelimiter(fileCheckText, filePath, " ");
         }
-        if (StringUtils.isBlank(fileCheckText)) {
+        if (StringUtils.isEmpty(fileCheckText)) {
             log.info("No files need to be checked for checkstyle errors");
             return;
         }

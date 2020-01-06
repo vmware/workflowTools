@@ -6,8 +6,6 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-
 import static com.vmware.util.StringUtils.appendCsvValue;
 
 @ActionDescription("Sets the bug number without showing assigned issues in Jira.")
@@ -19,7 +17,7 @@ public class SetBugNumbersOffline extends BaseCommitReadAction {
 
     @Override
     public void process() {
-        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
+        if (StringUtils.isNotEmpty(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
             log.info("");
             log.info("Existing Bug Numbers: {}", draft.bugNumbers);
         }

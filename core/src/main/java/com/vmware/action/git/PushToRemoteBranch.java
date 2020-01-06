@@ -5,9 +5,6 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @ActionDescription("Performs a git push origin HEAD:[remote branch path] -f.")
 public class PushToRemoteBranch extends BaseAction {
 
@@ -19,7 +16,7 @@ public class PushToRemoteBranch extends BaseAction {
     public void process() {
         String remoteBranchName = gitRepoConfig.remoteBranchToUse;
         String remoteBranchPath = gitRepoConfig.remoteBranches.get(remoteBranchName);
-        if (StringUtils.isBlank(remoteBranchPath)) {
+        if (StringUtils.isEmpty(remoteBranchPath)) {
             log.info("{} did not match any predefined remote branch names {}.", remoteBranchName, gitRepoConfig.remoteBranches.keySet().toString());
             log.info("Assuming that it is a valid remote branch path.");
             remoteBranchPath = remoteBranchName;

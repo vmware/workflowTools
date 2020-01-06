@@ -6,7 +6,7 @@ import com.vmware.util.StringUtils;
 
 import java.util.TreeMap;
 
-import static com.vmware.util.StringUtils.isBlank;
+import static com.vmware.util.StringUtils.isEmpty;
 
 public class SshConfig {
 
@@ -19,7 +19,7 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--ssh-host", help = "Ssh host to use")
     public String sshHost;
 
-    @ConfigurableProperty(commandLine = "--ssh-port", help = "Ssh port to use, no need to set if using port 22")
+    @ConfigurableProperty(commandLine = "--ssh-port", help = "Ssh port to use")
     public int sshPort;
 
     @ConfigurableProperty(commandLine = "--ssh-username", help = "Ssh username to use")
@@ -60,7 +60,7 @@ public class SshConfig {
     }
 
     public boolean useSshSite() {
-        if (StringUtils.isNotBlank(sshSite)) {
+        if (StringUtils.isNotEmpty(sshSite)) {
             return true;
         }
         boolean sitesExist = sshSiteConfigs != null && !sshSiteConfigs.isEmpty();
@@ -68,6 +68,6 @@ public class SshConfig {
     }
 
     private boolean noCommandLineSiteValues() {
-        return isBlank(sshHost) && isBlank(sshUsername) && isBlank(sshPassword);
+        return isEmpty(sshHost) && isEmpty(sshUsername) && isEmpty(sshPassword);
     }
 }

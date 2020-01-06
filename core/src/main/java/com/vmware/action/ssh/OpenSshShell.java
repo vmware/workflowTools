@@ -7,9 +7,11 @@ import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.vmware.action.base.BaseVappAction;
+import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 
+@ActionDescription("Opems a ssh shell using the specified ssh site config.")
 public class OpenSshShell extends BaseVappAction {
 
     public OpenSshShell(WorkflowConfig config) {

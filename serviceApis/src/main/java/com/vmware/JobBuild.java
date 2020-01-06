@@ -4,13 +4,14 @@ import com.google.gson.annotations.Expose;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.exception.FatalException;
 
 import java.util.Arrays;
 
 public class JobBuild {
     @Expose(serialize = false, deserialize = false)
     public String buildDisplayName;
-    public int number;
+    public Integer number;
     public String url;
     @Expose(serialize = false, deserialize = false)
     public BuildResult result;
@@ -21,6 +22,8 @@ public class JobBuild {
         this.buildDisplayName = buildDisplayName;
         this.url = url;
         this.result = result;
+        String foundNumber = MatcherUtils.singleMatch(this.url, ".+/(\\d+)/*");
+        this.number = foundNumber != null ? Integer.parseInt(foundNumber) : null;
     }
 
     public JobBuild(final int number, final String baseUrl, BuildResult result) {
@@ -66,7 +69,20 @@ public class JobBuild {
         return buildInfo;
     }
 
+    public void updateBuildNumber(int newBuildNumber) {
+        if (number == null) {
+            throw new FatalException("No build number found in url " + url);
+        }
+        this.url = this.url.replace(String.valueOf(number), String.valueOf(newBuildNumber));
+        this.number = newBuildNumber;
+        this.result = null;
+    }
+
     private String fullUrl(String path) {
         return UrlUtils.addTrailingSlash(url) + path;
+    }
+
+    public Integer getNumber() {
+        return number;
     }
 }

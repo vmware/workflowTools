@@ -13,6 +13,6 @@ public class CustomField {
             return false;
         }
 
-        return StringUtils.isNotBlank(statFieldValue.text);
+        return StringUtils.isNotEmpty(statFieldValue.text);
     }
 }

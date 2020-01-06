@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.vmware.jira.domain.FilterableIssueField.epic;
@@ -38,7 +37,7 @@ public class LoadIssues extends BaseBatchJiraAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isBlank(projectIssues.boardId)) {
+        if (StringUtils.isEmpty(projectIssues.boardId)) {
             return "no JIRA board selected";
         }
         return super.cannotRunAction();

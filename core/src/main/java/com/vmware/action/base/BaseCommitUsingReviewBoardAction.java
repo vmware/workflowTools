@@ -7,7 +7,6 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.ReviewBoard;
-import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
@@ -30,11 +29,10 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
+    protected void failWorkflowIfConditionNotMet() {
         if (reviewBoardException != null) {
             throw reviewBoardException;
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override
@@ -48,7 +46,7 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
     }
 
     protected String determineSubmittedRef() {
-        if (StringUtils.isBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isEmpty(draft.perforceChangelistId)) {
             return "ref " + git.revParse("head");
         }
 

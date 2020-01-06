@@ -8,7 +8,6 @@ import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,7 +64,7 @@ public class RequestParams {
     }
 
     public void addStatefulParamsFromUrlFragment(String urlFragment) {
-        if (StringUtils.isBlank(urlFragment)) {
+        if (StringUtils.isEmpty(urlFragment)) {
             return;
         }
 

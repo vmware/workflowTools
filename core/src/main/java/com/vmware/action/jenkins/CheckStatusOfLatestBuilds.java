@@ -32,7 +32,7 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
 
     @Override
     public void process() {
-        if (StringUtils.isBlank(jenkinsConfig.jenkinsJobsToUse)) {
+        if (StringUtils.isEmpty(jenkinsConfig.jenkinsJobsToUse)) {
             jenkinsConfig.jenkinsJobsToUse = InputUtils.readValueUntilNotBlank("Enter jobs");
         }
 

@@ -12,7 +12,6 @@ import java.util.Objects;
 
 import static com.vmware.util.scm.FileChangeType.added;
 import static com.vmware.util.scm.FileChangeType.copied;
-import static com.vmware.util.scm.FileChangeType.deleted;
 import static com.vmware.util.scm.FileChangeType.addedAndModified;
 import static com.vmware.util.scm.FileChangeType.renamed;
 import static com.vmware.util.scm.FileChangeType.renamedAndModified;
@@ -212,13 +211,13 @@ public class FileChange {
                 break;
             case added:
             case addedAndModified:
-                if (StringUtils.isBlank(fileMode)) {
+                if (StringUtils.isEmpty(fileMode)) {
                     throw new RuntimeException("Expected to find file mode for new file " + bFile);
                 }
                 header += "\nnew file mode " + fileMode;
                 break;
             case deleted:
-                if (StringUtils.isNotBlank(fileMode)) {
+                if (StringUtils.isNotEmpty(fileMode)) {
                     header += "\ndeleted file mode " + fileMode;
                 } else {
                     log.debug("No deleted file mode found for file {}", aFile);

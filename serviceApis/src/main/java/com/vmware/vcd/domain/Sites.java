@@ -27,7 +27,11 @@ public class Sites {
 
         public Deployment deployment;
 
-        public OsCredentials osCredentials;
+        public Credentials credentials;
+
+        public Credentials osCredentials;
+
+        public Credentials cliCredentials;
 
         @Override
         public String getLabel() {
@@ -39,10 +43,15 @@ public class Sites {
         public OvfProperties ovfProperties;
     }
 
-    public class OsCredentials {
+    public class Credentials {
         public String username;
 
         public String password;
+
+        @Override
+        public String toString() {
+            return username + " / " + password;
+        }
     }
 
     public class OvfProperties {

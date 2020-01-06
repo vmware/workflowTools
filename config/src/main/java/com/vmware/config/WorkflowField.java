@@ -26,7 +26,7 @@ public class WorkflowField {
 
     public Object determineValue(Object value) {
         Class fieldType = field.getType();
-        if ((value == null || StringUtils.isBlank(String.valueOf(value))) && (fieldType == Boolean.class || fieldType == boolean.class)) {
+        if ((value == null || StringUtils.isEmpty(String.valueOf(value))) && (fieldType == Boolean.class || fieldType == boolean.class)) {
             return Boolean.TRUE;
         } else if (value == null) {
             return null;

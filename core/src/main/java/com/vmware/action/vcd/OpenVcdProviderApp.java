@@ -1,11 +1,9 @@
 package com.vmware.action.vcd;
 
-import com.google.gson.Gson;
 import com.vmware.action.base.BaseSingleVappJsonAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.util.BrowserUtils;
+import com.vmware.util.SystemUtils;
 import com.vmware.vcd.domain.Sites;
 
 @ActionDescription("Opens the specified vcd provider endpoint in the Vapp Json")
@@ -18,7 +16,7 @@ public class OpenVcdProviderApp extends BaseSingleVappJsonAction {
     @Override
     public void process() {
         String uiUrl = uiUrl() + "/provider";
-        BrowserUtils.openUrl(uiUrl);
+        SystemUtils.openUrl(uiUrl);
     }
 
     protected String uiUrl() {

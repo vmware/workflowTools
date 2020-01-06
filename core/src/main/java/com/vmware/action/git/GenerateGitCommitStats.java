@@ -31,13 +31,12 @@ public class GenerateGitCommitStats extends BaseAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
+    protected void failWorkflowIfConditionNotMet() {
         CommitStatsConfig statsConfig = this.statsConfig;
         if (statsConfig.fileCountRanges.length != statsConfig.lineCountRanges.length) {
-            return "fileCountRanges " + Arrays.toString(statsConfig.fileCountRanges)
-                    + " must be the same length as lineCountRanges " + Arrays.toString(statsConfig.lineCountRanges);
+            exitDueToFailureCheck("fileCountRanges " + Arrays.toString(statsConfig.fileCountRanges)
+                    + " must be the same length as lineCountRanges " + Arrays.toString(statsConfig.lineCountRanges));
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override
@@ -68,12 +67,12 @@ public class GenerateGitCommitStats extends BaseAction {
         log.info("Read {} commits from repo {} since date {}", commitsSinceDate.size() - 1,
                 git.getRootDirectory().getPath(), oldestDateToCheckAgainst.toString());
         for (String commitText: commitsSinceDate) {
-            if (StringUtils.isBlank(commitText)) {
+            if (StringUtils.isEmpty(commitText)) {
                 continue;
             }
             ReviewRequestDraft draft = new ReviewRequestDraft(commitText, commitConfig);
             String authorEmail = draft.authorEmail;
-            if (StringUtils.isBlank(authorEmail)) {
+            if (StringUtils.isEmpty(authorEmail)) {
                 continue;
             }
             numberOfCommitsChecked++;
@@ -95,10 +94,10 @@ public class GenerateGitCommitStats extends BaseAction {
             if (!draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
                 incrementCount(authorEmail, noBugNumberCounts);
             }
-            if (StringUtils.isBlank(draft.testingDone) || !draft.testingDone.contains("\n")) {
+            if (StringUtils.isEmpty(draft.testingDone) || !draft.testingDone.contains("\n")) {
                 incrementCount(authorEmail, onelineTestingDoneCounts);
             }
-            if (StringUtils.isBlank(draft.testingDone) || draft.testingDone.length() < 40) {
+            if (StringUtils.isEmpty(draft.testingDone) || draft.testingDone.length() < 40) {
                 incrementCount(authorEmail, shortTestingDoneCounts);
             }
             if ("all".equalsIgnoreCase(statsConfig.authorEmailsForCommits) || draft.matchesAuthor(statsConfig.authorEmailsForCommits)) {

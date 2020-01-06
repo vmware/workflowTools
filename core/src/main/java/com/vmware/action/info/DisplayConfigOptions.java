@@ -9,7 +9,6 @@ import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
-import com.vmware.util.ReflectionUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
 
@@ -64,7 +63,7 @@ public class DisplayConfigOptions extends BaseAction {
 
             String defaultDisplayText = defaultDisplayValue != null ? "Default: " + defaultDisplayValue: "No Default";
             log.info("{},[{}], {}, {}", field.getName(), configProperty.commandLine(), configProperty.help(), defaultDisplayText);
-            if (StringUtils.isNotBlank(configProperty.gitConfigProperty())) {
+            if (StringUtils.isNotEmpty(configProperty.gitConfigProperty())) {
                 log.info("{} can also be set from git config value {}", field.getName(), configProperty.gitConfigProperty());
             }
         }

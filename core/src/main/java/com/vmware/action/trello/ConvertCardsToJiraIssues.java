@@ -70,7 +70,7 @@ public class ConvertCardsToJiraIssues extends BaseTrelloAction {
         Issue issueToUpdate = new Issue(cardToUpdate.getIssueKey());
         issueToUpdate.fields.storyPoints = storyPointValue;
         // new issues are created as stories
-        if (StringUtils.isBlank(cardToUpdate.getIssueKey())) {
+        if (StringUtils.isEmpty(cardToUpdate.getIssueKey())) {
             issueToUpdate.fields.issuetype = new IssueType(IssueTypeDefinition.Story);
         }
         issueToUpdate.fields.summary = cardToUpdate.name;

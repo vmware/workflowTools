@@ -14,9 +14,7 @@
     "--log-line-count"
   ],
   "BaseCheckstyleAction": [
-    "--checkstyle-suppressions-xml-path",
-    "--checkstyle-config-xml-path",
-    "--checkstyle-jar-path"
+    "--checkstyle-config-xml-path"
   ],
   "OpenBuildPage": [
     "--jenkins-url"
@@ -135,13 +133,15 @@
     "--reviewboard-url"
   ],
   "SelectVapp": [
-    "--vapp-name"
+    "--vapp-name",
+    "--vapp-json-file"
   ],
   "LoadVapps": [
     "--default-vcd-org",
     "--username",
     "--vcd-api-version",
-    "--vcd-url"
+    "--vcd-url",
+    "--vapp-json-file"
   ],
   "ExitIfPerforceClientIsNotFound": [
     "--perforce-client"
@@ -230,6 +230,9 @@
   "PushToPrecommitBranch": [
     "--git-remote",
     "--username"
+  ],
+  "ChangeBuildNumber": [
+    "--jenkins-url"
   ],
   "LoadCompletedIssuesWithoutResolution": [
     "--username"
@@ -382,6 +385,9 @@
   "AddTrackingIssueForBug": [
     "--bugzilla-url",
     "--default-jira-project"
+  ],
+  "SetMergeTo": [
+    "--merge-to-default"
   ],
   "RemoveSelectedBuilds": [
     "--jenkins-url"

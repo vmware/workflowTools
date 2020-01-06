@@ -72,7 +72,7 @@ public class TestGit {
     @Test
     public void unknownConfigValueIsEmpty() {
         String value = git.configValue("workflow.sdafddfdsffdsfd");
-        assertTrue(StringUtils.isBlank(value));
+        assertTrue(StringUtils.isEmpty(value));
     }
 
     @Test

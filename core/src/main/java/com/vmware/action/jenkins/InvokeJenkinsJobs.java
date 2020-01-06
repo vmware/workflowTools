@@ -81,7 +81,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private void askForJenkinsJobKeysIfBlank() {
-        if (StringUtils.isNotBlank(jenkinsConfig.jenkinsJobsToUse)) {
+        if (StringUtils.isNotEmpty(jenkinsConfig.jenkinsJobsToUse)) {
             return;
         }
         log.info("No jenkins job keys parameter provided! (-j parameter)");
@@ -143,10 +143,13 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             log.info("Setting job param {} to {}", paramName, paramValue);
 
             if (paramValue.equals(JenkinsJobsConfig.VAPP_JSON_VALUE)) {
-                if (StringUtils.isBlank(draft.vappJsonForJenkinsJob)) {
+                if (vappData.noVappSelected()) {
+                    throw new FatalException("$VAPP_JSON paramter used but no Vapp selected");
+                }
+                if (!vappData.jsonDataLoaded()) {
                     throw new FatalException("$VAPP_JSON paramter used but no Vapp Json loaded");
                 }
-                paramValue = draft.vappJsonForJenkinsJob;
+                paramValue = vappData.getJsonData();
             }
 
             parameter.value = paramValue;

@@ -1,7 +1,6 @@
 package com.vmware.util;
 
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
@@ -12,12 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Used for easy use of executing commands
@@ -118,7 +114,7 @@ public class CommandLineUtils {
             long maxSleepTimeInMillis = TimeUnit.SECONDS.toMillis(30);
             while (sleepTime < maxSleepTimeInMillis && !matchedText) {
                 String output = IOUtils.readWithoutClosing(statusProcess.getInputStream());
-                if (StringUtils.isNotBlank(output)) {
+                if (StringUtils.isNotEmpty(output)) {
                     dynamicLogger.log(logLevel, output);
                 }
                 totalOutput = StringUtils.appendWithDelimiter(totalOutput, output, "\n");

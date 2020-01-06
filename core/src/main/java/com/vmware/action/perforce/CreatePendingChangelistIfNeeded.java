@@ -16,7 +16,7 @@ public class CreatePendingChangelistIfNeeded extends BasePerforceCommitAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
             return "commit already associated with changelist " + draft.perforceChangelistId;
         }
         return super.cannotRunAction();

@@ -18,7 +18,7 @@ public class ExitIfNoVappSelected extends BaseVappAction {
 
     @Override
     public void process() {
-        if (vappData.getSelectedVapp() == null) {
+        if (vappData.noVappSelected()) {
             exitWithMessage("no Vapp has been selected.");
         }
     }

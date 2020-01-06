@@ -14,12 +14,11 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
+    protected void failWorkflowIfConditionNotMet() {
         String reasonForFailing = perforceClientCannotBeUsed();
         if (reasonForFailing != null) {
-            return reasonForFailing;
+            exitDueToFailureCheck(reasonForFailing);
         }
-        return super.failWorkflowIfConditionNotMet();
     }
 
     @Override

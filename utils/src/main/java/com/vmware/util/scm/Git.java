@@ -7,7 +7,6 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
-import com.vmware.util.logging.SimpleLogFormatter;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,7 +105,7 @@ public class Git extends BaseScmWrapper {
         exitIfNotInRepoRootFolder("apply must be run from the root folder " + getRootDirectory().getPath());
         String checkString = check ? " --check" : "";
         String output = executeScmCommand("apply --ignore-whitespace --directory={}{}", diffData, LogLevel.DEBUG, rootDirectory, checkString);
-        if (StringUtils.isBlank(output)) {
+        if (StringUtils.isEmpty(output)) {
             return output;
         }
 
@@ -135,7 +134,7 @@ public class Git extends BaseScmWrapper {
                 changelistId = fusionMatcher.group(1);
             } else {
                 lastCommitText = commitText(counter++);
-                if (StringUtils.isBlank(lastCommitText)) {
+                if (StringUtils.isEmpty(lastCommitText)) {
                     throw new FatalException("Failed to find last submitted changelist");
                 }
                 gitP4Matcher.reset(lastCommitText);
@@ -320,7 +319,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public String updateTag(String tagName, LogLevel logLevel) {
-        if (StringUtils.isBlank(tagName)) {
+        if (StringUtils.isEmpty(tagName)) {
             log.debug("Ignoring empty tag");
             return "no tag name specified";
         }
@@ -423,7 +422,7 @@ public class Git extends BaseScmWrapper {
 
     @Override
     protected String checkIfCommandFailed(String gitOutput) {
-        if (StringUtils.isBlank(gitOutput)) {
+        if (StringUtils.isEmpty(gitOutput)) {
             return null;
         }
 

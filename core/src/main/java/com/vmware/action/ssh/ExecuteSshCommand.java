@@ -37,7 +37,7 @@ public class ExecuteSshCommand extends BaseVappAction {
         siteConfigToUse.validate();
 
         String sshCommand = sshConfig.sshCommand;
-        if (StringUtils.isBlank(sshCommand)) {
+        if (StringUtils.isEmpty(sshCommand)) {
             sshCommand = InputUtils.readValueUntilNotBlank("Ssh command");
         }
         sshCommand = expandParametersInCommand(sshCommand);

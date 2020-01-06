@@ -52,7 +52,7 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
     public boolean includeInProgressBuilds;
 
-    @ConfigurableProperty(commandLine = "--build-display-name", help = "Display name to use for the build invoked")
+    @ConfigurableProperty(commandLine = "--build-display-name", help = "Display name to use for the buildweb build invoked")
     public String buildDisplayName;
 
     @ConfigurableProperty(commandLine = "--exclude-sync-to", help = "Exclude sync-to parameter in gobuild command")
@@ -71,7 +71,7 @@ public class BuildwebConfig {
         }
 
         String trackingBranch = git.getTrackingBranch();
-        if (StringUtils.isBlank(trackingBranch)) {
+        if (StringUtils.isEmpty(trackingBranch)) {
             return new CalculatedProperty(buildwebBranch, "buildwebBranch");
         }
         String trackingBranchWithoutOrigin = trackingBranch.substring(trackingBranch.indexOf("/") + 1);

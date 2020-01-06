@@ -2,7 +2,7 @@ package com.vmware.action.vcd;
 
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.BrowserUtils;
+import com.vmware.util.SystemUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
@@ -16,7 +16,7 @@ public class OpenVcdTenantApp extends OpenVcdProviderApp {
     @Override
     public void process() {
         String vcdTenant;
-        if (StringUtils.isNotBlank(vcdConfig.vcdTenant)) {
+        if (StringUtils.isNotEmpty(vcdConfig.vcdTenant)) {
             log.info("Using vcd tenant parameter {}", vcdConfig.vcdTenant);
             vcdTenant = vcdConfig.vcdTenant;
         } else {
@@ -24,6 +24,6 @@ public class OpenVcdTenantApp extends OpenVcdProviderApp {
         }
 
         String uiUrl = uiUrl() + "/tenant/" + vcdTenant;
-        BrowserUtils.openUrl(uiUrl);
+        SystemUtils.openUrl(uiUrl);
     }
 }

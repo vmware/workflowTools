@@ -5,7 +5,6 @@ import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueFields;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.http.RequestParams;
 import com.vmware.util.UrlUtils;
 
 import java.util.Arrays;
@@ -44,7 +43,7 @@ public class Card {
         this.name = details.summary;
 
         this.desc = "";
-        if (StringUtils.isNotBlank(details.acceptanceCriteria)) {
+        if (StringUtils.isNotEmpty(details.acceptanceCriteria)) {
             this.desc += "**  Acceptance Criteria  **\n" + details.acceptanceCriteria + "\n\n";
         }
 

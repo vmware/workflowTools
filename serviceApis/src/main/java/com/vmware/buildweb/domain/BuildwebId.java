@@ -16,7 +16,7 @@ public class BuildwebId {
     }
 
     private void parseBuildId(String value) {
-        if (StringUtils.isBlank(value)) {
+        if (StringUtils.isEmpty(value)) {
             return;
         }
         String delimeter = value.contains("-") ? "-" : "/";

@@ -1,6 +1,5 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -15,10 +14,10 @@ public class ExitIfPerforceClientIsNotFound extends BaseCommitAction {
     @Override
     public void process() {
         String reasonForFailing = perforceClientCannotBeUsed();
-        if (StringUtils.isBlank(reasonForFailing) && StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
+        if (StringUtils.isEmpty(reasonForFailing) && StringUtils.isEmpty(perforceClientConfig.perforceClientName)) {
             reasonForFailing = "perforceClientName config value is not set, can also be set by git-p4.client git config value.";
         }
-        if (StringUtils.isNotBlank(reasonForFailing)) {
+        if (StringUtils.isNotEmpty(reasonForFailing)) {
             exitWithMessage(reasonForFailing);
         }
     }

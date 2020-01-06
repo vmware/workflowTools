@@ -22,7 +22,7 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
     @Override
     public String cannotRunAction() {
         String propertyValue = (String) ReflectionUtils.getValue(property, draft);
-        if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isBlank(propertyValue)) {
+        if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isEmpty(propertyValue)) {
             return super.cannotRunAction();
         }
 

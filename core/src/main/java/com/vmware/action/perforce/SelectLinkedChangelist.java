@@ -16,7 +16,7 @@ public class SelectLinkedChangelist extends BasePerforceCommitUsingGitAction {
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
             return "commit already is linked to changelist " + draft.perforceChangelistId;
         }
         return super.cannotRunAction();

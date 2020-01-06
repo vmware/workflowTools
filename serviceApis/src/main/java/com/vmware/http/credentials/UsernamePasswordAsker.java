@@ -33,7 +33,7 @@ public class UsernamePasswordAsker {
         String username = InputUtils.readValue("Username");
         String password = InputUtils.readPassword("Password");
 
-        if (StringUtils.isNotBlank(orgName) && !username.contains("@")) {
+        if (StringUtils.isNotEmpty(orgName) && !username.contains("@")) {
             log.info("Appending org name {} to username {}", orgName, username);
             username += "@" + orgName;
         }

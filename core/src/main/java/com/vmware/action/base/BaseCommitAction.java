@@ -34,27 +34,26 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     protected String determineChangelistIdToUse() {
-        if (StringUtils.isNotBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
             return draft.perforceChangelistId;
-        } else if (StringUtils.isNotBlank(perforceClientConfig.changelistId)) {
+        } else if (StringUtils.isNotEmpty(perforceClientConfig.changelistId)) {
             return perforceClientConfig.changelistId;
         } else {
             return serviceLocator.getPerforce().selectPendingChangelist();
         }
     }
 
-    protected String gitRepoOrPerforceClientCannotBeUsed() {
+    protected void failIfGitRepoOrPerforceClientCannotBeUsed() {
         String gitReason = "", perforceReason = "";
         if (git.workingDirectoryIsInGitRepo()) {
-            return null; // don't need to check perforce
+            return; // don't need to check perforce
         } else {
             gitReason = "not in git repo";
         }
         perforceReason = perforceClientCannotBeUsed();
-        if (StringUtils.isNotBlank(gitReason) && StringUtils.isNotBlank(perforceReason)) {
-            return gitReason + " and " + perforceReason;
+        if (StringUtils.isNotEmpty(gitReason) && StringUtils.isNotEmpty(perforceReason)) {
+            exitDueToFailureCheck(gitReason + " and " + perforceReason);
         }
-        return null;
     }
 
     protected String readLastChange() {
@@ -94,7 +93,7 @@ public abstract class BaseCommitAction extends BaseAction {
 
     protected Perforce getLoggedInPerforceClient() {
         String reasonForFailing = perforceClientCannotBeUsed();
-        if (StringUtils.isNotBlank(reasonForFailing)) {
+        if (StringUtils.isNotEmpty(reasonForFailing)) {
             throw new FatalException("Exiting as " + reasonForFailing);
         }
         return serviceLocator.getPerforce();
@@ -108,7 +107,7 @@ public abstract class BaseCommitAction extends BaseAction {
         if (!perforce.isLoggedIn()) {
             return "perforce user is not logged in";
         }
-        if (StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
+        if (StringUtils.isEmpty(perforceClientConfig.perforceClientName)) {
             try {
                 perforceClientConfig.perforceClientName = perforce.getClientName();
             } catch (NoPerforceClientForDirectoryException npc) {
@@ -136,7 +135,7 @@ public abstract class BaseCommitAction extends BaseAction {
     private String readPendingChangelistText() {
         String changelistId = determineChangelistIdToUse();
         String changelistText = serviceLocator.getPerforce().readChangelist(changelistId);
-        if (StringUtils.isBlank(changelistText) || !changelistText.contains("\n")) {
+        if (StringUtils.isEmpty(changelistText) || !changelistText.contains("\n")) {
             throw new RuntimeException("No pending changelist exists for user " + config.username);
         }
         draft.perforceChangelistId = changelistId;

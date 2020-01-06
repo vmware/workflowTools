@@ -38,6 +38,7 @@
   "parentBranch": "head~1",
   "useGitTrackingBranch": true,
   "disableMarkdown": false,
+  "sshPort": 22,
   "issueTypesToInclude": [
     8
   ],
@@ -79,6 +80,7 @@
   "logLevel": "INFO",
   "maxSummaryLength": 80,
   "maxDescriptionLength": 100,
+  "mergeToDefault": ": YES",
   "closeOldSubmittedReviewsAfter": 2,
   "closeOldShipItReviewsAfter": 7,
   "jiraTaskEstimateInHours": 1,
@@ -473,6 +475,12 @@
       "SetDefaultApprover",
       "AmendCommit"
     ],
+    "setMergeTo": [
+      "ReadLastCommit",
+      "SetMergeTo",
+      "ExitIfConfirmationNotGiven",
+      "AmendCommit"
+    ],
     "addToDescription": [
       "ReadLastCommit",
       "AddToDescription",
@@ -491,6 +499,11 @@
     "removeSelectedBuilds": [
       "ReadLastCommit",
       "RemoveSelectedBuilds",
+      "AmendCommit"
+    ],
+    "changeBuildNumber": [
+      "ReadLastCommit",
+      "ChangeBuildNumber",
       "AmendCommit"
     ],
     "openSandboxLogPage": [
@@ -693,8 +706,12 @@
       "UpdateVappLease"
     ],
     "displayVappJson": [
-      "selectVcdCell",
+      "loadVappJson",
       "DisplayVappJson"
+    ],
+    "copyVappJson": [
+      "loadVappJson",
+      "CopyVappJsonToClipboard"
     ],
     "openVCenterUrl": [
       "selectVcdSite",

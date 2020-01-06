@@ -12,7 +12,7 @@ public abstract class BaseLinkedPerforceCommitAction extends BasePerforceCommitA
 
     @Override
     public String cannotRunAction() {
-        if (StringUtils.isBlank(draft.perforceChangelistId)) {
+        if (StringUtils.isEmpty(draft.perforceChangelistId)) {
             return "no changelist id read for commit";
         }
         return super.cannotRunAction();

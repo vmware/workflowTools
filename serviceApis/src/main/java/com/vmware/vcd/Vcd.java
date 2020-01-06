@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
@@ -49,7 +48,7 @@ public class Vcd extends AbstractRestService {
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
         String apiToken = readExistingApiToken(ApiAuthentication.vcd);
-        if (StringUtils.isNotBlank(apiToken)) {
+        if (StringUtils.isNotEmpty(apiToken)) {
             connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
         }
     }
@@ -58,8 +57,8 @@ public class Vcd extends AbstractRestService {
         return connection.delete(deleteLink.href, TaskType.class, taskAcceptHeader(), forceParam(force));
     }
 
-    public TaskType updateResource(String url, ResourceType resourceType) {
-        return connection.put(url, TaskType.class, resourceType, contentTypeHeader(resourceType), taskAcceptHeader());
+    public TaskType updateResource(LinkType link, ResourceType resourceType) {
+        return connection.put(link.href, TaskType.class, resourceType, contentTypeHeader(resourceType), taskAcceptHeader());
     }
 
     public QueryResultVappsType getVapps() {
@@ -105,7 +104,7 @@ public class Vcd extends AbstractRestService {
     @Override
     protected void loginManually() {
         connection.removeStatefulParam(AUTHORIZATION_HEADER);
-        if (StringUtils.isNotBlank(vcdOrg)) {
+        if (StringUtils.isNotEmpty(vcdOrg)) {
             log.info("Using default org {}, enter username as username@[org name] to use a different org", vcdOrg);
         } else {
             log.info("Enter username as username@[org name]");

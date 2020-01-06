@@ -2,7 +2,6 @@ package com.vmware.action.buildweb;
 
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
-import com.vmware.action.base.BaseCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.config.ActionDescription;
@@ -31,10 +30,10 @@ public class InvokeSandboxBuild extends BasePerforceCommitAction {
     @Override
     public void process() {
         String changelistId = draft.perforceChangelistId;
-        if (StringUtils.isBlank(changelistId)) {
+        if (StringUtils.isEmpty(changelistId)) {
             changelistId = perforceClientConfig.changelistId;
         }
-        if (StringUtils.isBlank(changelistId)) {
+        if (StringUtils.isEmpty(changelistId)) {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
         String syncToParameter = " --syncto latest";
@@ -70,7 +69,7 @@ public class InvokeSandboxBuild extends BasePerforceCommitAction {
     }
 
     private String createComponentBuildsParameter() {
-        if (StringUtils.isBlank(buildwebConfig.componentBuilds)) {
+        if (StringUtils.isEmpty(buildwebConfig.componentBuilds)) {
             return "";
         }
         String componentBuilds = " --component-builds " + buildwebConfig.componentBuilds;

@@ -20,7 +20,7 @@ public class AddGitChangesetConfigValueIfNeeded extends BaseLinkedPerforceCommit
         String clientDirectory = perforce.getWorkingDirectory().getPath();
         String changesetCheckoutPath = determineChangesetDirectoryCanonicalPath();
 
-        if (StringUtils.isBlank(changesetCheckoutPath)) {
+        if (StringUtils.isEmpty(changesetCheckoutPath)) {
             log.info("Adding git config value changesetsync.checkoutdir={} for git changeset setup", clientDirectory);
             git.addConfigValue("changesetsync.checkoutdir", clientDirectory);
         } else if (!clientDirectory.equals(changesetCheckoutPath)) {
@@ -33,7 +33,7 @@ public class AddGitChangesetConfigValueIfNeeded extends BaseLinkedPerforceCommit
 
     private String determineChangesetDirectoryCanonicalPath() {
         String checkoutDirectory = git.configValue("changesetsync.checkoutdir");
-        if (StringUtils.isNotBlank(checkoutDirectory)) {
+        if (StringUtils.isNotEmpty(checkoutDirectory)) {
             try {
                 checkoutDirectory = new File(checkoutDirectory).getCanonicalPath();
             } catch (IOException e) {

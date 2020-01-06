@@ -69,22 +69,19 @@ public abstract class BaseAction implements Action {
         this.vcdConfig = config.vcdConfig;
     }
 
-    public String failWorkflowIfConditionNotMet() {
-        if (expectedCommandsToBeAvailable == null) {
-            return null;
-        }
-        for (String command : expectedCommandsToBeAvailable) {
-            if (!CommandLineUtils.isCommandAvailable(command)) {
-                return "command " + command + " is not available";
-            }
-        }
+    public void checkIfWorkflowShouldBeFailed() {
+        checkExpectedCommands();
         if (failIfCannotBeRun) {
             String cannotBeRunReason = this.cannotRunAction();
-            if (StringUtils.isNotBlank(cannotBeRunReason)) {
-                return cannotBeRunReason;
+            if (StringUtils.isNotEmpty(cannotBeRunReason)) {
+                exitDueToFailureCheck(cannotBeRunReason);
             }
         }
-        return null;
+        failWorkflowIfConditionNotMet();
+    }
+
+
+    protected void failWorkflowIfConditionNotMet() {
     }
 
     @Override
@@ -125,6 +122,21 @@ public abstract class BaseAction implements Action {
         log.info("");
         log.warn(message);
         System.exit(0);
+    }
+
+    private void checkExpectedCommands() {
+        if (expectedCommandsToBeAvailable == null) {
+            return;
+        }
+        for (String command : expectedCommandsToBeAvailable) {
+            if (!CommandLineUtils.isCommandAvailable(command)) {
+                exitDueToFailureCheck("command " + command + " is not available");
+            }
+        }
+    }
+
+    protected void exitDueToFailureCheck(String reason) {
+        exitWithErrorMessage("Workflow failed by action " + this.getClass().getSimpleName() + " as " + reason);
     }
 
 }

@@ -35,7 +35,7 @@ public class Board implements InputListSelection {
     }
 
     public boolean hasNoId() {
-        return StringUtils.isBlank(id);
+        return StringUtils.isEmpty(id);
     }
 
     @Override

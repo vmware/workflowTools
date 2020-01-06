@@ -26,7 +26,7 @@ public class DeleteVapp extends BaseSingleVappAction {
             log.info("Aborting deletion of vapp {}", vappToDelete.name);
         }
 
-        LinkType deleteLink = vappToDelete.getLinkByRel("self");
+        LinkType deleteLink = vappToDelete.getSelfLink();
         Vcd vcd = serviceLocator.getVcd();
         TaskType deleteTask = vcd.deleteResource(deleteLink, true);
 

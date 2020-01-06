@@ -10,4 +10,10 @@ public class LinkType {
     public String href;
 
     public String model;
+
+    public LinkType() {}
+
+    public LinkType(String href) {
+        this.href = href;
+    }
 }

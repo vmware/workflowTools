@@ -25,7 +25,7 @@ public class BugzillaConfig {
             return Integer.parseInt(bugNumber);
         }
 
-        boolean prefixMatches = StringUtils.isNotBlank(bugzillaPrefix)
+        boolean prefixMatches = StringUtils.isNotEmpty(bugzillaPrefix)
                 && bugNumber.toUpperCase().startsWith(bugzillaPrefix.toUpperCase());
         if (!prefixMatches) {
             return null;

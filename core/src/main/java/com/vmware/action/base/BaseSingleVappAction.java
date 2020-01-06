@@ -6,7 +6,7 @@ public abstract class BaseSingleVappAction extends BaseVappAction {
 
     @Override
     public String cannotRunAction() {
-        if (vappData.getSelectedVapp() == null) {
+        if (vappData.noVappSelected()) {
             return "no Vapp has been selected";
         }
         return super.cannotRunAction();

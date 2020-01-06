@@ -17,7 +17,7 @@ public class ComplexEnumSelector {
 
     public static ComplexEnum findByValue(Class enumType, String value) {
         Integer valueAsInt = null;
-        if (StringUtils.isBlank(value)) {
+        if (StringUtils.isEmpty(value)) {
             return null;
         }
         if (StringUtils.isInteger(value)) {

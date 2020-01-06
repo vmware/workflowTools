@@ -25,7 +25,7 @@ public class UsernameParser {
         parseUsernameFromGitEmail();
         parseUsernameFromPerforceIfBlank();
         parseUsernameFromWhoamIIfBlank();
-        if (StringUtils.isNotBlank(username)) {
+        if (StringUtils.isNotEmpty(username)) {
             return new String[] {username, source};
         } else {
             return null;
@@ -34,7 +34,7 @@ public class UsernameParser {
 
     private void parseUsernameFromGitEmail() {
         String gitUserEmail = git.configValue("user.email");
-        if (StringUtils.isNotBlank(gitUserEmail) && gitUserEmail.contains("@")) {
+        if (StringUtils.isNotEmpty(gitUserEmail) && gitUserEmail.contains("@")) {
             this.username = gitUserEmail.substring(0, gitUserEmail.indexOf("@"));
             log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
             this.source = "Git user.email";
@@ -42,7 +42,7 @@ public class UsernameParser {
     }
 
     private void parseUsernameFromPerforceIfBlank() {
-        if (StringUtils.isNotBlank(username)) {
+        if (StringUtils.isNotEmpty(username)) {
             return;
         }
         Perforce perforce = new Perforce(System.getProperty("user.dir"));
@@ -54,7 +54,7 @@ public class UsernameParser {
     }
 
     private void parseUsernameFromWhoamIIfBlank() {
-        if (StringUtils.isNotBlank(username) || !CommandLineUtils.isCommandAvailable("whoami")) {
+        if (StringUtils.isNotEmpty(username) || !CommandLineUtils.isCommandAvailable("whoami")) {
             return;
         }
         String fullUsername = CommandLineUtils.executeCommand("whoami", LogLevel.DEBUG);

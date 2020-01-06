@@ -14,7 +14,7 @@ public class UpdateChangelistWithGitChangeset extends BaseLinkedPerforceCommitUs
 
     @Override
     public void process() {
-        if (StringUtils.isBlank(git.configValue("changesetsync.checkoutdir"))) {
+        if (StringUtils.isEmpty(git.configValue("changesetsync.checkoutdir"))) {
             throw new RuntimeException("git changeset has not been setup for this repo, git config value changesetsync.checkoutdir is missing");
         }
         git.updateTag("changeset-" + draft.perforceChangelistId, LogLevel.DEBUG);

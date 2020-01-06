@@ -89,11 +89,11 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private void checkThatPerforceConfigIsValid() {
-        if (StringUtils.isBlank(perforceClientConfig.perforceClientName)) {
+        if (StringUtils.isEmpty(perforceClientConfig.perforceClientName)) {
             throw new RuntimeException("config value perforceClientName not set, if using git, can be set by running git config git-p4.client clientName");
         }
         // if root directory is null, then assuming it should be a perforce client
-        if (!git.workingDirectoryIsInGitRepo() && StringUtils.isBlank(draft.perforceChangelistId)) {
+        if (!git.workingDirectoryIsInGitRepo() && StringUtils.isEmpty(draft.perforceChangelistId)) {
             throw new RuntimeException("no matching changelist found, run createPendingChangelist as part of workflow");
         }
     }

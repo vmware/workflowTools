@@ -30,7 +30,7 @@ public class AuthenticateAllApis extends BaseAction {
     }
 
     private void checkAuthentication(AbstractService restService) {
-        if (StringUtils.isBlank(restService.baseUrl)) {
+        if (StringUtils.isEmpty(restService.baseUrl)) {
             log.info("Skipping check of service {} as the base url is blank", restService.getClass().getSimpleName());
         }
         String serviceName = restService.getClass().getSimpleName();

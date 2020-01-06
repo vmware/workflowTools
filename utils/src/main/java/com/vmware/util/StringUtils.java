@@ -19,7 +19,7 @@ public class StringUtils {
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
 
     public static void throwFatalExceptionIfBlank(String value, String propertyName) {
-        if (StringUtils.isBlank(value)) {
+        if (StringUtils.isEmpty(value)) {
             throw new FatalException("{} cannot be null", propertyName);
         }
     }
@@ -48,7 +48,7 @@ public class StringUtils {
     }
 
     public static boolean isInteger(String value) {
-        if (isBlank(value)) {
+        if (isEmpty(value)) {
             return false;
         }
         try {
@@ -163,10 +163,15 @@ public class StringUtils {
     }
 
     public static boolean isNotBlank(String value) {
+        return value != null && isNotEmpty(value.trim());
+    }
+
+
+    public static boolean isNotEmpty(String value) {
         return value != null && !value.isEmpty();
     }
 
-    public static boolean isBlank(String value) {
+    public static boolean isEmpty(String value) {
         return value == null || value.isEmpty();
     }
 
@@ -251,7 +256,7 @@ public class StringUtils {
             return Collections.emptyList();
         }
         String[] spltValues = value.split(delimeter);
-        return Arrays.stream(spltValues).filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+        return Arrays.stream(spltValues).filter(StringUtils::isNotEmpty).map(String::trim).collect(Collectors.toList());
     }
 
     public static String unescapeJavaString(String st) {

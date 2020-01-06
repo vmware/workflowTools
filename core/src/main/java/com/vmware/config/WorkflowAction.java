@@ -81,8 +81,8 @@ public class WorkflowAction implements Action {
     }
 
     @Override
-    public String failWorkflowIfConditionNotMet() {
-        return instantiatedAction.failWorkflowIfConditionNotMet();
+    public void checkIfWorkflowShouldBeFailed() {
+        instantiatedAction.checkIfWorkflowShouldBeFailed();
     }
 
     public void setWorkflowValuesOnAction(WorkflowActionValues values) {

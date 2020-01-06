@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -78,7 +77,7 @@ public class InputUtils {
         String value = null;
         while (!valueEntered) {
             value = readValue(label, autoCompleteOptions);
-            if (StringUtils.isNotBlank(value)) {
+            if (StringUtils.isNotEmpty(value)) {
                 valueEntered = true;
             } else {
                 log.error("No value entered!");

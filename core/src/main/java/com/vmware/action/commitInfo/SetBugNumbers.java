@@ -8,18 +8,14 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
-import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.StringUtils;
-import com.vmware.util.ThreadUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @ActionDescription("Sets the bug number. A list of assigned jira bugs and tasks is shown for easy selection. Bug number can also be manually entered.")
 public class SetBugNumbers extends BaseCommitReadAction {
@@ -52,7 +48,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         loadIssuesList(draft);
         printIssuesList();
         List<IssueInfo> issues = null;
-        if (StringUtils.isNotBlank(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
+        if (StringUtils.isNotEmpty(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
             log.info("");
             log.info("Existing bug numbers: " + draft.bugNumbers);
         }

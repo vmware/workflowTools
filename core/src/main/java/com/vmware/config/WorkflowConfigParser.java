@@ -1,29 +1,25 @@
 package com.vmware.config;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.vmware.config.commandLine.CommandLineArgumentsParser;
-import com.vmware.config.section.PerforceClientConfig;
-import com.vmware.util.scm.Git;
-import com.vmware.util.scm.Perforce;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.logging.SimpleLogFormatter;
-import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.util.ClasspathResource;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.logging.LogLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.vmware.config.commandLine.CommandLineArgumentsParser;
+import com.vmware.config.section.PerforceClientConfig;
+import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.util.ClasspathResource;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.scm.Git;
+import com.vmware.util.scm.Perforce;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parses the workflow config from the source config files
@@ -35,12 +31,13 @@ public class WorkflowConfigParser {
     private final Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
     private final CommandLineArgumentsParser argsParser = new CommandLineArgumentsParser();
 
-    public WorkflowConfig parseWorkflowConfig(String[] args) {
+    public WorkflowConfig parseWorkflowConfig(String username, String[] args) {
         argsParser.generateArgumentMap(args);
-        java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        globalLogger.addHandler(createHandler());
 
         WorkflowConfig config = readInternalConfig();
+        if (StringUtils.isNotEmpty(username)) {
+            config.username = username;
+        }
 
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
@@ -77,7 +74,7 @@ public class WorkflowConfigParser {
 
         String trackingBranch = git.getTrackingBranch();
         String remoteName = trackingBranch != null ? trackingBranch.split("/")[0] : null;
-        if (StringUtils.isNotBlank(remoteName)) {
+        if (StringUtils.isNotEmpty(remoteName)) {
             configurableFields.setFieldValue("defaultGitRemote", remoteName, "tracking remote");
 
             log.debug("Applying remote specific config values for git remote {}", remoteName);
@@ -89,7 +86,7 @@ public class WorkflowConfigParser {
     }
 
     private void parseUsernameIfBlank(WorkflowConfig config) {
-        if (StringUtils.isNotBlank(config.username)) {
+        if (StringUtils.isNotEmpty(config.username)) {
             return;
         }
 
@@ -127,11 +124,11 @@ public class WorkflowConfigParser {
      */
     private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig) {
         String gitConfigFilePath = git.configValue("workflow.configFile");
-        if (StringUtils.isBlank(gitConfigFilePath)) {
+        if (StringUtils.isEmpty(gitConfigFilePath)) {
             gitConfigFilePath = git.configValue("workflow.config"); // backwards compatibility
         }
         String configFilePaths = argsParser.getArgument(gitConfigFilePath, "-c", "-config", "--config");
-        if (StringUtils.isBlank(configFilePaths)) {
+        if (StringUtils.isEmpty(configFilePaths)) {
             return;
         }
 
@@ -189,12 +186,5 @@ public class WorkflowConfigParser {
     private WorkflowConfig readInternalConfig() {
         Reader reader = new ClasspathResource("/internalConfig.json", this.getClass()).getReader();
         return gson.fromJson(reader, WorkflowConfig.class);
-    }
-
-    private ConsoleHandler createHandler() {
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleLogFormatter());
-        handler.setLevel(Level.FINEST);
-        return handler;
     }
 }

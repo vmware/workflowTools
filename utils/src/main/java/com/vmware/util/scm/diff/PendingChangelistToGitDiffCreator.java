@@ -161,7 +161,7 @@ public class PendingChangelistToGitDiffCreator {
             secondFile = perforce.fullPath(fileChange.getLastFileAffected());
         }
         String fileDiff = gitDiff(firstFile, secondFile, binaryPatch);
-        if (StringUtils.isBlank(fileDiff) && changeType == added) {
+        if (StringUtils.isEmpty(fileDiff) && changeType == added) {
             log.warn("No content in added file {}", fileChange.getLastFileAffected());
             return null;
         }

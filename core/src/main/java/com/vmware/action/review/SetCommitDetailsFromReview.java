@@ -43,7 +43,7 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(reviewId));
 
         ReviewRequestDraft reviewAsDraft = reviewRequest.asDraft();
-        if (StringUtils.isBlank(reviewAsDraft.summary) && StringUtils.isBlank(reviewAsDraft.description)) { // populate values from draft
+        if (StringUtils.isEmpty(reviewAsDraft.summary) && StringUtils.isEmpty(reviewAsDraft.description)) { // populate values from draft
             reviewAsDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
         }
         if (draft == null) {
@@ -61,7 +61,7 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         testingDone =  StringUtils.addNewLinesIfNeeded(testingDone, commitConfig.maxDescriptionLength, "Testing Done: " .length());
         draft.testingDone = testingDone;
         syncJobBuilds(draftConstructedFromReviewDetails);
-        if (StringUtils.isBlank(reviewAsDraft.bugNumbers)) {
+        if (StringUtils.isEmpty(reviewAsDraft.bugNumbers)) {
             draft.bugNumbers = commitConfig.noBugNumberLabel;
         } else {
             draft.bugNumbers = reviewAsDraft.bugNumbers;
