@@ -9,6 +9,7 @@ import com.vmware.config.section.CheckstyleConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
+import com.vmware.config.section.GitlabConfig;
 import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.JiraConfig;
 import com.vmware.config.section.LoggingConfig;
@@ -52,6 +53,9 @@ public class WorkflowConfig {
 
     @SectionConfig
     public GitRepoConfig gitRepoConfig;
+
+    @SectionConfig
+    public GitlabConfig gitlabConfig;
 
     @SectionConfig
     public PerforceClientConfig perforceClientConfig;

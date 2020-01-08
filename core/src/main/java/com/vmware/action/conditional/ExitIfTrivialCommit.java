@@ -17,6 +17,6 @@ public class ExitIfTrivialCommit extends BaseCommitAction {
             return;
         }
 
-        exitWithMessage("the commit is trivial");
+        cancelWithMessage("the commit is trivial");
     }
 }

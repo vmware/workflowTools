@@ -12,6 +12,7 @@ public enum ApiAuthentication {
     jenkins(".jenkins-api-token.txt"),
     trello(".trello-api-token.txt"),
     vcd(".vcd-api-token.txt"),
+    gitlab(".gitlab-access-token.txt"),
     none("");
 
     private String cookieName;

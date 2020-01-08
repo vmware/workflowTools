@@ -150,15 +150,15 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     @Override
-    protected void optimisticPost(String url, Object param, RequestParam... params) {
+    protected <T> T optimisticPost(String url, Class<T> responseConversionClass, Object param, RequestParam... params) {
         if (usesCsrf) {
             CsrfCrumb csrfCrumb = super.optimisticGet(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
             RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
             List<RequestParam> paramList = new ArrayList<>(Arrays.asList(params));
             paramList.add(csrfHeader);
-            super.optimisticPost(url, param, paramList.toArray(new RequestParam[paramList.size()]));
+            return super.optimisticPost(url, responseConversionClass, param, paramList.toArray(new RequestParam[0]));
         } else {
-            super.optimisticPost(url, param, params);
+            return super.optimisticPost(url, responseConversionClass, param, params);
         }
     }
 

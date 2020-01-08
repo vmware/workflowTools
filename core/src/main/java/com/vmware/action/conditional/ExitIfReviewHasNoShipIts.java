@@ -20,7 +20,7 @@ public class ExitIfReviewHasNoShipIts extends BaseSetShipItReviewersList {
             return;
         }
 
-        exitWithMessage("the review has no ship its.");
+        cancelWithMessage("the review has no ship its.");
     }
 
 }

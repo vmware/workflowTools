@@ -25,7 +25,7 @@ public class ExitIfVcdVmQuotaExceeded extends BaseVappAction {
         int totalVmCount = poweredOnVmCount + testbedTemplateVmCount;
 
         if (poweredOnVmCount + testbedTemplateVmCount > vcdConfig.vcdVmQuota) {
-            exitWithMessage(String.format("Total Vm count %s (powered on count %s, template count %s) exceeds quota of %s",
+            cancelWithMessage(String.format("Total Vm count %s (powered on count %s, template count %s) exceeds quota of %s",
                     totalVmCount, poweredOnVmCount, testbedTemplateVmCount, vcdConfig.vcdVmQuota));
         } else {
             log.info("Total Vm count {} (powered on count {}, template count {}) does not exceed quota of {}",

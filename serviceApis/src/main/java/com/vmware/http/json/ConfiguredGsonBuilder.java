@@ -1,5 +1,6 @@
 package com.vmware.http.json;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.vmware.config.WorkflowConfig;
@@ -50,6 +51,11 @@ public class ConfiguredGsonBuilder {
 
     public ConfiguredGsonBuilder setPrettyPrinting() {
         builder.setPrettyPrinting();
+        return this;
+    }
+
+    public ConfiguredGsonBuilder namingPolicy(FieldNamingPolicy namingPolicy) {
+        builder.setFieldNamingPolicy(namingPolicy);
         return this;
     }
 

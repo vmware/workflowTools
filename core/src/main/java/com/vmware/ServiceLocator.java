@@ -6,6 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.VcdConfig;
+import com.vmware.gitlab.Gitlab;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
@@ -21,6 +22,8 @@ import com.vmware.vcd.Vcd;
 public class ServiceLocator {
 
     private Git git;
+
+    private Gitlab gitlab;
 
     private Perforce perforce;
 
@@ -113,5 +116,12 @@ public class ServiceLocator {
                     config.perforceClientConfig.perforceClientDirectory);
         }
         return perforce;
+    }
+
+    public Gitlab getGitlab() {
+        if (gitlab == null) {
+            gitlab = new Gitlab(config.gitlabConfig.gitlabUrl, config.username);
+        }
+        return gitlab;
     }
 }

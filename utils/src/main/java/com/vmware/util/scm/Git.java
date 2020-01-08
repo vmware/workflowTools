@@ -266,6 +266,11 @@ public class Git extends BaseScmWrapper {
         log.info("Successfully ran git p4 submit");
     }
 
+    public void deleteRemoteBranch(String remote, String remoteBranch) {
+        String pushCommand = String.format("push %s :%s --porcelain", remote, remoteBranch);
+        executeScmCommand(pushCommand, LogLevel.INFO);
+    }
+
     public void pushToRemoteBranch(String remote, String remoteBranch) {
         pushToRemoteBranch(remote, remoteBranch, false);
     }
@@ -467,9 +472,8 @@ public class Git extends BaseScmWrapper {
         }
 
         if (!currentHeadRef.startsWith(updatedRemoteHeadRef)) {
-            log.error("Git push failed, remote branch ref of {} does not match local head ref",
+            throw new FatalException("Git push failed, remote branch ref of {} does not match local head ref",
                     updatedRemoteHeadRef, currentHeadRef);
-            System.exit(1);
         }
         log.info("Remote branch was successfully updated");
     }

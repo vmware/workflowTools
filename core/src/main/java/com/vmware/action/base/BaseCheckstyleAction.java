@@ -80,7 +80,7 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
             log.info(checkstyleOutput);
             errorPadder.errorTitle();
             if (failIfCheckstyleFails) {
-                exitWithMessage("checkstyle errors encountered");
+                cancelWithMessage("checkstyle errors encountered");
             }
         } else {
             log.info("All files passed checkstyle check");

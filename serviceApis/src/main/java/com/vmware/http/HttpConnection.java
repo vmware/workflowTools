@@ -66,12 +66,12 @@ public class HttpConnection {
     private boolean useSessionCookies;
 
     public HttpConnection(RequestBodyHandling requestBodyHandling) {
-        this(requestBodyHandling, null);
+        this(requestBodyHandling, new ConfiguredGsonBuilder().build());
     }
 
-    public HttpConnection(RequestBodyHandling requestBodyHandling, Map<String, String> customFieldNames) {
+    public HttpConnection(RequestBodyHandling requestBodyHandling, Gson gson) {
         this.requestBodyHandling = requestBodyHandling;
-        this.gson = new ConfiguredGsonBuilder(customFieldNames).build();
+        this.gson = gson;
 
         String homeFolder = System.getProperty("user.home");
         cookieFileStore = new CookieFileStore(homeFolder);
@@ -260,7 +260,7 @@ public class HttpConnection {
     private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) {
         String responseText = "";
         try {
-            responseText = parseResponseText();
+            responseText = parseResponseText(methodType);
             cookieFileStore.addCookiesFromResponse(activeConnection);
         } catch (SSLException e) {
             String urlText = activeConnection.getURL().toString();
@@ -334,7 +334,7 @@ public class HttpConnection {
                 + "\nFailed to access host " + activeConnection.getURL().getHost());
     }
 
-    private String parseResponseText() throws IOException {
+    private String parseResponseText(HttpMethodType methodType) throws IOException {
         String currentUrl = activeConnection.getURL().toExternalForm();
         int responseCode = activeConnection.getResponseCode();
         String responseText;
@@ -344,7 +344,7 @@ public class HttpConnection {
             responseText = IOUtils.read(activeConnection.getErrorStream());
         }
         log.trace("Response\n{}", responseText);
-        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, responseText);
+        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType, responseText);
         return responseText;
     }
 

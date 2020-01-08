@@ -3,10 +3,9 @@ package com.vmware.action.conditional;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.exception.CancelException;
 import com.vmware.util.input.InputUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
+import com.vmware.util.logging.LogLevel;
 
 @ActionDescription("Exit if the user does not confirm, can be used for confirming commit changes.")
 public class ExitIfConfirmationNotGiven extends BaseAction {
@@ -20,9 +19,7 @@ public class ExitIfConfirmationNotGiven extends BaseAction {
         log.info("");
         String confirmation = InputUtils.readValue("Confirm (press ENTER to confirm or type NO to cancel)");
         if (confirmation.equalsIgnoreCase("NO")) {
-            log.info("");
-            log.info("Canceling!");
-            System.exit(0);
+            throw new CancelException(LogLevel.INFO, "confirmation not given");
         }
     }
 }

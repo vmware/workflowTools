@@ -31,11 +31,13 @@ import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.CancelException;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.scm.Git;
 
@@ -169,7 +171,7 @@ public class Workflow {
     }
 
     private ArgumentCompleter createWorkflowCompleter() {
-        List<String> autocompleteList = new ArrayList<String>();
+        List<String> autocompleteList = new ArrayList<>();
 
         for (String workflow : config.workflows.keySet()) {
             if (config.supportingWorkflows.contains(workflow)) {
@@ -223,21 +225,30 @@ public class Workflow {
                 runActions(actions, new WorkflowActionValues());
                 outputTotalExecutionTime(startingDate);
             }
-            if (config.shellMode) {
-                init(args);
-                runWorkflow();
-            }
+            runWorkflowAgain();
         } catch (UnknownWorkflowValueException e) {
             log.error(e.getMessage());
             askForWorkflow(true);
-            runWorkflow();
+            runWorkflowAgain();
+        } catch (CancelException ee) {
+            log.info("");
+            new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + ee.getMessage());
+            runWorkflowAgain();
         } catch (FatalException iie) {
             log.info("");
             if (log.isDebugEnabled()) {
                 throw iie;
             } else {
                 log.error(iie.getMessage());
+                runWorkflowAgain();
             }
+        }
+    }
+
+    private void runWorkflowAgain() {
+        if (config.shellMode) {
+            init(args);
+            runWorkflow();
         }
     }
 

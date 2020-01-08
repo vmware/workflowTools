@@ -6,6 +6,7 @@ import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.request.UrlParam;
 import com.vmware.jira.domain.Issue;
@@ -53,7 +54,7 @@ public class Jira extends AbstractRestService {
 
     public Jira(String jiraUrl, String username, Map<String, String> customFieldNames) {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, username);
-        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity, customFieldNames);
+        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity, new ConfiguredGsonBuilder(customFieldNames).build());
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";

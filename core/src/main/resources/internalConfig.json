@@ -33,6 +33,7 @@
     "precommit": "topic/$USERNAME/pre-commit",
     "update": "topic/$USERNAME/update"
   },
+  "gitlabMergeBranchFormat": "topic/$USERNAME/$BRANCH_NAME",
   "remoteBranchToUse": "precommit",
   "trackingBranch": "master",
   "parentBranch": "head~1",
@@ -529,6 +530,44 @@
       "AmendCommit",
       "--disable-merge-to"
     ],
+    "createMergeRequestAndRemoteBranch": [
+      "createMergeRequest",
+      "PushToMergeBranch"
+    ],
+    "createMergeRequest": [
+      "selectMergeRequest",
+      "CreateMergeRequestIfNeeded"
+    ],
+    "openMergeRequest": [
+      "selectMergeRequest",
+      "OpenMergeRequest"
+    ],
+    "closeMergeRequest": [
+      "selectMergeRequest",
+      "CloseMergeRequest",
+      "DeleteMergeBranch"
+    ],
+    "approveMergeRequest": [
+      "selectMergeRequest",
+      "ApproveMergeRequest"
+    ],
+    "rebaseMergeRequest": [
+      "selectMergeRequest",
+      "RebaseMergeRequest"
+    ],
+    "acceptMergeRequest": [
+      "selectMergeRequest",
+      "AcceptMergeRequest"
+    ],
+    "selectMergeRequest": [
+      "ReadLastCommit",
+      "SelectMatchingMergeRequest"
+    ],
+    "createAndAcceptMergeRequest": [
+      "createMergeRequestAndRemoteBranch",
+      "ApproveMergeRequest",
+      "AcceptMergeRequest"
+    ],
     "reopenAndResolveIssues": [
       "LoadCompletedIssuesWithoutResolution",
       "ExitIfThereAreNoIssuesToProcess",
@@ -786,6 +825,7 @@
     "setReviewDetailsAndDiff",
     "loadVappJson",
     "selectVapp",
-    "selectVcdCell"
+    "selectVcdCell",
+    "selectMergeRequest"
   ]
 }

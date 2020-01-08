@@ -17,6 +17,6 @@ public class ExitIfCommitHasNoBugNumber extends BaseCommitAction {
             return;
         }
 
-        exitWithMessage("commit has no bug number");
+        cancelWithMessage("commit has no bug number");
     }
 }

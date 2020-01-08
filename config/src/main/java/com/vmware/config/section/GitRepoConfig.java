@@ -30,7 +30,7 @@ public class GitRepoConfig {
     @ConfigurableProperty(help = "Map of remote branches, $USERNAME is substituted for the real username.")
     public TreeMap<String, String> remoteBranches;
 
-    @ConfigurableProperty(commandLine = "-rb, --remote-branch", help = "Remote branch name to use")
+    @ConfigurableProperty(commandLine = "-rb,--remote-branch", help = "Remote branch name to use")
     public String remoteBranchToUse;
 
     @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review and sandbox")

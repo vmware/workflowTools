@@ -23,7 +23,7 @@ public class PushToTrackingBranch extends BaseAction {
 
         String[] pieces = trackingBranch.split("/");
         if (pieces.length != 2) {
-            exitWithErrorMessage("Expected tracking branch to be of the format remote/branchName, was " + trackingBranch);
+            cancelWithErrorMessage("Expected tracking branch to be of the format remote/branchName, was " + trackingBranch);
         }
         String remote = pieces[0];
         String branch = pieces[1];

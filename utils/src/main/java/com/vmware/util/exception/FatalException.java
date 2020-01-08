@@ -7,11 +7,11 @@ import com.vmware.util.StringUtils;
  */
 public class FatalException extends WorkflowRuntimeException {
 
-    public FatalException(String message, String... arguments) {
+    public FatalException(String message, Object... arguments) {
         super(message, arguments);
     }
 
-    public FatalException(Throwable cause, String message, String... arguments) {
+    public FatalException(Throwable cause, String message, Object... arguments) {
         super(cause, message, arguments);
     }
 }

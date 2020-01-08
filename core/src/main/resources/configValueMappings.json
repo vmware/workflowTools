@@ -1,7 +1,8 @@
 {
   "PushToRemoteBranch": [
+    "--git-remote",
     "--username",
-    " --remote-branch"
+    "--remote-branch"
   ],
   "AddTrackingIssueCreatedComments": [
     "--bugzilla-url"
@@ -62,12 +63,13 @@
     "--reviewboard-url",
     "--jira-url",
     "--bugzilla-test-bug",
-    "--username",
     "--bugzilla-url",
     "--trello-url",
     "--default-vcd-org",
     "--vcd-api-version",
-    "--vcd-url"
+    "--vcd-url",
+    "--username",
+    "--gitlab-url"
   ],
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
@@ -85,6 +87,9 @@
     "--latest-diff",
     "--review-request-id",
     "--review-board-date-format"
+  ],
+  "AcceptMergeRequest": [
+    "--gitlab-project-id"
   ],
   "BaseCommitReadAction": [
     "--set-empty-only"
@@ -121,6 +126,15 @@
     "--ssh-command",
     "--tail-follow",
     "--log-file"
+  ],
+  "BaseCommitUsingGitlabAction": [
+    "--tracking-branch",
+    "--target-merge-branch",
+    "--username",
+    "--merge-branch-format",
+    "--source-merge-branch",
+    "--gitlab-project-id",
+    "--gitlab-url"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -165,10 +179,16 @@
   "BaseCommitCreateAction": [
     "--perforce-client"
   ],
+  "SelectMatchingMergeRequest": [
+    "--gitlab-project-id"
+  ],
   "UploadReviewDiff": [
     "--tracking-branch",
     "--parent",
     "--perforce-client"
+  ],
+  "PushToMergeBranch": [
+    "--git-remote"
   ],
   "BaseCommitWithJenkinsBuildsAction": [
     "--disable-jenkins-login",
@@ -290,6 +310,12 @@
     "--ssh-host",
     "--ssh-site"
   ],
+  "CloseMergeRequest": [
+    "--gitlab-project-id"
+  ],
+  "CreateMergeRequestIfNeeded": [
+    "--gitlab-project-id"
+  ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--username",
     "--disable-jira"
@@ -317,6 +343,12 @@
   "LoadVappsIfNeeded": [
     "--use-vapp-json",
     "--vcd-check-quota"
+  ],
+  "RebaseMergeRequest": [
+    "--gitlab-project-id"
+  ],
+  "ApproveMergeRequest": [
+    "--gitlab-project-id"
   ],
   "DisplayConfig": [
     "--specific-properties"
@@ -382,6 +414,9 @@
   "BaseSetReviewersList": [
     "--always-include-review-url"
   ],
+  "OpenMergeRequest": [
+    "--gitlab-project-id"
+  ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",
     "--default-jira-project"
@@ -391,6 +426,9 @@
   ],
   "RemoveSelectedBuilds": [
     "--jenkins-url"
+  ],
+  "DeleteMergeBranch": [
+    "--git-remote"
   ],
   "SyncCardsWithJiraIssues": [
     "--jira-url",

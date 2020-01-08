@@ -18,7 +18,7 @@ public class ExitIfPerforceClientIsNotFound extends BaseCommitAction {
             reasonForFailing = "perforceClientName config value is not set, can also be set by git-p4.client git config value.";
         }
         if (StringUtils.isNotEmpty(reasonForFailing)) {
-            exitWithMessage(reasonForFailing);
+            cancelWithMessage(reasonForFailing);
         }
     }
 }

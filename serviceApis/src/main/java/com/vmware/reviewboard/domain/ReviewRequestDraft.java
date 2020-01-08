@@ -102,6 +102,9 @@ public class ReviewRequestDraft extends BaseEntity {
     public String perforceChangelistId;
 
     @Expose(serialize = false, deserialize = false)
+    public Integer gitlabMergeRequestId;
+
+    @Expose(serialize = false, deserialize = false)
     public String commitHash;
 
     @Expose(serialize = false, deserialize = false)

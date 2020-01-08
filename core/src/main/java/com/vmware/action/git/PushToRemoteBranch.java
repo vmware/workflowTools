@@ -23,8 +23,9 @@ public class PushToRemoteBranch extends BaseAction {
         }
 
         remoteBranchPath = remoteBranchPath.replace("$USERNAME", config.username);
+        remoteBranchPath = remoteBranchPath.replace("$BRANCH_NAME", git.currentBranch());
         log.info("Updating remote branch " + remoteBranchPath);
 
-        git.forcePushToRemoteBranch("origin", remoteBranchPath);
+        git.forcePushToRemoteBranch(gitRepoConfig.defaultGitRemote, remoteBranchPath);
     }
 }

@@ -5,6 +5,7 @@ import com.vmware.action.BaseAction;
 import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.gitlab.Gitlab;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
@@ -21,6 +22,7 @@ public class AuthenticateAllApis extends BaseAction {
 
     @Override
     public void process() {
+        checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl, config.username));
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg));
         checkAuthentication(new Trello(trelloConfig.trelloUrl));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));

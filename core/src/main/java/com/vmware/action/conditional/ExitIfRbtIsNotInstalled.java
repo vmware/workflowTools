@@ -4,7 +4,6 @@ import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
-import com.vmware.util.StringUtils;
 
 @ActionDescription("Exit if rbt is not installed.")
 public class ExitIfRbtIsNotInstalled extends BaseAction {
@@ -18,6 +17,6 @@ public class ExitIfRbtIsNotInstalled extends BaseAction {
             return;
         }
 
-        exitWithMessage("rbt is not installed.");
+        cancelWithMessage("rbt is not installed.");
     }
 }

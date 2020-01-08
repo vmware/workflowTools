@@ -8,6 +8,7 @@ import com.vmware.config.section.CheckstyleConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
+import com.vmware.config.section.GitlabConfig;
 import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.JiraConfig;
 import com.vmware.config.section.PatchConfig;
@@ -18,6 +19,9 @@ import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.CancelException;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.logging.LogLevel;
 import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +31,7 @@ public abstract class BaseAction implements Action {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
     protected final GitRepoConfig gitRepoConfig;
+    protected final GitlabConfig gitlabConfig;
     protected final PerforceClientConfig perforceClientConfig;
     protected final CommitConfig commitConfig;
     protected final CommitStatsConfig statsConfig;
@@ -56,6 +61,7 @@ public abstract class BaseAction implements Action {
         this.commitConfig = config.commitConfig;
         this.statsConfig = config.statsConfig;
         this.gitRepoConfig = config.gitRepoConfig;
+        this.gitlabConfig = config.gitlabConfig;
         this.perforceClientConfig = config.perforceClientConfig;
         this.reviewBoardConfig = config.reviewBoardConfig;
         this.jiraConfig = config.jiraConfig;
@@ -106,22 +112,16 @@ public abstract class BaseAction implements Action {
         this.expectedCommandsToBeAvailable = commands;
     }
 
-    protected void exitWithMessage(String message) {
-        log.info("");
-        log.info("Exiting as {}", message);
-        System.exit(0);
+    protected void cancelWithMessage(String message) {
+        throw new CancelException(LogLevel.INFO, message);
     }
 
-    protected void exitWithErrorMessage(String message) {
-        log.info("");
-        log.error(message);
-        System.exit(1);
+    protected void cancelWithErrorMessage(String message) {
+        throw new FatalException(message);
     }
 
-    protected void exitWithWarnMessage(String message) {
-        log.info("");
-        log.warn(message);
-        System.exit(0);
+    protected void cancelWithWarnMessage(String message) {
+        throw new CancelException(LogLevel.WARN, message);
     }
 
     private void checkExpectedCommands() {
@@ -136,7 +136,7 @@ public abstract class BaseAction implements Action {
     }
 
     protected void exitDueToFailureCheck(String reason) {
-        exitWithErrorMessage("Workflow failed by action " + this.getClass().getSimpleName() + " as " + reason);
+        cancelWithErrorMessage("Workflow failed by action " + this.getClass().getSimpleName() + " as " + reason);
     }
 
 }

@@ -10,15 +10,17 @@ import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
 
+import com.vmware.http.HttpMethodType;
+
 public class ExceptionChecker {
 
     private static Logger log = LoggerFactory.getLogger(ExceptionChecker.class);
 
-    public static void throwExceptionIfStatusIsNotValid(String currentUrl, final int statusCode, final String responseText) {
+    public static void throwExceptionIfStatusIsNotValid(String currentUrl, final int statusCode, HttpMethodType methodType, final String responseText) {
         if (isStatusValid(statusCode)) {
             return;
         }
-        log.debug("Response {} for url {}: {}", statusCode, currentUrl, responseText);
+        log.debug("Response {} for {} url {}: {}", statusCode, methodType, currentUrl, responseText);
 
         switch (statusCode) {
             case DoesNotExistException.STATUS_CODE:

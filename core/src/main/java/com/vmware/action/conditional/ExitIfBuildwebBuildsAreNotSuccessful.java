@@ -17,10 +17,10 @@ public class ExitIfBuildwebBuildsAreNotSuccessful extends BaseCommitWithBuildweb
             log.info("");
             buildweb.checkStatusOfBuilds(draft);
             if (!draft.buildwebBuildsAreSuccessful) {
-                exitWithMessage("one or more builds were not successful!");
+                cancelWithMessage("one or more builds were not successful!");
             }
         } else if (!draft.buildwebBuildsAreSuccessful) {
-            exitWithMessage("one or more builds were not successful!");
+            cancelWithMessage("one or more builds were not successful!");
         }
     }
 

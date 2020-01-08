@@ -19,7 +19,7 @@ public class ExitIfNoStagedChangesDetectedByGit extends BaseCommitAction {
     public void process() {
         List<FileChange> changes = git.getStagedChanges();
         if (changes.isEmpty()) {
-            exitWithMessage("no staged changes detected by git!");
+            cancelWithMessage("no staged changes detected by git!");
         }
 
         Padder titlePadder = new Padder("Staged Changes");

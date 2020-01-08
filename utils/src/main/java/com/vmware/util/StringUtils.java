@@ -103,16 +103,16 @@ public class StringUtils {
         return newValue;
     }
 
-    public static String addArgumentsToValue(String value, String... arguments) {
+    public static String addArgumentsToValue(String value, Object... arguments) {
         if (arguments.length == 0) {
             return value;
         }
-        for (String argument : arguments) {
+        for (Object argument : arguments) {
             if (argument == null) {
                 argument = "";
             }
-            argument = argument.replace("$", "\\$");
-            value = value.replaceFirst("\\{\\}", argument);
+            String argValue = String.valueOf(argument).replace("$", "\\$");
+            value = value.replaceFirst("\\{\\}", argValue);
         }
         return value;
     }
