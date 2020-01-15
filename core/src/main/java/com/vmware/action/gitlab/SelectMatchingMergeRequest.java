@@ -24,7 +24,7 @@ public class SelectMatchingMergeRequest extends BaseCommitUsingGitlabAction {
         Optional<MergeRequest> matchingRequest = Arrays.stream(userMergeRequests).filter(request -> matches(request, sourceMergeBranch, targetMergeBranch)).findFirst();
         if (matchingRequest.isPresent()) {
             log.info("Found matching merge request {}", matchingRequest.get().webUrl);
-            draft.gitlabMergeRequestId = matchingRequest.get().iid;
+            draft.setGitlabMergeRequest(matchingRequest.get());
         } else {
             log.info("Failed to find matching merge request");
         }

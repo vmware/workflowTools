@@ -15,8 +15,6 @@ public class OpenMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        log.info("Opening merge request {}", draft.gitlabMergeRequestId);
-        MergeRequest mergeRequest = gitlab.getMergeRequest(gitlabConfig.gitlabProjectId, draft.gitlabMergeRequestId);
-        SystemUtils.openUrl(mergeRequest.webUrl);
+        SystemUtils.openUrl(draft.mergeRequestUrl());
     }
 }

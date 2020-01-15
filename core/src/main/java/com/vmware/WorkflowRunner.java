@@ -17,8 +17,7 @@ public class WorkflowRunner {
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());
 
-        Workflow workflow = new Workflow();
-        workflow.init(args);
+        Workflow workflow = new Workflow(args);
         workflow.runWorkflow();
     }
 

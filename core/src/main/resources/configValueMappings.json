@@ -88,9 +88,6 @@
     "--review-request-id",
     "--review-board-date-format"
   ],
-  "AcceptMergeRequest": [
-    "--gitlab-project-id"
-  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
   ],
@@ -185,7 +182,8 @@
   "UploadReviewDiff": [
     "--tracking-branch",
     "--parent",
-    "--perforce-client"
+    "--perforce-client",
+    "--reviewboard-url"
   ],
   "PushToMergeBranch": [
     "--git-remote"
@@ -310,9 +308,6 @@
     "--ssh-host",
     "--ssh-site"
   ],
-  "CloseMergeRequest": [
-    "--gitlab-project-id"
-  ],
   "CreateMergeRequestIfNeeded": [
     "--gitlab-project-id"
   ],
@@ -343,12 +338,6 @@
   "LoadVappsIfNeeded": [
     "--use-vapp-json",
     "--vcd-check-quota"
-  ],
-  "RebaseMergeRequest": [
-    "--gitlab-project-id"
-  ],
-  "ApproveMergeRequest": [
-    "--gitlab-project-id"
   ],
   "DisplayConfig": [
     "--specific-properties"
@@ -413,9 +402,6 @@
   ],
   "BaseSetReviewersList": [
     "--always-include-review-url"
-  ],
-  "OpenMergeRequest": [
-    "--gitlab-project-id"
   ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",

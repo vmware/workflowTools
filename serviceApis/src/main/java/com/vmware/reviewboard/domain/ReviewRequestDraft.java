@@ -8,6 +8,7 @@ import com.vmware.IssueInfo;
 import com.vmware.JobBuild;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.jenkins.Job;
+import com.vmware.gitlab.domain.MergeRequest;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.DateUtils;
 import com.vmware.util.StringUtils;
@@ -102,9 +103,6 @@ public class ReviewRequestDraft extends BaseEntity {
     public String perforceChangelistId;
 
     @Expose(serialize = false, deserialize = false)
-    public Integer gitlabMergeRequestId;
-
-    @Expose(serialize = false, deserialize = false)
     public String commitHash;
 
     @Expose(serialize = false, deserialize = false)
@@ -125,6 +123,8 @@ public class ReviewRequestDraft extends BaseEntity {
     @Expose(serialize = false, deserialize = false)
     public int lineDeletions;
 
+    @Expose(serialize = false, deserialize = false)
+    private MergeRequest gitlabMergeRequest;
 
     public ReviewRequestDraft() {}
 
@@ -484,6 +484,23 @@ public class ReviewRequestDraft extends BaseEntity {
         return String.format("%s:%s %s, %s", truncatedSummary, dateText,
                 pluralize(filesChanged, "file"), pluralize(totalLineChanges(), "line change"));
     }
+
+    public void setGitlabMergeRequest(MergeRequest mergeRequest) {
+        this.gitlabMergeRequest = mergeRequest;
+    }
+
+    public Integer mergeRequestId() {
+        return gitlabMergeRequest != null ? gitlabMergeRequest.iid : null;
+    }
+
+    public Integer mergeRequestProjectId() {
+        return gitlabMergeRequest != null ? gitlabMergeRequest.projectId : null;
+    }
+
+    public String mergeRequestUrl() {
+        return gitlabMergeRequest != null ? gitlabMergeRequest.webUrl : null;
+    }
+
 
     private int totalLineChanges() {
         return lineInsertions + lineDeletions;

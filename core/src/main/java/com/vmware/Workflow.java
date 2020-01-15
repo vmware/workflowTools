@@ -75,12 +75,14 @@ public class Workflow {
     private boolean firstTime = true;
     private boolean displayedShellInfoMessage = false;
     private String username = null;
-    private String[] args;
+    private final String[] args;
 
-    public void init(String[] args) {
+    public Workflow(String[] args) {
         this.args = args;
-        readWorkflowHistoryFile();
+    }
 
+    private void init() {
+        readWorkflowHistoryFile();
         config = configParser.parseWorkflowConfig(username, args);
         username = config.username;
         serviceLocator = new ServiceLocator(config);
@@ -199,21 +201,22 @@ public class Workflow {
     }
 
     public void runWorkflow() {
-        if (StringUtils.isEmpty(config.workflowsToRun) && config.shellMode) {
-            askForWorkflow(false);
-            runWorkflow();
-        } else if (StringUtils.isEmpty(config.workflowsToRun)) {
-            // default workflow
-            config.workflowsToRun = "intro";
-        }
-
-        String workflowToRun = config.workflowsToRun;
-        if (Arrays.asList("abalta", "anabalta").contains(workflowToRun)) {
-            checkAllActionsCanBeInstantiated(workflowToRun.equals("anabalta"));
-            return;
-        }
-
         try {
+            init();
+            if (StringUtils.isEmpty(config.workflowsToRun) && config.shellMode) {
+                askForWorkflow(false);
+                runWorkflow();
+            } else if (StringUtils.isEmpty(config.workflowsToRun)) {
+                // default workflow
+                config.workflowsToRun = "intro";
+            }
+
+            String workflowToRun = config.workflowsToRun;
+            if (Arrays.asList("abalta", "anabalta").contains(workflowToRun)) {
+                checkAllActionsCanBeInstantiated(workflowToRun.equals("anabalta"));
+                return;
+            }
+
             WorkflowActions workflowActions = new WorkflowActions(config);
             List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
@@ -247,7 +250,6 @@ public class Workflow {
 
     private void runWorkflowAgain() {
         if (config.shellMode) {
-            init(args);
             runWorkflow();
         }
     }

@@ -13,8 +13,8 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
 
     @Override
     public String cannotRunAction() {
-        if (draft.gitlabMergeRequestId != null) {
-            return "merge request with id " + draft.gitlabMergeRequestId + " has already been created";
+        if (draft.mergeRequestId() != null) {
+            return "merge request with id " + draft.mergeRequestId() + " has already been created";
         }
         return super.cannotRunAction();
     }
@@ -32,7 +32,7 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
 
         log.info("Creating merge request with source branch {} and target branch {}", mergeRequest.sourceBranch, mergeRequest.targetBranch);
         MergeRequest createdRequest = gitlab.createMergeRequest(mergeRequest);
-        draft.gitlabMergeRequestId = createdRequest.iid;
+        draft.setGitlabMergeRequest(createdRequest);
         log.info("Created merge request {}", createdRequest.webUrl);
     }
 }

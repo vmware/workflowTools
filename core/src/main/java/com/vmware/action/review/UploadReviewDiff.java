@@ -62,7 +62,8 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
     protected void uploadDiffUsingRbt(File workingDirectory, String changelistId) {
         String changelistIdText = changelistId != null ? " " + changelistId : "";
-        String command = format("rbt post -r %s%s", draft.id, changelistIdText);
+        String debugFlag = log.isDebugEnabled() ? " -d" : "";
+        String command = format("rbt post %s --diff-only --server %s -r %s%s", debugFlag, commitConfig.reviewboardUrl, draft.id, changelistIdText);
         runRbtCommand(workingDirectory, command);
     }
 
@@ -85,6 +86,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         String mergeBase = git.mergeBase(trackingBranchPath, "HEAD");
         diff.path = git.diffAsByteArray(parentPath, "HEAD", supportsDiffWithRenames);
         diff.parent_diff_path = git.diffAsByteArray(mergeBase, parentPath, supportsDiffWithRenames);
+        log.debug("Parent diff paths are {} and {}", mergeBase, parentPath);
         return diff;
     }
 

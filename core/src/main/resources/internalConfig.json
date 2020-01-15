@@ -240,6 +240,15 @@
       "setReviewDetailsAndDiff",
       "CopyReviewUrlToClipboard"
     ],
+    "reviewWithRbt": [
+      "readNonTrivialCommit",
+      "CreateReviewIfNeeded",
+      "AmendCommit",
+      "AddReviewGroupsForMatchingFileMappings",
+      "UpdateReviewDetails",
+      "UploadReviewDiffWithRbt",
+      "CopyReviewUrlToClipboard"
+    ],
     "reviewAndOpen": [
       "readNonTrivialCommit",
       "CreateReviewIfNeeded",
@@ -536,11 +545,16 @@
     ],
     "createMergeRequest": [
       "selectMergeRequest",
-      "CreateMergeRequestIfNeeded"
+      "CreateMergeRequestIfNeeded",
+      "CopyMergeRequestUrlToClipboard"
     ],
     "openMergeRequest": [
       "selectMergeRequest",
       "OpenMergeRequest"
+    ],
+    "copyMergeRequestUrl": [
+      "selectMergeRequest",
+      "CopyMergeRequestUrlToClipboard"
     ],
     "closeMergeRequest": [
       "selectMergeRequest",
