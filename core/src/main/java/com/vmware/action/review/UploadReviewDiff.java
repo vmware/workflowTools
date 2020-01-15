@@ -84,7 +84,8 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
         DiffToUpload diff = new DiffToUpload();
         String mergeBase = git.mergeBase(trackingBranchPath, "HEAD");
-        diff.base_commit_id = git.revParse("HEAD");
+        diff.base_commit_id = git.revParse(mergeBase);
+        diff.commit_id = git.revParse("HEAD");
         diff.path = git.diffAsByteArray(parentPath, "HEAD", supportsDiffWithRenames);
         diff.parent_diff_path = git.diffAsByteArray(mergeBase, parentPath, supportsDiffWithRenames);
         log.debug("Parent diff paths are {} and {}", mergeBase, parentPath);
