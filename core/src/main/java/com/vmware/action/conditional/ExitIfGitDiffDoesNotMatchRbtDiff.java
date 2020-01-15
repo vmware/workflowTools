@@ -29,12 +29,17 @@ public class ExitIfGitDiffDoesNotMatchRbtDiff extends BaseCommitUsingReviewBoard
         if (rbtDiff.equals(gitDiff)) {
             log.info("Diffs match exactly");
         } else {
-            String reasonForMotMatching = DiffUtils.compareDiffContent(gitDiff, rbtDiff, "git", "rbt");
-            if (StringUtils.isNotBlank(reasonForMotMatching)) {
-                log.error("Perforce diff didn't match git diff\n{}\n", reasonForMotMatching);
-                cancelWithErrorMessage("diffs did not match");
+            String gitDiffWithExtraNewline = gitDiff + "\n";
+            if (gitDiffWithExtraNewline.equals(rbtDiff)) {
+                log.info("Diffs match if git diff has extra newline");
             } else {
-                log.info("Diffs are the same");
+                String reasonForMotMatching = DiffUtils.compareDiffContent(gitDiff, rbtDiff, "git", "rbt");
+                if (StringUtils.isNotBlank(reasonForMotMatching)) {
+                    log.error("Perforce diff didn't match git diff\n{}\n", reasonForMotMatching);
+                    cancelWithErrorMessage("diffs did not match");
+                } else {
+                    log.info("Diffs are the same");
+                }
             }
         }
 
