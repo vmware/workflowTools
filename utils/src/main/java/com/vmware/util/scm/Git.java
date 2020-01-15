@@ -238,6 +238,9 @@ public class Git extends BaseScmWrapper {
 
     public byte[] diffAsByteArray(String parentRef, String commitRef, boolean supportsRenames) {
         String output = diff(parentRef, commitRef, supportsRenames);
+        if (StringUtils.isNotBlank(output)) {
+            output += "\n";
+        }
         return output != null ? output.getBytes(Charset.forName("UTF8")) : null;
     }
 
