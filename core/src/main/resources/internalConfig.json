@@ -278,6 +278,10 @@
       "UploadReviewDiff",
       "CopyReviewUrlToClipboard"
     ],
+    "checkGitDiffMatchesRbtDiff": [
+      "ReadLastCommit",
+      "ExitIfGitDiffDoesNotMatchRbtDiff"
+    ],
     "detailsUpdateOnly": [
       "readNonTrivialCommit",
       "CreateReviewIfNeeded",

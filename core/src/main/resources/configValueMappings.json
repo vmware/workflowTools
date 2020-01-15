@@ -17,6 +17,10 @@
   "BaseCheckstyleAction": [
     "--checkstyle-config-xml-path"
   ],
+  "ExitIfGitDiffDoesNotMatchRbtDiff": [
+    "--parent",
+    "--reviewboard-url"
+  ],
   "OpenBuildPage": [
     "--jenkins-url"
   ],
