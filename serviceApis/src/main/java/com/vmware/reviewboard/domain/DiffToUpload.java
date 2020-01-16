@@ -2,7 +2,6 @@ package com.vmware.reviewboard.domain;
 
 public class DiffToUpload {
     public String basedir;
-    public String commit_id;
     public String base_commit_id;
     public byte[] parent_diff_path;
     public byte[] path;
