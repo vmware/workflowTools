@@ -23,10 +23,14 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox buikd, this is for a VMware specific tool")
     public String buildwebProject;
 
+    @ConfigurableProperty(help = "Default buildweb branch to use")
+    public String defaultBuildwebBranch;
+
     @ConfigurableProperty(commandLine = "--buildweb-branch",
             help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool",
             methodNameForValueCalculation = "determineBuildwebBranch")
     public String buildwebBranch;
+
 
     @ConfigurableProperty(commandLine = "--build-type", help = "Buildweb build type to use, this is for a VMware specific tool")
     public String buildType;
@@ -65,14 +69,17 @@ public class BuildwebConfig {
     public boolean useGitTrackingBranch;
 
     public CalculatedProperty determineBuildwebBranch() {
+        if (StringUtils.isNotBlank(buildwebBranch)) {
+            return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+        }
         Git git = new Git();
         if (!git.workingDirectoryIsInGitRepo()) {
-            return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+            return new CalculatedProperty(defaultBuildwebBranch, "defaultBuildwebBranch");
         }
 
         String trackingBranch = git.getTrackingBranch();
         if (StringUtils.isEmpty(trackingBranch)) {
-            return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+            return new CalculatedProperty(defaultBuildwebBranch, "defaultBuildwebBranch");
         }
         String trackingBranchWithoutOrigin = trackingBranch.substring(trackingBranch.indexOf("/") + 1);
         log.debug("Parsed branch name {} from tracking branch {}", trackingBranchWithoutOrigin, trackingBranch);
@@ -87,6 +94,6 @@ public class BuildwebConfig {
             return new CalculatedProperty(trackingBranchWithoutOrigin, "git tracking branch");
         }
 
-        return new CalculatedProperty(buildwebBranch, "buildwebBranch");
+        return new CalculatedProperty(defaultBuildwebBranch, "defaultBuildwebBranch");
     }
 }

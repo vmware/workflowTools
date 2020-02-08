@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -78,6 +79,18 @@ public class IOUtils {
     public static String readWithoutClosing(InputStream inputStream) {
         InputStreamReader reader = new InputStreamReader(inputStream);
         return read(reader, false, null);
+    }
+
+    public static String read(String path) {
+        if (path.startsWith("http")) {
+            try {
+                return IOUtils.read(new URL(path).openStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return IOUtils.read(new File(path));
+        }
     }
 
     public static String read(InputStream inputStream) {

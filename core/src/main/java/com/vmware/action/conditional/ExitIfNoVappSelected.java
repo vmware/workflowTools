@@ -12,6 +12,14 @@ public class ExitIfNoVappSelected extends BaseVappAction {
     }
 
     @Override
+    public String cannotRunAction() {
+        if (sshConfig.usesSshSite()) {
+            return "ssh site is configured";
+        }
+        return super.cannotRunAction();
+    }
+
+    @Override
     public void process() {
         if (vappData.noVappSelected()) {
             cancelWithMessage("no Vapp has been selected.");

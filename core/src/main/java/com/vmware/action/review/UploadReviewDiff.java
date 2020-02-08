@@ -63,7 +63,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     protected void uploadDiffUsingRbt(File workingDirectory, String changelistId) {
         String changelistIdText = changelistId != null ? " " + changelistId : "";
         String debugFlag = log.isDebugEnabled() ? " -d" : "";
-        String command = format("rbt post %s --diff-only --server %s -r %s%s", debugFlag, commitConfig.reviewboardUrl, draft.id, changelistIdText);
+        String command = format("rbt post%s --diff-only --server %s -r %s%s", debugFlag, commitConfig.reviewboardUrl, draft.id, changelistIdText);
         runRbtCommand(workingDirectory, command);
     }
 
@@ -78,21 +78,26 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
         String trackingBranchPath = gitRepoConfig.trackingBranchPath();
         String parentPath = gitRepoConfig.parentBranchPath();
         log.info("Creating git diff using tracking branch {} against parent {}", trackingBranchPath, parentPath);
-        String reviewBoardVersion = reviewBoard.getVersion();
-        boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
-        log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
+        log.debug("Review supports diff with renames {}", reviewBoard.supportsDiffWithRenames());
 
         DiffToUpload diff = new DiffToUpload();
         String mergeBase = git.mergeBase(trackingBranchPath, "HEAD");
-        diff.base_commit_id = git.revParse(mergeBase);
-        diff.path = git.diffAsByteArray(parentPath, "HEAD", supportsDiffWithRenames);
-        diff.parent_diff_path = git.diffAsByteArray(mergeBase, parentPath, supportsDiffWithRenames);
+        addBaseCommitIdIfNeeded(diff, mergeBase);
+        diff.path = git.diffAsByteArray(parentPath, "HEAD", reviewBoard.supportsDiffWithRenames());
+        diff.parent_diff_path = git.diffAsByteArray(mergeBase, parentPath, reviewBoard.supportsDiffWithRenames());
         if (diff.parent_diff_path != null && diff.parent_diff_path.length > 0) {
             log.info("Parent diff constructed using {} and parent {}", mergeBase, parentPath);
         } else {
             log.debug("Parent diff paths are {} and {}", mergeBase, parentPath);
         }
         return diff;
+    }
+
+    private void addBaseCommitIdIfNeeded(DiffToUpload diff, String mergeBase) {
+        if (reviewBoard.supportsDiffBaseCommitId()) {
+            diff.base_commit_id = git.revParse(mergeBase);
+            log.debug("Base commit id set to {}", diff.base_commit_id);
+        }
     }
 
     private void checkThatPerforceConfigIsValid() {
@@ -107,16 +112,15 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
 
     private DiffToUpload createPerforceReviewRequestDiffFromGit() {
         log.info("Converting git diff into a diff in perforce format against parent branch {}", gitRepoConfig.parentBranchPath());
-        String reviewBoardVersion = reviewBoard.getVersion();
-        boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
-        log.debug("Review board version: {}, Supports renames {}", reviewBoardVersion, supportsDiffWithRenames);
+        log.debug("Review board supports diff with renames {}", reviewBoard.supportsDiffWithRenames());
 
         DiffToUpload diff = new DiffToUpload();
         String mergeBase = git.mergeBase(gitRepoConfig.trackingBranchPath(), "HEAD");
+        addBaseCommitIdIfNeeded(diff, mergeBase);
         GitDiffToPerforceConverter diffConverter = new GitDiffToPerforceConverter(getLoggedInPerforceClient(),
                 git.lastSubmittedChangelistInfo().getChangelistId());
-        diff.path = diffConverter.convertAsBytes(git.diff(gitRepoConfig.parentBranchPath(), "HEAD", supportsDiffWithRenames));
-        diff.parent_diff_path = diffConverter.convertAsBytes(git.diff(mergeBase, gitRepoConfig.parentBranchPath(), supportsDiffWithRenames));
+        diff.path = diffConverter.convertAsBytes(git.diff(gitRepoConfig.parentBranchPath(), "HEAD", reviewBoard.supportsDiffWithRenames()));
+        diff.parent_diff_path = diffConverter.convertAsBytes(git.diff(mergeBase, gitRepoConfig.parentBranchPath(), reviewBoard.supportsDiffWithRenames()));
         return diff;
     }
 

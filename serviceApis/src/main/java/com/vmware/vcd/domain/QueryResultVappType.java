@@ -1,6 +1,8 @@
 package com.vmware.vcd.domain;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,15 +38,19 @@ public class QueryResultVappType extends ResourceType implements InputListSelect
     }
 
     public QueryResultVappType(File jsonFile) {
-        this.name = jsonFile.getName();
+        this(jsonFile.getName(), jsonFile.getPath());
+    }
+
+    public QueryResultVappType(String name, String path) {
+        this.name = name;
         this.status = "Json File Based";
         this.jsonFileBased = true;
         this.isOwnedByWorkflowUser = false;
-        parseJsonFile(jsonFile);
+        parseJsonFile(path);
     }
 
-    private void parseJsonFile(File jsonFile) {
-        String jsonData = IOUtils.read(jsonFile);
+    private void parseJsonFile(String path) {
+        String jsonData = IOUtils.read(path);
         parseJson(jsonData);
         this.otherAttributes = new OtherAttributes();
         this.otherAttributes.numberOfVMs = MatcherUtils.allMatches(jsonData, "(\"deployment\"\\s*:)").size();

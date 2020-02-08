@@ -65,6 +65,9 @@ public class ReviewRequestDraft extends BaseEntity {
     @SerializedName("target_groups")
     @JsonAdapter(LinkArrayDeserializer.class)
     public String targetGroups;
+    @SerializedName("depends_on")
+    @JsonAdapter(RequestLinksArrayDeserializer.class)
+    public String dependsOnRequests;
     @Expose(deserialize = false)
     @SerializedName("description_text_type")
     public String descriptionTextType;
@@ -92,6 +95,12 @@ public class ReviewRequestDraft extends BaseEntity {
      */
     @SerializedName("public")
     public Boolean isPublic;
+
+    /**
+     * Id used in review request for commit
+     */
+    @SerializedName("commit_id")
+    public String commitId;
 
     @Expose(serialize = false, deserialize = false)
     public Boolean jenkinsBuildsAreSuccessful;
@@ -286,8 +295,8 @@ public class ReviewRequestDraft extends BaseEntity {
         return null;
     }
 
-    public String[] bugNumbersAsArray() {
-        return bugNumbers != null ? bugNumbers.split(",") : new String[0];
+    public List<String> bugNumbersAsList() {
+        return StringUtils.splitAndTrim(bugNumbers, ",");
     }
 
     public List<JobBuild> jobBuildsMatchingUrl(String url) {
@@ -421,10 +430,10 @@ public class ReviewRequestDraft extends BaseEntity {
         }
         if (matches.isEmpty()) {
             dynamicLog.log(DEBUG, "{} not found in commit", description);
-            log.debug("Using pattern {} against text\n[{}]", pattern, text);
+            log.trace("Using pattern {} against text\n[{}]", pattern, text);
             return new String[0];
         }
-        return matches.toArray(new String[matches.size()]);
+        return matches.toArray(new String[0]);
     }
 
     private int parseValueFromText(String text, String pattern, String description) {
@@ -453,7 +462,7 @@ public class ReviewRequestDraft extends BaseEntity {
         Matcher matcher = Pattern.compile(pattern, patternFlags).matcher(text);
         if (!matcher.find()) {
             dynamicLog.log(logLevel, "{} not found in commit", description);
-            log.debug("Using pattern {} against text\n[{}]", pattern, text);
+            log.trace("Using pattern {} against text\n[{}]", pattern, text);
             return "";
         }
         // get first non null group match

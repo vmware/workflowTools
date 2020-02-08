@@ -18,25 +18,16 @@ public class UsernamePasswordAsker {
 
 
     public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingApiToken) {
-        return askUserForUsernameAndPassword(missingApiToken, null);
-
-    }
-
-    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingCookie, String orgName) {
         if (testCredentials != null) {
             log.info("Using test credentials");
             return testCredentials;
         }
 
-        log.info("Credentials are only used once for retrieving {}", missingCookie.getDisplayType());
+        log.info("Credentials are only used once for retrieving {}", missingApiToken.getDisplayType());
 
         String username = InputUtils.readValue("Username");
         String password = InputUtils.readPassword("Password");
 
-        if (StringUtils.isNotEmpty(orgName) && !username.contains("@")) {
-            log.info("Appending org name {} to username {}", orgName, username);
-            username += "@" + orgName;
-        }
         return new UsernamePasswordCredentials(username, password);
     }
 

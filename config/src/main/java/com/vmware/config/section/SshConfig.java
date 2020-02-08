@@ -7,6 +7,7 @@ import com.vmware.util.StringUtils;
 import java.util.TreeMap;
 
 import static com.vmware.util.StringUtils.isEmpty;
+import static com.vmware.util.StringUtils.isNotEmpty;
 
 public class SshConfig {
 
@@ -34,14 +35,26 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--ssh-strict-host-checking", help = "Whether to enforce strict host checking for ssh")
     public boolean sshStrictHostChecking;
 
-    @ConfigurableProperty(commandLine = "--log-file", help = "Log file to tail")
+    @ConfigurableProperty(commandLine = "--log-file", help = "Log file(s) to tail or find matching lines from")
     public String logFile;
+
+    @ConfigurableProperty(commandLine = "--output-log-file", help = "Log file to store ssh output to")
+    public String outputLogFile;
 
     @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
     public int logLineCount;
 
+    @ConfigurableProperty(commandLine = "--line-count-before", help = "How many lines of the log to show before a match")
+    public int lineCountBeforeMatch;
+
+    @ConfigurableProperty(commandLine = "--line-count-after", help = "How many lines of the log to show after a match")
+    public int lineCountAfterMatch;
+
     @ConfigurableProperty(commandLine = "--tail-follow", help = "Using tail -f")
     public boolean continuousTailing;
+
+    @ConfigurableProperty(commandLine = "--search-text", help = "Text to match using sed")
+    public String searchText;
 
     @ConfigurableProperty(commandLine = "--rsync-flags", help = "Flags to use for rsync command")
     public String rsyncFlags;
@@ -59,15 +72,11 @@ public class SshConfig {
         return new SiteConfig(sshHost, sshPort, sshUsername, sshPassword);
     }
 
-    public boolean useSshSite() {
-        if (StringUtils.isNotEmpty(sshSite)) {
-            return true;
-        }
-        boolean sitesExist = sshSiteConfigs != null && !sshSiteConfigs.isEmpty();
-        return sitesExist && noCommandLineSiteValues();
+    public boolean usesSshSite() {
+        return StringUtils.isNotEmpty(sshSite) || hasCommandLineSite();
     }
 
-    private boolean noCommandLineSiteValues() {
-        return isEmpty(sshHost) && isEmpty(sshUsername) && isEmpty(sshPassword);
+    public boolean hasCommandLineSite() {
+        return isNotEmpty(sshHost) && isNotEmpty(sshUsername) && isNotEmpty(sshPassword);
     }
 }

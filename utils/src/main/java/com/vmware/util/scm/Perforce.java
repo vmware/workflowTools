@@ -73,11 +73,6 @@ public class Perforce extends BaseScmWrapper {
         }
     }
 
-    private String loggedInUser() {
-
-        return null;
-    }
-
     public List<String> getPendingChangelists() {
         return getPendingChangelists(false);
     }

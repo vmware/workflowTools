@@ -45,6 +45,8 @@ public class ReviewRequest extends BaseEntity {
     @Expose(serialize = false)
     @SerializedName(value = "public")
     public boolean isPublic;
+    @SerializedName("commit_id")
+    public String commitId;
 
     @Expose(serialize = false, deserialize = false)
     public Map<ReviewStatType, Long> stats = new HashMap<ReviewStatType, Long>();

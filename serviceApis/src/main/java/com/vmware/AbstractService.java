@@ -84,8 +84,7 @@ public abstract class AbstractService {
      * @see ApiAuthentication for file system locations
      */
     protected String readExistingApiToken(ApiAuthentication credentialsType) {
-        String homeFolder = System.getProperty("user.home");
-        File apiTokenFile = new File(homeFolder + "/" + credentialsType.getFileName());
+        File apiTokenFile = determineApiTokenFile();
         if (!apiTokenFile.exists()) {
             return null;
         }
@@ -98,8 +97,7 @@ public abstract class AbstractService {
         if (apiToken == null || apiToken.equals(existingToken)) {
             return;
         }
-        String homeFolder = System.getProperty("user.home");
-        File apiTokenFile = new File(homeFolder + "/" + credentialsType.getFileName());
+        File apiTokenFile = determineApiTokenFile();
 
         log.info("Saving {} api token to {}", credentialsType.name(), apiTokenFile.getPath());
         IOUtils.write(apiTokenFile, apiToken);
@@ -118,8 +116,7 @@ public abstract class AbstractService {
 
     private void displayInputMessage(int retryCount) {
         if (retryCount == 0) {
-            String homeFolder = System.getProperty("user.home");
-            String filePath = homeFolder + "/" + credentialsType.getFileName();
+            String filePath = determineApiTokenFile().getPath();
             if (credentialsType.getCookieName() != null) {
                 log.info("Valid {} cookie ({}) not found in file {}", credentialsType.name(),
                         credentialsType.getCookieName(), filePath);
@@ -131,5 +128,10 @@ public abstract class AbstractService {
             log.warn("Login failure");
             log.info("Retrying login, attempt {} of {}", retryCount, MAX_LOGIN_RETRIES);
         }
+    }
+
+    protected File determineApiTokenFile() {
+        String homeFolder = System.getProperty("user.home");
+        return new File(homeFolder + "/" + credentialsType.getFileName());
     }
 }

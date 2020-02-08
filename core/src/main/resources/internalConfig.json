@@ -21,7 +21,7 @@
   "waitTimeForBlockingWorkflowAction": 1200,
   "buildDisplayName": "Sandbox",
   "buildwebProject": "vcloud",
-  "buildwebBranch": "sp-main",
+  "defaultBuildwebBranch": "sp-main",
   "buildType": "opt",
   "vcdApiVersion": "32.0",
   "vcdVmQuota": 40,
@@ -116,6 +116,10 @@
     "readPendingChangelist": [
       "ReadPendingChangelist",
       "ExitIfCommitDoesNotHaveAChangelistId"
+    ],
+    "openBugNumberUrls": [
+      "readNonTrivialCommit",
+      "OpenBugNumberUrls"
     ],
     "openReviewUrl": [
       "readNonTrivialCommit",
@@ -797,6 +801,10 @@
     "tailVappLogFile": [
       "selectVcdCell",
       "TailLogFile"
+    ],
+    "findVappLogLines": [
+      "selectVcdCell",
+      "FindMatchingLines"
     ],
     "loadVappJson": [
       "selectVapp",

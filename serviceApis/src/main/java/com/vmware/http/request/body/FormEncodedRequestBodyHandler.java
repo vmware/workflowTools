@@ -47,18 +47,18 @@ public class FormEncodedRequestBodyHandler {
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         }
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-        String contentToWrite = "";
+        StringBuilder contentToWrite = new StringBuilder();
         for (String name : valuesToWrite.keySet()) {
 
-            if (!contentToWrite.isEmpty()) {
-                contentToWrite += "&";
+            if (contentToWrite.length() > 0) {
+                contentToWrite.append("&");
             }
             String stringValue = String.valueOf(valuesToWrite.get(name));
             String encodedName = URLEncoder.encode(name, "UTF-8");
-            contentToWrite += encodedName + "=" + stringValue;
+            contentToWrite.append(encodedName).append("=").append(stringValue);
         }
-        log.trace("Form encoded request\n{}", contentToWrite);
-        outputStream.writeBytes(contentToWrite);
+        log.trace("Form encoded request\n{}", contentToWrite.toString());
+        outputStream.writeBytes(contentToWrite.toString());
         outputStream.flush();
         outputStream.close();
     }

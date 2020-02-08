@@ -100,6 +100,7 @@
     "--log-line-count"
   ],
   "UpdateReviewDetails": [
+    "--tracking-branch",
     "--groups",
     "--disable-markdown"
   ],
@@ -148,7 +149,14 @@
     "--reviewboard-url"
   ],
   "SelectVapp": [
+    "--disable-jenkins-login",
+    "--jenkins-uses-csrf",
+    "--username",
+    "--jenkins-url",
     "--vapp-name",
+    "--job-artifact",
+    "--job-build",
+    "--job-display-names",
     "--vapp-json-file"
   ],
   "LoadVapps": [
@@ -231,6 +239,7 @@
     "--username"
   ],
   "ExecuteSshCommand": [
+    "--output-log-file",
     "--ssh-strict-host-checking",
     "--build-display-name",
     "--ssh-command"
@@ -281,6 +290,13 @@
     "--max-description",
     "--max-summary"
   ],
+  "FindMatchingLines": [
+    "--line-count-after",
+    "--line-count-before",
+    "--ssh-command",
+    "--search-text",
+    "--log-file"
+  ],
   "ExitIfVcdVmQuotaExceeded": [
     "--vcd-vm-quota",
     "--use-vapp-json"
@@ -318,6 +334,9 @@
   "ResolveBugsWithResolvedTrackingIssues": [
     "--username",
     "--disable-jira"
+  ],
+  "OpenBugNumberUrls": [
+    "--bugzilla-url"
   ],
   "SetReviewId": [
     "--username",

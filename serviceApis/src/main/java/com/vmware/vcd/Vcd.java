@@ -1,5 +1,6 @@
 package com.vmware.vcd;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
@@ -109,7 +110,14 @@ public class Vcd extends AbstractRestService {
         } else {
             log.info("Enter username as username@[org name]");
         }
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(vcd, vcdOrg);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(vcd);
+        if (StringUtils.isNotEmpty(vcdOrg) && !credentials.getUsername().contains("@")) {
+            log.info("Appending org name {} to username {}", vcdOrg, credentials.getUsername());
+            credentials = new UsernamePasswordCredentials(credentials.getUsername() + "@" + vcdOrg, credentials.getPassword());
+        } else {
+            vcdOrg = StringUtils.splitOnlyOnce(credentials.getUsername(), ",")[1];
+            log.info("Setting vcd org to {}", vcdOrg);
+        }
 
         RequestHeader acceptHeader = anAcceptHeader("*/*;version=" + apiVersion);
         HttpResponse response = connection.post(apiUrl + "/sessions", HttpResponse.class, (Object) null,
@@ -121,6 +129,12 @@ public class Vcd extends AbstractRestService {
         String apiToken = authzHeaders.get(0);
         saveApiToken(apiToken, ApiAuthentication.vcd);
         connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
+    }
+
+    @Override
+    protected File determineApiTokenFile() {
+        String homeFolder = System.getProperty("user.home");
+        return new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-vcd-api-token.txt");
     }
 
     private RequestHeader taskAcceptHeader() {
@@ -138,4 +152,5 @@ public class Vcd extends AbstractRestService {
     private String mediaType(Class<?> dto) {
         return dto.getAnnotation(VcdMediaType.class).value() + "+json;version=" + apiVersion;
     }
+
 }

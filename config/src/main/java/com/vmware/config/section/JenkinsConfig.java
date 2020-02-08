@@ -59,6 +59,16 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--testbed-parameter-name", help = "Name of the Jenkins parameter used for testbed template")
     public String testbedParameter;
 
+    @ConfigurableProperty(commandLine = "--job-artifact", help = "Jenkins job output artifact")
+    public String jobArtifact;
+
+    @ConfigurableProperty(commandLine = "--job-build", help = "Number of jenkins build to use")
+    public Integer jobBuildNumber;
+
+    public boolean hasConfiguredArtifact() {
+        return StringUtils.isNotEmpty(jobArtifact) && jobsDisplayNames != null && jobsDisplayNames.length == 1 && jobBuildNumber != null;
+    }
+
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith("--J")) {

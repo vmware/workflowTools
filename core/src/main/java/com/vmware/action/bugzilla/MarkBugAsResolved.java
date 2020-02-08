@@ -5,11 +5,6 @@ import com.vmware.bugzilla.Bugzilla;
 import com.vmware.bugzilla.domain.BugResolutionType;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.StringUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 
 @ActionDescription("Resolves bugzilla bugs with a status of fixed.")
 public class MarkBugAsResolved extends BaseCommitAction {
@@ -41,8 +36,8 @@ public class MarkBugAsResolved extends BaseCommitAction {
 
     @Override
     public void process() {
-        for (String bugNumber : draft.bugNumbersAsArray()) {
-            Integer bugId = bugzillaConfig.parseBugzillaBugNumber(bugNumber.trim());
+        for (String bugNumber : draft.bugNumbersAsList()) {
+            Integer bugId = bugzillaConfig.parseBugzillaBugNumber(bugNumber);
             if (bugId == null) {
                 log.info("{} is not a Bugzilla id, assuming that it is a Jira issue key, skipping", bugNumber);
                 return;

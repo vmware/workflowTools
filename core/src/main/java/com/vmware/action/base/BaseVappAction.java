@@ -33,7 +33,6 @@ public abstract class BaseVappAction extends BaseCommitAction {
         if (checkVappJson && vappData.noVappSelected()) {
             exitDueToFailureCheck("no Vapp selected");
         }
-
         if (checkVappJson && !vappData.jsonDataLoaded()) {
             exitDueToFailureCheck("no Vapp json loaded");
         }
@@ -60,9 +59,14 @@ public abstract class BaseVappAction extends BaseCommitAction {
             Sites.DeployedVM cell = vappData.getSelectedVcdCell();
             Sites.OvfProperties ovfProperties = cell.deployment.ovfProperties;
             return new SiteConfig(ovfProperties.hostname, 22, cell.osCredentials.username, cell.osCredentials.password);
-        } else if (sshConfig.useSshSite()) {
+        } else if (sshConfig.hasCommandLineSite()) {
+            return sshConfig.commandLineSite();
+        } else {
             String sshSite = sshConfig.sshSite;
             TreeMap<String, SiteConfig> sshSiteConfigs = sshConfig.sshSiteConfigs;
+            if (sshSiteConfigs == null || sshSiteConfigs.isEmpty()) {
+                throw new FatalException("No ssh sites configured");
+            }
             if (StringUtils.isEmpty(sshSite)) {
                 sshSite = InputUtils.readValueUntilNotBlank("Ssh site", sshSiteConfigs.keySet());
             }
@@ -70,8 +74,6 @@ public abstract class BaseVappAction extends BaseCommitAction {
                 throw new FatalException("Ssh site {} is not present in list {}", sshSite, sshSiteConfigs.keySet().toString());
             }
             return sshSiteConfigs.get(sshSite);
-        } else {
-            return sshConfig.commandLineSite();
         }
     }
 

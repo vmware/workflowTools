@@ -27,6 +27,18 @@ public class Link {
         return title;
     }
 
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public void addPathParam(String value) {
         href += value + "/";
     }

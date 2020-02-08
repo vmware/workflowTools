@@ -226,8 +226,12 @@ public class ReviewBoard extends AbstractRestService {
         return cachedServerInfo;
     }
 
-    public String getVersion() {
-        return getServerInfo().product.version;
+    public boolean supportsDiffWithRenames() {
+        return getVersion().compareTo("1.7") >= 0;
+    }
+
+    public boolean supportsDiffBaseCommitId() {
+        return getVersion().compareTo("1.7.13") >= 0;
     }
 
     public void updateServerTimeZone(String serverDateFormat) {
@@ -255,6 +259,10 @@ public class ReviewBoard extends AbstractRestService {
         if (!connection.hasCookie(reviewBoard)) {
             log.warn("Cookie {} should have been retrieved from reviewboard login!", reviewBoard.getCookieName());
         }
+    }
+
+    private String getVersion() {
+        return getServerInfo().product.version;
     }
 
 }

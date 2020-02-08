@@ -62,9 +62,8 @@ public class TestReviewBoardApi extends BaseTests {
     }
 
     @Test
-    public void reviewboardIs17OrGreater() {
-        String version = reviewBoard.getVersion();
-        assertTrue("Expected review board version of 1.7 or greater", version.compareTo("1.7") >=0);
+    public void reviewBoardSupportsDiffRenames() {
+        assertTrue("Expected review board version of 1.7 or greater", reviewBoard.supportsDiffWithRenames());
     }
 
     @Test
@@ -117,13 +116,15 @@ public class TestReviewBoardApi extends BaseTests {
 
     @Test
     public void getReviewShipItComment() {
-        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(520886);
+        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(1617468);
+        ReviewRequestDraft draft = reviewBoard.getReviewRequestDraft(reviewRequest.getDraftLink());
         reviewBoard.getSoftSubmitReview(reviewRequest);
     }
 
     @Test
     public void getUserReviewsForReviewRequest() {
-        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(478638);
+        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(1618019);
+        ReviewRequestDraft draft = reviewBoard.getReviewRequestDraft(reviewRequest.getDraftLink());
         UserReview[] reviews = reviewBoard.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
         assertTrue(reviews.length == 1);
 

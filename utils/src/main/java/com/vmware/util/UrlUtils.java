@@ -12,15 +12,22 @@ public class UrlUtils {
         return url.endsWith("/") ? url : url + "/";
     }
 
+    public static String removeTrailingSlash(String url) {
+        if (url == null) {
+            return null;
+        }
+        return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+    }
+
     public static String addRelativePaths(String url, String... paths) {
         if (paths.length == 0) {
             return url;
         }
-        String urlWithTrailingSlash = addTrailingSlash(url);
-        StringBuilder urlBuilder = new StringBuilder(urlWithTrailingSlash);
+        String urlWithoutTrailingSlash = removeTrailingSlash(url);
+        StringBuilder urlBuilder = new StringBuilder(urlWithoutTrailingSlash);
         for (String path : paths) {
             if (path.startsWith("/")) {
-                urlBuilder.append(path.substring(1));
+                urlBuilder.append(path);
             } else {
                 urlBuilder.append("/").append(path);
             }

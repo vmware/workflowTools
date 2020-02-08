@@ -44,9 +44,9 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
     @Override
     public void process() {
-        String[] bugNumbers = draft.bugNumbersAsArray();
+        List<String> bugNumbers = draft.bugNumbersAsList();
         for (String bugNumber : bugNumbers) {
-            transitionIssue(bugNumber.trim());
+            transitionIssue(bugNumber);
         }
 
     }
@@ -56,7 +56,7 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
 
         if (bugzillaConfig.parseBugzillaBugNumber(bugNumber) != null) {
             log.info("Bug number {} appears to be a bugzilla bug, can't transition to {}",
-                    lastStatusToTransitionTo.name());
+                    bugNumber, lastStatusToTransitionTo.name());
             return;
         }
         IssueInfo issue = draft.getIssueForBugNumber(bugNumber);

@@ -38,6 +38,7 @@ import com.vmware.util.input.ImprovedArgumentCompleter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.scm.Git;
 
@@ -368,7 +369,11 @@ public class Workflow {
 
         int waitTimeInMilliSeconds = 0;
         Map<String, Long> executionTimesPerAction = new LinkedHashMap<>();
+        String lastActionName = null;
         for (WorkflowAction action : actions) {
+            if (lastActionName != null && config.checkPoint) {
+                checkWhetherToContinue(lastActionName, action);
+            }
             while (!actionsSetup.contains(action)) {
                 String actionName = action.getActionClassName();
                 if (waitTimeInMilliSeconds > 30000) {
@@ -386,8 +391,17 @@ public class Workflow {
             runAction(action, values);
             long elapsedTime = new Date().getTime() - startingDate.getTime();
             executionTimesPerAction.put(action.getClass().getSimpleName(), elapsedTime);
+            lastActionName = action.getActionClassName();
         }
         outputExecutionTimes(executionTimesPerAction);
+    }
+
+    private void checkWhetherToContinue(String lastActionName, WorkflowAction action) {
+        log.info("Finished action {}, next action is {}", lastActionName, action.getActionClassName());
+        String confirmation = InputUtils.readValue("Continue (Type no to cancel)", "yes","no");
+        if ("no".equalsIgnoreCase(confirmation)) {
+            throw new CancelException(LogLevel.INFO, "confirmation was declined before running action {}", action.getActionClassName());
+        }
     }
 
     private void outputExecutionTimes(Map<String, Long> executionTimesPerAction) {

@@ -19,6 +19,7 @@ import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.JobsList;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.logging.Padder;
 import org.slf4j.Logger;
@@ -81,6 +82,11 @@ public class Jenkins extends AbstractRestBuildService {
 
     public JobBuildDetails getJobBuildDetails(JobBuild jobBuild) {
         return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
+    }
+
+    public String constructFullArtifactPath(String jobName, int buildNumber, String artifactPath) {
+        return UrlUtils.addRelativePaths(baseUrl, "job", jobName,
+                String.valueOf(buildNumber), "artifact", artifactPath);
     }
 
     public void abortJobBuild(JobBuild jobBuildToAbort) {

@@ -31,6 +31,9 @@ public class LoadVapps extends BaseVappAction {
         if (StringUtils.isNotEmpty(vcdConfig.vappJsonFile)) {
             return "vappJsonFile has been specified";
         }
+        if (jenkinsConfig.hasConfiguredArtifact()) {
+            return "jenkins job artifact has been specified";
+        }
         return super.cannotRunAction();
     }
 

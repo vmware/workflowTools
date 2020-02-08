@@ -19,12 +19,10 @@ public class ExitIfGitDiffDoesNotMatchRbtDiff extends BaseCommitUsingReviewBoard
 
     @Override
     public void process() {
-        String reviewBoardVersion = reviewBoard.getVersion();
-        boolean supportsDiffWithRenames = reviewBoardVersion.compareTo("1.7") >= 0;
         String rbtDiff = CommandLineUtils.executeCommand("rbt diff --server " + commitConfig.reviewboardUrl, LogLevel.DEBUG);
         String parentRef = gitRepoConfig.parentBranchPath();
         log.info("Using parent ref {} for git diff", parentRef);
-        String gitDiff = git.diff(parentRef, "HEAD", supportsDiffWithRenames);
+        String gitDiff = git.diff(parentRef, "HEAD", reviewBoard.supportsDiffWithRenames());
 
         if (rbtDiff.equals(gitDiff)) {
             log.info("Diffs match exactly");
@@ -40,7 +38,7 @@ public class ExitIfGitDiffDoesNotMatchRbtDiff extends BaseCommitUsingReviewBoard
         } else {
             String reasonForMotMatching = DiffUtils.compareDiffContent(gitDiff, rbtDiff, "git", "rbt");
             if (StringUtils.isNotBlank(reasonForMotMatching)) {
-                log.error("Perforce diff didn't match git diff\n{}\n", reasonForMotMatching);
+                log.error("Git diff didn't match rbt diff\n{}\n", reasonForMotMatching);
                 cancelWithErrorMessage("diffs did not match");
             } else {
                 log.info("Diffs are the same");

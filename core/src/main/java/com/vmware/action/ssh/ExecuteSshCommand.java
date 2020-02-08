@@ -1,7 +1,12 @@
 package com.vmware.action.ssh;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +20,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
@@ -60,7 +66,8 @@ public class ExecuteSshCommand extends BaseVappAction {
     }
 
     protected void executeSshCommand(SiteConfig siteConfig, String command) {
-        log.info("Executing ssh command {} for {}@{}", command, siteConfig.username, siteConfig.host);
+        log.info("Executing ssh command for {}@{}", siteConfig.username, siteConfig.host);
+        log.info("{}", command);
         JSch jsch = new JSch();
         Session session = null;
         ChannelExec channel = null;
@@ -75,7 +82,7 @@ public class ExecuteSshCommand extends BaseVappAction {
             channel.setCommand(command);
 
             readCommandOutput(channel, command);
-        } catch (JSchException e) {
+        } catch (JSchException | IOException e) {
             throw new RuntimeException(e);
         } finally {
             if (channel != null) {
@@ -85,32 +92,44 @@ public class ExecuteSshCommand extends BaseVappAction {
                 session.disconnect();
             }
         }
-
     }
 
-    private void readCommandOutput(ChannelExec channel, String command) throws JSchException {
-        channel.setErrStream(new LoggerOutputStream(channel, log, LogLevel.ERROR));
-        channel.setOutputStream(new LoggerOutputStream(channel, log, LogLevel.INFO));
+    private void readCommandOutput(ChannelExec channel, String command) throws JSchException, IOException {
+        File outputFile = StringUtils.isNotBlank(sshConfig.outputLogFile) ? new File(sshConfig.outputLogFile) : null;
+        BufferedWriter writer = outputFile != null ? new BufferedWriter(new FileWriter(outputFile, true)) : null;
+
+        if (outputFile != null) {
+            log.info("Saving output to file {}", outputFile.getAbsolutePath());
+        }
+
+        channel.setErrStream(new LoggerOutputStream(channel, log, LogLevel.ERROR, writer));
+        channel.setOutputStream(new LoggerOutputStream(channel, log, LogLevel.INFO, writer));
 
         Padder commandOutputPadder = new Padder("Command {} output", command);
         commandOutputPadder.infoTitle();
         channel.connect((int) TimeUnit.SECONDS.toMillis(5));
         waitForChannelToFinish(channel);
         commandOutputPadder.infoTitle();
+        if (writer != null) {
+           writer.close();
+           log.info("Saved output to file {}", outputFile.getAbsolutePath());
+        }
     }
 
     private static class LoggerOutputStream extends OutputStream {
         private static final String FORCE_DISCONNECT_MESSAGE = "forceDisconnect";
+        private final BufferedWriter writer;
 
         private ByteArrayOutputStream baus = new ByteArrayOutputStream(1000);
         private ChannelExec channel;
         private DynamicLogger logger;
         private LogLevel level;
 
-        LoggerOutputStream(ChannelExec channel, Logger logger, LogLevel level) {
+        LoggerOutputStream(ChannelExec channel, Logger logger, LogLevel level, BufferedWriter writer) {
             this.channel = channel;
             this.logger = new DynamicLogger(logger);
             this.level = level;
+            this.writer = writer;
         }
 
         @Override
@@ -118,9 +137,7 @@ public class ExecuteSshCommand extends BaseVappAction {
             if (b == '\n') {
                 String logMessage = baus.toString();
                 baus.reset();
-                if (!forceDisconnect(logMessage)) {
-                    logger.log(level, logMessage);
-                }
+                logOrPrintOutput(logMessage);
             } else {
                 baus.write(b);
             }
@@ -134,6 +151,19 @@ public class ExecuteSshCommand extends BaseVappAction {
 
             String logMessage = baus.toString();
             if (!forceDisconnect(logMessage)) {
+                logOrPrintOutput(logMessage);
+            }
+        }
+
+        private void logOrPrintOutput(String logMessage) {
+            if (writer != null) {
+                try {
+                    writer.write(logMessage);
+                    writer.newLine();
+                } catch (IOException e) {
+                    throw new RuntimeIOException(e);
+                }
+            } else {
                 logger.log(level, logMessage);
             }
         }

@@ -45,6 +45,7 @@ public class ConfigMappings {
         configValues.add("--dry-run");
         configValues.add("--debug");
         configValues.add("--trace");
+        configValues.add("--check-point");
         return configValues;
     }
 

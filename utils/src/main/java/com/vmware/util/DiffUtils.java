@@ -29,7 +29,7 @@ public class DiffUtils {
     }
 
     private static Map<String, String> convertDiffToMap(String diff) {
-        Matcher diffLineMatcher = Pattern.compile("diff --first\\s+.+b/(.+)").matcher("");
+        Matcher diffLineMatcher = Pattern.compile("diff --git\\s+.+b/(.+)").matcher("");
         String fileName = null;
         StringBuilder fileDiffBuilder = new StringBuilder();
         Map<String, String> fileDiffs = new HashMap<>();
@@ -127,7 +127,7 @@ public class DiffUtils {
             }
             if (firstDiffLine.startsWith("+++ " + FileChange.NON_EXISTENT_FILE_IN_GIT)) {
                 log.info("Ignoring delete file lines in {} diff as the {} diff will not have those", firstDiffLabel, secondDiffLabel);
-                firstDiffLineAfterMoving = moveIteratorUntilLineStartsWith(firstDiffIterator, "diff --first");
+                firstDiffLineAfterMoving = moveIteratorUntilLineStartsWith(firstDiffIterator, "diff --git");
             }
         }
         return "failed to find expected difference between " + firstDiffLabel + " and " + secondDiffLabel + " diff";

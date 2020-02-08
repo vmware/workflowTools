@@ -2,6 +2,7 @@ package com.vmware.config.section;
 
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
 
 public class BugzillaConfig {
 
@@ -42,5 +43,9 @@ public class BugzillaConfig {
         } else {
             return null;
         }
+    }
+
+    public String bugzillaUrl(int bugNumber) {
+        return UrlUtils.addRelativePaths(bugzillaUrl, "show_bug.cgi?id=" + bugNumber);
     }
 }

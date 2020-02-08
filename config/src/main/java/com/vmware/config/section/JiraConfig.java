@@ -4,6 +4,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.config.jira.IssueTypesDefinitionMapper;
+import com.vmware.util.UrlUtils;
 
 import java.util.Map;
 
@@ -48,4 +49,8 @@ public class JiraConfig {
 
     @ConfigurableProperty(commandLine = "--use-epics", help = "Whether to use parent epics when loading Jira issues")
     public boolean useEpics;
+
+    public String issueUrl(String bugNumber) {
+        return UrlUtils.addRelativePaths(jiraUrl, "browse", bugNumber);
+    }
 }

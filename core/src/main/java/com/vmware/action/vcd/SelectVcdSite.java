@@ -31,7 +31,7 @@ public class SelectVcdSite extends BaseSingleVappJsonAction {
             log.info("Using first site as there is only one site");
             siteIndex = 0;
         } else if (siteIndex == null) {
-            siteIndex = InputUtils.readSelection(IntStream.range(0, sites.size()).mapToObj(String::valueOf).collect(Collectors.toList()), "Select Site");
+            siteIndex = InputUtils.readSelection(IntStream.range(0, sites.size()).mapToObj(String::valueOf).collect(Collectors.toList()), "Site");
         } else {
             log.info("Using specified site index of {}", siteIndex);
             validateListSelection(sites, "vcd site index", siteIndex);

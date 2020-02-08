@@ -117,6 +117,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-dr,--dry-run", help = "Shows the workflow actions that would be run")
     public boolean dryRun;
 
+    @ConfigurableProperty(commandLine = "-cp,--check-point", help = "Check after every workflow action whether to continue")
+    public boolean checkPoint;
+
     @ConfigurableProperty(commandLine = "-sp,--specific-properties", help = "Show value for just the specified config properties")
     public String configPropertiesToDisplay;
 
