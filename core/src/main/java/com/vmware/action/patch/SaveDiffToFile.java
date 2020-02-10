@@ -26,7 +26,7 @@ public class SaveDiffToFile extends BasePerforceCommitAction {
     @Override
     public void process() {
         String changelistIdToUse = determineChangelistIdToUse();
-        String outputFilePath = StringUtils.isNotEmpty(patchConfig.outputFileForContent) ? patchConfig.outputFileForContent
+        String outputFilePath = StringUtils.isNotEmpty(config.outputFile) ? config.outputFile
                 : "workflowPatch.patch";
         String content = perforce.diffChangelistInGitFormat(changelistIdToUse, LogLevel.TRACE);
         File outputFile = new File(outputFilePath);

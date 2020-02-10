@@ -38,9 +38,6 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--log-file", help = "Log file(s) to tail or find matching lines from")
     public String logFile;
 
-    @ConfigurableProperty(commandLine = "--output-log-file", help = "Log file to store ssh output to")
-    public String outputLogFile;
-
     @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
     public int logLineCount;
 

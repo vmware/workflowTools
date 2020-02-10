@@ -852,6 +852,7 @@
     "loadVappJson",
     "selectVapp",
     "selectVcdCell",
+    "selectVcdSite",
     "selectMergeRequest"
   ]
 }

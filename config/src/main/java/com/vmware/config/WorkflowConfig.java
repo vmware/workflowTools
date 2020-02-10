@@ -135,6 +135,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-s,--shell", help = "Run workflow in shell mode, will allow additional commands to be run")
     public boolean shellMode;
 
+    @ConfigurableProperty(commandLine = "--output-file", help = "File to store output to")
+    public String outputFile;
+
     @Expose(serialize = false, deserialize = false)
     private WorkflowFields configurableFields;
 

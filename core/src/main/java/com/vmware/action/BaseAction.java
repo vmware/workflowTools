@@ -1,5 +1,11 @@
 package com.vmware.action;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BugzillaConfig;
@@ -21,6 +27,7 @@ import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.CancelException;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
@@ -137,6 +144,21 @@ public abstract class BaseAction implements Action {
 
     protected void exitDueToFailureCheck(String reason) {
         cancelWithErrorMessage("Workflow failed by action " + this.getClass().getSimpleName() + " as " + reason);
+    }
+
+    protected BufferedWriter outputWriter() {
+        try {
+            if (StringUtils.isNotBlank(config.outputFile)) {
+                File outputFile = new File(config.outputFile);
+                log.info("Saving output to {}", outputFile.getAbsolutePath());
+                return new BufferedWriter(new FileWriter(outputFile));
+            } else {
+                log.debug("Displaying on command line as no output file is specified");
+                return new BufferedWriter(new PrintWriter(System.out));
+            }
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
 }

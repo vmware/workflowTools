@@ -95,14 +95,9 @@ public class ExecuteSshCommand extends BaseVappAction {
     }
 
     private void readCommandOutput(ChannelExec channel, String command) throws JSchException, IOException {
-        File outputFile = StringUtils.isNotBlank(sshConfig.outputLogFile) ? new File(sshConfig.outputLogFile) : null;
-        BufferedWriter writer = outputFile != null ? new BufferedWriter(new FileWriter(outputFile, true)) : null;
+        BufferedWriter writer = outputWriter();
 
-        if (outputFile != null) {
-            log.info("Saving output to file {}", outputFile.getAbsolutePath());
-        }
-
-        channel.setErrStream(new LoggerOutputStream(channel, log, LogLevel.ERROR, writer));
+        channel.setErrStream(new LoggerOutputStream(channel, log, LogLevel.ERROR, null));
         channel.setOutputStream(new LoggerOutputStream(channel, log, LogLevel.INFO, writer));
 
         Padder commandOutputPadder = new Padder("Command {} output", command);
@@ -112,7 +107,6 @@ public class ExecuteSshCommand extends BaseVappAction {
         commandOutputPadder.infoTitle();
         if (writer != null) {
            writer.close();
-           log.info("Saved output to file {}", outputFile.getAbsolutePath());
         }
     }
 

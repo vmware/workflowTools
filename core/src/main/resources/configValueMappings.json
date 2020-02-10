@@ -239,7 +239,6 @@
     "--username"
   ],
   "ExecuteSshCommand": [
-    "--output-log-file",
     "--ssh-strict-host-checking",
     "--build-display-name",
     "--ssh-command"
@@ -465,6 +464,9 @@
   ],
   "RebaseAgainstMaster": [
     "--git-remote"
+  ],
+  "BaseAction": [
+    "--output-file"
   ],
   "SelectVcdCell": [
     "--vcd-cell-index"
