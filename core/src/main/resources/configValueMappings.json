@@ -249,6 +249,10 @@
     "--vcd-api-version",
     "--vcd-url"
   ],
+  "DisplayAliasesForWorkflows": [
+    "--workflow-alias",
+    "--include-alias-autocomplete"
+  ],
   "CreateReview": [
     "--username",
     "--review-board-date-format",
@@ -295,6 +299,9 @@
     "--ssh-command",
     "--search-text",
     "--log-file"
+  ],
+  "GenerateAutoCompleteValues": [
+    "--autocomplete-workflow"
   ],
   "ExitIfVcdVmQuotaExceeded": [
     "--vcd-vm-quota",

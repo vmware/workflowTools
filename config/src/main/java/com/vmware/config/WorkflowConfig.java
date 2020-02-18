@@ -6,6 +6,7 @@ import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.CheckstyleConfig;
+import com.vmware.config.section.CommandLineConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
@@ -95,6 +96,9 @@ public class WorkflowConfig {
 
     @SectionConfig
     public VcdConfig vcdConfig;
+
+    @SectionConfig
+    public CommandLineConfig commandLineConfig;
 
     @ConfigurableProperty(help = "Information about the the git commit that this version of workflow tools was built from")
     public Map<String, String> buildInfo;

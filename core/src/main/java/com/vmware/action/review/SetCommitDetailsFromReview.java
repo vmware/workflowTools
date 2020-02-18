@@ -8,6 +8,7 @@ import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
 import java.util.List;
@@ -42,12 +43,13 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
 
         ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(reviewId));
 
-        ReviewRequestDraft reviewAsDraft = reviewRequest.asDraft();
-        if (StringUtils.isEmpty(reviewAsDraft.summary) && StringUtils.isEmpty(reviewAsDraft.description)) { // populate values from draft
-            reviewAsDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
+        ReviewRequestDraft reviewAsDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
+
+        if (reviewAsDraft == null) { // populate values from review
+            reviewAsDraft = reviewRequest.asDraft();
         }
-        if (draft == null) {
-            throw new RuntimeException("Summary and description and blank for review request " + reviewId + " and no draft found for request");
+        if (StringUtils.isEmpty(reviewAsDraft.summary) && StringUtils.isEmpty(reviewAsDraft.description)) {
+            throw new FatalException("Summary and description and blank for review request " + reviewId + " and no draft found for request");
         }
         log.info("Using review request {} ({}) for patching", reviewAsDraft.id, reviewRequest.summary);
         draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, commitConfig.maxSummaryLength);

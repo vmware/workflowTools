@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Completer for JLine2.
@@ -40,17 +42,23 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         }
 
         String workflowString = argumentList.getArguments()[0];
-        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config, workflowActions);
-        valuesParser.parse(Arrays.asList(workflowString.split(",")), Collections.emptyList());
         values.clear();
         valuesShownWhenNoBuffer.clear();
+        values.addAll(generateValuesForWorkflowString(workflowString));
+        valuesShownWhenNoBuffer.addAll(values);
+        return super.complete(buffer, cursor, candidates);
+    }
+
+    public SortedSet<String> generateValuesForWorkflowString(String workflowString) {
+        SortedSet<String> values = new TreeSet<>();
+        WorkflowValuesParser valuesParser = new WorkflowValuesParser(config, workflowActions);
+        valuesParser.parse(Arrays.asList(workflowString.split(",")), Collections.emptyList());
         for (WorkflowAction foundAction : valuesParser.getWorkflowActions()) {
             Set<String> matchingConfigValues = configMappings.getConfigValuesForAction(foundAction);
             values.addAll(matchingConfigValues);
         }
         values.addAll(valuesParser.calculateJenkinsParameterConfigValues());
-        valuesShownWhenNoBuffer.addAll(values);
-        return super.complete(buffer, cursor, candidates);
+        return values;
     }
 
     @Override

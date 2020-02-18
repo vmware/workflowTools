@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.vmware.action.info.GenerateAutoCompleteValues;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
@@ -93,6 +94,10 @@ public class Workflow {
 
     private void updateWorkflowHistoryFile() {
         String argumentsText = configParser.getRuntimeArgumentsText();
+        if (argumentsText != null && argumentsText.startsWith(GenerateAutoCompleteValues.class.getSimpleName())) {
+            log.info("Not adding action {} to history as it is just used for auto completion support", GenerateAutoCompleteValues.class.getSimpleName());
+            return;
+        }
         if (workflowHistory.isEmpty() || !workflowHistory.get(0).equals(argumentsText)) {
             workflowHistory.add(0, argumentsText);
         }
@@ -250,7 +255,7 @@ public class Workflow {
     }
 
     private void runWorkflowAgain() {
-        if (config.shellMode) {
+        if (config != null && config.shellMode) {
             runWorkflow();
         }
     }

@@ -143,7 +143,7 @@ public class IOUtils {
         }
     }
 
-    private static String read(Reader input, boolean readUntilStreamClosed, LogLevel printLinesLevel) {
+    public static String read(Reader input, boolean readUntilStreamClosed, LogLevel printLinesLevel) {
         StringWriter writer = new StringWriter();
         char[] buffer = new char[DEFAULT_BUFFER_SIZE];
 

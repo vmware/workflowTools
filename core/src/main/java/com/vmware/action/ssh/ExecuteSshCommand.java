@@ -131,7 +131,9 @@ public class ExecuteSshCommand extends BaseVappAction {
             if (b == '\n') {
                 String logMessage = baus.toString();
                 baus.reset();
-                logOrPrintOutput(logMessage);
+                if (!forceDisconnect(logMessage)) {
+                    logOrPrintOutput(logMessage);
+                }
             } else {
                 baus.write(b);
             }
@@ -154,6 +156,7 @@ public class ExecuteSshCommand extends BaseVappAction {
                 try {
                     writer.write(logMessage);
                     writer.newLine();
+                    writer.flush();
                 } catch (IOException e) {
                     throw new RuntimeIOException(e);
                 }

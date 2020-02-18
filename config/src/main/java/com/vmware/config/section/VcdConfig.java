@@ -17,7 +17,7 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-check-quota", help = "Whether to check if user is over VM quota count")
     public boolean checkVmQuota;
 
-    @ConfigurableProperty(commandLine = "--vcd-vm-quota", help = "User VM quota count for Vcloud Director")
+    @ConfigurableProperty(commandLine = "--vcd-vm-quota", help = "User VM quota count for Vcloud Director. Used if quota cannot be found in Vcloud Director")
     public int vcdVmQuota;
 
     @ConfigurableProperty(commandLine = "--vapp-lease", help = "Lease value in days for the selected Vapp")

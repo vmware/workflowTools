@@ -253,7 +253,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     private String buildPattern(String buildUrlsPattern) {
-        return "([\\w_]+)\\s" + buildUrlsPattern;
+        return "(.+)\\s" + buildUrlsPattern;
     }
 
     private String buildWithResultPattern(String buildUrlsPattern) {

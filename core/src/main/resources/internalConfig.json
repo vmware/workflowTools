@@ -40,6 +40,8 @@
   "useGitTrackingBranch": true,
   "disableMarkdown": false,
   "sshPort": 22,
+  "workflowAlias":  "workflow",
+  "includeAliasAutocomplete" : true,
   "issueTypesToInclude": [
     8
   ],
@@ -117,11 +119,11 @@
       "ReadPendingChangelist",
       "ExitIfCommitDoesNotHaveAChangelistId"
     ],
-    "openBugNumberUrls": [
+    "openBugs": [
       "readNonTrivialCommit",
       "OpenBugNumberUrls"
     ],
-    "openReviewUrl": [
+    "openReview": [
       "readNonTrivialCommit",
       "OpenReviewUrl"
     ],
@@ -524,15 +526,15 @@
       "ChangeBuildNumber",
       "AmendCommit"
     ],
-    "openSandboxLogPage": [
+    "openSandboxLog": [
       "ReadLastCommit",
       "OpenSandboxLogPage"
     ],
-    "openBuildPage": [
+    "openBuild": [
       "ReadLastCommit",
       "OpenBuildPage"
     ],
-    "openBuildConsolePage": [
+    "openBuildConsole": [
       "ReadLastCommit",
       "OpenBuildConsolePage"
     ],
@@ -774,19 +776,19 @@
       "loadVappJson",
       "CopyVappJsonToClipboard"
     ],
-    "openVCenterUrl": [
+    "openVCenter": [
       "selectVcdSite",
       "OpenVCenterApp"
     ],
-    "openNsxTManagerUrl": [
+    "openNsxTManager": [
       "selectVcdSite",
       "OpenNsxTManagerApp"
     ],
-    "openVappProviderUrl": [
+    "openVappProvider": [
       "selectVcdSite",
       "OpenVcdProviderApp"
     ],
-    "openVappTenantUrl": [
+    "openVappTenant": [
       "selectVcdSite",
       "OpenVcdTenantApp"
     ],
@@ -822,6 +824,9 @@
       "LoadVapps",
       "SelectVapp",
       "ExitIfNoVappSelected"
+    ],
+    "displayConfig": [
+      "DisplayConfig"
     ],
     "displayWorkflowBuildInfo": [
       "DisplayConfig",

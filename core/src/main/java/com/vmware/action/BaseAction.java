@@ -11,6 +11,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.CheckstyleConfig;
+import com.vmware.config.section.CommandLineConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.GitRepoConfig;
@@ -53,6 +54,7 @@ public abstract class BaseAction implements Action {
     protected final BuildwebConfig buildwebConfig;
     protected final SshConfig sshConfig;
     protected final VcdConfig vcdConfig;
+    protected final CommandLineConfig commandLineConfig;
 
     protected ServiceLocator serviceLocator;
 
@@ -80,6 +82,7 @@ public abstract class BaseAction implements Action {
         this.buildwebConfig = config.buildwebConfig;
         this.sshConfig = config.sshConfig;
         this.vcdConfig = config.vcdConfig;
+        this.commandLineConfig = config.commandLineConfig;
     }
 
     public void checkIfWorkflowShouldBeFailed() {
