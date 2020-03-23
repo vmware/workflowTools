@@ -2,6 +2,7 @@ package com.vmware.vcd.domain;
 
 import java.util.List;
 
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 
 public abstract class ResourceType {
@@ -26,5 +27,12 @@ public abstract class ResourceType {
         }
         return link.stream().filter(linkValue -> linkValue.rel.equals(rel) && linkValue.type.equals(type)).findFirst()
                 .orElseThrow(() -> new FatalException("No link with relation {} and type {} found for {}", rel, type, name));
+    }
+
+    public String parseIdFromRef() {
+        if (StringUtils.isEmpty(href)) {
+            return null;
+        }
+        return href.substring(href.lastIndexOf("/") + 1);
     }
 }

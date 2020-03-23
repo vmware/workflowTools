@@ -63,7 +63,7 @@ public class VappData {
 
     public int poweredOnVmCount() {
         return getVapps().stream().filter(QueryResultVappType::isOwnedByWorkflowUser)
-                .map(QueryResultVappType::poweredOnVmCount).reduce(Integer::sum).orElse(0);
+                .map(vapp -> vapp.poweredOnVmCount).reduce(Integer::sum).orElse(0);
     }
 
     public void setSelectedVappByIndex(int index) {

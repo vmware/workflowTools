@@ -26,6 +26,10 @@ public class RequestHeader extends RequestParam {
         return new RequestHeader("Authorization", "Basic " + basicCredentials);
     }
 
+    public static RequestHeader aBearerAuthHeader(String authValue) {
+        return new RequestHeader("Authorization", "Bearer " + authValue);
+    }
+
     public static RequestHeader aRefererHeader(String value) {
         return new RequestHeader("Referer", value);
     }

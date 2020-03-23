@@ -120,7 +120,8 @@
       "ExitIfCommitDoesNotHaveAChangelistId"
     ],
     "openBugs": [
-      "readNonTrivialCommit",
+      "ReadLastCommit",
+      "ExitIfCommitHasNoBugNumber",
       "OpenBugNumberUrls"
     ],
     "openReview": [
@@ -130,6 +131,10 @@
     "openReviewDiff": [
       "readNonTrivialCommit",
       "OpenReviewDiff"
+    ],
+    "copyReviewUrl": [
+      "readNonTrivialCommit",
+      "CopyReviewUrlToClipboard"
     ],
     "setCommitDetailsWithoutConfirmation": [
       "SetSummary",
@@ -526,9 +531,16 @@
       "ChangeBuildNumber",
       "AmendCommit"
     ],
+    "openSandbox": [
+      "ReadLastCommit",
+      "OpenSandbox"
+    ],
     "openSandboxLog": [
       "ReadLastCommit",
       "OpenSandboxLogPage"
+    ],
+    "openJob": [
+      "openBuild"
     ],
     "openBuild": [
       "ReadLastCommit",
@@ -746,6 +758,9 @@
       "AmendCommit"
     ],
     "invokeSandboxBuildWithGitFusion": [
+      "invokeSandboxBuildWithGit"
+    ],
+    "sandboxGit": [
       "invokeSandboxBuildWithGit"
     ],
     "invokeSandboxBuildWithGit": [

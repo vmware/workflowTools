@@ -59,6 +59,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--testbed-parameter-name", help = "Name of the Jenkins parameter used for testbed template")
     public String testbedParameter;
 
+    @ConfigurableProperty(commandLine = "--job-with-artifact", help = "Jenkins job to use for artifact")
+    public String jobWithArtifact;
+
     @ConfigurableProperty(commandLine = "--job-artifact", help = "Jenkins job output artifact")
     public String jobArtifact;
 
@@ -66,7 +69,8 @@ public class JenkinsConfig {
     public Integer jobBuildNumber;
 
     public boolean hasConfiguredArtifact() {
-        return StringUtils.isNotEmpty(jobArtifact) && jobsDisplayNames != null && jobsDisplayNames.length == 1 && jobBuildNumber != null;
+        return StringUtils.isNotEmpty(jobArtifact) && jobBuildNumber != null
+                && (StringUtils.isNotEmpty(jobWithArtifact) ||  (jobsDisplayNames != null && jobsDisplayNames.length == 1));
     }
 
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {

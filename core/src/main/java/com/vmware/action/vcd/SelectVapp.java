@@ -38,7 +38,7 @@ public class SelectVapp extends BaseVappAction {
             vappData.setSelectedVapp(new QueryResultVappType("url", vcdConfig.vappJsonFile));
         } else if (jenkinsConfig.hasConfiguredArtifact()) {
             String jobArtifactPath = serviceLocator.getJenkins()
-                    .constructFullArtifactPath(jenkinsConfig.jobsDisplayNames[0], jenkinsConfig.jobBuildNumber, jenkinsConfig.jobArtifact);
+                    .constructFullArtifactPath(getJobForArtifact(), jenkinsConfig.jobBuildNumber, jenkinsConfig.jobArtifact);
             log.info("Using artifact {}", jobArtifactPath);
             vappData.setSelectedVapp(new QueryResultVappType("artifact", jobArtifactPath));
         } else if (StringUtils.isNotEmpty(vcdConfig.vappName)) {
@@ -50,6 +50,14 @@ public class SelectVapp extends BaseVappAction {
             int selectedVapp = InputUtils.readSelection(vappData.vappLabels(),
                     "Select Vapp (Total powered on owned VM count " + vappData.poweredOnVmCount() + ")");
             vappData.setSelectedVappByIndex(selectedVapp);
+        }
+    }
+
+    public String getJobForArtifact() {
+        if (StringUtils.isNotEmpty(jenkinsConfig.jobWithArtifact)) {
+            return jenkinsConfig.jobWithArtifact;
+        } else {
+            return jenkinsConfig.jobsDisplayNames != null && jenkinsConfig.jobsDisplayNames.length == 1 ? jenkinsConfig.jobsDisplayNames[0] : null;
         }
     }
 }

@@ -527,7 +527,9 @@ public class Perforce extends BaseScmWrapper {
         String info = executeScmCommand("clients -e " + clientName, DEBUG);
         String clientDirectory = MatcherUtils.singleMatch(info, "Client\\s+" + clientName + "\\s+.+?(\\S+)\\s+'Created by");
         if (clientDirectory == null) {
-            throw new RuntimeException("Failed to parse client directory for client " + clientName + "\n" + info);
+            clientDirectory = System.getProperty("user.dir");
+            log.warn("Failed to parse client directory for client {} Using directory {}\n{}", clientName, clientDirectory, info);
+
         }
         return clientDirectory;
     }

@@ -19,6 +19,10 @@ public class MergeRequest {
 
     public String title;
 
+    public String sha;
+
+    public String mergeStatus;
+
     @Expose(serialize = false)
     public String state;
 
@@ -27,7 +31,14 @@ public class MergeRequest {
 
     public boolean removeSourceBranch;
 
+    @Expose(serialize = false)
+    public boolean forceRemoveSourceBranch;
+
     public String webUrl;
 
     public boolean squash;
+
+    public boolean canBeMerged() {
+        return "can_be_merged".equalsIgnoreCase(mergeStatus);
+    }
 }

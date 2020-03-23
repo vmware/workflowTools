@@ -498,6 +498,10 @@ public class ReviewRequestDraft extends BaseEntity {
         this.gitlabMergeRequest = mergeRequest;
     }
 
+    public MergeRequest getGitlabMergeRequest() {
+        return gitlabMergeRequest;
+    }
+
     public Integer mergeRequestId() {
         return gitlabMergeRequest != null ? gitlabMergeRequest.iid : null;
     }

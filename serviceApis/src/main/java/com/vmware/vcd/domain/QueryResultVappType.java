@@ -34,6 +34,9 @@ public class QueryResultVappType extends ResourceType implements InputListSelect
 
     public OtherAttributes otherAttributes;
 
+    @Expose(serialize = false, deserialize = false)
+    public int poweredOnVmCount;
+
     public QueryResultVappType() {
     }
 
@@ -56,17 +59,12 @@ public class QueryResultVappType extends ResourceType implements InputListSelect
         this.otherAttributes.numberOfVMs = MatcherUtils.allMatches(jsonData, "(\"deployment\"\\s*:)").size();
     }
 
-    public int poweredOnVmCount() {
-        if (!"POWERED_ON".equalsIgnoreCase(status)) {
-            return 0;
-        } else {
-            return otherAttributes.numberOfVMs;
-        }
-    }
-
     @Override
     public String getLabel() {
         String label = name + " (" + status + ") VM Count: " + otherAttributes.numberOfVMs;
+        if ("MIXED".equalsIgnoreCase(status)) {
+            label += " Powered On: " + poweredOnVmCount;
+        }
         if (!jsonFileBased && !isOwnedByWorkflowUser) {
             label = "Shared, owner " + ownerName + " - " + label + " Expires: " + otherAttributes.autoUndeployDate;
         } else if (!jsonFileBased) {

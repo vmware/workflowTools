@@ -13,14 +13,14 @@ public class SetDefaultApprover extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(commitConfig.defaultApprover)) {
-            exitDueToFailureCheck("no default approver set, config value defaultApprover must be set");
+        if (StringUtils.isEmpty(commitConfig.approver)) {
+            exitDueToFailureCheck("no approver set, config value approver must be set");
         }
     }
 
     @Override
     public void process() {
-        log.info("Setting approved by to default approver value {}", commitConfig.defaultApprover);
-        draft.approvedBy = commitConfig.defaultApprover;
+        log.info("Setting approved by to default approver value {}", commitConfig.approver);
+        draft.approvedBy = commitConfig.approver;
     }
 }

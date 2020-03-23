@@ -92,6 +92,9 @@
     "--review-request-id",
     "--review-board-date-format"
   ],
+  "OpenSandbox": [
+    "--buildweb-url"
+  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
   ],
@@ -153,10 +156,11 @@
     "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url",
+    "--job-display-names",
+    "--job-with-artifact",
     "--vapp-name",
     "--job-artifact",
     "--job-build",
-    "--job-display-names",
     "--vapp-json-file"
   ],
   "LoadVapps": [
@@ -170,7 +174,7 @@
     "--perforce-client"
   ],
   "SetDefaultApprover": [
-    "--default-approver"
+    "--approver"
   ],
   "SaveDiffToFile": [
     "--output-file"
@@ -276,6 +280,9 @@
   ],
   "BaseReadMultiLine": [
     "--max-description"
+  ],
+  "PostApprovalRequest": [
+    "--approver"
   ],
   "PushToMaster": [
     "--git-remote"

@@ -20,10 +20,12 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
+import com.vmware.vcd.domain.QueryResultVMsType;
 import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
 import com.vmware.vcd.domain.ResourceType;
 import com.vmware.vcd.domain.TaskType;
+import com.vmware.vcd.domain.VappType;
 import com.vmware.vcd.domain.VcdMediaType;
 
 import static com.vmware.http.cookie.ApiAuthentication.vcd;
@@ -75,8 +77,16 @@ public class Vcd extends AbstractRestService {
         return vapps;
     }
 
+    public QueryResultVMsType getVmsForVapp(String vappId) {
+        return optimisticGet(apiUrl + "/query?type=vm&filter=container==" + vappId, QueryResultVMsType.class, acceptHeader(QueryResultVMsType.class));
+    }
+
     public MetaDatasType getVappMetaData(LinkType metadataLink) {
         return optimisticGet(metadataLink.href, MetaDatasType.class, acceptHeader(MetaDatasType.class));
+    }
+
+    public VappType getVapp(LinkType vappLink) {
+        return optimisticGet(vappLink.href, VappType.class, acceptHeader(VappType.class));
     }
 
     public void waitForTaskToComplete(String taskHref, int amount, TimeUnit timeUnit) {

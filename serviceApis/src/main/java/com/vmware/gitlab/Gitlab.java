@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import com.google.gson.FieldNamingPolicy;
 import com.vmware.AbstractRestService;
+import com.vmware.gitlab.domain.MergeAcceptRequest;
 import com.vmware.gitlab.domain.MergeRequest;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
@@ -52,19 +53,22 @@ public class Gitlab extends AbstractRestService {
 
     }
 
-    public void acceptMergeRequest(int projectId, int mergeRequestId) {
+    public void acceptMergeRequest(MergeRequest mergeRequest) {
         try {
-            optimisticPut(mergeRequestUrl(projectId, mergeRequestId) + "/merge", null, null,
+            MergeAcceptRequest acceptRequest = new MergeAcceptRequest(mergeRequest);
+            String response = optimisticPut(mergeRequestUrl(mergeRequest.projectId, mergeRequest.iid) + "/merge", String.class, acceptRequest,
                     Collections.singletonList(NotAuthorizedException.class));
+            log.debug(response);
         } catch (NotAuthorizedException nae) {
-            throw new FatalException(nae, "Not authorized to accept merge request {} for project {}", mergeRequestId, projectId);
+            throw new FatalException(nae, "Not authorized to accept merge request {} for project {}", mergeRequest.iid, mergeRequest.projectId);
         }
     }
 
     public void rebaseMergeRequest(int projectId, int mergeRequestId) {
         try {
-            optimisticPut(mergeRequestUrl(projectId, mergeRequestId) + "/rebase", null, null,
+            String response = optimisticPut(mergeRequestUrl(projectId, mergeRequestId) + "/rebase", String.class, null,
                     Collections.singletonList(ForbiddenException.class));
+            log.debug("Rebase response: {}", response);
         } catch (ForbiddenException fe) {
             throw new FatalException(fe, "Not authorized to accept merge request {} for project {}", mergeRequestId, projectId);
         }

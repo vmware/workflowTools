@@ -61,8 +61,8 @@ public class CommitConfig {
     @ConfigurableProperty(help = "Default value to set for topic if none entered")
     public String defaultTopic;
 
-    @ConfigurableProperty(commandLine = "-da,--default-approver", help = "Default user to use for approving")
-    public String defaultApprover;
+    @ConfigurableProperty(commandLine = "--approver", help = "User to use for approving request")
+    public String approver;
 
     @ConfigurableProperty(help = "Template values for topic, press up to cycle through values when entering topic")
     public String[] topicTemplates;
