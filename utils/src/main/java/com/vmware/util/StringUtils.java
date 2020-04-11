@@ -232,10 +232,10 @@ public class StringUtils {
     }
 
     public static String pluralize(long value, String description) {
-        if (value > 1) {
-            return value + " " + description + "s";
-        } else {
+        if (value == 1) {
             return value + " " + description;
+        } else {
+            return value + " " + description + "s";
         }
     }
 

@@ -51,6 +51,13 @@ public class Git extends BaseScmWrapper {
         return isGitInstalled() && getRootDirectory() != null;
     }
 
+    public String addRepoDirectoryIfNeeded(String path) {
+        if (path == null || !workingDirectoryIsInGitRepo()) {
+            return path;
+        }
+        return path.replace("$REPO_DIR", getRootDirectory().getAbsolutePath());
+    }
+
     /**
      * @return The root directory for this repo. Null if this is not a repo
      */

@@ -142,7 +142,7 @@ public class TestReviewBoardApi extends BaseTests {
     public void publishReview() {
         createdRequest = reviewBoard.createReviewRequestFromDraft(sampleRequest, repository);
         assertFalse("Review should not be published", createdRequest.isPublic);
-        reviewBoard.publishReview(createdRequest.getDraftLink());
+        reviewBoard.publishReview(createdRequest.getDraftLink(), null);
         ReviewRequest publishedReview = reviewBoard.getReviewRequestById(createdRequest.id);
         assertTrue("Review should be published", publishedReview.isPublic);
     }

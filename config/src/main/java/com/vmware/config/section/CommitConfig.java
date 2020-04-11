@@ -76,6 +76,9 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--disable-merge-to", help = "Disable merge to")
     public boolean disableMergeTo;
 
+    @ConfigurableProperty(commandLine = "--change-description", help = "Change description for publishing review")
+    public String reviewChangeDescription;
+
     public CommitConfig() {}
 
     public CommitConfig(String reviewboardUrl, String buildwebUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,

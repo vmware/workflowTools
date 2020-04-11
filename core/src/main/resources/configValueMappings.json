@@ -149,6 +149,7 @@
     "--parent"
   ],
   "PublishReview": [
+    "--change-description",
     "--reviewboard-url"
   ],
   "SelectVapp": [
@@ -194,6 +195,11 @@
   ],
   "SelectMatchingMergeRequest": [
     "--gitlab-project-id"
+  ],
+  "SetPropertyFileValue": [
+    "--property-name",
+    "--property-value",
+    "--property-file"
   ],
   "UploadReviewDiff": [
     "--tracking-branch",
@@ -271,6 +277,12 @@
   ],
   "ChangeBuildNumber": [
     "--jenkins-url"
+  ],
+  "BackupFile": [
+    "--backup-name",
+    "--destination-file",
+    "--source-file",
+    "--skip-backup"
   ],
   "LoadCompletedIssuesWithoutResolution": [
     "--username"
@@ -402,6 +414,11 @@
     "--perforce-client",
     "--changelist-id"
   ],
+  "ScpFileFromRemote": [
+    "--ssh-strict-host-checking",
+    "--source-file",
+    "--destination-file"
+  ],
   "SetCommitDetailsFromReview": [
     "--username",
     "--max-description",
@@ -438,6 +455,15 @@
   ],
   "BaseSetReviewersList": [
     "--always-include-review-url"
+  ],
+  "ExecuteSqlStatement": [
+    "--database-password",
+    "--database-username",
+    "--database-driver-class",
+    "--database-driver-file",
+    "--sql-statement",
+    "--database-url",
+    "--database-url-pattern"
   ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",

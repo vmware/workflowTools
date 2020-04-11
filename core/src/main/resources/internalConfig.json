@@ -42,6 +42,9 @@
   "sshPort": 22,
   "workflowAlias":  "workflow",
   "includeAliasAutocomplete" : true,
+  "backupName": "original",
+  "databaseDriverClass": "org.postgresql.Driver",
+  "databaseUrlPattern": "jdbc:postgresql://$HOST:$PORT/$DB_NAME",
   "issueTypesToInclude": [
     8
   ],
@@ -305,6 +308,10 @@
       "PublishReview",
       "ExitIfReviewIsNotPublic",
       "MarkIssueAsInReview"
+    ],
+    "reviewAndPublishFixes": [
+      "review",
+      "publishReview&&--change-description=Addressed review comments"
     ],
     "submitReview": [
       "readNonTrivialCommit",
@@ -814,6 +821,10 @@
     "openVappSshShell": [
       "selectVcdCell",
       "OpenSshShell"
+    ],
+    "copyFileFromVapp": [
+      "selectVcdCell",
+      "ScpFileFromRemote"
     ],
     "tailVappLogFile": [
       "selectVcdCell",

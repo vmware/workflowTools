@@ -35,8 +35,6 @@ public enum LogLevel {
 
     public static LogLevel fromJschLevel(int level) {
         switch (level) {
-        case 2:
-            return WARN;
         case 3:
         case 4:
             return ERROR;

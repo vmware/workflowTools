@@ -343,7 +343,7 @@ public class HttpConnection {
         } else {
             responseText = IOUtils.read(activeConnection.getErrorStream());
         }
-        log.trace("Response\n{}", responseText);
+            log.trace("Response\n{}", responseText);
         ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType, responseText);
         return responseText;
     }

@@ -40,7 +40,7 @@ import java.util.TimeZone;
 
 import static com.vmware.http.cookie.ApiAuthentication.reviewBoard;
 import static com.vmware.http.request.RequestHeader.anAcceptHeader;
-import static com.vmware.reviewboard.domain.ReviewRequestDraft.anEmptyDraftForPublishingAReview;
+import static com.vmware.reviewboard.domain.ReviewRequestDraft.aDraftForPublishingAReview;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.all;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.pending;
 
@@ -155,8 +155,8 @@ public class ReviewBoard extends AbstractRestService {
         return updatedDraft;
     }
 
-    public void publishReview(Link draftLink) {
-        connection.put(draftLink.getHref(), anEmptyDraftForPublishingAReview());
+    public void publishReview(Link draftLink, String changeDescription) {
+        connection.put(draftLink.getHref(), aDraftForPublishingAReview(changeDescription));
     }
 
     public void updateReviewRequest(ReviewRequest reviewRequest) {

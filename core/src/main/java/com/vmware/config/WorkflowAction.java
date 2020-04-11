@@ -58,10 +58,7 @@ public class WorkflowAction implements Action {
     @Override
     public void process() {
         instantiatedAction.process();
-        if (!overriddenConfigValues.isEmpty()) {
-            config.applyValuesWithSource(existingValuesForConfig);
-            config.setupLogLevel();
-        }
+        resetConfigValues();
     }
 
     @Override
@@ -77,7 +74,11 @@ public class WorkflowAction implements Action {
             config.applyConfigValues(paramsMap, actionClass.getSimpleName(), true);
             config.setupLogLevel();
         }
-        return instantiatedAction.cannotRunAction();
+        String cannotRunReason = instantiatedAction.cannotRunAction();
+        if (cannotRunReason != null) {
+            resetConfigValues();
+        }
+        return cannotRunReason;
     }
 
     @Override
@@ -126,5 +127,12 @@ public class WorkflowAction implements Action {
             classToGetValuesFor = ignoreSuperClass ? Object.class : classToGetValuesFor.getSuperclass();
         }
         return configValues;
+    }
+
+    private void resetConfigValues() {
+        if (!overriddenConfigValues.isEmpty()) {
+            config.applyValuesWithSource(existingValuesForConfig);
+            config.setupLogLevel();
+        }
     }
 }

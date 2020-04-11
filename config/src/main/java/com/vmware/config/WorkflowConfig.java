@@ -9,6 +9,7 @@ import com.vmware.config.section.CheckstyleConfig;
 import com.vmware.config.section.CommandLineConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
+import com.vmware.config.section.FileSystemConfig;
 import com.vmware.config.section.GitRepoConfig;
 import com.vmware.config.section.GitlabConfig;
 import com.vmware.config.section.JenkinsConfig;
@@ -99,6 +100,9 @@ public class WorkflowConfig {
 
     @SectionConfig
     public CommandLineConfig commandLineConfig;
+
+    @SectionConfig
+    public FileSystemConfig fileSystemConfig;
 
     @ConfigurableProperty(help = "Information about the the git commit that this version of workflow tools was built from")
     public Map<String, String> buildInfo;

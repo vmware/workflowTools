@@ -74,6 +74,9 @@ public class ReviewRequestDraft extends BaseEntity {
     @Expose(deserialize = false)
     @SerializedName("testing_done_text_type")
     public String testingDoneTextType;
+    @Expose(deserialize = false)
+    @SerializedName("changedescription")
+    public String changeDescription;
 
     @Expose(serialize = false, deserialize = false)
     public List<JobBuild> jobBuilds = new ArrayList<>();
@@ -152,9 +155,10 @@ public class ReviewRequestDraft extends BaseEntity {
         fillValuesFromCommitText(commitText, commitConfig);
     }
 
-    public static ReviewRequestDraft anEmptyDraftForPublishingAReview() {
+    public static ReviewRequestDraft aDraftForPublishingAReview(String changeDescription) {
         ReviewRequestDraft draft = new ReviewRequestDraft(null,null,null,null,null,null,null);
         draft.isPublic = true;
+        draft.changeDescription = changeDescription;
         return draft;
     }
 

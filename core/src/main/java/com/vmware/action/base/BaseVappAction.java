@@ -57,6 +57,9 @@ public abstract class BaseVappAction extends BaseCommitAction {
     protected SiteConfig createSshSiteConfig() {
         if (vappData.getSelectedVcdCell() != null) {
             Sites.DeployedVM cell = vappData.getSelectedVcdCell();
+            if (cell.deployment == null) {
+                throw new FatalException("No deployment section found for cell " + vappData.getSelectedVcdCell().name);
+            }
             Sites.OvfProperties ovfProperties = cell.deployment.ovfProperties;
             return new SiteConfig(ovfProperties.hostname, 22, cell.osCredentials.username, cell.osCredentials.password);
         } else if (sshConfig.hasCommandLineSite()) {

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,24 +83,25 @@ public class FileUtils {
         }
     }
 
-    public static void copyFile(File src, File dst) {
-        long p = 0, dp, size;
-
-        if (!dst.exists()) try {
-            dst.createNewFile();
+    public static void copyFile(File src, File dest) {
+        try {
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
+    }
 
-        try (FileChannel in = new FileInputStream(src).getChannel();
-             FileChannel out = new FileOutputStream(dst).getChannel();)
-        {
-            size = in.size();
-
-            while ((dp = out.transferFrom(in, p, size)) > 0)
-            {
-                p += dp;
-            }
+    public static void copyDirectory(File src, File dest) {
+        Path srcPath = src.toPath();
+        Path destPath = dest.toPath();
+        try {
+            Files.walk(srcPath).forEach(source -> {
+                try {
+                    Files.copy(source, destPath.resolve(srcPath.relativize(source)), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new RuntimeIOException(e);
+                }
+            });
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }

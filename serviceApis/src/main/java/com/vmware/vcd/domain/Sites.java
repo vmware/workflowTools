@@ -18,6 +18,7 @@ public class Sites {
         public List<DeployedVM> cells;
         public List<DeployedVM> vcServers;
         public List<DeployedVM> nsxManagers;
+        public DatabaseServer databaseServer;
     }
 
     public class DeployedVM implements InputListSelection {
@@ -58,6 +59,21 @@ public class Sites {
         public String hostname;
         public String user;
         public String password;
+    }
+
+    public class DatabaseServer {
+        public String databaseType;
+        public String host;
+        public String port;
+        public String dbname;
+        public Credentials credentials;
+
+        public String urlForPattern(String urlPattern) {
+            String url = urlPattern.replace("$HOST", host);
+            url = url.replace("$PORT", port);
+            url = url.replace("$DB_NAME", dbname);
+            return url;
+        }
     }
 
 }

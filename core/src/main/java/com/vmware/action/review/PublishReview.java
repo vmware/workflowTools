@@ -25,7 +25,7 @@ public class PublishReview extends BaseCommitUsingReviewBoardAction {
         }
 
         log.info("Publishing review request {}", reviewRequest.id);
-        reviewBoard.publishReview(reviewRequest.getDraftLink());
+        reviewBoard.publishReview(reviewRequest.getDraftLink(), commitConfig.reviewChangeDescription);
         reviewRequest.isPublic = true;
         log.info("Successfully published review request");
     }

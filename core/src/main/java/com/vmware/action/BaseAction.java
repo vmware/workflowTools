@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import com.vmware.ServiceLocator;
 import com.vmware.config.WorkflowConfig;
@@ -14,6 +18,7 @@ import com.vmware.config.section.CheckstyleConfig;
 import com.vmware.config.section.CommandLineConfig;
 import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
+import com.vmware.config.section.FileSystemConfig;
 import com.vmware.config.section.GitRepoConfig;
 import com.vmware.config.section.GitlabConfig;
 import com.vmware.config.section.JenkinsConfig;
@@ -55,6 +60,7 @@ public abstract class BaseAction implements Action {
     protected final SshConfig sshConfig;
     protected final VcdConfig vcdConfig;
     protected final CommandLineConfig commandLineConfig;
+    protected final FileSystemConfig fileSystemConfig;
 
     protected ServiceLocator serviceLocator;
 
@@ -63,6 +69,10 @@ public abstract class BaseAction implements Action {
     protected boolean failIfCannotBeRun;
 
     private String[] expectedCommandsToBeAvailable;
+
+    private Set<String> failWorkflowIfBlankProperties = new HashSet<>();
+
+    private Set<String> cannotRunActionIfBlankProperties = new HashSet<>();
 
 
     public BaseAction(WorkflowConfig config) {
@@ -83,10 +93,12 @@ public abstract class BaseAction implements Action {
         this.sshConfig = config.sshConfig;
         this.vcdConfig = config.vcdConfig;
         this.commandLineConfig = config.commandLineConfig;
+        this.fileSystemConfig = config.fileSystemConfig;
     }
 
     public void checkIfWorkflowShouldBeFailed() {
         checkExpectedCommands();
+        failWorkflowIfBlankProperties.forEach(this::exitIfUnset);
         if (failIfCannotBeRun) {
             String cannotBeRunReason = this.cannotRunAction();
             if (StringUtils.isNotEmpty(cannotBeRunReason)) {
@@ -106,7 +118,7 @@ public abstract class BaseAction implements Action {
 
     @Override
     public String cannotRunAction() {
-        return null;
+        return cannotRunActionIfBlankProperties.stream().map(this::checkIfUnset).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     @Override
@@ -120,6 +132,14 @@ public abstract class BaseAction implements Action {
 
     protected void setExpectedCommandsToBeAvailable(String... commands) {
         this.expectedCommandsToBeAvailable = commands;
+    }
+
+    protected void addFailWorkflowIfBlankProperties(String... propertyNames) {
+        failWorkflowIfBlankProperties.addAll(Arrays.asList(propertyNames));
+    }
+
+    protected void addCannotRunActionIfBlankProperties(String... propertyNames) {
+        cannotRunActionIfBlankProperties.addAll(Arrays.asList(propertyNames));
     }
 
     protected void cancelWithMessage(String message) {
@@ -161,6 +181,19 @@ public abstract class BaseAction implements Action {
             }
         } catch (IOException e) {
             throw new RuntimeIOException(e);
+        }
+    }
+
+    protected String checkIfUnset(String propertyName) {
+        if (!config.getConfigurableFields().hasValue(propertyName)) {
+            return propertyName + " is unset";
+        }
+        return null;
+    }
+
+    private void exitIfUnset(String propertyName) {
+        if (!config.getConfigurableFields().hasValue(propertyName)) {
+            exitDueToFailureCheck("property " + propertyName + " not set");
         }
     }
 
