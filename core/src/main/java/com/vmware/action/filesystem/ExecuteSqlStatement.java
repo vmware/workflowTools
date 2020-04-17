@@ -6,9 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -23,20 +21,17 @@ public class ExecuteSqlStatement extends BaseVappAction {
 
     public ExecuteSqlStatement(WorkflowConfig config) {
         super(config);
-        super.addCannotRunActionIfBlankProperties("databaseDriverClass", "databaseDriverFile", "sqlStatement");
+        super.addSkipActionIfBlankProperties("databaseDriverClass", "databaseDriverFile", "sqlStatement");
     }
 
     @Override
-    public String cannotRunAction() {
-        String cannotRunReason = super.cannotRunAction();
-        if (cannotRunReason != null) {
-            return cannotRunReason;
-        }
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
         if (vappData.getSelectedSite() != null) {
-            return checkIfUnset("databaseUrlPattern");
+            super.skipActionIfUnset("databaseUrlPattern");
+        } else {
+            Stream.of("databaseUrl", "databaseUsername", "databasePassword").forEach(this::skipActionIfUnset);
         }
-        return Stream.of("databaseUrl", "databaseUsername", "databasePassword").map(this::checkIfUnset)
-                .filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     @Override

@@ -16,11 +16,9 @@ public class CreateIssues extends BaseBatchJiraAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (projectIssues.getIssuesNotInJira().isEmpty()) {
-            return "there are no issues not loaded from Jira";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(projectIssues.getIssuesNotInJira().isEmpty(), "there are no issues not loaded from Jira");
     }
 
     @Override

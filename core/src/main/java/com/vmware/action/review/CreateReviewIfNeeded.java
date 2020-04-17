@@ -16,11 +16,9 @@ public class CreateReviewIfNeeded extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (draft.hasReviewNumber()) {
-            return "commit already has review " + draft.id;
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(draft.hasReviewNumber(), "commit already has review " + draft.id);
     }
 
     @Override

@@ -17,11 +17,9 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!draft.hasData()) {
-            return "there no information set for the commit message";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(!draft.hasData(), "there no information set for the commit message");
     }
 
     @Override

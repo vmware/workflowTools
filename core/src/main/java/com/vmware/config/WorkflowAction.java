@@ -1,7 +1,6 @@
 package com.vmware.config;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.action.trello.BaseTrelloAction;
-import com.vmware.util.StringUtils;
+import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 public class WorkflowAction implements Action {
@@ -67,18 +66,19 @@ public class WorkflowAction implements Action {
     }
 
     @Override
-    public String cannotRunAction() {
+    public void checkIfActionShouldBeSkipped() {
         if (!overriddenConfigValues.isEmpty()) {
             Map<String, String> paramsMap = overriddenConfigValues.stream().collect(Collectors.toMap(WorkflowParameter::getName, WorkflowParameter::getValue));
             existingValuesForConfig = config.getExistingValues(paramsMap.keySet());
             config.applyConfigValues(paramsMap, actionClass.getSimpleName(), true);
             config.setupLogLevel();
         }
-        String cannotRunReason = instantiatedAction.cannotRunAction();
-        if (cannotRunReason != null) {
+        try {
+            instantiatedAction.checkIfActionShouldBeSkipped();
+        } catch (SkipActionException ce) {
             resetConfigValues();
+            throw ce;
         }
-        return cannotRunReason;
     }
 
     @Override

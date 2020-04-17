@@ -16,9 +16,7 @@ public class ReadChangelistDiffAsGitPatch extends BasePerforceCommitAction {
     @Override
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
-        if (StringUtils.isEmpty(draft.perforceChangelistId)) {
-            exitDueToFailureCheck("no perforce changelist id set");
-        }
+        super.failIfTrue(StringUtils.isEmpty(draft.perforceChangelistId), "no perforce changelist id set");
     }
 
     @Override

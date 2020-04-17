@@ -16,11 +16,9 @@ public class SaveDiffToFile extends BasePerforceCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (StringUtils.isEmpty(draft.draftPatchData)) {
-            return "no patch data to save";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(StringUtils.isEmpty(draft.draftPatchData), "no patch data to save");
     }
 
     @Override

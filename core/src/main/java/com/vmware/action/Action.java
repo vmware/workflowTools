@@ -11,7 +11,7 @@ public interface Action {
     /**
      * @return Reason for why this action should not be run, null if it should be run
      */
-    String cannotRunAction();
+    void checkIfActionShouldBeSkipped();
 
     /**
      * Override if any setup is needed before the process method is called

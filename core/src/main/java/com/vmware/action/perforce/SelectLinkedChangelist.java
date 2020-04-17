@@ -1,12 +1,13 @@
 package com.vmware.action.perforce;
 
+import java.util.List;
+
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
 
-import java.util.List;
+import static com.vmware.util.StringUtils.isNotEmpty;
 
 @ActionDescription("Attempts to find a linked changelist by git tag.")
 public class SelectLinkedChangelist extends BasePerforceCommitUsingGitAction {
@@ -15,11 +16,9 @@ public class SelectLinkedChangelist extends BasePerforceCommitUsingGitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
-            return "commit already is linked to changelist " + draft.perforceChangelistId;
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(isNotEmpty(draft.perforceChangelistId), "commit already linked with changelist " + draft.perforceChangelistId);
     }
 
     @Override

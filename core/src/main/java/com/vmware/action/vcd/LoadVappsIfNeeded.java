@@ -11,13 +11,10 @@ public class LoadVappsIfNeeded extends LoadVapps {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!vcdConfig.checkVmQuota && !jenkinsConfig.useVappJsonParameter) {
-            return "checkVmQuota and useVappJsonParameter are set to false";
-        }
-        if (sshConfig.usesSshSite()) {
-            return "ssh site is configured";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(!vcdConfig.checkVmQuota && !jenkinsConfig.useVappJsonParameter,
+                "checkVmQuota and useVappJsonParameter are set to false");
+        super.skipActionIfTrue(sshConfig.usesSshSite(), "ssh site is configured");
     }
 }

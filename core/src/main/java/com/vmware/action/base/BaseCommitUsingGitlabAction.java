@@ -9,23 +9,13 @@ public abstract class BaseCommitUsingGitlabAction extends BaseCommitAction {
 
     public BaseCommitUsingGitlabAction(WorkflowConfig config) {
         super(config);
+        super.addFailWorkflowIfBlankProperties("gitlabUrl", "gitlabProjectId");
     }
 
     @Override
     public void asyncSetup() {
         super.asyncSetup();
         gitlab = serviceLocator.getGitlab();
-    }
-
-    @Override
-    protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(gitlabConfig.gitlabUrl)) {
-            exitDueToFailureCheck("no git lab url set");
-        }
-        if (gitlabConfig.gitlabProjectId == null) {
-            exitDueToFailureCheck("no git lab project id set");
-        }
-        super.failWorkflowIfConditionNotMet();
     }
 
     protected String determineSourceMergeBranch() {

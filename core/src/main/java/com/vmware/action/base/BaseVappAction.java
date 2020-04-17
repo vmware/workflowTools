@@ -30,18 +30,11 @@ public abstract class BaseVappAction extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (checkVappJson && vappData.noVappSelected()) {
-            exitDueToFailureCheck("no Vapp selected");
-        }
-        if (checkVappJson && !vappData.jsonDataLoaded()) {
-            exitDueToFailureCheck("no Vapp json loaded");
-        }
-        if ((checkIfSiteSelected || checkIfCellSelected) && vappData.getSelectedSite() == null) {
-            exitDueToFailureCheck("no vcd site selected");
-        }
-        if (checkIfCellSelected && vappData.getSelectedVcdCell() == null) {
-            exitDueToFailureCheck("no vcd cell selected");
-        }
+        super.failWorkflowIfConditionNotMet();
+        failIfTrue(checkVappJson && vappData.noVappSelected(), "no Vapp selected");
+        failIfTrue(checkVappJson && !vappData.jsonDataLoaded(), "no Vapp json loaded");
+        failIfTrue((checkIfSiteSelected || checkIfCellSelected) && vappData.getSelectedSite() == null, "no vcd site selected");
+        failIfTrue(checkIfCellSelected && vappData.getSelectedVcdCell() == null, "no vcd cell selected");
     }
 
     public void setVappData(VappData vappData) {

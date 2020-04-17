@@ -12,11 +12,9 @@ public class ExitIfNoVappSelected extends BaseVappAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (sshConfig.usesSshSite()) {
-            return "ssh site is configured";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(sshConfig.usesSshSite(), "ssh site is configured");
     }
 
     @Override

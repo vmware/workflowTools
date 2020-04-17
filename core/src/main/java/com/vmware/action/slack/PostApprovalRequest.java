@@ -14,9 +14,8 @@ public class PostApprovalRequest extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(commitConfig.approver)) {
-            exitDueToFailureCheck("no approver set, config value approver must be set");
-        }
+        super.failWorkflowIfConditionNotMet();
+        super.failIfUnset("approver");
     }
 
     @Override

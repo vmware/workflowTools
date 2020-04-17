@@ -16,12 +16,10 @@ public class AddTrackingIssueCreatedComments extends BaseBatchBugzillaAction {
     }
 
     @Override
-    public String cannotRunAction() {
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
         List<Issue> issues = projectIssues.getIssuesRepresentingBugzillaBugs(bugzillaConfig.bugzillaUrl);
-        if (issues.isEmpty()) {
-            return "no matching issues found";
-        }
-        return super.cannotRunAction();
+        skipActionIfTrue(issues.isEmpty(), "no matching issues found");
     }
 
     @Override

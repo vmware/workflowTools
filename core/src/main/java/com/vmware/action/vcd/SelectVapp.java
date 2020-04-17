@@ -1,7 +1,5 @@
 package com.vmware.action.vcd;
 
-import java.io.File;
-
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -16,19 +14,16 @@ public class SelectVapp extends BaseVappAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (sshConfig.usesSshSite()) {
-            return "ssh site is configured";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(sshConfig.usesSshSite(), "ssh site is configured");
     }
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
-        if (vappData.getVapps().isEmpty() && StringUtils.isEmpty(vcdConfig.vappJsonFile) && !jenkinsConfig.hasConfiguredArtifact()) {
-            exitDueToFailureCheck("no vapps loaded");
-        }
+        super.failIfTrue(vappData.getVapps().isEmpty() && StringUtils.isEmpty(vcdConfig.vappJsonFile) && !jenkinsConfig.hasConfiguredArtifact(),
+                "no vapps loaded");
     }
 
     @Override

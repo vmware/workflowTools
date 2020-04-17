@@ -5,11 +5,9 @@ import com.vmware.config.WorkflowConfig;
 public abstract class BaseSingleVappAction extends BaseVappAction {
 
     @Override
-    public String cannotRunAction() {
-        if (vappData.noVappSelected()) {
-            return "no Vapp has been selected";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(vappData.noVappSelected(), "no Vapp has been selected");
     }
 
     public BaseSingleVappAction(WorkflowConfig config) {

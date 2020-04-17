@@ -3,23 +3,21 @@ package com.vmware.action.perforce;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
+
+import static com.vmware.util.StringUtils.isNotEmpty;
 
 @ActionDescription("Creates a new pending changelist in perforce if needed.")
 public class CreatePendingChangelistIfNeeded extends BasePerforceCommitAction {
 
     public CreatePendingChangelistIfNeeded(WorkflowConfig config) {
         super(config);
-        super.failIfCannotBeRun = false;
     }
 
     @Override
-    public String cannotRunAction() {
-        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
-            return "commit already associated with changelist " + draft.perforceChangelistId;
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(isNotEmpty(draft.perforceChangelistId), "commit already linked with changelist " + draft.perforceChangelistId);
     }
 
     @Override

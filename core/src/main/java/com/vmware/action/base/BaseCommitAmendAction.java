@@ -23,11 +23,9 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (commitHasNoChanges()) {
-            return "no changes detected";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(commitHasNoChanges(), "no changes detected");
     }
 
     @Override

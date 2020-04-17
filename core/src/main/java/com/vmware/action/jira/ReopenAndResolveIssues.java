@@ -20,12 +20,9 @@ public class ReopenAndResolveIssues extends BaseBatchJiraAction{
     }
 
     @Override
-    public String cannotRunAction() {
-        if (projectIssues.noIssuesAdded()) {
-            return "no issues added";
-        }
-
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(projectIssues.noIssuesAdded(), "no issues added");
     }
 
     @Override

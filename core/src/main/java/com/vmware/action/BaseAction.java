@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import com.vmware.ServiceLocator;
@@ -32,6 +31,7 @@ import com.vmware.config.section.VcdConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.CancelException;
+import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
@@ -72,7 +72,7 @@ public abstract class BaseAction implements Action {
 
     private Set<String> failWorkflowIfBlankProperties = new HashSet<>();
 
-    private Set<String> cannotRunActionIfBlankProperties = new HashSet<>();
+    private Set<String> skipActionIfBlankProperties = new HashSet<>();
 
 
     public BaseAction(WorkflowConfig config) {
@@ -98,12 +98,14 @@ public abstract class BaseAction implements Action {
 
     public void checkIfWorkflowShouldBeFailed() {
         checkExpectedCommands();
-        failWorkflowIfBlankProperties.forEach(this::exitIfUnset);
+        failWorkflowIfBlankProperties.forEach(this::failIfUnset);
         if (failIfCannotBeRun) {
-            String cannotBeRunReason = this.cannotRunAction();
-            if (StringUtils.isNotEmpty(cannotBeRunReason)) {
-                exitDueToFailureCheck(cannotBeRunReason);
+            try {
+                this.checkIfActionShouldBeSkipped();
+            } catch (SkipActionException ce) {
+                throw new FatalException(ce, ce.getMessage());
             }
+
         }
         failWorkflowIfConditionNotMet();
     }
@@ -117,8 +119,8 @@ public abstract class BaseAction implements Action {
     }
 
     @Override
-    public String cannotRunAction() {
-        return cannotRunActionIfBlankProperties.stream().map(this::checkIfUnset).filter(Objects::nonNull).findFirst().orElse(null);
+    public void checkIfActionShouldBeSkipped() {
+        skipActionIfBlankProperties.forEach(this::skipActionIfUnset);
     }
 
     @Override
@@ -138,8 +140,8 @@ public abstract class BaseAction implements Action {
         failWorkflowIfBlankProperties.addAll(Arrays.asList(propertyNames));
     }
 
-    protected void addCannotRunActionIfBlankProperties(String... propertyNames) {
-        cannotRunActionIfBlankProperties.addAll(Arrays.asList(propertyNames));
+    protected void addSkipActionIfBlankProperties(String... propertyNames) {
+        skipActionIfBlankProperties.addAll(Arrays.asList(propertyNames));
     }
 
     protected void cancelWithMessage(String message) {
@@ -158,15 +160,16 @@ public abstract class BaseAction implements Action {
         if (expectedCommandsToBeAvailable == null) {
             return;
         }
-        for (String command : expectedCommandsToBeAvailable) {
-            if (!CommandLineUtils.isCommandAvailable(command)) {
-                exitDueToFailureCheck("command " + command + " is not available");
-            }
-        }
+        Arrays.stream(expectedCommandsToBeAvailable)
+                .forEach(command -> failIfTrue(!CommandLineUtils.isCommandAvailable(command), "command " + command + " is not available"));
     }
 
     protected void exitDueToFailureCheck(String reason) {
         cancelWithErrorMessage("Workflow failed by action " + this.getClass().getSimpleName() + " as " + reason);
+    }
+
+    protected void skipActionDueTo(String reason, Object... arguments) {
+        throw new SkipActionException(reason, arguments);
     }
 
     protected BufferedWriter outputWriter() {
@@ -184,17 +187,27 @@ public abstract class BaseAction implements Action {
         }
     }
 
-    protected String checkIfUnset(String propertyName) {
-        if (!config.getConfigurableFields().hasValue(propertyName)) {
-            return propertyName + " is unset";
+    protected void skipActionIfTrue(boolean propertyValue, String description) {
+        if (propertyValue) {
+            skipActionDueTo(description);
         }
-        return null;
     }
 
-    private void exitIfUnset(String propertyName) {
+    protected void skipActionIfUnset(String propertyName) {
+        if (!config.getConfigurableFields().hasValue(propertyName)) {
+            throw new SkipActionException("{} is unset", propertyName);
+        }
+    }
+
+    protected void failIfTrue(boolean value, String description) {
+        if (value) {
+            exitDueToFailureCheck(description);
+        }
+    }
+
+    protected void failIfUnset(String propertyName) {
         if (!config.getConfigurableFields().hasValue(propertyName)) {
             exitDueToFailureCheck("property " + propertyName + " not set");
         }
     }
-
 }

@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static com.vmware.config.jenkins.JobParameter.NO_USERNAME_PARAMETER;
@@ -135,6 +137,7 @@ public class JenkinsJobsConfig {
     private void expandParameterValues(String jobName, List<JobParameter> parameters) {
         boolean setDefaultUsernameParam = true;
         Iterator<JobParameter> paramIter = parameters.iterator();
+        Set<String> usedPresetParams = new HashSet<>();
         while (paramIter.hasNext()) {
             JobParameter parameter = paramIter.next();
             String paramName = parameter.name;
@@ -144,6 +147,7 @@ public class JenkinsJobsConfig {
             }
 
             if (presetParameters.containsKey(paramName)) {
+                usedPresetParams.add(paramName);
                 paramValue = presetParameters.get(paramName);
                 log.debug("Setting parameter {} to preset parameter {}", paramName, paramValue);
                 if (paramValue.startsWith("$FILE:")) {
@@ -176,9 +180,11 @@ public class JenkinsJobsConfig {
         }
 
         if (vappJsonParameter != null && presetParameters.containsKey(vappJsonParameter)) {
-            log.debug("Adding Vapp json parameter {}", vappJsonParameter, presetParameters.get(vappJsonParameter));
+            usedPresetParams.add(vappJsonParameter);
+            log.debug("Adding preset value {} for Vapp json parameter {}", presetParameters.get(vappJsonParameter), vappJsonParameter);
             parameters.add(new JobParameter(vappJsonParameter, presetParameters.get(vappJsonParameter)));
         }
+        addUnusedPresetParameters(parameters, usedPresetParams);
     }
 
     @Override
@@ -189,5 +195,14 @@ public class JenkinsJobsConfig {
             jobText = StringUtils.appendWithDelimiter(jobText, job.parameters, "&");
         }
         return jobText;
+    }
+
+    private void addUnusedPresetParameters(List<JobParameter> parameters, Set<String> usedPresetParams) {
+        Set<String> unusedPresetKeys = new HashSet<>(presetParameters.keySet());
+        unusedPresetKeys.removeAll(usedPresetParams);
+        for (String unusedKey : unusedPresetKeys) {
+            log.debug("Adding unused preset parameter {}", unusedKey);
+            parameters.add(new JobParameter(unusedKey, presetParameters.get(unusedKey)));
+        }
     }
 }

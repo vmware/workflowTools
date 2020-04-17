@@ -13,8 +13,7 @@ public class AmendCommitFilesOnly extends BaseCommitAmendAction {
     }
 
     @Override // always run
-    public String cannotRunAction() {
-        return null;
+    public void checkIfActionShouldBeSkipped() {
     }
 
     @Override

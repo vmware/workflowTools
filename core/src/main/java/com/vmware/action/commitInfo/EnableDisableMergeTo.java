@@ -13,11 +13,9 @@ public class EnableDisableMergeTo extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (draft.mergeToValues.length == 0) {
-            return "no merge to values set for this commit";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(draft.mergeToValues.length == 0, "no merge to values set for this commit");
     }
 
     @Override

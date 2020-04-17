@@ -11,11 +11,9 @@ public class ExitIfVcdVmQuotaExceeded extends BaseVappAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (jenkinsConfig.useVappJsonParameter) {
-            return "useVappJsonParameter is set to true";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(jenkinsConfig.useVappJsonParameter, "useVappJsonParameter is set to true");
     }
 
     @Override

@@ -26,11 +26,9 @@ public class MarkBugAsResolved extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
-            return "commit has no bug number";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(!draft.hasBugNumber(commitConfig.noBugNumberLabel), "commit has no bug number");
     }
 
 

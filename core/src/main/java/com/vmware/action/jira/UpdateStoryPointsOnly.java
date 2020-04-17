@@ -17,11 +17,9 @@ public class UpdateStoryPointsOnly extends BaseBatchJiraAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (projectIssues.getIssuesFromJira().isEmpty()) {
-            return "there are no issues loaded from Jira";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(projectIssues.getIssuesFromJira().isEmpty(), "there are no issues loaded from Jira");
     }
 
     @Override

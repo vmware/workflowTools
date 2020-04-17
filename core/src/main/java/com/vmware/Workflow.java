@@ -33,6 +33,7 @@ import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.CancelException;
+import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
@@ -284,8 +285,8 @@ public class Workflow {
                 action.asyncSetup();
                 log.info("Running checkIfWorkflowShouldBeFailed");
                 action.checkIfWorkflowShouldBeFailed();
-                log.info("Running cannotRunAction method");
-                action.cannotRunAction();
+                log.info("Running checkIfActionShouldBeSkipped method");
+                action.checkIfActionShouldBeSkipped();
                 log.info("Running preprocess method");
                 action.preprocess();
             } else {
@@ -425,15 +426,13 @@ public class Workflow {
         String actionName = action.getActionClassName();
         log.debug("Executing workflow action {}", actionName);
         action.setWorkflowValuesOnAction(values);
-
-        String reasonForNotRunningAction = action.cannotRunAction();
-
-        if (reasonForNotRunningAction != null) {
-            log.info("Skipping running of action {} as {}", actionName, reasonForNotRunningAction);
-        } else {
+        try {
+            action.checkIfActionShouldBeSkipped();
             action.checkIfWorkflowShouldBeFailed();
             action.preprocess();
             action.process();
+        } catch (SkipActionException cbre) {
+            log.info("Skipping running of action {} as {}", actionName, cbre.getMessage());
         }
 
         action.updateWorkflowValues(values);

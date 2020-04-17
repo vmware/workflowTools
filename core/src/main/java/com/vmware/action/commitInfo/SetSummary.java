@@ -14,12 +14,10 @@ public class SetSummary extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isEmpty(draft.summary)) {
-            return super.cannotRunAction();
-        }
-
-        return "setEmptyPropertiesOnly is set to true and Summary has a value";
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(commitConfig.setEmptyPropertiesOnly && StringUtils.isNotEmpty(draft.summary),
+                "setEmptyPropertiesOnly is set to true and Summary has a value");
     }
 
     @Override

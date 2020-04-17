@@ -17,11 +17,9 @@ public class BackupFile extends BaseAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (fileSystemConfig.skipBackup) {
-            return "skipBackup is set to true";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        skipActionIfTrue(fileSystemConfig.skipBackup, "skipBackup is set to true");
     }
 
     @Override

@@ -16,11 +16,11 @@ public class CreateTrelloBoardIfNeeded extends BaseTrelloAction {
     }
 
     @Override
-    public String cannotRunAction() {
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
         if (selectedBoard != null) {
-            return "board " + selectedBoard.name + " is already selected";
+            skipActionDueTo("board {} is already selected", selectedBoard.name);
         }
-        return super.cannotRunAction();
     }
 
     @Override

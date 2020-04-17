@@ -5,6 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.reviewboard.domain.ReviewRequest;
+import com.vmware.util.StringUtils;
 
 @ActionDescription("Publishes a review on the review board server.")
 public class PublishReview extends BaseCommitUsingReviewBoardAction {
@@ -24,7 +25,12 @@ public class PublishReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        log.info("Publishing review request {}", reviewRequest.id);
+        if (StringUtils.isNotBlank(commitConfig.reviewChangeDescription)) {
+            log.info("Publishing review request {} with change description {}", reviewRequest.id, commitConfig.reviewChangeDescription);
+        } else {
+            log.info("Publishing review request {}", reviewRequest.id);
+        }
+
         reviewBoard.publishReview(reviewRequest.getDraftLink(), commitConfig.reviewChangeDescription);
         reviewRequest.isPublic = true;
         log.info("Successfully published review request");

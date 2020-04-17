@@ -31,16 +31,10 @@ public class ResolveBugsWithResolvedTrackingIssues extends BaseBatchBugzillaActi
     }
 
     @Override
-    public String cannotRunAction() {
-        if (jiraConfig.disableJira) {
-            return "Jira is disabled by config property disableJira";
-        }
-
-        if (projectIssues.noBugsAdded()) {
-            return "no bugs added";
-        }
-
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(jiraConfig.disableJira, "Jira is disabled by config property disableJira");
+        super.skipActionIfTrue(projectIssues.noBugsAdded(), "no bugs added");
     }
 
     @Override

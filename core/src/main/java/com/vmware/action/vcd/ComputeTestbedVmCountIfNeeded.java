@@ -20,11 +20,9 @@ public class ComputeTestbedVmCountIfNeeded extends BaseVappAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!vcdConfig.checkVmQuota) {
-            return "checkVmQuota is set to false";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(!vcdConfig.checkVmQuota, "checkVmQuota is set to false");
     }
 
     @Override

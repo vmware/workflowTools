@@ -14,10 +14,8 @@ public class OpenBugNumberUrls extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(draft.bugNumbers)) {
-            exitDueToFailureCheck("no bug numbers set");
-        }
         super.failWorkflowIfConditionNotMet();
+        super.failIfTrue(StringUtils.isEmpty(draft.bugNumbers), "no bug numbers set");
     }
 
     @Override

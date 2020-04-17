@@ -1,12 +1,13 @@
 package com.vmware.action.perforce;
 
+import java.util.List;
+
 import com.vmware.action.base.BasePerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
-import java.util.List;
+import static com.vmware.util.StringUtils.isNotEmpty;
 
 @ActionDescription("If only one changelist exists, that is selected by default. Otherwise the user is asked to select a changelist.")
 public class SelectExistingChangelist extends BasePerforceCommitUsingGitAction {
@@ -15,11 +16,9 @@ public class SelectExistingChangelist extends BasePerforceCommitUsingGitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (StringUtils.isNotEmpty(draft.perforceChangelistId)) {
-            return "commit already is linked to changelist " + draft.perforceChangelistId;
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(isNotEmpty(draft.perforceChangelistId), "commit already linked with changelist " + draft.perforceChangelistId);
     }
 
     @Override

@@ -26,15 +26,10 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (jiraConfig.disableJira) {
-            return "Jira is disabled by config property disableJira";
-        }
-
-        if (!draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
-            return "the commit has no bug number";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        skipActionIfTrue(jiraConfig.disableJira, "Jira is disabled by config property disableJira");
+        skipActionIfTrue(!draft.hasBugNumber(commitConfig.noBugNumberLabel), "the commit has no bug number");
     }
 
     @Override
@@ -48,7 +43,6 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
         for (String bugNumber : bugNumbers) {
             transitionIssue(bugNumber);
         }
-
     }
 
     private void transitionIssue(String bugNumber) {

@@ -10,10 +10,8 @@ public class SelectVappIfNeeded extends SelectVapp {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!jenkinsConfig.useVappJsonParameter) {
-            return "useVappJsonParameter is set to false";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(!jenkinsConfig.useVappJsonParameter, "useVappJsonParameter is set to false");
     }
 }

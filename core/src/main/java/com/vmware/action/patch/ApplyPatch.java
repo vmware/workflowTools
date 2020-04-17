@@ -28,9 +28,8 @@ public class ApplyPatch extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(draft.draftPatchData)) {
-            exitDueToFailureCheck("no patch data loaded");
-        }
+        super.failWorkflowIfConditionNotMet();
+        super.failIfTrue(StringUtils.isEmpty(draft.draftPatchData), "no patch data loaded");
     }
 
     @Override

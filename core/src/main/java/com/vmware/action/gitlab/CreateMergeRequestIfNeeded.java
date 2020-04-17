@@ -12,11 +12,10 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (draft.mergeRequestId() != null) {
-            return "merge request with id " + draft.mergeRequestId() + " has already been created";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(draft.mergeRequestId() != null,
+                "merge request with id " + draft.mergeRequestId() + " has already been created");
     }
 
     @Override

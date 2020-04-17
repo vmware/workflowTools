@@ -15,11 +15,9 @@ public class DisplayBuildOutputForBuildwebBuilds extends BaseCommitWithBuildwebB
     }
 
     @Override
-    public String cannotRunAction() {
-        if (buildwebConfig.logLineCount <= 0) {
-            return "line count to show (logLineCount) is " + buildwebConfig.logLineCount;
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        skipActionIfTrue(buildwebConfig.logLineCount <= 0, "line count to show (logLineCount) is " + buildwebConfig.logLineCount);
     }
 
     @Override

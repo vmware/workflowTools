@@ -20,13 +20,13 @@ public abstract class BaseCommitReadAction extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
+    public void checkIfActionShouldBeSkipped() {
         String propertyValue = (String) ReflectionUtils.getValue(property, draft);
         if (!commitConfig.setEmptyPropertiesOnly || StringUtils.isEmpty(propertyValue)) {
-            return super.cannotRunAction();
+            super.checkIfActionShouldBeSkipped();
+        } else {
+            skipActionDueTo("setEmptyPropertiesOnly is set to true and " + title + " has a value");
         }
-
-        return "setEmptyPropertiesOnly is set to true and " + title + " has a value";
     }
 
 

@@ -16,9 +16,7 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
     @Override
     protected void failWorkflowIfConditionNotMet() {
         String reasonForFailing = perforceClientCannotBeUsed();
-        if (reasonForFailing != null) {
-            exitDueToFailureCheck(reasonForFailing);
-        }
+        failIfTrue(reasonForFailing != null, reasonForFailing);
     }
 
     @Override

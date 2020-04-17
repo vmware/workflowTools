@@ -9,9 +9,7 @@ public abstract class BaseCommitWithMergeRequestAction extends BaseCommitUsingGi
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (draft.mergeRequestId() == null) {
-            exitDueToFailureCheck("no git lab merge request id set");
-        }
         super.failWorkflowIfConditionNotMet();
+        super.failIfTrue(draft.mergeRequestId() == null, "no git lab merge request id set");
     }
 }

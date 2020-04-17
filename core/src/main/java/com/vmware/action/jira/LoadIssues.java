@@ -36,11 +36,9 @@ public class LoadIssues extends BaseBatchJiraAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (StringUtils.isEmpty(projectIssues.boardId)) {
-            return "no JIRA board selected";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(StringUtils.isEmpty(projectIssues.boardId),"no JIRA board selected");
     }
 
     @Override

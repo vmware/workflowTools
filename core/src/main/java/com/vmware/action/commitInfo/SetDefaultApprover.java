@@ -13,9 +13,8 @@ public class SetDefaultApprover extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(commitConfig.approver)) {
-            exitDueToFailureCheck("no approver set, config value approver must be set");
-        }
+        super.failWorkflowIfConditionNotMet();
+        super.failIfTrue(StringUtils.isEmpty(commitConfig.approver), "no approver set, config value approver must be set");
     }
 
     @Override

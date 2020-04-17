@@ -9,15 +9,9 @@ public abstract class BaseCommitWithReviewAction extends BaseCommitAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (draft.isTrivialCommit(commitConfig.trivialReviewerLabel)) {
-            return "commit is trivial";
-        }
-
-        if (!draft.hasReviewNumber()) {
-            return "commit does not have a review url";
-        }
-
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(draft.isTrivialCommit(commitConfig.trivialReviewerLabel), "commit is trivial");
+        super.skipActionIfTrue(!draft.hasReviewNumber(), "commit does not have a review url");
     }
 }

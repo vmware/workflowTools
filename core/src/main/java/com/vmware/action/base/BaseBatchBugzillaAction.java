@@ -25,11 +25,9 @@ public abstract class BaseBatchBugzillaAction extends BaseIssuesProcessingAction
     }
 
     @Override
-    public String cannotRunAction() {
-        if (bugzillaConfig.disableBugzilla) {
-            return "Bugzilla is disabled by config property disableBugzilla";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(bugzillaConfig.disableBugzilla, "Bugzilla is disabled by config property disableBugzilla");
     }
 
     protected Issue createIssueFromBug(Bug bug) {

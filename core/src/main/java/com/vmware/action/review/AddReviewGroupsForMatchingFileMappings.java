@@ -15,11 +15,9 @@ public class AddReviewGroupsForMatchingFileMappings extends BaseCommitAction{
     }
 
     @Override
-    public String cannotRunAction() {
-        if (reviewBoardConfig.reviewGroupFileMappings.isEmpty()) {
-            return "no review group file mappings present";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(reviewBoardConfig.reviewGroupFileMappings.isEmpty(), "no review group file mappings present");
     }
 
     @Override

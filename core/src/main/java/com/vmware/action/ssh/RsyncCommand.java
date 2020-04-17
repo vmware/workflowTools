@@ -8,24 +8,13 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.FileUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
 @ActionDescription("Executes a rsync command using the specified source directory and destination directory")
 public class RsyncCommand extends BaseSingleVappJsonAction {
     public RsyncCommand(WorkflowConfig config) {
         super(config);
-    }
-
-    @Override
-    public void failWorkflowIfConditionNotMet() {
-        super.failWorkflowIfConditionNotMet();
-        if (StringUtils.isEmpty(sshConfig.rsyncSourcePath)) {
-            exitDueToFailureCheck("no rsync source path set");
-        }
-        if (StringUtils.isEmpty(sshConfig.rsyncDestinationPath)) {
-            exitDueToFailureCheck("no rsync destination path set");
-        }
+        super.addFailWorkflowIfBlankProperties("rsyncSourcePath", "rsyncDestinationPath");
     }
 
     @Override

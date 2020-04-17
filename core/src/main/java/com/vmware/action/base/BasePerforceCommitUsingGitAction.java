@@ -6,15 +6,12 @@ public abstract class BasePerforceCommitUsingGitAction extends BasePerforceCommi
 
     public BasePerforceCommitUsingGitAction(WorkflowConfig config) {
         super(config);
-        super.failIfCannotBeRun = false;
     }
 
     @Override
-    public String cannotRunAction() {
-        if (!git.workingDirectoryIsInGitRepo()) {
-            return "not in git repo directory";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(!git.workingDirectoryIsInGitRepo(), "not in git repo directory");
     }
 
 }

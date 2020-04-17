@@ -25,20 +25,8 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
 
     public BaseCheckstyleAction(WorkflowConfig config, boolean failIfCheckstyleFails) {
         super(config);
+        super.addSkipActionIfBlankProperties("checkstyleJarPath", "checkstyleConfigXmlPath", "checkstyleSuppressionsXmlPath");
         this.failIfCheckstyleFails = failIfCheckstyleFails;
-    }
-
-    @Override
-    public String cannotRunAction() {
-        if (StringUtils.isEmpty(checkstyleConfig.checkstyleJarPath)) {
-            return "checkstyleJarPath is not set";
-        } else if (StringUtils.isEmpty(checkstyleConfig.checkstyleConfigXmlPath)) {
-            return "checkstyleConfigXmlPath is not set";
-        } else if (StringUtils.isEmpty(checkstyleConfig.checkstyleSuppressionsXmlPath)) {
-            return "checkstyleSuppressionsXmlPath is not set";
-        } else {
-            return super.cannotRunAction();
-        }
     }
 
     @Override

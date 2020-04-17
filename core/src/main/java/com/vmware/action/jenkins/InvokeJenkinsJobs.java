@@ -36,8 +36,8 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        return null;
+    public void checkIfActionShouldBeSkipped() {
+        // always run
     }
 
     @Override

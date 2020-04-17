@@ -17,7 +17,6 @@ import com.vmware.vcd.domain.QueryResultVMType;
 import com.vmware.vcd.domain.QueryResultVMsType;
 import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
-import com.vmware.vcd.domain.VappType;
 
 
 @ActionDescription("Loads a list of vapps from Vcloud Director owned by the logged in user.")
@@ -30,14 +29,10 @@ public class LoadVapps extends BaseVappAction {
     }
 
     @Override
-    public String cannotRunAction() {
-        if (StringUtils.isNotEmpty(vcdConfig.vappJsonFile)) {
-            return "vappJsonFile has been specified";
-        }
-        if (jenkinsConfig.hasConfiguredArtifact()) {
-            return "jenkins job artifact has been specified";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(StringUtils.isNotEmpty(vcdConfig.vappJsonFile), "vappJsonFile has been specified");
+        super.skipActionIfTrue(jenkinsConfig.hasConfiguredArtifact(),"jenkins job artifact has been specified");
     }
 
     @Override

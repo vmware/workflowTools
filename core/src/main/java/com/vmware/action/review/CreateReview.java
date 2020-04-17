@@ -22,9 +22,9 @@ public class CreateReview extends BaseCommitAction {
 
     @Override
     protected void failWorkflowIfConditionNotMet() {
-        if (StringUtils.isEmpty(reviewBoardConfig.reviewBoardRepository)) {
-            exitDueToFailureCheck("no reviewboard repository is configured, set a config value for reviewBoardRepository");
-        }
+        super.failWorkflowIfConditionNotMet();
+        super.failIfTrue(StringUtils.isEmpty(reviewBoardConfig.reviewBoardRepository),
+                "no reviewboard repository is configured, set a config value for reviewBoardRepository");
     }
 
     @Override

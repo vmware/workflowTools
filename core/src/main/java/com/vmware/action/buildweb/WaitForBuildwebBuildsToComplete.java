@@ -15,11 +15,9 @@ public class WaitForBuildwebBuildsToComplete extends BaseCommitWithBuildwebBuild
     }
 
     @Override
-    public String cannotRunAction() {
-        if (draft.jobBuildsMatchingUrl(buildwebConfig.buildwebUrl).isEmpty()) {
-            return "commit does not contain any buildweb builds";
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(draft.jobBuildsMatchingUrl(buildwebConfig.buildwebUrl).isEmpty(), "commit does not contain any buildweb builds");
     }
 
     @Override

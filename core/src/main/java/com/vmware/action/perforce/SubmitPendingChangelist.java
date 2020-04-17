@@ -14,9 +14,7 @@ public class SubmitPendingChangelist extends BasePerforceCommitAction {
     @Override
     public void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
-        if (StringUtils.isEmpty(draft.perforceChangelistId)) {
-            exitDueToFailureCheck("no changelist specified");
-        }
+        super.failIfTrue(StringUtils.isEmpty(draft.perforceChangelistId), "no changelist specified");
     }
 
     @Override

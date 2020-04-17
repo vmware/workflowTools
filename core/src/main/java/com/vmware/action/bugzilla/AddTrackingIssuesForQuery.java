@@ -16,12 +16,10 @@ public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
     }
 
     @Override
-    public String cannotRunAction() {
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
         List<Bug> bugList = projectIssues.getBugsForProcessing();
-        if (bugList.isEmpty()) {
-            return " no bugs found for named query " + bugzillaConfig.bugzillaQuery;
-        }
-        return super.cannotRunAction();
+        super.skipActionIfTrue(bugList.isEmpty(), "no bugs found for named query " + bugzillaConfig.bugzillaQuery);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class AddTrackingIssuesForQuery extends BaseBatchBugzillaAction {
         }
 
         if (projectIssues.noIssuesAdded()) {
-            log.info("No issues added", bugzillaConfig.bugzillaQuery);
+            log.info("No issues added for query {}", bugzillaConfig.bugzillaQuery);
         }
     }
 }

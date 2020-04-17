@@ -117,9 +117,9 @@
     "--estimate"
   ],
   "RsyncCommand": [
+    "--rsync-destination",
     "--rsync-flags",
     "--rsync-delete",
-    "--rsync-destination",
     "--rsync-source"
   ],
   "BaseBatchJiraAction": [
@@ -127,19 +127,17 @@
     "--disable-jira"
   ],
   "TailLogFile": [
+    "--log-file",
     "--log-line-count",
     "--ssh-command",
-    "--tail-follow",
-    "--log-file"
+    "--tail-follow"
   ],
   "BaseCommitUsingGitlabAction": [
     "--tracking-branch",
     "--target-merge-branch",
     "--username",
     "--merge-branch-format",
-    "--source-merge-branch",
-    "--gitlab-project-id",
-    "--gitlab-url"
+    "--source-merge-branch"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -313,11 +311,11 @@
     "--max-summary"
   ],
   "FindMatchingLines": [
+    "--log-file",
+    "--search-text",
     "--line-count-after",
     "--line-count-before",
-    "--ssh-command",
-    "--search-text",
-    "--log-file"
+    "--ssh-command"
   ],
   "GenerateAutoCompleteValues": [
     "--autocomplete-workflow"

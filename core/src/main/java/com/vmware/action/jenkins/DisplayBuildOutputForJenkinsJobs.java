@@ -16,11 +16,10 @@ public class DisplayBuildOutputForJenkinsJobs extends BaseCommitWithJenkinsBuild
     }
 
     @Override
-    public String cannotRunAction() {
-        if (jenkinsConfig.logLineCount <= 0) {
-            return "line count to show (logLineCount) is " + jenkinsConfig.logLineCount;
-        }
-        return super.cannotRunAction();
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        super.skipActionIfTrue(jenkinsConfig.logLineCount <= 0,
+                "line count to show (logLineCount) is " + jenkinsConfig.logLineCount);
     }
 
     @Override
