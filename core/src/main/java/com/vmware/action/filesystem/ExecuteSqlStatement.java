@@ -38,8 +38,8 @@ public class ExecuteSqlStatement extends BaseVappAction {
     public void process() {
         Driver driver = createDatabaseDriver();
 
-        String databaseUrl = vappData.getSelectedSite() != null ?
-                vappData.getSelectedSite().databaseServer.urlForPattern(fileSystemConfig.databaseUrlPattern) : fileSystemConfig.databaseUrl;
+        String databaseUrl = fileSystemConfig.databaseConfigured() ? fileSystemConfig.databaseUrl :
+                vappData.getSelectedSite().databaseServer.urlForPattern(fileSystemConfig.databaseUrlPattern);
 
         log.info("Executing sql statement \"{}\" using database url {}", fileSystemConfig.sqlStatement, databaseUrl);
         Properties connectionProperties = determineConnectionProperties();
@@ -68,13 +68,13 @@ public class ExecuteSqlStatement extends BaseVappAction {
 
     private Properties determineConnectionProperties() {
         Properties connectionProperties = new Properties();
-        if (vappData.getSelectedSite() != null) {
+        if (fileSystemConfig.databaseConfigured()) {
+            connectionProperties.put("user", fileSystemConfig.databaseUsername);
+            connectionProperties.put("password", fileSystemConfig.databasePassword);
+        } else {
             Sites.DatabaseServer databaseServer = vappData.getSelectedSite().databaseServer;
             connectionProperties.put("user", databaseServer.credentials.username);
             connectionProperties.put("password", databaseServer.credentials.password);
-        } else {
-            connectionProperties.put("user", fileSystemConfig.databaseUsername);
-            connectionProperties.put("password", fileSystemConfig.databasePassword);
         }
         return connectionProperties;
     }

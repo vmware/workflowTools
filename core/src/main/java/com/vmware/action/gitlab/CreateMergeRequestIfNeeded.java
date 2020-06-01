@@ -15,12 +15,11 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
         super.skipActionIfTrue(draft.mergeRequestId() != null,
-                "merge request with id " + draft.mergeRequestId() + " has already been created");
+                "merge request with url " + draft.mergeRequestUrl + " has already been created");
     }
 
     @Override
     public void process() {
-        log.info("Creating merge request for git branch {}", git.currentBranch());
         MergeRequest mergeRequest = new MergeRequest();
         mergeRequest.title = draft.summary;
         mergeRequest.targetProjectId = gitlabConfig.gitlabProjectId;

@@ -1,12 +1,8 @@
 package com.vmware.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.vmware.jira.domain.ProjectIssues;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.trello.domain.Board;
-import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.VappData;
 
 /**
@@ -22,6 +18,8 @@ public class WorkflowActionValues {
     private Board trelloBoard;
 
     private VappData vappData;
+
+    private String fileData;
 
     public WorkflowActionValues() {
         this.draft = new ReviewRequestDraft();
@@ -47,5 +45,13 @@ public class WorkflowActionValues {
 
     public VappData getVappData() {
         return vappData;
+    }
+
+    public String getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(String fileData) {
+        this.fileData = fileData;
     }
 }

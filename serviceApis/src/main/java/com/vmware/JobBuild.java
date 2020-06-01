@@ -85,4 +85,8 @@ public class JobBuild {
     public Integer getNumber() {
         return number;
     }
+
+    public String consoleUrl() {
+        return UrlUtils.addRelativePaths(url, "consoleFull");
+    }
 }

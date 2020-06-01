@@ -14,7 +14,7 @@ public class CloseMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        log.info("Closing merge request {}", draft.mergeRequestUrl());
+        log.info("Closing merge request {}", draft.mergeRequestUrl);
         MergeRequest mergeRequest = gitlab.getMergeRequest(draft.mergeRequestProjectId(), draft.mergeRequestId());
         mergeRequest.stateEvent = "close";
         gitlab.updateMergeRequest(mergeRequest);

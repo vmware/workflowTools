@@ -9,8 +9,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.gson.annotations.Expose;
 import com.vmware.ServiceLocator;
+import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.config.WorkflowField;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.CheckstyleConfig;
@@ -68,9 +71,11 @@ public abstract class BaseAction implements Action {
 
     protected boolean failIfCannotBeRun;
 
-    private String[] expectedCommandsToBeAvailable;
+    protected ReplacementVariables replacementVariables;
 
     private Set<String> failWorkflowIfBlankProperties = new HashSet<>();
+
+    private String[] expectedCommandsToBeAvailable;
 
     private Set<String> skipActionIfBlankProperties = new HashSet<>();
 
@@ -94,6 +99,7 @@ public abstract class BaseAction implements Action {
         this.vcdConfig = config.vcdConfig;
         this.commandLineConfig = config.commandLineConfig;
         this.fileSystemConfig = config.fileSystemConfig;
+        this.replacementVariables = config.replacementVariables;
     }
 
     public void checkIfWorkflowShouldBeFailed() {
@@ -194,8 +200,11 @@ public abstract class BaseAction implements Action {
     }
 
     protected void skipActionIfUnset(String propertyName) {
-        if (!config.getConfigurableFields().hasValue(propertyName)) {
-            throw new SkipActionException("{} is unset", propertyName);
+        WorkflowField matchingField = config.getConfigurableFields().getFieldByName(propertyName);
+        if (matchingField.getValue(config) == null) {
+            String commandLineParam = matchingField.commandLineParameter();
+            String paramText = commandLineParam != null ? " (" + commandLineParam + ") " : "";
+            throw new SkipActionException("{}{} is unset", propertyName, paramText);
         }
     }
 
@@ -206,8 +215,11 @@ public abstract class BaseAction implements Action {
     }
 
     protected void failIfUnset(String propertyName) {
-        if (!config.getConfigurableFields().hasValue(propertyName)) {
-            exitDueToFailureCheck("property " + propertyName + " not set");
+        WorkflowField matchingField = config.getConfigurableFields().getFieldByName(propertyName);
+        if (matchingField.getValue(config) == null) {
+            String commandLineParam = matchingField.commandLineParameter();
+            String paramText = commandLineParam != null ? " (" + commandLineParam + ") " : "";
+            exitDueToFailureCheck("property " + propertyName + paramText + " not set");
         }
     }
 }

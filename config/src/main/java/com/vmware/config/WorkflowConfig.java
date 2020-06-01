@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Workflow configuration.
@@ -49,6 +51,7 @@ import java.util.TreeMap;
 public class WorkflowConfig {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
+    private static final String COMMAND_LINE_SOURCE = "Command Line";
 
     @SectionConfig
     public LoggingConfig loggingConfig;
@@ -108,7 +111,8 @@ public class WorkflowConfig {
     public Map<String, String> buildInfo;
 
     @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira, review board and vcd")
-    public String username;
+    public String
+            username;
 
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public List<String> bugNumberSearchOrder;
@@ -147,6 +151,9 @@ public class WorkflowConfig {
     public String outputFile;
 
     @Expose(serialize = false, deserialize = false)
+    public ReplacementVariables replacementVariables = new ReplacementVariables(this);
+
+    @Expose(serialize = false, deserialize = false)
     private WorkflowFields configurableFields;
 
     public WorkflowConfig() {
@@ -161,7 +168,7 @@ public class WorkflowConfig {
     }
 
     public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
-        List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), "Command Line", true);
+        List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), COMMAND_LINE_SOURCE, true);
         if (argsParser.containsArgument("--possible-workflow")) {
             configurableFields.markFieldAsOverridden("workflowsToRun", "Command Line");
             this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
@@ -172,7 +179,7 @@ public class WorkflowConfig {
     public Map<String, CalculatedProperty> getExistingValues(Set<String> configValues) {
         Map<String, CalculatedProperty> existingValues = new HashMap<>();
         for (String configValueName : configValues) {
-            if (configValueName.startsWith("--J")) {
+            if (configValueName.startsWith(JenkinsConfig.CONFIG_PREFIX)) {
                 if (!existingValues.containsKey("jenkinsJobParameters")) {
                     existingValues.put("jenkinsJobParameters", new CalculatedProperty(new HashMap<>(jenkinsConfig.jenkinsJobParameters),
                             configurableFields.getFieldValueSource("jenkinsJobParameters")));
@@ -194,6 +201,7 @@ public class WorkflowConfig {
             return Collections.emptyList();
         }
         jenkinsConfig.addJenkinsParametersFromConfigValues(configValues, overwriteJenkinsParameters);
+        replacementVariables.addReplacementVariables(configValues, COMMAND_LINE_SOURCE.equals(source));
         return configurableFields.applyConfigValues(configValues, source);
     }
 
@@ -241,7 +249,57 @@ public class WorkflowConfig {
         }
     }
 
+    public void applyReplacementVariables() {
+        if (replacementVariables.isEmpty()) {
+            return;
+        }
+        WorkflowFields fields = getConfigurableFields();
+        List<WorkflowField> fieldsWithStringType = fields.values().stream().filter(field -> field.getType() == String.class).collect(Collectors.toList());
+        for (WorkflowField field : fieldsWithStringType) {
+            String value = (String) valueForField(field).getValue();
+            String updatedValue = replaceVariablesInValue(value);
+
+            if (value != null && !value.equals(updatedValue)) {
+                Class sectionConfigClass = field.getConfigClassContainingField();
+                field.setValue(sectionConfigForClass(sectionConfigClass), updatedValue);
+            }
+        }
+    }
+
+    private String replaceVariablesInValue(String value) {
+        if (value == null || !value.contains("$")) {
+            return value;
+        }
+
+        String existingValue;
+        String updatedValue = value;
+        do {
+            existingValue = updatedValue;
+            updatedValue = replacementVariables.replaceVariablesInValue(existingValue);
+            if (!existingValue.equals(updatedValue)) {
+                log.trace(existingValue + " " + updatedValue);
+            }
+        } while(!existingValue.equals(updatedValue));
+        return updatedValue;
+    }
+
+    public List<WorkflowParameter> applyReplacementVariables(List<WorkflowParameter> parameters) {
+        List<WorkflowParameter> updatedParams = new ArrayList<>();
+        for (WorkflowParameter parameter : parameters) {
+            String updatedValue = replaceVariablesInValue(parameter.getValue());
+            if (parameter.getValue() != null && !parameter.getValue().equals(updatedValue)) {
+                updatedParams.add(new WorkflowParameter(parameter.getName(), updatedValue));
+            } else {
+                updatedParams.add(parameter);
+            }
+        }
+        return updatedParams;
+    }
+
     private Object sectionConfigForClass(Class clazz) {
+        if (clazz == WorkflowConfig.class) {
+            return this;
+        }
         Optional<Field> matchingField = Arrays.stream(this.getClass().getFields()).filter(field -> field.getType().equals(clazz)).findFirst();
         if (!matchingField.isPresent()) {
             throw new FatalException("No match for config class {}", clazz.getName());

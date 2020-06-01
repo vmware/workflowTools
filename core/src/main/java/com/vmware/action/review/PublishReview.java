@@ -25,13 +25,14 @@ public class PublishReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
+        String trivialText = commitConfig.publishAsTrivial ? " as trivial" : "";
         if (StringUtils.isNotBlank(commitConfig.reviewChangeDescription)) {
-            log.info("Publishing review request {} with change description {}", reviewRequest.id, commitConfig.reviewChangeDescription);
+            log.info("Publishing review request {}{} with change description {}", reviewRequest.id, trivialText, commitConfig.reviewChangeDescription);
         } else {
-            log.info("Publishing review request {}", reviewRequest.id);
+            log.info("Publishing review request {}{}", reviewRequest.id, trivialText);
         }
 
-        reviewBoard.publishReview(reviewRequest.getDraftLink(), commitConfig.reviewChangeDescription);
+        reviewBoard.publishReview(reviewRequest.getDraftLink(), commitConfig.reviewChangeDescription, commitConfig.publishAsTrivial);
         reviewRequest.isPublic = true;
         log.info("Successfully published review request");
     }

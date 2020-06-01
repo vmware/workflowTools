@@ -24,8 +24,8 @@ public class BackupFile extends BaseAction {
 
     @Override
     public void process() {
-        String sourceFilePath = git.addRepoDirectoryIfNeeded(fileSystemConfig.sourceFile);
-        String destinationFilePath = git.addRepoDirectoryIfNeeded(fileSystemConfig.destinationFile);
+        String sourceFilePath = fileSystemConfig.sourceFile;
+        String destinationFilePath = fileSystemConfig.destinationFile;
 
         log.debug("Configured source file {} and destination file {}", sourceFilePath, destinationFilePath);
 

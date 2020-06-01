@@ -18,6 +18,7 @@ import com.vmware.action.info.GenerateAutoCompleteValues;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.ReplacementVariables;
 import com.vmware.config.UnknownWorkflowValueException;
 import com.vmware.config.WorkflowAction;
 import com.vmware.config.WorkflowActionValues;
@@ -312,7 +313,8 @@ public class Workflow {
             }
             configOptions.addAll(configMappings.getConfigValuesForAction(action));
             log.info(action.getActionClassName() + " - " + description.value());
-            for (WorkflowParameter parameter : configMappings.getRelevantOverriddenConfigValues(action)) {
+            List<WorkflowParameter> params = configMappings.getRelevantOverriddenConfigValues(action);
+            for (WorkflowParameter parameter : params) {
                 log.info("{}   {}={}", StringUtils.repeat(action.getActionClassName().length(), " "),
                         parameter.getName(), parameter.getValue());
             }
@@ -362,6 +364,17 @@ public class Workflow {
             }
         }
         configPadder.infoTitle();
+
+        Map<String, String> replacementVariables = config.replacementVariables.values();
+        if (replacementVariables.isEmpty()) {
+            return;
+        }
+        Padder variablePadder = new Padder("Variables for workflow");
+        variablePadder.infoTitle();
+        for (String key : replacementVariables.keySet().stream().sorted().collect(Collectors.toList())) {
+            log.info("{}{}={}", ReplacementVariables.CONFIG_PREFIX, key, replacementVariables.get(key));
+        }
+        variablePadder.infoTitle();
     }
 
     private void runActions(List<WorkflowAction> actions, WorkflowActionValues values) {

@@ -38,7 +38,7 @@ public class MatcherUtils {
 
     private static String getMatchedValue(Matcher matcher) {
         if (matcher.find()) {
-            return matcher.group(1);
+            return matcher.groupCount() > 0 ? matcher.group(1) : matcher.group();
         } else {
             return null;
         }

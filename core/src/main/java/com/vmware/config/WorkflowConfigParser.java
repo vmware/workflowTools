@@ -39,6 +39,10 @@ public class WorkflowConfigParser {
             config.username = username;
         }
 
+        if (git.workingDirectoryIsInGitRepo()) {
+            config.replacementVariables.addVariable(ReplacementVariables.VariableName.REPO_DIR, git.getRootDirectory().getAbsolutePath());
+        }
+
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
         config.setupLogLevel();
@@ -58,6 +62,8 @@ public class WorkflowConfigParser {
         log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
 
         parseUsernameIfBlank(config);
+
+        config.applyReplacementVariables();
 
         log.trace("Workflow Config\n{}", gson.toJson(config));
         return config;

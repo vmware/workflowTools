@@ -66,6 +66,7 @@ public class CommandLineUtils {
 
     public static String executeCommand(File workingDirectory, Map<String, String> environmentVariables,
                                         String command, String inputText, LogLevel logLevel) {
+        log.debug("Executing command {}", command);
         ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).directory(workingDirectory)
                 .redirectErrorStream(true);
         if (environmentVariables != null) {

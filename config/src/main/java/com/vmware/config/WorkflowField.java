@@ -87,6 +87,15 @@ public class WorkflowField {
         return field.getAnnotation(ConfigurableProperty.class);
     }
 
+    public String commandLineParameter() {
+        ConfigurableProperty configAnnotation = configAnnotation();
+        if (StringUtils.isEmpty(configAnnotation.commandLine())) {
+            return null;
+        }
+        return Arrays.stream(configAnnotation.commandLine().split(",")).filter(value -> value.startsWith("--")).findFirst()
+                .orElse(configAnnotation.commandLine());
+    }
+
     public Class<?> getType() {
         return field.getType();
     }

@@ -1,5 +1,7 @@
 package com.vmware.action.ssh;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.jcraft.jsch.Channel;
@@ -14,22 +16,25 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 
 @ActionDescription("Uses scp to copy a file from a ssh site.")
-public class ScpFileFromRemote extends BaseVappAction {
+public class ScpFileFromRemote extends ExecuteSshCommand {
     public ScpFileFromRemote(WorkflowConfig config) {
+        this(config, Arrays.asList("sourceFile", "destinationFile"));
+    }
+
+    public ScpFileFromRemote(WorkflowConfig config, List<String> failIfBlankProperties) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("sourceFile", "destinationFile");
+        super.addFailWorkflowIfBlankProperties(failIfBlankProperties.toArray(new String[0]));
     }
 
     @Override
     public void process() {
         SiteConfig siteConfigToUse = createSshSiteConfig();
         siteConfigToUse.validate();
-        copyFile(siteConfigToUse);
+        copyFile(siteConfigToUse, fileSystemConfig.sourceFile, fileSystemConfig.destinationFile);
     }
 
-    protected void copyFile(SiteConfig siteConfig) {
-        String destinationFilePath = git.addRepoDirectoryIfNeeded(fileSystemConfig.destinationFile);
-        log.info("Copying file {} from {}@{} to {}", fileSystemConfig.sourceFile, siteConfig.username, siteConfig.host, destinationFilePath);
+    protected void copyFile(SiteConfig siteConfig, String sourceFile, String destinationFile) {
+        log.info("Copying file {} from {}@{} to {}", sourceFile, siteConfig.username, siteConfig.host, destinationFile);
         JSch jsch = new JSch();
         Session session = null;
         Channel channel = null;
@@ -42,7 +47,7 @@ public class ScpFileFromRemote extends BaseVappAction {
             channel.connect();
 
             ChannelSftp sftpChannel = (ChannelSftp) channel;
-            sftpChannel.get(fileSystemConfig.sourceFile, destinationFilePath);
+            sftpChannel.get(sourceFile, destinationFile);
             sftpChannel.exit();
         } catch (JSchException | SftpException e) {
             throw new RuntimeException(e);

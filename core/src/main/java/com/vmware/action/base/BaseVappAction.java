@@ -48,7 +48,12 @@ public abstract class BaseVappAction extends BaseCommitAction {
     }
 
     protected SiteConfig createSshSiteConfig() {
-        if (vappData.getSelectedVcdCell() != null) {
+        if (vappData.getSelectedSite() != null && vcdConfig.useDatabaseHost) {
+            Sites.Site site = vappData.getSelectedSite();
+            Sites.DatabaseServer databaseConfig = site.databaseServer;
+            log.info("Using database host {} for ssh site config", databaseConfig.host);
+            return new SiteConfig(databaseConfig.host, 22, "root", databaseConfig.deployment.guestProperties.adminPassword);
+        } else if (vappData.getSelectedVcdCell() != null) {
             Sites.DeployedVM cell = vappData.getSelectedVcdCell();
             if (cell.deployment == null) {
                 throw new FatalException("No deployment section found for cell " + vappData.getSelectedVcdCell().name);

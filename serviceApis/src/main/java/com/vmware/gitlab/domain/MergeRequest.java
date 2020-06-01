@@ -38,6 +38,10 @@ public class MergeRequest {
 
     public boolean squash;
 
+    public Integer assigneeId;
+
+    public ApprovalUser[] appovedBy;
+
     public boolean canBeMerged() {
         return "can_be_merged".equalsIgnoreCase(mergeStatus);
     }

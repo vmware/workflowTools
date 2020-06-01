@@ -8,6 +8,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.Vcd;
+import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.TaskType;
 import com.vmware.vcd.domain.VappType;
 
@@ -28,6 +29,10 @@ public class RenameVapp extends BaseSingleVappAction {
         Vcd vcd = serviceLocator.getVcd();
         TaskType updatedVappTask = vcd.updateResource(vappData.getSelectedVapp().getSelfLink(), vappTypeForUpdate);
         vcd.waitForTaskToComplete(updatedVappTask.href, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
-        vappData.getSelectedVapp().name = newName;
+
+        String vappId = vappData.getSelectedVapp().parseIdFromRef();
+        QueryResultVappType updatedVapp = vcd.queryVappById(vappId);
+        log.info("Name successfully changed to {}", updatedVapp.name);
+        vappData.getSelectedVapp().name = updatedVapp.name;
     }
 }

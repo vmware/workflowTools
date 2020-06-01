@@ -1,10 +1,14 @@
 package com.vmware.vcd;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
@@ -18,6 +22,8 @@ import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
+import com.vmware.util.UrlUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
 import com.vmware.vcd.domain.QueryResultVMsType;
@@ -25,7 +31,6 @@ import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
 import com.vmware.vcd.domain.ResourceType;
 import com.vmware.vcd.domain.TaskType;
-import com.vmware.vcd.domain.VappType;
 import com.vmware.vcd.domain.VcdMediaType;
 
 import static com.vmware.http.cookie.ApiAuthentication.vcd;
@@ -44,6 +49,17 @@ public class Vcd extends AbstractRestService {
     private String vcdOrg;
 
 
+    public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
+        super(vcdUrl, "api", null, username);
+        this.apiVersion = apiVersion;
+        this.vcdOrg = vcdOrg;
+        this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
+        this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
+        this.connection.setDisableHostnameVerification(true);
+        String apiToken = loginWithCredentials(new UsernamePasswordCredentials(username + "@" + vcdOrg, password));
+        connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
+    }
+
     public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg) {
         super(vcdUrl, "api", ApiAuthentication.vcd, username);
         this.apiVersion = apiVersion;
@@ -56,6 +72,15 @@ public class Vcd extends AbstractRestService {
         }
     }
 
+    public Map getResourceAsMap(String resourcePath, String acceptType) {
+        return optimisticGet(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, anAcceptHeader(acceptType + "+json;version=" + apiVersion));
+    }
+
+    public Map updateResourceFromMap(String resourcePath, Map resourceValue, String contentType, String acceptType) {
+        return optimisticPut(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, resourceValue,
+                aContentTypeHeader(contentType + "+json;version=" + apiVersion), anAcceptHeader(acceptType + "+json;version=" + apiVersion));
+    }
+
     public TaskType deleteResource(LinkType deleteLink, boolean force) {
         return connection.delete(deleteLink.href, TaskType.class, taskAcceptHeader(), forceParam(force));
     }
@@ -64,9 +89,20 @@ public class Vcd extends AbstractRestService {
         return connection.put(link.href, TaskType.class, resourceType, contentTypeHeader(resourceType), taskAcceptHeader());
     }
 
-    public QueryResultVappsType getVapps() {
-        QueryResultVappsType vapps = optimisticGet(apiUrl + "/query?type=vApp&links=true", QueryResultVappsType.class,
-                acceptHeader(QueryResultVappsType.class));
+    public <T extends ResourceType> T getResource(LinkType link, Class<T> resourceTypeClass) {
+        return optimisticGet(link.href, resourceTypeClass, acceptHeader(resourceTypeClass));
+    }
+
+    public QueryResultVappType queryVappById(String id) {
+        QueryResultVappsType vapps = query("vApp", QueryResultVappsType.class, true, "id==" + id);
+        if (vapps.record == null || vapps.record.isEmpty()) {
+            throw new FatalException("Failed to find vapp for id " + id);
+        }
+        return vapps.record.get(0);
+    }
+
+    public QueryResultVappsType queryVapps() {
+        QueryResultVappsType vapps = query("vApp", QueryResultVappsType.class, true);
         if (vapps.record != null) {
             String username = getUsername();
             vapps.record.forEach(vapp -> vapp.setOwnedByWorkflowUser(username.equalsIgnoreCase(vapp.ownerName)));
@@ -77,16 +113,20 @@ public class Vcd extends AbstractRestService {
         return vapps;
     }
 
-    public QueryResultVMsType getVmsForVapp(String vappId) {
-        return optimisticGet(apiUrl + "/query?type=vm&filter=container==" + vappId, QueryResultVMsType.class, acceptHeader(QueryResultVMsType.class));
+    public QueryResultVMsType queryVmsForVapp(String vappId) {
+        return query("vm", QueryResultVMsType.class, false, "container==" + vappId);
     }
 
     public MetaDatasType getVappMetaData(LinkType metadataLink) {
-        return optimisticGet(metadataLink.href, MetaDatasType.class, acceptHeader(MetaDatasType.class));
+        return getResource(metadataLink, MetaDatasType.class);
     }
 
-    public VappType getVapp(LinkType vappLink) {
-        return optimisticGet(vappLink.href, VappType.class, acceptHeader(VappType.class));
+    public <T extends ResourceType> T query(String queryType, Class<T> responseTypeClass, boolean includeLinks, String... filterValues) {
+        String queryUrl = String.format("%s/query?type=%s&links=%s", apiUrl, queryType,  includeLinks);
+        if (filterValues.length > 0) {
+            queryUrl += "&filter=" + Arrays.stream(filterValues).filter(Objects::nonNull).collect(Collectors.joining(";"));
+        }
+        return optimisticGet(queryUrl, responseTypeClass, acceptHeader(responseTypeClass));
     }
 
     public void waitForTaskToComplete(String taskHref, int amount, TimeUnit timeUnit) {
@@ -109,7 +149,7 @@ public class Vcd extends AbstractRestService {
 
     @Override
     protected void checkAuthenticationAgainstServer() {
-        getVapps();
+        queryVapps();
     }
 
     @Override
@@ -129,14 +169,7 @@ public class Vcd extends AbstractRestService {
             log.info("Setting vcd org to {}", vcdOrg);
         }
 
-        RequestHeader acceptHeader = anAcceptHeader("*/*;version=" + apiVersion);
-        HttpResponse response = connection.post(apiUrl + "/sessions", HttpResponse.class, (Object) null,
-                acceptHeader, aBasicAuthHeader(credentials));
-        List<String> authzHeaders = response.getHeaders().get(AUTHORIZATION_HEADER);
-        if (authzHeaders == null || authzHeaders.isEmpty()) {
-            throw new NotAuthorizedException("Could not find authorization header " + AUTHORIZATION_HEADER);
-        }
-        String apiToken = authzHeaders.get(0);
+        String apiToken = loginWithCredentials(credentials);
         saveApiToken(apiToken, ApiAuthentication.vcd);
         connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
     }
@@ -148,7 +181,7 @@ public class Vcd extends AbstractRestService {
     }
 
     private RequestHeader taskAcceptHeader() {
-        return anAcceptHeader(mediaType(TaskType.class));
+        return acceptHeader(TaskType.class);
     }
 
     private RequestHeader acceptHeader(Class<?> resourceClass) {
@@ -161,6 +194,19 @@ public class Vcd extends AbstractRestService {
 
     private String mediaType(Class<?> dto) {
         return dto.getAnnotation(VcdMediaType.class).value() + "+json;version=" + apiVersion;
+    }
+
+    private String loginWithCredentials(UsernamePasswordCredentials credentials) {
+        String loginUrl = baseUrl + "api/sessions";
+        RequestHeader acceptHeader = anAcceptHeader("*/*;version=" + apiVersion);
+        log.debug("Logging into vcd at url {} with username {} and accept header {}", loginUrl, credentials.getUsername(), acceptHeader);
+        HttpResponse response = connection.post(loginUrl, HttpResponse.class, (Object) null,
+                acceptHeader, aBasicAuthHeader(credentials));
+        List<String> authzHeaders = response.getHeaders().get(AUTHORIZATION_HEADER);
+        if (authzHeaders == null || authzHeaders.isEmpty()) {
+            throw new NotAuthorizedException("Could not find authorization header " + AUTHORIZATION_HEADER);
+        }
+        return authzHeaders.get(0);
     }
 
 }

@@ -15,6 +15,6 @@ public class OpenMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        SystemUtils.openUrl(draft.mergeRequestUrl());
+        SystemUtils.openUrl(draft.mergeRequestUrl);
     }
 }

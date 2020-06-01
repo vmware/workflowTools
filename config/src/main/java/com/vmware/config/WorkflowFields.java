@@ -129,6 +129,10 @@ public class WorkflowFields {
                 setFieldValue(field, valueToSet, "Git " + sourceConfigProperty);
             }
         }
+        final String variablePrefix = "workflow." + configPrefixText + "var.";
+        gitConfigValues.keySet().stream().filter(key -> key.startsWith(variablePrefix))
+                .forEach(key -> workflowConfig.replacementVariables.addVariable(key.substring(variablePrefix.length()), gitConfigValues.get(key), true));
+
     }
 
     public WorkflowField getMatchingField(String commandLineProperty) {
@@ -147,12 +151,12 @@ public class WorkflowFields {
         return null;
     }
 
-    public boolean hasValue(String fieldName) {
+    public WorkflowField getFieldByName(String fieldName) {
         Optional<WorkflowField> matchingField = configurableFields.stream().filter(field -> field.getName().equals(fieldName)).findFirst();
         if (!matchingField.isPresent()) {
             throw new RuntimeException("No field found for name " + fieldName);
         }
-        return matchingField.get().getValue(workflowConfig) != null;
+        return matchingField.get();
     }
 
     public String getFieldValueSource(String fieldName) {

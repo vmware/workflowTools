@@ -17,6 +17,10 @@
   "BaseCheckstyleAction": [
     "--checkstyle-config-xml-path"
   ],
+  "AppendTextToFile": [
+    "--input-text",
+    "--source-file"
+  ],
   "ExitIfGitDiffDoesNotMatchRbtDiff": [
     "--parent",
     "--reviewboard-url"
@@ -60,6 +64,9 @@
     "--store-trees",
     "--changelist-id"
   ],
+  "SaveFileData": [
+    "--destination-file"
+  ],
   "AuthenticateAllApis": [
     "--disable-jenkins-login",
     "--jenkins-uses-csrf",
@@ -69,7 +76,7 @@
     "--bugzilla-test-bug",
     "--bugzilla-url",
     "--trello-url",
-    "--default-vcd-org",
+    "--vcd-default-org",
     "--vcd-api-version",
     "--vcd-url",
     "--username",
@@ -82,6 +89,9 @@
     "--bugzilla-url",
     "--default-jira-project",
     "--bugzilla-query"
+  ],
+  "LoadFileData": [
+    "--source-file"
   ],
   "RevertWorkspace": [
     "--perforce-client"
@@ -106,6 +116,10 @@
     "--tracking-branch",
     "--groups",
     "--disable-markdown"
+  ],
+  "AssignMergeRequestToBot": [
+    "--merge-bot-user-id",
+    "--gitlab-project-id"
   ],
   "CreateReviewIfNeeded": [
     "--username",
@@ -146,8 +160,14 @@
   "ReadGitDiffAsGitPatch": [
     "--parent"
   ],
+  "ExecuteLocalSqlStatementUsingPsql": [
+    "--database-username",
+    "--database-schema-name",
+    "--sql-statement"
+  ],
   "PublishReview": [
-    "--change-description",
+    "--publish-description",
+    "--publish-as-trivial",
     "--reviewboard-url"
   ],
   "SelectVapp": [
@@ -155,15 +175,13 @@
     "--jenkins-uses-csrf",
     "--username",
     "--jenkins-url",
-    "--job-display-names",
-    "--job-with-artifact",
     "--vapp-name",
     "--job-artifact",
-    "--job-build",
+    "--job-build-number",
     "--vapp-json-file"
   ],
   "LoadVapps": [
-    "--default-vcd-org",
+    "--vcd-default-org",
     "--username",
     "--vcd-api-version",
     "--vcd-url",
@@ -174,6 +192,10 @@
   ],
   "SetDefaultApprover": [
     "--approver"
+  ],
+  "SetJsonProperty": [
+    "--property-value",
+    "--json-property-path"
   ],
   "SaveDiffToFile": [
     "--output-file"
@@ -194,10 +216,8 @@
   "SelectMatchingMergeRequest": [
     "--gitlab-project-id"
   ],
-  "SetPropertyFileValue": [
-    "--property-name",
-    "--property-value",
-    "--property-file"
+  "DeleteJsonProperty": [
+    "--json-property-path"
   ],
   "UploadReviewDiff": [
     "--tracking-branch",
@@ -221,7 +241,7 @@
     "--disable-bugzilla"
   ],
   "RenameVapp": [
-    "--default-vcd-org",
+    "--vcd-default-org",
     "--username",
     "--vcd-api-version",
     "--vcd-url",
@@ -236,7 +256,7 @@
     "--buildweb-url"
   ],
   "DeleteVapp": [
-    "--default-vcd-org",
+    "--vcd-default-org",
     "--username",
     "--vcd-api-version",
     "--vcd-url",
@@ -252,7 +272,7 @@
     "--ssh-command"
   ],
   "LoadVappJson": [
-    "--default-vcd-org",
+    "--vcd-default-org",
     "--username",
     "--vcd-api-version",
     "--vcd-url"
@@ -285,6 +305,9 @@
   "LoadCompletedIssuesWithoutResolution": [
     "--username"
   ],
+  "RemoveReviewUrl": [
+    "--always-include-review-url"
+  ],
   "OpenBuildConsolePage": [
     "--jenkins-url"
   ],
@@ -312,7 +335,7 @@
   ],
   "FindMatchingLines": [
     "--log-file",
-    "--search-text",
+    "--input-text",
     "--line-count-after",
     "--line-count-before",
     "--ssh-command"
@@ -324,8 +347,14 @@
     "--vcd-vm-quota",
     "--use-vapp-json"
   ],
+  "ReadCertsFromUrl": [
+    "--source-url"
+  ],
   "LoadGitPatchFile": [
     "--diff-file"
+  ],
+  "SkipPipeline": [
+    "--skip-pipeline"
   ],
   "CheckStatusOfLatestBuilds": [
     "--disable-jenkins-login",
@@ -349,7 +378,8 @@
     "--ssh-username",
     "--ssh-port",
     "--ssh-host",
-    "--ssh-site"
+    "--ssh-site",
+    "--use-database-host"
   ],
   "CreateMergeRequestIfNeeded": [
     "--gitlab-project-id"
@@ -391,6 +421,11 @@
   "StripJenkinsBuilds": [
     "--jenkins-url"
   ],
+  "CreatePostgresDatabaseFromFile": [
+    "--database-username",
+    "--database-schema-name",
+    "--source-file"
+  ],
   "PushToDevelop": [
     "--git-remote"
   ],
@@ -414,8 +449,8 @@
   ],
   "ScpFileFromRemote": [
     "--ssh-strict-host-checking",
-    "--source-file",
-    "--destination-file"
+    "--destination-file",
+    "--source-file"
   ],
   "SetCommitDetailsFromReview": [
     "--username",
@@ -429,7 +464,7 @@
     "--review-board-date-format"
   ],
   "UpdateVappLease": [
-    "--default-vcd-org",
+    "--vcd-default-org",
     "--username",
     "--vcd-api-version",
     "--vcd-url",
@@ -438,6 +473,9 @@
   ],
   "LoadVappJsonIfNeeded": [
     "--use-vapp-json"
+  ],
+  "ExitIfPostgresDatabaseAlreadyExists": [
+    "--database-schema-name"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",
@@ -460,8 +498,8 @@
     "--database-driver-class",
     "--database-driver-file",
     "--sql-statement",
-    "--database-url",
-    "--database-url-pattern"
+    "--database-url-pattern",
+    "--database-url"
   ],
   "AddTrackingIssueForBug": [
     "--bugzilla-url",
@@ -472,6 +510,12 @@
   ],
   "RemoveSelectedBuilds": [
     "--jenkins-url"
+  ],
+  "UpdatePublicCerts": [
+    "--vcd-sys-admin-password",
+    "--vcd-sys-admin-username",
+    "--vcd-api-version",
+    "--vcd-url"
   ],
   "DeleteMergeBranch": [
     "--git-remote"
@@ -506,6 +550,25 @@
   "BaseAction": [
     "--output-file"
   ],
+  "ReplaceText": [
+    "--replacement-text",
+    "--input-text"
+  ],
+  "DumpPostgresqlDatabaseFromRemote": [
+    "--ssh-password",
+    "--ssh-username",
+    "--ssh-port",
+    "--ssh-host",
+    "--destination-file",
+    "--source-database-schema-name"
+  ],
+  "DownloadBuildArtifact": [
+    "--job-with-artifact",
+    "--job-build-number",
+    "--destination-file",
+    "--job-artifact",
+    "--jenkins-url"
+  ],
   "SelectVcdCell": [
     "--vcd-cell-index"
   ],
@@ -519,6 +582,10 @@
   ],
   "PushToTrackingBranch": [
     "--tracking-branch"
+  ],
+  "SetProperty": [
+    "--property-name",
+    "--property-value"
   ],
   "ComputeTestbedVmCountIfNeeded": [
     "--testbed-parameter-name",

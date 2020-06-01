@@ -81,12 +81,16 @@ public class ReviewRequestDraft extends BaseEntity {
     @Expose(serialize = false, deserialize = false)
     public List<JobBuild> jobBuilds = new ArrayList<>();
     @Expose(serialize = false, deserialize = false)
+    public Integer selectedBuild;
+    @Expose(serialize = false, deserialize = false)
     public List<IssueInfo> issues = new ArrayList<>();
     public String branch = "";
     @Expose(serialize = false, deserialize = false)
     public String[] mergeToValues = new String[0];
     @Expose(serialize = false, deserialize = false)
     public String approvedBy;
+    @Expose(serialize = false, deserialize = false)
+    public String pipeline;
     @Expose(serialize = false, deserialize = false)
     public String draftPatchData;
     @Expose(serialize = false, deserialize = false)
@@ -98,6 +102,11 @@ public class ReviewRequestDraft extends BaseEntity {
      */
     @SerializedName("public")
     public Boolean isPublic;
+
+    /**
+     * Set to true to publish review without sending emails to reviewers
+     */
+    public Boolean trivial;
 
     /**
      * Id used in review request for commit
@@ -136,6 +145,9 @@ public class ReviewRequestDraft extends BaseEntity {
     public int lineDeletions;
 
     @Expose(serialize = false, deserialize = false)
+    public String mergeRequestUrl;
+
+    @Expose(serialize = false, deserialize = false)
     private MergeRequest gitlabMergeRequest;
 
     public ReviewRequestDraft() {}
@@ -155,10 +167,13 @@ public class ReviewRequestDraft extends BaseEntity {
         fillValuesFromCommitText(commitText, commitConfig);
     }
 
-    public static ReviewRequestDraft aDraftForPublishingAReview(String changeDescription) {
+    public static ReviewRequestDraft aDraftForPublishingAReview(String changeDescription, boolean trivial) {
         ReviewRequestDraft draft = new ReviewRequestDraft(null,null,null,null,null,null,null);
         draft.isPublic = true;
         draft.changeDescription = changeDescription;
+        if (trivial) {
+            draft.trivial = true;
+        }
         return draft;
     }
 
@@ -210,6 +225,8 @@ public class ReviewRequestDraft extends BaseEntity {
         this.bugNumbers = parseSingleLineFromText(commitText, commitConfig.generateBugNumberPattern(), "Bug Number");
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfig.generateReviewedByPattern(), "Reviewers");
         this.approvedBy = parseSingleLineFromText(commitText, commitConfig.generateApprovedByPattern(), "Approved by");
+        this.pipeline = parseSingleLineFromText(commitText, commitConfig.generatePipelinePattern(), "Run Pipeline");
+        this.mergeRequestUrl = parseSingleLineFromText(commitText, commitConfig.generateMergeUrlPattern(), "Merge URL");
         this.mergeToValues = parseRepeatingSingleLineFromText(commitText, commitConfig.generateMergeToPattern(), "Merge To");
 
         this.filesChanged = parseValueFromText(commitText, "(\\d+) files* changed", "Files Changed");
@@ -422,6 +439,12 @@ public class ReviewRequestDraft extends BaseEntity {
         if (isNotEmpty(approvedBy)) {
             builder.append("\n").append(commitConfig.getApprovedByLabel()).append(approvedBy);
         }
+        if (isNotEmpty(pipeline)) {
+            builder.append("\n").append(commitConfig.getPipelineLabel()).append(pipeline);
+        }
+        if (StringUtils.isNotBlank(mergeRequestUrl)) {
+            builder.append("\n").append(commitConfig.getMergeUrlLabel()).append(mergeRequestUrl);
+        }
         return builder.toString();
     }
 
@@ -500,6 +523,7 @@ public class ReviewRequestDraft extends BaseEntity {
 
     public void setGitlabMergeRequest(MergeRequest mergeRequest) {
         this.gitlabMergeRequest = mergeRequest;
+        this.mergeRequestUrl = mergeRequest.webUrl;
     }
 
     public MergeRequest getGitlabMergeRequest() {
@@ -507,15 +531,15 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public Integer mergeRequestId() {
-        return gitlabMergeRequest != null ? gitlabMergeRequest.iid : null;
+        return StringUtils.isNotBlank(mergeRequestUrl) ? Integer.parseInt(StringUtils.substringAfterLast(mergeRequestUrl, "/")) : null;
+    }
+
+    public boolean mergeRequestLoaded() {
+        return gitlabMergeRequest != null;
     }
 
     public Integer mergeRequestProjectId() {
         return gitlabMergeRequest != null ? gitlabMergeRequest.projectId : null;
-    }
-
-    public String mergeRequestUrl() {
-        return gitlabMergeRequest != null ? gitlabMergeRequest.webUrl : null;
     }
 
 

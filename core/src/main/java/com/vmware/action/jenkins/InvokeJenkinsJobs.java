@@ -73,7 +73,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
             return updatedDetails.building;
         };
-        ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
+        ThreadUtils.waitForCallable(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS, "Build failed to complete.");
 
         JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
         log.info("Job status {}", updatedDetails.realResult());

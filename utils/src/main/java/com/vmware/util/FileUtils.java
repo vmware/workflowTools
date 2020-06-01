@@ -107,6 +107,14 @@ public class FileUtils {
         }
     }
 
+    public static String appendToFileName(String fileName, String suffix) {
+        if (!fileName.contains(".")) {
+            return fileName + suffix;
+        }
+        int dotIndex = fileName.indexOf(".");
+        return fileName.substring(0, dotIndex) + suffix + fileName.substring(dotIndex);
+    }
+
     private static void addDirectoryToList(List<File> files, File directory, FileFilter fileFilter) {
         File[] filesFound = directory.listFiles(fileFilter);
         if (filesFound == null) {

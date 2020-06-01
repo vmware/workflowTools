@@ -32,6 +32,9 @@ import static com.vmware.util.CommandLineUtils.isCommandAvailable;
  * Exposes git functionality needed for workflows.
  */
 public class Git extends BaseScmWrapper {
+    private static String trackingBranch;
+    private static String rootDirectoryCommandOutput;
+    private static Map<String, String> configValues;
     private Boolean gitInstalled;
     private File rootDirectory;
 
@@ -51,22 +54,11 @@ public class Git extends BaseScmWrapper {
         return isGitInstalled() && getRootDirectory() != null;
     }
 
-    public String addRepoDirectoryIfNeeded(String path) {
-        if (path == null || !workingDirectoryIsInGitRepo()) {
-            return path;
-        }
-        return path.replace("$REPO_DIR", getRootDirectory().getAbsolutePath());
-    }
-
     /**
      * @return The root directory for this repo. Null if this is not a repo
      */
     public File getRootDirectory() {
         return rootDirectory;
-    }
-
-    public String newTrackingBranch(String branchName, String trackingBranch) {
-        return executeScmCommand("checkout -b {} {}", branchName, trackingBranch);
     }
 
     public String applyPartialPatchFile(File patchFile) {
@@ -181,14 +173,22 @@ public class Git extends BaseScmWrapper {
     }
 
     public String configValue(String propertyName) {
-        if (!isGitInstalled()) {
+        if (configValues == null) {
+            configValues = configValues();
+        }
+        if (configValues.isEmpty()) {
             log.debug("Returning empty string for git config value {} as git is not installed", propertyName);
             return "";
         }
-        return executeScmCommand("config " + propertyName);
+        if (!configValues.containsKey(propertyName)) {
+            log.debug("Returning empty string as config value {} was not found", propertyName);
+            return "";
+        }
+        return configValues.get(propertyName);
     }
 
     public String addConfigValue(String propertyName, String propertyValue) {
+        configValues.put(propertyName, propertyValue);
         return executeScmCommand("config {} {}", propertyName, propertyValue);
     }
 
@@ -198,6 +198,9 @@ public class Git extends BaseScmWrapper {
     }
 
     public Map<String, String> configValues() {
+        if (configValues != null) {
+            return Collections.unmodifiableMap(configValues);
+        }
         if (!isGitInstalled()) {
             log.debug("Returning empty maps for git config values as git is not installed");
             return new HashMap<>();
@@ -216,7 +219,8 @@ public class Git extends BaseScmWrapper {
                 log.debug("{} git config value could not be parsed", valueAsText);
             }
         }
-        return values;
+        configValues = values;
+        return Collections.unmodifiableMap(configValues);
     }
 
     public void commit(String msg) {
@@ -355,6 +359,10 @@ public class Git extends BaseScmWrapper {
     }
 
     public String getTrackingBranch() {
+        if (Git.trackingBranch != null) {
+            log.debug("Already parsed tracking branch value of {}", Git.trackingBranch);
+            return Git.trackingBranch;
+        }
         String branchName = currentBranch();
         String headRef = revParse("HEAD");
 
@@ -377,6 +385,7 @@ public class Git extends BaseScmWrapper {
         }
 
         log.debug("Parsed tracking branch {} from git branch -vv", trackingBranch);
+        Git.trackingBranch = trackingBranch;
         return trackingBranch;
     }
 
@@ -561,9 +570,15 @@ public class Git extends BaseScmWrapper {
     }
 
     private void determineRootDirectory() {
-        String rootDirectoryPath = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
-        String commandCheckOutput = checkIfCommandFailed(rootDirectoryPath);
-        rootDirectory = commandCheckOutput == null ? new File(rootDirectoryPath) : null;
+        if (Git.rootDirectoryCommandOutput != null) {
+            log.debug("Previously ran root directory command output {}", Git.rootDirectoryCommandOutput);
+            String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
+            rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
+        } else {
+            Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
+            String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
+            rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
+        }
     }
 
 }

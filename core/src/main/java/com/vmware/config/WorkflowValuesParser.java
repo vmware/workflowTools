@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  * Used to parse actions and config values from workflow arguments.
  */
 public class WorkflowValuesParser {
-
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private Map<String, String> configValues = new HashMap<>();
     private List<String> unknownActions = new ArrayList<>();
@@ -118,8 +117,12 @@ public class WorkflowValuesParser {
             if (jenkinsParameterPieces.length != 2) {
                 continue;
             }
-            jenkinsParameterConfigValues.add("--J" + jenkinsParameterPieces[0]);
+            jenkinsParameterConfigValues.add(JenkinsConfig.CONFIG_PREFIX + jenkinsParameterPieces[0]);
         }
         return jenkinsParameterConfigValues;
+    }
+
+    public Collection<? extends String> calculateReplacementVariables() {
+        return configValues.keySet().stream().filter(key -> key.startsWith(ReplacementVariables.CONFIG_PREFIX)).collect(Collectors.toSet());
     }
 }

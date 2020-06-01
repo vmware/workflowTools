@@ -7,6 +7,7 @@ import com.vmware.util.logging.LogLevel;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,6 +38,15 @@ public class IOUtils {
             write(new FileOutputStream(file), data);
         } catch (FileNotFoundException e) {
             throw new RuntimeIOException(e);
+        }
+    }
+
+    public static void appendToFile(File file, String data) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            writer.newLine();
+            writer.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

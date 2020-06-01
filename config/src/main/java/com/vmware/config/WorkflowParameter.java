@@ -8,6 +8,11 @@ public class WorkflowParameter {
 
     private String value;
 
+    public WorkflowParameter(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
     public WorkflowParameter(String text) {
         String[] configPieces = StringUtils.splitOnlyOnce(text, "=");
 

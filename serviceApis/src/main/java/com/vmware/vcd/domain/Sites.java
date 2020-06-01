@@ -42,6 +42,7 @@ public class Sites {
 
     public class Deployment {
         public OvfProperties ovfProperties;
+        public GuestProperties guestProperties;
     }
 
     public class Credentials {
@@ -61,12 +62,17 @@ public class Sites {
         public String password;
     }
 
+    public class GuestProperties {
+        public String adminPassword;
+    }
+
     public class DatabaseServer {
         public String databaseType;
         public String host;
         public String port;
         public String dbname;
         public Credentials credentials;
+        public Deployment deployment;
 
         public String urlForPattern(String urlPattern) {
             String url = urlPattern.replace("$HOST", host);

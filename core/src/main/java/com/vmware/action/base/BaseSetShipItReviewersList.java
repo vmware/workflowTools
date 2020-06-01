@@ -20,6 +20,11 @@ public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBo
         int reviewNumber = draft.reviewRequest.id;
         log.info("Checking ship its for review {}", reviewNumber);
 
+        if (!draft.reviewRequest.isPublic) {
+            log.info("Review has not been published yet");
+            return;
+        }
+
         String updatedReviewers = reviewBoard.getShipItReviewerList(draft.reviewRequest);
 
         draft.shipItReviewers = updatedReviewers;

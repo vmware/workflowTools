@@ -35,14 +35,27 @@ public class WorkflowCertificateManager {
 
     private Set<String> trustedHosts = new HashSet<>();
 
+    public WorkflowCertificateManager() {
+        this(null);
+    }
+
     public WorkflowCertificateManager(String keyStoreFile) {
-        this.keyStoreFile = new File(keyStoreFile);
+        this.keyStoreFile = keyStoreFile != null ? new File(keyStoreFile) : null;
         try {
             context = initSslContext();
         } catch (Exception e) {
             throw new WorkflowCertificateException(e);
         }
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+    }
+
+    public X509Certificate[] getCertificatesForUri(URI uri) {
+        isUriTrusted(uri); // makes call so cert is retrieved
+        X509Certificate[] chain = workflowTrustManager.chain;
+        if (chain == null) {
+            throw new WorkflowCertificateException("Could not obtain server certificate chain for host " + uri.getHost());
+        }
+        return chain;
     }
 
     public void saveCertForUri(URI uri) {
@@ -163,6 +176,10 @@ public class WorkflowCertificateManager {
     }
 
     private void createKeyStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+        if (keyStoreFile == null) {
+            logger.debug("No keystore file set");
+            return;
+        }
         if (!keyStoreFile.exists()) {
             logger.info("Creating blank keystore file {}", keyStoreFile.getPath());
             keyStoreFile.createNewFile();

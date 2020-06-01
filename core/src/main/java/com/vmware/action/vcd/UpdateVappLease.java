@@ -11,6 +11,7 @@ import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.Vcd;
 import com.vmware.vcd.domain.LeaseSection;
 import com.vmware.vcd.domain.LinkType;
+import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.TaskType;
 
 @ActionDescription("Updates a Vapp runtime lease")
@@ -30,14 +31,18 @@ public class UpdateVappLease extends BaseSingleVappAction {
 
         log.debug("Runtime lease value in hours {}", timeUnitToUse.toHours(leaseValue));
         long leaseInMilliseconds = TimeUnit.SECONDS.toMillis(leaseSection.deploymentLeaseInSeconds);
-        Date updatedUndeployDate = new Date(new Date().getTime() + leaseInMilliseconds);
-        log.info("Runtime lease will be updated to {}", updatedUndeployDate);
+        Date undeployDateToUpdateTo = new Date(new Date().getTime() + leaseInMilliseconds);
+        log.info("Runtime lease will be updated to {}", undeployDateToUpdateTo);
 
-        String leaseUrl = vappData.getSelectedVapp().getSelfLink().href + "/leaseSettingsSection/";
+        LinkType leaseLink = new LinkType(vappData.getSelectedVapp().getSelfLink().href + "/leaseSettingsSection/");
         Vcd vcd = serviceLocator.getVcd();
-        TaskType leaseUpdateTask = vcd.updateResource(new LinkType(leaseUrl), leaseSection);
+        TaskType leaseUpdateTask = vcd.updateResource(leaseLink, leaseSection);
         vcd.waitForTaskToComplete(leaseUpdateTask.href, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
-        vappData.getSelectedVapp().otherAttributes.autoUndeployDate = updatedUndeployDate;
+
+        String vappId = vappData.getSelectedVapp().parseIdFromRef();
+        QueryResultVappType updatedVapp = vcd.queryVappById(vappId);
+        log.info("Lease successfully changed to {}", updatedVapp.otherAttributes.autoUndeployDate);
+        vappData.getSelectedVapp().otherAttributes.autoUndeployDate = updatedVapp.otherAttributes.autoUndeployDate;
     }
 
     private int determineLeaseValue(TimeUnit timeUnitToUse) {

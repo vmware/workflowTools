@@ -2,6 +2,7 @@ package com.vmware.action.buildweb;
 
 import com.vmware.BuildResult;
 import com.vmware.JobBuild;
+import com.vmware.action.base.BaseCommitAction;
 import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.config.ActionDescription;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
 import static java.lang.String.format;
 
 @ActionDescription("Used to invoke a sandbox build on buildweb. This is a VMware specific action.")
-public class InvokeSandboxBuild extends BasePerforceCommitAction {
+public class InvokeSandboxBuild extends BaseCommitAction {
 
     private static final String SANDBOX_BUILD_PREFIX = "$SANDBOX_";
 

@@ -27,7 +27,7 @@ public class WaitForBuildwebBuildsToComplete extends BaseCommitWithBuildwebBuild
             return draft.allJobBuildsMatchingUrlAreComplete(buildwebConfig.buildwebUrl);
         };
         log.info("Waiting for all buildweb builds to complete");
-        ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
+        ThreadUtils.waitForCallable(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS, "Buildweb builds failed to complete");
         log.info("All buildweb builds have completed");
     }
 }

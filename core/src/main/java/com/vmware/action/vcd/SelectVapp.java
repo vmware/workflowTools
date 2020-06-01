@@ -3,6 +3,7 @@ package com.vmware.action.vcd;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.QueryResultVappType;
@@ -32,8 +33,8 @@ public class SelectVapp extends BaseVappAction {
             log.info("Using Vapp json file {}", vcdConfig.vappJsonFile);
             vappData.setSelectedVapp(new QueryResultVappType("url", vcdConfig.vappJsonFile));
         } else if (jenkinsConfig.hasConfiguredArtifact()) {
-            String jobArtifactPath = serviceLocator.getJenkins()
-                    .constructFullArtifactPath(getJobForArtifact(), jenkinsConfig.jobBuildNumber, jenkinsConfig.jobArtifact);
+            JobBuildDetails buildDetails = serviceLocator.getJenkins().getJobBuildDetails(jenkinsConfig.jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
+            String jobArtifactPath = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
             log.info("Using artifact {}", jobArtifactPath);
             vappData.setSelectedVapp(new QueryResultVappType("artifact", jobArtifactPath));
         } else if (StringUtils.isNotEmpty(vcdConfig.vappName)) {
@@ -45,14 +46,6 @@ public class SelectVapp extends BaseVappAction {
             int selectedVapp = InputUtils.readSelection(vappData.vappLabels(),
                     "Select Vapp (Total powered on owned VM count " + vappData.poweredOnVmCount() + ")");
             vappData.setSelectedVappByIndex(selectedVapp);
-        }
-    }
-
-    public String getJobForArtifact() {
-        if (StringUtils.isNotEmpty(jenkinsConfig.jobWithArtifact)) {
-            return jenkinsConfig.jobWithArtifact;
-        } else {
-            return jenkinsConfig.jobsDisplayNames != null && jenkinsConfig.jobsDisplayNames.length == 1 ? jenkinsConfig.jobsDisplayNames[0] : null;
         }
     }
 }

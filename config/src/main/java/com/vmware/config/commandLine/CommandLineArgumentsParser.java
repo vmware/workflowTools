@@ -1,6 +1,8 @@
 package com.vmware.config.commandLine;
 
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.ReplacementVariables;
+import com.vmware.config.section.JenkinsConfig;
 import com.vmware.util.ArrayUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
@@ -22,24 +24,24 @@ public class CommandLineArgumentsParser {
 
     private Map<String, String> argumentMap = new HashMap<String, String>();
 
-    private String argumentsText;
+    private StringBuilder argumentsText;
 
     public void generateArgumentMap(final String[] args) {
-        argumentsText = "";
+        argumentsText = new StringBuilder();
 
         argumentMap.clear();
 
         for (int i = 0; i < args.length; i ++) {
             if (i > 0) {
-                argumentsText += " ";
+                argumentsText.append(" ");
             }
             if (!args[i].startsWith("-")) {
-                argumentsText += args[i];
+                argumentsText.append(args[i]);
                 continue;
             }
             String[] paramPieces = args[i].split("=");
             String paramName = paramPieces[0];
-            argumentsText += paramName;
+            argumentsText.append(paramName);
             String paramValue = null;
 
             if (paramPieces.length == 1 && args[i].endsWith("=")) {
@@ -50,7 +52,7 @@ public class CommandLineArgumentsParser {
                 paramValue = args[++i];
             }
             if (paramValue != null) {
-                argumentsText += "=" + (paramValue.contains(" ") ? "\"" + paramValue + "\"" : paramValue);
+                argumentsText.append("=").append(paramValue.contains(" ") ? "\"" + paramValue + "\"" : paramValue);
             }
 
             argumentMap.put(paramName, paramValue);
@@ -66,7 +68,7 @@ public class CommandLineArgumentsParser {
     }
 
     public String getArgumentsText() {
-        return argumentsText;
+        return argumentsText.toString();
     }
 
     public boolean containsArgument(String... possibleMatchingValues) {
@@ -118,7 +120,10 @@ public class CommandLineArgumentsParser {
             if (ArrayUtils.contains(ADDITIONAL_ARGUMENT_NAMES, argument)) {
                 continue;
             }
-            if (argument.startsWith("--J")) {
+            if (argument.startsWith(JenkinsConfig.CONFIG_PREFIX)) {
+                continue;
+            }
+            if (argument.startsWith(ReplacementVariables.CONFIG_PREFIX)) {
                 continue;
             }
             UnrecognizedCommandLineArgument potentiallyUnrecognizedArgument = new UnrecognizedCommandLineArgument(argument);

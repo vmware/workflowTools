@@ -36,7 +36,7 @@ public class UsernameParser {
         String gitUserEmail = git.configValue("user.email");
         if (StringUtils.isNotEmpty(gitUserEmail) && gitUserEmail.contains("@")) {
             this.username = gitUserEmail.substring(0, gitUserEmail.indexOf("@"));
-            log.info("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
+            log.debug("No username set, parsed username {} from git config user.email {}", username, gitUserEmail);
             this.source = "Git user.email";
         }
     }
@@ -60,7 +60,7 @@ public class UsernameParser {
         String fullUsername = CommandLineUtils.executeCommand("whoami", LogLevel.DEBUG);
         String[] usernamePieces = fullUsername.split("\\\\");
         this.username = usernamePieces[usernamePieces.length - 1];
-        log.info("No username set, parsed username {} from whoami output {}", username, fullUsername);
+        log.debug("No username set, parsed username {} from whoami output {}", username, fullUsername);
         this.source = "Whoami command";
     }
 }

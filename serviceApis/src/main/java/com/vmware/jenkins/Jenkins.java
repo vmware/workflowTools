@@ -50,7 +50,7 @@ public class Jenkins extends AbstractRestBuildService {
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
 
         if (disableLogin) {
-            log.info("Not attempting to read api token for Jenkins as disableLogin is true");
+            log.debug("Not attempting to read api token for Jenkins as disableLogin is true");
             return;
         }
 
@@ -84,9 +84,9 @@ public class Jenkins extends AbstractRestBuildService {
         return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
     }
 
-    public String constructFullArtifactPath(String jobName, int buildNumber, String artifactPath) {
-        return UrlUtils.addRelativePaths(baseUrl, "job", jobName,
-                String.valueOf(buildNumber), "artifact", artifactPath);
+    public JobBuildDetails getJobBuildDetails(String jobName, int buildNumber) {
+        String jobUrl = UrlUtils.addRelativePaths(baseUrl, "job", jobName);
+        return getJobBuildDetails(new JobBuild(buildNumber, jobUrl));
     }
 
     public void abortJobBuild(JobBuild jobBuildToAbort) {

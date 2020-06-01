@@ -19,4 +19,6 @@ public class GitlabConfig {
     @ConfigurableProperty(commandLine = "--target-merge-branch", help = "Specify custom target branch for a merge request")
     public String targetMergeBranch;
 
+    @ConfigurableProperty(commandLine = "--merge-bot-user-id", help = "User if of the bot used for merging merge requests")
+    public Integer mergeBotUserId;
 }

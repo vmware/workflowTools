@@ -14,7 +14,7 @@ public class AcceptMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        log.info("Accepting merge request {}", draft.mergeRequestUrl());
+        log.info("Accepting merge request {}", draft.mergeRequestUrl);
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
         if (!mergeRequest.canBeMerged()) {
             throw new FatalException("Cannot accept merge request {} as it has a status of {} and cannot be merged",

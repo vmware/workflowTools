@@ -72,7 +72,6 @@ public abstract class BaseScmWrapper {
 
     String executeScmCommand(Map<String, String> environmentVariables, String command, String inputText, LogLevel level, String... commandArguments) {
         String expandedCommand = scmExecutablePath() + " " + addArgumentsToValue(command, commandArguments);
-        log.debug("{} command {}", this.getClass().getSimpleName(), expandedCommand);
         String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, level);
         String commandCheckOutput = checkIfCommandFailed(output);
         if (commandCheckOutput != null) {

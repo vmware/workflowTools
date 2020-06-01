@@ -19,17 +19,18 @@ public class UrlUtils {
         return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
     }
 
-    public static String addRelativePaths(String url, String... paths) {
+    public static String addRelativePaths(String url, Object... paths) {
         if (paths.length == 0) {
             return url;
         }
         String urlWithoutTrailingSlash = removeTrailingSlash(url);
         StringBuilder urlBuilder = new StringBuilder(urlWithoutTrailingSlash);
-        for (String path : paths) {
-            if (path.startsWith("/")) {
-                urlBuilder.append(path);
+        for (Object path : paths) {
+            String pathAsString = String.valueOf(path);
+            if (pathAsString.startsWith("/")) {
+                urlBuilder.append(pathAsString);
             } else {
-                urlBuilder.append("/").append(path);
+                urlBuilder.append("/").append(pathAsString);
             }
         }
         return urlBuilder.toString();

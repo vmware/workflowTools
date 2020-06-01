@@ -50,9 +50,6 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--tail-follow", help = "Using tail -f")
     public boolean continuousTailing;
 
-    @ConfigurableProperty(commandLine = "--search-text", help = "Text to match using sed")
-    public String searchText;
-
     @ConfigurableProperty(commandLine = "--rsync-flags", help = "Flags to use for rsync command")
     public String rsyncFlags;
 
@@ -65,6 +62,9 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--rsync-delete", help = "Delete files not in the source path from the destination")
     public boolean rsyncDeleteRemovedFiles;
 
+    @ConfigurableProperty(commandLine = "--source-database-schema-name", help = "Source database schema name")
+    public String sourceDatabaseSchemaName;
+
     public SiteConfig commandLineSite() {
         return new SiteConfig(sshHost, sshPort, sshUsername, sshPassword);
     }
@@ -75,5 +75,9 @@ public class SshConfig {
 
     public boolean hasCommandLineSite() {
         return isNotEmpty(sshHost) && isNotEmpty(sshUsername) && isNotEmpty(sshPassword);
+    }
+
+    public boolean hasConfiguredSourceDatabaseServer() {
+        return hasCommandLineSite() && StringUtils.isNotBlank(sourceDatabaseSchemaName);
     }
 }

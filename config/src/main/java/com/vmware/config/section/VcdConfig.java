@@ -8,8 +8,14 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-url", help = "Url for Vcloud Director")
     public String vcdUrl;
 
-    @ConfigurableProperty(commandLine = "--default-vcd-org", help = "Default Org to use for user login if none specified")
+    @ConfigurableProperty(commandLine = "--vcd-default-org", help = "Default Org to use for user login if none specified")
     public String defaultVcdOrg;
+
+    @ConfigurableProperty(commandLine = "--vcd-sys-admin-username", help = "Username for the vcd sys admin user")
+    public String vcdSysAdminUser;
+
+    @ConfigurableProperty(commandLine = "--vcd-sys-admin-password", help = "Password for the vcd sys admin user")
+    public String vcdSysAdminPassword;
 
     @ConfigurableProperty(commandLine = "--vcd-api-version", help = "Api version to use for Vcloud Director")
     public String vcdApiVersion;
@@ -43,4 +49,7 @@ public class VcdConfig {
 
     @ConfigurableProperty(commandLine = "--vapp-json-file", help = "Name of file to load json from")
     public String vappJsonFile;
+
+    @ConfigurableProperty(commandLine = "--use-database-host", help = "Use database host config for ssh site")
+    public boolean useDatabaseHost;
 }

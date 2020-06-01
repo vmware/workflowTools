@@ -58,6 +58,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
             values.addAll(matchingConfigValues);
         }
         values.addAll(valuesParser.calculateJenkinsParameterConfigValues());
+        values.addAll(valuesParser.calculateReplacementVariables());
         return values;
     }
 

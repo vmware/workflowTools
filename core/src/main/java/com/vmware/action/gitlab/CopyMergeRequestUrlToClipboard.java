@@ -13,7 +13,7 @@ public class CopyMergeRequestUrlToClipboard extends BaseCommitWithMergeRequestAc
 
     @Override
     public void process() {
-        log.info("Copying merge request url {} to clipboard", draft.mergeRequestUrl());
-        SystemUtils.copyTextToClipboard(draft.mergeRequestUrl());
+        log.info("Copying merge request url {} to clipboard", draft.mergeRequestUrl);
+        SystemUtils.copyTextToClipboard(draft.mergeRequestUrl);
     }
 }

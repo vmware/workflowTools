@@ -52,6 +52,15 @@ public class CommitConfig {
     @ConfigurableProperty(help = "Label for review url")
     public String reviewUrlLabel;
 
+    @ConfigurableProperty(help = "Label for gitlab merge request")
+    public String mergeUrlLabel;
+
+    @ConfigurableProperty(help = "Label for pipeline")
+    public String pipelineLabel;
+
+    @ConfigurableProperty(help = "Label for no pipeline")
+    public String noPipelineLabel;
+
     @ConfigurableProperty(commandLine = "--merge-to", help = "Comma separate values for merge to property")
     public String[] mergeToValues;
 
@@ -76,8 +85,16 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--disable-merge-to", help = "Disable merge to")
     public boolean disableMergeTo;
 
-    @ConfigurableProperty(commandLine = "--change-description", help = "Change description for publishing review")
+    @ConfigurableProperty(commandLine = "--publish-description", help = "Change description for publishing review")
     public String reviewChangeDescription;
+
+    @ConfigurableProperty(commandLine = "--publish-as-trivial", help = "Publishes review without emailing reviewers")
+    public boolean publishAsTrivial;
+
+    @ConfigurableProperty(commandLine = "--skip-pipeline", help = "Skips pipeline in Gitlab")
+    public boolean skipPipeline;
+
+
 
     public CommitConfig() {}
 
@@ -106,6 +123,8 @@ public class CommitConfig {
         appendLabelToPattern(builder, reviewUrlLabel);
         appendLabelToPattern(builder, mergeToLabel);
         appendLabelToPattern(builder, approvedByLabel);
+        appendLabelToPattern(builder, pipelineLabel);
+        appendLabelToPattern(builder, mergeUrlLabel);
         appendLabelToPattern(builder, "\\s+\\d+\\s+files*\\s+changed");
         builder.append("($))");
         return builder.toString();
@@ -119,6 +138,8 @@ public class CommitConfig {
         appendLabelToPattern(builder, reviewUrlLabel);
         appendLabelToPattern(builder, mergeToLabel);
         appendLabelToPattern(builder, approvedByLabel);
+        appendLabelToPattern(builder, pipelineLabel);
+        appendLabelToPattern(builder, mergeUrlLabel);
         appendLabelToPattern(builder, "\\s+\\d+\\s+ file\\w*\\s+changed");
         builder.append("($))");
         return builder.toString();
@@ -138,6 +159,14 @@ public class CommitConfig {
 
     public String generateMergeToPattern() {
         return mergeToLabel.trim() + "\\s*(.+)$";
+    }
+
+    public String generatePipelinePattern() {
+        return pipelineLabel.trim() + "\\s*(.+)$";
+    }
+
+    public String generateMergeUrlPattern() {
+        return mergeUrlLabel.trim() + "\\s*(.+)$";
     }
 
     public String generateApprovedByPattern() {
@@ -182,6 +211,14 @@ public class CommitConfig {
 
     public String getApprovedByLabel() {
         return padLabel(approvedByLabel);
+    }
+
+    public String getPipelineLabel() {
+        return padLabel(pipelineLabel);
+    }
+
+    public String getMergeUrlLabel() {
+        return padLabel(mergeUrlLabel);
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {

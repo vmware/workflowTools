@@ -21,7 +21,7 @@ public class WaitForJenkinsBuildsToComplete extends BaseCommitWithJenkinsBuildsA
             return draft.allJobBuildsMatchingUrlAreComplete(jenkinsConfig.jenkinsUrl);
         };
         log.info("Waiting for all jenkins builds to complete");
-        ThreadUtils.sleepUntilCallableReturnsTrue(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS);
+        ThreadUtils.waitForCallable(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS, "Jenkins jobs failed to complete");
         log.info("All jenkins builds have completed");
     }
 }

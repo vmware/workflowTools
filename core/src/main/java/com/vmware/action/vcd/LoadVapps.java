@@ -37,7 +37,7 @@ public class LoadVapps extends BaseVappAction {
 
     @Override
     public void process() {
-        QueryResultVappsType vappRecords = serviceLocator.getVcd().getVapps();
+        QueryResultVappsType vappRecords = serviceLocator.getVcd().queryVapps();
         vappRecords.record.forEach(this::populatedPoweredOnVmCount);
         List<QueryResultVappType> vapps = new ArrayList<>();
         vapps.addAll(parseVappJsonFiles());
@@ -53,7 +53,7 @@ public class LoadVapps extends BaseVappAction {
             if (vappId.startsWith("vapp-")) {
                 vappId = vappId.substring("vapp-".length());
             }
-            QueryResultVMsType vmsForVapp = serviceLocator.getVcd().getVmsForVapp(vappId);
+            QueryResultVMsType vmsForVapp = serviceLocator.getVcd().queryVmsForVapp(vappId);
             queryResultVappType.poweredOnVmCount = (int) vmsForVapp.record.stream().filter(QueryResultVMType::isPoweredOn).count();
         }
     }

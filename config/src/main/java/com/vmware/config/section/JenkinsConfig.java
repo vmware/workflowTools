@@ -15,6 +15,8 @@ import java.util.TreeMap;
 
 public class JenkinsConfig {
 
+    public static final String CONFIG_PREFIX = "--J";
+
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
@@ -65,7 +67,7 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--job-artifact", help = "Jenkins job output artifact")
     public String jobArtifact;
 
-    @ConfigurableProperty(commandLine = "--job-build", help = "Number of jenkins build to use")
+    @ConfigurableProperty(commandLine = "--job-build-number", help = "Number of jenkins build to use")
     public Integer jobBuildNumber;
 
     public boolean hasConfiguredArtifact() {
@@ -73,9 +75,16 @@ public class JenkinsConfig {
                 && (StringUtils.isNotEmpty(jobWithArtifact) ||  (jobsDisplayNames != null && jobsDisplayNames.length == 1));
     }
 
+    public String jobWithArtifactName() {
+        if (!hasConfiguredArtifact()) {
+            return null;
+        }
+        return StringUtils.isNotEmpty(jobWithArtifact) ? jobWithArtifact : jobsDisplayNames[0];
+    }
+
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {
         for (String configValue : configValues.keySet()) {
-            if (!configValue.startsWith("--J")) {
+            if (!configValue.startsWith(CONFIG_PREFIX)) {
                 continue;
             }
             String parameterName = configValue.substring(3);

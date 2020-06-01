@@ -13,7 +13,7 @@ public class FindMatchingLines extends ExecuteSshCommand {
     @Override
     public void process() {
         sshConfig.sshCommand = String.format("grep -B %s -A %s --group-separator='' '%s' %s",
-                sshConfig.lineCountBeforeMatch, sshConfig.lineCountAfterMatch, sshConfig.searchText, sshConfig.logFile);
+                sshConfig.lineCountBeforeMatch, sshConfig.lineCountAfterMatch, fileSystemConfig.inputText, sshConfig.logFile);
         super.process();
     }
 }

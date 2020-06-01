@@ -155,8 +155,8 @@ public class ReviewBoard extends AbstractRestService {
         return updatedDraft;
     }
 
-    public void publishReview(Link draftLink, String changeDescription) {
-        connection.put(draftLink.getHref(), aDraftForPublishingAReview(changeDescription));
+    public void publishReview(Link draftLink, String changeDescription, boolean trivial) {
+        connection.put(draftLink.getHref(), aDraftForPublishingAReview(changeDescription, trivial));
     }
 
     public void updateReviewRequest(ReviewRequest reviewRequest) {

@@ -6,6 +6,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.vmware.AbstractRestService;
 import com.vmware.gitlab.domain.MergeAcceptRequest;
 import com.vmware.gitlab.domain.MergeRequest;
+import com.vmware.gitlab.domain.MergeRequestApprovals;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
@@ -43,9 +44,13 @@ public class Gitlab extends AbstractRestService {
         return optimisticGet(mergeRequestUrl(projectId, mergeRequestId), MergeRequest.class);
     }
 
-    public void approveMergeRequest(int projectId, int mergeRequestId) {
+    public MergeRequestApprovals getMergeRequestApprovals(int projectId, int mergeRequestId) {
+        return optimisticGet(mergeRequestUrl(projectId, mergeRequestId) + "/approvals", MergeRequestApprovals.class);
+    }
+
+    public MergeRequestApprovals approveMergeRequest(int projectId, int mergeRequestId) {
         try {
-            optimisticPost(mergeRequestUrl(projectId, mergeRequestId) + "/approve", null, null,
+            return optimisticPost(mergeRequestUrl(projectId, mergeRequestId) + "/approve", MergeRequestApprovals.class, null,
                     Collections.singletonList(NotAuthorizedException.class));
         } catch (NotAuthorizedException nae) {
             throw new FatalException(nae, "Not authorized to approve merge request {} for project {}", mergeRequestId, projectId);

@@ -23,15 +23,13 @@ public class OpenBuildConsolePage extends BaseCommitWithJenkinsBuildsAction {
 
         if (matchingBuilds.size() == 1) {
             log.info("Opening build {} as it is the only Jenkins build", matchingBuilds.get(0).buildDisplayName);
-            String consoleUrl = matchingBuilds.get(0).url + "/console";
-            SystemUtils.openUrl(consoleUrl);
+            SystemUtils.openUrl(matchingBuilds.get(0).consoleUrl());
         } else {
             List<String> choices = new ArrayList<>();
             matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.buildDisplayName));
             int selection = InputUtils.readSelection(choices, "Select jenkins builds to open console web page for");
 
-            String consoleUrl = matchingBuilds.get(selection).url + "/console";
-            SystemUtils.openUrl(consoleUrl);
+            SystemUtils.openUrl(matchingBuilds.get(selection).consoleUrl());
         }
     }
 }

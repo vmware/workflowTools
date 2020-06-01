@@ -175,6 +175,13 @@ public class StringUtils {
         return value == null || value.isEmpty();
     }
 
+    public static String substringAfterLast(String value, String valueToCheckFor) {
+        if (value == null) {
+            return null;
+        }
+        return value.substring(value.lastIndexOf(valueToCheckFor) + 1);
+    }
+
     public static int indexOrNthOccurence(String text, String searchText, int count) {
         int index = text.indexOf(searchText);
         int counter = 1;
@@ -249,6 +256,10 @@ public class StringUtils {
         } else {
             return new String[] {value.substring(0, firstIndex), value.substring(firstIndex + 1)};
         }
+    }
+
+    public static String trim(String value) {
+        return value != null ? value.trim() : null;
     }
 
     public static List<String> splitAndTrim(String value, String delimeter) {

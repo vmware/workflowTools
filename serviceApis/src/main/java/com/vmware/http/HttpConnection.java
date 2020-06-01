@@ -22,7 +22,10 @@ import com.vmware.util.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -64,6 +67,7 @@ public class HttpConnection {
     private RequestParams requestParams;
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
+    private boolean disableHostnameVerification;
 
     public HttpConnection(RequestBodyHandling requestBodyHandling) {
         this(requestBodyHandling, new ConfiguredGsonBuilder().build());
@@ -182,6 +186,10 @@ public class HttpConnection {
         this.useSessionCookies = useSessionCookies;
     }
 
+    public void setDisableHostnameVerification(boolean disableHostnameVerification) {
+        this.disableHostnameVerification = disableHostnameVerification;
+    }
+
     public String toJson(Object value) {
         return gson.toJson(value);
     }
@@ -212,6 +220,10 @@ public class HttpConnection {
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
+        if (activeConnection instanceof HttpsURLConnection && disableHostnameVerification) {
+            // allow all host names
+            ((HttpsURLConnection) activeConnection).setHostnameVerifier((s, sslSession) -> true);
+        }
         try {
             activeConnection.setRequestMethod(methodType.name());
         } catch (ProtocolException e) {
@@ -295,7 +307,7 @@ public class HttpConnection {
             throw new RuntimeURISyntaxException(e);
         }
         if (workflowCertificateManager == null || workflowCertificateManager.isUriTrusted(uri)) {
-            log.info("Url {} is already trusted, no need to save cert to local keystore");
+            log.info("Url {} is already trusted, no need to save cert to local keystore", uri);
             return;
         }
         log.info("Host {} is not trusted, do you want to save the cert for this to the local workflow trust store {}",
