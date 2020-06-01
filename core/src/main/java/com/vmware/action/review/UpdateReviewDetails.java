@@ -44,7 +44,12 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
         draft.updateTargetGroupsIfNeeded(reviewBoardConfig.targetGroups);
         draft.addExtraTargetGroupsIfNeeded();
         draft.dependsOnRequests = determineDependsOnRequestIds();
+        if (commitConfig.noReviewerLabel.equals(draft.reviewedBy)) {
+            log.debug("Setting reviewedBy to null as it matches the no reviewer label {}", commitConfig.noReviewerLabel);
+            draft.reviewedBy = null;
+        }
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
+        draft.reviewedBy = commitConfig.noReviewerLabel;
         log.info("Successfully updated review information");
     }
 

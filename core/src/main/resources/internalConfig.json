@@ -86,6 +86,7 @@
   "approvedByLabel": "Approved by:",
   "noBugNumberLabel": "none",
   "trivialReviewerLabel": "trivial",
+  "noReviewerLabel": "nobody",
   "alwaysIncludeReviewUrl": false,
   "noReviewNumberLabel": "none",
   "logLevel": "INFO",
