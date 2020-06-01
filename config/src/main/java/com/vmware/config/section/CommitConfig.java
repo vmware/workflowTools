@@ -13,10 +13,10 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "-reviewboardUrl,--reviewboard-url", help = "Url for review board server", gitConfigProperty = "reviewboard.url")
     public String reviewboardUrl;
 
-    @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
+    @ConfigurableProperty(help = "Url for jenkins server")
     public String jenkinsUrl;
 
-    @ConfigurableProperty(commandLine = "-buildwebUrl,--buildweb-url", help = "Url for buildweb server")
+    @ConfigurableProperty(help = "Url for buildweb server")
     public String buildwebUrl;
 
     @ConfigurableProperty(commandLine = "-ms,--max-summary", help = "Sets max line length for the one line summary")

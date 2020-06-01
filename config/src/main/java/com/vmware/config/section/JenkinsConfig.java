@@ -19,10 +19,10 @@ public class JenkinsConfig {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @ConfigurableProperty(commandLine = "-jenkinsUrl,--jenkins-url", help = "Url for jenkins server")
+    @ConfigurableProperty(help = "Url for jenkins server")
     public String jenkinsUrl;
 
-    @ConfigurableProperty(commandLine = "-jcsrf,--jenkins-uses-csrf", help = "Whether the jenkins server uses CSRF header")
+    @ConfigurableProperty(help = "Whether the jenkins server uses CSRF header")
     public boolean jenkinsUsesCsrf;
 
     @ConfigurableProperty(commandLine = "-ignoreJobFailure,--ignore-jenkins-job-failure", help = "If wait for Jenkins job result is set, then ignore job failure and run the next build")
@@ -37,7 +37,7 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--job-display-names", help = "Display names to use for the jobs invoked")
     public String[] jobsDisplayNames;
 
-    @ConfigurableProperty(commandLine = "--disable-jenkins-login", help = "Skips trying to log into jenkins if the server is not using user login module")
+    @ConfigurableProperty(help = "Skips trying to log into jenkins if the server is not using user login module")
     public boolean disableJenkinsLogin;
 
     @ConfigurableProperty(help = "Map of user friendly names for jenkins jobs to select from")

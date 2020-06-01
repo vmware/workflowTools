@@ -150,7 +150,7 @@
       "SetTestingDone",
       "SetReviewedBy",
       "SetBugNumbers",
-      "SkipPipeline"
+      "SkipPipelineIfSet"
     ],
     "setCommitDetails": [
       "setCommitDetailsWithoutConfirmation",
@@ -618,20 +618,17 @@
     "merge": [
       "prepareCommitForPush",
       "DisplayLineBreak",
-      "createMergeRequestAndRemoteBranch",
+      "createMergeRequest",
       "WaitForMergeRequestToBeUpdated",
       "DisplayLineBreak",
       "ApproveMergeRequest",
       "AssignMergeRequestToBot"
     ],
-    "createMergeRequestAndRemoteBranch": [
-      "createMergeRequest",
-      "PushToMergeBranch"
-    ],
     "createMergeRequest": [
       "selectMergeRequest",
       "CreateMergeRequestIfNeeded",
-      "CopyMergeRequestUrlToClipboard"
+      "CopyMergeRequestUrlToClipboard",
+      "PushToMergeBranch"
     ],
     "openMergeRequest": [
       "selectMergeRequest",
@@ -667,7 +664,7 @@
       "SelectMatchingMergeRequest"
     ],
     "createAndAcceptMergeRequest": [
-      "createMergeRequestAndRemoteBranch",
+      "createMergeRequest",
       "ApproveMergeRequest",
       "AcceptMergeRequest"
     ],

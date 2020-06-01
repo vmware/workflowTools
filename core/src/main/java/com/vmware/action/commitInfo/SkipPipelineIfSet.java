@@ -5,8 +5,8 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Skips pipeline if skipPipeline is set to true")
-public class SkipPipeline extends BaseCommitAction {
-    public SkipPipeline(WorkflowConfig config) {
+public class SkipPipelineIfSet extends BaseCommitAction {
+    public SkipPipelineIfSet(WorkflowConfig config) {
         super(config);
     }
 

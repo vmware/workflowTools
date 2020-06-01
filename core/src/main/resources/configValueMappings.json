@@ -25,9 +25,6 @@
     "--parent",
     "--reviewboard-url"
   ],
-  "OpenBuildPage": [
-    "--jenkins-url"
-  ],
   "AddGitChangesetConfigValueIfNeeded": [
     "--perforce-client"
   ],
@@ -54,7 +51,6 @@
   "InvokeSandboxBuild": [
     "--use-git-tracking-branch",
     "--buildweb-branch",
-    "--buildweb-url",
     "--component-builds",
     "--build-display-name",
     "--build-type",
@@ -68,9 +64,6 @@
     "--destination-file"
   ],
   "AuthenticateAllApis": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--jenkins-url",
     "--reviewboard-url",
     "--jira-url",
     "--bugzilla-test-bug",
@@ -101,9 +94,6 @@
     "--latest-diff",
     "--review-request-id",
     "--review-board-date-format"
-  ],
-  "OpenSandbox": [
-    "--buildweb-url"
   ],
   "BaseCommitReadAction": [
     "--set-empty-only"
@@ -171,10 +161,7 @@
     "--reviewboard-url"
   ],
   "SelectVapp": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
     "--username",
-    "--jenkins-url",
     "--vapp-name",
     "--job-artifact",
     "--job-build-number",
@@ -203,12 +190,10 @@
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
     "--buildweb-log-file-name",
-    "--buildweb-api-url",
-    "--buildweb-url"
+    "--buildweb-api-url"
   ],
   "WaitForJenkinsBuildsToComplete": [
-    "--wait-time",
-    "--jenkins-url"
+    "--wait-time"
   ],
   "BaseCommitCreateAction": [
     "--perforce-client"
@@ -229,10 +214,7 @@
     "--git-remote"
   ],
   "BaseCommitWithJenkinsBuildsAction": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--username",
-    "--jenkins-url"
+    "--username"
   ],
   "BaseBatchBugzillaAction": [
     "--username",
@@ -252,8 +234,7 @@
     "--set-empty-only"
   ],
   "WaitForBuildwebBuildsToComplete": [
-    "--wait-time",
-    "--buildweb-url"
+    "--wait-time"
   ],
   "DeleteVapp": [
     "--vcd-default-org",
@@ -293,9 +274,6 @@
     "--git-remote",
     "--username"
   ],
-  "ChangeBuildNumber": [
-    "--jenkins-url"
-  ],
   "BackupFile": [
     "--backup-name",
     "--destination-file",
@@ -308,9 +286,6 @@
   "RemoveReviewUrl": [
     "--always-include-review-url"
   ],
-  "OpenBuildConsolePage": [
-    "--jenkins-url"
-  ],
   "BaseReadMultiLine": [
     "--max-description"
   ],
@@ -322,9 +297,6 @@
   ],
   "EnableDisableMergeTo": [
     "--disable-merge-to"
-  ],
-  "OpenSandboxLogPage": [
-    "--buildweb-url"
   ],
   "OpenSshShell": [
     "--ssh-strict-host-checking"
@@ -353,13 +325,7 @@
   "LoadGitPatchFile": [
     "--diff-file"
   ],
-  "SkipPipeline": [
-    "--skip-pipeline"
-  ],
   "CheckStatusOfLatestBuilds": [
-    "--disable-jenkins-login",
-    "--jenkins-uses-csrf",
-    "--jenkins-url",
     "--username",
     "--jenkins-jobs"
   ],
@@ -418,9 +384,6 @@
   "DisplayConfig": [
     "--specific-properties"
   ],
-  "StripJenkinsBuilds": [
-    "--jenkins-url"
-  ],
   "CreatePostgresDatabaseFromFile": [
     "--database-username",
     "--database-schema-name",
@@ -441,9 +404,11 @@
   "SelectVappIfNeeded": [
     "--use-vapp-json"
   ],
+  "SkipPipelineIfSet": [
+    "--skip-pipeline"
+  ],
   "BaseCommitAction": [
     "--username",
-    "--buildweb-url",
     "--perforce-client",
     "--changelist-id"
   ],
@@ -508,9 +473,6 @@
   "SetMergeTo": [
     "--merge-to-default"
   ],
-  "RemoveSelectedBuilds": [
-    "--jenkins-url"
-  ],
   "UpdatePublicCerts": [
     "--vcd-sys-admin-password",
     "--vcd-sys-admin-username",
@@ -566,8 +528,7 @@
     "--job-with-artifact",
     "--job-build-number",
     "--destination-file",
-    "--job-artifact",
-    "--jenkins-url"
+    "--job-artifact"
   ],
   "SelectVcdCell": [
     "--vcd-cell-index"

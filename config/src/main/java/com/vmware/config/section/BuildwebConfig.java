@@ -14,7 +14,7 @@ public class BuildwebConfig {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @ConfigurableProperty(commandLine = "--buildweb-url", help = "Url for buildweb server")
+    @ConfigurableProperty(help = "Url for buildweb server")
     public String buildwebUrl;
 
     @ConfigurableProperty(commandLine = "--gobuild-bin-path", help = "Path to gobuild bin file, this is a VMware specific tool")
