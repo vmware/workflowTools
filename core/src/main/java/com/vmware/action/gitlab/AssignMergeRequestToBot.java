@@ -13,7 +13,7 @@ public class AssignMergeRequestToBot extends BaseCommitUsingGitlabAction {
 
     @Override
     public void process() {
-        log.info("Assigning merge request {} to {}", draft.mergeRequestUrl, gitlabConfig.gitlabProjectId);
+        log.info("Assigning merge request {} to user with id {}", draft.mergeRequestUrl, gitlabConfig.mergeBotUserId);
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
         mergeRequest.assigneeId = gitlabConfig.mergeBotUserId;
         gitlab.updateMergeRequest(mergeRequest);

@@ -108,8 +108,7 @@
     "--disable-markdown"
   ],
   "AssignMergeRequestToBot": [
-    "--merge-bot-user-id",
-    "--gitlab-project-id"
+    "--merge-bot-user-id"
   ],
   "CreateReviewIfNeeded": [
     "--username",
