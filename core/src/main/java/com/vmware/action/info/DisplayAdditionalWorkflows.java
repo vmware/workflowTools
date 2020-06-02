@@ -27,6 +27,7 @@ public class DisplayAdditionalWorkflows extends BaseAction {
         List<String> mainWorkflows = new ArrayList<>();
         mainWorkflows.addAll(Workflow.BATCH_MAIN_WORKFLOWS);
         mainWorkflows.addAll(Workflow.GIT_MAIN_WORKFLOWS);
+        mainWorkflows.addAll(Workflow.VAPP_MAIN_WORKFLOWS);
         mainWorkflows.addAll(Workflow.PERFORCE_MAIN_WORKFLOWS);
         for (String workflow : sortedWorkflows) {
             if (!mainWorkflows.contains(workflow) && !config.supportingWorkflows.contains(workflow)) {

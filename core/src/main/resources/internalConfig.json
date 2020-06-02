@@ -623,7 +623,8 @@
       "WaitForMergeRequestToBeUpdated",
       "DisplayLineBreak",
       "ApproveMergeRequest",
-      "AssignMergeRequestToBot"
+      "AssignMergeRequestToBot",
+      "HardSubmitReview"
     ],
     "createMergeRequest": [
       "selectMergeRequest",
@@ -650,7 +651,8 @@
     ],
     "assignMergeRequestToBot": [
       "selectMergeRequest",
-      "AssignMergeRequestToBot"
+      "AssignMergeRequestToBot",
+      "HardSubmitReview"
     ],
     "rebaseMergeRequest": [
       "selectMergeRequest",

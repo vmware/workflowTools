@@ -26,6 +26,7 @@ public class GettingStarted extends BaseAction {
         log.info("run java -jar workflow.jar help");
         log.info("To see what actions will be run, use the flag -dr to do a dry run");
         log.info("e.g. java -jar workflow.jar commit -dr");
+        log.info("Use the flag -d to see increased debug logging");
         gettingStartedTitle.infoTitle();
     }
 }

@@ -1,0 +1,28 @@
+{
+  "commit": "Walks you through creating a commit, allows you to select a JIRA or bug that is assigned to you, set reviewers etc.",
+  "commitAll": "Similar to commit but includes all edited files not just staged files",
+  "amendCommit": "Adds file changes to existing commit",
+  "amendCommitAll": "Similar to amendCommit but includes all edited files not just staged files",
+  "review": "Posts a review based on the information in the commit, sets bug number, reviewers on review",
+  "pushable": "Checks if review has ship its, checks for checkstyle errors, checks status of buildweb and jenkins builds in testing done section",
+  "push": "Performs a git push, closes any associated review",
+  "submit": "Peforms a perforce submit. Changelist is submitted to depot. Closes any associated review",
+  "merge": "Creates the merge request, topic branch, self approves it and assigns it to the merge bot. Closes any associated review",
+  "createMergeRequest": "Creates merge request and topic branch only if more granular control is desired",
+  "sandbox": "Starts a sandbox build",
+
+  "deleteVapp": "Delete selected vapp, uses force flag so can delete powered on Vapps",
+  "openVappProvider": "Opens the provider UI for the Vcd cell in the Vapp",
+  "renameVapp": "Allows for renaming a vapp",
+  "updateVappLease": "Allows for updating the vapp lease",
+  "tailVappLogFile": "Tails the output from a specified vapp log file",
+  "displayVappJson": "Displays the testbed template json for the specified vapp",
+
+  "closeOldReviews": "Closes old reviewboard reviews",
+  "createTrelloBoardFromLabel": "Creates a Trello board from a Jira label",
+  "createTrelloBoardFromFixVersion": "Creates a Trello boad from a Jira fix version",
+  "setStoryPointsForBoard": "Sets story points for Jira issues from Trello board",
+
+  "moveOpenFilesToPendingChangelist": "Moves all open files to the specified pending perforce changelist"
+
+}

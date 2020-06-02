@@ -58,15 +58,14 @@ public class Workflow {
             Arrays.asList("createTrelloBoardFromLabel", "createTrelloBoardFromFixVersion", "setStoryPointsForBoard", "closeOldReviews"));
 
     public static final List<String> GIT_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("commit", "commitAll", "amendCommit", "amendCommitAll", "review", "pushable", "push", "submit")
+            Arrays.asList("commit", "commitAll", "amendCommit", "amendCommitAll", "review", "pushable", "push", "merge")
     );
 
     public static final List<String> PERFORCE_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("moveOpenFilesToPendingChangelist", "review", "pushable", "submitChangelist")
-    );
+            Arrays.asList("moveOpenFilesToPendingChangelist", "review", "pushable", "submit"));
 
     public static final List<String> VAPP_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("deleteVapp", "renameVapp", "updateVappLease", "tailVappLogFile", "displayVappJson", "openVappProviderUrl")
+            Arrays.asList("deleteVapp", "renameVapp", "updateVappLease", "tailVappLogFile", "displayVappJson", "openVappProvider")
     );
 
     private static final String QUIT_WORKFLOW = "q";
