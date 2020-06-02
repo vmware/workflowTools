@@ -442,7 +442,7 @@ public class ReviewRequestDraft extends BaseEntity {
         if (isNotEmpty(pipeline)) {
             builder.append("\n").append(commitConfig.getPipelineLabel()).append(pipeline);
         }
-        if (StringUtils.isNotBlank(mergeRequestUrl)) {
+        if (hasMergeRequest()) {
             builder.append("\n").append(commitConfig.getMergeUrlLabel()).append(mergeRequestUrl);
         }
         return builder.toString();
@@ -530,8 +530,12 @@ public class ReviewRequestDraft extends BaseEntity {
         return gitlabMergeRequest;
     }
 
+    public boolean hasMergeRequest() {
+        return StringUtils.isNotBlank(mergeRequestUrl);
+    }
+
     public Integer mergeRequestId() {
-        return StringUtils.isNotBlank(mergeRequestUrl) ? Integer.parseInt(StringUtils.substringAfterLast(mergeRequestUrl, "/")) : null;
+        return hasMergeRequest() ? Integer.parseInt(StringUtils.substringAfterLast(mergeRequestUrl, "/")) : null;
     }
 
     public boolean mergeRequestLoaded() {

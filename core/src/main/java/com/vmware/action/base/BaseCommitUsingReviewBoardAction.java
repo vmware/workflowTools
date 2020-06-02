@@ -45,13 +45,15 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
         }
     }
 
-    protected String determineSubmittedRef() {
-        if (StringUtils.isEmpty(draft.perforceChangelistId)) {
-            return "ref " + git.revParse("head");
+    protected String determineSubmittedDescription() {
+        if (draft.hasMergeRequest()) {
+            return "Merged via merge request " + draft.mergeRequestUrl;
+        } else if (StringUtils.isEmpty(draft.perforceChangelistId)) {
+            return "Submitted as ref " + git.revParse("head");
+        } else {
+            String currentChangelistId = serviceLocator.getPerforce().getCurrentChangelistId(draft.perforceChangelistId);
+            return "Submitted as changelist " + currentChangelistId;
         }
-
-        String currentChangelistId = serviceLocator.getPerforce().getCurrentChangelistId(draft.perforceChangelistId);
-        return "changelist " + currentChangelistId;
     }
 
 }

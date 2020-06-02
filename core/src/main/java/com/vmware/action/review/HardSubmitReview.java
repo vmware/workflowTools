@@ -22,10 +22,9 @@ public class HardSubmitReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        String submittedRef = determineSubmittedRef();
         log.debug("Marking review request as submitted");
         reviewRequest.status = ReviewRequestStatus.submitted;
-        reviewRequest.description = "Submitted as " + submittedRef;
+        reviewRequest.description = determineSubmittedDescription();
 
         reviewBoard.updateReviewRequest(reviewRequest);
         log.info("Successfully marked review request as submitted");

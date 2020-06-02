@@ -28,11 +28,10 @@ public class SoftSubmitReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        String submittedRef = determineSubmittedRef();
         log.info("Adding submitted comment to review request. Leaving open for further reviews.");
 
         UserReview review = new UserReview();
-        review.body_top = String.format("Submitted as %s, left open for further reviews", submittedRef);
+        review.body_top = String.format("%s, left open for further reviews", determineSubmittedDescription());
         review.isPublic = true;
 
         reviewBoard.createUserReview(reviewRequest, review);

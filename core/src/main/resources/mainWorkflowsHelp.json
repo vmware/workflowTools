@@ -7,7 +7,7 @@
   "pushable": "Checks if review has ship its, checks for checkstyle errors, checks status of buildweb and jenkins builds in testing done section",
   "push": "Performs a git push, closes any associated review",
   "submit": "Peforms a perforce submit. Changelist is submitted to depot. Closes any associated review",
-  "merge": "Creates the merge request, topic branch, self approves it and assigns it to the merge bot. Closes any associated review",
+  "merge": "Creates the merge request, topic branch, approves request and assigns request to the merge bot. Closes any associated review",
   "createMergeRequest": "Creates merge request and topic branch only if more granular control is desired",
   "sandbox": "Starts a sandbox build",
 

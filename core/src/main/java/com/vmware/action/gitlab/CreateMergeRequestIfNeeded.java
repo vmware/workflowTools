@@ -14,8 +14,7 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        super.skipActionIfTrue(draft.mergeRequestId() != null,
-                "merge request with url " + draft.mergeRequestUrl + " has already been created");
+        super.skipActionIfTrue(draft.hasMergeRequest(), "merge request with url " + draft.mergeRequestUrl + " has already been created");
     }
 
     @Override

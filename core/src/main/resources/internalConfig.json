@@ -929,6 +929,9 @@
       "DisplayCustomActionsHelp",
       "DisplayMainWorkflows",
       "DisplayAdditionalWorkflows"
+    ],
+    "openDoc": [
+      "OpenProjectDocumentationUrl"
     ]
   },
   "supportingWorkflows": [

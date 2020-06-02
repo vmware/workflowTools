@@ -24,7 +24,7 @@ public class DisplayMainWorkflows extends BaseAction {
     public void process() {
         printWorkflows("Git", Workflow.GIT_MAIN_WORKFLOWS);
         printWorkflows("Vapp", Workflow.VAPP_MAIN_WORKFLOWS);
-        printWorkflows("Perfoce", Workflow.PERFORCE_MAIN_WORKFLOWS);
+        printWorkflows("Perforce", Workflow.PERFORCE_MAIN_WORKFLOWS);
         printWorkflows("Batch", Workflow.BATCH_MAIN_WORKFLOWS);
     }
 
