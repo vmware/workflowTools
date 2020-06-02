@@ -4,10 +4,10 @@ import com.vmware.config.ConfigurableProperty;
 
 public class GitlabConfig {
 
-    @ConfigurableProperty(commandLine = "--gitlab-url", help = "Url for gitlab site")
+    @ConfigurableProperty(help = "Url for gitlab site")
     public String gitlabUrl;
 
-    @ConfigurableProperty(commandLine = "--gitlab-project-id", help = "Id for gitlab project")
+    @ConfigurableProperty(help = "Id for gitlab project")
     public Integer gitlabProjectId;
 
     @ConfigurableProperty(commandLine = "--merge-branch-format", help = "Format for source branch for a merge request")

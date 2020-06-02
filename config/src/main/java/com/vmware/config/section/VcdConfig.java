@@ -5,10 +5,10 @@ import java.util.List;
 import com.vmware.config.ConfigurableProperty;
 
 public class VcdConfig {
-    @ConfigurableProperty(commandLine = "--vcd-url", help = "Url for Vcloud Director")
+    @ConfigurableProperty(help = "Url for Vcloud Director")
     public String vcdUrl;
 
-    @ConfigurableProperty(commandLine = "--vcd-default-org", help = "Default Org to use for user login if none specified")
+    @ConfigurableProperty(help = "Default Org to use for user login if none specified")
     public String defaultVcdOrg;
 
     @ConfigurableProperty(commandLine = "--vcd-sys-admin-username", help = "Username for the vcd sys admin user")
@@ -17,7 +17,7 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-sys-admin-password", help = "Password for the vcd sys admin user")
     public String vcdSysAdminPassword;
 
-    @ConfigurableProperty(commandLine = "--vcd-api-version", help = "Api version to use for Vcloud Director")
+    @ConfigurableProperty(help = "Api version to use for Vcloud Director")
     public String vcdApiVersion;
 
     @ConfigurableProperty(commandLine = "--vcd-check-quota", help = "Whether to check if user is over VM quota count")

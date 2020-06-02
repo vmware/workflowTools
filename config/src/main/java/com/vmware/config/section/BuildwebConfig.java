@@ -17,7 +17,7 @@ public class BuildwebConfig {
     @ConfigurableProperty(help = "Url for buildweb server")
     public String buildwebUrl;
 
-    @ConfigurableProperty(commandLine = "--gobuild-bin-path", help = "Path to gobuild bin file, this is a VMware specific tool")
+    @ConfigurableProperty(help = "Path to gobuild bin file, this is a VMware specific tool")
     public String goBuildBinPath;
 
     @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox buikd, this is for a VMware specific tool")

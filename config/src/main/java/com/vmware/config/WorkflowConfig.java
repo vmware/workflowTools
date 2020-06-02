@@ -150,6 +150,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--output-file", help = "File to store output to")
     public String outputFile;
 
+    @ConfigurableProperty(help = "Project documentation url")
+    public String projectDocumentationUrl;
+
     @Expose(serialize = false, deserialize = false)
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);
 

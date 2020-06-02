@@ -134,6 +134,10 @@ public class Workflow {
         displayShellInfoMessageIfNeeded();
         if (firstTime) {
             log.info("Press ENTER for getting started info");
+            if (StringUtils.isNotBlank(config.projectDocumentationUrl)) {
+                log.info("Project specific documentation can be found here: {}", config.projectDocumentationUrl);
+            }
+
             log.info("");
 
             log.info("Press tab to see a list of available workflows, up to see previously entered workflows");

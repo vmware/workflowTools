@@ -58,7 +58,7 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--use-vapp-json", help = "Use json metadata from Vapp")
     public boolean useVappJsonParameter;
 
-    @ConfigurableProperty(commandLine = "--testbed-parameter-name", help = "Name of the Jenkins parameter used for testbed template")
+    @ConfigurableProperty(help = "Name of the Jenkins parameter used for testbed template")
     public String testbedParameter;
 
     @ConfigurableProperty(commandLine = "--job-with-artifact", help = "Jenkins job to use for artifact")

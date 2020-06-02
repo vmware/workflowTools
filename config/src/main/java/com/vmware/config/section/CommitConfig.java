@@ -19,10 +19,10 @@ public class CommitConfig {
     @ConfigurableProperty(help = "Url for buildweb server")
     public String buildwebUrl;
 
-    @ConfigurableProperty(commandLine = "-ms,--max-summary", help = "Sets max line length for the one line summary")
+    @ConfigurableProperty(help = "Sets max line length for the one line summary")
     public int maxSummaryLength;
 
-    @ConfigurableProperty(commandLine = "-md,--max-description", help = "Sets max line length for all other lines in the commit")
+    @ConfigurableProperty(help = "Sets max line length for all other lines in the commit")
     public int maxDescriptionLength;
 
     @ConfigurableProperty(help = "Label for no review number, only relevant if review url is always included")
@@ -67,7 +67,7 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--merge-to", help = "Comma separate values for merge to property")
     public String[] mergeToValues;
 
-    @ConfigurableProperty(commandLine = "--merge-to-default", help = "Default value for merge to property if none set")
+    @ConfigurableProperty(help = "Default value for merge to property if none set")
     public String mergeToDefault;
 
     @ConfigurableProperty(help = "Default value to set for topic if none entered")
@@ -96,8 +96,6 @@ public class CommitConfig {
 
     @ConfigurableProperty(commandLine = "--skip-pipeline", help = "Skips pipeline in Gitlab")
     public boolean skipPipeline;
-
-
 
     public CommitConfig() {}
 

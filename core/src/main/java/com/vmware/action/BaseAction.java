@@ -178,21 +178,6 @@ public abstract class BaseAction implements Action {
         throw new SkipActionException(reason, arguments);
     }
 
-    protected BufferedWriter outputWriter() {
-        try {
-            if (StringUtils.isNotBlank(config.outputFile)) {
-                File outputFile = new File(config.outputFile);
-                log.info("Saving output to {}", outputFile.getAbsolutePath());
-                return new BufferedWriter(new FileWriter(outputFile));
-            } else {
-                log.debug("Displaying on command line as no output file is specified");
-                return new BufferedWriter(new PrintWriter(System.out));
-            }
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
-    }
-
     protected void skipActionIfTrue(boolean propertyValue, String description) {
         if (propertyValue) {
             skipActionDueTo(description);

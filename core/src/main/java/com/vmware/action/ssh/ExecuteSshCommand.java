@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.vmware.action.base.BaseSshAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -29,7 +31,7 @@ import com.vmware.util.logging.Padder;
 import org.slf4j.Logger;
 
 @ActionDescription("Executes the specified ssh command against the specified ssh site.")
-public class ExecuteSshCommand extends BaseVappAction {
+public class ExecuteSshCommand extends BaseSshAction {
 
     private static final String SANDBOX_BUILD_NUMBER = "$SANDBOX_BUILD";
 
@@ -107,6 +109,21 @@ public class ExecuteSshCommand extends BaseVappAction {
         commandOutputPadder.infoTitle();
         if (writer != null) {
            writer.close();
+        }
+    }
+
+    private BufferedWriter outputWriter() {
+        try {
+            if (StringUtils.isNotBlank(config.outputFile)) {
+                File outputFile = new File(config.outputFile);
+                log.info("Saving output to {}", outputFile.getAbsolutePath());
+                return new BufferedWriter(new FileWriter(outputFile));
+            } else {
+                log.debug("Displaying on command line as no output file is specified");
+                return new BufferedWriter(new PrintWriter(System.out));
+            }
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
         }
     }
 

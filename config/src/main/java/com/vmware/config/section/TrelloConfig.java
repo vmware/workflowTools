@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 public class TrelloConfig {
 
-    @ConfigurableProperty(commandLine = "-trelloUrl,--trello-url", help = "Url for trello server")
+    @ConfigurableProperty(help = "Url for trello server")
     public String trelloUrl;
 
     @ConfigurableProperty(help = "Swimlanes to use for trello. A list of story point values as integers is expected")

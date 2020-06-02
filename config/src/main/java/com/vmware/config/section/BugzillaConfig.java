@@ -6,19 +6,19 @@ import com.vmware.util.UrlUtils;
 
 public class BugzillaConfig {
 
-    @ConfigurableProperty(commandLine = "-bugzillaUrl,--bugzilla-url", help = "Url for Bugzilla server")
+    @ConfigurableProperty(help = "Url for Bugzilla server")
     public String bugzillaUrl;
 
-    @ConfigurableProperty(commandLine = "-bugzillaTestBug,--bugzilla-test-bug", help = "Bug number to fetch to test user is logged in")
+    @ConfigurableProperty(commandLine = "--bugzilla-test-bug", help = "Bug number to fetch to test user is logged in")
     public int bugzillaTestBug;
 
-    @ConfigurableProperty(commandLine = "-disableBugzilla,--disable-bugzilla", help = "Don't use Bugzilla when checking bug numbers")
+    @ConfigurableProperty(commandLine = "--disable-bugzilla", help = "Don't use Bugzilla when checking bug numbers")
     public boolean disableBugzilla;
 
-    @ConfigurableProperty(commandLine = "-bugzillaQuery,--bugzilla-query", help = "Named query in bugzilla to execute for loading assigned bugs")
+    @ConfigurableProperty(help = "Named query in bugzilla to execute for loading assigned bugs")
     public String bugzillaQuery;
 
-    @ConfigurableProperty(commandLine = "-bugzillaPrefix,--bugzilla-prefix", help = "Represents a bug in bugzilla, only the number part will be stored")
+    @ConfigurableProperty(help = "Represents a bug in bugzilla, only the number part will be stored")
     public String bugzillaPrefix;
 
     public Integer parseBugzillaBugNumber(String bugNumber) {

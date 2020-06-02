@@ -9,13 +9,13 @@ import java.util.TreeMap;
 
 public class ReviewBoardConfig {
 
-    @ConfigurableProperty(commandLine = "-reviewboardUrl,--reviewboard-url", help = "Url for review board server", gitConfigProperty = "reviewboard.url")
+    @ConfigurableProperty(help = "Url for review board server", gitConfigProperty = "reviewboard.url")
     public String reviewboardUrl;
 
     @ConfigurableProperty(commandLine = "-reviewRepo,--review-board-repo", help = "Review board repository")
     public String reviewBoardRepository;
 
-    @ConfigurableProperty(commandLine = "-rbDateFormat,--review-board-date-format", help = "Date format used by review board. Can change between review board versions")
+    @ConfigurableProperty(help = "Date format used by review board. Can change between review board versions")
     public String reviewBoardDateFormat;
 
     @ConfigurableProperty(commandLine = "--always-include-review-url", help = "Include review url for trivial commits as well")

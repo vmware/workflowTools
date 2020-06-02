@@ -19,7 +19,7 @@ public class WaitForMergeRequestToBeUpdated extends BaseCommitWithMergeRequestAc
     @Override
     public void process() {
         String headRef = git.revParse("HEAD");
-        log.info("Waiting for merge request {} commit to be updated to {}", draft.mergeRequestId(), headRef);
+        log.info("Waiting for merge request {} commit hash to be updated to {}", draft.mergeRequestId(), headRef);
         Callable<Boolean> commitHashCheck = () -> {
             MergeRequest mergeRequest = gitlab.getMergeRequest(draft.mergeRequestProjectId(), draft.mergeRequestId());
             draft.setGitlabMergeRequest(mergeRequest);

@@ -9,7 +9,7 @@ public class CheckstyleConfig {
     @ConfigurableProperty(help = "Path to jar for checkstyle")
     public String checkstyleJarPath;
 
-    @ConfigurableProperty(commandLine = "--checkstyle-config-xml-path", help = "Path to config xml for checkstyle")
+    @ConfigurableProperty(help = "Path to config xml for checkstyle")
     public String checkstyleConfigXmlPath;
 
     @ConfigurableProperty(help = "Path to suppressions xml for checkstyle")

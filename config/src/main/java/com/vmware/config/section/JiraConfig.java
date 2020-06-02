@@ -10,13 +10,13 @@ import java.util.Map;
 
 public class JiraConfig {
 
-    @ConfigurableProperty(commandLine = "-jiraUrl,--jira-url", help = "Url for jira server")
+    @ConfigurableProperty(help = "Url for jira server")
     public String jiraUrl;
 
     @ConfigurableProperty(commandLine = "-disableJira,--disable-jira", help = "Don't use Jira when checking bug numbers")
     public boolean disableJira;
 
-    @ConfigurableProperty(commandLine = "-defaultJiraProject,--default-jira-project", help = "Default Jira project to use")
+    @ConfigurableProperty(help = "Default Jira project to use")
     public String defaultJiraProject;
 
     @ConfigurableProperty(commandLine = "-defaultJiraComponent,--default-jira-component", help = "Default Jira component to use for creating issues")

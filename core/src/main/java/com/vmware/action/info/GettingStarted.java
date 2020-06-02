@@ -3,6 +3,7 @@ package com.vmware.action.info;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 import com.vmware.util.logging.Padder;
 
 @ActionDescription("Displays initial info information.")
@@ -26,7 +27,8 @@ public class GettingStarted extends BaseAction {
         log.info("run java -jar workflow.jar help");
         log.info("To see what actions will be run, use the flag -dr to do a dry run");
         log.info("e.g. java -jar workflow.jar commit -dr");
-        log.info("Use the flag -d to see increased debug logging");
+        log.info("Use flag -d for displaying debug logging, useful for troubleshooting");
+
         gettingStartedTitle.infoTitle();
     }
 }
