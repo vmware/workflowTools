@@ -10,7 +10,7 @@ public class GitlabConfig {
     @ConfigurableProperty(help = "Id for gitlab project")
     public Integer gitlabProjectId;
 
-    @ConfigurableProperty(commandLine = "--merge-branch-format", help = "Format for source branch for a merge request")
+    @ConfigurableProperty(help = "Format for source branch for a merge request")
     public String gitlabMergeBranchFormat;
 
     @ConfigurableProperty(commandLine = "--source-merge-branch", help = "Specify custom source branch for a merge request")

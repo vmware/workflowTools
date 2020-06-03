@@ -43,7 +43,7 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
                     || jobBuild.result == BuildResult.STARTING || jobBuild.result == BuildResult.BUILDING) {
                 try {
                     jobBuild.result = getResultForBuild(jobUrl);
-                    log.info("{}: {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
+                    log.info("{} {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
                 } catch (NotFoundException nfe) {
                     log.info("{} {} could not be found", jobBuild.buildDisplayName, jobUrl);
                 }

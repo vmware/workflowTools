@@ -629,16 +629,16 @@
     "createMergeRequest": [
       "selectMergeRequest",
       "CreateMergeRequestIfNeeded",
-      "CopyMergeRequestUrlToClipboard",
+      "CopyMergeUrlToClipboard",
       "PushToMergeBranch"
     ],
-    "openMergeRequest": [
+    "openMerge": [
       "selectMergeRequest",
       "OpenMergeRequest"
     ],
-    "copyMergeRequestUrl": [
+    "copyMergeUrl": [
       "selectMergeRequest",
-      "CopyMergeRequestUrlToClipboard"
+      "CopyMergeUrlToClipboard"
     ],
     "closeMergeRequest": [
       "selectMergeRequest",

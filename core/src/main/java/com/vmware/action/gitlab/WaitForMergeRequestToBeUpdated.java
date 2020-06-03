@@ -13,21 +13,23 @@ import com.vmware.util.ThreadUtils;
 public class WaitForMergeRequestToBeUpdated extends BaseCommitWithMergeRequestAction {
 
     public WaitForMergeRequestToBeUpdated(WorkflowConfig config) {
-        super(config);
+        super(config, true);
     }
 
     @Override
     public void process() {
         String headRef = git.revParse("HEAD");
-        log.info("Waiting for merge request {} commit hash to be updated to {}", draft.mergeRequestId(), headRef);
+        String currentBranch = git.currentBranch();
+        if (headRef.equals(draft.getGitlabMergeRequest().sha)) {
+            log.info("Merge request {} commit hash already matches branch {} ref {}", draft.mergeRequestId(), currentBranch, headRef);
+            return;
+        }
+        log.info("Waiting for merge request {} commit hash to be updated to match branch {} ref {}", draft.mergeRequestId(), currentBranch, headRef);
         Callable<Boolean> commitHashCheck = () -> {
             MergeRequest mergeRequest = gitlab.getMergeRequest(draft.mergeRequestProjectId(), draft.mergeRequestId());
             draft.setGitlabMergeRequest(mergeRequest);
             log.info("Current merge request commit hash " + mergeRequest.sha);
-            if (!headRef.equals(mergeRequest.sha)) {
-                return false;
-            }
-            return true;
+            return headRef.equals(mergeRequest.sha);
         };
 
         ThreadUtils.waitForCallable(commitHashCheck, 30, TimeUnit.SECONDS, "Merge request failed to be updated with sha " + headRef);

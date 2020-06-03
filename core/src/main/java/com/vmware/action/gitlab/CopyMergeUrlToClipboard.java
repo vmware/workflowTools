@@ -6,8 +6,8 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.SystemUtils;
 
 @ActionDescription("Copies merge request url to clipboard.")
-public class CopyMergeRequestUrlToClipboard extends BaseCommitWithMergeRequestAction {
-    public CopyMergeRequestUrlToClipboard(WorkflowConfig config) {
+public class CopyMergeUrlToClipboard extends BaseCommitWithMergeRequestAction {
+    public CopyMergeUrlToClipboard(WorkflowConfig config) {
         super(config);
     }
 

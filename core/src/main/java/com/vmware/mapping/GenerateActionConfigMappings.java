@@ -1,10 +1,17 @@
 package com.vmware.mapping;
 
 import com.google.gson.Gson;
+import com.vmware.action.Action;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.WorkflowActionLister;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
+import com.vmware.config.section.BuildwebConfig;
+import com.vmware.config.section.CommitConfig;
+import com.vmware.config.section.JenkinsConfig;
+import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.FileUtils;
@@ -19,6 +26,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +84,8 @@ public class GenerateActionConfigMappings {
     }
 
     public void run() {
+        WorkflowConfig config = new WorkflowConfig();
+
         List<File> javaActionFiles = FileUtils.scanDirectorRecursivelyForFiles(actionDirectory, new JavaFileFilter());
         if (javaActionFiles.isEmpty()) {
             log.info("No action files found at {}", actionDirectory.getPath());
@@ -83,8 +93,6 @@ public class GenerateActionConfigMappings {
         }
 
         configValuePattern = createConfigValuesPattern();
-
-        WorkflowConfig config = new WorkflowConfig();
 
         Map<String, String[]> mappings = new HashMap<String, String[]>();
         populateLocatorMethodArguments();
@@ -184,6 +192,8 @@ public class GenerateActionConfigMappings {
             System.exit(1);
         }
 
+        validateAllActionsCanBeInstantiated();
+
         String moduleBaseDirectory = args[0];
         String actionsDirectory = moduleBaseDirectory + "/src/main/java/com/vmware/action";
         String locatorFilePath = moduleBaseDirectory + "/src/main/java/com/vmware/ServiceLocator.java";
@@ -236,6 +246,26 @@ public class GenerateActionConfigMappings {
                 .map(Field::getName).collect(Collectors.toList());
         String configValuesPattern = StringUtils.appendWithDelimiter("config", sectionConfigFields, "|");
         return Pattern.compile("[^\\.](?:" + configValuesPattern + ")\\.(\\w+)");
+    }
+
+    private static void validateAllActionsCanBeInstantiated() {
+        List<Class<? extends BaseAction>> workflowActions = new WorkflowActionLister().findWorkflowActions();
+
+        log.info("Validating all workflow actions can be instantiated");
+        WorkflowConfig config = new WorkflowConfig();
+        config.reviewBoardConfig = new ReviewBoardConfig();
+        config.commitConfig = new CommitConfig();
+        config.jenkinsConfig = new JenkinsConfig();
+        config.buildwebConfig = new BuildwebConfig();
+
+        workflowActions.forEach(action -> {
+            try {
+                BaseAction workflowAction = action.getConstructor(WorkflowConfig.class).newInstance(config);
+                workflowAction.checkSkipAndFailConfigPropertiesAreValid();
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static ConsoleHandler createHandler() {

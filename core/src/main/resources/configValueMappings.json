@@ -41,8 +41,8 @@
   "InvokeSandboxBuild": [
     "--use-git-tracking-branch",
     "--buildweb-branch",
-    "--component-builds",
     "--build-display-name",
+    "--component-builds",
     "--build-type",
     "--buildweb-project",
     "--exclude-sync-to",
@@ -119,7 +119,6 @@
     "--tracking-branch",
     "--target-merge-branch",
     "--username",
-    "--merge-branch-format",
     "--source-merge-branch"
   ],
   "SyncChangelistWithGitDiff": [

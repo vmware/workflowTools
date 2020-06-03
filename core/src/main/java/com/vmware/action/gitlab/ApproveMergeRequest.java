@@ -9,7 +9,7 @@ import com.vmware.util.exception.FatalException;
 @ActionDescription("Approve merge request in Gitlab.")
 public class ApproveMergeRequest extends BaseCommitWithMergeRequestAction {
     public ApproveMergeRequest(WorkflowConfig config) {
-        super(config);
+        super(config, true);
     }
 
     @Override

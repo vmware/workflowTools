@@ -14,6 +14,7 @@ import com.vmware.ServiceLocator;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowField;
+import com.vmware.config.WorkflowFields;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.CheckstyleConfig;
@@ -133,6 +134,12 @@ public abstract class BaseAction implements Action {
     public void preprocess() {
     }
 
+    public void checkSkipAndFailConfigPropertiesAreValid() {
+        WorkflowFields fields = config.getConfigurableFields();
+        skipActionIfBlankProperties.forEach(propertyName -> checkPropertyMatchesConfigValue(fields, propertyName));
+        failWorkflowIfBlankProperties.forEach(propertyName -> checkPropertyMatchesConfigValue(fields, propertyName));
+    }
+
     public void setServiceLocator(ServiceLocator serviceLocator) {
         this.serviceLocator = serviceLocator;
         this.git = serviceLocator.getGit();
@@ -205,6 +212,14 @@ public abstract class BaseAction implements Action {
             String commandLineParam = matchingField.commandLineParameter();
             String paramText = commandLineParam != null ? " (" + commandLineParam + ") " : "";
             exitDueToFailureCheck("property " + propertyName + paramText + " not set");
+        }
+    }
+
+    private void checkPropertyMatchesConfigValue(WorkflowFields fields, String propertyName) {
+        try {
+            fields.getFieldByName(propertyName);
+        } catch (RuntimeException re) {
+            throw new RuntimeException("Failed to find config value " + propertyName + " in class " + this.getClass().getSimpleName(), re);
         }
     }
 }

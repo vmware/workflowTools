@@ -47,8 +47,7 @@ public class DisplayWorkflowActions extends BaseAction {
     private Map<String, List<Class<? extends BaseAction>>> generateClassMap() {
         Map<String, List<Class<? extends BaseAction>>> classes = new TreeMap<String, List<Class<? extends BaseAction>>>();
         List<Class<? extends BaseAction>> workflowActions = new WorkflowActions(config).getWorkflowActionClasses();
-        for (int i = 0; i < workflowActions.size(); i ++) {
-            Class<? extends BaseAction> action = workflowActions.get(i);
+        for (Class<? extends BaseAction> action : workflowActions) {
             String[] pieces = action.getName().split("\\.");
             String packageName = pieces[pieces.length - 2];
             if (!classes.containsKey(packageName)) {
@@ -61,16 +60,16 @@ public class DisplayWorkflowActions extends BaseAction {
 
     public String convertToReadableText(String value) {
         char[] chars = value.toCharArray();
-        String readableValue = "";
+        StringBuilder readableValue = new StringBuilder();
         for (char character : chars) {
-            if (Character.isUpperCase(character) && !readableValue.isEmpty()) {
-                readableValue += " " + character;
-            } else if (readableValue.isEmpty()) {
-                readableValue += Character.toUpperCase(character);
+            if (Character.isUpperCase(character) && (readableValue.length() > 0)) {
+                readableValue.append(" ").append(character);
+            } else if (readableValue.length() == 0) {
+                readableValue.append(Character.toUpperCase(character));
             } else {
-                readableValue += character;
+                readableValue.append(character);
             }
         }
-        return readableValue;
+        return readableValue.toString();
     }
 }

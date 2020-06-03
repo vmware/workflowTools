@@ -7,7 +7,7 @@ import com.vmware.config.WorkflowConfig;
 public class FindMatchingLines extends ExecuteSshCommand {
     public FindMatchingLines(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("logFile", "searchText");
+        super.addFailWorkflowIfBlankProperties("logFile", "inputText");
     }
 
     @Override
