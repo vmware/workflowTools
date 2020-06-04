@@ -1,11 +1,7 @@
 {
   "PushToRemoteBranch": [
-    "--git-remote",
     "--username",
     "--remote-branch"
-  ],
-  "CopyReviewUrlToClipboard": [
-    "--reviewboard-url"
   ],
   "DisplayBuildOutputForBuildwebBuilds": [
     "--include-in-progress",
@@ -16,8 +12,7 @@
     "--source-file"
   ],
   "ExitIfGitDiffDoesNotMatchRbtDiff": [
-    "--parent",
-    "--reviewboard-url"
+    "--parent"
   ],
   "GenerateReviewStats": [
     "--file-count-ranges",
@@ -53,7 +48,6 @@
     "--destination-file"
   ],
   "AuthenticateAllApis": [
-    "--reviewboard-url",
     "--bugzilla-test-bug",
     "--username"
   ],
@@ -79,9 +73,6 @@
     "--tracking-branch",
     "--groups",
     "--disable-markdown"
-  ],
-  "AssignMergeRequestToBot": [
-    "--merge-bot-user-id"
   ],
   "CreateReviewIfNeeded": [
     "--username",
@@ -135,8 +126,7 @@
   ],
   "PublishReview": [
     "--publish-description",
-    "--publish-as-trivial",
-    "--reviewboard-url"
+    "--publish-as-trivial"
   ],
   "SelectVapp": [
     "--username",
@@ -172,11 +162,7 @@
   ],
   "UploadReviewDiff": [
     "--tracking-branch",
-    "--parent",
-    "--reviewboard-url"
-  ],
-  "PushToMergeBranch": [
-    "--git-remote"
+    "--parent"
   ],
   "BaseCommitWithJenkinsBuildsAction": [
     "--username"
@@ -226,7 +212,6 @@
     "--tracking-branch"
   ],
   "PushToPrecommitBranch": [
-    "--git-remote",
     "--username"
   ],
   "BackupFile": [
@@ -243,9 +228,6 @@
   ],
   "PostApprovalRequest": [
     "--approver"
-  ],
-  "PushToMaster": [
-    "--git-remote"
   ],
   "EnableDisableMergeTo": [
     "--disable-merge-to"
@@ -291,9 +273,6 @@
   "SetReviewId": [
     "--username"
   ],
-  "DisplayReviewUrl": [
-    "--reviewboard-url"
-  ],
   "GenerateGitCommitStats": [
     "--author-emails",
     "--last-number-of-days",
@@ -314,9 +293,6 @@
     "--database-username",
     "--database-schema-name",
     "--source-file"
-  ],
-  "PushToDevelop": [
-    "--git-remote"
   ],
   "LoadIssues": [
     "--use-epics",
@@ -388,9 +364,6 @@
     "--vcd-sys-admin-password",
     "--vcd-sys-admin-username"
   ],
-  "DeleteMergeBranch": [
-    "--git-remote"
-  ],
   "SyncCardsWithJiraIssues": [
     "--keep-missing-cards"
   ],
@@ -410,9 +383,6 @@
   ],
   "BaseBatchCloseReviews": [
     "--username"
-  ],
-  "RebaseAgainstMaster": [
-    "--git-remote"
   ],
   "ReplaceText": [
     "--replacement-text",

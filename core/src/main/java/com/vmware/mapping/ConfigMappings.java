@@ -41,11 +41,8 @@ public class ConfigMappings {
     public Set<String> getConfigValuesForAction(WorkflowAction action) {
         Set<String> configValues = action.getConfigValues(mappings);
         // add global values
-        configValues.add("--username");
         configValues.add("--dry-run");
         configValues.add("--debug");
-        configValues.add("--trace");
-        configValues.add("--check-point");
         return configValues;
     }
 
