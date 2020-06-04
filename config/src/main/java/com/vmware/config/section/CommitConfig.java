@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class CommitConfig {
 
-    @ConfigurableProperty(commandLine = "-reviewboardUrl,--reviewboard-url", help = "Url for review board server", gitConfigProperty = "reviewboard.url")
+    @ConfigurableProperty(help = "Url for review board server", gitConfigProperty = "reviewboard.url")
     public String reviewboardUrl;
 
     @ConfigurableProperty(help = "Url for jenkins server")

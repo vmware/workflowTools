@@ -19,6 +19,10 @@ public class ReplacementVariables {
         this.config = config;
     }
 
+    public boolean hasVariable(VariableName variableName) {
+        return replacementVariables.containsKey(variableName.name());
+    }
+
     public void addVariable(VariableName name, String value) {
         addVariable(name.name(), value, false);
     }

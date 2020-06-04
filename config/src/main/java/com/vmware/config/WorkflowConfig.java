@@ -111,8 +111,7 @@ public class WorkflowConfig {
     public Map<String, String> buildInfo;
 
     @ConfigurableProperty(commandLine = "-u,--username", help = "Username to use for jenkins, jira, review board and vcd")
-    public String
-            username;
+    public String username;
 
     @ConfigurableProperty(help = "Order of services to check against for bug number")
     public List<String> bugNumberSearchOrder;

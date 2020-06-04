@@ -24,7 +24,7 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "-b,--branch", help = "Optional value to set if using the local branch name for review board is not desired")
     public String targetBranch;
 
-    @ConfigurableProperty(commandLine = "--git-remote", help = "Default git remote. Remote used for pushing to master or other remote branches.")
+    @ConfigurableProperty(help = "Default git remote. Remote used for pushing to master or other remote branches.")
     public String defaultGitRemote;
 
     @ConfigurableProperty(help = "Map of remote branches, $USERNAME is substituted for the real username.")
