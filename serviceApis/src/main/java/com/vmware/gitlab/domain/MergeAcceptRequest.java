@@ -5,7 +5,7 @@ public class MergeAcceptRequest {
     public MergeAcceptRequest(MergeRequest mergeRequest) {
         this.sha = mergeRequest.sha;
         this.mergeWhenPipelineSucceeds = true;
-        this.shouldRemoveSourceBranch = mergeRequest.removeSourceBranch;
+        this.shouldRemoveSourceBranch = mergeRequest.forceRemoveSourceBranch;
         this.squash = mergeRequest.squash;
     }
 

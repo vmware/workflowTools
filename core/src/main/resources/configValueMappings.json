@@ -14,6 +14,11 @@
   "ExitIfGitDiffDoesNotMatchRbtDiff": [
     "--parent"
   ],
+  "UpdateVcdPublicCerts": [
+    "--vcd-sys-admin-password",
+    "--vcd-sys-admin-username",
+    "--source-url"
+  ],
   "GenerateReviewStats": [
     "--file-count-ranges",
     "--groups"
@@ -359,10 +364,6 @@
     "--sql-statement",
     "--database-url-pattern",
     "--database-url"
-  ],
-  "UpdatePublicCerts": [
-    "--vcd-sys-admin-password",
-    "--vcd-sys-admin-username"
   ],
   "SyncCardsWithJiraIssues": [
     "--keep-missing-cards"

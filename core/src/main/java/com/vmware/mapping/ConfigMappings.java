@@ -8,7 +8,6 @@ import java.util.Set;
 
 import com.google.gson.Gson;
 import com.vmware.config.WorkflowAction;
-import com.vmware.config.WorkflowParameter;
 import com.vmware.util.ClasspathResource;
 
 /**
@@ -31,11 +30,6 @@ public class ConfigMappings {
 
     public Set<String> keySet() {
         return mappings.keySet();
-    }
-
-    public List<WorkflowParameter> getRelevantOverriddenConfigValues(WorkflowAction action) {
-        Set<String> relevantConfigValues = getConfigValuesForAction(action);
-        return action.getRelevantOverriddenConfigValues(relevantConfigValues);
     }
 
     public Set<String> getConfigValuesForAction(WorkflowAction action) {

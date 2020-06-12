@@ -20,8 +20,6 @@ import java.util.Map;
  */
 public class CommandLineArgumentsParser {
 
-    private static final String[] ADDITIONAL_ARGUMENT_NAMES = new String[] {"-c", "--config", "--possible-workflow"};
-
     private Map<String, String> argumentMap = new HashMap<String, String>();
 
     private StringBuilder argumentsText;
@@ -113,61 +111,19 @@ public class CommandLineArgumentsParser {
         return argValue;
     }
 
-    public void checkForUnrecognizedArguments(List<ConfigurableProperty> validProperties) {
-        List<UnrecognizedCommandLineArgument> unrecognizedArguments = new ArrayList<>();
-
-        for (String argument : argumentMap.keySet()) {
-            if (ArrayUtils.contains(ADDITIONAL_ARGUMENT_NAMES, argument)) {
-                continue;
-            }
-            if (argument.startsWith(JenkinsConfig.CONFIG_PREFIX)) {
-                continue;
-            }
-            if (argument.startsWith(ReplacementVariables.CONFIG_PREFIX)) {
-                continue;
-            }
-            UnrecognizedCommandLineArgument potentiallyUnrecognizedArgument = new UnrecognizedCommandLineArgument(argument);
-            for (ConfigurableProperty validProperty : validProperties) {
-                List<String> validMatches = StringUtils.splitAndTrim(validProperty.commandLine(), ",");
-                if (validMatches.contains(argument)) {
-                    potentiallyUnrecognizedArgument = null;
-                    break;
-                }
-                int numberOfCharactersToCheck = argument.startsWith("--") ? 3 : 2;
-                String argumentFragmentToPartialMatch = argument.substring(0,numberOfCharactersToCheck);
-                for (String validMatch : validMatches) {
-                    if (validMatch.startsWith(argumentFragmentToPartialMatch)) {
-                        potentiallyUnrecognizedArgument.addPossibleArgument(validMatch, validProperty);
-                    }
-                }
-
-            }
-            if (potentiallyUnrecognizedArgument != null) {
-                unrecognizedArguments.add(potentiallyUnrecognizedArgument);
-            }
-        }
-        if (!unrecognizedArguments.isEmpty()) {
-            String errorMessage = "Following arguments were unrecognized\n";
-            for (UnrecognizedCommandLineArgument unrecognizedArgument : unrecognizedArguments) {
-                errorMessage += "\n" + unrecognizedArgument.toString() + "\n";
-            }
-            throw new FatalException(errorMessage);
-        }
-    }
-
     @Override
     public String toString() {
-        String argumentText = "";
+        StringBuilder argumentText = new StringBuilder();
         for (String argumentKey : argumentMap.keySet()) {
             String argumentValue = argumentMap.get(argumentKey);
-            if (!argumentText.isEmpty()) {
-                argumentText += "\n";
+            if (argumentText.length() > 0) {
+                argumentText.append("\n");
             }
-            argumentText += argumentKey;
+            argumentText.append(argumentKey);
             if (argumentValue != null) {
-                argumentText += "=" + argumentValue;
+                argumentText.append("=").append(argumentValue);
             }
         }
-        return argumentText;
+        return argumentText.toString();
     }
 }

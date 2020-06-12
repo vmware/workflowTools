@@ -15,8 +15,12 @@ import com.vmware.action.base.BaseFileSystemAction;
 import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.action.trello.BaseTrelloAction;
-import com.vmware.util.exception.SkipActionException;
+import com.vmware.mapping.ConfigMappings;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
+import com.vmware.util.exception.SkipActionException;
+
+import static com.vmware.util.StringUtils.pluralizeDescription;
 
 public class WorkflowAction implements Action {
     private WorkflowConfig config;
@@ -27,10 +31,10 @@ public class WorkflowAction implements Action {
 
     private Map<String, CalculatedProperty> existingValuesForConfig;
 
-    public WorkflowAction(WorkflowConfig config, Class<? extends BaseAction> actionClass, List<WorkflowParameter> parameters) {
+    public WorkflowAction(ConfigMappings mappings, WorkflowConfig config, Class<? extends BaseAction> actionClass, List<WorkflowParameter> parameters) {
         this.config = config;
         this.actionClass = actionClass;
-        this.overriddenConfigValues = parameters;
+        setWorkflowParametersForAction(mappings, parameters);
     }
 
     public String getActionClassName() {
@@ -115,10 +119,8 @@ public class WorkflowAction implements Action {
         }
     }
 
-    public List<WorkflowParameter> getRelevantOverriddenConfigValues(Set<String> relevantConfigValues) {
-        List<WorkflowParameter> params = overriddenConfigValues.stream().filter(param -> relevantConfigValues.contains(param.getName()))
-                .collect(Collectors.toList());
-        return config.applyReplacementVariables(params);
+    public List<WorkflowParameter> getOverriddenConfigValues() {
+        return config.applyReplacementVariables(overriddenConfigValues);
     }
 
     public Set<String> getConfigValues(Map<String, List<String>> mappings) {
@@ -144,5 +146,28 @@ public class WorkflowAction implements Action {
             config.applyValuesWithSource(existingValuesForConfig);
             config.setupLogLevel();
         }
+    }
+
+    private void setWorkflowParametersForAction(ConfigMappings mappings, List<WorkflowParameter> parameters) {
+        Set<String> allowedConfigValues = mappings.getConfigValuesForAction(this);
+        Set<String> unknownParameters = parameters.stream().filter(param -> !paramIsAllowed(allowedConfigValues, param.getName()))
+                .map(WorkflowParameter::getName).collect(Collectors.toSet());
+
+        if (!unknownParameters.isEmpty()) {
+            Set<String> allConfigValues = mappings.allConfigValues();
+            Set<String> completelyUnknownParams = unknownParameters.stream().filter(unknownParam -> !allConfigValues.contains(unknownParam)).collect(Collectors.toSet());
+            if (!completelyUnknownParams.isEmpty()) {
+                throw new FatalException("Unknown {} {} for action {}",
+                        pluralizeDescription(completelyUnknownParams.size(), "parameter"), completelyUnknownParams, getActionClassName());
+            }
+        }
+        this.overriddenConfigValues = parameters.stream().filter(param -> !unknownParameters.contains(param.getName())).collect(Collectors.toList());
+    }
+
+    private boolean paramIsAllowed(Set<String> allowedConfigValues, String propertyName) {
+        if (WorkflowFields.isSystemProperty(propertyName)) {
+            return true;
+        }
+        return allowedConfigValues.contains(propertyName);
     }
 }

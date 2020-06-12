@@ -316,7 +316,7 @@ public class Workflow {
             }
             configOptions.addAll(configMappings.getConfigValuesForAction(action));
             log.info(action.getActionClassName() + " - " + description.value());
-            List<WorkflowParameter> params = configMappings.getRelevantOverriddenConfigValues(action);
+            List<WorkflowParameter> params = action.getOverriddenConfigValues();
             for (WorkflowParameter parameter : params) {
                 log.info("{}   {}={}", StringUtils.repeat(action.getActionClassName().length(), " "),
                         parameter.getName(), parameter.getValue());

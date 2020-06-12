@@ -8,17 +8,16 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.exception.FatalException;
 import com.vmware.vcd.Vcd;
 
-@ActionDescription("Updates the public certificates for the specified vcd url. Reads certs to use from fileData.")
-public class UpdatePublicCerts extends BaseFileSystemAction {
-    public UpdatePublicCerts(WorkflowConfig config) {
+@ActionDescription("Updates the public certificates for the specified url. Reads certs to use from fileData.")
+public class UpdateVcdPublicCerts extends BaseFileSystemAction {
+    public UpdateVcdPublicCerts(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("vcdUrl", "vcdApiVersion", "vcdSysAdminUser", "vcdSysAdminPassword");
+        super.addFailWorkflowIfBlankProperties("sourceUrl", "vcdApiVersion", "vcdSysAdminUser", "vcdSysAdminPassword");
     }
 
     @Override
     public void process() {
-
-        Vcd vcdClientForSystemOrg = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdSysAdminUser, vcdConfig.vcdSysAdminPassword, "System");
+        Vcd vcdClientForSystemOrg = new Vcd(fileSystemConfig.sourceUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdSysAdminUser, vcdConfig.vcdSysAdminPassword, "System");
         final String resourceType = "application/vnd.vmware.admin.generalsettings";
         Map generalSettings = vcdClientForSystemOrg
                 .getResourceAsMap("admin/extension/settings/general", resourceType);
@@ -31,7 +30,7 @@ public class UpdatePublicCerts extends BaseFileSystemAction {
         checkCertValueMatches(updatedSettings, "systemExternalAddressPublicCertChain");
         checkCertValueMatches(updatedSettings, "restApiBaseUriPublicCertChain");
         checkCertValueMatches(updatedSettings, "tenantPortalPublicCertChain");
-        log.info("Successfully updated public certificates for vcd url {}", vcdConfig.vcdUrl);
+        log.info("Successfully updated public certificates for vcd url {}", fileSystemConfig.sourceUrl);
     }
 
     private void updateCertValueForProperty(Map generalSettings, String key) {
