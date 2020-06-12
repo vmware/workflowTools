@@ -1,25 +1,33 @@
 package com.vmware.config;
 
-import com.google.gson.annotations.Expose;
-import com.vmware.config.section.SectionConfig;
-import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import com.google.gson.annotations.Expose;
+import com.vmware.config.section.JenkinsConfig;
+import com.vmware.config.section.SectionConfig;
+import com.vmware.util.ArrayUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+
+import static com.vmware.util.StringUtils.pluralizeDescription;
 
 /**
  * Encapsulates a list of workflow fields.
  */
 public class WorkflowFields {
+
+    private static final String[] ADDITIONAL_ARGUMENT_NAMES = new String[] {"-c", "--config", "--possible-workflow"};
 
     @Expose(serialize = false, deserialize = false)
     private Map<String, String> overriddenConfigSources = new TreeMap<>();
@@ -31,6 +39,16 @@ public class WorkflowFields {
 
     private WorkflowConfig workflowConfig;
 
+    public static boolean isSystemProperty(String propertyName) {
+        if (ArrayUtils.contains(ADDITIONAL_ARGUMENT_NAMES, propertyName)) {
+            return true;
+        }
+        if (propertyName.startsWith(JenkinsConfig.CONFIG_PREFIX)) {
+            return true;
+        }
+        return propertyName.startsWith(ReplacementVariables.CONFIG_PREFIX);
+    }
+
     public WorkflowFields(WorkflowConfig workflowConfig) {
         this.workflowConfig = workflowConfig;
         populateConfigurableFields();
@@ -38,13 +56,19 @@ public class WorkflowFields {
 
     public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source) {
         List<ConfigurableProperty> propertiesAffected = new ArrayList<>();
+        Set<String> unknownConfigValues = new HashSet<>();
         for (String configValueName : configValues.keySet()) {
             List<WorkflowField> matchingFields = findWorkflowFieldsByConfigValue(configValueName);
             if (!matchingFields.isEmpty()) {
                 propertiesAffected.add(matchingFields.get(0).configAnnotation());
                 String value = configValues.get(configValueName);
                 matchingFields.forEach(matchingField -> setFieldValue(matchingField, value, source)); ;
+            } else if (!isSystemProperty(configValueName)) {
+                unknownConfigValues.add(configValueName);
             }
+        }
+        if (!unknownConfigValues.isEmpty()) {
+            throw new FatalException("Unknown workflow config {} {}", pluralizeDescription(unknownConfigValues.size(), "value"), unknownConfigValues);
         }
         return propertiesAffected;
     }

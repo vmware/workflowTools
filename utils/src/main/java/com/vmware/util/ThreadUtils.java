@@ -54,7 +54,9 @@ public class ThreadUtils {
 
     private static long determineRetryWaitPeriod(long totalSeconds) {
         long timeBetweenRetries = 60;
-        if (totalSeconds <= 20) {
+        if (totalSeconds <= 10) {
+            timeBetweenRetries = 2;
+        } else if (totalSeconds <= 20) {
             timeBetweenRetries = 3;
         } else if (totalSeconds <= 30) {
             timeBetweenRetries = 5;

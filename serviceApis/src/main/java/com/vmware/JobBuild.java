@@ -5,10 +5,11 @@ import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputListSelection;
 
 import java.util.Arrays;
 
-public class JobBuild {
+public class JobBuild implements InputListSelection {
     @Expose(serialize = false, deserialize = false)
     public String buildDisplayName;
     public Integer number;
@@ -88,5 +89,10 @@ public class JobBuild {
 
     public String consoleUrl() {
         return UrlUtils.addRelativePaths(url, "consoleFull");
+    }
+
+    @Override
+    public String getLabel() {
+        return buildDisplayName != null && buildDisplayName.endsWith(":") ? buildDisplayName.substring(0, buildDisplayName.length() - 1) : buildDisplayName;
     }
 }

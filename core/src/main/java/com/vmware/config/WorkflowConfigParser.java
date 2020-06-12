@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * Parses the workflow config from the source config files
  */
 public class WorkflowConfigParser {
-
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final Git git = new Git();
     private final Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();

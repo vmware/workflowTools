@@ -29,10 +29,10 @@ public class MergeRequest {
     @Expose(deserialize = false)
     public String stateEvent;
 
-    public boolean removeSourceBranch;
+    @Expose(deserialize = false)
+    public Boolean removeSourceBranch;
 
-    @Expose(serialize = false)
-    public boolean forceRemoveSourceBranch;
+    public Boolean forceRemoveSourceBranch;
 
     public String webUrl;
 

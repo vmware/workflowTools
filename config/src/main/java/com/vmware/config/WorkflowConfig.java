@@ -170,12 +170,11 @@ public class WorkflowConfig {
     }
 
     public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
-        List<ConfigurableProperty> commandLineProperties = applyConfigValues(argsParser.getArgumentMap(), COMMAND_LINE_SOURCE, true);
+        applyConfigValues(argsParser.getArgumentMap(), COMMAND_LINE_SOURCE, true);
         if (argsParser.containsArgument("--possible-workflow")) {
             configurableFields.markFieldAsOverridden("workflowsToRun", "Command Line");
             this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
         }
-        argsParser.checkForUnrecognizedArguments(commandLineProperties);
     }
 
     public Map<String, CalculatedProperty> getExistingValues(Set<String> configValues) {

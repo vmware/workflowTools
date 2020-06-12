@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import com.vmware.action.BaseAction;
 import com.vmware.config.section.JenkinsConfig;
+import com.vmware.mapping.ConfigMappings;
 import com.vmware.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WorkflowValuesParser {
     private Logger log = LoggerFactory.getLogger(this.getClass());
+    private ConfigMappings mappings = new ConfigMappings();
     private Map<String, String> configValues = new HashMap<>();
     private List<String> unknownActions = new ArrayList<>();
 
@@ -65,7 +67,7 @@ public class WorkflowValuesParser {
             Optional<Class<? extends BaseAction>> matchingAction = workflowActionClasses.stream()
                     .filter(action -> action.getSimpleName().equals(workflowName)).findFirst();
             if (matchingAction.isPresent()) {
-                workflowActions.add(new WorkflowAction(config, matchingAction.get(), parameters));
+                workflowActions.add(new WorkflowAction(mappings, config, matchingAction.get(), parameters));
                 log.trace("Found action class {}", workflowName);
             } else {
                 unknownActions.add(workflowName);

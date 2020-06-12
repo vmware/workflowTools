@@ -239,10 +239,14 @@ public class StringUtils {
     }
 
     public static String pluralize(long value, String description) {
+        return value + " " + pluralizeDescription(value, description);
+    }
+
+    public static String pluralizeDescription(long value, String description) {
         if (value == 1) {
-            return value + " " + description;
+            return description;
         } else {
-            return value + " " + description + "s";
+            return description + "s";
         }
     }
 

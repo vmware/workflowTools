@@ -5,5 +5,5 @@ package com.vmware.util.input;
  */
 public interface InputListSelection {
 
-    public String getLabel();
+    String getLabel();
 }

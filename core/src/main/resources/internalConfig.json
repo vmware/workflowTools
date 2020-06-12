@@ -46,7 +46,7 @@
   "backupName": "original",
   "databaseDriverClass": "org.postgresql.Driver",
   "databaseUrlPattern": "jdbc:postgresql://$HOST:$PORT/$DB_NAME",
-  "databaseSchemaName": "backup",
+  "databaseSchemaName": "local",
   "issueTypesToInclude": [
     8
   ],
