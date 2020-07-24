@@ -75,13 +75,6 @@ public class JenkinsConfig {
                 && (StringUtils.isNotEmpty(jobWithArtifact) ||  (jobsDisplayNames != null && jobsDisplayNames.length == 1));
     }
 
-    public String jobWithArtifactName() {
-        if (!hasConfiguredArtifact()) {
-            return null;
-        }
-        return StringUtils.isNotEmpty(jobWithArtifact) ? jobWithArtifact : jobsDisplayNames[0];
-    }
-
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {
         for (String configValue : configValues.keySet()) {
             if (!configValue.startsWith(CONFIG_PREFIX)) {
@@ -99,7 +92,6 @@ public class JenkinsConfig {
 
     public JenkinsJobsConfig getJenkinsJobsConfig(String username, String targetBranch) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
-
         Map<String, String> presetParams = new HashMap<>(jenkinsJobParameters);
         if (useVappJsonParameter) {
             presetParams.put(vappJsonParameter, JenkinsJobsConfig.VAPP_JSON_VALUE);

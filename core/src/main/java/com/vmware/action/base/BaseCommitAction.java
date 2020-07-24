@@ -132,6 +132,13 @@ public abstract class BaseCommitAction extends BaseAction {
         return buildId;
     }
 
+    protected String jobWithArtifactName() {
+        if (!jenkinsConfig.hasConfiguredArtifact()) {
+            return null;
+        }
+        return StringUtils.isNotEmpty(jenkinsConfig.jobWithArtifact) ? jenkinsConfig.jobWithArtifact : jenkinsConfig.jobsDisplayNames[0];
+    }
+
     private String readPendingChangelistText() {
         String changelistId = determineChangelistIdToUse();
         String changelistText = serviceLocator.getPerforce().readChangelist(changelistId);

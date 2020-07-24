@@ -52,7 +52,7 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
         JobBuildDetails buildDetails;
         if (jenkinsConfig.hasConfiguredArtifact()) {
             log.info("Downloading artifact {} from job {} with build number {}", jenkinsConfig.jobArtifact,
-                    jenkinsConfig.jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
+                    jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
             buildDetails = jenkins.getJobBuildDetails(jenkinsConfig.jobWithArtifact, jenkinsConfig.jobBuildNumber);
         } else {
             JobBuild build = determineBuildToUse();

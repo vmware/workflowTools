@@ -157,8 +157,8 @@ public abstract class BaseAction implements Action {
         skipActionIfBlankProperties.addAll(Arrays.asList(propertyNames));
     }
 
-    protected void cancelWithMessage(String message) {
-        throw new CancelException(LogLevel.INFO, message);
+    protected void cancelWithMessage(String message, String... arguments) {
+        throw new CancelException(LogLevel.INFO, message, arguments);
     }
 
     protected void cancelWithErrorMessage(String message) {

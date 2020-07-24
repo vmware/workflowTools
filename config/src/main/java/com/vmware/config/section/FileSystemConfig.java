@@ -21,11 +21,11 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--property-value", help = "Property value")
     public String propertyValue;
 
-    @ConfigurableProperty(commandLine = "--backup-name", help = "Name to append to file / directory being backed up")
-    public String backupName;
+    @ConfigurableProperty(commandLine = "--skip-file-copy", help = "Skip copying operation")
+    public boolean skipFileCopy;
 
-    @ConfigurableProperty(commandLine = "--skip-backup", help = "Skip backup action")
-    public boolean skipBackup;
+    @ConfigurableProperty(commandLine = "--replace-existing", help = "Replace existing file on copy")
+    public boolean replaceExisting;
 
     @ConfigurableProperty(commandLine = "--sql-statement", help = "Sql statement to execute")
     public String sqlStatement;
