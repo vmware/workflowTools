@@ -59,6 +59,12 @@
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
   ],
+  "CopyFile": [
+    "--replace-existing",
+    "--destination-file",
+    "--source-file",
+    "--skip-file-copy"
+  ],
   "LoadFileData": [
     "--source-file"
   ],
@@ -66,6 +72,9 @@
     "--username",
     "--latest-diff",
     "--review-request-id"
+  ],
+  "DeleteFile": [
+    "--source-file"
   ],
   "BaseCommitReadAction": [
     "--set-empty-only"
@@ -219,12 +228,6 @@
   "PushToPrecommitBranch": [
     "--username"
   ],
-  "BackupFile": [
-    "--backup-name",
-    "--destination-file",
-    "--source-file",
-    "--skip-backup"
-  ],
   "LoadCompletedIssuesWithoutResolution": [
     "--username"
   ],
@@ -316,6 +319,8 @@
   ],
   "BaseCommitAction": [
     "--username",
+    "--job-display-names",
+    "--job-with-artifact",
     "--changelist-id"
   ],
   "ScpFileFromRemote": [
@@ -372,6 +377,9 @@
     "--username",
     "--disable-bugzilla",
     "--disable-jira"
+  ],
+  "ExitIflBranchDoesNotHaveLocalCommit": [
+    "--tracking-branch"
   ],
   "BaseReviewBoardAction": [
     "--username"

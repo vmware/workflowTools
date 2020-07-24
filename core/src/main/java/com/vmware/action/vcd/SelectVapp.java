@@ -33,7 +33,7 @@ public class SelectVapp extends BaseVappAction {
             log.info("Using Vapp json file {}", vcdConfig.vappJsonFile);
             vappData.setSelectedVapp(new QueryResultVappType("url", vcdConfig.vappJsonFile));
         } else if (jenkinsConfig.hasConfiguredArtifact()) {
-            JobBuildDetails buildDetails = serviceLocator.getJenkins().getJobBuildDetails(jenkinsConfig.jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
+            JobBuildDetails buildDetails = serviceLocator.getJenkins().getJobBuildDetails(jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
             String jobArtifactPath = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
             log.info("Using artifact {}", jobArtifactPath);
             vappData.setSelectedVapp(new QueryResultVappType("artifact", jobArtifactPath));

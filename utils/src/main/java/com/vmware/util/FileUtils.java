@@ -97,7 +97,14 @@ public class FileUtils {
         try {
             Files.walk(srcPath).forEach(source -> {
                 try {
-                    Files.copy(source, destPath.resolve(srcPath.relativize(source)), StandardCopyOption.REPLACE_EXISTING);
+                    Path destination = destPath.resolve(srcPath.relativize(source));
+                    File destinationFile = destination.toFile();
+                    if (!destinationFile.exists() || !destinationFile.isDirectory()) {
+                        log.debug("Copying {} to {}", source, destination);
+                        Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                    } else {
+                        log.debug("Skipping copying of directory {} to existing directory {}", source, destination);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeIOException(e);
                 }

@@ -135,7 +135,7 @@ public class JenkinsJobsConfig {
     }
 
     private void expandParameterValues(String jobName, List<JobParameter> parameters) {
-        boolean setDefaultUsernameParam = true;
+        boolean setDefaultUsernameParam = !presetParameters.containsKey(USERNAME_PARAM);
         Iterator<JobParameter> paramIter = parameters.iterator();
         Set<String> usedPresetParams = new HashSet<>();
         while (paramIter.hasNext()) {
@@ -165,7 +165,7 @@ public class JenkinsJobsConfig {
                 paramValue = paramValue.replace(USERNAME_VALUE, presetParameters.get(USERNAME_PARAM));
             }
 
-            if (paramName.equals(NO_USERNAME_PARAMETER) && Boolean.valueOf(paramValue)) {
+            if (paramName.equals(NO_USERNAME_PARAMETER) && Boolean.parseBoolean(paramValue)) {
                 setDefaultUsernameParam = false;
                 log.debug("Not setting default {} parameter for this job as {} is true", USERNAME_PARAM, NO_USERNAME_PARAMETER);
                 paramIter.remove();

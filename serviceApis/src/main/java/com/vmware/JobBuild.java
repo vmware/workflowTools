@@ -29,7 +29,7 @@ public class JobBuild implements InputListSelection {
 
     public JobBuild(final int number, final String baseUrl, BuildResult result) {
         this.number = number;
-        this.url = baseUrl + number;
+        this.url = UrlUtils.addTrailingSlash(baseUrl) + number;
         this.result = result;
     }
 

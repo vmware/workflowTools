@@ -369,7 +369,8 @@ public class Workflow {
         configPadder.infoTitle();
 
         Map<String, String> replacementVariables = config.replacementVariables.values();
-        if (replacementVariables.isEmpty()) {
+        if (replacementVariables.isEmpty() || (replacementVariables.size() == 1
+                && replacementVariables.keySet().iterator().next().equals(ReplacementVariables.VariableName.REPO_DIR.name()))) {
             return;
         }
         Padder variablePadder = new Padder("Variables for workflow");

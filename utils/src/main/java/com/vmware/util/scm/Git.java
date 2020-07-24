@@ -389,12 +389,12 @@ public class Git extends BaseScmWrapper {
         return trackingBranch;
     }
 
-    public String initRepo() {
-        return executeScmCommand("init");
+    public void initRepo() {
+        executeScmCommand("init");
     }
 
-    public String addAllFiles() {
-        return executeScmCommand("add --all");
+    public void addAllFiles() {
+        executeScmCommand("add --all");
     }
 
     public String reset(String ref) {
