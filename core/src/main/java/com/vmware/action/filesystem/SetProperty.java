@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import com.vmware.action.base.BaseFileSystemAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
 
 @ActionDescription("Adds or replaces a property value.")
-public class SetProperty extends BaseFileSystemAction {
+public class SetProperty extends BaseAction {
     public SetProperty(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("propertyName", "propertyValue");
+        super.addFailWorkflowIfBlankProperties("fileData", "propertyName", "propertyValue");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SetProperty extends BaseFileSystemAction {
     private Properties loadProperties() {
         Properties properties = new Properties();
         try {
-            properties.load(new StringReader(fileData));
+            properties.load(new StringReader(fileSystemConfig.fileData));
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
@@ -54,6 +54,6 @@ public class SetProperty extends BaseFileSystemAction {
         for (String propertyName : sortedNames) {
             builder.append(propertyName).append("=").append(properties.getProperty(propertyName)).append("\n");
         }
-        fileData = builder.toString();
+        fileSystemConfig.fileData = builder.toString();
     }
 }

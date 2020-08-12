@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.vmware.action.info.GenerateAutoCompleteValues;
@@ -34,14 +35,13 @@ import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.CancelException;
-import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.input.CommaArgumentDelimeter;
 import com.vmware.util.input.ImprovedArgumentCompleter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.DynamicLogger;
-import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.scm.Git;
 
@@ -390,41 +390,46 @@ public class Workflow {
         new Thread(setupActions).start();
         ThreadUtils.sleep(10, TimeUnit.MILLISECONDS);
 
-        int waitTimeInMilliSeconds = 0;
+        AtomicInteger waitTimeInMilliSeconds = new AtomicInteger(0);
         Map<String, Long> executionTimesPerAction = new LinkedHashMap<>();
-        String lastActionName = null;
         for (WorkflowAction action : actions) {
-            if (lastActionName != null && config.checkPoint) {
-                checkWhetherToContinue(lastActionName, action);
-            }
-            while (!actionsSetup.contains(action)) {
-                String actionName = action.getActionClassName();
-                if (waitTimeInMilliSeconds > 30000) {
-                    log.error(actionName + ".asyncSetup failed to finish in 30 seconds");
-                    System.exit(1);
+            if (config.checkPoint) {
+                boolean shouldSkip = checkWhetherToSkipAction(action);
+                if (shouldSkip) {
+                    log.info("Skipping action {}", action.getActionClassName());
+                    continue;
                 }
-                if (waitTimeInMilliSeconds > 0 && waitTimeInMilliSeconds % 1000 == 0) {
-                    log.debug("Waiting for {}.asyncSetup to finish, waited {} seconds",
-                            actionName, TimeUnit.MILLISECONDS.toSeconds(waitTimeInMilliSeconds));
-                }
-                ThreadUtils.sleep(50, TimeUnit.MILLISECONDS);
-                waitTimeInMilliSeconds += 50;
             }
+            waitForAsyncActionSetupToFinish(actionsSetup, waitTimeInMilliSeconds, action);
             Date startingDate = new Date();
             runAction(action, values);
             long elapsedTime = new Date().getTime() - startingDate.getTime();
             executionTimesPerAction.put(action.getClass().getSimpleName(), elapsedTime);
-            lastActionName = action.getActionClassName();
         }
         outputExecutionTimes(executionTimesPerAction);
     }
 
-    private void checkWhetherToContinue(String lastActionName, WorkflowAction action) {
-        log.info("Finished action {}, next action is {}", lastActionName, action.getActionClassName());
-        String confirmation = InputUtils.readValue("Continue (Type no to cancel)", "yes","no");
-        if ("no".equalsIgnoreCase(confirmation)) {
-            throw new CancelException(LogLevel.INFO, "confirmation was declined before running action {}", action.getActionClassName());
+    private void waitForAsyncActionSetupToFinish(ConcurrentLinkedQueue<WorkflowAction> actionsSetup, AtomicInteger waitTimeInMilliSeconds, WorkflowAction action) {
+        while (!actionsSetup.contains(action)) {
+            String actionName = action.getActionClassName();
+            int waitTimeValue = waitTimeInMilliSeconds.get();
+            if (waitTimeValue > 30000) {
+                log.error(actionName + ".asyncSetup failed to finish in 30 seconds");
+                System.exit(1);
+            }
+            if (waitTimeValue > 0 && waitTimeValue % 1000 == 0) {
+                log.debug("Waiting for {}.asyncSetup to finish, waited {} seconds",
+                        actionName, TimeUnit.MILLISECONDS.toSeconds(waitTimeValue));
+            }
+            ThreadUtils.sleep(50, TimeUnit.MILLISECONDS);
+            waitTimeInMilliSeconds.addAndGet(50);
         }
+    }
+
+    private boolean checkWhetherToSkipAction(WorkflowAction action) {
+        log.info("Next action is {}", action.getActionClassName());
+        String confirmation = InputUtils.readValue("Skip action (y/n)", "yes","no");
+        return "y".equalsIgnoreCase(confirmation);
     }
 
     private void outputExecutionTimes(Map<String, Long> executionTimesPerAction) {

@@ -21,13 +21,13 @@ public class SetJsonProperty extends DeleteJsonProperty {
         log.info("Setting json property {} to {}", fileSystemConfig.jsonPropertyPath, fileSystemConfig.propertyValue);
 
         Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
-        Map<String, Object> jsonMap = gson.fromJson(new StringReader(fileData), Map.class);
+        Map<String, Object> jsonMap = gson.fromJson(new StringReader(fileSystemConfig.fileData), Map.class);
 
         JsonMatch jsonMatch = findJsonPropertyMatch(jsonMap, fileSystemConfig.jsonPropertyPath);
         if (jsonMatch == null) {
             throw new FatalException("Failed to find match for path " + fileSystemConfig.jsonPropertyPath);
         }
         jsonMatch.setValue(fileSystemConfig.propertyValue);
-        fileData = gson.toJson(jsonMap);
+        fileSystemConfig.fileData = gson.toJson(jsonMap);
     }
 }

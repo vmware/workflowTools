@@ -7,7 +7,11 @@ public class MetaDatasType extends ResourceType {
     public List<MetaDataType> metadataEntry;
 
     public String jsonMetadata() {
-        return metadataEntry.stream().filter(entry -> entry.key.equalsIgnoreCase("json"))
+        return getMetadata("json");
+    }
+
+    public String getMetadata(String name) {
+        return metadataEntry.stream().filter(entry -> entry.key.equalsIgnoreCase(name))
                 .map(MetaDataType::unescapedValue).findFirst().orElse(null);
     }
 }

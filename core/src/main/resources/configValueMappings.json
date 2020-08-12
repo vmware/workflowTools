@@ -15,6 +15,7 @@
     "--parent"
   ],
   "UpdateVcdPublicCerts": [
+    "--file-data",
     "--vcd-sys-admin-password",
     "--vcd-sys-admin-username",
     "--source-url"
@@ -35,6 +36,11 @@
     "--tracking-branch",
     "--sync-to-branch-latest"
   ],
+  "LoadVappMetadataIfFound": [
+    "--username",
+    "--file-data",
+    "--vapp-metadata-name"
+  ],
   "AddGitChangesToChangelist": [
     "--tracking-branch"
   ],
@@ -50,6 +56,7 @@
     "--changelist-id"
   ],
   "SaveFileData": [
+    "--file-data",
     "--destination-file"
   ],
   "AuthenticateAllApis": [
@@ -66,6 +73,7 @@
     "--skip-file-copy"
   ],
   "LoadFileData": [
+    "--file-data",
     "--source-file"
   ],
   "LoadReviewPatch": [
@@ -87,6 +95,11 @@
     "--tracking-branch",
     "--groups",
     "--disable-markdown"
+  ],
+  "DownloadBuildArtifactIfNeeded": [
+    "--job-artifact",
+    "--always-download",
+    "--file-data"
   ],
   "CreateReviewIfNeeded": [
     "--username",
@@ -133,6 +146,11 @@
   "ReadGitDiffAsGitPatch": [
     "--parent"
   ],
+  "SetVappMetadataIfNeeded": [
+    "--username",
+    "--file-data",
+    "--vapp-metadata-name"
+  ],
   "ExecuteLocalSqlStatementUsingPsql": [
     "--database-username",
     "--database-schema-name",
@@ -157,6 +175,7 @@
     "--approver"
   ],
   "SetJsonProperty": [
+    "--file-data",
     "--property-value",
     "--json-property-path"
   ],
@@ -172,6 +191,7 @@
     "--wait-time"
   ],
   "DeleteJsonProperty": [
+    "--file-data",
     "--json-property-path"
   ],
   "UploadReviewDiff": [
@@ -185,6 +205,10 @@
     "--username",
     "--default-jira-component",
     "--disable-bugzilla"
+  ],
+  "DeleteVappMetadataIfNeeded": [
+    "--username",
+    "--vapp-metadata-name"
   ],
   "RenameVapp": [
     "--username",
@@ -243,6 +267,9 @@
   "OpenSshShell": [
     "--ssh-strict-host-checking"
   ],
+  "DisplayFileData": [
+    "--file-data"
+  ],
   "FindMatchingLines": [
     "--log-file",
     "--input-text",
@@ -258,6 +285,7 @@
     "--use-vapp-json"
   ],
   "ReadCertsFromUrl": [
+    "--file-data",
     "--source-url"
   ],
   "LoadGitPatchFile": [
@@ -381,11 +409,17 @@
   "ExitIflBranchDoesNotHaveLocalCommit": [
     "--tracking-branch"
   ],
+  "CopyFileData": [
+    "--file-data"
+  ],
   "BaseReviewBoardAction": [
     "--username"
   ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
+  ],
+  "DisplayVappMetadataKeys": [
+    "--username"
   ],
   "DiscardUnpublishedReviews": [
     "--username"
@@ -394,6 +428,7 @@
     "--username"
   ],
   "ReplaceText": [
+    "--file-data",
     "--replacement-text",
     "--input-text"
   ],
@@ -408,7 +443,7 @@
   "DownloadBuildArtifact": [
     "--job-with-artifact",
     "--job-build-number",
-    "--destination-file",
+    "--file-data",
     "--job-artifact"
   ],
   "SelectVcdCell": [
@@ -425,6 +460,7 @@
     "--tracking-branch"
   ],
   "SetProperty": [
+    "--file-data",
     "--property-name",
     "--property-value"
   ],

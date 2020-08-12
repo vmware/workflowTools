@@ -2,22 +2,21 @@ package com.vmware.action.filesystem;
 
 import java.io.File;
 
-import com.vmware.action.base.BaseFileSystemAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.IOUtils;
-import com.vmware.util.StringUtils;
 
-@ActionDescription("Saves file data to a specified file. Source file path is used if destination file is not set or is a directory.")
-public class SaveFileData extends BaseFileSystemAction {
+@ActionDescription("Saves file data to a specified file.")
+public class SaveFileData extends BaseAction {
     public SaveFileData(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("destinationFile");
+        super.addFailWorkflowIfBlankProperties("destinationFile", "fileData");
     }
 
     @Override
     public void process() {
-        log.info("Saving file data to {}", fileSystemConfig.destinationFile);
-        IOUtils.write(new File(fileSystemConfig.destinationFile), fileData);
+        log.info("Saving to {}", fileSystemConfig.destinationFile);
+        IOUtils.write(new File(fileSystemConfig.destinationFile), fileSystemConfig.fileData);
     }
 }

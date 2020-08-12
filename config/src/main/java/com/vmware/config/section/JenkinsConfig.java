@@ -70,6 +70,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--job-build-number", help = "Number of jenkins build to use")
     public Integer jobBuildNumber;
 
+    @ConfigurableProperty(commandLine = "--always-download", help = "Always select a build to download artifiact from")
+    public boolean alwaysDownload;
+
     public boolean hasConfiguredArtifact() {
         return StringUtils.isNotEmpty(jobArtifact) && jobBuildNumber != null
                 && (StringUtils.isNotEmpty(jobWithArtifact) ||  (jobsDisplayNames != null && jobsDisplayNames.length == 1));

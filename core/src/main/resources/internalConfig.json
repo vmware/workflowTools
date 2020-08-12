@@ -915,6 +915,28 @@
       "SelectVapp",
       "ExitIfNoVappSelected"
     ],
+    "displayVappMetadataKeys": [
+      "selectVapp",
+      "DisplayVappMetadataKeys"
+    ],
+    "displayVappMetadata": [
+      "selectVapp",
+      "LoadVappMetadataIfFound",
+      "DisplayFileData"
+    ],
+    "saveVappMetadata": [
+      "selectVapp",
+      "SaveVappMetadataIfNeeded"
+    ],
+    "copyVappMetadata": [
+      "selectVapp",
+      "LoadVappMetadataIfFound",
+      "CopyFileData"
+    ],
+    "deleteVappMetadata": [
+      "selectVapp",
+      "DeleteVappMetadataIfNeeded"
+    ],
     "displayConfig": [
       "DisplayConfig"
     ],

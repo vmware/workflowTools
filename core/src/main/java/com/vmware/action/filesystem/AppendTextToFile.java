@@ -2,15 +2,15 @@ package com.vmware.action.filesystem;
 
 import java.io.File;
 
-import com.vmware.action.base.BaseFileSystemAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.IOUtils;
 
 @ActionDescription("Appends the specified test to the source file.")
-public class AppendTextToFile extends BaseFileSystemAction {
+public class AppendTextToFile extends BaseAction {
     public AppendTextToFile(WorkflowConfig config) {
-        super(config, false);
+        super(config);
     }
 
     @Override

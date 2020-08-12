@@ -2,6 +2,7 @@ package com.vmware.action.vcd;
 
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
+import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.util.StringUtils;
@@ -41,11 +42,13 @@ public class SelectVapp extends BaseVappAction {
             log.info("Using specified Vapp name {}", vcdConfig.vappName);
             vappData.setSelectedVappByName(vcdConfig.vappName);
         } else if (!vappData.noVappSelected()) {
-            log.info("Using already selected Vapp {}", vappData.getSelectedVapp().getLabel());
+            log.info("Using already selected Vapp {}", vappData.getSelectedVappName());
         } else {
             int selectedVapp = InputUtils.readSelection(vappData.vappLabels(),
                     "Select Vapp (Total powered on owned VM count " + vappData.poweredOnVmCount() + ")");
             vappData.setSelectedVappByIndex(selectedVapp);
         }
+        String vappNameWithoutPeriods = vappData.getSelectedVappName().replace(".", "");
+        replacementVariables.addVariable(ReplacementVariables.VariableName.VAPP_NAME, vappNameWithoutPeriods);
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.vmware.action.base.BaseFileSystemAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
@@ -14,10 +14,10 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 
 @ActionDescription("Deletes the specified property path in the source json file.")
-public class DeleteJsonProperty extends BaseFileSystemAction {
+public class DeleteJsonProperty extends BaseAction {
     public DeleteJsonProperty(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("jsonPropertyPath");
+        super.addFailWorkflowIfBlankProperties("fileData", "jsonPropertyPath");
     }
 
     @Override
@@ -25,15 +25,15 @@ public class DeleteJsonProperty extends BaseFileSystemAction {
         log.info("Deleting json property path {}", fileSystemConfig.jsonPropertyPath);
 
         Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
-        Map<String, Object> jsonMap = gson.fromJson(new StringReader(fileData), Map.class);
+        Map<String, Object> jsonMap = gson.fromJson(new StringReader(fileSystemConfig.fileData), Map.class);
 
         JsonMatch jsonMatch = findJsonPropertyMatch(jsonMap, fileSystemConfig.jsonPropertyPath);
         if (jsonMatch == null) {
-            log.info("Could not find a match for so skipping deletion of json property path {}", fileSystemConfig.jsonPropertyPath);
+            log.info("Could not find a match for {} so skipping deletion of json property path", fileSystemConfig.jsonPropertyPath);
             return;
         }
         jsonMatch.removeMatch();
-        fileData = gson.toJson(jsonMap);
+        fileSystemConfig.fileData = gson.toJson(jsonMap);
     }
 
     protected JsonMatch findJsonPropertyMatch(Map<String, Object> jsonMap, String propertyPath) {
@@ -54,14 +54,20 @@ public class DeleteJsonProperty extends BaseFileSystemAction {
                 throw new FatalException("Path {}.{} could not be found", alreadyMatchedParts.toString(), fullPropertyName);
             }
             if (matchedPart instanceof List) {
-                matchedPart = ((List) matchedPart).get(propertyIndex != null ? propertyIndex : 0);
+                List parts = (List) matchedPart;
+                if (propertyIndex != null && parts.size() <= propertyIndex) {
+                    log.info("No match for index {}, largest index is {}", propertyIndex, parts.size() - 1);
+                    return null;
+                } else {
+                    matchedPart = parts.get(propertyIndex != null ? propertyIndex : 0);
+                }
             }
             if (matchedPart == null && i < propertyPaths.size() - 1) {
                 log.info("Path {}.{} could not be found", alreadyMatchedParts.toString(), propertyPathToSearchFor);
                 return null;
             } else if (matchedPart == null && i == propertyPaths.size() - 1) {
                 log.info("Property {} was missing for {}", fullPropertyName, alreadyMatchedParts.toString());
-                return new JsonMatch(propertiesToSearch, fullPropertyName, propertyIndex);
+                return null;
             }
             if (i < propertyPaths.size() - 1 && !(matchedPart instanceof Map)) {
                 throw new FatalException("Path {}.{} was of type {}, should be a map",
