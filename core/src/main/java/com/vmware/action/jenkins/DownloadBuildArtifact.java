@@ -20,7 +20,7 @@ import com.vmware.util.input.InputUtils;
 public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
     public DownloadBuildArtifact(WorkflowConfig config) {
         super(config, true);
-        super.addFailWorkflowIfBlankProperties("jobArtifact", "destinationFile");
+        super.addFailWorkflowIfBlankProperties("jobArtifact");
     }
 
     @Override
@@ -37,15 +37,11 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
         replacementVariables.addVariable(ReplacementVariables.VariableName.BUILD_NUMBER, buildDetails.number);
 
         String fullUrl = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
-        String destinationFilePath = replacementVariables.replaceVariablesInValue(fileSystemConfig.destinationFile);
-        if (new File(destinationFilePath).isDirectory()) {
-            JobBuildArtifact matchingArtifact = buildDetails.getArtifactForPathPattern(jenkinsConfig.jobArtifact);
-            destinationFilePath = UrlUtils.addRelativePaths(destinationFilePath, FileUtils.appendToFileName(matchingArtifact.fileName, buildDetails.number));
-        }
-        log.info("Downloading build artifact {} to {}", fullUrl, destinationFilePath);
-        String fileData = IOUtils.read(fullUrl);
-        IOUtils.write(new File(destinationFilePath), fileData);
-        replacementVariables.addVariable(ReplacementVariables.VariableName.LAST_DOWNLOADED_FILE, destinationFilePath);
+        JobBuildArtifact matchingArtifact = buildDetails.getArtifactForPathPattern(jenkinsConfig.jobArtifact);
+        String downloadedFileName = FileUtils.appendToFileName(matchingArtifact.fileName, buildDetails.number);
+        log.info("Downloading build artifact {}", fullUrl);
+        fileSystemConfig.fileData = IOUtils.read(fullUrl);
+        replacementVariables.addVariable(ReplacementVariables.VariableName.LAST_DOWNLOADED_FILE_NAME, downloadedFileName);
     }
 
     private JobBuildDetails getJobBuildDetails() {

@@ -11,7 +11,6 @@ import com.vmware.ServiceLocator;
 import com.vmware.action.Action;
 import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseFileSystemAction;
 import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.action.trello.BaseTrelloAction;
@@ -105,17 +104,11 @@ public class WorkflowAction implements Action {
         if (instantiatedAction instanceof BaseVappAction) {
             ((BaseVappAction) instantiatedAction).setVappData(values.getVappData());
         }
-        if (instantiatedAction instanceof BaseFileSystemAction) {
-            ((BaseFileSystemAction) instantiatedAction).setFileData(values.getFileData());
-        }
     }
 
     public void updateWorkflowValues(WorkflowActionValues values) {
         if (instantiatedAction instanceof BaseTrelloAction) {
             values.setTrelloBoard(((BaseTrelloAction) instantiatedAction).getSelectedBoard());
-        }
-        if (instantiatedAction instanceof BaseFileSystemAction) {
-            values.setFileData(((BaseFileSystemAction) instantiatedAction).getFileData());
         }
     }
 

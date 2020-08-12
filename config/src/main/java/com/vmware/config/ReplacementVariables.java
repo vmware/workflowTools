@@ -130,8 +130,9 @@ public class ReplacementVariables {
     }
 
     public enum VariableName {
-        LAST_DOWNLOADED_FILE,
+        LAST_DOWNLOADED_FILE_NAME,
         REPO_DIR,
-        BUILD_NUMBER
+        BUILD_NUMBER,
+        VAPP_NAME
     }
 }

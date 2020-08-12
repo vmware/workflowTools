@@ -19,8 +19,6 @@ public class WorkflowActionValues {
 
     private VappData vappData;
 
-    private String fileData;
-
     public WorkflowActionValues() {
         this.draft = new ReviewRequestDraft();
         this.projectIssues = new ProjectIssues();
@@ -45,13 +43,5 @@ public class WorkflowActionValues {
 
     public VappData getVappData() {
         return vappData;
-    }
-
-    public String getFileData() {
-        return fileData;
-    }
-
-    public void setFileData(String fileData) {
-        this.fileData = fileData;
     }
 }

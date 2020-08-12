@@ -2,17 +2,17 @@ package com.vmware.action.vcd;
 
 import java.util.Map;
 
-import com.vmware.action.base.BaseFileSystemAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.exception.FatalException;
 import com.vmware.vcd.Vcd;
 
 @ActionDescription("Updates the public certificates for the specified url. Reads certs to use from fileData.")
-public class UpdateVcdPublicCerts extends BaseFileSystemAction {
+public class UpdateVcdPublicCerts extends BaseAction {
     public UpdateVcdPublicCerts(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("sourceUrl", "vcdApiVersion", "vcdSysAdminUser", "vcdSysAdminPassword");
+        super.addFailWorkflowIfBlankProperties("fileData", "sourceUrl", "vcdApiVersion", "vcdSysAdminUser", "vcdSysAdminPassword");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class UpdateVcdPublicCerts extends BaseFileSystemAction {
         final String resourceType = "application/vnd.vmware.admin.generalsettings";
         Map generalSettings = vcdClientForSystemOrg
                 .getResourceAsMap("admin/extension/settings/general", resourceType);
-        log.info("Updating public endpoint cerificates with certificate:\n{}\n", fileData);
+        log.info("Updating public endpoint cerificates with certificate:\n{}\n", fileSystemConfig.fileData);
         updateCertValueForProperty(generalSettings, "systemExternalAddressPublicCertChain");
         updateCertValueForProperty(generalSettings, "restApiBaseUriPublicCertChain");
         updateCertValueForProperty(generalSettings, "tenantPortalPublicCertChain");
@@ -37,7 +37,7 @@ public class UpdateVcdPublicCerts extends BaseFileSystemAction {
         if (!generalSettings.containsKey(key)) {
             throw new FatalException("Failed to find property {} in general settings {}", key, generalSettings.keySet());
         }
-        String existingValue = String.valueOf(generalSettings.put(key, fileData));
+        String existingValue = String.valueOf(generalSettings.put(key, fileSystemConfig.fileData));
         log.info("Replacing existing cert value for {}\n{}\n", key, existingValue);
     }
 
@@ -46,7 +46,7 @@ public class UpdateVcdPublicCerts extends BaseFileSystemAction {
             throw new FatalException("Failed to find property {} in general settings {}", key, generalSettings.keySet());
         }
         String existingValue = String.valueOf(generalSettings.get(key));
-        if (!existingValue.equals(fileData)) {
+        if (!existingValue.equals(fileSystemConfig.fileData)) {
             throw new FatalException("Updated cert for {} did not match. Updated value\n{}", key, existingValue);
         }
     }

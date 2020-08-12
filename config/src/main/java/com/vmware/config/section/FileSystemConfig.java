@@ -60,6 +60,9 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--json-property-path", help = "Json property path")
     public String jsonPropertyPath;
 
+    @ConfigurableProperty(commandLine = "--file-data", help = "Read in file data directly from command line")
+    public String fileData;
+
     public boolean databaseConfigured() {
         return Stream.of(databaseUrl, databaseUsername, databasePassword).allMatch(StringUtils::isNotBlank);
     }

@@ -7,19 +7,19 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
-import com.vmware.action.base.BaseFileSystemAction;
+import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 
 @ActionDescription("Reads certs from the speciifed url.")
-public class ReadCertsFromUrl extends BaseFileSystemAction {
+public class ReadCertsFromUrl extends BaseAction {
     private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
     private static final String END_CERT = "-----END CERTIFICATE-----";
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public ReadCertsFromUrl(WorkflowConfig config) {
-        super(config, false);
+        super(config);
         super.addFailWorkflowIfBlankProperties("sourceUrl");
     }
 
@@ -27,8 +27,8 @@ public class ReadCertsFromUrl extends BaseFileSystemAction {
     public void process() {
         log.info("Reading SSL certificates from url {}", fileSystemConfig.sourceUrl);
         X509Certificate[] certificates = new WorkflowCertificateManager().getCertificatesForUri(URI.create(fileSystemConfig.sourceUrl));
-        fileData = Arrays.stream(certificates).map(this::formatCrtFileContents).collect(Collectors.joining("\n"));
-        log.debug("Cert data {}", fileData);
+        fileSystemConfig.fileData = Arrays.stream(certificates).map(this::formatCrtFileContents).collect(Collectors.joining("\n"));
+        log.debug("Cert data {}", fileSystemConfig.fileData);
 
     }
 

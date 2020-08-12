@@ -50,6 +50,9 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vapp-json-file", help = "Name of file to load json from")
     public String vappJsonFile;
 
+    @ConfigurableProperty(commandLine = "--vapp-metadata-name", help = "Name of metadata property")
+    public String vappMetadataName;
+
     @ConfigurableProperty(commandLine = "--use-database-host", help = "Use database host config for ssh site")
     public boolean useDatabaseHost;
 }
