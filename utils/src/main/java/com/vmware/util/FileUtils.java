@@ -10,6 +10,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,16 @@ import org.slf4j.LoggerFactory;
 public class FileUtils {
 
     private static Logger log = LoggerFactory.getLogger(FileUtils.class);
+
+    public static Properties loadProperties(String fileData) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new StringReader(fileData));
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+        return properties;
+    }
 
     public static File determineFullPath(String path) {
         File startingFile = new File(path);

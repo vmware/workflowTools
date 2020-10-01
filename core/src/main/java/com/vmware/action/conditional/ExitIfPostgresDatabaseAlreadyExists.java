@@ -11,7 +11,7 @@ import com.vmware.util.logging.LogLevel;
 public class ExitIfPostgresDatabaseAlreadyExists extends BaseAction {
     public ExitIfPostgresDatabaseAlreadyExists(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("psql");
+        super.addExpectedCommandsToBeAvailable("psql");
         super.addFailWorkflowIfBlankProperties("databaseSchemaName");
     }
 

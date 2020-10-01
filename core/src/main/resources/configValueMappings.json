@@ -84,6 +84,11 @@
   "DeleteFile": [
     "--source-file"
   ],
+  "DecryptVariable": [
+    "--property-value",
+    "--cipher-key",
+    "--output-variable-name"
+  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
   ],
@@ -165,11 +170,13 @@
     "--vapp-name",
     "--job-artifact",
     "--job-build-number",
-    "--vapp-json-file"
+    "--vapp-json-file",
+    "--use-owned-vapps-only"
   ],
   "LoadVapps": [
     "--username",
-    "--vapp-json-file"
+    "--vapp-json-file",
+    "--use-owned-vapps-only"
   ],
   "SetDefaultApprover": [
     "--approver"
@@ -179,8 +186,21 @@
     "--property-value",
     "--json-property-path"
   ],
+  "UnwrapCipherKey": [
+    "--property-value",
+    "--cipher-key",
+    "--output-variable-name"
+  ],
   "SaveDiffToFile": [
     "--output-file"
+  ],
+  "AddCertToKeystore": [
+    "--file-data",
+    "--keystore-alias-password",
+    "--keystore-alias",
+    "--keystore-password",
+    "--keystore-file",
+    "--keystore-type"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
@@ -258,8 +278,18 @@
   "RemoveReviewUrl": [
     "--always-include-review-url"
   ],
+  "ReadPropertyAsVariable": [
+    "--output-variable-name",
+    "--property-name",
+    "--file-data"
+  ],
   "PostApprovalRequest": [
     "--approver"
+  ],
+  "CreateSelfSignedCertForUrl": [
+    "--file-data",
+    "--keystore-type",
+    "--source-url"
   ],
   "EnableDisableMergeTo": [
     "--disable-merge-to"
@@ -460,8 +490,8 @@
     "--tracking-branch"
   ],
   "SetProperty": [
-    "--file-data",
     "--property-name",
+    "--file-data",
     "--property-value"
   ],
   "ComputeTestbedVmCountIfNeeded": [

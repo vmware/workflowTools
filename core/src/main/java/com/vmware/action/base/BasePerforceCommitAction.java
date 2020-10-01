@@ -9,7 +9,7 @@ public abstract class BasePerforceCommitAction extends BaseCommitAction {
 
     public BasePerforceCommitAction(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("p4");
+        super.addExpectedCommandsToBeAvailable("p4");
         super.failIfCannotBeRun = true;
     }
 

@@ -24,6 +24,24 @@ public class StringUtils {
         }
     }
 
+    public static String findStringWithStartAndEnd(String text, String start, String end) {
+        if (!text.contains(start)) {
+            throw new FatalException("Could not find {} in \n{}", start, text);
+        }
+        if (!text.contains(end)) {
+            throw new FatalException("Could not find {} in \n{}", end, start);
+        }
+        int startIndex = text.indexOf(start);
+        int endIndex = text.indexOf(end);
+
+        return text.substring(startIndex, endIndex) + end;
+    }
+
+    public static String findStringBetween(String text, String start, String end) {
+        String textWithStartAndEnd = findStringWithStartAndEnd(text, start, end);
+        return textWithStartAndEnd.substring(start.length(), textWithStartAndEnd.lastIndexOf(end));
+    }
+
     public static boolean textStartsWithValue(String text, String... valuesToCheck) {
         return Arrays.stream(valuesToCheck).anyMatch(text::startsWith);
     }

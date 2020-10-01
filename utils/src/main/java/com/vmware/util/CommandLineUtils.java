@@ -175,6 +175,6 @@ public class CommandLineUtils {
                 sb.append(character);
             }
         }
-        return strings.toArray(new String[strings.size()]);
+        return strings.toArray(new String[0]);
     }
 }

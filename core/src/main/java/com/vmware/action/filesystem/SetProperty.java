@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
 
@@ -25,7 +26,7 @@ public class SetProperty extends BaseAction {
     public void process() {
         String propertyValue = fileSystemConfig.propertyValue;
 
-        Properties properties = loadProperties();
+        Properties properties = FileUtils.loadProperties(fileSystemConfig.fileData);
 
         String existingPropertyValue = properties.getProperty(fileSystemConfig.propertyName);
         if (StringUtils.isEmpty(existingPropertyValue)) {
@@ -37,15 +38,7 @@ public class SetProperty extends BaseAction {
         storeProperties(properties);
     }
 
-    private Properties loadProperties() {
-        Properties properties = new Properties();
-        try {
-            properties.load(new StringReader(fileSystemConfig.fileData));
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        }
-        return properties;
-    }
+
 
     private void storeProperties(Properties properties) {
         StringBuilder builder = new StringBuilder();

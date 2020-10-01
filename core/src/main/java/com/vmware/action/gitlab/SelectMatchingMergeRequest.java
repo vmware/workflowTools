@@ -16,11 +16,6 @@ public class SelectMatchingMergeRequest extends BaseCommitUsingGitlabAction {
     }
 
     @Override
-    protected void skipActionDueTo(String reason, Object... arguments) {
-        super.skipActionDueTo(reason, arguments);
-    }
-
-    @Override
     public void process() {
         String sourceMergeBranch = determineSourceMergeBranch();
         String targetMergeBranch = determineTargetMergeBranch();

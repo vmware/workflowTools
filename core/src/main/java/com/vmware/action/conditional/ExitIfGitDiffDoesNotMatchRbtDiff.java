@@ -1,6 +1,5 @@
 package com.vmware.action.conditional;
 
-import com.vmware.action.BaseAction;
 import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -14,7 +13,7 @@ public class ExitIfGitDiffDoesNotMatchRbtDiff extends BaseCommitUsingReviewBoard
 
     public ExitIfGitDiffDoesNotMatchRbtDiff(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("rbt");
+        super.addExpectedCommandsToBeAvailable("rbt");
     }
 
     @Override
@@ -39,7 +38,7 @@ public class ExitIfGitDiffDoesNotMatchRbtDiff extends BaseCommitUsingReviewBoard
             String reasonForMotMatching = DiffUtils.compareDiffContent(gitDiff, rbtDiff, "git", "rbt");
             if (StringUtils.isNotBlank(reasonForMotMatching)) {
                 log.error("Git diff didn't match rbt diff\n{}\n", reasonForMotMatching);
-                cancelWithErrorMessage("diffs did not match");
+                cancelWithMessage(LogLevel.ERROR, "diffs did not match");
             } else {
                 log.info("Diffs are the same");
             }

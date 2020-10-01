@@ -31,8 +31,10 @@ public class LoadVapps extends BaseVappAction {
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        super.skipActionIfTrue(StringUtils.isNotEmpty(vcdConfig.vappJsonFile), "vappJsonFile has been specified");
-        super.skipActionIfTrue(jenkinsConfig.hasConfiguredArtifact(),"jenkins job artifact has been specified");
+        if (!vcdConfig.useOwnedVappsOnly) {
+            super.skipActionIfTrue(StringUtils.isNotEmpty(vcdConfig.vappJsonFile), "vappJsonFile has been specified");
+            super.skipActionIfTrue(jenkinsConfig.hasConfiguredArtifact(),"jenkins job artifact has been specified");
+        }
     }
 
     @Override

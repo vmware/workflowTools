@@ -16,6 +16,8 @@
   "waitForBlockingWorkflowAction": false,
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 10,
+  "keystoreType": "JCEKS",
+  "keySize": 2048,
   "goBuildBinPath": "/build/apps/bin/gobuild",
   "patchCommand": "patch -f -p1 -s",
   "waitTimeForBlockingWorkflowAction": 1200,
@@ -924,9 +926,9 @@
       "LoadVappMetadataIfFound",
       "DisplayFileData"
     ],
-    "saveVappMetadata": [
+    "setVappMetadata": [
       "selectVapp",
-      "SaveVappMetadataIfNeeded"
+      "SetVappMetadataIfNeeded"
     ],
     "copyVappMetadata": [
       "selectVapp",

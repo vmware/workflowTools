@@ -6,6 +6,9 @@ import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.FileUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.LogLevel;
 
 import static com.vmware.util.StringUtils.isNotEmpty;
 
@@ -33,7 +36,12 @@ public class CopyFile extends BaseAction {
         File destinationFile = new File(destinationFilePath);
 
         if (destinationFile.exists() && !fileSystemConfig.replaceExisting) {
-            cancelWithErrorMessage(destinationFile.getAbsolutePath() + " already exists. Use --replace-existing flag to overwrite");
+            log.info("{} already exists. --replace-existing flag can be used to overwrite automatically", destinationFile.getAbsolutePath());
+
+            String replaceFile =InputUtils.readValueUntilNotBlank("Replace " + destinationFile.getAbsolutePath() + " (yes/no)", "yes", "no");
+            if (!"yes".equalsIgnoreCase(replaceFile)) {
+                cancelWithMessage("{} already exists", destinationFile.getAbsolutePath());
+            }
         }
 
         if (fileToCopy.isDirectory()) {

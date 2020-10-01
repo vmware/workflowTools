@@ -13,8 +13,7 @@ public class SkipPipelineIfSet extends BaseCommitAction {
     @Override
     protected void skipActionDueTo(String reason, Object... arguments) {
         super.skipActionDueTo(reason, arguments);
-        skipActionIfTrue(!commitConfig.skipPipeline, "as skipPipeline is set to false");
-
+        skipActionIfTrue(!commitConfig.skipPipeline, "skipPipeline is set to false");
     }
 
     @Override

@@ -17,7 +17,7 @@ import com.vmware.util.exception.FatalException;
 public class DeleteJsonProperty extends BaseAction {
     public DeleteJsonProperty(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("fileData", "jsonPropertyPath");
+        super.addSkipActionIfBlankProperties("fileData", "jsonPropertyPath");
     }
 
     @Override

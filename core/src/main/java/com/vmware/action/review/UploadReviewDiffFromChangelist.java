@@ -1,11 +1,9 @@
 package com.vmware.action.review;
 
-import com.vmware.action.base.BaseCommitWithReviewAction;
 import com.vmware.action.base.BaseLinkedPerforceCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
@@ -17,7 +15,7 @@ public class UploadReviewDiffFromChangelist extends BaseLinkedPerforceCommitActi
 
     public UploadReviewDiffFromChangelist(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("rbt");
+        super.addExpectedCommandsToBeAvailable("rbt");
         super.failIfCannotBeRun = true;
     }
 

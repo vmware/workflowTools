@@ -24,16 +24,20 @@ public class SelectVapp extends BaseVappAction {
     @Override
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
-        super.failIfTrue(vappData.getVapps().isEmpty() && StringUtils.isEmpty(vcdConfig.vappJsonFile) && !jenkinsConfig.hasConfiguredArtifact(),
-                "no vapps loaded");
+        if (vcdConfig.useOwnedVappsOnly) {
+            super.failIfTrue(vappData.getVapps().isEmpty(), "no Vapps loaded");
+        } else {
+            super.failIfTrue(vappData.getVapps().isEmpty() && StringUtils.isEmpty(vcdConfig.vappJsonFile) && !jenkinsConfig.hasConfiguredArtifact(),
+                    "no Vapps loaded");
+        }
     }
 
     @Override
     public void process() {
-        if (StringUtils.isNotEmpty(vcdConfig.vappJsonFile)) {
+        if (!vcdConfig.useOwnedVappsOnly && StringUtils.isNotEmpty(vcdConfig.vappJsonFile)) {
             log.info("Using Vapp json file {}", vcdConfig.vappJsonFile);
             vappData.setSelectedVapp(new QueryResultVappType("url", vcdConfig.vappJsonFile));
-        } else if (jenkinsConfig.hasConfiguredArtifact()) {
+        } else if (!vcdConfig.useOwnedVappsOnly && jenkinsConfig.hasConfiguredArtifact()) {
             JobBuildDetails buildDetails = serviceLocator.getJenkins().getJobBuildDetails(jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
             String jobArtifactPath = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
             log.info("Using artifact {}", jobArtifactPath);
@@ -48,7 +52,9 @@ public class SelectVapp extends BaseVappAction {
                     "Select Vapp (Total powered on owned VM count " + vappData.poweredOnVmCount() + ")");
             vappData.setSelectedVappByIndex(selectedVapp);
         }
-        String vappNameWithoutPeriods = vappData.getSelectedVappName().replace(".", "");
-        replacementVariables.addVariable(ReplacementVariables.VariableName.VAPP_NAME, vappNameWithoutPeriods);
+        if (StringUtils.isNotBlank(vappData.getSelectedVappName())) {
+            String vappNameWithoutPeriods = vappData.getSelectedVappName().replace(".", "");
+            replacementVariables.addVariable(ReplacementVariables.VariableName.VAPP_NAME, vappNameWithoutPeriods);
+        }
     }
 }
