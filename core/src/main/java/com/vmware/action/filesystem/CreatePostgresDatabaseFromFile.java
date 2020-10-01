@@ -10,7 +10,7 @@ import com.vmware.util.logging.LogLevel;
 public class CreatePostgresDatabaseFromFile extends BaseAction {
     public CreatePostgresDatabaseFromFile(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("psql", "createdb");
+        super.addExpectedCommandsToBeAvailable("psql", "createdb");
         super.addFailWorkflowIfBlankProperties("sourceFile", "databaseSchemaName", "databaseUsername");
     }
 

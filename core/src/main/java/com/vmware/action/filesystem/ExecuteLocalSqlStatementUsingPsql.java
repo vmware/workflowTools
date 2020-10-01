@@ -10,7 +10,7 @@ import com.vmware.util.logging.LogLevel;
 public class ExecuteLocalSqlStatementUsingPsql extends BaseAction {
     public ExecuteLocalSqlStatementUsingPsql(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("psql");
+        super.addExpectedCommandsToBeAvailable("psql");
         super.addFailWorkflowIfBlankProperties("databaseUsername", "databaseSchemaName", "sqlStatement");
     }
 

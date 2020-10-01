@@ -55,4 +55,7 @@ public class VcdConfig {
 
     @ConfigurableProperty(commandLine = "--use-database-host", help = "Use database host config for ssh site")
     public boolean useDatabaseHost;
+
+    @ConfigurableProperty(commandLine = "--use-owned-vapps-only", help = "Only use a Vapp owned by the user, no file based Vapps")
+    public boolean useOwnedVappsOnly;
 }

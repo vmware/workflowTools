@@ -20,6 +20,7 @@ import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SectionConfig;
 import com.vmware.config.section.SshConfig;
+import com.vmware.config.section.SslConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.util.StringUtils;
@@ -106,6 +107,9 @@ public class WorkflowConfig {
 
     @SectionConfig
     public FileSystemConfig fileSystemConfig;
+
+    @SectionConfig
+    public SslConfig sslConfig;
 
     @ConfigurableProperty(help = "Information about the the git commit that this version of workflow tools was built from")
     public Map<String, String> buildInfo;

@@ -14,6 +14,7 @@ public class LoadVappMetadataIfFound extends BaseVappAction {
     public LoadVappMetadataIfFound(WorkflowConfig config) {
         super(config);
         super.addFailWorkflowIfBlankProperties("vappMetadataName");
+        super.skipIfFileBasedVapp = true;
     }
 
     @Override

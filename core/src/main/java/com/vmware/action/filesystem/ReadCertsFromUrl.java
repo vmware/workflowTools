@@ -12,10 +12,11 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 
+import static sun.security.provider.X509Factory.BEGIN_CERT;
+import static sun.security.provider.X509Factory.END_CERT;
+
 @ActionDescription("Reads certs from the speciifed url.")
 public class ReadCertsFromUrl extends BaseAction {
-    private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
-    private static final String END_CERT = "-----END CERTIFICATE-----";
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public ReadCertsFromUrl(WorkflowConfig config) {

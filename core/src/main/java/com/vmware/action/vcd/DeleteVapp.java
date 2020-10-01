@@ -24,6 +24,7 @@ public class DeleteVapp extends BaseSingleVappAction {
         String confirmation = InputUtils.readValue("Confirm deletion of " + vappToDelete.name + ": Type yes to confirm");
         if (!confirmation.equalsIgnoreCase("yes")) {
             log.info("Aborting deletion of vapp {}", vappToDelete.name);
+            return;
         }
 
         LinkType deleteLink = vappToDelete.getSelfLink();

@@ -13,7 +13,7 @@ public class UploadReviewDiffWithRbt extends UploadReviewDiff {
 
     public UploadReviewDiffWithRbt(WorkflowConfig config) {
         super(config);
-        super.setExpectedCommandsToBeAvailable("rbt");
+        super.addExpectedCommandsToBeAvailable("rbt");
     }
 
     @Override

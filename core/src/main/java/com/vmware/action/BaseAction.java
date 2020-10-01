@@ -1,15 +1,9 @@
 package com.vmware.action;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.gson.annotations.Expose;
 import com.vmware.ServiceLocator;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
@@ -30,16 +24,17 @@ import com.vmware.config.section.PatchConfig;
 import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SshConfig;
+import com.vmware.config.section.SslConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.CancelException;
-import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.scm.Git;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +60,7 @@ public abstract class BaseAction implements Action {
     protected final VcdConfig vcdConfig;
     protected final CommandLineConfig commandLineConfig;
     protected final FileSystemConfig fileSystemConfig;
+    protected final SslConfig sslConfig;
 
     protected ServiceLocator serviceLocator;
 
@@ -74,11 +70,11 @@ public abstract class BaseAction implements Action {
 
     protected ReplacementVariables replacementVariables;
 
-    private Set<String> failWorkflowIfBlankProperties = new HashSet<>();
+    private final Set<String> failWorkflowIfBlankProperties = new HashSet<>();
 
-    private String[] expectedCommandsToBeAvailable;
+    private final Set<String> expectedCommandsToBeAvailable = new HashSet<>();
 
-    private Set<String> skipActionIfBlankProperties = new HashSet<>();
+    private final Set<String> skipActionIfBlankProperties = new HashSet<>();
 
 
     public BaseAction(WorkflowConfig config) {
@@ -100,6 +96,7 @@ public abstract class BaseAction implements Action {
         this.vcdConfig = config.vcdConfig;
         this.commandLineConfig = config.commandLineConfig;
         this.fileSystemConfig = config.fileSystemConfig;
+        this.sslConfig = config.sslConfig;
         this.replacementVariables = config.replacementVariables;
     }
 
@@ -145,8 +142,8 @@ public abstract class BaseAction implements Action {
         this.git = serviceLocator.getGit();
     }
 
-    protected void setExpectedCommandsToBeAvailable(String... commands) {
-        this.expectedCommandsToBeAvailable = commands;
+    protected void addExpectedCommandsToBeAvailable(String... commands) {
+        this.expectedCommandsToBeAvailable.addAll(Arrays.asList(commands));
     }
 
     protected void addFailWorkflowIfBlankProperties(String... propertyNames) {
@@ -158,27 +155,19 @@ public abstract class BaseAction implements Action {
     }
 
     protected void cancelWithMessage(String message, String... arguments) {
-        throw new CancelException(LogLevel.INFO, message, arguments);
+        cancelWithMessage(LogLevel.INFO, message, arguments);
     }
 
-    protected void cancelWithErrorMessage(String message) {
-        throw new FatalException(message);
-    }
-
-    protected void cancelWithWarnMessage(String message) {
-        throw new CancelException(LogLevel.WARN, message);
+    protected void cancelWithMessage(LogLevel level, String message, String... arguments) {
+        throw new CancelException(level, message, arguments);
     }
 
     private void checkExpectedCommands() {
-        if (expectedCommandsToBeAvailable == null) {
-            return;
-        }
-        Arrays.stream(expectedCommandsToBeAvailable)
-                .forEach(command -> failIfTrue(!CommandLineUtils.isCommandAvailable(command), "command " + command + " is not available"));
+        expectedCommandsToBeAvailable.forEach(command -> failIfTrue(!CommandLineUtils.isCommandAvailable(command), "command " + command + " is not available"));
     }
 
     protected void exitDueToFailureCheck(String reason) {
-        cancelWithErrorMessage("Workflow failed by action " + this.getClass().getSimpleName() + " as " + reason);
+        cancelWithMessage(LogLevel.ERROR, "Workflow failed by action {} as {}", this.getClass().getSimpleName(), reason);
     }
 
     protected void skipActionDueTo(String reason, Object... arguments) {
@@ -193,9 +182,10 @@ public abstract class BaseAction implements Action {
 
     protected void skipActionIfUnset(String propertyName) {
         WorkflowField matchingField = config.getConfigurableFields().getFieldByName(propertyName);
-        if (matchingField.getValue(config) == null) {
+        Object value = matchingField.getValue(config);
+        if (value == null || (value instanceof String && ((String) value).isEmpty())) {
             String commandLineParam = matchingField.commandLineParameter();
-            String paramText = commandLineParam != null ? " (" + commandLineParam + ") " : "";
+            String paramText = commandLineParam != null ? " (" + commandLineParam + ")" : "";
             throw new SkipActionException("{}{} is unset", propertyName, paramText);
         }
     }
