@@ -34,10 +34,10 @@ public class DisplayWorkflowActions extends BaseAction {
                     throw new RuntimeException("Please add a action description annotation for " + action.getSimpleName());
                 }
                 String helpText = "- " + description.value();
-                log.info(action.getSimpleName() + " " + helpText);
                 if (!helpText.endsWith(".")) {
-                    log.warn("*** ADD ENDING FULL STOP FOR ABOVE DESCRIPTION");
+                    helpText += ".";
                 }
+                log.info(action.getSimpleName() + " " + helpText);
             }
             packagePadder.infoTitle();
         }

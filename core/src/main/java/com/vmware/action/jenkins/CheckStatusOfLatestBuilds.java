@@ -46,7 +46,7 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
         log.debug("Using url {}", jobToCheck.url);
         JobDetails jobDetails = jenkins.getJobDetails(jobToCheck);
         int buildCounter = 0;
-        for (JobBuild build : jobDetails.builds) {
+        for (JobBuildDetails build : jobDetails.builds) {
             JobBuildDetails buildDetails = jenkins.getJobBuildDetails(build);
             buildCounter++;
             if (buildDetails.getJobInitiator().equals(config.username)) {

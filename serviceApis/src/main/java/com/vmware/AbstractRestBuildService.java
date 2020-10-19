@@ -48,7 +48,7 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
                     log.info("{} {} could not be found", jobBuild.buildDisplayName, jobUrl);
                 }
             } else {
-                log.info("{}: {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
+                log.info("{} {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
             }
             isSuccess = isSuccess && jobBuild.result == BuildResult.SUCCESS;
         }

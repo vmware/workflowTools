@@ -166,7 +166,6 @@
     "--publish-as-trivial"
   ],
   "SelectVapp": [
-    "--username",
     "--vapp-name",
     "--job-artifact",
     "--job-build-number",
@@ -217,9 +216,6 @@
   "UploadReviewDiff": [
     "--tracking-branch",
     "--parent"
-  ],
-  "BaseCommitWithJenkinsBuildsAction": [
-    "--username"
   ],
   "BaseBatchBugzillaAction": [
     "--username",
@@ -372,6 +368,9 @@
   "SelectVappIfNeeded": [
     "--use-vapp-json"
   ],
+  "OpenFile": [
+    "--destination-file"
+  ],
   "SkipPipelineIfSet": [
     "--skip-pipeline"
   ],
@@ -430,6 +429,11 @@
   ],
   "SyncCardsWithJiraIssues": [
     "--keep-missing-cards"
+  ],
+  "FindRealTestFailures": [
+    "--username",
+    "--file-data",
+    "--jenkins-view"
   ],
   "SetBugNumbers": [
     "--username",

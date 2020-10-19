@@ -1,7 +1,7 @@
 package com.vmware.jenkins.domain;
 
 import com.google.gson.annotations.SerializedName;
-import com.vmware.JobBuild;
+import com.vmware.util.UrlUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,16 +11,28 @@ public class JobDetails {
 
     public String name;
 
+    public String url;
+
     public ActionDefinition[] actions;
 
     @SerializedName("property")
     public PropertyDefinition[] properties;
 
-    public JobBuild[] builds;
+    public JobBuildDetails[] builds;
 
-    public JobBuild lastBuild;
+    public JobBuildDetails lastBuild;
+
+    public JobBuildDetails lastCompletedBuild;
+
+    public JobBuildDetails lastStableBuild;
+
+    public JobBuildDetails lastUnstableBuild;
 
     public int nextBuildNumber;
+
+    public String getFullInfoUrl() {
+        return UrlUtils.addRelativePaths(url, "api/json?depth=1");
+    }
 
     public List<ParameterDefinition> getParameterDefinitions() {
         if (actions == null && properties == null) {
@@ -45,5 +57,11 @@ public class JobDetails {
         return Collections.emptyList();
     }
 
+    public boolean lastBuildWasSuccessful() {
+        return lastStableBuild != null && lastStableBuild.number.equals(lastCompletedBuild.number);
+    }
 
+    public int lastUnstableBuildAge() {
+        return Integer.parseInt(lastCompletedBuild.number) - Integer.parseInt(lastUnstableBuild.number);
+    }
 }

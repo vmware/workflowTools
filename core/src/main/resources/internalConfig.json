@@ -960,6 +960,11 @@
     ],
     "openDoc": [
       "OpenProjectDocumentationUrl"
+    ],
+    "showRealTestFailures": [
+      "FindRealTestFailures",
+      "SaveFileData",
+      "OpenFile"
     ]
   },
   "supportingWorkflows": [

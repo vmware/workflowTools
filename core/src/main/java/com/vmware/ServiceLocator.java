@@ -73,10 +73,14 @@ public class ServiceLocator {
 
     public Jenkins getJenkins() {
         if (jenkins == null) {
-            JenkinsConfig jenkinsConfig = config.jenkinsConfig;
-            jenkins = new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin);
+            jenkins = newJenkins();
         }
         return jenkins;
+    }
+
+    public Jenkins newJenkins() {
+        JenkinsConfig jenkinsConfig = config.jenkinsConfig;
+        return new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin);
     }
 
     public Buildweb getBuildweb() {

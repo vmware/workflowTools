@@ -63,7 +63,6 @@ public class TestJenkinsApi extends BaseTests {
 
         JobBuildDetails jobBuildDetails = jenkins.getJobBuildDetails(jobDetails.lastBuild);
         assertNotNull(jobBuildDetails.getJobBuildCommitId());
-
     }
 
     @Test

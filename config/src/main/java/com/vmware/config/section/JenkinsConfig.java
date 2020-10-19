@@ -67,6 +67,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--job-artifact", help = "Jenkins job output artifact")
     public String jobArtifact;
 
+    @ConfigurableProperty(commandLine = "--jenkins-view", help = "View ")
+    public String jenkinsView;
+
     @ConfigurableProperty(commandLine = "--job-build-number", help = "Number of jenkins build to use")
     public Integer jobBuildNumber;
 

@@ -17,6 +17,8 @@ import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.JobsList;
+import com.vmware.jenkins.domain.TestNGResults;
+import com.vmware.jenkins.domain.ViewDetails;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
@@ -76,8 +78,20 @@ public class Jenkins extends AbstractRestBuildService {
         optimisticPost(jobToInvoke.getBuildWithParametersUrl(), params.toMap());
     }
 
+    public ViewDetails getViewDetails(String viewName) {
+        return optimisticGet(UrlUtils.addRelativePaths(baseUrl, "view", viewName, "api/json?depth=1"), ViewDetails.class);
+    }
+
     public JobDetails getJobDetails(Job jobToInvoke) {
-        return optimisticGet(jobToInvoke.getInfoUrl(), JobDetails.class);
+        return getJobDetails(jobToInvoke.getInfoUrl());
+    }
+
+    public JobDetails getJobDetails(String url) {
+        return optimisticGet(url, JobDetails.class);
+    }
+
+    public JobBuildDetails getJobBuildDetails(JobBuildDetails jobBuild) {
+        return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
     }
 
     public JobBuildDetails getJobBuildDetails(JobBuild jobBuild) {
@@ -87,6 +101,10 @@ public class Jenkins extends AbstractRestBuildService {
     public JobBuildDetails getJobBuildDetails(String jobName, int buildNumber) {
         String jobUrl = UrlUtils.addRelativePaths(baseUrl, "job", jobName);
         return getJobBuildDetails(new JobBuild(buildNumber, jobUrl));
+    }
+
+    public TestNGResults getJobBuildTestResults(JobBuildDetails jobBuild) {
+        return optimisticGet(jobBuild.getTestReportsApiUrl(), TestNGResults.class);
     }
 
     public void abortJobBuild(JobBuild jobBuildToAbort) {

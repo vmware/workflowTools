@@ -35,6 +35,18 @@ public class JobBuildDetails {
                .orElseThrow(() -> new RuntimeException("Could not get username for job starter for job " + fullDisplayName));
     }
 
+    public String getJenkinsInfoUrl() {
+        return UrlUtils.addRelativePaths(url, "api/json");
+    }
+
+    public String getTestReportsUIUrl() {
+        return UrlUtils.addRelativePaths(url, "testngreports");
+    }
+
+    public String getTestReportsApiUrl() {
+        return UrlUtils.addRelativePaths(getTestReportsUIUrl(), "api/json?depth=3");
+    }
+
     public String fullUrlForArtifact(String pathPattern) {
        JobBuildArtifact matchingArtifact = getArtifactForPathPattern(pathPattern);
        return UrlUtils.addRelativePaths(url, "artifact", matchingArtifact.relativePath);
