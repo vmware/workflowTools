@@ -57,6 +57,9 @@ public class FindRealTestFailures extends BaseAction {
 
     private String createJobFragmentsHtml() {
         Map<JobDetails, List<TestNGResults.TestMethod>> failingTestMethods = findAllRealFailingTests();
+        if (failingTestMethods.isEmpty()) {
+            cancelWithMessage("no consistently failing tests found for any job");
+        }
 
         final StringBuilder jobFragments = new StringBuilder("");
         final AtomicInteger counter = new AtomicInteger();
@@ -75,6 +78,8 @@ public class FindRealTestFailures extends BaseAction {
         Jenkins jenkins = serviceLocator.getJenkins();
         ViewDetails viewDetails = jenkins.getViewDetails(jenkinsConfig.jenkinsView);
         Map<JobDetails, List<TestNGResults.TestMethod>> allFailingTests = new HashMap<>();
+
+        log.info("Checking {} jobs in {} for test failures", viewDetails.jobs.length, viewDetails.name);
 
         Arrays.stream(viewDetails.jobs).parallel().forEach(jobDetails -> {
             if (jobDetails.lastCompletedBuild == null) {
