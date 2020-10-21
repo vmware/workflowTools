@@ -60,4 +60,8 @@ public class JobBuildDetails {
         return Arrays.stream(artifacts).filter(artifact -> artifact.matchesPathPattern(pathPattern)).findFirst()
                 .orElseThrow(() -> new RuntimeException("Could not find artifact for path pattern " + pathPattern + " for job " + fullDisplayName));
     }
+
+    public int number() {
+       return Integer.parseInt(number);
+    }
 }

@@ -58,10 +58,14 @@ public class JobDetails {
     }
 
     public boolean lastBuildWasSuccessful() {
-        return lastStableBuild != null && lastStableBuild.number.equals(lastCompletedBuild.number);
+        if (lastStableBuild == null) {
+            return false;
+        }
+        return lastStableBuild.number() == lastCompletedBuild.number()
+                || lastUnstableBuild == null || lastStableBuild.number() > lastUnstableBuild.number();
     }
 
     public int lastUnstableBuildAge() {
-        return Integer.parseInt(lastCompletedBuild.number) - Integer.parseInt(lastUnstableBuild.number);
+        return lastCompletedBuild.number() - lastUnstableBuild.number();
     }
 }

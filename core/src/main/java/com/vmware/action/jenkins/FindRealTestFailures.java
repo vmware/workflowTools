@@ -87,7 +87,7 @@ public class FindRealTestFailures extends BaseAction {
                 return;
             }
             if (jobDetails.lastBuildWasSuccessful()) {
-                log.info("Skipping job {} as last build was successful", jobDetails.name);
+                log.info("Skipping job {} as most recent build was successful", jobDetails.name);
                 return;
             }
             if (jobDetails.lastUnstableBuild == null) {
@@ -122,9 +122,6 @@ public class FindRealTestFailures extends BaseAction {
             log.info("Most recent build for job {} passed", fullDetails.name);
             return Collections.emptyList();
         }
-        Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = new HashMap<>();
-        final AtomicInteger successCount = new AtomicInteger(0);
-
         List<TestNGResults> usableResults =
                 Arrays.stream(fullDetails.builds).parallel().sorted((first, second) -> second.number.compareTo(first.number)).limit(7).map(build -> {
                     if (build.result == BuildResult.UNSTABLE) {
@@ -138,6 +135,14 @@ public class FindRealTestFailures extends BaseAction {
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
 
+        Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = createTestMethodResultsMap(usableResults);
+
+        return testResults.entrySet().stream().filter(this::isRealFailure).map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
+    private Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> createTestMethodResultsMap(List<TestNGResults> usableResults) {
+        final AtomicInteger successCount = new AtomicInteger(0);
+        Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = new HashMap<>();
         usableResults.forEach(testNGResults -> {
             if (testNGResults.failCount > 0) {
                 List<TestNGResults.TestMethod> testMethods = testNGResults.testMethods();
@@ -157,15 +162,14 @@ public class FindRealTestFailures extends BaseAction {
                     } else {
                         testResults.get(matchingTestMethod).add(testMethod.status);
                     }
-                    successCount.set(0);
                 });
+                successCount.set(0);
             } else {
                 testResults.forEach((key, value) -> value.add(TestNGResults.TestResult.PASS));
                 successCount.incrementAndGet();
             }
         });
-
-        return testResults.entrySet().stream().filter(this::isRealFailure).map(Map.Entry::getKey).collect(Collectors.toList());
+        return testResults;
     }
 
     private boolean isRealFailure(Map.Entry<TestNGResults.TestMethod, List<TestNGResults.TestResult>> entry) {
