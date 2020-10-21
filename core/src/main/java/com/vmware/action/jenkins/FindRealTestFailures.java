@@ -27,6 +27,8 @@ import com.vmware.util.collection.BlockingExecutorService;
 
 import org.slf4j.LoggerFactory;
 
+import static com.vmware.util.StringUtils.pluralize;
+
 @ActionDescription("Finds real test failures for a Jenkins View. Real failures are tests that are continuously failing as opposed to one offs.")
 public class FindRealTestFailures extends BaseAction {
 
@@ -136,8 +138,13 @@ public class FindRealTestFailures extends BaseAction {
                 }).filter(Objects::nonNull).collect(Collectors.toList());
 
         Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = createTestMethodResultsMap(usableResults);
+        return testResults.entrySet().stream().filter(this::isRealFailure).map(this::testMethodWithInfo).collect(Collectors.toList());
+    }
 
-        return testResults.entrySet().stream().filter(this::isRealFailure).map(Map.Entry::getKey).collect(Collectors.toList());
+    private TestNGResults.TestMethod testMethodWithInfo(Map.Entry<TestNGResults.TestMethod, List<TestNGResults.TestResult>> entry) {
+        entry.getKey().failureCount = entry.getValue().stream().filter(result -> result == TestNGResults.TestResult.FAIL).count();
+        entry.getKey().successCount = entry.getValue().stream().filter(result -> result == TestNGResults.TestResult.PASS).count();
+        return entry.getKey();
     }
 
     private Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> createTestMethodResultsMap(List<TestNGResults> usableResults) {
@@ -185,13 +192,14 @@ public class FindRealTestFailures extends BaseAction {
 
         String filledInJobFragment = jobFragment.replace("#url", fullDetails.url);
         filledInJobFragment = filledInJobFragment.replace("#jobName", fullDetails.name);
-        filledInJobFragment = filledInJobFragment.replace("#failingTestCount", String.valueOf(failingMethods.size()));
+        filledInJobFragment = filledInJobFragment.replace("#failingTestCount", pluralize(failingMethods.size(), "failing test"));
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);
 
         StringBuilder rowBuilder = new StringBuilder("");
         int index = 0;
         for (TestNGResults.TestMethod method : failingMethods) {
             String filledInRow = rowFragment.replace("#testName", method.fullTestName());
+            filledInRow = filledInRow.replace("#testResultDescription", method.testResultsDescription());
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
             if (method.status == null) {
                 log.warn("No status found for test method {}", method.fullTestName());

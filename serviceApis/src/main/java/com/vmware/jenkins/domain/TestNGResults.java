@@ -3,8 +3,12 @@ package com.vmware.jenkins.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
+
+import static com.vmware.util.StringUtils.pluralize;
 
 public class TestNGResults {
     public String name;
@@ -61,6 +65,11 @@ public class TestNGResults {
         public String exception;
         public double duration;
 
+        @Expose(serialize = false, deserialize = false)
+        public long failureCount;
+        @Expose(serialize = false, deserialize = false)
+        public long successCount;
+
         public String fullTestName() {
             return className + "." + name;
         }
@@ -72,6 +81,14 @@ public class TestNGResults {
                 text += " " + exception;
             }
             return text;
+        }
+
+        public String testResultsDescription() {
+            if (failureCount == 0) {
+                return "no failures";
+            } else if (successCount == 0) {
+                return "test failed in all builds";
+            } return "test failed in " + pluralize(failureCount, "build") + ", passed in " + pluralize(successCount, "build");
         }
     }
 
