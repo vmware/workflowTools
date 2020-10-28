@@ -97,7 +97,7 @@ public class TestReviewBoardApi extends BaseTests {
 
     @Test
     public void getReviewRequestsForGroup() {
-        long sevenDaysAgo = new Date().getTime() - TimeUnit.DAYS.toMillis(7);
+        long sevenDaysAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7);
         ReviewRequests reviewRequests =
                 reviewBoard.getReviewRequestsWithShipItsForGroups(reviewGroup, new Date(sevenDaysAgo));
         assertTrue(reviewRequests.review_requests.length > 0);

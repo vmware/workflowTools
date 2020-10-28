@@ -31,7 +31,7 @@ public class UpdateVappLease extends BaseSingleVappAction {
 
         log.debug("Runtime lease value in hours {}", timeUnitToUse.toHours(leaseValue));
         long leaseInMilliseconds = TimeUnit.SECONDS.toMillis(leaseSection.deploymentLeaseInSeconds);
-        Date undeployDateToUpdateTo = new Date(new Date().getTime() + leaseInMilliseconds);
+        Date undeployDateToUpdateTo = new Date(System.currentTimeMillis() + leaseInMilliseconds);
         log.info("Runtime lease will be updated to {}", undeployDateToUpdateTo);
 
         LinkType leaseLink = new LinkType(vappData.getSelectedVapp().getSelfLink().href + "/leaseSettingsSection/");

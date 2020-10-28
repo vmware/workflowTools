@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class FindRealTestFailures extends BaseAction {
             LoggerFactory.getLogger(FindRealTestFailures.class).debug("Creating new service");
             return serviceLocator.newJenkins();
         });
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
         String jobFragments = createJobFragmentsHtml();
 
         String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
@@ -53,7 +52,7 @@ public class FindRealTestFailures extends BaseAction {
         filledInFailures = filledInFailures.replace("#viewName", jenkinsConfig.jenkinsView);
         log.trace("Test Failures:\n{}", filledInFailures);
         fileSystemConfig.fileData = filledInFailures;
-        long elapsedTime = new Date().getTime() - startTime;
+        long elapsedTime = System.currentTimeMillis() - startTime;
         log.info("Took {} seconds", TimeUnit.MILLISECONDS.toSeconds(elapsedTime));
     }
 
@@ -128,10 +127,15 @@ public class FindRealTestFailures extends BaseAction {
                 Arrays.stream(fullDetails.builds).parallel().sorted((first, second) -> second.number.compareTo(first.number)).limit(7).map(build -> {
                     if (build.result == BuildResult.UNSTABLE) {
                         TestNGResults results = jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build));
+                        results.jobName = build.fullDisplayName;
+                        results.buildNumber = build.number;
                         results.uiUrl = build.getTestReportsUIUrl();
                         return results;
                     } else if (build.result == BuildResult.SUCCESS) {
-                        return new TestNGResults();
+                        TestNGResults results = new TestNGResults();
+                        results.jobName = build.fullDisplayName;
+                        results.buildNumber = build.number;
+                        return results;
                     } else {
                         return null;
                     }
@@ -148,9 +152,9 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> createTestMethodResultsMap(List<TestNGResults> usableResults) {
-        final AtomicInteger successCount = new AtomicInteger(0);
         Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = new HashMap<>();
         usableResults.forEach(testNGResults -> {
+            log.debug("Processing build {}", testNGResults.jobName);
             if (testNGResults.failCount > 0) {
                 List<TestNGResults.TestMethod> testMethods = testNGResults.testMethods();
                 testMethods.forEach(testMethod -> {
@@ -159,7 +163,6 @@ public class FindRealTestFailures extends BaseAction {
                                 testResults.put(testMethod, new ArrayList<>());
                                 return testMethod;
                             });
-                    IntStream.range(0, successCount.get()).forEach(index -> testResults.get(matchingTestMethod).add(TestNGResults.TestResult.PASS));
                     // skipped test
                     if (matchingTestMethod.status == null && testMethod.status == TestNGResults.TestResult.FAIL) {
                         log.debug("Using older test method failure for test {}", testMethod.fullTestName());
@@ -170,10 +173,8 @@ public class FindRealTestFailures extends BaseAction {
                         testResults.get(matchingTestMethod).add(testMethod.status);
                     }
                 });
-                successCount.set(0);
             } else {
                 testResults.forEach((key, value) -> value.add(TestNGResults.TestResult.PASS));
-                successCount.incrementAndGet();
             }
         });
         return testResults;

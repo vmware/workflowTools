@@ -78,7 +78,7 @@ public class CommandLineUtils {
         Process statusProcess = executeCommand(workingDirectory, environmentVariables, command, inputText);
 
         String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
-        long elapsedMilliseconds = new Date().getTime() - startingDate.getTime();
+        long elapsedMilliseconds = System.currentTimeMillis() - startingDate.getTime();
         if (elapsedMilliseconds < 1000) {
             dynamicLogger.log(LogLevel.DEBUG, "Execution time {} milliseconds", elapsedMilliseconds);
         } else {

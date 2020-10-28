@@ -1,12 +1,11 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ThreadUtils {
 
@@ -47,7 +46,7 @@ public class ThreadUtils {
 
     private static long determineElapsedTime(Date startTime) {
         long elapsedTimeInSeconds;
-        long elapsedTimeInMilliseconds = new Date().getTime() - startTime.getTime();
+        long elapsedTimeInMilliseconds = System.currentTimeMillis() - startTime.getTime();
         elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTimeInMilliseconds);
         return elapsedTimeInSeconds;
     }

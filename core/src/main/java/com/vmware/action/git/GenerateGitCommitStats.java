@@ -41,7 +41,7 @@ public class GenerateGitCommitStats extends BaseAction {
 
     @Override
     public void process() {
-        Date oldestDateToCheckAgainst = new Date(new Date().getTime() - TimeUnit.DAYS.toMillis(statsConfig.lastNumberOfDaysForStats));
+        Date oldestDateToCheckAgainst = new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(statsConfig.lastNumberOfDaysForStats));
         log.info("Computing stats against all git commits newer than {} ({} ago)",
                 oldestDateToCheckAgainst.toString(), pluralize(statsConfig.lastNumberOfDaysForStats, "day"));
 

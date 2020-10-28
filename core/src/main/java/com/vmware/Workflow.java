@@ -268,7 +268,7 @@ public class Workflow {
     private void outputTotalExecutionTime(Date startingDate) {
         if (log.isDebugEnabled()) {
             log.info("");
-            long totalElapsedTimeInMs = new Date().getTime() - startingDate.getTime();
+            long totalElapsedTimeInMs = System.currentTimeMillis() - startingDate.getTime();
             log.debug("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
         }
     }
@@ -403,7 +403,7 @@ public class Workflow {
             waitForAsyncActionSetupToFinish(actionsSetup, waitTimeInMilliSeconds, action);
             Date startingDate = new Date();
             runAction(action, values);
-            long elapsedTime = new Date().getTime() - startingDate.getTime();
+            long elapsedTime = System.currentTimeMillis() - startingDate.getTime();
             executionTimesPerAction.put(action.getClass().getSimpleName(), elapsedTime);
         }
         outputExecutionTimes(executionTimesPerAction);

@@ -1,6 +1,7 @@
 package com.vmware.jenkins.domain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
@@ -12,6 +13,10 @@ import static com.vmware.util.StringUtils.pluralize;
 
 public class TestNGResults {
     public String name;
+    @Expose(serialize = false, deserialize = false)
+    public String jobName;
+    @Expose(serialize = false, deserialize = false)
+    public String buildNumber;
     public String uiUrl;
     @SerializedName("package")
     public Package[] packages;
@@ -64,6 +69,7 @@ public class TestNGResults {
         public String className;
         public String exception;
         public double duration;
+        public String[] parameters;
 
         @Expose(serialize = false, deserialize = false)
         public long failureCount;
@@ -71,7 +77,12 @@ public class TestNGResults {
         public long successCount;
 
         public String fullTestName() {
-            return className + "." + name;
+            String testName = className + "." + name;
+            if (parameters != null && parameters.length > 0) {
+                String testParams = StringUtils.join(Arrays.asList(parameters), ",");
+                testName += " (" + testParams + ")";
+            }
+            return testName;
         }
 
         @Override

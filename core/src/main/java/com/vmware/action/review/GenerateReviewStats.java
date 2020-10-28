@@ -48,7 +48,7 @@ public class GenerateReviewStats extends BaseReviewBoardAction {
 
         log.info("Generating stats for groups {} with file count ranges {}",
                 groupsToUse, Arrays.toString(statsConfig.fileCountRanges));
-        long aMonthAgo = new Date().getTime() - TimeUnit.DAYS.toMillis(30);
+        long aMonthAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);
 
         ReviewRequests recentReviews =
                 reviewBoard.getReviewRequestsWithShipItsForGroups(groupsToUse, new Date(aMonthAgo));
