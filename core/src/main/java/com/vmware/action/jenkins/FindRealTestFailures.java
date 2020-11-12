@@ -62,44 +62,31 @@ public class FindRealTestFailures extends BaseAction {
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy");
         generationDate = formatter.format(new Date());
 
+        File destinationFile = new File(fileSystemConfig.destinationFile);
         if (matchingViews.size() > 1) {
             log.info("Matched {} views to view name {}", matchingViews.size(), jenkinsConfig.jenkinsView);
             log.info("View names: {}", matchingViews.stream().map(view -> view.name).collect(Collectors.joining(", ")));
+            if (!destinationFile.exists()) {
+                failIfTrue(!destinationFile.mkdir(), "Failed to create directory " + destinationFile.getAbsolutePath());
+            }
         }
 
         log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
                 jenkinsConfig.maxJenkinsBuildsToCheck);
 
-        File destinationFile = new File(fileSystemConfig.destinationFile);
         if (matchingViews.size() > 1) {
             failIfTrue(destinationFile.exists() && destinationFile.isFile(),
                     destinationFile.getAbsolutePath() + " is a file. Destination file needs to specify a directory");
         }
         matchingViews.forEach(view -> {
             try {
-                createJobFragmentsHtml(view);
+                saveFailuresPageForView(view);
             } catch (Exception e) {
                 log.error("Failed to create failures page for view " + view.name, e);
             }
         });
 
-        if (matchingViews.size() == 1 && matchingViews.get(0).failurePageHtml != null) {
-            if (destinationFile.isDirectory()) {
-                fileSystemConfig.destinationFile = fileSystemConfig.destinationFile + File.separator + matchingViews.get(0).htmlFileName();
-                destinationFile = new File(fileSystemConfig.destinationFile);
-            }
-            log.info("Saving to {}", fileSystemConfig.destinationFile);
-            IOUtils.write(destinationFile, matchingViews.get(0).failurePageHtml);
-        } else if (matchingViews.size() > 1) {
-            if (!destinationFile.exists()) {
-                failIfTrue(!destinationFile.mkdir(), "Failed to create directory " + destinationFile.getAbsolutePath());
-            }
-            matchingViews.stream().filter(view -> view.failurePageHtml != null).forEach(view -> {
-                File failurePageFile = new File(fileSystemConfig.destinationFile + File.separator + view.htmlFileName());
-                log.info("Saving view failures for {} to {}", view.name, failurePageFile);
-                IOUtils.write(failurePageFile, view.failurePageHtml);
-            });
-
+        if (matchingViews.size() > 1) {
             String viewListing = createViewListingHtml(matchingViews);
             fileSystemConfig.destinationFile = fileSystemConfig.destinationFile + File.separator + "index.html";
             log.info("Saving view listing to {}", fileSystemConfig.destinationFile);
@@ -118,7 +105,7 @@ public class FindRealTestFailures extends BaseAction {
         return viewListingPage.replace("#body", viewListingHtml);
     }
 
-    private void createJobFragmentsHtml(HomePage.View view) {
+    private void saveFailuresPageForView(HomePage.View view) {
         Map<JobDetails, List<TestNGResults.TestMethod>> failingTestMethods = findAllRealFailingTests(view.url);
         view.failingTestsCount = failingTestMethods.values().stream().mapToInt(List::size).sum();
         log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
@@ -140,8 +127,18 @@ public class FindRealTestFailures extends BaseAction {
         String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
         String filledInFailures = failuresPage.replace("#body", jobFragments.toString());
         filledInFailures = filledInFailures.replace("#date", generationDate);
-        view.failurePageHtml = filledInFailures.replace("#viewName", view.viewNameWithFailureCount());
-        log.trace("Test Failures for view {}:\n{}", view.name, view.failurePageHtml);
+        filledInFailures = filledInFailures.replace("#viewName", view.viewNameWithFailureCount());
+        log.trace("Test Failures for view {}:\n{}", view.name, filledInFailures);
+
+        File destinationFile = new File(fileSystemConfig.destinationFile);
+        if (destinationFile.exists() && destinationFile.isDirectory()) {
+            File failurePageFile = new File(fileSystemConfig.destinationFile + File.separator + view.htmlFileName());
+            log.info("Saving test failures for {} to {}", view.name, failurePageFile);
+            IOUtils.write(failurePageFile, filledInFailures);
+        } else {
+            log.info("Saving test failures for {} to {}", view.name, destinationFile);
+            IOUtils.write(destinationFile, filledInFailures);
+        }
     }
 
     private Map<JobDetails, List<TestNGResults.TestMethod>> findAllRealFailingTests(String viewUrl) {

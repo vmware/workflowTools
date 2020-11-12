@@ -37,9 +37,6 @@ public class HomePage {
         @Expose(serialize = false, deserialize = false)
         public int failingTestsCount;
 
-        @Expose(serialize = false, deserialize = false)
-        public String failurePageHtml;
-
         public String viewNameWithFailureCount() {
             if (failingTestsCount == 0) {
                 return name + " (no test failures)";
