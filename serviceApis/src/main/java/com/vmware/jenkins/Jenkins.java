@@ -16,12 +16,11 @@ import com.vmware.config.jenkins.Job;
 import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.JobParameters;
-import com.vmware.jenkins.domain.JobsList;
+import com.vmware.jenkins.domain.HomePage;
 import com.vmware.jenkins.domain.TestNGResults;
 import com.vmware.jenkins.domain.ViewDetails;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.logging.Padder;
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ public class Jenkins extends AbstractRestBuildService {
     private final boolean disableLogin;
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private String configureUrl;
-    private JobsList jobsList = null;
+    private HomePage homePage = null;
 
     public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin) {
         super(serverUrl, "api/json", jenkins, username);
@@ -62,12 +61,12 @@ public class Jenkins extends AbstractRestBuildService {
         }
     }
 
-    public JobsList getJobsListing() {
-        if (jobsList == null) {
-            jobsList = connection.get(apiUrl, JobsList.class);
+    public HomePage getHomePage() {
+        if (homePage == null) {
+            homePage = connection.get(apiUrl, HomePage.class);
         }
 
-        return jobsList;
+        return homePage;
     }
 
     public void invokeJob(Job jobToInvoke) {
@@ -78,8 +77,8 @@ public class Jenkins extends AbstractRestBuildService {
         optimisticPost(jobToInvoke.getBuildWithParametersUrl(), params.toMap());
     }
 
-    public ViewDetails getViewDetails(String viewName) {
-        return optimisticGet(UrlUtils.addRelativePaths(baseUrl, "view", viewName, "api/json?depth=1"), ViewDetails.class);
+    public ViewDetails getFullViewDetails(String viewUrl) {
+        return optimisticGet(UrlUtils.addRelativePaths(viewUrl, "api/json?depth=1"), ViewDetails.class);
     }
 
     public JobDetails getJobDetails(Job jobToInvoke) {

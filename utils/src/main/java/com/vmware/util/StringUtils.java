@@ -197,7 +197,7 @@ public class StringUtils {
         if (value == null) {
             return null;
         }
-        return value.substring(value.lastIndexOf(valueToCheckFor) + 1);
+        return value.substring(value.lastIndexOf(valueToCheckFor) + valueToCheckFor.length());
     }
 
     public static int indexOrNthOccurence(String text, String searchText, int count) {

@@ -1,9 +1,12 @@
 package com.vmware.action.jenkins;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,17 +14,18 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.vmware.BuildResult;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.Jenkins;
+import com.vmware.jenkins.domain.HomePage;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.jenkins.domain.TestNGResults;
 import com.vmware.jenkins.domain.ViewDetails;
 import com.vmware.util.ClasspathResource;
+import com.vmware.util.IOUtils;
 import com.vmware.util.collection.BlockingExecutorService;
 
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ import static com.vmware.util.StringUtils.pluralize;
 public class FindRealTestFailures extends BaseAction {
 
     private BlockingExecutorService<Jenkins> jenkinsExecutor;
+    private String generationDate;
 
     public FindRealTestFailures(WorkflowConfig config) {
         super(config);
@@ -45,21 +50,80 @@ public class FindRealTestFailures extends BaseAction {
             return serviceLocator.newJenkins();
         });
         long startTime = System.currentTimeMillis();
-        String jobFragments = createJobFragmentsHtml();
 
-        String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
-        String filledInFailures = failuresPage.replace("#body", jobFragments);
-        filledInFailures = filledInFailures.replace("#viewName", jenkinsConfig.jenkinsView);
-        log.trace("Test Failures:\n{}", filledInFailures);
-        fileSystemConfig.fileData = filledInFailures;
+        HomePage homePage = serviceLocator.getJenkins().getHomePage();
+
+        List<HomePage.View> matchingViews = Arrays.stream(homePage.views).filter(view -> view.matches(jenkinsConfig.jenkinsView)).collect(Collectors.toList());
+
+        if (matchingViews.isEmpty()) {
+            exitDueToFailureCheck("No views found for name " + jenkinsConfig.jenkinsView);
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy");
+        generationDate = formatter.format(new Date());
+
+        if (matchingViews.size() > 1) {
+            log.info("Matched {} views to view name {}", matchingViews.size(), jenkinsConfig.jenkinsView);
+            log.info("View names: {}", matchingViews.stream().map(view -> view.name).collect(Collectors.joining(", ")));
+        }
+
+        log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
+                jenkinsConfig.maxJenkinsBuildsToCheck);
+
+        File destinationFile = new File(fileSystemConfig.destinationFile);
+        if (matchingViews.size() > 1) {
+            failIfTrue(destinationFile.exists() && destinationFile.isFile(),
+                    destinationFile.getAbsolutePath() + " is a file. Destination file needs to specify a directory");
+        }
+        matchingViews.forEach(view -> {
+            try {
+                createJobFragmentsHtml(view);
+            } catch (Exception e) {
+                log.error("Failed to create failures page for view " + view.name, e);
+            }
+        });
+
+        if (matchingViews.size() == 1 && matchingViews.get(0).failurePageHtml != null) {
+            if (destinationFile.isDirectory()) {
+                fileSystemConfig.destinationFile = fileSystemConfig.destinationFile + File.separator + matchingViews.get(0).htmlFileName();
+                destinationFile = new File(fileSystemConfig.destinationFile);
+            }
+            log.info("Saving to {}", fileSystemConfig.destinationFile);
+            IOUtils.write(destinationFile, matchingViews.get(0).failurePageHtml);
+        } else if (matchingViews.size() > 1) {
+            if (!destinationFile.exists()) {
+                failIfTrue(!destinationFile.mkdir(), "Failed to create directory " + destinationFile.getAbsolutePath());
+            }
+            matchingViews.stream().filter(view -> view.failurePageHtml != null).forEach(view -> {
+                File failurePageFile = new File(fileSystemConfig.destinationFile + File.separator + view.htmlFileName());
+                log.info("Saving view failures for {} to {}", view.name, failurePageFile);
+                IOUtils.write(failurePageFile, view.failurePageHtml);
+            });
+
+            String viewListing = createViewListingHtml(matchingViews);
+            fileSystemConfig.destinationFile = fileSystemConfig.destinationFile + File.separator + "index.html";
+            log.info("Saving view listing to {}", fileSystemConfig.destinationFile);
+            IOUtils.write(new File(fileSystemConfig.destinationFile), viewListing);
+        }
+
         long elapsedTime = System.currentTimeMillis() - startTime;
         log.info("Took {} seconds", TimeUnit.MILLISECONDS.toSeconds(elapsedTime));
     }
 
-    private String createJobFragmentsHtml() {
-        Map<JobDetails, List<TestNGResults.TestMethod>> failingTestMethods = findAllRealFailingTests();
+    private String createViewListingHtml(List<HomePage.View> matchingViews) {
+        String viewListingHtml = matchingViews.stream().map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
+        String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
+        viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
+        viewListingPage = viewListingPage.replace("#date", generationDate);
+        return viewListingPage.replace("#body", viewListingHtml);
+    }
+
+    private void createJobFragmentsHtml(HomePage.View view) {
+        Map<JobDetails, List<TestNGResults.TestMethod>> failingTestMethods = findAllRealFailingTests(view.url);
+        view.failingTestsCount = failingTestMethods.values().stream().mapToInt(List::size).sum();
+        log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
         if (failingTestMethods.isEmpty()) {
-            cancelWithMessage("no consistently failing tests found for any job");
+            return;
         }
 
         final StringBuilder jobFragments = new StringBuilder("");
@@ -72,14 +136,20 @@ public class FindRealTestFailures extends BaseAction {
             }
             jobFragments.append(jobFragment);
         });
-        return jobFragments.toString();
+
+        String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
+        String filledInFailures = failuresPage.replace("#body", jobFragments.toString());
+        filledInFailures = filledInFailures.replace("#date", generationDate);
+        view.failurePageHtml = filledInFailures.replace("#viewName", view.viewNameWithFailureCount());
+        log.trace("Test Failures for view {}:\n{}", view.name, view.failurePageHtml);
     }
 
-    private Map<JobDetails, List<TestNGResults.TestMethod>> findAllRealFailingTests() {
+    private Map<JobDetails, List<TestNGResults.TestMethod>> findAllRealFailingTests(String viewUrl) {
         Jenkins jenkins = serviceLocator.getJenkins();
-        ViewDetails viewDetails = jenkins.getViewDetails(jenkinsConfig.jenkinsView);
+        ViewDetails viewDetails = jenkins.getFullViewDetails(viewUrl);
         Map<JobDetails, List<TestNGResults.TestMethod>> allFailingTests = new HashMap<>();
 
+        log.info("");
         log.info("Checking {} jobs in {} for test failures", viewDetails.jobs.length, viewDetails.name);
 
         Arrays.stream(viewDetails.jobs).parallel().forEach(jobDetails -> {
@@ -124,7 +194,8 @@ public class FindRealTestFailures extends BaseAction {
             return Collections.emptyList();
         }
         List<TestNGResults> usableResults =
-                Arrays.stream(fullDetails.builds).parallel().sorted((first, second) -> second.number.compareTo(first.number)).limit(7).map(build -> {
+                Arrays.stream(fullDetails.builds).parallel().sorted((first, second) -> second.number.compareTo(first.number))
+                        .limit(jenkinsConfig.maxJenkinsBuildsToCheck).map(build -> {
                     if (build.result == BuildResult.UNSTABLE) {
                         TestNGResults results = jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build));
                         results.jobName = build.fullDisplayName;
@@ -159,7 +230,8 @@ public class FindRealTestFailures extends BaseAction {
                 List<TestNGResults.TestMethod> testMethods = testNGResults.testMethods();
                 testMethods.forEach(testMethod -> {
                     TestNGResults.TestMethod matchingTestMethod =
-                            testResults.keySet().stream().filter(key -> key.fullTestName().equals(testMethod.fullTestName())).findFirst().orElseGet(() -> {
+                            testResults.keySet().stream().filter(key -> key.fullTestNameWithPackage().equals(testMethod.fullTestNameWithPackage()))
+                                    .findFirst().orElseGet(() -> {
                                 testResults.put(testMethod, new ArrayList<>());
                                 return testMethod;
                             });

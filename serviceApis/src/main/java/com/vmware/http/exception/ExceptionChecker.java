@@ -22,27 +22,29 @@ public class ExceptionChecker {
         }
         log.debug("Response {} for {} url {}: {}", statusCode, methodType, currentUrl, responseText);
 
+        String fullResponseText = currentUrl + "\n" + responseText;
+
         switch (statusCode) {
             case DoesNotExistException.STATUS_CODE:
-                throw new DoesNotExistException(responseText);
+                throw new DoesNotExistException(fullResponseText);
             case PermissionDeniedException.STATUS_CODE:
-                throw new PermissionDeniedException(responseText);
+                throw new PermissionDeniedException(fullResponseText);
             case NotLoggedInException.STATUS_CODE:
-                throw new NotLoggedInException(responseText);
+                throw new NotLoggedInException(fullResponseText);
             case HttpURLConnection.HTTP_BAD_REQUEST:
-                throw new BadRequestException(responseText);
+                throw new BadRequestException(fullResponseText);
             case HttpURLConnection.HTTP_UNAUTHORIZED:
-                throw new NotAuthorizedException(responseText);
+                throw new NotAuthorizedException(fullResponseText);
             case HttpURLConnection.HTTP_FORBIDDEN:
-                throw new ForbiddenException(responseText);
+                throw new ForbiddenException(fullResponseText);
             case HttpURLConnection.HTTP_NOT_FOUND:
-                throw new NotFoundException(responseText);
+                throw new NotFoundException(fullResponseText);
             case HttpURLConnection.HTTP_BAD_METHOD:
-                throw new MethodNotAllowedException(responseText);
+                throw new MethodNotAllowedException(fullResponseText);
             case HttpURLConnection.HTTP_INTERNAL_ERROR:
-                throw new InternalServerException(responseText);
+                throw new InternalServerException(fullResponseText);
             default:
-                throw new UnexpectedStatusException(statusCode, responseText);
+                throw new UnexpectedStatusException(statusCode, fullResponseText);
         }
     }
 

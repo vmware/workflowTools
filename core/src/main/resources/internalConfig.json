@@ -15,7 +15,7 @@
   "jenkinsUsesCsrf": false,
   "waitForBlockingWorkflowAction": false,
   "ignoreJenkinsJobFailure": false,
-  "maxJenkinsBuildsToCheck": 10,
+  "maxJenkinsBuildsToCheck": 7,
   "keystoreType": "JCEKS",
   "keySize": 2048,
   "goBuildBinPath": "/build/apps/bin/gobuild",
@@ -963,7 +963,6 @@
     ],
     "showRealTestFailures": [
       "FindRealTestFailures",
-      "SaveFileData",
       "OpenFile"
     ]
   },

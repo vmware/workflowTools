@@ -54,7 +54,7 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
                 break;
             } else if (buildCounter == jenkinsConfig.maxJenkinsBuildsToCheck) {
                 log.info("Checked {} number of jenkins builds, set maxJenkinsBuildsToCheck " +
-                        "to a higher number if you want more builds to be checked");
+                        "to a higher number if you want more builds to be checked", buildCounter);
                 break;
             }
         }

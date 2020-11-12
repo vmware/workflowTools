@@ -6,7 +6,7 @@ import com.vmware.jenkins.domain.JobBuildDetails;
 import com.vmware.jenkins.domain.JobDetails;
 import com.vmware.config.jenkins.JobParameter;
 import com.vmware.jenkins.domain.JobParameters;
-import com.vmware.jenkins.domain.JobsList;
+import com.vmware.jenkins.domain.HomePage;
 import com.vmware.http.exception.NotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,20 +34,20 @@ public class TestJenkinsApi extends BaseTests {
 
     @Test
     public void canGetJobsListing() {
-        JobsList jobs = jenkins.getJobsListing();
+        HomePage jobs = jenkins.getHomePage();
         assertNotNull(jobs);
     }
 
     @Test
     public void canGetPrecommitUnitTestsJob() {
-        JobsList jobs = jenkins.getJobsListing();
+        HomePage jobs = jenkins.getHomePage();
         Job precommitUnitJob = jobs.getPrecommitUnitTestsJob();
         assertNotNull(precommitUnitJob);
     }
 
     @Test(expected = NotFoundException.class)
     public void cannotInvokeJunkBuild() {
-        Job precommitJob = jenkins.getJobsListing().getPrecommitUnitTestsPostgresJob();
+        Job precommitJob = jenkins.getHomePage().getPrecommitUnitTestsPostgresJob();
 
         precommitJob.url = precommitJob.url.replace("postgres", "postgres1");
         jenkins.invokeJobWithParameters(precommitJob, new JobParameters(Collections.<JobParameter>emptyList()));
@@ -55,7 +55,7 @@ public class TestJenkinsApi extends BaseTests {
 
     @Test
     public void canInvokePrecommitUnitTestsJob() {
-        Job precommitJob = jenkins.getJobsListing().getPrecommitUnitTestsPostgresJob();
+        Job precommitJob = jenkins.getHomePage().getPrecommitUnitTestsPostgresJob();
 
         JobDetails jobDetails = jenkins.getJobDetails(precommitJob);
         JobParameter usernameParam = new JobParameter("USERNAME", jenkinsUsername);

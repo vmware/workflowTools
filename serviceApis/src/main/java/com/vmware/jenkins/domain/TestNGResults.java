@@ -34,7 +34,8 @@ public class TestNGResults {
         for (Package pkg : packages) {
             for (Class clazz : pkg.classs) {
                 for (TestMethod testMethod : clazz.testMethods) {
-                    testMethod.url = UrlUtils.addRelativePaths(uiUrl, pkg.name, clazz.name, testMethod.name);
+                    testMethod.packagePath = pkg.name;
+                    testMethod.url = UrlUtils.addRelativePaths(uiUrl, testMethod.packagePath, testMethod.className, testMethod.name);
                     testMethods.add(testMethod);
                 }
             }
@@ -66,6 +67,7 @@ public class TestNGResults {
         public String name;
         public String url;
         public TestResult status;
+        public String packagePath;
         public String className;
         public String exception;
         public double duration;
@@ -75,6 +77,10 @@ public class TestNGResults {
         public long failureCount;
         @Expose(serialize = false, deserialize = false)
         public long successCount;
+
+        public String fullTestNameWithPackage() {
+            return packagePath + "." + fullTestName();
+        }
 
         public String fullTestName() {
             String testName = className + "." + name;
