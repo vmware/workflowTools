@@ -32,7 +32,7 @@ public class WaitForMergeRequestToBeUpdated extends BaseCommitWithMergeRequestAc
             return headRef.equals(mergeRequest.sha);
         };
 
-        ThreadUtils.waitForCallable(commitHashCheck, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS,
+        ThreadUtils.waitForCallable(commitHashCheck, config.waitTimeForBlockingWorkflowAction, 3,
                 "Merge request failed to be updated with sha " + headRef);
     }
 }

@@ -23,7 +23,10 @@ public class ThreadUtils {
 
     public static void waitForCallable(Callable<Boolean> condition, long totalTimeToWait, TimeUnit timeUnit, String reason) {
         long totalTimeToWaitInSeconds = timeUnit.toSeconds(totalTimeToWait);
-        long timeBetweenRetriesInSeconds = determineRetryWaitPeriod(totalTimeToWaitInSeconds);
+        waitForCallable(condition, totalTimeToWaitInSeconds, determineRetryWaitPeriod(totalTimeToWaitInSeconds), reason);
+    }
+
+    public static void waitForCallable(Callable<Boolean> condition, long totalTimeToWaitInSeconds, long timeBetweenRetriesInSeconds, String reason) {
         Date startTime = new Date();
         long elapsedTimeInSeconds = 0;
         try {
