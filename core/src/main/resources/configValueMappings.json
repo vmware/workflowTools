@@ -20,6 +20,9 @@
     "--vcd-sys-admin-username",
     "--source-url"
   ],
+  "WaitForMergeRequestToBeUpdated": [
+    "--wait-time"
+  ],
   "GenerateReviewStats": [
     "--file-count-ranges",
     "--groups"

@@ -36,9 +36,12 @@ public class HomePage {
 
         @Expose(serialize = false, deserialize = false)
         public int failingTestsCount;
+        public Exception failingTestsGenerationException;
 
         public String viewNameWithFailureCount() {
-            if (failingTestsCount == 0) {
+            if (failingTestsGenerationException != null) {
+                return name + " (failed with error " + StringUtils.truncateStringIfNeeded(failingTestsGenerationException.getMessage(), 80) + ")";
+            } else if (failingTestsCount == 0) {
                 return name + " (no test failures)";
             } else {
                 return name + " (" + failingTestsCount + " test failures)";

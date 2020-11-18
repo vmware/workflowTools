@@ -2,10 +2,13 @@ package com.vmware.jenkins.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.BuildResult;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 
@@ -14,6 +17,7 @@ import static com.vmware.util.StringUtils.pluralize;
 public class TestNGResults {
     public String name;
     @Expose(serialize = false, deserialize = false)
+    public BuildResult buildResult;
     public String jobName;
     @Expose(serialize = false, deserialize = false)
     public String buildNumber;
@@ -33,9 +37,16 @@ public class TestNGResults {
         List<TestMethod> testMethods = new ArrayList<>();
         for (Package pkg : packages) {
             for (Class clazz : pkg.classs) {
+                Set<String> usedUrls = new HashSet<>();
                 for (TestMethod testMethod : clazz.testMethods) {
                     testMethod.packagePath = pkg.name;
-                    testMethod.url = UrlUtils.addRelativePaths(uiUrl, testMethod.packagePath, testMethod.className, testMethod.name);
+                    String urlToUse = UrlUtils.addRelativePaths(uiUrl, testMethod.packagePath, testMethod.className, testMethod.name);
+                    int counter = 1;
+                    while (usedUrls.contains(urlToUse)) {
+                       urlToUse = UrlUtils.addRelativePaths(uiUrl, testMethod.packagePath, testMethod.className, testMethod.name + "_" + counter++);
+                    }
+                    testMethod.url = urlToUse;
+                    usedUrls.add(urlToUse);
                     testMethods.add(testMethod);
                 }
             }

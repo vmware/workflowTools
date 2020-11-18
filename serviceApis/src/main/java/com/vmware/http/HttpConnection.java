@@ -1,32 +1,5 @@
 package com.vmware.http;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.vmware.http.cookie.ApiAuthentication;
-import com.vmware.http.cookie.Cookie;
-import com.vmware.http.cookie.CookieFileStore;
-import com.vmware.http.credentials.UsernamePasswordCredentials;
-import com.vmware.http.exception.ExceptionChecker;
-import com.vmware.http.json.ConfiguredGsonBuilder;
-import com.vmware.http.request.body.RequestBodyFactory;
-import com.vmware.http.request.body.RequestBodyHandling;
-import com.vmware.http.request.RequestHeader;
-import com.vmware.http.request.RequestParam;
-import com.vmware.http.ssl.WorkflowCertificateManager;
-import com.vmware.util.IOUtils;
-import com.vmware.util.ThreadUtils;
-import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
-import com.vmware.util.exception.RuntimeURISyntaxException;
-import com.vmware.util.input.InputUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -39,15 +12,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLException;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.cookie.Cookie;
+import com.vmware.http.cookie.CookieFileStore;
+import com.vmware.http.credentials.UsernamePasswordCredentials;
+import com.vmware.http.exception.ExceptionChecker;
+import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.http.request.RequestHeader;
+import com.vmware.http.request.RequestParam;
+import com.vmware.http.request.body.RequestBodyFactory;
+import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.http.ssl.WorkflowCertificateManager;
+import com.vmware.util.IOUtils;
+import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.exception.RuntimeURISyntaxException;
+import com.vmware.util.input.InputUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.vmware.http.HttpMethodType.DELETE;
 import static com.vmware.http.HttpMethodType.GET;
 import static com.vmware.http.HttpMethodType.POST;
 import static com.vmware.http.HttpMethodType.PUT;
-import static com.vmware.http.HttpMethodType.DELETE;
 import static com.vmware.http.request.RequestHeader.aBasicAuthHeader;
 import static com.vmware.http.request.RequestHeader.anAcceptHeader;
 

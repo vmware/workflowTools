@@ -78,13 +78,7 @@ public class FindRealTestFailures extends BaseAction {
             failIfTrue(destinationFile.exists() && destinationFile.isFile(),
                     destinationFile.getAbsolutePath() + " is a file. Destination file needs to specify a directory");
         }
-        matchingViews.forEach(view -> {
-            try {
-                saveFailuresPageForView(view);
-            } catch (Exception e) {
-                log.error("Failed to create failures page for view " + view.name, e);
-            }
-        });
+        matchingViews.forEach(this::saveFailuresPageForView);
 
         if (matchingViews.size() > 1) {
             String viewListing = createViewListingHtml(matchingViews);
@@ -106,7 +100,15 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private void saveFailuresPageForView(HomePage.View view) {
-        Map<JobDetails, List<TestNGResults.TestMethod>> failingTestMethods = findAllRealFailingTests(view.url);
+        final Map<JobDetails, List<TestNGResults.TestMethod>> failingTestMethods;
+        try {
+            failingTestMethods = findAllRealFailingTests(view.url);
+        } catch (Exception e) {
+            log.error("Failed to create failures page for view " + view.name, e);
+            view.failingTestsGenerationException = e;
+            return;
+        }
+
         view.failingTestsCount = failingTestMethods.values().stream().mapToInt(List::size).sum();
         log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
         if (failingTestMethods.isEmpty()) {
@@ -195,12 +197,14 @@ public class FindRealTestFailures extends BaseAction {
                         .limit(jenkinsConfig.maxJenkinsBuildsToCheck).map(build -> {
                     if (build.result == BuildResult.UNSTABLE) {
                         TestNGResults results = jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build));
+                        results.buildResult = build.result;
                         results.jobName = build.fullDisplayName;
                         results.buildNumber = build.number;
                         results.uiUrl = build.getTestReportsUIUrl();
                         return results;
                     } else if (build.result == BuildResult.SUCCESS) {
                         TestNGResults results = new TestNGResults();
+                        results.buildResult = build.result;
                         results.jobName = build.fullDisplayName;
                         results.buildNumber = build.number;
                         return results;
@@ -223,7 +227,7 @@ public class FindRealTestFailures extends BaseAction {
         Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = new HashMap<>();
         usableResults.forEach(testNGResults -> {
             log.debug("Processing build {}", testNGResults.jobName);
-            if (testNGResults.failCount > 0) {
+            if (testNGResults.buildResult != BuildResult.SUCCESS) {
                 List<TestNGResults.TestMethod> testMethods = testNGResults.testMethods();
                 testMethods.forEach(testMethod -> {
                     TestNGResults.TestMethod matchingTestMethod =

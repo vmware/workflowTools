@@ -20,7 +20,7 @@
   "keySize": 2048,
   "goBuildBinPath": "/build/apps/bin/gobuild",
   "patchCommand": "patch -f -p1 -s",
-  "waitTimeForBlockingWorkflowAction": 1200,
+  "waitTimeForBlockingWorkflowAction": 300,
   "buildDisplayName": "Sandbox",
   "buildwebProject": "vcloud",
   "defaultBuildwebBranch": "sp-main",

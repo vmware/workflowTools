@@ -78,7 +78,7 @@ public class StringUtils {
     }
 
     public static String truncateStringIfNeeded(String value, int maxLength) {
-        if (value.length() <= maxLength) {
+        if (value == null || value.length() <= maxLength) {
             return value;
         }
         String newValue = value.substring(0, maxLength -3) + "...";
