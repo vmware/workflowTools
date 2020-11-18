@@ -2,17 +2,17 @@ package com.vmware.jenkins.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildResult;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
-
-import static com.vmware.util.StringUtils.pluralize;
 
 public class TestNGResults {
     public String name;
@@ -40,13 +40,9 @@ public class TestNGResults {
                 Set<String> usedUrls = new HashSet<>();
                 for (TestMethod testMethod : clazz.testMethods) {
                     testMethod.packagePath = pkg.name;
-                    String urlToUse = UrlUtils.addRelativePaths(uiUrl, testMethod.packagePath, testMethod.className, testMethod.name);
-                    int counter = 1;
-                    while (usedUrls.contains(urlToUse)) {
-                       urlToUse = UrlUtils.addRelativePaths(uiUrl, testMethod.packagePath, testMethod.className, testMethod.name + "_" + counter++);
-                    }
-                    testMethod.url = urlToUse;
-                    usedUrls.add(urlToUse);
+                    testMethod.buildNumber = buildNumber;
+                    testMethod.setUrlForTestMethod(uiUrl, usedUrls);
+                    usedUrls.add(testMethod.url);
                     testMethods.add(testMethod);
                 }
             }
@@ -55,7 +51,7 @@ public class TestNGResults {
     }
 
 
-    public class Package {
+    public static class Package {
         public String name;
         public Class[] classs;
         public int fail;
@@ -64,7 +60,7 @@ public class TestNGResults {
         public double duration;
     }
 
-    public class Class {
+    public static class Class {
         public String name;
         public int fail;
         public int skip;
@@ -74,9 +70,8 @@ public class TestNGResults {
         public double duration;
     }
 
-    public class TestMethod {
+    public static class TestMethod {
         public String name;
-        public String url;
         public TestResult status;
         public String packagePath;
         public String className;
@@ -85,9 +80,23 @@ public class TestNGResults {
         public String[] parameters;
 
         @Expose(serialize = false, deserialize = false)
-        public long failureCount;
+        public String url;
         @Expose(serialize = false, deserialize = false)
-        public long successCount;
+        public String buildNumber;
+        @Expose(serialize = false, deserialize = false)
+        public List<TestMethod> testRuns;
+
+        public TestMethod() {
+        }
+
+        public TestMethod(TestMethod methodToClone, TestResult status, String buildNumber) {
+            this.name = methodToClone.name;
+            this.packagePath = methodToClone.packagePath;
+            this.className = methodToClone.className;
+            this.parameters = methodToClone.parameters;
+            this.status = status;
+            this.buildNumber = buildNumber;
+        }
 
         public String fullTestNameWithPackage() {
             return packagePath + "." + fullTestName();
@@ -102,6 +111,25 @@ public class TestNGResults {
             return testName;
         }
 
+        public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
+            String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name);
+            int counter = 1;
+            while (usedUrls.contains(urlToUse)) {
+                urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + counter++);
+            }
+            this.url = urlToUse;
+        }
+
+        public String testResultLink(TestMethod testMethod) {
+            String linkClass = testMethod.status == TestResult.PASS ? "testPass" : "testFail";
+            return String.format("<a class =\"%s\" href = \"%s\">%s</a>", linkClass, testMethod.url, testMethod.buildNumber);
+        }
+
+        public String testResultsLinks() {
+            return testRuns.stream().sorted(Comparator.comparing(TestMethod::buildNumberAsInt))
+                    .map(this::testResultLink).collect(Collectors.joining(" "));
+        }
+
         @Override
         public String toString() {
             String text = fullTestName() + " " + status;
@@ -111,12 +139,8 @@ public class TestNGResults {
             return text;
         }
 
-        public String testResultsDescription() {
-            if (failureCount == 0) {
-                return "no failures";
-            } else if (successCount == 0) {
-                return "test failed in all builds";
-            } return "test failed in " + pluralize(failureCount, "build") + ", passed in " + pluralize(successCount, "build");
+        private int buildNumberAsInt() {
+            return Integer.parseInt(buildNumber);
         }
     }
 

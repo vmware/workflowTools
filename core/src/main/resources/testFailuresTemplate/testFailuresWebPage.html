@@ -97,6 +97,31 @@
             transform: rotate(90deg);
         }
 
+        .css-treeview .testFail, .css-treeview .testPass {
+            padding: 3px 6px;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .testFail
+        {
+            background-color: lightcoral;
+        }
+
+        .testFail:hover, .testFail:active {
+            background-color: red;
+        }
+
+        .testPass
+        {
+            background-color: lightgreen;
+        }
+
+        .testPass:hover, a:active {
+            background-color: green;
+        }
+
         /* webkit adjacent element selector bugfix */
         @media screen and (-webkit-min-device-pixel-ratio:0)
         {

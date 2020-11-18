@@ -8,9 +8,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ import com.vmware.jenkins.domain.TestNGResults;
 import com.vmware.jenkins.domain.ViewDetails;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.collection.BlockingExecutorService;
 
 import org.slf4j.LoggerFactory;
@@ -104,7 +107,7 @@ public class FindRealTestFailures extends BaseAction {
         try {
             failingTestMethods = findAllRealFailingTests(view.url);
         } catch (Exception e) {
-            log.error("Failed to create failures page for view " + view.name, e);
+            log.error("Failed to create page for view " + view.name, e);
             view.failingTestsGenerationException = e;
             return;
         }
@@ -179,7 +182,7 @@ public class FindRealTestFailures extends BaseAction {
                 log.info("Found {} consistently failing tests for job {}", failingTests.size(), fullDetails.name);
                 allFailingTests.put(fullDetails, failingTests);
             } catch (Exception e) {
-                log.error("Failed to get full job details for {}", jobDetails.name);
+                log.error("Failed to get full job details for {}\n{}", jobDetails.name, StringUtils.exceptionAsString(e));
                 throw e;
             }
         });
@@ -207,24 +210,27 @@ public class FindRealTestFailures extends BaseAction {
                         results.buildResult = build.result;
                         results.jobName = build.fullDisplayName;
                         results.buildNumber = build.number;
+                        results.uiUrl = build.getTestReportsUIUrl();
                         return results;
                     } else {
                         return null;
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
 
-        Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = createTestMethodResultsMap(usableResults);
+        Map<TestNGResults.TestMethod, List<TestNGResults.TestMethod>> testResults = createTestMethodResultsMap(usableResults);
         return testResults.entrySet().stream().filter(this::isRealFailure).map(this::testMethodWithInfo).collect(Collectors.toList());
     }
 
-    private TestNGResults.TestMethod testMethodWithInfo(Map.Entry<TestNGResults.TestMethod, List<TestNGResults.TestResult>> entry) {
-        entry.getKey().failureCount = entry.getValue().stream().filter(result -> result == TestNGResults.TestResult.FAIL).count();
-        entry.getKey().successCount = entry.getValue().stream().filter(result -> result == TestNGResults.TestResult.PASS).count();
+    private TestNGResults.TestMethod testMethodWithInfo(Map.Entry<TestNGResults.TestMethod, List<TestNGResults.TestMethod>> entry) {
+        TestNGResults.TestMethod testMethod = entry.getKey();
+        testMethod.testRuns = new ArrayList<>();
+        testMethod.testRuns.addAll(entry.getValue().stream().filter(method -> method.status == TestNGResults.TestResult.FAIL).collect(Collectors.toList()));
+        testMethod.testRuns.addAll(entry.getValue().stream().filter(method -> method.status == TestNGResults.TestResult.PASS).collect(Collectors.toList()));
         return entry.getKey();
     }
 
-    private Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> createTestMethodResultsMap(List<TestNGResults> usableResults) {
-        Map<TestNGResults.TestMethod, List<TestNGResults.TestResult>> testResults = new HashMap<>();
+    private Map<TestNGResults.TestMethod, List<TestNGResults.TestMethod>> createTestMethodResultsMap(List<TestNGResults> usableResults) {
+        Map<TestNGResults.TestMethod, List<TestNGResults.TestMethod>> testResults = new HashMap<>();
         usableResults.forEach(testNGResults -> {
             log.debug("Processing build {}", testNGResults.jobName);
             if (testNGResults.buildResult != BuildResult.SUCCESS) {
@@ -241,23 +247,29 @@ public class FindRealTestFailures extends BaseAction {
                         log.debug("Using older test method failure for test {}", testMethod.fullTestName());
                         testResults.put(testMethod, testResults.get(matchingTestMethod));
                         testResults.remove(matchingTestMethod);
-                        testResults.get(testMethod).add(testMethod.status);
+                        testResults.get(testMethod).add(testMethod);
                     } else {
-                        testResults.get(matchingTestMethod).add(testMethod.status);
+                        testResults.get(matchingTestMethod).add(testMethod);
                     }
                 });
             } else {
-                testResults.forEach((key, value) -> value.add(TestNGResults.TestResult.PASS));
+                Set<String> usedUrls = new HashSet<>();
+                testResults.forEach((key, value) -> {
+                    TestNGResults.TestMethod dummyPassMethod = new TestNGResults.TestMethod(key, TestNGResults.TestResult.PASS, testNGResults.buildNumber);
+                    dummyPassMethod.setUrlForTestMethod(testNGResults.uiUrl, usedUrls);
+                    usedUrls.add(dummyPassMethod.url);
+                    value.add(dummyPassMethod);
+                });
             }
         });
         return testResults;
     }
 
-    private boolean isRealFailure(Map.Entry<TestNGResults.TestMethod, List<TestNGResults.TestResult>> entry) {
-        if (entry.getValue().get(0) == TestNGResults.TestResult.PASS) {
+    private boolean isRealFailure(Map.Entry<TestNGResults.TestMethod, List<TestNGResults.TestMethod>> entry) {
+        if (entry.getValue().get(0).status == TestNGResults.TestResult.PASS) {
             return false;
         }
-        return entry.getValue().stream().filter(value -> value == TestNGResults.TestResult.FAIL).count() > 1;
+        return entry.getValue().stream().filter(value -> value.status == TestNGResults.TestResult.FAIL).count() > 1;
     }
 
     private String createJobFragment(int jobIndex, JobDetails fullDetails, List<TestNGResults.TestMethod> failingMethods) {
@@ -273,7 +285,7 @@ public class FindRealTestFailures extends BaseAction {
         int index = 0;
         for (TestNGResults.TestMethod method : failingMethods) {
             String filledInRow = rowFragment.replace("#testName", method.fullTestName());
-            filledInRow = filledInRow.replace("#testResultDescription", method.testResultsDescription());
+            filledInRow = filledInRow.replace("#testResultDescription", method.testResultsLinks());
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
             if (method.status == null) {
                 log.warn("No status found for test method {}", method.fullTestName());

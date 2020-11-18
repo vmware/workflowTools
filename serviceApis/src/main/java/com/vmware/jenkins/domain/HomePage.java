@@ -49,7 +49,7 @@ public class HomePage {
         }
 
         public String listHtmlFragment() {
-            return "<li><a href = '" + htmlFileName() + "'>" + viewNameWithFailureCount() + "</a></li>";
+            return "<li><a href = \"" + htmlFileName() + "\" " + titleAttribute() + ">" + viewNameWithFailureCount() + "</a></li>";
         }
 
         public boolean matches(String value) {
@@ -77,6 +77,14 @@ public class HomePage {
                 nameInUrl = nameInUrl.substring(0, nameInUrl.length() - 1);
             }
             return nameInUrl;
+        }
+
+        private String titleAttribute() {
+            if (failingTestsGenerationException == null || failingTestsGenerationException.getMessage() == null) {
+                return "";
+            }
+            String messageWithoutDoubleQuotes = failingTestsGenerationException.getMessage().replace("\"", "'");
+            return "title=\"" + messageWithoutDoubleQuotes + "\"";
         }
     }
 }

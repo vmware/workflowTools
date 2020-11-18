@@ -1,5 +1,7 @@
 package com.vmware.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +24,13 @@ public class StringUtils {
         if (StringUtils.isEmpty(value)) {
             throw new FatalException("{} cannot be null", propertyName);
         }
+    }
+
+    public static String exceptionAsString(Exception e) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        e.printStackTrace(writer);
+        return stringWriter.toString();
     }
 
     public static String findStringWithStartAndEnd(String text, String start, String end) {
