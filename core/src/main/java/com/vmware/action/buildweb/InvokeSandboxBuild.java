@@ -1,13 +1,12 @@
 package com.vmware.action.buildweb;
 
-import com.vmware.BuildResult;
-import com.vmware.JobBuild;
+import com.vmware.BuildStatus;
 import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BasePerforceCommitAction;
 import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.config.jenkins.Job;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
@@ -97,7 +96,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             String buildTypeUrl = commitConfig.buildwebUrl + "/" + buildwebId.getBuildType();
             Job sandboxJob = Job.buildwebJob(buildTypeUrl, buildwebConfig.buildDisplayName);
             draft.updateTestingDoneWithJobBuild(sandboxJob,
-                    new JobBuild(sandboxJob.jobDisplayName, buildUrl, BuildResult.BUILDING));
+                    new JobBuild(sandboxJob.name, buildUrl, BuildStatus.BUILDING));
         } else {
             throw new RuntimeException("Unable to parse build url from output using pattern " + buildIdPattern);
         }

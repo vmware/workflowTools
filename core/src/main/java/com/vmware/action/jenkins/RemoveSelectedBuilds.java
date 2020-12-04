@@ -3,10 +3,10 @@ package com.vmware.action.jenkins;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Removes selected jenkins builds from testing done section of commit.")
@@ -21,7 +21,7 @@ public class RemoveSelectedBuilds extends BaseCommitWithJenkinsBuildsAction {
         List<JobBuild> matchingBuilds = draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl);
         log.info("");
         List<String> choices = new ArrayList<>();
-        matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.buildDisplayName));
+        matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.name));
         choices.add("None");
         List<Integer> selections = InputUtils.readSelections(choices, "Select jenkins builds to remove from commit", false);
         // check selection doesn't contain none value

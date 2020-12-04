@@ -1,8 +1,7 @@
 package com.vmware.jenkins;
 
 import com.vmware.AbstractRestBuildService;
-import com.vmware.BuildResult;
-import com.vmware.JobBuild;
+import com.vmware.BuildStatus;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
@@ -12,13 +11,12 @@ import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.jenkins.domain.CsrfCrumb;
-import com.vmware.config.jenkins.Job;
-import com.vmware.jenkins.domain.JobBuildDetails;
-import com.vmware.jenkins.domain.JobDetails;
+import com.vmware.jenkins.domain.JobBuild;
+import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.HomePage;
-import com.vmware.jenkins.domain.TestNGResults;
-import com.vmware.jenkins.domain.ViewDetails;
+import com.vmware.jenkins.domain.TestResults;
+import com.vmware.jenkins.domain.JobView;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
 import com.vmware.util.UrlUtils;
@@ -77,50 +75,48 @@ public class Jenkins extends AbstractRestBuildService {
         optimisticPost(jobToInvoke.getBuildWithParametersUrl(), params.toMap());
     }
 
-    public ViewDetails getFullViewDetails(String viewUrl) {
-        return optimisticGet(UrlUtils.addRelativePaths(viewUrl, "api/json?depth=1"), ViewDetails.class);
+    public JobView getFullViewDetails(String viewUrl) {
+        return optimisticGet(UrlUtils.addRelativePaths(viewUrl, "api/json?depth=1"), JobView.class);
     }
 
-    public JobDetails getJobDetails(Job jobToInvoke) {
+    public Job getJobDetails(Job jobToInvoke) {
         return getJobDetails(jobToInvoke.getInfoUrl());
     }
 
-    public JobDetails getJobDetails(String url) {
-        return optimisticGet(url, JobDetails.class);
+    public Job getJobDetails(String url) {
+        return optimisticGet(url, Job.class);
     }
 
-    public JobBuildDetails getJobBuildDetails(JobBuildDetails jobBuild) {
-        return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
+    public JobBuild getJobBuildDetails(JobBuild jobBuild) {
+        return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuild.class);
     }
 
-    public JobBuildDetails getJobBuildDetails(JobBuild jobBuild) {
-        return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuildDetails.class);
-    }
-
-    public JobBuildDetails getJobBuildDetails(String jobName, int buildNumber) {
+    public JobBuild getJobBuildDetails(String jobName, int buildNumber) {
         String jobUrl = UrlUtils.addRelativePaths(baseUrl, "job", jobName);
         return getJobBuildDetails(new JobBuild(buildNumber, jobUrl));
     }
 
-    public TestNGResults getJobBuildTestResults(JobBuildDetails jobBuild) {
-        return optimisticGet(jobBuild.getTestReportsApiUrl(), TestNGResults.class);
+    public TestResults getJobBuildTestResults(JobBuild jobBuild) {
+        TestResults results = optimisticGet(jobBuild.getTestReportsApiUrl(), TestResults.class);
+        results.setBuild(jobBuild);
+        return results;
     }
 
     public void abortJobBuild(JobBuild jobBuildToAbort) {
         log.info("Aborting build {}", jobBuildToAbort.url);
-        optimisticPost(jobBuildToAbort.getJenkinsStopUrl(), null);
-        jobBuildToAbort.result = BuildResult.ABORTED;
+        optimisticPost(jobBuildToAbort.stopUrl(), null);
+        jobBuildToAbort.status = BuildStatus.ABORTED;
     }
 
-    public void logOutputForBuildsMatchingResult(ReviewRequestDraft draft, int linesToShow, BuildResult... buildTypes) {
+    public void logOutputForBuildsMatchingResult(ReviewRequestDraft draft, int linesToShow, BuildStatus... buildTypes) {
         String urlToCheckFor = urlUsedInBuilds();
         log.debug("Displaying output for builds matching url {} of type {}", urlToCheckFor, Arrays.toString(buildTypes));
         List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
         jobsToCheck.stream().filter(build -> build.matches(buildTypes))
                 .forEach(jobBuild -> {
-                    Padder buildPadder = new Padder("Jenkins build {} result {}", jobBuild.id(), jobBuild.result);
+                    Padder buildPadder = new Padder("Jenkins build {} status {}", jobBuild.buildNumber(), jobBuild.status);
                     buildPadder.infoTitle();
-                    String consoleOutput = IOUtils.tail(jobBuild.getConsoleOutputUrl(), linesToShow);
+                    String consoleOutput = IOUtils.tail(jobBuild.consoleUrl(), linesToShow);
                     log.info(consoleOutput);
                     buildPadder.infoTitle();
                 });
@@ -131,7 +127,7 @@ public class Jenkins extends AbstractRestBuildService {
         log.info("Aborting all builds matching url {}", urlToCheckFor);
         List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
         List<JobBuild> runningBuilds = jobsToCheck.stream()
-                .filter(jobBuild -> jobBuild.result == BuildResult.BUILDING).collect(Collectors.toList());
+                .filter(jobBuild -> jobBuild.status == BuildStatus.BUILDING).collect(Collectors.toList());
         if (runningBuilds.isEmpty()) {
             log.info("No builds running");
             return;
@@ -141,9 +137,9 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     @Override
-    protected BuildResult getResultForBuild(String url) {
+    protected BuildStatus getResultForBuild(String url) {
         String jobApiUrl = UrlUtils.addTrailingSlash(url) + "api/json";
-        JobBuildDetails buildDetails = this.getJobBuildDetails(jobApiUrl);
+        JobBuild buildDetails = this.getJobBuildDetails(jobApiUrl);
         return buildDetails.realResult();
     }
 
@@ -168,8 +164,8 @@ public class Jenkins extends AbstractRestBuildService {
         connection.setupBasicAuthHeader(credentials);
     }
 
-    private JobBuildDetails getJobBuildDetails(String jobBuildUrl) {
-        return optimisticGet(jobBuildUrl, JobBuildDetails.class);
+    private JobBuild getJobBuildDetails(String jobBuildUrl) {
+        return optimisticGet(jobBuildUrl, JobBuild.class);
     }
 
     @Override

@@ -3,12 +3,12 @@ package com.vmware.reviewboard.domain;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.vmware.BuildResult;
+import com.vmware.BuildStatus;
 import com.vmware.IssueInfo;
-import com.vmware.JobBuild;
 import com.vmware.config.section.CommitConfig;
-import com.vmware.config.jenkins.Job;
 import com.vmware.gitlab.domain.MergeRequest;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jira.domain.Issue;
 import com.vmware.util.DateUtils;
 import com.vmware.util.StringUtils;
@@ -182,6 +182,7 @@ public class ReviewRequestDraft extends BaseEntity {
             log.warn("Text is blank, can't extract commit values!");
             return;
         }
+        this.commitId = parseSingleLineFromText(commitText, "commit\\s+(\\w+)", "Git commit id", DEBUG);
         this.perforceChangelistId = parseSingleLineFromText(commitText, "^Change\\s+(\\d+)", "Perforce Changelist Id", DEBUG);
         if (isNotEmpty(perforceChangelistId)) {
             log.debug("Matched first line of perforce changelist, id was {}", perforceChangelistId);
@@ -260,7 +261,7 @@ public class ReviewRequestDraft extends BaseEntity {
 
     public JobBuild getMatchingJobBuild(Job job) {
         for (JobBuild build : jobBuilds) {
-            if (StringUtils.equals(job.jobDisplayName, build.buildDisplayName) && build.url.startsWith(job.url)) {
+            if (StringUtils.equals(job.name, build.name) && build.url.startsWith(job.url)) {
                 return build;
             }
         }
@@ -278,7 +279,7 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     private String buildWithResultPattern(String buildUrlsPattern) {
-        return buildPattern(buildUrlsPattern) + "\\s+" + BuildResult.generateResultPattern();
+        return buildPattern(buildUrlsPattern) + "\\s+" + BuildStatus.generateResultPattern();
     }
 
     private List<JobBuild> generateJobBuildsList(String text, String jobUrlPattern) {
@@ -287,8 +288,8 @@ public class ReviewRequestDraft extends BaseEntity {
         while (buildMatcher.find()) {
             String buildDisplayName = buildMatcher.group(1);
             String buildUrl = buildMatcher.group(2);
-            BuildResult buildResult = buildMatcher.groupCount() > 2 ? BuildResult.valueOf(buildMatcher.group(3)) : null;
-            jobBuilds.add(new JobBuild(buildDisplayName, buildUrl, buildResult));
+            BuildStatus buildStatus = buildMatcher.groupCount() > 2 ? BuildStatus.valueOf(buildMatcher.group(3)) : null;
+            jobBuilds.add(new JobBuild(buildDisplayName, buildUrl, buildStatus));
         }
         return jobBuilds;
     }
@@ -333,7 +334,7 @@ public class ReviewRequestDraft extends BaseEntity {
     public boolean allJobBuildsMatchingUrlAreComplete(String url) {
         List<JobBuild> builds = jobBuildsMatchingUrl(url);
         for (JobBuild buildToCheck : builds) {
-            if (buildToCheck.result == BuildResult.BUILDING) {
+            if (buildToCheck.status == BuildStatus.BUILDING) {
                 return false;
             }
         }
@@ -380,7 +381,7 @@ public class ReviewRequestDraft extends BaseEntity {
             log.debug("Replacing existing build url {} in testing done ", existingBuild.url);
             log.debug("New build url {}", expectedNewBuild.url);
             existingBuild.url = expectedNewBuild.url;
-            existingBuild.result = expectedNewBuild.result;
+            existingBuild.status = expectedNewBuild.status;
         }
     }
 

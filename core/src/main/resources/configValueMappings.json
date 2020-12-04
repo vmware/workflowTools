@@ -58,6 +58,9 @@
     "--store-trees",
     "--changelist-id"
   ],
+  "DisplayCommitsForIssues": [
+    "--max-commits"
+  ],
   "SaveFileData": [
     "--file-data",
     "--destination-file"
@@ -212,6 +215,9 @@
   "WaitForJenkinsBuildsToComplete": [
     "--wait-time"
   ],
+  "LoadAllIssuesForEpic": [
+    "--epic-id"
+  ],
   "DeleteJsonProperty": [
     "--file-data",
     "--json-property-path"
@@ -321,6 +327,7 @@
     "--diff-file"
   ],
   "CheckStatusOfLatestBuilds": [
+    "--max-builds",
     "--username",
     "--jenkins-jobs"
   ],
@@ -422,8 +429,6 @@
     "--always-include-review-url"
   ],
   "ExecuteSqlStatement": [
-    "--database-password",
-    "--database-username",
     "--database-driver-class",
     "--database-driver-file",
     "--sql-statement",
@@ -435,6 +440,10 @@
   ],
   "FindRealTestFailures": [
     "--username",
+    "--database-url",
+    "--database-driver-class",
+    "--database-driver-file",
+    "--max-builds",
     "--destination-file",
     "--jenkins-view"
   ],

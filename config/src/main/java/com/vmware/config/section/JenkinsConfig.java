@@ -2,7 +2,7 @@ package com.vmware.config.section;
 
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
-import com.vmware.config.jenkins.JobParameter;
+import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -28,8 +28,11 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "-ignoreJobFailure,--ignore-jenkins-job-failure", help = "If wait for Jenkins job result is set, then ignore job failure and run the next build")
     public boolean ignoreJenkinsJobFailure;
 
-    @ConfigurableProperty(help = "Max number of jenkins jobs to iterate over when checking for latest status of jenkins job")
+    @ConfigurableProperty(commandLine = "--max-builds", help = "Max number of jenkins builds to iterate over when checking for latest status of jenkins job")
     public int maxJenkinsBuildsToCheck;
+
+    @ConfigurableProperty(commandLine = "--build-failure-threshold", help = "Threshold for failing tests and config being considered a normal amount")
+    public int buildFailureThreshold;
 
     @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the names and parameters for the jenkins jobs to invoke. Separate jobs by commas and parameters by ampersands")
     public String jenkinsJobsToUse;
@@ -75,6 +78,12 @@ public class JenkinsConfig {
 
     @ConfigurableProperty(commandLine = "--always-download", help = "Always select a build to download artifiact from")
     public boolean alwaysDownload;
+
+    @ConfigurableProperty(help = "Pattern for parsing commit id from build description")
+    public String commitIdInDescriptionPattern;
+
+    @ConfigurableProperty(help = "Url for displaying comparison between two build commit ids. Needs to contain named groups first and second")
+    public String commitComparisonUrl;
 
     public boolean hasConfiguredArtifact() {
         return StringUtils.isNotEmpty(jobArtifact) && jobBuildNumber != null

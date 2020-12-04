@@ -1,19 +1,16 @@
 package com.vmware.action.jenkins;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jenkins.domain.JobBuildArtifact;
-import com.vmware.jenkins.domain.JobBuildDetails;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
-import com.vmware.util.UrlUtils;
 import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Download a specified artifact from a jenkins build.")
@@ -33,19 +30,19 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
 
     @Override
     public void process() {
-        JobBuildDetails buildDetails = getJobBuildDetails();
-        replacementVariables.addVariable(ReplacementVariables.VariableName.BUILD_NUMBER, buildDetails.number);
+        JobBuild buildDetails = getJobBuildDetails();
+        replacementVariables.addVariable(ReplacementVariables.VariableName.BUILD_NUMBER, buildDetails.number());
 
         String fullUrl = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
         JobBuildArtifact matchingArtifact = buildDetails.getArtifactForPathPattern(jenkinsConfig.jobArtifact);
-        String downloadedFileName = FileUtils.appendToFileName(matchingArtifact.fileName, buildDetails.number);
+        String downloadedFileName = FileUtils.appendToFileName(matchingArtifact.fileName, buildDetails.number());
         log.info("Downloading build artifact {}", fullUrl);
         fileSystemConfig.fileData = IOUtils.read(fullUrl);
         replacementVariables.addVariable(ReplacementVariables.VariableName.LAST_DOWNLOADED_FILE_NAME, downloadedFileName);
     }
 
-    private JobBuildDetails getJobBuildDetails() {
-        JobBuildDetails buildDetails;
+    private JobBuild getJobBuildDetails() {
+        JobBuild buildDetails;
         if (jenkinsConfig.hasConfiguredArtifact()) {
             log.info("Downloading artifact {} from job {} with build number {}", jenkinsConfig.jobArtifact,
                     jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
@@ -63,12 +60,12 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
             return matchingBuilds.get(draft.selectedBuild);
         }
         if (matchingBuilds.size() == 1) {
-            log.info("Using build {} as it is the only Jenkins build", matchingBuilds.get(0).buildDisplayName);
+            log.info("Using build {} as it is the only Jenkins build", matchingBuilds.get(0).name);
             draft.selectedBuild = 0;
             return matchingBuilds.get(0);
         } else {
             List<String> choices = new ArrayList<>();
-            matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.buildDisplayName));
+            matchingBuilds.forEach(jobBuild -> choices.add(jobBuild.name));
             int selection = InputUtils.readSelection(choices, "Select jenkins builds to download artifact " + jenkinsConfig.jobArtifact + " for");
             draft.selectedBuild = selection;
             return matchingBuilds.get(selection);

@@ -5,10 +5,13 @@
  */
 package com.vmware.action.base;
 
-import com.vmware.JobBuild;
+import java.util.Collections;
+import java.util.List;
+
 import com.vmware.action.BaseAction;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.config.jenkins.Job;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
@@ -17,9 +20,6 @@ import com.vmware.util.input.InputUtils;
 import com.vmware.util.scm.FileChange;
 import com.vmware.util.scm.NoPerforceClientForDirectoryException;
 import com.vmware.util.scm.Perforce;
-
-import java.util.Collections;
-import java.util.List;
 
 public abstract class BaseCommitAction extends BaseAction {
 
@@ -122,7 +122,7 @@ public abstract class BaseCommitAction extends BaseAction {
         JobBuild sandboxBuild = draft.getMatchingJobBuild(sandboxJob);
         String buildId;
         if (sandboxBuild != null) {
-            buildId = sandboxBuild.id();
+            buildId = sandboxBuild.buildNumber();
             if (buildId == null) {
                 throw new FatalException("No build number found in url " + sandboxBuild.url);
             }

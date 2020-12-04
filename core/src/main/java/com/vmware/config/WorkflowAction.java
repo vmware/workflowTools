@@ -76,7 +76,7 @@ public class WorkflowAction implements Action {
             existingValuesForConfig = config.getExistingValues(paramsMap.keySet());
             config.applyConfigValues(paramsMap, actionClass.getSimpleName(), true);
             config.applyReplacementVariables();
-            config.setupLogLevel();
+            config.setupLogging();
         }
         try {
             instantiatedAction.checkIfActionShouldBeSkipped();
@@ -137,7 +137,7 @@ public class WorkflowAction implements Action {
     private void resetConfigValues() {
         if (!overriddenConfigValues.isEmpty()) {
             config.applyValuesWithSource(existingValuesForConfig);
-            config.setupLogLevel();
+            config.setupLogging();
         }
     }
 

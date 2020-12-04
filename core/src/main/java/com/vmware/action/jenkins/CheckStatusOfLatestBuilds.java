@@ -1,13 +1,11 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.JobBuild;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.config.jenkins.Job;
 import com.vmware.jenkins.Jenkins;
-import com.vmware.jenkins.domain.JobBuildDetails;
-import com.vmware.jenkins.domain.JobDetails;
+import com.vmware.jenkins.domain.JobBuild;
+import com.vmware.jenkins.domain.Job;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 
@@ -40,14 +38,14 @@ public class CheckStatusOfLatestBuilds extends BaseAction {
     }
 
     private void checkStatusOfLatestJob(Job jobToCheck) {
-        JobBuildDetails matchedBuild = null;
+        JobBuild matchedBuild = null;
 
         log.info("Checking status of job {}", jobToCheck);
         log.debug("Using url {}", jobToCheck.url);
-        JobDetails jobDetails = jenkins.getJobDetails(jobToCheck);
+        Job job = jenkins.getJobDetails(jobToCheck);
         int buildCounter = 0;
-        for (JobBuildDetails build : jobDetails.builds) {
-            JobBuildDetails buildDetails = jenkins.getJobBuildDetails(build);
+        for (JobBuild build : job.builds) {
+            JobBuild buildDetails = jenkins.getJobBuildDetails(build);
             buildCounter++;
             if (buildDetails.getJobInitiator().equals(config.username)) {
                 matchedBuild = buildDetails;

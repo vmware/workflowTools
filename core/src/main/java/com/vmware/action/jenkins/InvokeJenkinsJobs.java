@@ -1,15 +1,14 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.BuildResult;
-import com.vmware.JobBuild;
+import com.vmware.BuildStatus;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.config.jenkins.Job;
-import com.vmware.config.jenkins.JobParameter;
+
 import com.vmware.config.jenkins.JenkinsJobsConfig;
-import com.vmware.jenkins.domain.JobBuildDetails;
-import com.vmware.jenkins.domain.JobDetails;
+import com.vmware.jenkins.domain.JobBuild;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.ParameterDefinition;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -70,14 +69,14 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
         log.info("Waiting for build to complete");
         Callable<Boolean> condition = () -> {
-            JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
+            JobBuild updatedDetails = jenkins.getJobBuildDetails(newBuild);
             return updatedDetails.building;
         };
         ThreadUtils.waitForCallable(condition, config.waitTimeForBlockingWorkflowAction, TimeUnit.SECONDS, "Build failed to complete.");
 
-        JobBuildDetails updatedDetails = jenkins.getJobBuildDetails(newBuild);
+        JobBuild updatedDetails = jenkins.getJobBuildDetails(newBuild);
         log.info("Job status {}", updatedDetails.realResult());
-        return updatedDetails.realResult() == BuildResult.SUCCESS;
+        return updatedDetails.realResult() == BuildStatus.SUCCESS;
     }
 
     private void askForJenkinsJobKeysIfBlank() {
@@ -94,17 +93,17 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, Job jobToInvoke) {
-        log.info("Invoking job {} using display name {}", jobToInvoke.name, jobToInvoke.jobDisplayName);
+        log.info("Invoking job {} using display name {}", jobToInvoke.name, jobToInvoke.name);
 
-        JobDetails jobDetails = jenkins.getJobDetails(jobToInvoke);
-        JobParameters params = constructParametersForJob(jobToInvoke.parameters, jobDetails.getParameterDefinitions());
+        Job job = jenkins.getJobDetails(jobToInvoke);
+        JobParameters params = constructParametersForJob(jobToInvoke.parameters, job.getParameterDefinitions());
 
         int buildNumber = jenkins.getJobDetails(jobToInvoke).nextBuildNumber;
 
         JobBuild expectedNewBuild = new JobBuild(buildNumber, jobToInvoke.url);
-        expectedNewBuild.buildDisplayName = jobToInvoke.jobDisplayName;
+        expectedNewBuild.name = jobToInvoke.name;
 
-        if (jobDetails.getParameterDefinitions().isEmpty()) {
+        if (job.getParameterDefinitions().isEmpty()) {
             log.info("Invoking job {} with no parameters", expectedNewBuild.url);
             jenkins.invokeJob(jobToInvoke);
         } else {

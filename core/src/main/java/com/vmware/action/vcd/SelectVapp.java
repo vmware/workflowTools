@@ -4,7 +4,7 @@ import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.jenkins.domain.JobBuildDetails;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.QueryResultVappType;
@@ -38,7 +38,7 @@ public class SelectVapp extends BaseVappAction {
             log.info("Using Vapp json file {}", vcdConfig.vappJsonFile);
             vappData.setSelectedVapp(new QueryResultVappType("url", vcdConfig.vappJsonFile));
         } else if (!vcdConfig.useOwnedVappsOnly && jenkinsConfig.hasConfiguredArtifact()) {
-            JobBuildDetails buildDetails = serviceLocator.getJenkins().getJobBuildDetails(jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
+            JobBuild buildDetails = serviceLocator.getJenkins().getJobBuildDetails(jobWithArtifactName(), jenkinsConfig.jobBuildNumber);
             String jobArtifactPath = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
             log.info("Using artifact {}", jobArtifactPath);
             vappData.setSelectedVapp(new QueryResultVappType("artifact", jobArtifactPath));

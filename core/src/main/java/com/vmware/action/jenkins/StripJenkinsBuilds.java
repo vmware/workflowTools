@@ -1,9 +1,9 @@
 package com.vmware.action.jenkins;
 
-import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jenkins.domain.JobBuild;
 
 @ActionDescription("Strips jenkins build text from testing done section of commit.")
 public class StripJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {

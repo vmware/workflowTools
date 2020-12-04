@@ -1,7 +1,6 @@
 package com.vmware.jenkins.domain;
 
 import com.google.gson.annotations.Expose;
-import com.vmware.config.jenkins.Job;
 import com.vmware.util.StringUtils;
 
 import java.util.NoSuchElementException;

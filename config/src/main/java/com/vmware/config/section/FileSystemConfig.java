@@ -1,5 +1,6 @@
 package com.vmware.config.section;
 
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.vmware.config.ConfigurableProperty;
@@ -68,5 +69,14 @@ public class FileSystemConfig {
 
     public boolean databaseConfigured() {
         return Stream.of(databaseUrl, databaseUsername, databasePassword).allMatch(StringUtils::isNotBlank);
+    }
+
+    public Properties dbConnectionProperties() {
+        Properties connectionProperties = new Properties();
+        connectionProperties.put("url", databaseUrl);
+        connectionProperties.put("user", databaseUsername);
+        connectionProperties.put("password", databasePassword);
+        return connectionProperties;
+
     }
 }

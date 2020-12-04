@@ -4,9 +4,9 @@ import com.vmware.action.base.BaseCommitWithBuildwebBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-import static com.vmware.BuildResult.BUILDING;
-import static com.vmware.BuildResult.FAILURE;
-import static com.vmware.BuildResult.UNSTABLE;
+import static com.vmware.BuildStatus.BUILDING;
+import static com.vmware.BuildStatus.FAILURE;
+import static com.vmware.BuildStatus.UNSTABLE;
 
 @ActionDescription("Tails the output for buildweb builds that are not successful.")
 public class DisplayBuildOutputForBuildwebBuilds extends BaseCommitWithBuildwebBuildsAction {

@@ -1,8 +1,7 @@
 package com.vmware.buildweb;
 
 import com.vmware.AbstractRestBuildService;
-import com.vmware.BuildResult;
-import com.vmware.JobBuild;
+import com.vmware.BuildStatus;
 import com.vmware.buildweb.domain.BuildMachine;
 import com.vmware.buildweb.domain.BuildMachines;
 import com.vmware.buildweb.domain.BuildwebBuild;
@@ -10,6 +9,7 @@ import com.vmware.buildweb.domain.BuildwebId;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
@@ -41,15 +41,15 @@ public class Buildweb extends AbstractRestBuildService {
         return connection.get(addRelativePaths(baseUrl, buildType, "build", idForBuild), BuildwebBuild.class);
     }
 
-    public void logOutputForBuilds(ReviewRequestDraft draft, int linesToShow, BuildResult... results) {
+    public void logOutputForBuilds(ReviewRequestDraft draft, int linesToShow, BuildStatus... results) {
         String urlToCheckFor = urlUsedInBuilds();
         log.debug("Displaying output for failed builds matching url {}", urlToCheckFor);
         List<JobBuild> jobsToCheck = draft.jobBuildsMatchingUrl(urlToCheckFor);
         jobsToCheck.stream().filter(jobBuild -> jobBuild.matches(results))
                 .forEach(jobBuild -> {
-                    Padder buildPadder = new Padder("Buildweb build {} result {}", jobBuild.id(), jobBuild.result);
+                    Padder buildPadder = new Padder("Buildweb build {} result {}", jobBuild.buildNumber(), jobBuild.status);
                     buildPadder.infoTitle();
-                    log.info(getBuildOutput(jobBuild.id(), linesToShow));
+                    log.info(getBuildOutput(jobBuild.buildNumber(), linesToShow));
                     buildPadder.infoTitle();
                 });
     }
@@ -61,13 +61,13 @@ public class Buildweb extends AbstractRestBuildService {
 
     public String getLogsUrl(String buildId) {
         BuildwebBuild build = getSandboxBuild(buildId);
-        if (build.buildResult == BuildResult.STARTING) {
+        if (build.buildStatus == BuildStatus.STARTING) {
             return null;
         }
         BuildMachines machines = connection.get(addRelativePaths(baseUrl, build.buildMachinesUrl), BuildMachines.class);
         BuildMachine buildMachine = machines.realBuildMachine();
         String logsUrl;
-        if (build.buildResult == BuildResult.BUILDING) {
+        if (build.buildStatus == BuildStatus.BUILDING) {
             logsUrl = addRelativePaths("http://" + buildMachine.hostName, build.relativeBuildTreePath(), "logs", buildwebLogFileName);
         } else {
             logsUrl = addRelativePaths(build.buildTreeUrl, "logs", buildMachine.hostType, buildwebLogFileName);
@@ -90,11 +90,11 @@ public class Buildweb extends AbstractRestBuildService {
     }
 
     @Override
-    protected BuildResult getResultForBuild(String url) {
+    protected BuildStatus getResultForBuild(String url) {
         BuildwebId buildwebId = new BuildwebId(MatcherUtils.singleMatchExpected(url, "/(\\w\\w/\\d++)"));
         String buildApiUrl = baseUrl + buildwebId.buildApiPath();
         BuildwebBuild build = optimisticGet(buildApiUrl, BuildwebBuild.class);
-        return build.buildResult;
+        return build.buildStatus;
     }
 
     @Override

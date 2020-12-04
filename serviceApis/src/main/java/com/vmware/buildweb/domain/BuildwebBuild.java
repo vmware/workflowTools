@@ -3,7 +3,7 @@ package com.vmware.buildweb.domain;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.vmware.BuildResult;
+import com.vmware.BuildStatus;
 
 import java.net.URI;
 
@@ -22,7 +22,7 @@ public class BuildwebBuild {
     @Expose(serialize = false)
     @SerializedName("buildstate")
     @JsonAdapter(BuildResultDeserializer.class)
-    public BuildResult buildResult;
+    public BuildStatus buildStatus;
 
     @SerializedName("_buildtree_url")
     public String buildTreeUrl;

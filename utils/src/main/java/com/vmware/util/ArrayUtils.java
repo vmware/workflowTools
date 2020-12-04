@@ -1,16 +1,34 @@
 package com.vmware.util;
 
+import java.util.Arrays;
+
 public class ArrayUtils {
 
     public static <T> boolean contains(final T[] values, final T valueToFind) {
         if (values == null) {
             return false;
         }
-        for (final T value : values)
-            if (value == valueToFind || valueToFind != null && valueToFind.equals(value))
-                return true;
+        return Arrays.asList(values).contains(valueToFind);
+    }
 
-        return false;
+    public static int[] add(int[] existingValues, int value) {
+        if (existingValues == null) {
+            return new int[] {value};
+        } else {
+            int length = existingValues.length + 1;
+            int[] result = new int[length];
+            System.arraycopy(existingValues, 0, result, 0, existingValues.length);
+            result[result.length - 1] = value;
+            return result;
+        }
+    }
+
+    public static int[] remove(int[] existingValues, int value) {
+        if (existingValues == null || Arrays.stream(existingValues).noneMatch(i -> i == value)) {
+            return existingValues;
+        } else {
+            return Arrays.stream(existingValues).filter(i -> i != value).toArray();
+        }
     }
 
     public static String[] join(String[] firstArray, String[] secondArray) {

@@ -19,6 +19,9 @@ public class JiraConfig {
     @ConfigurableProperty(help = "Default Jira project to use")
     public String defaultJiraProject;
 
+    @ConfigurableProperty(commandLine = "--epic-id", help = "Jira epic to use")
+    public String epicId;
+
     @ConfigurableProperty(commandLine = "-defaultJiraComponent,--default-jira-component", help = "Default Jira component to use for creating issues")
     public String defaultJiraComponent;
 

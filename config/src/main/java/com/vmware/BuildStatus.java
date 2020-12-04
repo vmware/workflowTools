@@ -6,7 +6,7 @@ import java.util.EnumSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public enum BuildResult {
+public enum BuildStatus {
     SUCCESS,
     UNSTABLE,
     FAILURE,
@@ -15,11 +15,11 @@ public enum BuildResult {
     STARTING;
 
     public static String generateResultPattern() {
-        String patternValues = StringUtils.appendWithDelimiter("", EnumSet.allOf(BuildResult.class), "|");
+        String patternValues = StringUtils.appendWithDelimiter("", EnumSet.allOf(BuildStatus.class), "|");
         return "(" + patternValues + ")";
     }
 
-    public static BuildResult fromValue(String value) {
+    public static BuildStatus fromValue(String value) {
         switch (value) {
             case "starting":
             case "building-components":
@@ -33,10 +33,10 @@ public enum BuildResult {
             case "storing":
                 return SUCCESS;
             case "compile-error":
-                return BuildResult.FAILURE;
+                return BuildStatus.FAILURE;
             default:
-                getLogger(BuildResult.class).info("Treating buildweb build state {} as a failure", value);
-                return BuildResult.FAILURE;
+                getLogger(BuildStatus.class).info("Treating buildweb build state {} as a failure", value);
+                return BuildStatus.FAILURE;
         }
     }
 

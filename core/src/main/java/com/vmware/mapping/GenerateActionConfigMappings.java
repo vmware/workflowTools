@@ -1,7 +1,23 @@
 package com.vmware.mapping;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import com.google.gson.Gson;
-import com.vmware.action.Action;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.config.WorkflowActionLister;
@@ -19,27 +35,9 @@ import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.SimpleLogFormatter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 
@@ -185,7 +183,6 @@ public class GenerateActionConfigMappings {
         globalLogger.setLevel(Level.INFO);
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Enumeration<URL> resources = loader.getResources("com");
 
         if (args.length == 0) {
             log.error("Module base directory not specified");

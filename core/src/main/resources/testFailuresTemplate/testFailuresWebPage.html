@@ -24,7 +24,7 @@
         .css-treeview ul,
         .css-treeview li
         {
-            padding: 0;
+            padding: 2px;
             margin: 0;
             list-style: none;
         }
@@ -97,11 +97,25 @@
             transform: rotate(90deg);
         }
 
-        .css-treeview .testFail, .css-treeview .testPass {
+        .css-treeview .testFail, .css-treeview .testSkip, .css-treeview .testPass {
             padding: 3px 6px;
-            color: white;
+            color: black;
             text-decoration: none;
             display: inline-block;
+        }
+
+        .css-treeview .suspects
+        {
+            padding: 3px 6px;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            background-color: whitesmoke;
+        }
+
+        .suspects:hover, .suspects:active {
+            background-color: navajowhite;
         }
 
         .testFail
@@ -113,12 +127,21 @@
             background-color: red;
         }
 
+        .testSkip
+        {
+            background-color: yellow;
+        }
+
+        .testSkip:hover, .testSkip:active {
+            background-color: darkkhaki;
+        }
+
         .testPass
         {
             background-color: lightgreen;
         }
 
-        .testPass:hover, a:active {
+        .testPass:hover, .testPass:active {
             background-color: green;
         }
 

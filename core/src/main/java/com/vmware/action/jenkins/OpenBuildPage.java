@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.util.SystemUtils;
 import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;

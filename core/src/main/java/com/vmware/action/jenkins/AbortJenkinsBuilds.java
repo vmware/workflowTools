@@ -3,10 +3,10 @@ package com.vmware.action.jenkins;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.JobBuild;
-import com.vmware.BuildResult;
+import com.vmware.BuildStatus;
 import com.vmware.http.exception.NotFoundException;
-import com.vmware.config.jenkins.Job;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.StringUtils;
@@ -52,7 +52,7 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
             return;
         }
 
-        if (buildToAbort.result != BuildResult.BUILDING) {
+        if (buildToAbort.status != BuildStatus.BUILDING) {
             return;
         }
 
@@ -64,6 +64,6 @@ public class AbortJenkinsBuilds extends BaseCommitWithJenkinsBuildsAction {
         }
 
         log.info("Marking build url {} as ABORTED", buildToAbort.url);
-        buildToAbort.result = BuildResult.ABORTED;
+        buildToAbort.status = BuildStatus.ABORTED;
     }
 }

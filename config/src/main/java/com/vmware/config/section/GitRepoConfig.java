@@ -36,6 +36,11 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review and sandbox")
     public boolean useGitTrackingBranch;
 
+    @ConfigurableProperty(commandLine = "--max-commits", help = "Max number of commits to check")
+    public int maxCommitsToCheck;
+
+
+
     public String trackingBranchPath() {
         return String.valueOf(determineTrackingBranchPath().getValue());
     }

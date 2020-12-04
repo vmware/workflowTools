@@ -14,6 +14,12 @@ public class LoggingConfig {
     @ConfigurableProperty(commandLine = "-l,--log,--log-level", help = "Sets log level to any of the following, ERROR,INFO,DEBUG,TRACE")
     public String logLevel;
 
+    @ConfigurableProperty(commandLine = "--output-log-file", help = "File to output logging statements to")
+    public String outputLogFile;
+
+    @ConfigurableProperty(commandLine = "--silent", help = "Prevent logging to console")
+    public boolean silent;
+
     public LogLevel determineLogLevel() {
         if (traceLogLevel) {
             logLevel = LogLevel.TRACE.name();

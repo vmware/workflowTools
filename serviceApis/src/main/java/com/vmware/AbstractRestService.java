@@ -3,15 +3,20 @@ package com.vmware;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ApiException;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.exception.ForbiddenException;
 import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base class for all rest services.
@@ -78,6 +83,10 @@ public abstract class AbstractRestService extends AbstractService {
         } catch (ForbiddenException e) {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
+            return connection.get(url, responseConversionClass, params);
+        } catch (NotFoundException | RuntimeIOException e) {
+            ThreadUtils.sleep(3, TimeUnit.SECONDS);
+            log.info("Retrying GET for url " + url);
             return connection.get(url, responseConversionClass, params);
         }
     }

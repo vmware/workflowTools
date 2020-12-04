@@ -162,6 +162,33 @@ public class StringUtils {
         return builder.toString();
     }
 
+    public static String convertToDbName(String value) {
+        StringBuilder dbName = new StringBuilder("");
+        for (char character : value.toCharArray()) {
+            if (dbName.length() > 0 && Character.isUpperCase(character)) {
+                dbName.append("_");
+            }
+            dbName.append(Character.toUpperCase(character));
+        }
+        return dbName.toString();
+    }
+
+    public static String convertFromDbName(String value) {
+        StringBuilder name = new StringBuilder("");
+        boolean uppercaseNextLetter = false;
+        for (char character : value.toCharArray()) {
+            if (character == '_') {
+                uppercaseNextLetter = true;
+            } else if (uppercaseNextLetter) {
+                name.append(Character.toUpperCase(character));
+                uppercaseNextLetter = false;
+            } else {
+                name.append(Character.toLowerCase(character));
+            }
+        }
+        return name.toString();
+    }
+
     public static String splitOnCapitalization(String value) {
         if (value == null || value.isEmpty()) {
             return "";

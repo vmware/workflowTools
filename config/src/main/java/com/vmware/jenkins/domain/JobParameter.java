@@ -1,4 +1,4 @@
-package com.vmware.config.jenkins;
+package com.vmware.jenkins.domain;
 
 public class JobParameter {
     public static final String USERNAME_PARAM = "USERNAME";

@@ -1,9 +1,9 @@
 package com.vmware.action.review;
 
-import com.vmware.JobBuild;
 import com.vmware.action.base.BaseCommitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -79,8 +79,8 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
                     existingBuilds.stream().filter(build -> build.url.equals(jobBuildFromReview.url)).findFirst();
             if (!existingBuild.isPresent()) {
                 existingBuilds.add(jobBuildFromReview);
-            } else if (jobBuildFromReview.result != null) {
-                existingBuild.get().result = jobBuildFromReview.result;
+            } else if (jobBuildFromReview.status != null) {
+                existingBuild.get().status = jobBuildFromReview.status;
             }
         }
         existingBuilds.removeIf(build -> buildsFromReview.stream()

@@ -1,5 +1,7 @@
 package com.vmware.config.jenkins;
 
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.util.FileUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
@@ -17,8 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.vmware.config.jenkins.JobParameter.NO_USERNAME_PARAMETER;
-import static com.vmware.config.jenkins.JobParameter.USERNAME_PARAM;
+import static com.vmware.jenkins.domain.JobParameter.NO_USERNAME_PARAMETER;
+import static com.vmware.jenkins.domain.JobParameter.USERNAME_PARAM;
 
 /**
  * Encapsulates handling of the jenkins jobs config value.
@@ -78,21 +80,21 @@ public class JenkinsJobsConfig {
         String mappedValue = jenkinsJobsMappings.get(jobInfo);
         Job job = new Job();
         if (mappedValue != null) {
-            job.jobDisplayName = jobInfo;
+            job.name = jobInfo;
             jobInfo = mappedValue;
         } else if (!jobInfo.contains("&")) {
             log.info("Treating job text {} as jenkins job name since it didn't matching any mappings", jobInfo);
         }
         int pipeIndex = jobInfo.indexOf("|");
         if (pipeIndex != -1) {
-            job.jobDisplayName = jobInfo.substring(0, pipeIndex);
+            job.name = jobInfo.substring(0, pipeIndex);
             jobInfo = jobInfo.substring(pipeIndex + 1);
         } else {
-            job.jobDisplayName = "Build";
+            job.name = "Build";
         }
         if (jobsDisplayNames != null) {
             if (jobsDisplayNames.length > jobCounter) {
-                job.jobDisplayName = jobsDisplayNames[jobCounter];
+                job.name = jobsDisplayNames[jobCounter];
             }
         }
         if (jobInfo.contains("&")) {
@@ -191,7 +193,7 @@ public class JenkinsJobsConfig {
     public String toString() {
         String jobText = "";
         for (Job job : jobs) {
-            jobText = StringUtils.appendWithDelimiter(jobText, job.jobDisplayName + "|" + job.name, ",");
+            jobText = StringUtils.appendWithDelimiter(jobText, job.name + "|" + job.name, ",");
             jobText = StringUtils.appendWithDelimiter(jobText, job.parameters, "&");
         }
         return jobText;

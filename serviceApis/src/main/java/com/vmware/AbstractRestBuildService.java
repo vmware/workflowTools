@@ -2,10 +2,10 @@ package com.vmware;
 
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Superclass for common functionality for rest build services such as Jenkins and Buildweb.
@@ -39,23 +39,23 @@ public abstract class AbstractRestBuildService extends AbstractRestService {
         for (JobBuild jobBuild : buildsToCheck) {
             String jobUrl = jobBuild.url;
 
-            if (jobBuild.result == null
-                    || jobBuild.result == BuildResult.STARTING || jobBuild.result == BuildResult.BUILDING) {
+            if (jobBuild.status == null
+                    || jobBuild.status == BuildStatus.STARTING || jobBuild.status == BuildStatus.BUILDING) {
                 try {
-                    jobBuild.result = getResultForBuild(jobUrl);
-                    log.info("{} {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
+                    jobBuild.status = getResultForBuild(jobUrl);
+                    log.info("{} {} Result: {}", jobBuild.name, jobUrl, jobBuild.status);
                 } catch (NotFoundException nfe) {
-                    log.info("{} {} could not be found", jobBuild.buildDisplayName, jobUrl);
+                    log.info("{} {} could not be found", jobBuild.name, jobUrl);
                 }
             } else {
-                log.info("{} {} Result: {}", jobBuild.buildDisplayName, jobUrl, jobBuild.result);
+                log.info("{} {} Result: {}", jobBuild.name, jobUrl, jobBuild.status);
             }
-            isSuccess = isSuccess && jobBuild.result == BuildResult.SUCCESS;
+            isSuccess = isSuccess && jobBuild.status == BuildStatus.SUCCESS;
         }
         return isSuccess;
     }
 
-    protected abstract BuildResult getResultForBuild(String url);
+    protected abstract BuildStatus getResultForBuild(String url);
 
     protected abstract void updateAllBuildsResultSuccessValue(ReviewRequestDraft draft, boolean result);
 }

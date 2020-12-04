@@ -27,10 +27,13 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.logging.LogLevel;
+import com.vmware.util.logging.SimpleLogFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,6 +46,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.StreamHandler;
 import java.util.stream.Collectors;
 
 /**
@@ -166,10 +174,27 @@ public class WorkflowConfig {
         this.configurableFields = new WorkflowFields(this);
     }
 
-    public void setupLogLevel() {
+    public void setupLogging() {
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         LogLevel logLevelToUse = loggingConfig.determineLogLevel();
         globalLogger.setLevel(logLevelToUse.getLevel());
+
+        Handler[] handlers = globalLogger.getHandlers();
+        boolean containsLoggingHandler = Arrays.stream(handlers).anyMatch(handler -> handler.getClass() == StreamHandler.class);
+        if (StringUtils.isNotBlank(loggingConfig.outputLogFile) && !containsLoggingHandler) {
+            log.info("Saving log output to {}", loggingConfig.outputLogFile);
+            try {
+                StreamHandler streamHandler = new StreamHandler(new FileOutputStream(loggingConfig.outputLogFile), new SimpleLogFormatter());
+                globalLogger.addHandler(streamHandler);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Optional<Handler> consoleHandler = Arrays.stream(handlers).filter(handler -> handler.getClass() == ConsoleHandler.class).findFirst();
+        if (loggingConfig.silent && consoleHandler.isPresent()) {
+            log.info("Suppressing console output as silent flag is set to true");
+            globalLogger.removeHandler(consoleHandler.get());
+        }
         log.debug("Using log level {}", logLevelToUse);
     }
 

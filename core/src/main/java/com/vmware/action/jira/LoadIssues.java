@@ -143,7 +143,7 @@ public class LoadIssues extends BaseBatchJiraAction {
         List<String> fieldsToInclude = new ArrayList<>();
         fieldsToInclude.addAll(Arrays.asList("summary","description","assignee","status", "fixVersions","issuetype", "labels"));
         fieldsToInclude.addAll(jiraConfig.jiraCustomFieldNames.values());
-        searchRequest.fields = fieldsToInclude.toArray(new String[fieldsToInclude.size()]);
+        searchRequest.fields = fieldsToInclude.toArray(new String[0]);
         return searchRequest;
     }
 

@@ -1,10 +1,9 @@
 package com.vmware;
 
 import com.vmware.jenkins.Jenkins;
-import com.vmware.config.jenkins.Job;
-import com.vmware.jenkins.domain.JobBuildDetails;
-import com.vmware.jenkins.domain.JobDetails;
-import com.vmware.config.jenkins.JobParameter;
+import com.vmware.jenkins.domain.JobBuild;
+import com.vmware.jenkins.domain.Job;
+import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.HomePage;
 import com.vmware.http.exception.NotFoundException;
@@ -57,12 +56,12 @@ public class TestJenkinsApi extends BaseTests {
     public void canInvokePrecommitUnitTestsJob() {
         Job precommitJob = jenkins.getHomePage().getPrecommitUnitTestsPostgresJob();
 
-        JobDetails jobDetails = jenkins.getJobDetails(precommitJob);
+        Job job = jenkins.getJobDetails(precommitJob);
         JobParameter usernameParam = new JobParameter("USERNAME", jenkinsUsername);
         jenkins.invokeJobWithParameters(precommitJob, new JobParameters(Collections.singletonList(usernameParam)));
 
-        JobBuildDetails jobBuildDetails = jenkins.getJobBuildDetails(jobDetails.lastBuild);
-        assertNotNull(jobBuildDetails.getJobBuildCommitId());
+        JobBuild jobBuild = jenkins.getJobBuildDetails(job.lastBuild);
+        assertNotNull(jobBuild.getJobBuildCommitId());
     }
 
     @Test

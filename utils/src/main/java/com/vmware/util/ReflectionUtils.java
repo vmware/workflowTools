@@ -1,14 +1,16 @@
 package com.vmware.util;
 
-import com.vmware.util.exception.RuntimeReflectiveOperationException;
-
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
 /**
  * Util methods for invoking reflection methods and wrapping the exceptions with runtime exceptions.
@@ -50,6 +52,19 @@ public class ReflectionUtils {
         }
     }
 
+    public static List<Field> getAllFieldsWithoutAnnotation(Class clazz, Class<? extends Annotation> ignoreAnnotation) {
+        Class clazzToFetch = clazz;
+        List<Field> fieldsToReturn = new ArrayList<>();
+        while (clazzToFetch != Object.class) {
+            List<Field> matchingFields = Arrays.stream(clazzToFetch.getFields())
+                    .filter(field -> ignoreAnnotation == null || field.getAnnotation(ignoreAnnotation) == null).collect(Collectors.toList());
+            fieldsToReturn.addAll(matchingFields);
+            clazzToFetch = clazzToFetch.getSuperclass();
+        }
+        return fieldsToReturn;
+    }
+
+
     public static Object getValue(Field field, Object instance) {
         try {
             Object instanceToUse = determineInstanceForField(field, instance);
@@ -62,7 +77,15 @@ public class ReflectionUtils {
     public static void setValue(Field field, Object instance, Object value) {
         try {
             Object instanceToUse = determineInstanceForField(field, instance);
-            field.set(instanceToUse, value);
+            if (field.getType() == int[].class && value != null && value.getClass() == String.class) {
+                int[] values = Arrays.stream(String.valueOf(value).split(",")).mapToInt(Integer::parseInt).toArray();
+                field.set(instance, values);
+            } else if (field.getType().isArray() && value != null && value.getClass() == Object[].class) {
+                String[] values = Arrays.stream((Object[]) value).map(val -> (String) val).toArray(String[]::new);
+                field.set(instance, values);
+            } else {
+                field.set(instanceToUse, value);
+            }
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
         }

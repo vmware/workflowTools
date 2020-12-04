@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.vmware.util.CommandLineUtils.isCommandAvailable;
 
@@ -157,11 +158,17 @@ public class Git extends BaseScmWrapper {
                 String.valueOf(skipCount)).trim();
     }
 
+    public List<String> commitTexts(int count) {
+        String commitsOutput = executeScmCommand("log -{} --pretty=\";break;commit %H%nAuthor: %an <%ae>%nDate: %ad%n%B\" --shortstat --date=local",
+                String.valueOf(count));
+        return Arrays.stream(commitsOutput.split(";break;")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+    }
+
     public List<String> commitsSince(Date date) {
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZZZ").format(date);
         String commitsOutput = executeScmCommand("log --pretty=\";break;commit %H%nAuthor: %an <%ae>%nDate: %ad%n%B\" --shortstat --date=local --since={}",
                 formattedDate);
-        return Arrays.asList(commitsOutput.split(";break;"));
+        return Arrays.stream(commitsOutput.split(";break;")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
     }
 
     public String commitTextBody(int skipCount) {

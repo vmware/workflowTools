@@ -15,7 +15,9 @@
   "jenkinsUsesCsrf": false,
   "waitForBlockingWorkflowAction": false,
   "ignoreJenkinsJobFailure": false,
-  "maxJenkinsBuildsToCheck": 7,
+  "maxJenkinsBuildsToCheck": 5,
+  "maxCommitsToCheck": 500,
+  "commitIdInDescriptionPattern": "CL\\s+(\\w+)",
   "keystoreType": "JCEKS",
   "keySize": 2048,
   "goBuildBinPath": "/build/apps/bin/gobuild",
@@ -964,6 +966,10 @@
     "showRealTestFailures": [
       "FindRealTestFailures",
       "OpenFile"
+    ],
+    "showCommitsForEpic": [
+      "LoadAllIssuesForEpic",
+      "DisplayCommitsForIssues"
     ]
   },
   "supportingWorkflows": [

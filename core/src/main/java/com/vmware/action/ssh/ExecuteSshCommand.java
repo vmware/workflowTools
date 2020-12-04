@@ -107,9 +107,7 @@ public class ExecuteSshCommand extends BaseSshAction {
         channel.connect((int) TimeUnit.SECONDS.toMillis(5));
         waitForChannelToFinish(channel);
         commandOutputPadder.infoTitle();
-        if (writer != null) {
-           writer.close();
-        }
+        writer.close();
     }
 
     private BufferedWriter outputWriter() {

@@ -44,7 +44,7 @@ public class WorkflowConfigParser {
 
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
-        config.setupLogLevel();
+        config.setupLogging();
 
         String gitRemoteValue = git.configValue(String.format("remote.%s.url", config.gitRepoConfig.defaultGitRemote));
         config.setGitRemoteUrlAsReviewBoardRepo(gitRemoteValue);
@@ -56,7 +56,7 @@ public class WorkflowConfigParser {
         applyGitConfigValuesAsWorkflowConfigValues(config);
 
         applyRuntimeArguments(config);
-        config.setupLogLevel();
+        config.setupLogging();
 
         log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
 
@@ -106,7 +106,7 @@ public class WorkflowConfigParser {
     public void updateWithRuntimeArguments(WorkflowConfig config, String[] args) {
         argsParser.generateArgumentMap(args);
         applyRuntimeArguments(config);
-        config.setupLogLevel();
+        config.setupLogging();
     }
 
     public String getRuntimeArgumentsText() {

@@ -24,6 +24,9 @@ public class MatcherUtils {
     }
 
     public static String singleMatch(String text, String pattern) {
+        if (StringUtils.isEmpty(text)) {
+            return text;
+        }
         Matcher matcher = Pattern.compile(pattern).matcher(text);
         return getMatchedValue(matcher);
     }

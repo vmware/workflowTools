@@ -1,6 +1,5 @@
 package com.vmware.jenkins.domain;
 
-import com.vmware.config.jenkins.JobParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
