@@ -12,7 +12,6 @@ import com.vmware.util.logging.SimpleLogFormatter;
 public class WorkflowRunner {
 
     public static void main(String[] args) {
-        System.setProperty("jsse.enableSNIExtension", "false");
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());

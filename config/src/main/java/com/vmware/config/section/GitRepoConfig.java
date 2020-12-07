@@ -7,6 +7,7 @@ import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.TreeMap;
 
 public class GitRepoConfig {
@@ -39,7 +40,8 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "--max-commits", help = "Max number of commits to check")
     public int maxCommitsToCheck;
 
-
+    @ConfigurableProperty(commandLine = "--since-date", help = "Commits since date")
+    public Date sinceDate;
 
     public String trackingBranchPath() {
         return String.valueOf(determineTrackingBranchPath().getValue());

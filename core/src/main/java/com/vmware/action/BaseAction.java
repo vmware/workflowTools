@@ -106,10 +106,9 @@ public abstract class BaseAction implements Action {
         if (failIfCannotBeRun) {
             try {
                 this.checkIfActionShouldBeSkipped();
-            } catch (SkipActionException ce) {
-                throw new FatalException(ce, ce.getMessage());
+            } catch (SkipActionException sae) {
+                throw new CancelException(LogLevel.ERROR, sae.getMessage());
             }
-
         }
         failWorkflowIfConditionNotMet();
     }

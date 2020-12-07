@@ -1,3 +1,4 @@
+
 package com.vmware.action.git;
 
 import java.text.SimpleDateFormat;
@@ -21,16 +22,24 @@ public class DisplayCommitsForIssues extends BaseIssuesProcessingAction {
     @Override
     public void process() {
         List<String> issueKeys = projectIssues.getIssuesFromJira().stream().map(Issue::getKey).collect(Collectors.toList());
-        log.info("Checking last {} commits for following {} jira issues\n{}", gitRepoConfig.maxCommitsToCheck, issueKeys.size(), issueKeys);
+        if (gitRepoConfig.sinceDate != null) {
+            log.info("Checking commits since {} for following {} jira issues\n{}", gitRepoConfig.sinceDate, issueKeys.size(), issueKeys);
+        } else {
+            log.info("Checking last {} commits for following {} jira issues\n{}", gitRepoConfig.maxCommitsToCheck, issueKeys.size(), issueKeys);
+        }
 
         Padder commitPadder = new Padder("Matching Commits");
 
         List<ReviewRequestDraft> matchingCommits = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> commitTexts = gitRepoConfig.sinceDate != null ? git.commitsSince(gitRepoConfig.sinceDate) : git.commitTexts(gitRepoConfig.maxCommitsToCheck);
+        if (gitRepoConfig.sinceDate != null || commitTexts.size() != gitRepoConfig.maxCommitsToCheck) {
+            log.info("Checking {} commits", commitTexts.size());
+        }
+
         commitPadder.infoTitle();
-        List<String> commitTexts = git.commitTexts(gitRepoConfig.maxCommitsToCheck);
-        for (int i = 0; i < commitTexts.size(); i ++) {
-            ReviewRequestDraft parsedCommit = new ReviewRequestDraft(commitTexts.get(i), commitConfig);
+        for (String commitText : commitTexts) {
+            ReviewRequestDraft parsedCommit = new ReviewRequestDraft(commitText, commitConfig);
             if (parsedCommit.bugNumbers != null && issueKeys.stream().anyMatch(key -> parsedCommit.bugNumbers.contains(key))) {
                 log.info("{} {} {} {}", parsedCommit.commitId, formatter.format(parsedCommit.commitDate), parsedCommit.authorName, parsedCommit.summary);
                 matchingCommits.add(parsedCommit);

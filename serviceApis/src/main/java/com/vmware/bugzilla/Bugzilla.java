@@ -41,7 +41,6 @@ public class Bugzilla extends AbstractService {
     public Bugzilla(String bugzillaUrl, String username, int testBugNumber) {
         super(bugzillaUrl, "xmlrpc.cgi", ApiAuthentication.bugzilla_cookie, username);
         this.testBugNumber = testBugNumber;
-        System.setProperty("jsse.enableSNIExtension", "false");
         xmlRpcClient = new CookieAwareXmlRpcClient(apiUrl);
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
         mapConverter = new MapObjectConverter();

@@ -3,11 +3,16 @@ package com.vmware.config;
 import com.vmware.config.jira.IssueTypeDefinition;
 import com.vmware.util.ReflectionUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -15,6 +20,8 @@ import java.util.TreeSet;
  * Used for determining the valid value for a workflow config field.
  */
 public class WorkflowField {
+
+    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -56,6 +63,12 @@ public class WorkflowField {
             ((SortedSet) validValue).addAll(Arrays.asList(sourceValue.split(",")));
         } else if (fieldType == String.class) {
             validValue = sourceValue;
+        } else if (fieldType == Date.class) {
+            try {
+                validValue = DATE_FORMAT.parse(sourceValue);
+            } catch (ParseException e) {
+                throw new FatalException(e, "Could not parse value {} for {}, date format is {}", sourceValue, field.getName(), DATE_FORMAT.toPattern());
+            }
         } else if (fieldType == IssueTypeDefinition[].class) {
             validValue = IssueTypeDefinition.fromValues(sourceValue.trim().split(","));
         } else if (fieldType == ActionAfterFailedPatchCheck.class) {

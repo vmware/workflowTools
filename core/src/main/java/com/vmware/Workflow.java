@@ -284,19 +284,26 @@ public class Workflow {
             action.instantiateAction(config, serviceLocator);
 
             action.setWorkflowValuesOnAction(actionValues);
-            if (runAllHelperMethods) {
-                log.info("Running asyncSetup");
-                action.asyncSetup();
-                log.info("Running checkIfWorkflowShouldBeFailed");
-                action.checkIfWorkflowShouldBeFailed();
-                log.info("Running checkIfActionShouldBeSkipped method");
-                action.checkIfActionShouldBeSkipped();
-                log.info("Running preprocess method");
-                action.preprocess();
-            } else {
-                log.info("Running asyncSetup");
-                action.asyncSetup();
+            try {
+                if (runAllHelperMethods) {
+                    log.info("Running asyncSetup");
+                    action.asyncSetup();
+                    log.info("Running checkIfWorkflowShouldBeFailed");
+                    action.checkIfWorkflowShouldBeFailed();
+                    log.info("Running checkIfActionShouldBeSkipped method");
+                    action.checkIfActionShouldBeSkipped();
+                    log.info("Running preprocess method");
+                    action.preprocess();
+                } else {
+                    log.info("Running asyncSetup");
+                    action.asyncSetup();
+                }
+            } catch (SkipActionException sae) {
+                log.info("Skipping {} as {}", action.getActionClassName(), sae.getMessage());
+            } catch (CancelException ce) {
+                log.info("Canceling {} as {}", action.getActionClassName(), ce.getMessage());
             }
+
         }
     }
 

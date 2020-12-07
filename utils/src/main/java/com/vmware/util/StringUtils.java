@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -26,11 +27,11 @@ public class StringUtils {
         }
     }
 
-    public static String exceptionAsString(Exception e) {
+    public static ToStringSupplier exceptionAsString(Exception e) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         e.printStackTrace(writer);
-        return stringWriter.toString();
+        return ToStringSupplier.toString(stringWriter::toString);
     }
 
     public static String findStringWithStartAndEnd(String text, String start, String end) {
@@ -396,6 +397,29 @@ public class StringUtils {
             sb.append(ch);
         }
         return sb.toString();
+    }
+
+    public static class ToStringSupplier implements Supplier<String> {
+
+        private Supplier<String> stringSource;
+
+        private ToStringSupplier(Supplier<String> stringSource) {
+            this.stringSource = stringSource;
+        }
+
+        public static ToStringSupplier toString(Supplier<String> supplier) {
+            return new ToStringSupplier(supplier);
+        }
+
+        @Override
+        public String get() {
+            return stringSource.get();
+        }
+
+        @Override
+        public String toString() {
+            return stringSource.get();
+        }
     }
 
 }

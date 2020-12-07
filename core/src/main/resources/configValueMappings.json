@@ -59,7 +59,8 @@
     "--changelist-id"
   ],
   "DisplayCommitsForIssues": [
-    "--max-commits"
+    "--max-commits",
+    "--since-date"
   ],
   "SaveFileData": [
     "--file-data",

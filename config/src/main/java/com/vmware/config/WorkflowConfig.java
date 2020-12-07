@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  */
 public class WorkflowConfig {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private static final String COMMAND_LINE_SOURCE = "Command Line";
 
     @SectionConfig
@@ -168,7 +168,7 @@ public class WorkflowConfig {
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);
 
     @Expose(serialize = false, deserialize = false)
-    private WorkflowFields configurableFields;
+    private final WorkflowFields configurableFields;
 
     public WorkflowConfig() {
         this.configurableFields = new WorkflowFields(this);

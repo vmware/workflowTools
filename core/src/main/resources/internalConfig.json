@@ -120,7 +120,7 @@
       "ReadLastCommit",
       "ExitIfTrivialCommit"
     ],
-    "displayCommit": [
+    "showCommit": [
       "ReadLastCommit",
       "DisplayCommit"
     ],
@@ -854,7 +854,7 @@
       "selectVapp",
       "UpdateVappLease"
     ],
-    "displayVappJson": [
+    "showVappJson": [
       "loadVappJson",
       "DisplayVappJson"
     ],
@@ -919,11 +919,11 @@
       "SelectVapp",
       "ExitIfNoVappSelected"
     ],
-    "displayVappMetadataKeys": [
+    "showVappMetadataKeys": [
       "selectVapp",
       "DisplayVappMetadataKeys"
     ],
-    "displayVappMetadata": [
+    "showVappMetadata": [
       "selectVapp",
       "LoadVappMetadataIfFound",
       "DisplayFileData"
@@ -941,10 +941,10 @@
       "selectVapp",
       "DeleteVappMetadataIfNeeded"
     ],
-    "displayConfig": [
+    "showConfig": [
       "DisplayConfig"
     ],
-    "displayWorkflowBuildInfo": [
+    "showWorkflowBuildInfo": [
       "DisplayConfig",
       "--specific-properties=buildInfo"
     ],

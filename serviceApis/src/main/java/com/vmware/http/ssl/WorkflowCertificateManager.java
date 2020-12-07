@@ -1,17 +1,21 @@
 package com.vmware.http.ssl;
 
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -50,8 +54,13 @@ public class WorkflowCertificateManager {
     }
 
     public X509Certificate[] getCertificatesForUri(URI uri) {
-        isUriTrusted(uri); // makes call so cert is retrieved
-        X509Certificate[] chain = workflowTrustManager.chain;
+        X509Certificate[] chain = getServerCertsForUri(uri);
+
+        // assuming uri was not trusted so that certs were saved by Trust Manager
+        if (chain == null) {
+            chain = workflowTrustManager.chain;
+        }
+
         if (chain == null) {
             throw new WorkflowCertificateException("Could not obtain server certificate chain for host " + uri.getHost());
         }
@@ -72,7 +81,7 @@ public class WorkflowCertificateManager {
             throw new WorkflowCertificateException("Could not obtain server certificate chain for host " + uri.getHost());
         }
 
-        logger.info("Saving ssl cert for host {} to local keystore file", uri.getHost(), keyStoreFile.getPath());
+        logger.info("Saving ssl cert for host {} to local keystore file {}", uri.getHost(), keyStoreFile.getPath());
         storeCert(uri.getHost(), chain[0]);
         try {
             context = initSslContext();
@@ -90,18 +99,14 @@ public class WorkflowCertificateManager {
             return true;
         }
         try {
-            SSLSocketFactory sslFactory = context.getSocketFactory();
-            int port = uri.getPort() == -1 ? 443 : uri.getPort();
-            SSLSocket socket = (SSLSocket) sslFactory.createSocket(uri.getHost(), port);
-            socket.setSoTimeout(10000);
-            logger.debug("Checking if host {} is trusted", uri.getHost());
-            socket.startHandshake();
-            socket.close();
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+            connection.getResponseCode();
+            connection.disconnect();
             logger.debug("No errors, host {} is trusted", uri.getHost());
             trustedHosts.add(uri.getHost());
             return true;
         } catch (SSLException e) {
-            logger.debug("Host " + uri.getHost() + " is not trusted", e);
+            logger.debug("Host {} is not trusted\n{}", uri.getHost(), StringUtils.exceptionAsString(e));
             return false;
         } catch (IOException e) {
             throw new RuntimeIOException(e);
@@ -194,6 +199,21 @@ public class WorkflowCertificateManager {
         }
     }
 
+    private X509Certificate[] getServerCertsForUri(URI uri) {
+        try {
+            URLConnection connection = uri.toURL().openConnection();
+            if (connection instanceof HttpsURLConnection) {
+                ((HttpsURLConnection) connection).getResponseCode();
+                Certificate[] serverCerts = ((HttpsURLConnection) connection).getServerCertificates();
+                return Arrays.stream(serverCerts).filter(certificate -> certificate instanceof X509Certificate)
+                        .map(certificate -> ((X509Certificate) certificate)).toArray(X509Certificate[]::new);
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return null;
+    }
+
     private static class SavingTrustManager implements X509TrustManager {
 
         private final X509TrustManager tm;
@@ -207,8 +227,7 @@ public class WorkflowCertificateManager {
             return tm.getAcceptedIssuers();
         }
 
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
             throw new UnsupportedOperationException();
         }
 
