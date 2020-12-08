@@ -16,6 +16,7 @@ import com.google.gson.annotations.Expose;
 import com.vmware.util.ArrayUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.db.AfterDbLoad;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
 
@@ -31,6 +32,8 @@ public class TestResult extends BaseDbClass {
     public double duration;
     public long startedAt;
     public String[] parameters;
+
+    public Integer similarSkips;
 
     @Expose(serialize = false, deserialize = false)
     public int[] failedBuilds;
@@ -72,6 +75,12 @@ public class TestResult extends BaseDbClass {
         this.commitId = build.commitId;
     }
 
+    @AfterDbLoad
+    public void sortArrays() {
+        Stream.of(passedBuilds, skippedBuilds, failedBuilds).filter(Objects::nonNull).forEach(Arrays::sort);
+    }
+
+
     public String fullTestNameWithPackage() {
         return packagePath + "." + fullTestName();
     }
@@ -89,15 +98,19 @@ public class TestResult extends BaseDbClass {
         return testName;
     }
 
-    public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
-        String nameToUse = name;
-        if (nameToUse.contains("similar skips")) {
-            nameToUse = name.substring(0, name.lastIndexOf(" ("));
+    public String fullTestNameWithSkipInfo() {
+        String fullTestName = fullTestName();
+        if (status == TestStatus.SKIP && similarSkips != null && similarSkips > 0) {
+            fullTestName = fullTestName + " (" + StringUtils.pluralize(similarSkips, "similar skip") + ")";
         }
-        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, nameToUse);
+        return fullTestName;
+    }
+
+    public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
+        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name);
         int counter = 1;
         while (usedUrls.contains(urlToUse)) {
-            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, nameToUse + "_" + counter++);
+            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + counter++);
         }
         this.url = urlToUse;
     }
@@ -184,6 +197,7 @@ public class TestResult extends BaseDbClass {
         this.url = testResult.url;
         this.buildNumber = testResult.buildNumber;
         this.status = testResult.status;
+        this.similarSkips = testResult.similarSkips;
         this.exception = testResult.exception;
         this.startedAt = testResult.startedAt;
         this.duration = testResult.duration;

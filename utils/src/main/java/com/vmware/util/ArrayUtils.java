@@ -13,12 +13,15 @@ public class ArrayUtils {
 
     public static int[] add(int[] existingValues, int value) {
         if (existingValues == null) {
-            return new int[] {value};
+            return new int[] { value } ;
+        } else if (Arrays.binarySearch(existingValues, value) >= 0) {
+            return existingValues;
         } else {
             int length = existingValues.length + 1;
             int[] result = new int[length];
             System.arraycopy(existingValues, 0, result, 0, existingValues.length);
             result[result.length - 1] = value;
+            Arrays.sort(result);
             return result;
         }
     }

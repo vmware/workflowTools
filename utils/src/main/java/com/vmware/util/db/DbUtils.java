@@ -117,6 +117,7 @@ public class DbUtils {
                         throw new RuntimeException(se);
                     }
                 });
+                ReflectionUtils.invokeAllMethodsWithAnnotation(record, AfterDbLoad.class);
                 records.add(record);
             }
             return records;

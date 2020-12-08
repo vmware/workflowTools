@@ -18,6 +18,9 @@ public class Job extends BaseDbClass {
     public String name;
 
     @Expose(serialize = false, deserialize = false)
+    public String buildDisplayName;
+
+    @Expose(serialize = false, deserialize = false)
     public Long viewId;
 
     public String url;
@@ -67,7 +70,7 @@ public class Job extends BaseDbClass {
     public static Job buildwebJob(String url, String jobDisplayName) {
         Job job = new Job();
         job.url = url;
-        job.name = jobDisplayName;
+        job.buildDisplayName = jobDisplayName;
         return job;
     }
 
@@ -141,7 +144,6 @@ public class Job extends BaseDbClass {
                         .filter(result  -> result.fullTestNameWithPackage().equals(resultToAdd.fullTestNameWithPackage())).findFirst();
                 if (matchingResult.isPresent()) {
                     matchingResult.get().addTestResult(resultToAdd);
-
                 } else {
                     resultToAdd.addTestResult(resultToAdd);
                     testResults.add(resultToAdd);

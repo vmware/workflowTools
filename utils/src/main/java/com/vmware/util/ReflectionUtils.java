@@ -44,6 +44,24 @@ public class ReflectionUtils {
         }
     }
 
+    public static void invokeAllMethodsWithAnnotation(Object instance, Class<? extends Annotation> annotation) {
+        List<Method> annotatedMethods = new ArrayList<>();
+        Class clazzToFetch = instance.getClass();
+        while (clazzToFetch != Object.class) {
+            List<Method> matchingMethods = Arrays.stream(clazzToFetch.getMethods())
+                    .filter(method -> method.getAnnotation(annotation) != null).collect(Collectors.toList());
+            annotatedMethods.addAll(matchingMethods);
+            clazzToFetch = clazzToFetch.getSuperclass();
+        }
+        annotatedMethods.forEach(method -> {
+            try {
+                method.invoke(instance);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     public static Field getField(Class clazz, String fieldName) {
         try {
             return clazz.getField(fieldName);

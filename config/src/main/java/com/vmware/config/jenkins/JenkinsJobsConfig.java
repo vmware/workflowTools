@@ -87,14 +87,14 @@ public class JenkinsJobsConfig {
         }
         int pipeIndex = jobInfo.indexOf("|");
         if (pipeIndex != -1) {
-            job.name = jobInfo.substring(0, pipeIndex);
+            job.buildDisplayName = jobInfo.substring(0, pipeIndex);
             jobInfo = jobInfo.substring(pipeIndex + 1);
         } else {
-            job.name = "Build";
+            job.buildDisplayName = "Build";
         }
         if (jobsDisplayNames != null) {
             if (jobsDisplayNames.length > jobCounter) {
-                job.name = jobsDisplayNames[jobCounter];
+                job.buildDisplayName = jobsDisplayNames[jobCounter];
             }
         }
         if (jobInfo.contains("&")) {
@@ -193,7 +193,7 @@ public class JenkinsJobsConfig {
     public String toString() {
         String jobText = "";
         for (Job job : jobs) {
-            jobText = StringUtils.appendWithDelimiter(jobText, job.name + "|" + job.name, ",");
+            jobText = StringUtils.appendWithDelimiter(jobText, job.buildDisplayName + "|" + job.name, ",");
             jobText = StringUtils.appendWithDelimiter(jobText, job.parameters, "&");
         }
         return jobText;

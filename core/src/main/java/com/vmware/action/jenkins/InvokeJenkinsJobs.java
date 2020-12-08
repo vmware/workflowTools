@@ -93,7 +93,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private JobBuild invokeJenkinsJob(ReviewRequestDraft draft, Job jobToInvoke) {
-        log.info("Invoking job {} using display name {}", jobToInvoke.name, jobToInvoke.name);
+        log.info("Invoking job {} using display name {}", jobToInvoke.name, jobToInvoke.buildDisplayName);
 
         Job job = jenkins.getJobDetails(jobToInvoke);
         JobParameters params = constructParametersForJob(jobToInvoke.parameters, job.getParameterDefinitions());
@@ -101,7 +101,7 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         int buildNumber = jenkins.getJobDetails(jobToInvoke).nextBuildNumber;
 
         JobBuild expectedNewBuild = new JobBuild(buildNumber, jobToInvoke.url);
-        expectedNewBuild.name = jobToInvoke.name;
+        expectedNewBuild.name = jobToInvoke.buildDisplayName;
 
         if (job.getParameterDefinitions().isEmpty()) {
             log.info("Invoking job {} with no parameters", expectedNewBuild.url);

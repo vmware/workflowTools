@@ -12,11 +12,10 @@ import com.vmware.BuildStatus;
 import com.vmware.util.StringUtils;
 
 import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
+import static java.util.Arrays.stream;
 
 public class TestResults {
     public String name;
-    @Expose(serialize = false, deserialize = false)
-    public BuildStatus buildStatus;
     @Expose(serialize = false, deserialize = false)
     private JobBuild build;
     @SerializedName("package")
@@ -69,11 +68,9 @@ public class TestResults {
                     testResult.commitId = build.commitId;
                     testResult.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
                     if (testResult.status == SKIP && StringUtils.isNotBlank(testResult.exception) && !usedSkipExceptions.contains(testResult.exception)) {
-                        long similarSkips = Arrays.stream(clazz.testResults).filter(method -> method.status == SKIP
-                                && StringUtils.equals(method.exception, testResult.exception)).count() - 1;
-                        if (similarSkips > 0) {
-                            testResult.name = testResult.name + " (" + StringUtils.pluralize(similarSkips, "similar skip") + ")";
-                        }
+                        testResult.similarSkips = Math.toIntExact(
+                                stream(clazz.testResults).filter(method -> method.status == SKIP
+                                        && StringUtils.equals(method.exception, testResult.exception)).count() - 1);
                         usedSkipExceptions.add(testResult.exception);
                     }
                     usedUrls.add(testResult.url);

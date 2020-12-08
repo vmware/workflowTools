@@ -261,7 +261,7 @@ public class ReviewRequestDraft extends BaseEntity {
 
     public JobBuild getMatchingJobBuild(Job job) {
         for (JobBuild build : jobBuilds) {
-            if (StringUtils.equals(job.name, build.name) && build.url.startsWith(job.url)) {
+            if (StringUtils.equals(job.buildDisplayName, build.name) && build.url.startsWith(job.url)) {
                 return build;
             }
         }
@@ -393,7 +393,7 @@ public class ReviewRequestDraft extends BaseEntity {
      * @return Whether the review request draft contains any actual data.
      */
     public boolean hasData() {
-        boolean hasData = false;
+        boolean hasData;
         hasData = isNotEmpty(summary);
         hasData = isNotEmpty(description) || hasData;
         hasData = isNotEmpty(testingDone) || hasData;

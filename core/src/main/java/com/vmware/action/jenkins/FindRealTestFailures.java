@@ -95,6 +95,8 @@ public class FindRealTestFailures extends BaseAction {
         }
 
         if (fileSystemConfig.databaseConfigured()) {
+            log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
+            log.info("Using database {} to store test results",fileSystemConfig.databaseUrl);
             dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
                     fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
         }
@@ -188,20 +190,20 @@ public class FindRealTestFailures extends BaseAction {
 
         List<Job> usableJobs = Arrays.stream(jobView.jobs).filter(jobDetails -> {
             if (jobDetails.lastCompletedBuild == null) {
-                log.info("Skipping job {} as there are no recent completed builds", jobDetails.name);
+                log.info("Skipping {} as there are no recent completed builds", jobDetails.name);
                 return false;
             }
             if (jobDetails.lastBuildWasSuccessful()) {
-                log.info("Skipping job {} as most recent build was successful", jobDetails.name);
+                log.info("Skipping {} as most recent build {} was successful", jobDetails.name, jobDetails.lastStableBuild.buildNumber);
                 return false;
             }
             if (jobDetails.lastUnstableBuild == null) {
-                log.info("Skipping job {} as there are no recent unstable builds", jobDetails.name);
+                log.info("Skipping {} as there are no recent unstable builds", jobDetails.name);
                 return false;
             }
 
             if (jobDetails.lastUnstableBuildAge() > jenkinsConfig.maxJenkinsBuildsToCheck) {
-                log.info("Skipping job {} as last unstable build was {} builds ago", jobDetails.name, jobDetails.lastUnstableBuildAge());
+                log.info("Skipping {} as last unstable build was {} builds ago", jobDetails.name, jobDetails.lastUnstableBuildAge());
                 return false;
             }
             return true;
@@ -228,9 +230,6 @@ public class FindRealTestFailures extends BaseAction {
         usableJobs.stream().parallel().forEach(job -> {
             try {
                 addTestResultsToJob(job, jobView.lastFetchAmount);
-                if (job.fetchedResults != null && !job.fetchedResults.isEmpty()) {
-                    log.info("Fetched {} for job {}", StringUtils.pluralize(job.fetchedResults.size(), "build"), job.name);
-                }
             } catch (Exception e) {
                 log.error("Failed to get full job details for {}\n{}", job.name, StringUtils.exceptionAsString(e));
                 throw e;
@@ -256,10 +255,10 @@ public class FindRealTestFailures extends BaseAction {
             }
             List<TestResult> failingTests = createFailingTestsList(job, jenkinsConfig.maxJenkinsBuildsToCheck);
             if (failingTests.isEmpty()) {
-                log.info("No consistently failing tests found for job {}", job.name);
+                log.info("No consistently failing tests found for {}", job.name);
                 return;
             }
-            log.info("Found {} for job {}", StringUtils.pluralize(failingTests.size(), "consistently failing test"), job.name);
+            log.info("Found {} for {}", pluralize(failingTests.size(), "consistently failing test"), job.name);
             allFailingTests.put(job, failingTests);
         });
 
@@ -273,7 +272,7 @@ public class FindRealTestFailures extends BaseAction {
 
         int latestUsableBuildNumber = job.latestUsableBuildNumber();
         if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && savedBuilds.stream().anyMatch(build -> build.buildNumber == latestUsableBuildNumber)) {
-            log.info("Saved builds for job {} already include latest build {}", job.name, latestUsableBuildNumber);
+            log.info("Saved builds for {} already include latest build {}", job.name, latestUsableBuildNumber);
             return;
         }
 
@@ -291,12 +290,12 @@ public class FindRealTestFailures extends BaseAction {
         }
 
         if (usefulBuilds.get(0).status == SUCCESS) {
-            log.info("Most recent build for job {} passed", job.name);
+            log.info("Most recent build for {} passed", job.name);
             return;
         }
 
-        final Integer lastBuildNumberToCheck = usefulBuilds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ?
-                    usefulBuilds.get(jenkinsConfig.maxJenkinsBuildsToCheck - 1).buildNumber : usefulBuilds.get(usefulBuilds.size() - 1).buildNumber;
+        final int numberOfBuildsToCheck = usefulBuilds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ? jenkinsConfig.maxJenkinsBuildsToCheck : usefulBuilds.size();
+        final int lastBuildNumberToCheck = usefulBuilds.get(numberOfBuildsToCheck - 1).buildNumber;
 
         List<Supplier<TestResults>> usableResultSuppliers = usefulBuilds.stream().map(build -> {
             if (build.buildNumber < lastBuildNumberToCheck) {
@@ -306,11 +305,15 @@ public class FindRealTestFailures extends BaseAction {
             }).filter(Objects::nonNull).collect(toList());
 
         if (usableResultSuppliers.isEmpty()) {
-            log.info("Builds for job {} already saved", job.name);
-            return;
+            log.info("Builds for {} already saved, checked for last {} of {} usable builds. Lase build number checked was {}", job.name,
+                    numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
+        } else {
+            log.info("Fetching {} for {}. Checked last {} of {} usable builds. Last build number checked was {}",
+                    pluralize(usableResultSuppliers.size(), "new build"), job.name, numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
+            job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).collect(toList());
         }
 
-        job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).collect(toList());
+
     }
 
     private void saveTestResultsToDb(Job job) {
@@ -405,7 +408,7 @@ public class FindRealTestFailures extends BaseAction {
         StringBuilder rowBuilder = new StringBuilder("");
         int index = 0;
         for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)).collect(toList())) {
-            String filledInRow = rowFragment.replace("#testName", method.fullTestName());
+            String filledInRow = rowFragment.replace("#testName", method.fullTestNameWithSkipInfo());
             filledInRow = filledInRow.replace("#testResultLinks", method.testLinks(jenkinsConfig.commitComparisonUrl));
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
             filledInRow = filledInRow.replace("#exception", method.exception != null ? method.exception.replace("\n", "<br/>") : "");
