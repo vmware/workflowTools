@@ -96,7 +96,7 @@ public class ReflectionUtils {
         try {
             Object instanceToUse = determineInstanceForField(field, instance);
             if (field.getType() == int[].class && value != null && value.getClass() == String.class) {
-                int[] values = Arrays.stream(String.valueOf(value).split(",")).mapToInt(Integer::parseInt).toArray();
+                int[] values = Arrays.stream(String.valueOf(value).split(",")).filter(StringUtils::isNotBlank).mapToInt(Integer::parseInt).toArray();
                 field.set(instance, values);
             } else if (field.getType().isArray() && value != null && value.getClass() == Object[].class) {
                 String[] values = Arrays.stream((Object[]) value).map(val -> (String) val).toArray(String[]::new);

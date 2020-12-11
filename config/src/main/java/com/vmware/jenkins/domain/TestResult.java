@@ -207,10 +207,14 @@ public class TestResult extends BaseDbClass {
         if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
             return false;
         }
-        int newestPassingBuild = passedBuilds != null ? Arrays.stream(passedBuilds).max().orElseGet(() -> -1) : -1;
-        if (newestPassingBuild < build.buildNumber) {
+        int newestPass = passedBuilds != null ? Arrays.stream(passedBuilds).max().orElse(-1) : -1;
+        int firstFailureAfterPass = failedBuilds != null ? Arrays.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1) : -1;
+        int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
+        int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
+        if (newestPass == build.buildNumber || firstFailureOrSkipAfterPass == build.buildNumber) {
             return false;
         }
+
         passedBuilds = ArrayUtils.remove(passedBuilds, build.buildNumber);
         failedBuilds = ArrayUtils.remove(failedBuilds, build.buildNumber);
         skippedBuilds = ArrayUtils.remove(skippedBuilds, build.buildNumber);

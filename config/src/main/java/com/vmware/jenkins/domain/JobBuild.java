@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildStatus;
 import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
@@ -161,6 +162,9 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
 
     public void setCommitIdForBuild(String commitIdPattern) {
         commitId = MatcherUtils.singleMatch(description, commitIdPattern);
+        if (StringUtils.isEmpty(commitId)) {
+            commitId = getJobBuildCommitId();
+        }
     }
 
     @Override

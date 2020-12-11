@@ -96,7 +96,7 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             String buildTypeUrl = commitConfig.buildwebUrl + "/" + buildwebId.getBuildType();
             Job sandboxJob = Job.buildwebJob(buildTypeUrl, buildwebConfig.buildDisplayName);
             draft.updateTestingDoneWithJobBuild(sandboxJob,
-                    new JobBuild(sandboxJob.name, buildUrl, BuildStatus.BUILDING));
+                    new JobBuild(sandboxJob.buildDisplayName, buildUrl, BuildStatus.BUILDING));
         } else {
             throw new RuntimeException("Unable to parse build url from output using pattern " + buildIdPattern);
         }

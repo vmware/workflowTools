@@ -1,5 +1,7 @@
 package com.vmware.util;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class ClasspathResource {
@@ -18,6 +20,10 @@ public class ClasspathResource {
 
     public byte[] getBytes() {
         return getText().getBytes();
+    }
+
+    public InputStream getInputStream() {
+        return classToUseAsLoader.getResourceAsStream(fileName);
     }
 
     public InputStreamReader getReader() {
