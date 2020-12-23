@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.gson.Gson;
 import com.vmware.config.WorkflowAction;
 import com.vmware.util.ClasspathResource;
+import com.vmware.util.CollectionUtils;
 
 /**
  * Represents the mapping of config values to a workflow action.
@@ -30,6 +31,18 @@ public class ConfigMappings {
 
     public Set<String> keySet() {
         return mappings.keySet();
+    }
+
+    public Set<String> getUsableConfigValuesForAction(WorkflowAction action) {
+        Set<String> configValues = getConfigValuesForAction(action);
+        Set<String> workflowActionParameters = action.getWorkflowParameterNames();
+        if (CollectionUtils.isNotEmpty(action.getOverriddenConfigValues())) {
+            configValues.removeIf(workflowActionParameters::contains);
+        }
+        List<String> configValuesToExclude = action.configFlagsToRemoveFromCompleter();
+        configValues.removeIf(configValuesToExclude::contains);
+        configValues.remove("--file-data");
+        return configValues;
     }
 
     public Set<String> getConfigValuesForAction(WorkflowAction action) {

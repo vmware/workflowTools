@@ -625,10 +625,8 @@
     ],
     "merge": [
       "prepareCommitForPush",
-      "DisplayLineBreak",
       "createMergeRequest",
       "WaitForMergeRequestToBeUpdated",
-      "DisplayLineBreak",
       "ApproveMergeRequest",
       "AssignMergeRequestToBot",
       "HardSubmitReview"
@@ -835,7 +833,7 @@
       "invokeSandboxBuildWithGit"
     ],
     "invokeSandboxBuildWithGit": [
-      "ExitIflBranchDoesNotHaveLocalCommit",
+      "ExitIfBranchDoesNotHaveLocalCommit",
       "ReadLastCommit",
       "--changelist-id=head",
       "ExitIfCommitFailsCheckstyle",

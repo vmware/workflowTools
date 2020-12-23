@@ -2,6 +2,7 @@ package com.vmware.mapping;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -13,17 +14,23 @@ import com.vmware.config.WorkflowAction;
 import com.vmware.config.WorkflowActions;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowValuesParser;
+import com.vmware.util.CollectionUtils;
 import com.vmware.util.input.ArgumentListAware;
 import com.vmware.util.input.ImprovedStringsCompleter;
 
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Completer for JLine2.
  * Allows tab completion of workflow config values on the command line.
  */
 public class ConfigValuesCompleter extends ImprovedStringsCompleter implements Completer, ArgumentListAware {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private ConfigMappings configMappings;
     private ArgumentCompleter.ArgumentList argumentList;
@@ -53,15 +60,22 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
 
     public SortedSet<String> generateValuesForWorkflowString(String workflowString) {
         SortedSet<String> values = new TreeSet<>();
+        Set<String> valuesToRemove = new HashSet<>();
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(config, workflowActions);
-        valuesParser.parse(Arrays.asList(workflowString.split(",")), Collections.emptyList());
+        valuesParser.parse(null, Arrays.asList(workflowString.split(",")), Collections.emptyList());
         for (WorkflowAction foundAction : valuesParser.getWorkflowActions()) {
-            Set<String> matchingConfigValues = configMappings.getConfigValuesForAction(foundAction);
+            Set<String> matchingConfigValues = configMappings.getUsableConfigValuesForAction(foundAction);
+            valuesToRemove.addAll(foundAction.configFlagsToAlwaysRemoveFromCompleter());
+            matchingConfigValues.removeIf(values::contains);
+            if (CollectionUtils.isNotEmpty(matchingConfigValues)) {
+                log.trace("Action {} added {} config flags", foundAction.getActionClassName(), matchingConfigValues);
+            }
             values.addAll(matchingConfigValues);
         }
         values.addAll(valuesParser.calculateJenkinsParameterConfigValues());
         values.addAll(valuesParser.calculateReplacementVariables());
 
+        values.removeAll(valuesToRemove);
         removeUnneededConfigValues(values);
         return values;
     }

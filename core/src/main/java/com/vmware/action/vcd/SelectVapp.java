@@ -9,7 +9,7 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.QueryResultVappType;
 
-@ActionDescription("Select a specific Vapp.")
+@ActionDescription(value = "Select a specific Vapp.")
 public class SelectVapp extends BaseVappAction {
     public SelectVapp(WorkflowConfig config) {
         super(config);

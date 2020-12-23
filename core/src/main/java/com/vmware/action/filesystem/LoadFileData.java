@@ -5,7 +5,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.IOUtils;
 
-@ActionDescription("Load the specified file into memory.")
+@ActionDescription(value = "Load the specified file into memory.")
 public class LoadFileData extends BaseAction {
     public LoadFileData(WorkflowConfig config) {
         super(config);

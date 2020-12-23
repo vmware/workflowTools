@@ -49,7 +49,8 @@ public class CreateSelfSignedCertForUrl extends BaseAction {
         File tempKeystoreFile = FileUtils.createTempFile("keystore", ".ks");
         tempKeystoreFile.delete();
         String command = "keytool -genkey -keystore " + tempKeystoreFile.getAbsolutePath()
-                + " -keyalg RSA -keysize 2048 -validity 365 -alias selfsign -dname \"cn=" + sourceUri.getHost() + "\" -storepass password -keypass password";
+                + " -keyalg RSA -keysize " + sslConfig.keySize +
+                " -validity 365 -alias selfsign -dname \"cn=" + sourceUri.getHost() + "\" -storepass password -keypass password";
         try {
             InetAddress inetAddress = InetAddress.getByName(sourceUri.getHost());
             if (inetAddress.getHostAddress() != null && inetAddress.getHostAddress().equals(sourceUri.getHost())) {

@@ -285,6 +285,14 @@ public class WorkflowConfig {
         }
         WorkflowFields fields = getConfigurableFields();
         List<WorkflowField> fieldsWithStringType = fields.values().stream().filter(field -> field.getType() == String.class).collect(Collectors.toList());
+
+        for (WorkflowField field : fieldsWithStringType) {
+            String value = (String) valueForField(field).getValue();
+            if (value != null) {
+                replacementVariables.addConfigPropertyAsVariable(field.getName(), value);
+            }
+        }
+
         for (WorkflowField field : fieldsWithStringType) {
             String value = (String) valueForField(field).getValue();
             String updatedValue = replaceVariablesInValue(value);

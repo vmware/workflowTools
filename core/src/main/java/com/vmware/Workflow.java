@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.vmware.action.info.DisplayLineBreak;
+import com.vmware.action.info.DisplayInfo;
 import com.vmware.action.info.GenerateAutoCompleteValues;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.CalculatedProperty;
@@ -311,30 +313,58 @@ public class Workflow {
         log.info("Executing in dry run mode");
         log.info("Showing workflow actions that would have run for workflow argument [{}]", config.workflowsToRun);
 
-        Padder actionsPadder = new Padder("Workflow Actions for workflow");
+        Padder actionsPadder = new Padder("Workflow Actions");
         actionsPadder.infoTitle();
 
         ConfigMappings configMappings = new ConfigMappings();
         Set<String> configOptions = new HashSet<>();
+        Set<String> configValuesToRemove = new HashSet<>();
+        Padder sectionPadder = null;
         for (WorkflowAction action : actions) {
             ActionDescription description = action.getActionDescription();
             if (description == null) {
                 throw new RuntimeException("Please add a action description annotation for " + action.getActionClassName());
             }
-            configOptions.addAll(configMappings.getConfigValuesForAction(action));
-            log.info(action.getActionClassName() + " - " + description.value());
-            List<WorkflowParameter> params = action.getOverriddenConfigValues();
-            for (WorkflowParameter parameter : params) {
-                log.info("{}   {}={}", StringUtils.repeat(action.getActionClassName().length(), " "),
-                        parameter.getName(), parameter.getValue());
+            if (StringUtils.isNotEmpty(action.getSectionName()) && (sectionPadder == null || !sectionPadder.getTitle().equals(action.getSectionName()))) {
+                if (sectionPadder != null){
+                    sectionPadder.infoTitle();
+                }
+                sectionPadder = new Padder(action.getSectionName());
+                sectionPadder.infoTitle();
+            } else if (StringUtils.isEmpty(action.getSectionName()) && sectionPadder != null) {
+                sectionPadder.infoTitle();
+                sectionPadder = null;
             }
+            configOptions.addAll(configMappings.getUsableConfigValuesForAction(action));
+            configValuesToRemove.addAll(action.configFlagsToAlwaysRemoveFromCompleter());
+            List<WorkflowParameter> params = action.getOverriddenConfigValues();
+            if (action.getActionClassName().equals(DisplayLineBreak.class.getSimpleName())) {
+                log.info("");
+            } else if (action.getActionClassName().equals(DisplayInfo.class.getSimpleName())) {
+                log.info(params.get(0).getValue());
+                log.info("");
+            } else {
+                log.info(action.getActionClassName() + " - " + description.value());
+                for (WorkflowParameter parameter : params) {
+                    log.info("{}   {}={}", StringUtils.repeat(action.getActionClassName().length(), " "),
+                            parameter.getName(), parameter.getValue());
+                }
+            }
+        }
+        if (sectionPadder != null) {
+            sectionPadder.infoTitle();
         }
         actionsPadder.infoTitle();
 
-        Padder configPadder = new Padder("Config Options for workflow");
+        Padder configPadder = new Padder("Config Options");
         configPadder.infoTitle();
         if (git.isGitInstalled()) {
             log.info("Config values can also be set by executing git config [name in square brackets] [configValue]");
+        }
+
+        configOptions.removeAll(configValuesToRemove);
+        if (config.replacementVariables.hasVariable(ReplacementVariables.VariableName.REPO_DIR)) {
+            configOptions.remove("--changelist-id");
         }
 
         WorkflowFields configurableFields = config.getConfigurableFields();
@@ -365,12 +395,10 @@ public class Workflow {
                 if (git.isGitInstalled()) {
                     gitConfigValue = "[" + matchingField.getName() + "]";
                 }
-                if (StringUtils.isNotEmpty(matchingValueText)) {
-                    if (counter++ >= 5 && counter++ % 5 == 1) {
-                        log.info("");
-                    }
-                    log.info("{}{}={} source=[{}] - {}", configOption, gitConfigValue, matchingValueText, source, matchingPropertyText);
+                if (counter++ >= 5 && counter++ % 5 == 1) {
+                    log.info("");
                 }
+                log.info("{}{}={} source=[{}] - {}", configOption, gitConfigValue, matchingValueText, source, matchingPropertyText);
             }
         }
         configPadder.infoTitle();

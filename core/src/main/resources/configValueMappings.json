@@ -27,6 +27,9 @@
     "--file-count-ranges",
     "--groups"
   ],
+  "ExitIfBranchDoesNotHaveLocalCommit": [
+    "--tracking-branch"
+  ],
   "InvokeJenkinsJobs": [
     "--build-display-name",
     "--jenkins-jobs",
@@ -295,6 +298,7 @@
   "CreateSelfSignedCertForUrl": [
     "--file-data",
     "--keystore-type",
+    "--key-size",
     "--source-url"
   ],
   "EnableDisableMergeTo": [
@@ -448,13 +452,13 @@
     "--destination-file",
     "--jenkins-view"
   ],
+  "DisplayInfo": [
+    "--input-text"
+  ],
   "SetBugNumbers": [
     "--username",
     "--disable-bugzilla",
     "--disable-jira"
-  ],
-  "ExitIflBranchDoesNotHaveLocalCommit": [
-    "--tracking-branch"
   ],
   "CopyFileData": [
     "--file-data"

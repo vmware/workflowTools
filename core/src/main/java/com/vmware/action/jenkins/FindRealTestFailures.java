@@ -1,20 +1,14 @@
 package com.vmware.action.jenkins;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -40,7 +34,6 @@ import com.vmware.util.logging.Padder;
 import org.slf4j.LoggerFactory;
 
 import static com.vmware.BuildStatus.SUCCESS;
-import static com.vmware.BuildStatus.UNSTABLE;
 import static com.vmware.util.StringUtils.pluralize;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingLong;
@@ -75,34 +68,20 @@ public class FindRealTestFailures extends BaseAction {
             exitDueToFailureCheck("No views found for name " + jenkinsConfig.jenkinsView);
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy");
-        generationDate = formatter.format(new Date());
+        log.info("Matched {} views to view name {}", matchingViews.size(), jenkinsConfig.jenkinsView);
+        log.info("View names: {}", matchingViews.stream().map(view -> view.name).collect(Collectors.joining(", ")));
+
+        generationDate = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy").format(new Date());
 
         File destinationFile = new File(fileSystemConfig.destinationFile);
-        if (matchingViews.size() > 1) {
-            log.info("Matched {} views to view name {}", matchingViews.size(), jenkinsConfig.jenkinsView);
-            log.info("View names: {}", matchingViews.stream().map(view -> view.name).collect(Collectors.joining(", ")));
-            if (!destinationFile.exists()) {
-                failIfTrue(!destinationFile.mkdir(), "Failed to create directory " + destinationFile.getAbsolutePath());
-            }
-        }
+        validateThatDestinationFileIsDirectoryIfNeeded(matchingViews, destinationFile);
 
         log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
                 jenkinsConfig.maxJenkinsBuildsToCheck);
 
-        if (matchingViews.size() > 1) {
-            failIfTrue(destinationFile.exists() && destinationFile.isFile(),
-                    destinationFile.getAbsolutePath() + " is a file. Destination file needs to specify a directory as multiple views matched");
-        }
-
-        if (fileSystemConfig.databaseConfigured()) {
-            log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
-            log.info("Using database {} to store test results",fileSystemConfig.databaseUrl);
-            dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
-                    fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
-        }
-
+        createDbUtilsIfNeeded();
         matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
+        purgeVanillaTestResults();
 
         if (destinationFile.isDirectory()) {
             String viewListing = createViewListingHtml(matchingViews);
@@ -113,6 +92,28 @@ public class FindRealTestFailures extends BaseAction {
 
         long elapsedTime = System.currentTimeMillis() - startTime;
         log.info("Took {} seconds", TimeUnit.MILLISECONDS.toSeconds(elapsedTime));
+    }
+
+    private void validateThatDestinationFileIsDirectoryIfNeeded(List<HomePage.View> matchingViews, File destinationFile) {
+        if (matchingViews.size() <= 1) {
+            return;
+        }
+
+        if (!destinationFile.exists()) {
+            failIfTrue(!destinationFile.mkdir(), "Failed to create directory " + destinationFile.getAbsolutePath());
+        } else {
+            failIfTrue(destinationFile.isFile(),
+                    destinationFile.getAbsolutePath() + " is a file. Destination file needs to specify a directory as multiple views matched");
+        }
+    }
+
+    private void createDbUtilsIfNeeded() {
+        if (fileSystemConfig.databaseConfigured()) {
+            log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
+            log.info("Using database {} to store test results",fileSystemConfig.databaseUrl);
+            dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
+                    fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
+        }
     }
 
     private String createViewListingHtml(List<HomePage.View> matchingViews) {
@@ -185,11 +186,12 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private Map<Job, List<TestResult>> findAllRealFailingTests(JobView jobView) {
-        jobView.populateFromDb(dbUtils);
+        jobView.setDbUtils(dbUtils);
+        jobView.populateFromDb();
 
         Map<Job, List<TestResult>> allFailingTests = new HashMap<>();
 
-        List<Job> usableJobs = jobView.usableJobs(dbUtils, jenkinsConfig.maxJenkinsBuildsToCheck);
+        List<Job> usableJobs = jobView.usableJobs(jenkinsConfig.maxJenkinsBuildsToCheck);
 
         if (usableJobs.isEmpty()) {
             return Collections.emptyMap();
@@ -197,6 +199,7 @@ public class FindRealTestFailures extends BaseAction {
 
         usableJobs.stream().parallel().forEach(job -> {
             try {
+                job.loadTestResultsFromDb();
                 addTestResultsToJob(job, jobView.lastFetchAmount);
             } catch (Exception e) {
                 log.error("Failed to get full job details for {}\n{}", job.name, StringUtils.exceptionAsString(e));
@@ -205,16 +208,15 @@ public class FindRealTestFailures extends BaseAction {
         });
 
         jobView.lastFetchAmount = jenkinsConfig.maxJenkinsBuildsToCheck;
-        if (dbUtils != null) {
-            dbUtils.update(jobView);
-        }
+        jobView.updateInDb();
 
         log.info("");
 
         usableJobs.forEach(job -> {
-            job.addTestResultsToMasterList();
-            job.saveTestResultsToDb(dbUtils);
-            job.removeOldBuilds(dbUtils, jenkinsConfig.maxJenkinsBuildsToCheck);
+            boolean presumedPassedResultsAdded = job.addTestResultsToMasterList();
+            job.saveTestResultsToDb(presumedPassedResultsAdded);
+            job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToCheck);
+
             List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck);
             if (failingTests.isEmpty()) {
                 log.info("No consistently failing tests found for {}", job.name);
@@ -228,23 +230,16 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private void addTestResultsToJob(Job job, int lastFetchAmount) {
-        List<JobBuild> savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ?", job.id);
-        job.testResults = new ArrayList<>();
-        job.testResults.addAll(loadTestResultsFromDb(job, savedBuilds));
-
+        job.fetchedResults = Collections.emptyList();
         int latestUsableBuildNumber = job.latestUsableBuildNumber();
-        if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && savedBuilds.stream().anyMatch(build -> build.buildNumber == latestUsableBuildNumber)) {
+        if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && job.hasSavedBuild(latestUsableBuildNumber)) {
             log.info("Saved builds for {} already include latest build {}", job.name, latestUsableBuildNumber);
             return;
         }
 
         Job fullDetails = jenkinsExecutor.execute(j -> j.getJobDetails(job.getFullInfoUrl()));
-        job.builds = fullDetails.builds; // full details includes build statuses
-
-        List<JobBuild> usefulBuilds = Arrays.stream(job.builds).filter(build -> build.status == SUCCESS || build.status == UNSTABLE)
-                .sorted((first, second) -> Integer.compare(second.buildNumber, first.buildNumber))
-                .peek(build -> build.setCommitIdForBuild(jenkinsConfig.commitIdInDescriptionPattern)).collect(toList());
-        job.usefulBuilds = usefulBuilds;
+        job.updateBuilds(fullDetails.builds, jenkinsConfig.commitIdInDescriptionPattern); // full details includes build statuses
+        List<JobBuild> usefulBuilds = job.usefulBuilds;
 
         if (usefulBuilds.isEmpty()) {
             log.info("No usable builds found for {}", job.name);
@@ -260,50 +255,20 @@ public class FindRealTestFailures extends BaseAction {
         final int lastBuildNumberToCheck = usefulBuilds.get(numberOfBuildsToCheck - 1).buildNumber;
 
         List<Supplier<TestResults>> usableResultSuppliers = usefulBuilds.stream().map(build -> {
-            if (build.buildNumber < lastBuildNumberToCheck) {
+            if (build.buildNumber < lastBuildNumberToCheck || job.hasSavedBuild(build.buildNumber)) {
                 return null;
             }
-            return fetchBuildIfNeeded(build, savedBuilds);
+            return (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build));
             }).filter(Objects::nonNull).collect(toList());
 
         if (usableResultSuppliers.isEmpty()) {
-            log.info("Builds for {} already saved, checked for last {} of {} usable builds. Lase build number checked was {}", job.name,
+            log.info("Builds for {} already saved, checked for last {} of {} usable builds. Last build number checked was {}", job.name,
                     numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
         } else {
             log.info("Fetching {} for {}. Checked last {} of {} usable builds. Last build number checked was {}",
                     pluralize(usableResultSuppliers.size(), "new build"), job.name, numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
             job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).collect(toList());
         }
-
-
-    }
-
-
-    private List<TestResult> loadTestResultsFromDb(Job job, List<JobBuild> savedBuilds) {
-        if (dbUtils == null) {
-            return Collections.emptyList();
-        }
-        try (Connection connection = dbUtils.createConnection()) {
-            List<TestResult> testResults = dbUtils.query(connection, TestResult.class, "SELECT tr.* from TEST_RESULT tr"
-                    + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY ID ASC", job.id);
-            Set<String> usedUrls = new HashSet<>();
-            savedBuilds.forEach(build -> testResults.stream().filter(result -> result.jobBuildId.equals(build.id)).forEach(result -> {
-                result.commitId = build.commitId;
-                result.buildNumber = build.buildNumber;
-                result.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
-                usedUrls.add(result.url);
-            }));
-            return testResults;
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
-    }
-
-    private Supplier<TestResults> fetchBuildIfNeeded(JobBuild build, List<JobBuild> savedBuilds) {
-        if (savedBuilds.stream().anyMatch(savedBuild -> savedBuild.url.equals(build.url))) {
-            return null;
-        }
-        return () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build));
     }
 
     private String createJobFragment(int jobIndex, Job fullDetails, List<TestResult> failingMethods) {
@@ -327,4 +292,17 @@ public class FindRealTestFailures extends BaseAction {
         filledInJobFragment = filledInJobFragment.replace("#body", rowBuilder.toString());
         return filledInJobFragment;
     }
+
+    private void purgeVanillaTestResults() {
+        if (dbUtils == null) {
+            return;
+        }
+        String tableName = StringUtils.convertToDbName(TestResult.class.getSimpleName());
+        int purgedRecords = dbUtils.delete("DELETE FROM " + tableName + " WHERE STATUS = '" + TestResult.TestStatus.PASS.name()
+                + "' and coalesce(failed_builds, '') = '' and coalesce(skipped_builds, '') = ''");
+        if (purgedRecords > 0) {
+            log.info("Purged {} test results from database that have no failure information", purgedRecords);
+        }
+    }
+
 }

@@ -185,6 +185,23 @@ public class DbUtils {
         }
     }
 
+    public int delete(Connection connection, BaseDbClass record) {
+        if (record.id == null) {
+            return 0;
+        }
+        String tableName = StringUtils.convertToDbName(record.getClass().getSimpleName());
+        String query = "DELETE FROM " + tableName + " WHERE id = ?";
+        return delete(connection, query, record.id);
+    }
+
+    public <T> int delete(String query, Object... parameters) {
+        try (Connection connection = createConnection()) {
+            return delete(connection, query, parameters);
+        } catch (SQLException se) {
+            throw new RuntimeException(se);
+        }
+    }
+
     public int delete(Connection connection, String query, Object... parameters) {
         try {
             log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));

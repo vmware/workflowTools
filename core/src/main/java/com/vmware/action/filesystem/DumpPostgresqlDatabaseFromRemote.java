@@ -11,7 +11,8 @@ import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.exception.FatalException;
 import com.vmware.vcd.domain.Sites;
 
-@ActionDescription("Uses psql to copy a database from a source server to a destination server")
+@ActionDescription(value = "Uses psql to copy a database from a source server to a destination server",
+        configFlagsToExcludeFromCompleter = {"--build-display-name", "--output-file", "--use-database-host", "--source-file"})
 public class DumpPostgresqlDatabaseFromRemote extends ScpFileFromRemote {
     public DumpPostgresqlDatabaseFromRemote(WorkflowConfig config) {
         super(config, Collections.singletonList("destinationFile"));

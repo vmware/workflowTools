@@ -3,9 +3,13 @@ package com.vmware.jenkins.domain;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.annotations.Expose;
+import com.vmware.util.StringUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
 import com.vmware.util.db.DbUtils;
@@ -13,6 +17,7 @@ import com.vmware.util.db.DbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.vmware.util.StringUtils.pluralize;
 import static java.util.stream.Collectors.toList;
 
 public class JobView extends BaseDbClass {
@@ -28,7 +33,15 @@ public class JobView extends BaseDbClass {
     @DbSaveIgnore
     public Job[] jobs;
 
-    public void populateFromDb(DbUtils dbUtils) {
+    @DbSaveIgnore
+    @Expose(serialize = false, deserialize = false)
+    private DbUtils dbUtils;
+
+    public void setDbUtils(DbUtils dbUtils) {
+        this.dbUtils = dbUtils;
+    }
+
+    public void populateFromDb() {
         if (dbUtils == null) {
             return;
         }
@@ -41,25 +54,32 @@ public class JobView extends BaseDbClass {
         }
     }
 
-    public List<Job> usableJobs(DbUtils dbUtils, int maxJenkinsBuildsToCheck) {
-        List<Job> usableJobs = Arrays.stream(jobs).filter(jobDetails -> {
-            if (jobDetails.lastCompletedBuild == null) {
-                log.info("Skipping {} as there are no recent completed builds", jobDetails.name);
+    public void updateInDb() {
+        if (dbUtils != null) {
+            dbUtils.update(this);
+        }
+    }
+
+    public List<Job> usableJobs(int maxJenkinsBuildsToCheck) {
+        List<Job> usableJobs = Arrays.stream(jobs).filter(job -> {
+            if (job.lastCompletedBuild == null) {
+                log.info("Skipping {} as there are no recent completed builds", job.name);
                 return false;
             }
-            if (jobDetails.lastBuildWasSuccessful()) {
-                log.info("Skipping {} as most recent build {} was successful", jobDetails.name, jobDetails.lastStableBuild.buildNumber);
+            if (job.lastBuildWasSuccessful()) {
+                log.info("Skipping {} as most recent build {} was successful", job.name, job.lastStableBuild.buildNumber);
                 return false;
             }
-            if (jobDetails.lastUnstableBuild == null) {
-                log.info("Skipping {} as there are no recent unstable builds", jobDetails.name);
+            if (job.lastUnstableBuild == null) {
+                log.info("Skipping {} as there are no recent unstable builds", job.name);
                 return false;
             }
 
-            if (jobDetails.lastUnstableBuildAge() > maxJenkinsBuildsToCheck) {
-                log.info("Skipping {} as last unstable build was {} builds ago", jobDetails.name, jobDetails.lastUnstableBuildAge());
+            if (job.lastUnstableBuildAge() > maxJenkinsBuildsToCheck) {
+                log.info("Skipping {} as last unstable build was {} builds ago", job.name, job.lastUnstableBuildAge());
                 return false;
             }
+            job.setDbUtils(dbUtils);
             return true;
         }).collect(toList());
 
@@ -80,4 +100,5 @@ public class JobView extends BaseDbClass {
         }
         return usableJobs;
     }
+
 }

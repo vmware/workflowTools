@@ -3,6 +3,7 @@ package com.vmware.config;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,7 +104,7 @@ public class WorkflowFields {
                 if (valueMap.isEmpty()) {
                     continue;
                 }
-                Map  existingValues = (Map) existingValue;
+                Map existingValues = (Map) existingValue;
                 String existingConfigValue = overriddenConfigSources.get(field.getName());
                 String updatedConfigValue;
                 if (existingConfigValue == null && !existingValues.isEmpty()) {
@@ -115,6 +116,9 @@ public class WorkflowFields {
                 }
                 overriddenConfigSources.put(field.getName(), updatedConfigValue);
                 existingValues.putAll(valueMap);
+            } else if (existingValue != null && field.getName().equals("supportingWorkflows")) {
+                List<String> existingValues = (List<String>) existingValue;
+                existingValues.addAll((Collection<? extends String>) value);
             } else {
                 overriddenConfigSources.put(field.getName(), configFileName);
                 // override for everything else

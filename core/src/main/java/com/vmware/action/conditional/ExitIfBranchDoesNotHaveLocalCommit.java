@@ -5,8 +5,8 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Exits if the local git branch does not have a local commit.")
-public class ExitIflBranchDoesNotHaveLocalCommit extends BaseAction {
-    public ExitIflBranchDoesNotHaveLocalCommit(WorkflowConfig config) {
+public class ExitIfBranchDoesNotHaveLocalCommit extends BaseAction {
+    public ExitIfBranchDoesNotHaveLocalCommit(WorkflowConfig config) {
         super(config);
     }
 

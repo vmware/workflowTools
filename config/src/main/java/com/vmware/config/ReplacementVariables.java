@@ -13,6 +13,7 @@ public class ReplacementVariables {
     public static final String CONFIG_PREFIX = "--V";
     private Map<String, String> replacementVariables = new HashMap<>();
     private Map<String, String> runtimeReplacementVariables = new HashMap<>();
+    private Set<String> configPropertyNames = new HashSet<>();
     private WorkflowConfig config;
 
     public ReplacementVariables(WorkflowConfig config) {
@@ -25,6 +26,11 @@ public class ReplacementVariables {
 
     public void addVariable(VariableName name, String value) {
         addVariable(name.name(), value, false);
+    }
+
+    public void addConfigPropertyAsVariable(String name, String valueToAdd) {
+        addVariable(name, valueToAdd, false);
+        configPropertyNames.add(name);
     }
 
     public void addVariable(String name, String valueToAdd, boolean isRuntime) {
@@ -70,14 +76,15 @@ public class ReplacementVariables {
     }
 
     public Map<String, String> values() {
-        return Collections.unmodifiableMap(replacementVariables);
+        return replacementVariables.entrySet().stream().filter(entry -> !configPropertyNames.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private String replaceVariable(String value, String variableName, String variableValue) {
-        if (value.contains("$" + variableName)) {
+        if (value.contains("$" + variableName) && variableValue != null) {
             value = value.replace("$" + variableName, variableValue);
         }
-        if (value.contains("${" + variableName + "}")) {
+        if (value.contains("${" + variableName + "}") && variableValue != null) {
             value = value.replace("${" + variableName + "}", variableValue);
         }
         return value;

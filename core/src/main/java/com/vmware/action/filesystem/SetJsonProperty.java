@@ -9,7 +9,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.exception.FatalException;
 
-@ActionDescription("Sets value for a specified json property value.")
+@ActionDescription(value = "Sets value for a specified json property value.", configFlagsToExcludeFromCompleter = "--file-data")
 public class SetJsonProperty extends DeleteJsonProperty {
     public SetJsonProperty(WorkflowConfig config) {
         super(config);

@@ -52,7 +52,7 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--database-schema-name", help = "Database schema name to copy database as")
     public String databaseSchemaName;
 
-    @ConfigurableProperty(commandLine = "--input-text", help = "Text to use for searching or appending to file")
+    @ConfigurableProperty(commandLine = "--input-text", help = "Text to use")
     public String inputText;
 
     @ConfigurableProperty(commandLine = "--replacement-text", help = "Replacement text for matches")

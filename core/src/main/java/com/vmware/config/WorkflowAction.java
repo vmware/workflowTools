@@ -1,6 +1,8 @@
 package com.vmware.config;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import com.vmware.util.exception.SkipActionException;
 import static com.vmware.util.StringUtils.pluralizeDescription;
 
 public class WorkflowAction implements Action {
+    private String sectionName;
     private WorkflowConfig config;
     private Class<? extends BaseAction> actionClass;
     private BaseAction instantiatedAction;
@@ -30,7 +33,8 @@ public class WorkflowAction implements Action {
 
     private Map<String, CalculatedProperty> existingValuesForConfig;
 
-    public WorkflowAction(ConfigMappings mappings, WorkflowConfig config, Class<? extends BaseAction> actionClass, List<WorkflowParameter> parameters) {
+    public WorkflowAction(String sectionName, ConfigMappings mappings, WorkflowConfig config, Class<? extends BaseAction> actionClass, List<WorkflowParameter> parameters) {
+        this.sectionName = sectionName;
         this.config = config;
         this.actionClass = actionClass;
         setWorkflowParametersForAction(mappings, parameters);
@@ -38,6 +42,40 @@ public class WorkflowAction implements Action {
 
     public String getActionClassName() {
         return actionClass.getSimpleName();
+    }
+
+    public List<String> configFlagsToRemoveFromCompleter() {
+        Class<? extends BaseAction> classToCheck = actionClass;
+        List<String> configFlagsToRemoveFromCompleter = new ArrayList<>();
+        do {
+            ActionDescription actionDescription = classToCheck.getAnnotation(ActionDescription.class);
+            configFlagsToRemoveFromCompleter.addAll(Arrays.asList(actionDescription.configFlagsToExcludeFromCompleter()));
+            if (classToCheck.getSuperclass().getAnnotation(ActionDescription.class) != null) {
+                classToCheck = (Class<? extends BaseAction>) classToCheck.getSuperclass();
+            } else {
+                classToCheck = null;
+            }
+        } while (classToCheck != null);
+        return configFlagsToRemoveFromCompleter;
+    }
+
+    public List<String> configFlagsToAlwaysRemoveFromCompleter() {
+        Class<? extends BaseAction> classToCheck = actionClass;
+        List<String> configFlagsToAlwaysRemoveFromCompleter = new ArrayList<>();
+        do {
+            ActionDescription actionDescription = classToCheck.getAnnotation(ActionDescription.class);
+            configFlagsToAlwaysRemoveFromCompleter.addAll(Arrays.asList(actionDescription.configFlagsToAlwaysExcludeFromCompleter()));
+            if (classToCheck.getSuperclass().getAnnotation(ActionDescription.class) != null) {
+                classToCheck = (Class<? extends BaseAction>) classToCheck.getSuperclass();
+            } else {
+                classToCheck = null;
+            }
+        } while (classToCheck != null);
+        return configFlagsToAlwaysRemoveFromCompleter;
+    }
+
+    public String getSectionName() {
+        return sectionName;
     }
 
     public ActionDescription getActionDescription() {
@@ -114,6 +152,10 @@ public class WorkflowAction implements Action {
 
     public List<WorkflowParameter> getOverriddenConfigValues() {
         return config.applyReplacementVariables(overriddenConfigValues);
+    }
+
+    public Set<String> getWorkflowParameterNames() {
+        return overriddenConfigValues.stream().map(WorkflowParameter::getName).collect(Collectors.toSet());
     }
 
     public Set<String> getConfigValues(Map<String, List<String>> mappings) {

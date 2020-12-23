@@ -43,7 +43,7 @@ public class WorkflowValuesParser {
         this.jenkinsConfig = workflowConfig.jenkinsConfig;
     }
 
-    public void parse(List<String> workflowValues, List<WorkflowParameter> workflowParameters) {
+    public void parse(String sectionName, List<String> workflowValues, List<WorkflowParameter> workflowParameters) {
         for (String workflowValue : workflowValues) {
             String[] workflowPieces = workflowValue.split("&&-");
             String workflowName = workflowPieces[0];
@@ -60,14 +60,15 @@ public class WorkflowValuesParser {
             }
 
             if (workflows.containsKey(workflowName)) {
-                parse(workflows.get(workflowName), parameters);
+                String sectionNameToUse = sectionName != null && config.supportingWorkflows.contains(workflowName) ? sectionName : workflowName;
+                parse(sectionNameToUse, workflows.get(workflowName), parameters);
                 continue;
             }
 
             Optional<Class<? extends BaseAction>> matchingAction = workflowActionClasses.stream()
                     .filter(action -> action.getSimpleName().equals(workflowName)).findFirst();
             if (matchingAction.isPresent()) {
-                workflowActions.add(new WorkflowAction(mappings, config, matchingAction.get(), parameters));
+                workflowActions.add(new WorkflowAction(sectionName, mappings, config, matchingAction.get(), parameters));
                 log.trace("Found action class {}", workflowName);
             } else {
                 unknownActions.add(workflowName);

@@ -15,4 +15,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ActionDescription {
     String value();
     boolean ignoreConfigValuesInSuperclass() default false;
+    String[] configFlagsToExcludeFromCompleter() default {};
+    String[] configFlagsToAlwaysExcludeFromCompleter() default {};
 }

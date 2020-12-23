@@ -1,6 +1,5 @@
 package com.vmware.action.filesystem;
 
-import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -18,12 +17,9 @@ import com.vmware.util.exception.SkipActionException;
 @ActionDescription("Unwraps the specified property using the specified cipher key to the specified variable.")
 public class UnwrapCipherKey extends BaseAction {
 
-    private static final String CIPHER_WRAP_TRANSFORMATION = "AES/ECB/NoPadding";
-    private static final String KEY_ALGORITHM = "AES";
-
     public UnwrapCipherKey(WorkflowConfig config) {
         super(config);
-        super.addSkipActionIfBlankProperties("cipherKey", "propertyValue", "outputVariableName");
+        super.addSkipActionIfBlankProperties("cipherKey", "cipherUnwrapTransformation", "cipherKeyAlgorithm", "propertyValue", "outputVariableName");
     }
 
     @Override
@@ -55,9 +51,9 @@ public class UnwrapCipherKey extends BaseAction {
 
     private byte[] unwrap(byte[] cryptoKey, String value) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
         byte[] cipherData = Base64.getDecoder().decode(value);
-        Cipher cipher = Cipher.getInstance(CIPHER_WRAP_TRANSFORMATION);
-        SecretKeySpec skeySpec = new SecretKeySpec(cryptoKey, KEY_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(sslConfig.cipherUnwrapTransformation);
+        SecretKeySpec skeySpec = new SecretKeySpec(cryptoKey, sslConfig.cipherKeyAlgorithm);
         cipher.init(Cipher.UNWRAP_MODE, skeySpec);
-        return cipher.unwrap(cipherData, KEY_ALGORITHM, Cipher.SECRET_KEY).getEncoded();
+        return cipher.unwrap(cipherData, sslConfig.cipherKeyAlgorithm, Cipher.SECRET_KEY).getEncoded();
     }
 }

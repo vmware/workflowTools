@@ -1,5 +1,6 @@
 package com.vmware.jenkins.domain;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.util.ArrayUtils;
+import com.vmware.util.CollectionUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.db.AfterDbLoad;
@@ -43,6 +45,9 @@ public class TestResult extends BaseDbClass {
 
     @Expose(serialize = false, deserialize = false)
     public int[] passedBuilds;
+
+    @Expose(serialize = false, deserialize = false)
+    public int[] presumedPassedBuilds;
 
     @DbSaveIgnore
     @Expose(serialize = false, deserialize = false)
@@ -77,7 +82,7 @@ public class TestResult extends BaseDbClass {
 
     @AfterDbLoad
     public void sortArrays() {
-        Stream.of(passedBuilds, skippedBuilds, failedBuilds).filter(Objects::nonNull).forEach(Arrays::sort);
+        Stream.of(passedBuilds, presumedPassedBuilds, skippedBuilds, failedBuilds).filter(Objects::nonNull).forEach(Arrays::sort);
     }
 
 
@@ -121,7 +126,7 @@ public class TestResult extends BaseDbClass {
 
         sortedTestRuns.sort(Comparator.comparing(TestResult::buildNumber).reversed());
         Optional<TestResult> lastPassingResult =
-                IntStream.range(1, sortedTestRuns.size()).mapToObj(sortedTestRuns::get).filter(method -> method.status == TestStatus.PASS).findFirst();
+                IntStream.range(1, sortedTestRuns.size()).mapToObj(sortedTestRuns::get).filter(method -> TestStatus.isPass(method.status)).findFirst();
 
         if (lastPassingResult.isPresent() && StringUtils.isNotBlank(commitComparisonUrl) && StringUtils.isNotBlank(lastPassingResult.get().commitId)) {
             TestResult firstFailure = sortedTestRuns.get(sortedTestRuns.indexOf(lastPassingResult.get()) - 1);
@@ -136,33 +141,40 @@ public class TestResult extends BaseDbClass {
     }
 
     public boolean containsBuildNumbers(int... buildNumber) {
-        return Stream.of(passedBuilds, skippedBuilds, failedBuilds).anyMatch(values -> containsBuildNumbers(values, buildNumber));
+        return Stream.of(passedBuilds, presumedPassedBuilds, skippedBuilds, failedBuilds).anyMatch(values -> containsBuildNumbers(values, buildNumber));
     }
 
-    public Map<Integer, TestStatus> buildsToUse(int limit) {
+    public List<Map.Entry<Integer, TestStatus>> buildsToUse(int limit) {
         Map<Integer, TestStatus> testStatusMap = new HashMap<>();
         Stream.of(passedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.PASS));
+        Stream.of(presumedPassedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.PRESUMED_PASS));
         Stream.of(failedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.FAIL));
         Stream.of(skippedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.SKIP));
 
         Comparator<Map.Entry<Integer, TestStatus>> keyComparator = Map.Entry.<Integer, TestStatus>comparingByKey().reversed();
 
-        Map<Integer, TestStatus> buildsToUse = testStatusMap.entrySet().stream().sorted(keyComparator).limit(limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        if (buildsToUse.values().stream().noneMatch(value -> value == TestStatus.PASS) && passedBuilds != null && passedBuilds.length > 0) {
-            int lastPassingBuildNumber = passedBuilds[passedBuilds.length - 1];
-            buildsToUse.put(lastPassingBuildNumber, TestStatus.PASS);
+        List<Map.Entry<Integer, TestStatus>> buildsToUse = testStatusMap.entrySet().stream().sorted(keyComparator).limit(limit).collect(Collectors.toList());
+
+        List<Map.Entry<Integer, TestStatus>> passingBuilds = testStatusMap.entrySet().stream().filter(entry -> TestStatus.isPass(entry.getValue()))
+                .sorted(Map.Entry.comparingByKey()).collect(Collectors.toList());
+
+        if (buildsToUse.stream().noneMatch(entry -> TestStatus.isPass(entry.getValue())) && CollectionUtils.isNotEmpty(passingBuilds)) {
+            Map.Entry<Integer, TestStatus> lastPassingBuild = passingBuilds.get(passingBuilds.size() - 1);
+            buildsToUse.remove(buildsToUse.size() - 1);
+            buildsToUse.add(lastPassingBuild);
             // get next failing / skipped test
-            for (int i = lastPassingBuildNumber + 1; i < buildNumber; i ++) {
+            for (int i = lastPassingBuild.getKey() + 1; i < buildNumber; i ++) {
                 if (testStatusMap.containsKey(i) && testStatusMap.get(i) == TestStatus.FAIL) {
-                    buildsToUse.put(i, testStatusMap.get(i));
+                    buildsToUse.remove(buildsToUse.size() - 2); // current build after last passing build
+                    buildsToUse.add(new AbstractMap.SimpleEntry<>(i, testStatusMap.get(i)));
                     return buildsToUse;
                 }
             }
 
-            for (int i = lastPassingBuildNumber + 1; i < buildNumber; i ++) {
-                if (testStatusMap.containsKey(i)) {
-                    buildsToUse.put(i, testStatusMap.get(i));
+            for (int i = lastPassingBuild.getKey() + 1; i < buildNumber; i ++) {
+                if (testStatusMap.containsKey(i) && testStatusMap.get(i) == TestStatus.SKIP) {
+                    buildsToUse.remove(buildsToUse.size() - 2); // current build after last passing build
+                    buildsToUse.add(new AbstractMap.SimpleEntry<>(i, testStatusMap.get(i)));
                     return buildsToUse;
                 }
             }
@@ -175,6 +187,9 @@ public class TestResult extends BaseDbClass {
             throw new RuntimeException("Bad build number for test " + testResult.name);
         }
         switch (testResult.status) {
+        case PRESUMED_PASS:
+            presumedPassedBuilds = ArrayUtils.add(presumedPassedBuilds, testResult.buildNumber);
+            break;
         case PASS:
             passedBuilds = ArrayUtils.add(passedBuilds, testResult.buildNumber);
             break;
@@ -203,11 +218,15 @@ public class TestResult extends BaseDbClass {
         this.duration = testResult.duration;
     }
 
+    public boolean noFailureInfo() {
+        return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
+    }
+
     public boolean removeUnimportantTestResultsForBuild(JobBuild build) {
         if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
             return false;
         }
-        int newestPass = passedBuilds != null ? Arrays.stream(passedBuilds).max().orElse(-1) : -1;
+        int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMapToInt(Arrays::stream).max().orElse(-1);
         int firstFailureAfterPass = failedBuilds != null ? Arrays.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1) : -1;
         int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
         int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
@@ -216,10 +235,10 @@ public class TestResult extends BaseDbClass {
         }
 
         passedBuilds = ArrayUtils.remove(passedBuilds, build.buildNumber);
+        presumedPassedBuilds = ArrayUtils.remove(presumedPassedBuilds, build.buildNumber);
         failedBuilds = ArrayUtils.remove(failedBuilds, build.buildNumber);
         skippedBuilds = ArrayUtils.remove(skippedBuilds, build.buildNumber);
         return true;
-
     }
 
     @Override
@@ -249,6 +268,7 @@ public class TestResult extends BaseDbClass {
     }
 
     public enum TestStatus {
+        PRESUMED_PASS("Presumed passed", "testPass"),
         PASS("Passed", "testPass"), ABORTED("Aborted", "testFail"),
         FAIL("Failed", "testFail"), SKIP("Skipped", "testSkip");
         private final String description;
@@ -261,6 +281,10 @@ public class TestResult extends BaseDbClass {
 
         public String getDescription() {
             return description;
+        }
+
+        public static boolean isPass(TestStatus status) {
+            return status == PASS || status == PRESUMED_PASS;
         }
     }
 

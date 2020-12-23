@@ -17,13 +17,10 @@ import com.vmware.util.exception.SkipActionException;
 @ActionDescription("Decrypts the specified property to the specified variable name.")
 public class DecryptVariable extends BaseAction {
 
-    private static final int SALT_LENGTH = 8; // 8 bytes salt per PSP guidelines
-    private static final String CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
-    private static final String KEY_ALGORITHM = "AES";
-
     public DecryptVariable(WorkflowConfig config) {
         super(config);
-        super.addSkipActionIfBlankProperties("cipherKey", "propertyValue", "outputVariableName");
+        super.addSkipActionIfBlankProperties("cipherKey", "cipherDecryptTransformation", "cipherSaltLength", "cipherKeyAlgorithm",
+                "propertyValue", "outputVariableName");
     }
 
     @Override
@@ -56,13 +53,13 @@ public class DecryptVariable extends BaseAction {
 
     private String decryptValue(byte[] cryptoKey, String value) throws GeneralSecurityException {
         byte[] valueAsByteArray = Base64.getDecoder().decode(value);
-        Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
-        SecretKeySpec skeySpec = new SecretKeySpec(cryptoKey, KEY_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(sslConfig.cipherDecryptTransformation);
+        SecretKeySpec skeySpec = new SecretKeySpec(cryptoKey, sslConfig.cipherKeyAlgorithm);
         IvParameterSpec paramSpec = new IvParameterSpec(extractIv(cryptoKey.length, valueAsByteArray));
         cipher.init(Cipher.DECRYPT_MODE, skeySpec, paramSpec);
         byte[] decryptedData = cipher.doFinal(extractCipherData(cryptoKey.length, valueAsByteArray));
-        byte[] plainData = new byte[decryptedData.length - SALT_LENGTH];
-        System.arraycopy(decryptedData, SALT_LENGTH, plainData, 0, plainData.length);
+        byte[] plainData = new byte[decryptedData.length - sslConfig.cipherSaltLength];
+        System.arraycopy(decryptedData, sslConfig.cipherSaltLength, plainData, 0, plainData.length);
         return new String(plainData, StandardCharsets.UTF_8);
     }
 

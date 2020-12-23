@@ -10,13 +10,14 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 
-@ActionDescription("Uses scp to copy a file from a ssh site.")
+@ActionDescription(value = "Uses scp to copy a file from a ssh site.",
+        configFlagsToExcludeFromCompleter = {"--build-display-name", "--output-file", "--use-database-host", "--ssh-command"})
 public class ScpFileFromRemote extends ExecuteSshCommand {
+
     public ScpFileFromRemote(WorkflowConfig config) {
         this(config, Arrays.asList("sourceFile", "destinationFile"));
     }

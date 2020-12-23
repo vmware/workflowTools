@@ -26,4 +26,16 @@ public class SslConfig {
 
     @ConfigurableProperty(commandLine = "--key-size", help = "Key size for entry in the keystore")
     public int keySize;
+
+    @ConfigurableProperty(help = "Key algorithm for unwrapping or decrypting a value")
+    public String cipherKeyAlgorithm;
+
+    @ConfigurableProperty(help = "Cipher transformation for unwrapping a value")
+    public String cipherUnwrapTransformation;
+
+    @ConfigurableProperty(help = "Cipher transformation for decrypting a value")
+    public String cipherDecryptTransformation;
+
+    @ConfigurableProperty(help = "Cipher salt length for decrypting a value")
+    public int cipherSaltLength;
 }

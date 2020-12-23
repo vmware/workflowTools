@@ -39,7 +39,7 @@ public class WorkflowActions {
         log.info("");
 
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(workflowConfig, workflowActionClasses);
-        valuesParser.parse(possibleActions, Collections.emptyList());
+        valuesParser.parse(null, possibleActions, Collections.emptyList());
         workflowConfig.applyConfigValues(valuesParser.getConfigValues(), "Config in Workflow", false);
         workflowConfig.applyReplacementVariables();
         if (!valuesParser.getUnknownActions().isEmpty() && !workflowConfig.ignoreUnknownActions) {
