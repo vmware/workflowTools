@@ -3,8 +3,13 @@ package com.vmware.config.section;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.config.ReplacementVariables;
+import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
+
+import static com.vmware.config.ReplacementVariables.VariableName.VAPP_NAME;
 
 public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--source-url", help = "Source url to copy certificates from")
@@ -22,11 +27,11 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--property-value", help = "Property value")
     public String propertyValue;
 
-    @ConfigurableProperty(commandLine = "--skip-file-copy", help = "Skip copying operation")
-    public boolean skipFileCopy;
+    @ConfigurableProperty(commandLine = "--skip-backup", help = "Skip backup")
+    public boolean skipBackup;
 
-    @ConfigurableProperty(commandLine = "--replace-existing", help = "Replace existing file on copy")
-    public boolean replaceExisting;
+    @ConfigurableProperty(commandLine = "--overwrite-backup", help = "Overwrite existing file if present on backup")
+    public boolean overwriteBackup;
 
     @ConfigurableProperty(commandLine = "--sql-statement", help = "Sql statement to execute")
     public String sqlStatement;
@@ -77,6 +82,5 @@ public class FileSystemConfig {
         connectionProperties.put("user", databaseUsername);
         connectionProperties.put("password", databasePassword);
         return connectionProperties;
-
     }
 }

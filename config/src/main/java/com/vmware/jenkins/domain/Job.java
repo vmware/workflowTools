@@ -211,6 +211,26 @@ public class Job extends BaseDbClass {
         return presumedPassResultsAdded.get();
     }
 
+    public void saveFetchedBuildsInfo() {
+        if (dbUtils == null || (CollectionUtils.isEmpty(fetchedResults))) {
+            return;
+        }
+
+        try (Connection connection = dbUtils.createConnection()) {
+            connection.setAutoCommit(false);
+            dbUtils.insertIfNeeded(connection, this, "SELECT * FROM JOB WHERE URL = ?", url);
+            usefulBuilds.forEach(build -> {
+                build.jobId = this.id;
+                dbUtils.insertIfNeeded(connection, build, "SELECT * FROM JOB_BUILD WHERE url = ?", build.url);
+            });
+            connection.commit();
+        } catch (SQLException se) {
+            throw new RuntimeException(se);
+        }
+
+        savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
+    }
+
     public void saveTestResultsToDb(boolean presumedPassedResultsAdded) {
         if (dbUtils == null || (CollectionUtils.isEmpty(fetchedResults) && !presumedPassedResultsAdded)) {
             return;
@@ -218,18 +238,9 @@ public class Job extends BaseDbClass {
 
         try (Connection connection = dbUtils.createConnection()) {
             connection.setAutoCommit(false);
-            dbUtils.insertIfNeeded(connection, this, "SELECT * FROM JOB WHERE URL = ?", url);
-            if (usefulBuilds == null) {
-                usefulBuilds = savedBuilds;
-            } else {
-                usefulBuilds.forEach(build -> {
-                    build.jobId = this.id;
-                    dbUtils.insertIfNeeded(connection, build, "SELECT * FROM JOB_BUILD WHERE url = ?", build.url);
-                });
-            }
 
             testResults.forEach(result -> {
-                result.jobBuildId = usefulBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).map(build -> build.id)
+                result.jobBuildId = savedBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).map(build -> build.id)
                         .findFirst().orElse(result.jobBuildId);
                 if (result.id != null) {
                     dbUtils.update(connection, result);

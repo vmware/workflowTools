@@ -8,6 +8,7 @@ import com.vmware.action.ssh.ScpFileFromRemote;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
+import com.vmware.util.SystemUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.vcd.domain.Sites;
 
@@ -16,6 +17,14 @@ import com.vmware.vcd.domain.Sites;
 public class DumpPostgresqlDatabaseFromRemote extends ScpFileFromRemote {
     public DumpPostgresqlDatabaseFromRemote(WorkflowConfig config) {
         super(config, Collections.singletonList("destinationFile"));
+    }
+
+    @Override
+    public void checkIfActionShouldBeSkipped() {
+        super.checkIfActionShouldBeSkipped();
+        if (SystemUtils.postgresSchemaExists(fileSystemConfig.databaseSchemaName)) {
+            skipActionDueTo("{} schema already exists", fileSystemConfig.databaseSchemaName);
+        }
     }
 
     @Override

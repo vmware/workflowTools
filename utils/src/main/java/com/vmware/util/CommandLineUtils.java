@@ -34,7 +34,7 @@ public class CommandLineUtils {
 
     public static boolean isCommandAvailable(String command) {
         String osName = System.getProperty("os.name");
-        log.debug("Os name {}", osName);
+        log.trace("Os name {}", osName);
         if (osName == null) {
             return false;
         } else if (osName.startsWith("Windows")) {
@@ -79,7 +79,9 @@ public class CommandLineUtils {
 
         String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
         long elapsedMilliseconds = System.currentTimeMillis() - startingDate.getTime();
-        if (elapsedMilliseconds < 1000) {
+        if (elapsedMilliseconds < 10) {
+            dynamicLogger.log(LogLevel.TRACE, "Execution time {} milliseconds", elapsedMilliseconds);
+        } else if (elapsedMilliseconds < 1000) {
             dynamicLogger.log(LogLevel.DEBUG, "Execution time {} milliseconds", elapsedMilliseconds);
         } else {
             long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds);

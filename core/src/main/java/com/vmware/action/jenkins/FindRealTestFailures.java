@@ -213,6 +213,7 @@ public class FindRealTestFailures extends BaseAction {
         log.info("");
 
         usableJobs.forEach(job -> {
+            job.saveFetchedBuildsInfo();
             boolean presumedPassedResultsAdded = job.addTestResultsToMasterList();
             job.saveTestResultsToDb(presumedPassedResultsAdded);
             job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToCheck);

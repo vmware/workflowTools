@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 public class BuildwebConfig {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Git git = new Git();
 
     @ConfigurableProperty(help = "Url for buildweb server")
     public String buildwebUrl;
@@ -72,7 +73,6 @@ public class BuildwebConfig {
         if (StringUtils.isNotBlank(buildwebBranch)) {
             return new CalculatedProperty(buildwebBranch, "buildwebBranch");
         }
-        Git git = new Git();
         if (!git.workingDirectoryIsInGitRepo()) {
             return new CalculatedProperty(defaultBuildwebBranch, "defaultBuildwebBranch");
         }

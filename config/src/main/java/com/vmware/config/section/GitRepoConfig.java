@@ -12,7 +12,8 @@ import java.util.TreeMap;
 
 public class GitRepoConfig {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Git git = new Git();
 
     @ConfigurableProperty(commandLine = "-tb,--tracking-branch",
             help = "Tracking branch to use as base for reviews and for pushing commits. Combined with defaultGitRemote if no remote specified.",
@@ -61,7 +62,6 @@ public class GitRepoConfig {
     }
 
     private String getGitTrackingBranch() {
-        Git git = new Git();
         if (git.workingDirectoryIsInGitRepo()) {
             return git.getTrackingBranch();
         } else {

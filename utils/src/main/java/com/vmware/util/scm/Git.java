@@ -367,7 +367,7 @@ public class Git extends BaseScmWrapper {
 
     public String getTrackingBranch() {
         if (Git.trackingBranch != null) {
-            log.debug("Already parsed tracking branch value of {}", Git.trackingBranch);
+            log.trace("Already parsed tracking branch value of {}", Git.trackingBranch);
             return Git.trackingBranch;
         }
         String branchName = currentBranch();
@@ -578,7 +578,7 @@ public class Git extends BaseScmWrapper {
 
     private void determineRootDirectory() {
         if (Git.rootDirectoryCommandOutput != null) {
-            log.debug("Previously ran root directory command output {}", Git.rootDirectoryCommandOutput);
+            log.trace("Previously ran root directory command output {}", Git.rootDirectoryCommandOutput);
             String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
             rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
         } else {

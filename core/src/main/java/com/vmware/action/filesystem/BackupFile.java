@@ -6,15 +6,11 @@ import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.FileUtils;
-import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
-import com.vmware.util.logging.LogLevel;
 
-import static com.vmware.util.StringUtils.isNotEmpty;
-
-@ActionDescription("Copies source file / directory to destination file / directory.")
-public class CopyFile extends BaseAction {
-    public CopyFile(WorkflowConfig config) {
+@ActionDescription("Backups source file / directory to destination file / directory.")
+public class BackupFile extends BaseAction {
+    public BackupFile(WorkflowConfig config) {
         super(config);
         super.addFailWorkflowIfBlankProperties("sourceFile", "destinationFile");
     }
@@ -22,7 +18,7 @@ public class CopyFile extends BaseAction {
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        skipActionIfTrue(fileSystemConfig.skipFileCopy, "skipFileCopy is set to true");
+        skipActionIfTrue(fileSystemConfig.skipBackup, "skipBackup is set to true");
     }
 
     @Override
@@ -35,20 +31,23 @@ public class CopyFile extends BaseAction {
         File fileToCopy = new File(sourceFilePath);
         File destinationFile = new File(destinationFilePath);
 
-        if (destinationFile.exists() && !fileSystemConfig.replaceExisting) {
-            log.info("{} already exists. --replace-existing flag can be used to overwrite automatically", destinationFile.getAbsolutePath());
+        if (destinationFile.exists() && !fileSystemConfig.overwriteBackup) {
+            log.info("{} already exists. --overwrite-backup flag can be used to overwrite automatically, --skip-backup to skip backing up", destinationFile.getAbsolutePath());
 
-            String replaceFile =InputUtils.readValueUntilNotBlank("Replace " + destinationFile.getAbsolutePath() + " (yes/no)", "yes", "no");
-            if (!"yes".equalsIgnoreCase(replaceFile)) {
+            String backupFile = InputUtils.readValueUntilNotBlank("Action? (o)verwrite (s)kip (c)ancel", "yes", "no");
+            if ("skip".startsWith(backupFile)) {
+                log.info("Skipping backing up of {}", sourceFilePath);
+                return;
+            } else if (!"skip".startsWith(backupFile)) {
                 cancelWithMessage("{} already exists", destinationFile.getAbsolutePath());
             }
         }
 
         if (fileToCopy.isDirectory()) {
-            log.info("Copying directory {} to {}", fileToCopy.getAbsolutePath(), destinationFile.getAbsolutePath());
+            log.info("Backing up directory {} to {}", fileToCopy.getAbsolutePath(), destinationFile.getAbsolutePath());
             FileUtils.copyDirectory(fileToCopy, destinationFile);
         } else {
-            log.info("Copying file {} to {}", fileToCopy.getAbsolutePath(), destinationFile.getAbsolutePath());
+            log.info("Backing up file {} to {}", fileToCopy.getAbsolutePath(), destinationFile.getAbsolutePath());
             FileUtils.copyFile(fileToCopy, destinationFile);
         }
     }

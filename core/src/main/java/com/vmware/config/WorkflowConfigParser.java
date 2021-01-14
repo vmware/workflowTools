@@ -115,7 +115,8 @@ public class WorkflowConfigParser {
 
     private void applyRuntimeArguments(WorkflowConfig config) {
         try {
-            config.applyRuntimeArguments(argsParser);
+            config.setCommandlineArgMap(argsParser.getArgumentMap());
+            config.applyRuntimeArguments();
         } catch (IllegalArgumentException iae) {
             // handle gracefully as they are validation type exceptions
             log.error(iae.getMessage());

@@ -28,7 +28,7 @@ import static com.vmware.util.StringUtils.pluralizeDescription;
  */
 public class WorkflowFields {
 
-    private static final String[] ADDITIONAL_ARGUMENT_NAMES = new String[] {"-c", "--config", "--possible-workflow"};
+    private static final String[] ADDITIONAL_ARGUMENT_NAMES = new String[] {"-c", "--config", "--possible-workflow", "--cancel-message"};
 
     @Expose(serialize = false, deserialize = false)
     private Map<String, String> overriddenConfigSources = new TreeMap<>();

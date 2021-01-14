@@ -19,7 +19,7 @@ public class DecryptVariable extends BaseAction {
 
     public DecryptVariable(WorkflowConfig config) {
         super(config);
-        super.addSkipActionIfBlankProperties("cipherKey", "cipherDecryptTransformation", "cipherSaltLength", "cipherKeyAlgorithm",
+        super.addSkipActionIfBlankProperties("cipherKey", "cipherTransformation", "cipherSaltLength", "cipherKeyAlgorithm",
                 "propertyValue", "outputVariableName");
     }
 
@@ -53,7 +53,7 @@ public class DecryptVariable extends BaseAction {
 
     private String decryptValue(byte[] cryptoKey, String value) throws GeneralSecurityException {
         byte[] valueAsByteArray = Base64.getDecoder().decode(value);
-        Cipher cipher = Cipher.getInstance(sslConfig.cipherDecryptTransformation);
+        Cipher cipher = Cipher.getInstance(sslConfig.cipherTransformation);
         SecretKeySpec skeySpec = new SecretKeySpec(cryptoKey, sslConfig.cipherKeyAlgorithm);
         IvParameterSpec paramSpec = new IvParameterSpec(extractIv(cryptoKey.length, valueAsByteArray));
         cipher.init(Cipher.DECRYPT_MODE, skeySpec, paramSpec);

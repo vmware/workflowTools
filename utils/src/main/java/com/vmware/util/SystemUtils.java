@@ -5,6 +5,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
+import java.util.stream.Stream;
 
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;
@@ -48,5 +49,15 @@ public class SystemUtils {
             Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbrd.setContents(stringSelection, null);
         }
+    }
+
+    public static boolean postgresSchemaExists(String schemaName) {
+        if (!CommandLineUtils.isCommandAvailable("psql") || StringUtils.isEmpty(schemaName)) {
+            return false;
+        }
+        String sqlCommand = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = '" + schemaName + "')";
+        String command = String.format("psql -t -c \"%s\"", sqlCommand);
+        String output = CommandLineUtils.executeCommand(command, LogLevel.DEBUG);
+        return "t".equals(StringUtils.trim(output));
     }
 }

@@ -69,10 +69,6 @@ public class CommandLineArgumentsParser {
         return argumentsText.toString();
     }
 
-    public boolean containsArgument(String... possibleMatchingValues) {
-        return getMatchingArgumentKey(possibleMatchingValues) != null;
-    }
-
     public String getMatchingArgumentKey(String... possibleMatchingValues) {
         String foundKey = null;
         for (String key : possibleMatchingValues) {
@@ -98,17 +94,6 @@ public class CommandLineArgumentsParser {
             throw new FatalException("Command line argument {} did not specify a value", matchingArgumentKey);
         }
         return argumentValue;
-    }
-
-    public String getExpectedArgument(String... possibleMatchingValues) {
-        String NO_DEFAULT = null;
-
-        String argValue = getArgument(NO_DEFAULT, possibleMatchingValues);
-
-        if (argValue == null) {
-            throw new FatalException("Expected to find match for config names " + Arrays.toString(possibleMatchingValues));
-        }
-        return argValue;
     }
 
     @Override

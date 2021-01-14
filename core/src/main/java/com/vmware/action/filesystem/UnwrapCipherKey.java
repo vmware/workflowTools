@@ -19,7 +19,7 @@ public class UnwrapCipherKey extends BaseAction {
 
     public UnwrapCipherKey(WorkflowConfig config) {
         super(config);
-        super.addSkipActionIfBlankProperties("cipherKey", "cipherUnwrapTransformation", "cipherKeyAlgorithm", "propertyValue", "outputVariableName");
+        super.addSkipActionIfBlankProperties("cipherKey", "cipherTransformation", "cipherKeyAlgorithm", "propertyValue", "outputVariableName");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class UnwrapCipherKey extends BaseAction {
 
     private byte[] unwrap(byte[] cryptoKey, String value) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
         byte[] cipherData = Base64.getDecoder().decode(value);
-        Cipher cipher = Cipher.getInstance(sslConfig.cipherUnwrapTransformation);
+        Cipher cipher = Cipher.getInstance(sslConfig.cipherTransformation);
         SecretKeySpec skeySpec = new SecretKeySpec(cryptoKey, sslConfig.cipherKeyAlgorithm);
         cipher.init(Cipher.UNWRAP_MODE, skeySpec);
         return cipher.unwrap(cipherData, sslConfig.cipherKeyAlgorithm, Cipher.SECRET_KEY).getEncoded();

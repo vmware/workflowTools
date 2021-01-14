@@ -85,13 +85,13 @@ public class WorkflowCertificateManager {
         storeCert(uri.getHost(), chain[0]);
         try {
             context = initSslContext();
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
         } catch (Exception e) {
             throw new WorkflowCertificateException(e);
         }
         if (!isUriTrusted(uri)) {
             throw new WorkflowCertificateException("Expected host " + uri.getHost() + " to be trusted after saving cert!");
         }
-        HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
 
     public boolean isUriTrusted(URI uri) {

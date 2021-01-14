@@ -76,12 +76,6 @@
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
   ],
-  "CopyFile": [
-    "--replace-existing",
-    "--destination-file",
-    "--source-file",
-    "--skip-file-copy"
-  ],
   "LoadFileData": [
     "--file-data",
     "--source-file"
@@ -95,6 +89,7 @@
     "--source-file"
   ],
   "DecryptVariable": [
+    "--cipher-transformation",
     "--property-value",
     "--cipher-key",
     "--output-variable-name"
@@ -196,6 +191,7 @@
     "--json-property-path"
   ],
   "UnwrapCipherKey": [
+    "--cipher-transformation",
     "--property-value",
     "--cipher-key",
     "--output-variable-name"
@@ -208,13 +204,16 @@
     "--keystore-alias-password",
     "--keystore-alias",
     "--keystore-password",
-    "--keystore-file",
-    "--keystore-type"
+    "--keystore-file"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
     "--buildweb-log-file-name",
     "--buildweb-api-url"
+  ],
+  "ExitIfValueTooLarge": [
+    "--property-value",
+    "--input-text"
   ],
   "WaitForJenkinsBuildsToComplete": [
     "--wait-time"
@@ -281,6 +280,12 @@
   "PushToPrecommitBranch": [
     "--username"
   ],
+  "BackupFile": [
+    "--overwrite-backup",
+    "--destination-file",
+    "--source-file",
+    "--skip-backup"
+  ],
   "LoadCompletedIssuesWithoutResolution": [
     "--username"
   ],
@@ -297,12 +302,14 @@
   ],
   "CreateSelfSignedCertForUrl": [
     "--file-data",
-    "--keystore-type",
-    "--key-size",
     "--source-url"
   ],
   "EnableDisableMergeTo": [
     "--disable-merge-to"
+  ],
+  "ExitIfValueMatches": [
+    "--property-value",
+    "--input-text"
   ],
   "OpenSshShell": [
     "--ssh-strict-host-checking"
@@ -350,6 +357,9 @@
   "SetReviewId": [
     "--username"
   ],
+  "ExitIfReusingPostgresDatabaseNotAllowed": [
+    "--database-schema-name"
+  ],
   "GenerateGitCommitStats": [
     "--author-emails",
     "--last-number-of-days",
@@ -368,8 +378,8 @@
   ],
   "CreatePostgresDatabaseFromFile": [
     "--database-username",
-    "--database-schema-name",
-    "--source-file"
+    "--source-file",
+    "--database-schema-name"
   ],
   "LoadIssues": [
     "--use-epics",
@@ -396,6 +406,7 @@
     "--changelist-id"
   ],
   "ScpFileFromRemote": [
+    "--file-data",
     "--ssh-strict-host-checking",
     "--destination-file",
     "--source-file"
@@ -414,9 +425,6 @@
   ],
   "LoadVappJsonIfNeeded": [
     "--use-vapp-json"
-  ],
-  "ExitIfPostgresDatabaseAlreadyExists": [
-    "--database-schema-name"
   ],
   "ExitIfChangelistDoesNotMatchGitBranch": [
     "--tracking-branch",
@@ -489,7 +497,8 @@
     "--ssh-port",
     "--ssh-host",
     "--destination-file",
-    "--source-database-schema-name"
+    "--source-database-schema-name",
+    "--database-schema-name"
   ],
   "DownloadBuildArtifact": [
     "--job-with-artifact",

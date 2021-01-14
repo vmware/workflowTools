@@ -109,6 +109,7 @@ public class WorkflowAction implements Action {
 
     @Override
     public void checkIfActionShouldBeSkipped() {
+        config.addDateTimeVariables();
         if (!overriddenConfigValues.isEmpty()) {
             Map<String, String> paramsMap = overriddenConfigValues.stream().collect(Collectors.toMap(WorkflowParameter::getName, WorkflowParameter::getValue));
             existingValuesForConfig = config.getExistingValues(paramsMap.keySet());

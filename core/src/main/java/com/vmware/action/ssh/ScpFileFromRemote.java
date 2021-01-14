@@ -1,5 +1,8 @@
 package com.vmware.action.ssh;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -14,9 +17,11 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 
-@ActionDescription(value = "Uses scp to copy a file from a ssh site.",
+@ActionDescription(value = "Uses scp to copy a file from a ssh site. If destination file is IN_MEMORY_FILE the the contents are loaded into memory.",
         configFlagsToExcludeFromCompleter = {"--build-display-name", "--output-file", "--use-database-host", "--ssh-command"})
 public class ScpFileFromRemote extends ExecuteSshCommand {
+
+    private final String IN_MEMORY_FILE = "IN_MEMORY_FILE";
 
     public ScpFileFromRemote(WorkflowConfig config) {
         this(config, Arrays.asList("sourceFile", "destinationFile"));
@@ -35,7 +40,11 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
     }
 
     protected void copyFile(SiteConfig siteConfig, String sourceFile, String destinationFile) {
-        log.info("Copying file {} from {}@{} to {}", sourceFile, siteConfig.username, siteConfig.host, destinationFile);
+        if (IN_MEMORY_FILE.equals(destinationFile)) {
+            log.info("Copying file {} from {}@{} into memory", sourceFile, siteConfig.username, siteConfig.host);
+        } else {
+            log.info("Copying file {} from {}@{} to {}", sourceFile, siteConfig.username, siteConfig.host, destinationFile);
+        }
         JSch jsch = new JSch();
         Session session = null;
         Channel channel = null;
@@ -48,9 +57,16 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
             channel.connect();
 
             ChannelSftp sftpChannel = (ChannelSftp) channel;
-            sftpChannel.get(sourceFile, destinationFile);
+            if (IN_MEMORY_FILE.equals(destinationFile)) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                sftpChannel.get(sourceFile, outputStream);
+                fileSystemConfig.fileData = outputStream.toString(StandardCharsets.UTF_8.name());
+                log.trace("File data {}", fileSystemConfig.fileData);
+            } else {
+                sftpChannel.get(sourceFile, destinationFile);
+            }
             sftpChannel.exit();
-        } catch (JSchException | SftpException e) {
+        } catch (UnsupportedEncodingException | JSchException | SftpException e) {
             throw new RuntimeException(e);
         } finally {
             if (channel != null) {

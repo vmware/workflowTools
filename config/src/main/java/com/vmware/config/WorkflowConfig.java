@@ -1,7 +1,28 @@
 package com.vmware.config;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.StreamHandler;
+import java.util.stream.Collectors;
+
 import com.google.gson.annotations.Expose;
-import com.vmware.config.commandLine.CommandLineArgumentsParser;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
@@ -32,26 +53,7 @@ import com.vmware.util.logging.SimpleLogFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.StreamHandler;
-import java.util.stream.Collectors;
+import static com.vmware.util.StringUtils.isNotBlank;
 
 /**
  * Workflow configuration.
@@ -61,6 +63,8 @@ public class WorkflowConfig {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private static final String COMMAND_LINE_SOURCE = "Command Line";
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat timeFormat = new SimpleDateFormat("HHmmss");
 
     @SectionConfig
     public LoggingConfig loggingConfig;
@@ -164,11 +168,15 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Project documentation url")
     public String projectDocumentationUrl;
 
+    @ConfigurableProperty(commandLine = "--cancel-message", help = "Message to use if a canceling workflow")
+    public String errorMessageForCancel;
+
     @Expose(serialize = false, deserialize = false)
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);
 
     @Expose(serialize = false, deserialize = false)
     private final WorkflowFields configurableFields;
+    private Map<String, String> commandlineArgMap;
 
     public WorkflowConfig() {
         this.configurableFields = new WorkflowFields(this);
@@ -176,12 +184,14 @@ public class WorkflowConfig {
 
     public void setupLogging() {
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
+        Level existingLevel = globalLogger.getLevel();
         LogLevel logLevelToUse = loggingConfig.determineLogLevel();
+
         globalLogger.setLevel(logLevelToUse.getLevel());
 
         Handler[] handlers = globalLogger.getHandlers();
         boolean containsLoggingHandler = Arrays.stream(handlers).anyMatch(handler -> handler.getClass() == StreamHandler.class);
-        if (StringUtils.isNotBlank(loggingConfig.outputLogFile) && !containsLoggingHandler) {
+        if (isNotBlank(loggingConfig.outputLogFile) && !containsLoggingHandler) {
             log.info("Saving log output to {}", loggingConfig.outputLogFile);
             try {
                 StreamHandler streamHandler = new StreamHandler(new FileOutputStream(loggingConfig.outputLogFile), new SimpleLogFormatter());
@@ -195,14 +205,26 @@ public class WorkflowConfig {
             log.info("Suppressing console output as silent flag is set to true");
             globalLogger.removeHandler(consoleHandler.get());
         }
-        log.debug("Using log level {}", logLevelToUse);
+        if (existingLevel == null || logLevelToUse.getLevel().intValue() != existingLevel.intValue()) {
+            log.debug("Using log level {}", logLevelToUse);
+        }
     }
 
-    public void applyRuntimeArguments(CommandLineArgumentsParser argsParser) {
-        applyConfigValues(argsParser.getArgumentMap(), COMMAND_LINE_SOURCE, true);
-        if (argsParser.containsArgument("--possible-workflow")) {
+    public void addDateTimeVariables() {
+        Date currentDate = new Date();
+        replacementVariables.addVariable(ReplacementVariables.VariableName.DATE, dateFormat.format(currentDate));
+        replacementVariables.addVariable(ReplacementVariables.VariableName.TIME, timeFormat.format(currentDate));
+    }
+
+    public void setCommandlineArgMap(Map<String, String> commandlineArgMap) {
+        this.commandlineArgMap = commandlineArgMap;
+    }
+
+    public void applyRuntimeArguments() {
+        applyConfigValues(commandlineArgMap, COMMAND_LINE_SOURCE, true);
+        if (commandlineArgMap.containsKey("--possible-workflow")) {
             configurableFields.markFieldAsOverridden("workflowsToRun", "Command Line");
-            this.workflowsToRun = argsParser.getExpectedArgument("--possible-workflow");
+            this.workflowsToRun = commandlineArgMap.get("--possible-workflow");
         }
     }
 
@@ -272,7 +294,8 @@ public class WorkflowConfig {
         }
         Class sectionConfigClass = matchingField.getConfigClassContainingField();
         try {
-            Method methodToExecute = sectionConfigClass.getMethod(configurableProperty.methodNameForValueCalculation());
+            String methodName = configurableProperty.methodNameForValueCalculation();
+            Method methodToExecute = sectionConfigClass.getMethod(methodName);
             return (CalculatedProperty) methodToExecute.invoke(sectionConfigForClass(sectionConfigClass));
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeReflectiveOperationException(e);
@@ -287,6 +310,11 @@ public class WorkflowConfig {
         List<WorkflowField> fieldsWithStringType = fields.values().stream().filter(field -> field.getType() == String.class).collect(Collectors.toList());
 
         for (WorkflowField field : fieldsWithStringType) {
+            if (isNotBlank(field.configAnnotation().methodNameForValueCalculation()) && replacementVariables.hasVariable(field.getName())) {
+                log.trace("Skipping adding {} with value {} as replacement variable again as it generates extra logging",
+                        field.getName(), replacementVariables.getVariable(field.getName()));
+                continue;
+            }
             String value = (String) valueForField(field).getValue();
             if (value != null) {
                 replacementVariables.addConfigPropertyAsVariable(field.getName(), value);
@@ -294,6 +322,9 @@ public class WorkflowConfig {
         }
 
         for (WorkflowField field : fieldsWithStringType) {
+            if (isNotBlank(field.configAnnotation().methodNameForValueCalculation())) {
+                continue;
+            }
             String value = (String) valueForField(field).getValue();
             String updatedValue = replaceVariablesInValue(value);
 

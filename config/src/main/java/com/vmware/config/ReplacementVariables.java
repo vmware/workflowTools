@@ -21,7 +21,15 @@ public class ReplacementVariables {
     }
 
     public boolean hasVariable(VariableName variableName) {
-        return replacementVariables.containsKey(variableName.name());
+        return hasVariable(variableName.name());
+    }
+
+    public boolean hasVariable(String variableName) {
+        return replacementVariables.containsKey(variableName);
+    }
+
+    public String getVariable(String variableName) {
+        return replacementVariables.get(variableName);
     }
 
     public void addVariable(VariableName name, String value) {
@@ -140,6 +148,8 @@ public class ReplacementVariables {
         LAST_DOWNLOADED_FILE_NAME,
         REPO_DIR,
         BUILD_NUMBER,
-        VAPP_NAME
+        VAPP_NAME,
+        DATE,
+        TIME
     }
 }

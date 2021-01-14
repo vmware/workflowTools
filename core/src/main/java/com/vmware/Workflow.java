@@ -44,6 +44,7 @@ import com.vmware.util.input.ImprovedArgumentCompleter;
 import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.scm.Git;
 
@@ -234,6 +235,7 @@ public class Workflow {
             List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
+            config.addDateTimeVariables();
             if (config.dryRun) {
                 dryRunActions(actions);
             } else {
@@ -248,7 +250,11 @@ public class Workflow {
             runWorkflowAgain();
         } catch (CancelException ee) {
             log.info("");
-            new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + ee.getMessage());
+            if (StringUtils.isNotEmpty(config.errorMessageForCancel)) {
+                new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + config.errorMessageForCancel);
+            } else {
+                new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + ee.getMessage());
+            }
             runWorkflowAgain();
         } catch (FatalException iie) {
             log.info("");
@@ -271,7 +277,12 @@ public class Workflow {
         if (log.isDebugEnabled()) {
             log.info("");
             long totalElapsedTimeInMs = System.currentTimeMillis() - startingDate.getTime();
-            log.debug("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
+            if (totalElapsedTimeInMs < 10) {
+                log.trace("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
+            } else {
+                log.debug("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
+            }
+
         }
     }
 
@@ -463,8 +474,11 @@ public class Workflow {
 
     private boolean checkWhetherToSkipAction(WorkflowAction action) {
         log.info("Next action is {}", action.getActionClassName());
-        String confirmation = InputUtils.readValue("Skip action (y/n)", "yes","no");
-        return "y".equalsIgnoreCase(confirmation);
+        String confirmation = InputUtils.readValue("(s)kip (p)roceed (e)xit", "yes","no");
+        if (StringUtils.isNotBlank(confirmation) && "exit".startsWith(confirmation)) {
+            throw new CancelException(LogLevel.INFO, "exit selected before running " + action.getActionClassName());
+        }
+        return StringUtils.isNotBlank(confirmation) && "skip".startsWith(confirmation);
     }
 
     private void outputExecutionTimes(Map<String, Long> executionTimesPerAction) {

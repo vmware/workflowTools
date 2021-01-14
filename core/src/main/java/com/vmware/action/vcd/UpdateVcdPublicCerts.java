@@ -5,6 +5,7 @@ import java.util.Map;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.vcd.Vcd;
 
@@ -22,6 +23,13 @@ public class UpdateVcdPublicCerts extends BaseAction {
         Map generalSettings = vcdClientForSystemOrg
                 .getResourceAsMap("admin/extension/settings/general", resourceType);
         log.info("Updating public endpoint cerificates with certificate:\n{}\n", fileSystemConfig.fileData);
+
+
+        generalSettings.compute("restApiBaseUri",
+                (k,v) -> v == null || StringUtils.isEmpty(String.valueOf(v)) ? fileSystemConfig.sourceUrl : v);
+        generalSettings.compute("tenantPortalExternalAddress",
+                (k,v) -> v == null || StringUtils.isEmpty(String.valueOf(v)) ? fileSystemConfig.sourceUrl : v);
+
         updateCertValueForProperty(generalSettings, "systemExternalAddressPublicCertChain");
         updateCertValueForProperty(generalSettings, "restApiBaseUriPublicCertChain");
         updateCertValueForProperty(generalSettings, "tenantPortalPublicCertChain");
