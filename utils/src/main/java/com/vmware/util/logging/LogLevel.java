@@ -24,6 +24,10 @@ public enum LogLevel {
         return level;
     }
 
+    public boolean isDebug() {
+        return level == Level.FINE || level == Level.FINEST;
+    }
+
     public static LogLevel fromLevel(Level level) {
         for (LogLevel logLevel : LogLevel.values()) {
             if (logLevel.getLevel().equals(level)) {

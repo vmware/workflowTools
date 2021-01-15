@@ -4,7 +4,7 @@ import com.vmware.util.logging.LogLevel;
 
 public class CancelException extends WorkflowRuntimeException {
 
-    private LogLevel logLevel;
+    private final LogLevel logLevel;
 
     public CancelException(LogLevel logLevel, String message, String... arguments) {
         super(message, arguments);

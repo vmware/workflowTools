@@ -107,9 +107,9 @@
     "--disable-markdown"
   ],
   "DownloadBuildArtifactIfNeeded": [
-    "--job-artifact",
     "--always-download",
-    "--file-data"
+    "--file-data",
+    "--job-artifact"
   ],
   "CreateReviewIfNeeded": [
     "--username",

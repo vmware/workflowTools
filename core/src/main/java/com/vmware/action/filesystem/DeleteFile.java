@@ -17,6 +17,10 @@ public class DeleteFile extends BaseAction {
     public void process() {
         log.info("Deleting file {}", fileSystemConfig.sourceFile);
         File sourceFile = new File(fileSystemConfig.sourceFile);
+        if (!sourceFile.exists()) {
+            log.info("File {} does not exist", sourceFile.getAbsolutePath());
+            return;
+        }
         boolean fileDeleted = sourceFile.delete();
         if (!fileDeleted) {
             log.warn("File {} might not be deleted!", sourceFile.getAbsolutePath());

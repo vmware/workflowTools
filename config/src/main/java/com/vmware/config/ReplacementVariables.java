@@ -149,6 +149,8 @@ public class ReplacementVariables {
         REPO_DIR,
         BUILD_NUMBER,
         VAPP_NAME,
+        VCD_CELL_NAME,
+        VCD_CELL_HOST_NAME,
         DATE,
         TIME
     }

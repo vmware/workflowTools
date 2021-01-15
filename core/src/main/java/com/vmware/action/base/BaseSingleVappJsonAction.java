@@ -3,6 +3,7 @@ package com.vmware.action.base;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
@@ -38,5 +39,10 @@ public abstract class BaseSingleVappJsonAction extends BaseSingleVappAction {
             vappData.setSelectedVcdCell(site.cells.get(index));
         }
 
+        Sites.DeployedVM selectedVcdCell = vappData.getSelectedVcdCell();
+        String hostName = selectedVcdCell.deployment != null && selectedVcdCell.deployment.ovfProperties != null
+                ? selectedVcdCell.deployment.ovfProperties.hostname : selectedVcdCell.endPointURI;
+        replacementVariables.addVariable(ReplacementVariables.VariableName.VCD_CELL_NAME, selectedVcdCell.name);
+        replacementVariables.addVariable(ReplacementVariables.VariableName.VCD_CELL_HOST_NAME, hostName);
     }
 }

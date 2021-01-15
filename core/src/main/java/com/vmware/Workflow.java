@@ -250,7 +250,7 @@ public class Workflow {
             runWorkflowAgain();
         } catch (CancelException ee) {
             log.info("");
-            if (StringUtils.isNotEmpty(config.errorMessageForCancel)) {
+            if (!ee.getLogLevel().isDebug() && StringUtils.isNotEmpty(config.errorMessageForCancel)) {
                 new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + config.errorMessageForCancel);
             } else {
                 new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + ee.getMessage());
