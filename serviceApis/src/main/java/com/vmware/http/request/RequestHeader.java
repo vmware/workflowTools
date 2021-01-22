@@ -1,6 +1,6 @@
 package com.vmware.http.request;
 
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 
@@ -22,7 +22,7 @@ public class RequestHeader extends RequestParam {
     }
 
     public static RequestHeader aBasicAuthHeader(UsernamePasswordCredentials credentials) {
-        String basicCredentials = DatatypeConverter.printBase64Binary(credentials.toString().getBytes());
+        String basicCredentials = Base64.getEncoder().encodeToString(credentials.toString().getBytes());
         return new RequestHeader("Authorization", "Basic " + basicCredentials);
     }
 
