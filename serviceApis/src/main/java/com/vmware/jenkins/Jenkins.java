@@ -175,6 +175,7 @@ public class Jenkins extends AbstractRestBuildService {
             RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
             List<RequestParam> paramList = new ArrayList<>(Arrays.asList(params));
             paramList.add(csrfHeader);
+            connection.setUseSessionCookies(true);
             return super.optimisticPost(url, responseConversionClass, param, paramList.toArray(new RequestParam[0]));
         } else {
             return super.optimisticPost(url, responseConversionClass, param, params);

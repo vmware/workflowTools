@@ -33,6 +33,7 @@ import com.vmware.http.request.body.RequestBodyFactory;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
@@ -263,7 +264,10 @@ public class HttpConnection {
 
     private void addCookiesHeader(String host) {
         String cookieHeaderValue = cookieFileStore.toCookieRequestText(host, useSessionCookies);
-        log.trace("Cookie header {}", cookieHeaderValue);
+        if (StringUtils.isEmpty(cookieHeaderValue)) {
+            return;
+        }
+        log.debug("Adding request header Cookie:{}", cookieHeaderValue);
         activeConnection.setRequestProperty("Cookie", cookieHeaderValue);
     }
 
@@ -340,7 +344,7 @@ public class HttpConnection {
 
     private void handleNetworkException(IOException e) {
         throw new FatalException(e, "Unknown host exception thrown: " + e.getMessage()
-                + "\nAre you connected to the corporate network?"
+                + "\nAre you connected to the correct network?"
                 + "\nFailed to access host " + activeConnection.getURL().getHost());
     }
 
@@ -353,7 +357,8 @@ public class HttpConnection {
         } else {
             responseText = IOUtils.read(activeConnection.getErrorStream());
         }
-            log.trace("Response\n{}", responseText);
+
+        log.trace("Response\n{}", responseText);
         ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType, responseText);
         return responseText;
     }

@@ -110,15 +110,17 @@ public class CookieFileStore {
     public void addCookiesFromResponse(URLConnection connection) {
         String key;
         for (int i = 1; (key = connection.getHeaderFieldKey(i)) != null; i++) {
+            String headerText = connection.getHeaderField(i);
+            if (headerText == null || headerText.isEmpty()) {
+                log.debug("No value for response header {}", key);
+                continue;
+            }
+            log.debug("Response Header {}={}", key, headerText);
             if (!key.equals("Set-Cookie")) {
                 continue;
             }
-            String cookieText = connection.getHeaderField(i);
-            if (cookieText == null || cookieText.isEmpty()) {
-                continue;
-            }
             Cookie cookie = new Cookie();
-            cookie.parseValuesFromHttpResponse(cookieText);
+            cookie.parseValuesFromHttpResponse(headerText);
             // domain is not set in the cookie string for review board and jira
             cookie.setDomain(connection.getURL().getHost());
             addCookieIfUseful(cookie);
