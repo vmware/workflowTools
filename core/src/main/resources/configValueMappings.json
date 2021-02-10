@@ -204,7 +204,8 @@
     "--keystore-alias-password",
     "--keystore-alias",
     "--keystore-password",
-    "--keystore-file"
+    "--keystore-file",
+    "--keystore-type"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
@@ -302,6 +303,7 @@
   ],
   "CreateSelfSignedCertForUrl": [
     "--file-data",
+    "--keystore-type",
     "--source-url"
   ],
   "EnableDisableMergeTo": [

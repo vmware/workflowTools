@@ -6,7 +6,7 @@ public class SslConfig {
     public static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
     public static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
 
-    @ConfigurableProperty(help = "Keystore type")
+    @ConfigurableProperty(commandLine = "--keystore-type", help = "Keystore type")
     public String keystoreType;
 
     @ConfigurableProperty(help = "Key size for entry in the keystore")

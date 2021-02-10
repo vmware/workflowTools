@@ -29,7 +29,8 @@ import static com.vmware.config.section.SslConfig.END_PRIVATE_KEY;
 import static sun.security.provider.X509Factory.BEGIN_CERT;
 import static sun.security.provider.X509Factory.END_CERT;
 
-@ActionDescription("Created a self signed cert. The host of the specified url is used as the CN value.")
+@ActionDescription(value = "Created a self signed cert. The host of the specified url is used as the CN value.",
+        configFlagsToExcludeFromCompleter = "--keystore-type")
 public class CreateSelfSignedCertForUrl extends BaseAction {
 
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -49,7 +50,7 @@ public class CreateSelfSignedCertForUrl extends BaseAction {
         File tempKeystoreFile = FileUtils.createTempFile("keystore", ".ks");
         tempKeystoreFile.delete();
         String command = "keytool -genkey -keystore " + tempKeystoreFile.getAbsolutePath()
-                + " -keyalg RSA -keysize " + sslConfig.keySize +
+                + " -storetype " + sslConfig.keystoreType + " -keyalg RSA -keysize " + sslConfig.keySize +
                 " -validity 365 -alias selfsign -dname \"cn=" + sourceUri.getHost() + "\" -storepass password -keypass password";
         try {
             InetAddress inetAddress = InetAddress.getByName(sourceUri.getHost());

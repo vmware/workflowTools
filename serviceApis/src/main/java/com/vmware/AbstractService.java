@@ -23,10 +23,10 @@ public abstract class AbstractService {
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public String baseUrl;
-    protected String apiUrl;
-    protected ApiAuthentication credentialsType;
-    private String username;
+    final public String baseUrl;
+    final protected String apiUrl;
+    final protected ApiAuthentication credentialsType;
+    final private String username;
 
     protected Boolean connectionIsAuthenticated = null;
 
