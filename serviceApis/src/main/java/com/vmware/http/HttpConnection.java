@@ -255,7 +255,10 @@ public class HttpConnection {
                 if (responseConversionClass.equals(String.class)) {
                     return (T) responseText;
                 } else {
-                    log.error("Failed to parse response text\n{}", responseText);
+                    String responseTextToShow = responseText.length() > 400
+                            ? responseText.substring(0, 200) + "\n...\n" + responseText.substring(responseText.length() - 200)
+                            : responseText;
+                    log.error("Failed to parse response text\n{}", responseTextToShow);
                     throw e;
                 }
             }

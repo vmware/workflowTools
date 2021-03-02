@@ -38,10 +38,13 @@ public class WorkflowConfigParser {
             config.username = username;
         }
 
+        Git git = new Git();
         if (git.workingDirectoryIsInGitRepo()) {
             config.replacementVariables.addVariable(ReplacementVariables.VariableName.REPO_DIR, git.getRootDirectory().getAbsolutePath());
+            config.replacementVariables.addVariable(ReplacementVariables.VariableName.BRANCH_NAME, git.currentBranch());
         }
 
+        config.addGeneratedVariables();
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
         config.setupLogging();

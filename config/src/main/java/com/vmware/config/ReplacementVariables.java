@@ -85,6 +85,7 @@ public class ReplacementVariables {
 
     public Map<String, String> values() {
         return replacementVariables.entrySet().stream().filter(entry -> !configPropertyNames.contains(entry.getKey()))
+                .filter(entry -> !VariableName.UUID.name().equals(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -147,11 +148,13 @@ public class ReplacementVariables {
     public enum VariableName {
         LAST_DOWNLOADED_FILE_NAME,
         REPO_DIR,
+        BRANCH_NAME,
         BUILD_NUMBER,
         VAPP_NAME,
         VCD_CELL_NAME,
         VCD_CELL_HOST_NAME,
         DATE,
-        TIME
+        TIME,
+        UUID
     }
 }

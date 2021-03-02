@@ -257,12 +257,13 @@ public class Job extends BaseDbClass {
 
     public void loadTestResultsFromDb() {
         if (dbUtils == null) {
+            this.testResults = new ArrayList<>();
             return;
         }
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
         try (Connection connection = dbUtils.createConnection()) {
             this.testResults = dbUtils.query(connection, TestResult.class, "SELECT tr.* from TEST_RESULT tr"
-                    + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY BUILD_NUMBER ASC", id);
+                    + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME, tr.PARAMETERS ASC", id);
             Set<String> usedUrls = new HashSet<>();
             savedBuilds.forEach(build -> testResults.stream().filter(result -> result.jobBuildId.equals(build.id)).forEach(result -> {
                 result.commitId = build.commitId;

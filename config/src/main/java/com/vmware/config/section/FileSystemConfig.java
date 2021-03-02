@@ -3,13 +3,8 @@ package com.vmware.config.section;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
-import com.vmware.config.ReplacementVariables;
-import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
-
-import static com.vmware.config.ReplacementVariables.VariableName.VAPP_NAME;
 
 public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--source-url", help = "Source url to copy certificates from")

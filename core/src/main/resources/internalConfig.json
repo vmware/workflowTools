@@ -18,7 +18,7 @@
   "maxJenkinsBuildsToCheck": 5,
   "maxCommitsToCheck": 500,
   "commitIdInDescriptionPattern": "CL\\s+(\\w+)",
-  "keystoreType": "JCEKS",
+  "newKeystoreType": "PKCS12",
   "keySize": 2048,
   "goBuildBinPath": "/build/apps/bin/gobuild",
   "patchCommand": "patch -f -p1 -s",

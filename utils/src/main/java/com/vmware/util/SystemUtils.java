@@ -55,7 +55,7 @@ public class SystemUtils {
         if (!CommandLineUtils.isCommandAvailable("psql") || StringUtils.isEmpty(schemaName)) {
             return false;
         }
-        String sqlCommand = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = '" + schemaName + "')";
+        String sqlCommand = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE datname = '" + schemaName + "')";
         String command = String.format("psql -t -c \"%s\"", sqlCommand);
         String output = CommandLineUtils.executeCommand(command, LogLevel.DEBUG);
         return "t".equals(StringUtils.trim(output));

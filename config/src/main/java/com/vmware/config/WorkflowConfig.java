@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -210,10 +211,11 @@ public class WorkflowConfig {
         }
     }
 
-    public void addDateTimeVariables() {
+    public void addGeneratedVariables() {
+        replacementVariables.addVariable(ReplacementVariables.VariableName.UUID, UUID.randomUUID().toString());
         Date currentDate = new Date();
         replacementVariables.addVariable(ReplacementVariables.VariableName.DATE, dateFormat.format(currentDate));
-        replacementVariables.addVariable(ReplacementVariables.VariableName.TIME, timeFormat.format(currentDate));
+        replacementVariables.addVariable(ReplacementVariables.VariableName.TIME, timeFormat.format(new Date()));
     }
 
     public void setCommandlineArgMap(Map<String, String> commandlineArgMap) {

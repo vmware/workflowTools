@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.vmware.BuildStatus.SUCCESS;
 import static com.vmware.util.StringUtils.pluralize;
+import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.toList;
@@ -117,7 +120,9 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private String createViewListingHtml(List<HomePage.View> matchingViews) {
-        String viewListingHtml = matchingViews.stream().map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
+        Comparator<HomePage.View> viewComparator = Comparator.comparing(HomePage.View::htmlFileName);
+        String viewListingHtml = matchingViews.stream().sorted(viewComparator)
+                .map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
         String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
         viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
         viewListingPage = viewListingPage.replace("#date", generationDate);
@@ -255,19 +260,21 @@ public class FindRealTestFailures extends BaseAction {
         final int numberOfBuildsToCheck = usefulBuilds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ? jenkinsConfig.maxJenkinsBuildsToCheck : usefulBuilds.size();
         final int lastBuildNumberToCheck = usefulBuilds.get(numberOfBuildsToCheck - 1).buildNumber;
 
-        List<Supplier<TestResults>> usableResultSuppliers = usefulBuilds.stream().map(build -> {
-            if (build.buildNumber < lastBuildNumberToCheck || job.hasSavedBuild(build.buildNumber)) {
-                return null;
-            }
-            return (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build));
-            }).filter(Objects::nonNull).collect(toList());
+        List<JobBuild> usableBuilds = usefulBuilds.stream()
+                .filter(build -> build.buildNumber >= lastBuildNumberToCheck && !job.hasSavedBuild(build.buildNumber)).collect(toList());
 
-        if (usableResultSuppliers.isEmpty()) {
+        List<Supplier<TestResults>> usableResultSuppliers = usableBuilds.stream()
+                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build)))
+                .collect(toList());
+
+        if (usableBuilds.isEmpty()) {
             log.info("Builds for {} already saved, checked for last {} of {} usable builds. Last build number checked was {}", job.name,
                     numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
         } else {
-            log.info("Fetching {} for {}. Checked last {} of {} usable builds. Last build number checked was {}",
-                    pluralize(usableResultSuppliers.size(), "new build"), job.name, numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
+            String buildsToFetch = usableBuilds.stream().map(JobBuild::buildNumber).collect(Collectors.joining(","));
+            log.info("Fetching {} {} for {}. Checked last {} of {} usable builds. Last build number checked was {}",
+                    pluralizeDescription(usableBuilds.size(), "build"), buildsToFetch, job.name, numberOfBuildsToCheck,
+                    usefulBuilds.size(), lastBuildNumberToCheck);
             job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).collect(toList());
         }
     }

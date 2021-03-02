@@ -14,17 +14,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Parsed command line arguments.
  * Parsed values override workflow config values.
  */
 public class CommandLineArgumentsParser {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private Map<String, String> argumentMap = new HashMap<String, String>();
 
     private StringBuilder argumentsText;
 
     public void generateArgumentMap(final String[] args) {
+        log.debug("Command line arguments; {}", Arrays.toString(args));
         argumentsText = new StringBuilder();
 
         argumentMap.clear();
@@ -37,7 +43,7 @@ public class CommandLineArgumentsParser {
                 argumentsText.append(args[i]);
                 continue;
             }
-            String[] paramPieces = args[i].split("=");
+            String[] paramPieces = StringUtils.splitOnlyOnce(args[i], "=");
             String paramName = paramPieces[0];
             argumentsText.append(paramName);
             String paramValue = null;

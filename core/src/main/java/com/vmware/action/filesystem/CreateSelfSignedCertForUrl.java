@@ -50,8 +50,8 @@ public class CreateSelfSignedCertForUrl extends BaseAction {
         File tempKeystoreFile = FileUtils.createTempFile("keystore", ".ks");
         tempKeystoreFile.delete();
         String command = "keytool -genkey -keystore " + tempKeystoreFile.getAbsolutePath()
-                + " -storetype " + sslConfig.keystoreType + " -keyalg RSA -keysize " + sslConfig.keySize +
-                " -validity 365 -alias selfsign -dname \"cn=" + sourceUri.getHost() + "\" -storepass password -keypass password";
+                + " -storetype PKCS12 -keyalg RSA -keysize " + sslConfig.keySize +
+                " -validity 365 -ext KeyUsage=digitalSignature,keyEncipherment,keyCertSign -alias selfsign -dname \"cn=" + sourceUri.getHost() + "\" -storepass password -keypass password";
         try {
             InetAddress inetAddress = InetAddress.getByName(sourceUri.getHost());
             if (inetAddress.getHostAddress() != null && inetAddress.getHostAddress().equals(sourceUri.getHost())) {
@@ -66,7 +66,7 @@ public class CreateSelfSignedCertForUrl extends BaseAction {
         tempKeystoreFile.deleteOnExit();
 
         try {
-            KeyStore keystoreForCreatedCert = KeyStore.getInstance(sslConfig.keystoreType);
+            KeyStore keystoreForCreatedCert = KeyStore.getInstance("PKCS12");
             keystoreForCreatedCert.load(new FileInputStream(tempKeystoreFile), "password".toCharArray());
 
             KeyStore.PrivateKeyEntry entry =

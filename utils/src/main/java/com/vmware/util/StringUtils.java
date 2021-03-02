@@ -27,11 +27,13 @@ public class StringUtils {
         }
     }
 
-    public static ToStringSupplier exceptionAsString(Exception e) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-        e.printStackTrace(writer);
-        return ToStringSupplier.toString(stringWriter::toString);
+    public static ToStringSupplier exceptionAsString(Throwable t) {
+        return ToStringSupplier.toString(() -> {
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter writer = new PrintWriter(stringWriter);
+            t.printStackTrace(writer);
+            return stringWriter.toString();
+        });
     }
 
     public static String findStringWithStartAndEnd(String text, String start, String end) {

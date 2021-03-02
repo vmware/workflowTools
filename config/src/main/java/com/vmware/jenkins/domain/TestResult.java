@@ -34,6 +34,8 @@ public class TestResult extends BaseDbClass {
     public double duration;
     public long startedAt;
     public String[] parameters;
+    @Expose(serialize = false, deserialize = false)
+    public Integer dataProviderIndex;
 
     public Integer similarSkips;
 
@@ -112,11 +114,21 @@ public class TestResult extends BaseDbClass {
     }
 
     public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
-        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name);
-        int counter = 1;
-        while (usedUrls.contains(urlToUse)) {
-            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + counter++);
+        if (dataProviderIndex != null) {
+            this.url = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + dataProviderIndex);
+            return;
         }
+
+        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name);
+        if (!usedUrls.contains(urlToUse)) {
+            this.url = urlToUse;
+            return;
+        }
+        int counter = 0;
+        while (usedUrls.contains(urlToUse)) {
+            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + ++counter);
+        }
+        this.dataProviderIndex = counter;
         this.url = urlToUse;
     }
 
@@ -210,6 +222,7 @@ public class TestResult extends BaseDbClass {
 
         // update to latest build result
         this.url = testResult.url;
+        this.dataProviderIndex = testResult.dataProviderIndex;
         this.buildNumber = testResult.buildNumber;
         this.status = testResult.status;
         this.similarSkips = testResult.similarSkips;

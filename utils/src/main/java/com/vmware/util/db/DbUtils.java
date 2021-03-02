@@ -313,7 +313,7 @@ public class DbUtils {
         Driver driver;
         try {
             log.debug("Loading driver {} in file {}", databaseDriverClass, databaseDriverFile.getPath());
-            URLClassLoader urlClassloader = new URLClassLoader( new URL[] { databaseDriverFile.toURI().toURL() }, System.class.getClassLoader() );
+            URLClassLoader urlClassloader = new URLClassLoader( new URL[] { databaseDriverFile.toURI().toURL() }, this.getClass().getClassLoader() );
             Class driverClass = urlClassloader.loadClass(databaseDriverClass);
             driver = (Driver) driverClass.newInstance();
         } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {

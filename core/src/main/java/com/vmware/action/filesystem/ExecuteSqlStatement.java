@@ -13,7 +13,7 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.db.DbUtils;
 import com.vmware.vcd.domain.Sites;
 
-@ActionDescription("Excecutes the specified sql statement against the configured database. Assumes that it is an update command.")
+@ActionDescription("Executes the specified sql statement against the configured database. Assumes that it is an update command.")
 public class ExecuteSqlStatement extends BaseVappAction {
 
     public ExecuteSqlStatement(WorkflowConfig config) {

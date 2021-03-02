@@ -92,7 +92,7 @@ public class GenerateActionConfigMappings {
 
         configValuePattern = createConfigValuesPattern();
 
-        Map<String, String[]> mappings = new HashMap<String, String[]>();
+        Map<String, String[]> mappings = new HashMap<>();
         populateLocatorMethodArguments();
         WorkflowFields configurableFields = config.getConfigurableFields();
         for (File javaActionFile : javaActionFiles) {

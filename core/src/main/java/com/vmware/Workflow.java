@@ -166,7 +166,7 @@ public class Workflow {
     }
 
     private String[] splitWorkflowTextIntoArguments(String workFlowText) {
-        String[] quotedTextPieces = workFlowText.split("[\"']");
+        String[] quotedTextPieces = workFlowText.split("[\"]");
         List<String> workflowTextPieces = new ArrayList<>();
         for (int i = 0; i < quotedTextPieces.length; i ++) {
             if (i % 2 == 0) {
@@ -235,7 +235,6 @@ public class Workflow {
             List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
-            config.addDateTimeVariables();
             if (config.dryRun) {
                 dryRunActions(actions);
             } else {
@@ -348,6 +347,7 @@ public class Workflow {
             }
             configOptions.addAll(configMappings.getUsableConfigValuesForAction(action));
             configValuesToRemove.addAll(action.configFlagsToAlwaysRemoveFromCompleter());
+            config.addGeneratedVariables();
             List<WorkflowParameter> params = action.getOverriddenConfigValues();
             if (action.getActionClassName().equals(DisplayLineBreak.class.getSimpleName())) {
                 log.info("");
@@ -474,7 +474,7 @@ public class Workflow {
 
     private boolean checkWhetherToSkipAction(WorkflowAction action) {
         log.info("Next action is {}", action.getActionClassName());
-        String confirmation = InputUtils.readValue("(s)kip (p)roceed (e)xit", "yes","no");
+        String confirmation = InputUtils.readValue("(s)kip (p)roceed (a)lways proceed (e)xit", "yes","no");
         if (StringUtils.isNotBlank(confirmation) && "exit".startsWith(confirmation)) {
             throw new CancelException(LogLevel.INFO, "exit selected before running " + action.getActionClassName());
         }

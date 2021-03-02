@@ -1,13 +1,16 @@
 package com.vmware.config.section;
 
+import java.util.List;
+import java.util.TreeMap;
+
 import com.vmware.config.ConfigurableProperty;
 
 public class SslConfig {
     public static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
     public static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
 
-    @ConfigurableProperty(commandLine = "--keystore-type", help = "Keystore type")
-    public String keystoreType;
+    @ConfigurableProperty(commandLine = "--new-keystore-type", help = "Keystore type to use for a new keystore")
+    public String newKeystoreType;
 
     @ConfigurableProperty(help = "Key size for entry in the keystore")
     public int keySize;
@@ -35,4 +38,7 @@ public class SslConfig {
 
     @ConfigurableProperty(help = "Cipher salt length for decrypting a value")
     public int cipherSaltLength;
+
+    @ConfigurableProperty(help = "A map of additional keystore configs that can be used to load a keystore. Key is keystore type, values are provider class and jar path")
+    public TreeMap<String, List<String>> additionalKeystoreTypes;
 }

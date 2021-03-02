@@ -195,6 +195,12 @@ public abstract class BaseAction implements Action {
         }
     }
 
+    protected void failIfEmpty(String value, String description) {
+        if (StringUtils.isEmpty(value)) {
+            exitDueToFailureCheck(description);
+        }
+    }
+
     protected void failIfUnset(String propertyName) {
         WorkflowField matchingField = config.getConfigurableFields().getFieldByName(propertyName);
         if (matchingField.getValue(config) == null) {
