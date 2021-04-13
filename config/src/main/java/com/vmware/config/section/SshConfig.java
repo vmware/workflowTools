@@ -65,6 +65,9 @@ public class SshConfig {
     @ConfigurableProperty(commandLine = "--source-database-schema-name", help = "Source database schema name")
     public String sourceDatabaseSchemaName;
 
+    @ConfigurableProperty(commandLine = "--ignore-unknown", help = "Ignore if a file is not found on scp")
+    public boolean ignoreUnknownFile;
+
     public SiteConfig commandLineSite() {
         return new SiteConfig(sshHost, sshPort, sshUsername, sshPassword);
     }

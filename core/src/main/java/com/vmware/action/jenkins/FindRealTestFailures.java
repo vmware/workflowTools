@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -36,6 +35,7 @@ import com.vmware.util.logging.Padder;
 import org.slf4j.LoggerFactory;
 
 import static com.vmware.BuildStatus.SUCCESS;
+import static com.vmware.BuildStatus.UNSTABLE;
 import static com.vmware.util.StringUtils.pluralize;
 import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Comparator.comparing;
@@ -205,7 +205,7 @@ public class FindRealTestFailures extends BaseAction {
         usableJobs.stream().parallel().forEach(job -> {
             try {
                 job.loadTestResultsFromDb();
-                addTestResultsToJob(job, jobView.lastFetchAmount);
+                fetchLatestTestResults(job, jobView.lastFetchAmount);
             } catch (Exception e) {
                 log.error("Failed to get full job details for {}\n{}", job.name, StringUtils.exceptionAsString(e));
                 throw e;
@@ -235,7 +235,7 @@ public class FindRealTestFailures extends BaseAction {
         return allFailingTests;
     }
 
-    private void addTestResultsToJob(Job job, int lastFetchAmount) {
+    private void fetchLatestTestResults(Job job, int lastFetchAmount) {
         job.fetchedResults = Collections.emptyList();
         int latestUsableBuildNumber = job.latestUsableBuildNumber();
         if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && job.hasSavedBuild(latestUsableBuildNumber)) {
@@ -243,39 +243,33 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
 
-        Job fullDetails = jenkinsExecutor.execute(j -> j.getJobDetails(job.getFullInfoUrl()));
-        job.updateBuilds(fullDetails.builds, jenkinsConfig.commitIdInDescriptionPattern); // full details includes build statuses
-        List<JobBuild> usefulBuilds = job.usefulBuilds;
+        List<JobBuild> builds = Arrays.asList(job.builds);
 
-        if (usefulBuilds.isEmpty()) {
-            log.info("No usable builds found for {}", job.name);
-            return;
-        }
+        final int numberOfBuildsToCheck = builds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ? jenkinsConfig.maxJenkinsBuildsToCheck : builds.size();
+        final int lastBuildNumberToCheck = builds.get(numberOfBuildsToCheck - 1).buildNumber;
 
-        if (usefulBuilds.get(0).status == SUCCESS) {
-            log.info("Most recent build for {} passed", job.name);
-            return;
-        }
+        List<JobBuild> usableBuilds = builds.stream()
+                .filter(build -> build.buildNumber >= lastBuildNumberToCheck && !job.hasSavedBuild(build.buildNumber))
+                .collect(toList());
+        job.usefulBuilds = usableBuilds.stream().parallel()
+                .map(build -> jenkinsExecutor.execute(j -> j.getJobBuildDetails(build)))
+                .peek(build -> build.setCommitIdForBuild(jenkinsConfig.commitIdInDescriptionPattern))
+                .collect(toList());
+        job.usefulBuilds.removeIf(build -> build.status != SUCCESS && build.status != UNSTABLE);
 
-        final int numberOfBuildsToCheck = usefulBuilds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ? jenkinsConfig.maxJenkinsBuildsToCheck : usefulBuilds.size();
-        final int lastBuildNumberToCheck = usefulBuilds.get(numberOfBuildsToCheck - 1).buildNumber;
-
-        List<JobBuild> usableBuilds = usefulBuilds.stream()
-                .filter(build -> build.buildNumber >= lastBuildNumberToCheck && !job.hasSavedBuild(build.buildNumber)).collect(toList());
-
-        List<Supplier<TestResults>> usableResultSuppliers = usableBuilds.stream()
+        List<Supplier<TestResults>> usableResultSuppliers = job.usefulBuilds.stream()
                 .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build)))
                 .collect(toList());
 
-        if (usableBuilds.isEmpty()) {
+        if (job.usefulBuilds.isEmpty()) {
             log.info("Builds for {} already saved, checked for last {} of {} usable builds. Last build number checked was {}", job.name,
-                    numberOfBuildsToCheck, usefulBuilds.size(), lastBuildNumberToCheck);
+                    numberOfBuildsToCheck, builds.size(), lastBuildNumberToCheck);
         } else {
-            String buildsToFetch = usableBuilds.stream().map(JobBuild::buildNumber).collect(Collectors.joining(","));
-            log.info("Fetching {} {} for {}. Checked last {} of {} usable builds. Last build number checked was {}",
+            String buildsToFetch = job.usefulBuilds.stream().map(JobBuild::buildNumber).collect(Collectors.joining(","));
+            log.info("Fetching {} {} for {}. Checking last {} of {} builds. Last build number checked was {}",
                     pluralizeDescription(usableBuilds.size(), "build"), buildsToFetch, job.name, numberOfBuildsToCheck,
-                    usefulBuilds.size(), lastBuildNumberToCheck);
-            job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).collect(toList());
+                    builds.size(), lastBuildNumberToCheck);
+            job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).filter(Objects::nonNull).collect(toList());
         }
     }
 

@@ -64,6 +64,9 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--file-data", help = "Read in file data directly from command line")
     public String fileData;
 
+    @ConfigurableProperty(commandLine = "--regex", help = "Regular expression to use")
+    public String regex;
+
     @ConfigurableProperty(commandLine = "--output-variable-name", help = "Name of variable used for output")
     public String outputVariableName;
 

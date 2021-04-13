@@ -16,9 +16,11 @@ import com.jcraft.jsch.SftpException;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
+import com.vmware.util.StringUtils;
 
 @ActionDescription(value = "Uses scp to copy a file from a ssh site. If destination file is IN_MEMORY_FILE the the contents are loaded into memory.",
-        configFlagsToExcludeFromCompleter = {"--build-display-name", "--output-file", "--use-database-host", "--ssh-command"})
+        configFlagsToExcludeFromCompleter = {"--build-display-name", "--output-file", "--use-database-host", "--ssh-command"},
+        configFlagsToAlwaysExcludeFromCompleter = "--ignore-unknown")
 public class ScpFileFromRemote extends ExecuteSshCommand {
 
     private final String IN_MEMORY_FILE = "IN_MEMORY_FILE";
@@ -67,7 +69,12 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
             }
             sftpChannel.exit();
         } catch (UnsupportedEncodingException | JSchException | SftpException e) {
-            throw new RuntimeException(e);
+            if (sshConfig.ignoreUnknownFile && e.getMessage().contains("No such file")) {
+                log.info("Ignoring that source file {} was not found", sourceFile);
+                log.debug("Exception: {}", StringUtils.exceptionAsString(e));
+            } else {
+                throw new RuntimeException(e);
+            }
         } finally {
             if (channel != null) {
                 channel.disconnect();

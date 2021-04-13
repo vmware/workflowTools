@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
 import com.vmware.util.db.DbUtils;
@@ -100,5 +101,4 @@ public class JobView extends BaseDbClass {
         }
         return usableJobs;
     }
-
 }

@@ -6,8 +6,6 @@ import java.util.TreeMap;
 import com.vmware.config.ConfigurableProperty;
 
 public class SslConfig {
-    public static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
-    public static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
 
     @ConfigurableProperty(commandLine = "--new-keystore-type", help = "Keystore type to use for a new keystore")
     public String newKeystoreType;
@@ -18,9 +16,6 @@ public class SslConfig {
     @ConfigurableProperty(commandLine = "--cipher-key", help = "Base64 Encoded cipher key")
     public String cipherKey;
 
-    @ConfigurableProperty(commandLine = "--keystore-file", help = "Keystore file to use")
-    public String keystoreFile;
-
     @ConfigurableProperty(commandLine = "--keystore-password", help = "Keystore password to use")
     public String keystorePassword;
 
@@ -30,15 +25,18 @@ public class SslConfig {
     @ConfigurableProperty(commandLine = "--keystore-alias-password", help = "Keystore password to use")
     public String keystoreAliasPassword;
 
-    @ConfigurableProperty(help = "Key algorithm for unwrapping or decrypting a value")
+    @ConfigurableProperty(help = "Secret key algorithm to use")
     public String cipherKeyAlgorithm;
 
-    @ConfigurableProperty(commandLine = "--cipher-transformation", help = "Cipher transformation to use")
-    public String cipherTransformation;
+    @ConfigurableProperty(commandLine = "--cipher", help = "Cipher to use")
+    public String cipherAlgorithm;
 
-    @ConfigurableProperty(help = "Cipher salt length for decrypting a value")
+    @ConfigurableProperty(commandLine = "--cipher-salt-length", help = "Cipher salt length")
     public int cipherSaltLength;
 
     @ConfigurableProperty(help = "A map of additional keystore configs that can be used to load a keystore. Key is keystore type, values are provider class and jar path")
     public TreeMap<String, List<String>> additionalKeystoreTypes;
+
+    @ConfigurableProperty(help = "Cipher to use for encrypting private keys")
+    public String cipherForPrivateKey;
 }

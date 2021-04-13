@@ -19,6 +19,10 @@
   "maxCommitsToCheck": 500,
   "commitIdInDescriptionPattern": "CL\\s+(\\w+)",
   "newKeystoreType": "PKCS12",
+  "cipherKeyAlgorithm": "AES",
+  "cipherAlgorithm": "AES/CBC/PKCS5Padding",
+  "cipherForPrivateKey": "PBEWithSHA1AndDESede",
+  "cipherSaltLength": 8,
   "keySize": 2048,
   "goBuildBinPath": "/build/apps/bin/gobuild",
   "patchCommand": "patch -f -p1 -s",
@@ -968,6 +972,12 @@
     "showCommitsForEpic": [
       "LoadAllIssuesForEpic",
       "DisplayCommitsForIssues"
+    ],
+    "testEncryption": [
+      "EncryptProperty&&--cipher-key=bG9uZ2VyUGFzc3dvcmQxMg==&&--property-value=sampleData&&--output-variable-name=encryptedData",
+      "DecryptProperty&&--cipher-key=bG9uZ2VyUGFzc3dvcmQxMg==&&--property-value=$encryptedData&&--output-variable-name=decryptedData",
+      "ExitIfValueDoesNotMatch&&--input-text=$decryptedData&&--property-value=sampleData",
+      "DisplayInfo&&--input-text=Values matched for sampleData!"
     ]
   },
   "supportingWorkflows": [
@@ -983,6 +993,7 @@
     "selectVapp",
     "selectVcdCell",
     "selectVcdSite",
-    "selectMergeRequest"
+    "selectMergeRequest",
+    "testEncryption"
   ]
 }

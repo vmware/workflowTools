@@ -41,4 +41,20 @@ public class ArrayUtils {
         System.arraycopy(secondArray, 0, result, firstArray.length, secondArray.length);
         return result;
     }
+
+    public static byte[] join(byte[] first, byte[] second) {
+        byte[] combinedArray = new byte[first.length + second.length];
+        System.arraycopy(first,0, combinedArray,0, first.length);
+        System.arraycopy(second,0, combinedArray, first.length, second.length);
+        return combinedArray;
+    }
+
+    public static byte[] subSection(byte[] data, int startPos, int length) {
+        if (data.length < length) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        byte[] result = new byte[length];
+        System.arraycopy(data, startPos, result, 0, length);
+        return result;
+    }
 }

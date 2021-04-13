@@ -117,6 +117,9 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
     }
 
     public String getJobBuildCommitId() {
+        if (actions == null) {
+            return null;
+        }
         for (JobBuildAction action : actions) {
             if (action.lastBuiltRevision != null) {
                 return action.lastBuiltRevision.SHA1;

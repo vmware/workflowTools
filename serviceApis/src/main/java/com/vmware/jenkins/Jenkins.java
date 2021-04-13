@@ -7,6 +7,7 @@ import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotAuthorizedException;
+import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.body.RequestBodyHandling;
@@ -80,11 +81,7 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     public Job getJobDetails(Job jobToInvoke) {
-        return getJobDetails(jobToInvoke.getInfoUrl());
-    }
-
-    public Job getJobDetails(String url) {
-        return optimisticGet(url, Job.class);
+        return optimisticGet(jobToInvoke.getInfoUrl(), Job.class);
     }
 
     public JobBuild getJobBuildDetails(JobBuild jobBuild) {

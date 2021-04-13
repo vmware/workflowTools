@@ -4,11 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -17,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -29,50 +33,46 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
+
+import javax.crypto.Cipher;
+import javax.crypto.EncryptedPrivateKeyInfo;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 
-import static com.vmware.config.section.SslConfig.BEGIN_PRIVATE_KEY;
-import static com.vmware.config.section.SslConfig.END_PRIVATE_KEY;
+import static com.vmware.util.StringUtils.BEGIN_PRIVATE_KEY;
+import static com.vmware.util.StringUtils.END_PRIVATE_KEY;
 import static sun.security.provider.X509Factory.BEGIN_CERT;
 import static sun.security.provider.X509Factory.END_CERT;
 
-@ActionDescription("Adds the loaded certificate to the specified keystore.")
-public class AddCertToKeystore extends BaseAction {
-    public AddCertToKeystore(WorkflowConfig config) {
+@ActionDescription(value = "Saves the loaded cert. If keystore password is set, cert is saved to a keystore, otherwise as pem files.",
+        configFlagsToAlwaysExcludeFromCompleter = {"--cipher-salt-length", "--new-keystore-type"})
+public class SaveCert extends BaseAction {
+    public SaveCert(WorkflowConfig config) {
         super(config);
-        super.addSkipActionIfBlankProperties("fileData", "keystoreFile", "keystorePassword", "keystoreAlias", "keystoreAliasPassword");
+        super.addSkipActionIfBlankProperties("fileData", "destinationFile", "keystoreAlias", "keystorePassword");
     }
 
     @Override
     public void process() {
         try {
-            File keystoreFile = new File(sslConfig.keystoreFile);
-            KeyStore privateKS;
-            if (keystoreFile.exists()) {
-                privateKS = loadKeyStore(keystoreFile);
+            if (StringUtils.isEmpty(sslConfig.keystorePassword)) {
+                saveCertToPemFile();
             } else {
-                failIfEmpty(sslConfig.newKeystoreType, "newKeystoreType not set");
-                privateKS = createKeyStore(sslConfig.newKeystoreType);
-                log.info("Created keystore {} of type {}", keystoreFile.getAbsolutePath(), sslConfig.newKeystoreType);
+                addCertToKeyStoreFile();
             }
-;
-            X509Certificate certificate = createCertificate();
-            KeyPair pair = createKeyPair();
-            certificate.verify(pair.getPublic());
-
-            privateKS.setKeyEntry(sslConfig.keystoreAlias, pair.getPrivate(), sslConfig.keystoreAliasPassword.toCharArray(),
-                    new Certificate[] { certificate });
-            privateKS.store(new FileOutputStream(sslConfig.keystoreFile), sslConfig.keystorePassword.toCharArray());
-
-            log.info("Added certificate with alias {} to keystore {}", sslConfig.keystoreAlias, sslConfig.keystoreFile);
-
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -81,6 +81,58 @@ public class AddCertToKeystore extends BaseAction {
             }
         }
     }
+
+    private void saveCertToPemFile()
+            throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, InvalidKeySpecException {
+        log.info("No keystore password set, assuming keystore file {} corresponds to key file and pem file pairing", fileSystemConfig.destinationFile);
+
+        X509Certificate certificate = createCertificate();
+        KeyPair pair = createKeyPair();
+        certificate.verify(pair.getPublic());
+
+        File keyFile = new File(fileSystemConfig.destinationFile + ".key");
+        File certificateFile = new File(fileSystemConfig.destinationFile + ".pem");
+
+        String keyPem;
+        if (StringUtils.isNotBlank(sslConfig.keystoreAliasPassword)) {
+            keyPem = encrypt(pair.getPrivate(), sslConfig.keystoreAliasPassword.toCharArray());
+            log.info("Saving encrypted private key to {}", keyFile.getAbsolutePath());
+        } else {
+            keyPem = StringUtils.convertToPem(pair.getPrivate());
+            log.info("Saving unencrypted private key to {}", keyFile.getAbsolutePath());
+        }
+
+        IOUtils.write(keyFile, keyPem);
+
+        log.info("Saving certificate to {}", certificateFile.getAbsolutePath());
+        IOUtils.write(certificateFile, StringUtils.convertToPem(certificate));
+    }
+
+    private void addCertToKeyStoreFile()
+            throws ClassNotFoundException, KeyStoreException, IllegalAccessException, InstantiationException, CertificateException, NoSuchAlgorithmException,
+            InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException, IOException {
+        failIfEmpty("keystoreAliasPassword", "keystoreAliasPassword not set");
+        File keystoreFile = new File(fileSystemConfig.destinationFile);
+        KeyStore privateKS;
+        if (keystoreFile.exists()) {
+            privateKS = loadKeyStore(keystoreFile);
+        } else {
+            failIfEmpty(sslConfig.newKeystoreType, "newKeystoreType not set");
+            privateKS = createKeyStore(sslConfig.newKeystoreType);
+            log.info("Created keystore {} of type {}", keystoreFile.getAbsolutePath(), sslConfig.newKeystoreType);
+        }
+        ;
+        X509Certificate certificate = createCertificate();
+        KeyPair pair = createKeyPair();
+        certificate.verify(pair.getPublic());
+
+        privateKS.setKeyEntry(sslConfig.keystoreAlias, pair.getPrivate(), sslConfig.keystoreAliasPassword.toCharArray(),
+                new Certificate[] { certificate });
+        privateKS.store(new FileOutputStream(fileSystemConfig.destinationFile), sslConfig.keystorePassword.toCharArray());
+
+        log.info("Added certificate with alias {} to keystore {}", sslConfig.keystoreAlias, fileSystemConfig.destinationFile);
+    }
+
 
     private KeyStore loadKeyStore(File keystoreFile) {
         List<String> keystoreTypes = new ArrayList<>(Arrays.asList("JCEKS", "PKCS12", "JKS"));
@@ -141,4 +193,46 @@ public class AddCertToKeystore extends BaseAction {
         PublicKey publicKey = kf.generatePublic(publicKeySpec);
         return new KeyPair(publicKey, privateKey);
     }
+
+    private String encrypt(Key key, char[] password) {
+        try {
+            String algorithm = sslConfig.cipherForPrivateKey;
+
+            SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm);
+            PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
+            SecretKey pbeKey = keyFact.generateSecret(pbeKeySpec);
+
+            byte[] salt = randomBytes(sslConfig.cipherSaltLength);
+            int iterationCount = generateIterationCount();
+            PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+            AlgorithmParameters params = AlgorithmParameters.getInstance(algorithm);
+            params.init(pbeParameterSpec);
+
+            Cipher cipher = Cipher.getInstance(algorithm);
+            cipher.init(Cipher.WRAP_MODE, pbeKey, params);
+
+            byte[] encryptedBytes = cipher.wrap(key);
+            EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(params, encryptedBytes);
+
+            return StringUtils.convertToPem(privateKeyInfo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int generateIterationCount() {
+        Random rng = new Random();
+        rng.setSeed(Calendar.getInstance().getTimeInMillis());
+
+        int random = rng.nextInt();
+        int mod1000 = random % 1000;
+        return mod1000 + 1000;
+    }
+
+    private byte[] randomBytes(int length) {
+        byte[] bytes = new byte[length];
+        new SecureRandom().nextBytes(bytes);
+        return bytes;
+    }
+
 }

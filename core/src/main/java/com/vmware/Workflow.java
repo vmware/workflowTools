@@ -438,10 +438,13 @@ public class Workflow {
 
         AtomicInteger waitTimeInMilliSeconds = new AtomicInteger(0);
         Map<String, Long> executionTimesPerAction = new LinkedHashMap<>();
+        boolean alwaysProceed = false;
         for (WorkflowAction action : actions) {
-            if (config.checkPoint) {
-                boolean shouldSkip = checkWhetherToSkipAction(action);
-                if (shouldSkip) {
+            if (config.checkPoint && !alwaysProceed) {
+                String skipResponse = checkWhetherToSkipAction(action);
+                alwaysProceed = StringUtils.isNotBlank(skipResponse) && "always".startsWith(skipResponse);
+                boolean skippable = StringUtils.isNotBlank(skipResponse) && "skip".startsWith(skipResponse);
+                if (skippable && !alwaysProceed) {
                     log.info("Skipping action {}", action.getActionClassName());
                     continue;
                 }
@@ -472,13 +475,13 @@ public class Workflow {
         }
     }
 
-    private boolean checkWhetherToSkipAction(WorkflowAction action) {
+    private String checkWhetherToSkipAction(WorkflowAction action) {
         log.info("Next action is {}", action.getActionClassName());
         String confirmation = InputUtils.readValue("(s)kip (p)roceed (a)lways proceed (e)xit", "yes","no");
         if (StringUtils.isNotBlank(confirmation) && "exit".startsWith(confirmation)) {
             throw new CancelException(LogLevel.INFO, "exit selected before running " + action.getActionClassName());
         }
-        return StringUtils.isNotBlank(confirmation) && "skip".startsWith(confirmation);
+        return confirmation;
     }
 
     private void outputExecutionTimes(Map<String, Long> executionTimesPerAction) {
@@ -526,8 +529,7 @@ public class Workflow {
                 try {
                     action.asyncSetup();
                 } catch (Exception e) {
-                    log.error(e.getMessage() != null ? e.getMessage() : "", e);
-                    e.printStackTrace(); // log.error doesn't seem to include the stack trace
+                    log.error("{}\n{}", e.getMessage(), StringUtils.exceptionAsString(e));
                     System.exit(1);
                 }
                 actionsRun.add(action);

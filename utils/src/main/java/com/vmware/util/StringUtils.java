@@ -1,8 +1,13 @@
 package com.vmware.util;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -11,12 +16,23 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.crypto.EncryptedPrivateKeyInfo;
+
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static sun.security.provider.X509Factory.BEGIN_CERT;
+import static sun.security.provider.X509Factory.END_CERT;
+
 public class StringUtils {
+    public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
+    public static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
+    public static final String BEGIN_ENCRYPTED_PRIVATE_KEY = "-----BEGIN ENCRYPTED PRIVATE KEY-----";
+    public static final String END_ENCRYPTED_PRIVATE_KEY = "-----END ENCRYPTED PRIVATE KEY-----";
     public static final String NEW_LINE_CHAR = "\n";
 
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
@@ -331,6 +347,22 @@ public class StringUtils {
         return Arrays.stream(spltValues).filter(StringUtils::isNotEmpty).map(String::trim).collect(Collectors.toList());
     }
 
+    public static String convertToPem(final Certificate certificate) throws CertificateEncodingException {
+        return convertToPem(certificate.getEncoded(), BEGIN_CERT, END_CERT);
+    }
+
+    public static String convertToPem(final PrivateKey key) {
+        return convertToPem(key.getEncoded(), BEGIN_PRIVATE_KEY, END_PRIVATE_KEY);
+    }
+
+    public static String convertToPem(final EncryptedPrivateKeyInfo key) {
+        try {
+            return convertToPem(key.getEncoded(), BEGIN_ENCRYPTED_PRIVATE_KEY, END_ENCRYPTED_PRIVATE_KEY);
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
     public static String unescapeJavaString(String st) {
         StringBuilder sb = new StringBuilder(st.length());
 
@@ -399,6 +431,13 @@ public class StringUtils {
             sb.append(ch);
         }
         return sb.toString();
+    }
+
+    private static String convertToPem(byte[] value, String header, String footer) {
+        final Base64.Encoder encoder = Base64.getMimeEncoder(64, LINE_SEPARATOR.getBytes());
+
+        final String encodedCertText = new String(encoder.encode(value));
+        return header + LINE_SEPARATOR + encodedCertText + LINE_SEPARATOR + footer;
     }
 
     public static class ToStringSupplier implements Supplier<String> {

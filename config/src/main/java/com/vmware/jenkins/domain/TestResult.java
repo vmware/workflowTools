@@ -87,30 +87,33 @@ public class TestResult extends BaseDbClass {
         Stream.of(passedBuilds, presumedPassedBuilds, skippedBuilds, failedBuilds).filter(Objects::nonNull).forEach(Arrays::sort);
     }
 
+    public String fullTestNameWithoutParameters() {
+        return packagePath + "." + className + "." + name;
+    }
 
     public String fullTestNameWithPackage() {
-        return packagePath + "." + fullTestName();
+        return packagePath + "." + classAndTestName();
     }
 
     public long getStartedAt() {
         return startedAt;
     }
 
-    public String fullTestName() {
+    public String fullTestNameWithSkipInfo() {
+        String fullTestName = classAndTestName();
+        if (status == TestStatus.SKIP && similarSkips != null && similarSkips > 0) {
+            fullTestName = fullTestName + " (" + StringUtils.pluralize(similarSkips, "similar skip") + ")";
+        }
+        return fullTestName;
+    }
+
+    public String classAndTestName() {
         String testName = className + "." + name;
         if (parameters != null && parameters.length > 0) {
             String testParams = StringUtils.join(Arrays.asList(parameters), ",");
             testName += " (" + testParams + ")";
         }
         return testName;
-    }
-
-    public String fullTestNameWithSkipInfo() {
-        String fullTestName = fullTestName();
-        if (status == TestStatus.SKIP && similarSkips != null && similarSkips > 0) {
-            fullTestName = fullTestName + " (" + StringUtils.pluralize(similarSkips, "similar skip") + ")";
-        }
-        return fullTestName;
     }
 
     public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
@@ -216,11 +219,8 @@ public class TestResult extends BaseDbClass {
             return;
         }
 
-        if (testResult.status == TestStatus.SKIP && testResult.hasStandardSkipException()) {
-            return;
-        }
-
         // update to latest build result
+        this.jobBuildId = testResult.jobBuildId;
         this.url = testResult.url;
         this.dataProviderIndex = testResult.dataProviderIndex;
         this.buildNumber = testResult.buildNumber;
@@ -256,7 +256,7 @@ public class TestResult extends BaseDbClass {
 
     @Override
     public String toString() {
-        String text = fullTestName() + " " + status;
+        String text = classAndTestName() + " " + status;
         if (exception != null) {
             text += " " + exception;
         }
@@ -299,10 +299,6 @@ public class TestResult extends BaseDbClass {
         public static boolean isPass(TestStatus status) {
             return status == PASS || status == PRESUMED_PASS;
         }
-    }
-
-    private boolean hasStandardSkipException() {
-        return exception == null || exception.contains("depends on not successfully finished methods");
     }
 }
 

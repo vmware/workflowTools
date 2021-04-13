@@ -11,6 +11,10 @@
     "--input-text",
     "--source-file"
   ],
+  "ExitIfValueDoesNotMatch": [
+    "--property-value",
+    "--input-text"
+  ],
   "ExitIfGitDiffDoesNotMatchRbtDiff": [
     "--parent"
   ],
@@ -65,6 +69,13 @@
     "--max-commits",
     "--since-date"
   ],
+  "DecryptProperty": [
+    "--cipher-salt-length",
+    "--cipher",
+    "--property-value",
+    "--cipher-key",
+    "--output-variable-name"
+  ],
   "SaveFileData": [
     "--file-data",
     "--destination-file"
@@ -88,8 +99,9 @@
   "DeleteFile": [
     "--source-file"
   ],
-  "DecryptVariable": [
-    "--cipher-transformation",
+  "EncryptProperty": [
+    "--cipher",
+    "--cipher-salt-length",
     "--property-value",
     "--cipher-key",
     "--output-variable-name"
@@ -110,6 +122,15 @@
     "--always-download",
     "--file-data",
     "--job-artifact"
+  ],
+  "SaveCert": [
+    "--cipher-salt-length",
+    "--file-data",
+    "--keystore-alias",
+    "--new-keystore-type",
+    "--keystore-alias-password",
+    "--destination-file",
+    "--keystore-password"
   ],
   "CreateReviewIfNeeded": [
     "--username",
@@ -191,21 +212,13 @@
     "--json-property-path"
   ],
   "UnwrapCipherKey": [
-    "--cipher-transformation",
+    "--cipher",
     "--property-value",
     "--cipher-key",
     "--output-variable-name"
   ],
   "SaveDiffToFile": [
     "--output-file"
-  ],
-  "AddCertToKeystore": [
-    "--file-data",
-    "--keystore-password",
-    "--keystore-alias-password",
-    "--keystore-alias",
-    "--new-keystore-type",
-    "--keystore-file"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
     "--username",
@@ -229,6 +242,11 @@
   "UploadReviewDiff": [
     "--tracking-branch",
     "--parent"
+  ],
+  "ParseText": [
+    "--output-variable-name",
+    "--regex",
+    "--input-text"
   ],
   "BaseBatchBugzillaAction": [
     "--username",
@@ -407,6 +425,7 @@
     "--changelist-id"
   ],
   "ScpFileFromRemote": [
+    "--ignore-unknown",
     "--file-data",
     "--ssh-strict-host-checking",
     "--destination-file",

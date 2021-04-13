@@ -215,7 +215,7 @@ public class WorkflowConfig {
         replacementVariables.addVariable(ReplacementVariables.VariableName.UUID, UUID.randomUUID().toString());
         Date currentDate = new Date();
         replacementVariables.addVariable(ReplacementVariables.VariableName.DATE, dateFormat.format(currentDate));
-        replacementVariables.addVariable(ReplacementVariables.VariableName.TIME, timeFormat.format(new Date()));
+        replacementVariables.addVariable(ReplacementVariables.VariableName.TIME, timeFormat.format(currentDate));
     }
 
     public void setCommandlineArgMap(Map<String, String> commandlineArgMap) {

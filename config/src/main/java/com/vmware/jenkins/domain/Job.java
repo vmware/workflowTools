@@ -30,6 +30,7 @@ import static com.vmware.BuildStatus.SUCCESS;
 import static com.vmware.BuildStatus.UNSTABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PRESUMED_PASS;
+import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static java.util.stream.Collectors.toList;
 
 public class Job extends BaseDbClass {
@@ -108,10 +109,6 @@ public class Job extends BaseDbClass {
         return url + "api/json";
     }
 
-    public String getFullInfoUrl() {
-        return UrlUtils.addRelativePaths(url, "api/json?depth=1");
-    }
-
     public void constructUrl(String baseUrl, String jobName) {
         this.name = jobName;
         baseUrl = UrlUtils.addTrailingSlash(baseUrl);
@@ -165,13 +162,6 @@ public class Job extends BaseDbClass {
         this.dbUtils = dbUtils;
     }
 
-    public void updateBuilds(JobBuild[] builds, String commitIdInDescriptionPattern) {
-        this.builds = builds;
-        this.usefulBuilds = Arrays.stream(builds).filter(build -> build.status == SUCCESS || build.status == UNSTABLE)
-                .sorted((first, second) -> Integer.compare(second.buildNumber, first.buildNumber))
-                .peek(build -> build.setCommitIdForBuild(commitIdInDescriptionPattern)).collect(toList());
-    }
-
     public boolean addTestResultsToMasterList() {
         List<TestResult> newTestResultsAdded = new ArrayList<>();
 
@@ -181,6 +171,13 @@ public class Job extends BaseDbClass {
                 resultToAdd.jobBuildId = results.getBuild().id;
                 Optional<TestResult> matchingResult = testResults.stream()
                         .filter(result  -> result.fullTestNameWithPackage().equals(resultToAdd.fullTestNameWithPackage())).findFirst();
+                if (!matchingResult.isPresent()) {
+                    matchingResult = testResults.stream()
+                            .filter(result  -> (result.status == SKIP || resultToAdd.status == SKIP)
+                                    && result.fullTestNameWithoutParameters().equals(resultToAdd.fullTestNameWithoutParameters()))
+                            .findFirst();
+                    matchingResult.ifPresent(result -> log.debug("Matched result {} based on skip status", result.fullTestNameWithoutParameters()));
+                }
                 if (matchingResult.isPresent()) {
                     matchingResult.get().addTestResult(resultToAdd);
                 } else {
@@ -205,7 +202,7 @@ public class Job extends BaseDbClass {
                 .filter(build -> !result.containsBuildNumbers(build.buildNumber))
                 .forEach(build -> {
                     presumedPassResultsAdded.set(true);
-                    log.info("Adding presumed pass result for test {} in build {}", result.fullTestName(), build.buildNumber);
+                    log.info("Adding presumed pass result for test {} in build {}", result.classAndTestName(), build.buildNumber);
                     result.addTestResult(new TestResult(result, build, PRESUMED_PASS));
                 }));
         return presumedPassResultsAdded.get();

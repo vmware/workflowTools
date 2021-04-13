@@ -13,9 +13,9 @@ public class ExitIfValueMatches extends BaseAction {
 
     @Override
     public void process() {
-        log.debug("Comparing value {} with expected value {}", fileSystemConfig.inputText, fileSystemConfig.propertyValue);
+        log.debug("Comparing value {} with value {}", fileSystemConfig.inputText, fileSystemConfig.propertyValue);
         if (fileSystemConfig.inputText.equals(fileSystemConfig.propertyValue)) {
-            cancelWithMessage(fileSystemConfig.inputText + " does not match " + fileSystemConfig.propertyValue);
+            cancelWithMessage(fileSystemConfig.inputText + " matches " + fileSystemConfig.propertyValue);
         }
     }
 }
