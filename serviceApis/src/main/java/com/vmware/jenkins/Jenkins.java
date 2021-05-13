@@ -7,7 +7,6 @@ import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotAuthorizedException;
-import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.body.RequestBodyHandling;
@@ -62,30 +61,30 @@ public class Jenkins extends AbstractRestBuildService {
 
     public HomePage getHomePage() {
         if (homePage == null) {
-            homePage = connection.get(apiUrl, HomePage.class);
+            homePage = get(apiUrl, HomePage.class);
         }
 
         return homePage;
     }
 
     public void invokeJob(Job jobToInvoke) {
-        optimisticPost(jobToInvoke.getBuildWithParametersUrl(), null);
+        post(jobToInvoke.getBuildWithParametersUrl(), null);
     }
 
     public void invokeJobWithParameters(Job jobToInvoke, JobParameters params) {
-        optimisticPost(jobToInvoke.getBuildWithParametersUrl(), params.toMap());
+        post(jobToInvoke.getBuildWithParametersUrl(), params.toMap());
     }
 
     public JobView getFullViewDetails(String viewUrl) {
-        return optimisticGet(UrlUtils.addRelativePaths(viewUrl, "api/json?depth=1"), JobView.class);
+        return get(UrlUtils.addRelativePaths(viewUrl, "api/json?depth=1"), JobView.class);
     }
 
     public Job getJobDetails(Job jobToInvoke) {
-        return optimisticGet(jobToInvoke.getInfoUrl(), Job.class);
+        return get(jobToInvoke.getInfoUrl(), Job.class);
     }
 
     public JobBuild getJobBuildDetails(JobBuild jobBuild) {
-        return optimisticGet(jobBuild.getJenkinsInfoUrl(), JobBuild.class);
+        return get(jobBuild.getJenkinsInfoUrl(), JobBuild.class);
     }
 
     public JobBuild getJobBuildDetails(String jobName, int buildNumber) {
@@ -94,14 +93,14 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     public TestResults getJobBuildTestResults(JobBuild jobBuild) {
-        TestResults results = optimisticGet(jobBuild.getTestReportsApiUrl(), TestResults.class);
+        TestResults results = get(jobBuild.getTestReportsApiUrl(), TestResults.class);
         results.setBuild(jobBuild);
         return results;
     }
 
     public void abortJobBuild(JobBuild jobBuildToAbort) {
         log.info("Aborting build {}", jobBuildToAbort.url);
-        optimisticPost(jobBuildToAbort.stopUrl(), null);
+        post(jobBuildToAbort.stopUrl(), null);
         jobBuildToAbort.status = BuildStatus.ABORTED;
     }
 
@@ -162,20 +161,20 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     private JobBuild getJobBuildDetails(String jobBuildUrl) {
-        return optimisticGet(jobBuildUrl, JobBuild.class);
+        return get(jobBuildUrl, JobBuild.class);
     }
 
     @Override
-    protected <T> T optimisticPost(String url, Class<T> responseConversionClass, Object param, RequestParam... params) {
+    protected <T> T post(String url, Class<T> responseConversionClass, Object param, RequestParam... params) {
         if (usesCsrf) {
-            CsrfCrumb csrfCrumb = super.optimisticGet(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
+            CsrfCrumb csrfCrumb = super.get(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
             RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
             List<RequestParam> paramList = new ArrayList<>(Arrays.asList(params));
             paramList.add(csrfHeader);
             connection.setUseSessionCookies(true);
-            return super.optimisticPost(url, responseConversionClass, param, paramList.toArray(new RequestParam[0]));
+            return super.post(url, responseConversionClass, param, paramList.toArray(new RequestParam[0]));
         } else {
-            return super.optimisticPost(url, responseConversionClass, param, params);
+            return super.post(url, responseConversionClass, param, params);
         }
     }
 

@@ -33,24 +33,24 @@ public class Gitlab extends AbstractRestService {
     }
 
     public MergeRequest[] getMergeRequests(String state) {
-        return optimisticGet(apiUrl +"/merge_requests?state=" + state, MergeRequest[].class);
+        return get(apiUrl +"/merge_requests?state=" + state, MergeRequest[].class);
     }
 
     public MergeRequest createMergeRequest(MergeRequest mergeRequest) {
-        return optimisticPost(mergeRequestsUrl(mergeRequest.targetProjectId), MergeRequest.class, mergeRequest);
+        return post(mergeRequestsUrl(mergeRequest.targetProjectId), MergeRequest.class, mergeRequest);
     }
 
     public MergeRequest getMergeRequest(int projectId, int mergeRequestId) {
-        return optimisticGet(mergeRequestUrl(projectId, mergeRequestId), MergeRequest.class);
+        return get(mergeRequestUrl(projectId, mergeRequestId), MergeRequest.class);
     }
 
     public MergeRequestApprovals getMergeRequestApprovals(int projectId, int mergeRequestId) {
-        return optimisticGet(mergeRequestUrl(projectId, mergeRequestId) + "/approvals", MergeRequestApprovals.class);
+        return get(mergeRequestUrl(projectId, mergeRequestId) + "/approvals", MergeRequestApprovals.class);
     }
 
     public MergeRequestApprovals approveMergeRequest(int projectId, int mergeRequestId) {
         try {
-            return optimisticPost(mergeRequestUrl(projectId, mergeRequestId) + "/approve", MergeRequestApprovals.class, null,
+            return post(mergeRequestUrl(projectId, mergeRequestId) + "/approve", MergeRequestApprovals.class, null,
                     Collections.singletonList(NotAuthorizedException.class));
         } catch (NotAuthorizedException nae) {
             throw new FatalException(nae, "Not authorized to approve merge request {} for project {}", mergeRequestId, projectId);
@@ -61,7 +61,7 @@ public class Gitlab extends AbstractRestService {
     public void acceptMergeRequest(MergeRequest mergeRequest) {
         try {
             MergeAcceptRequest acceptRequest = new MergeAcceptRequest(mergeRequest);
-            String response = optimisticPut(mergeRequestUrl(mergeRequest.projectId, mergeRequest.iid) + "/merge", String.class, acceptRequest,
+            String response = put(mergeRequestUrl(mergeRequest.projectId, mergeRequest.iid) + "/merge", String.class, acceptRequest,
                     Collections.singletonList(NotAuthorizedException.class));
             log.debug(response);
         } catch (NotAuthorizedException nae) {
@@ -71,7 +71,7 @@ public class Gitlab extends AbstractRestService {
 
     public void rebaseMergeRequest(int projectId, int mergeRequestId) {
         try {
-            String response = optimisticPut(mergeRequestUrl(projectId, mergeRequestId) + "/rebase", String.class, null,
+            String response = put(mergeRequestUrl(projectId, mergeRequestId) + "/rebase", String.class, null,
                     Collections.singletonList(ForbiddenException.class));
             log.debug("Rebase response: {}", response);
         } catch (ForbiddenException fe) {
@@ -80,12 +80,12 @@ public class Gitlab extends AbstractRestService {
     }
 
     public MergeRequest updateMergeRequest(MergeRequest mergeRequest) {
-        return optimisticPut(mergeRequestUrl(mergeRequest.projectId, mergeRequest.iid), MergeRequest.class, mergeRequest);
+        return put(mergeRequestUrl(mergeRequest.projectId, mergeRequest.iid), MergeRequest.class, mergeRequest);
     }
 
     @Override
     protected void checkAuthenticationAgainstServer() {
-        optimisticGet(apiUrl + "/version", String.class);
+        get(apiUrl + "/version", String.class);
     }
 
     @Override

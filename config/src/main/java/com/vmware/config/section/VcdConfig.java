@@ -1,8 +1,10 @@
 package com.vmware.config.section;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.vmware.config.ConfigurableProperty;
+import com.vmware.util.StringUtils;
 
 public class VcdConfig {
     @ConfigurableProperty(help = "Url for Vcloud Director")
@@ -58,4 +60,14 @@ public class VcdConfig {
 
     @ConfigurableProperty(commandLine = "--use-owned-vapps-only", help = "Only use a Vapp owned by the user, no file based Vapps")
     public boolean useOwnedVappsOnly;
+
+    @ConfigurableProperty(commandLine = "--query-filter", help = "Optional filter to use when querying Vapps or VMs")
+    public String queryFilter;
+
+    public String[] queryFilters() {
+        if (StringUtils.isEmpty(queryFilter)) {
+            return new String[0];
+        }
+        return new String[] {queryFilter};
+    }
 }

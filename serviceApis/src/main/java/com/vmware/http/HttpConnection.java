@@ -114,10 +114,6 @@ public class HttpConnection {
         requestParams.reset();
     }
 
-    public <T> T get(String url, Class<T> responseConversionClass, List<RequestParam> params) {
-        return get(url, responseConversionClass, params.toArray(new RequestParam[params.size()]));
-    }
-
     public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params) {
         setupConnection(url, GET, params);
         return handleServerResponse(responseConversionClass, GET, params);

@@ -65,7 +65,7 @@ public class Jira extends AbstractRestService {
     public List<MenuItem> getRecentBoardItems() {
         List<MenuItem> recentItems = new ArrayList<MenuItem>();
         String url = legacyApiUrl + "menus/greenhopper_menu?inAdminMode=false";
-        MenuSection[] sections = connection.get(url, MenuSections.class).sections;
+        MenuSection[] sections = get(url, MenuSections.class).sections;
         if (sections.length == 0) {
             return recentItems;
         }
@@ -81,12 +81,12 @@ public class Jira extends AbstractRestService {
 
     public RapidView getRapidView(String viewId) {
         String url = greenhopperUrl + "xboard/plan/backlog/data.json";
-        RapidView rapidView = connection.get(url, RapidView.class, new UrlParam("rapidViewId", viewId));
+        RapidView rapidView = get(url, RapidView.class, new UrlParam("rapidViewId", viewId));
         return rapidView;
     }
 
     public Issue getIssueByKey(String key) {
-        return connection.get(urlBaseForKey(key), Issue.class);
+        return get(urlBaseForKey(key), Issue.class);
     }
 
     public Issue getIssueWithoutException(String key) {
@@ -99,7 +99,7 @@ public class Jira extends AbstractRestService {
     }
 
     public IssuesResponse searchForIssues(SearchRequest searchRequest) {
-        return connection.post(searchUrl, IssuesResponse.class, searchRequest);
+        return post(searchUrl, IssuesResponse.class, searchRequest);
     }
 
     public IssuesResponse getOpenTasksForUser() {
@@ -108,7 +108,7 @@ public class Jira extends AbstractRestService {
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee=%s",
                 issueTypesToGet, allowedStatuses, escapeUsername(getUsername()));
-        IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
+        IssuesResponse response = get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
         log.debug("{} tasks found", response.issues.length);
         return response;
     }
@@ -116,7 +116,7 @@ public class Jira extends AbstractRestService {
     public IssuesResponse getIssuesForUser(IssueStatusDefinition status, IssueResolutionDefinition resolution) {
         String jql = String.format("status=%s AND resolution=%s AND assignee=%s",
                 status.getValue(), resolution != null ? resolution.getValue() : null, escapeUsername(getUsername()));
-        IssuesResponse response = connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
+        IssuesResponse response = get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
         log.debug("{} tasks found", response.issues.length);
         return response;
     }
@@ -127,11 +127,11 @@ public class Jira extends AbstractRestService {
 
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND reporter in (%s)",
                 issueTypesToGet, allowedStatuses, escapeUsername(getUsername()));
-        return connection.get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
+        return get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
     }
 
     public IssueTransitions getAllowedTransitions(String key) {
-        IssueTransitions transitions = connection.get(urlBaseForKey(key) + "transitions", IssueTransitions.class);
+        IssueTransitions transitions = get(urlBaseForKey(key) + "transitions", IssueTransitions.class);
         if (transitions == null) {
             transitions = new IssueTransitions();
         }
@@ -148,11 +148,11 @@ public class Jira extends AbstractRestService {
         if (resolution != null) {
             updateIssue.fields.resolution = new IssueResolution(resolution);
         }
-        connection.post(urlBaseForKey(transition.issueId) + "transitions", updateIssue);
+        post(urlBaseForKey(transition.issueId) + "transitions", updateIssue);
     }
 
     public Issue createIssue(Issue issue) {
-        return connection.post(apiUrl + "issue", Issue.class, issue);
+        return post(apiUrl + "issue", Issue.class, issue);
     }
 
     public void updateIssue(Issue issue) {

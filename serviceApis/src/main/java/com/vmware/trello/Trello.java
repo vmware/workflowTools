@@ -59,11 +59,11 @@ public class Trello extends AbstractRestService {
     }
 
     public Member getTrelloMember(String memberId) {
-        return connection.get(apiUrl + "members/" + memberId, Member.class);
+        return get(apiUrl + "members/" + memberId, Member.class);
     }
 
     public Board createBoard(Board boardToCreate) {
-        return connection.post(apiUrl + "boards", Board.class, boardToCreate);
+        return post(apiUrl + "boards", Board.class, boardToCreate);
     }
 
     public void closeBoard(Board board) {
@@ -72,7 +72,7 @@ public class Trello extends AbstractRestService {
     }
 
     public Swimlane createSwimlane(Swimlane swimlaneToCreate) {
-        return connection.post(apiUrl + "lists", Swimlane.class, swimlaneToCreate);
+        return post(apiUrl + "lists", Swimlane.class, swimlaneToCreate);
     }
 
     public void closeSwimlane(Swimlane swimlane) {
@@ -86,7 +86,7 @@ public class Trello extends AbstractRestService {
     }
 
     public Card createCard(Card cardToCreate) {
-        return connection.post(apiUrl + "cards", Card.class, cardToCreate);
+        return post(apiUrl + "cards", Card.class, cardToCreate);
     }
 
     public void deleteCard(Card cardToDelete) {
@@ -95,23 +95,23 @@ public class Trello extends AbstractRestService {
     }
 
     public Board[] getOpenBoardsForUser() {
-        return connection.get(apiUrl + "members/me/boards", Board[].class,
+        return get(apiUrl + "members/me/boards", Board[].class,
                     new UrlParam("filter", "open"));
     }
 
     public Swimlane[] getSwimlanesForBoard(Board board) {
         String url = String.format("%sboards/%s/lists", apiUrl, board.id);
-        return connection.get(url, Swimlane[].class);
+        return get(url, Swimlane[].class);
     }
 
     public Card[] getCardsForSwimlane(Swimlane swimlane) {
         String url = String.format("%slists/%s/cards", apiUrl, swimlane.id);
-        return connection.get(url, Card[].class);
+        return get(url, Card[].class);
     }
 
     public Card[] getCardsForBoard(Board board) {
         String url = String.format("%sboards/%s/cards", apiUrl, board.id);
-        return connection.get(url, Card[].class);
+        return get(url, Card[].class);
     }
 
     public void createDefaultSwimlanesIfNeeded(Board board, List<Double> storyPointValues) {
@@ -211,7 +211,7 @@ public class Trello extends AbstractRestService {
         authorizeParams.add(new UrlParam("scope", "read,write"));
         authorizeParams.add(new UrlParam("expiration", "30days"));
         authorizeParams.add(new UrlParam("name", "Workflow Tools"));
-        String authorizeResponseText = connection.get(authorizeUrl, String.class, authorizeParams);
+        String authorizeResponseText = connection.get(authorizeUrl, String.class, authorizeParams.toArray(new RequestParam[0]));
 
         String requestKey = findMatchForPattern(authorizeResponseText, "name=\"requestKey\" value=\"(\\w+)\"");
         String signature = findMatchForPattern(authorizeResponseText, "name=\"signature\" value=\"([\\w/]+)\"");

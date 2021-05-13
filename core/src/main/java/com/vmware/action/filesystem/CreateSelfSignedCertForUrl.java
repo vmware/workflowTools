@@ -21,14 +21,12 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.LogLevel;
 
-import static com.vmware.util.StringUtils.convertToPem;
+import static com.vmware.util.StringUtils.LINE_SEPARATOR;
 import static com.vmware.util.StringUtils.convertToPem;
 
 @ActionDescription(value = "Created a self signed cert. The host of the specified url is used as the CN value.",
         configFlagsToExcludeFromCompleter = "--keystore-type")
 public class CreateSelfSignedCertForUrl extends BaseAction {
-
-    public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public CreateSelfSignedCertForUrl(WorkflowConfig config) {
         super(config);

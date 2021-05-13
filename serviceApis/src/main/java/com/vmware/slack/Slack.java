@@ -25,7 +25,7 @@ public class Slack extends AbstractRestService {
         message.channel = channel;
         message.text = text;
 
-        SlackResponse response = optimisticPost(apiUrl + "/chat.postMessage", SlackResponse.class, message);
+        SlackResponse response = post(apiUrl + "/chat.postMessage", SlackResponse.class, message);
         checkResponse(response);
     }
 

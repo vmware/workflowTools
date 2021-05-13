@@ -64,7 +64,7 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewRequests getReviewRequests(ReviewRequestStatus status) {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
-        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class,
+        return get(reviewRequestLink.getHref(), ReviewRequests.class,
                 new UrlParam("from-user", getUsername()), new UrlParam("status", status.name()));
     }
 
@@ -81,7 +81,7 @@ public class ReviewBoard extends AbstractRestService {
 
     public ReviewRequests getOpenReviewRequestsWithShipIts() {
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
-        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", getUsername()),
+        return get(reviewRequestLink.getHref(), ReviewRequests.class, new UrlParam("from-user", getUsername()),
                 new UrlParam("status", pending.name()), new UrlParam("ship-it", "1"));
     }
 
@@ -92,18 +92,18 @@ public class ReviewBoard extends AbstractRestService {
         if (!searchByUsernameOnly) {
             params.add(new UrlParam("fullname", "1"));
         }
-        return connection.get(usersLink.getHref(), ReviewUsersResponse.class, params).users;
+        return get(usersLink.getHref(), ReviewUsersResponse.class, params.toArray(new RequestParam[0])).users;
     }
 
     public int getFilesCountForReviewRequestDiff(Link filesLink) {
-        return connection.get(filesLink.getHref(), ResultsCount.class, new UrlParam("counts-only", "1")).count;
+        return get(filesLink.getHref(), ResultsCount.class, new UrlParam("counts-only", "1")).count;
     }
 
     public ReviewRequests getReviewRequestsWithShipItsForGroups(String groupNames, Date fromDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
         String formattedDate = formatter.format(fromDate);
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
-        return connection.get(reviewRequestLink.getHref(), ReviewRequests.class,
+        return get(reviewRequestLink.getHref(), ReviewRequests.class,
                 new UrlParam("to-groups", groupNames), new UrlParam("max-results", "200"),
                 new UrlParam("time-added-from", formattedDate),
                 new UrlParam("ship-it", "1"), new UrlParam("status", all.name()));
@@ -115,7 +115,7 @@ public class ReviewBoard extends AbstractRestService {
         }
         Link reviewRequestLink = getRootLinkList().getReviewRequestsLink();
         reviewRequestLink.addPathParam(String.valueOf(id));
-        return connection.get(reviewRequestLink.getHref(), ReviewRequestResponse.class).review_request;
+        return get(reviewRequestLink.getHref(), ReviewRequestResponse.class).review_request;
     }
 
     public ReviewRequest createReviewRequest(String repository) {
@@ -134,7 +134,7 @@ public class ReviewBoard extends AbstractRestService {
     }
 
     public ReviewRequestDraft getReviewRequestDraft(Link draftLink) {
-        return connection.get(draftLink.getHref(), ReviewRequestDraftResponse.class).draft;
+        return get(draftLink.getHref(), ReviewRequestDraftResponse.class).draft;
     }
 
     public ReviewRequestDraft getReviewRequestDraftWithExceptionHandling(Link draftLink) {
@@ -164,27 +164,27 @@ public class ReviewBoard extends AbstractRestService {
     }
 
     public void createReviewRequestDiff(Link diffLink, DiffToUpload diffToCreate) {
-        connection.post(diffLink.getHref(), diffToCreate);
+        post(diffLink.getHref(), diffToCreate);
     }
 
     public void createUserReview(ReviewRequest reviewRequest, UserReview review) {
-        connection.post(reviewRequest.getReviewsLink().getHref(), review);
+        post(reviewRequest.getReviewsLink().getHref(), review);
     }
 
     public UserReview[] getReviewsForReviewRequest(Link reviewsLink) {
-        return connection.get(reviewsLink.getHref(), UserReviewsResponse.class).reviews;
+        return get(reviewsLink.getHref(), UserReviewsResponse.class).reviews;
     }
 
     public ReviewRequestDiff[] getDiffsForReviewRequest(Link diffsLink) {
-        return connection.get(diffsLink.getHref(), ReviewRequestDiffsResponse.class).diffs;
+        return get(diffsLink.getHref(), ReviewRequestDiffsResponse.class).diffs;
     }
 
     public Repository getRepository(Link repositoryLink) {
-        return connection.get(repositoryLink.getHref(), RepositoryResponse.class).repository;
+        return get(repositoryLink.getHref(), RepositoryResponse.class).repository;
     }
 
     public String getDiffData(Link diffLink) {
-        String diffData = connection.get(diffLink.getHref(), String.class, anAcceptHeader("text/x-patch"));
+        String diffData = get(diffLink.getHref(), String.class, anAcceptHeader("text/x-patch"));
         // need to add in a trailing newline for git apply to work correctly
         diffData += "\n";
         return diffData;

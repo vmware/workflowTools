@@ -2,12 +2,8 @@ package com.vmware.action.filesystem;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.InvalidKeyException;
@@ -18,7 +14,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
@@ -30,12 +25,8 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import javax.crypto.Cipher;
@@ -45,12 +36,11 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import com.vmware.action.BaseAction;
+import com.vmware.action.base.BaseSslAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
 
 import static com.vmware.util.StringUtils.BEGIN_PRIVATE_KEY;
 import static com.vmware.util.StringUtils.END_PRIVATE_KEY;
@@ -59,10 +49,10 @@ import static sun.security.provider.X509Factory.END_CERT;
 
 @ActionDescription(value = "Saves the loaded cert. If keystore password is set, cert is saved to a keystore, otherwise as pem files.",
         configFlagsToAlwaysExcludeFromCompleter = {"--cipher-salt-length", "--new-keystore-type"})
-public class SaveCert extends BaseAction {
+public class SaveCert extends BaseSslAction {
     public SaveCert(WorkflowConfig config) {
         super(config);
-        super.addSkipActionIfBlankProperties("fileData", "destinationFile", "keystoreAlias", "keystorePassword");
+        super.addSkipActionIfBlankProperties("fileData", "destinationFile", "keystoreAliasPassword");
     }
 
     @Override
@@ -112,6 +102,7 @@ public class SaveCert extends BaseAction {
             throws ClassNotFoundException, KeyStoreException, IllegalAccessException, InstantiationException, CertificateException, NoSuchAlgorithmException,
             InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException, IOException {
         failIfEmpty("keystoreAliasPassword", "keystoreAliasPassword not set");
+        failIfEmpty("keystoreAlias", "keystoreAlias not set");
         File keystoreFile = new File(fileSystemConfig.destinationFile);
         KeyStore privateKS;
         if (keystoreFile.exists()) {
@@ -134,43 +125,7 @@ public class SaveCert extends BaseAction {
     }
 
 
-    private KeyStore loadKeyStore(File keystoreFile) {
-        List<String> keystoreTypes = new ArrayList<>(Arrays.asList("JCEKS", "PKCS12", "JKS"));
-        if (sslConfig.additionalKeystoreTypes != null) {
-            keystoreTypes.addAll(sslConfig.additionalKeystoreTypes.keySet());
-        }
-        return keystoreTypes.stream().map(keystoreType -> {
-            try {
-                KeyStore privateKS = createKeyStore(keystoreType);
-                privateKS.load(new FileInputStream(keystoreFile), sslConfig.keystorePassword.toCharArray());
-                log.info("Loaded keystore {} of type {}", keystoreFile.getAbsolutePath(), keystoreType);
-                return privateKS;
-            } catch (Throwable t) {
-                log.debug("Failed with keystore type {}\n{}", keystoreType, StringUtils.exceptionAsString(t));
-                return null;
-            }
-        }).filter(Objects::nonNull).findFirst().orElseThrow(() -> new FatalException("Unable to load keystore file {}",
-                keystoreFile.getPath(), sslConfig.keystorePassword));
-    }
 
-    private KeyStore createKeyStore(String keystoreType)
-            throws MalformedURLException, ClassNotFoundException, KeyStoreException, IllegalAccessException, InstantiationException {
-        if (sslConfig.additionalKeystoreTypes == null || !sslConfig.additionalKeystoreTypes.containsKey(keystoreType)) {
-            return KeyStore.getInstance(keystoreType);
-        }
-        List<String> providerInfo = sslConfig.additionalKeystoreTypes.get(keystoreType);
-
-        failIfTrue(providerInfo == null || providerInfo.size() != 2, "Invalid value " + providerInfo + " for keystore " + keystoreType);
-        String filePath = replacementVariables.replaceVariablesInValue(providerInfo.get(1));
-        File providerJarFile = new File(filePath);
-        failIfTrue(!providerJarFile.exists(), "file " + providerJarFile.getAbsolutePath() + " path not set");
-
-        log.debug("Using jar file {} for provider {}", providerJarFile.getAbsolutePath(), providerInfo.get(0));
-        URL jarUrl = new URL("jar:file:" + providerJarFile.getAbsolutePath() + "!/");
-        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] {jarUrl}, getClass().getClassLoader());
-        Provider provider = (Provider) classLoader.loadClass(providerInfo.get(0)).newInstance();
-        return KeyStore.getInstance(keystoreType, provider);
-    }
 
     private X509Certificate createCertificate() throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
         String certOutput = StringUtils.findStringWithStartAndEnd(fileSystemConfig.fileData, BEGIN_CERT, END_CERT);

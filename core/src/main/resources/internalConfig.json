@@ -974,10 +974,11 @@
       "DisplayCommitsForIssues"
     ],
     "testEncryption": [
-      "EncryptProperty&&--cipher-key=bG9uZ2VyUGFzc3dvcmQxMg==&&--property-value=sampleData&&--output-variable-name=encryptedData",
+      "EncryptProperty&&--cipher-key=bG9uZ2VyUGFzc3dvcmQxMg==&&--property-value=$encryptionValue&&--output-variable-name=encryptedData",
       "DecryptProperty&&--cipher-key=bG9uZ2VyUGFzc3dvcmQxMg==&&--property-value=$encryptedData&&--output-variable-name=decryptedData",
-      "ExitIfValueDoesNotMatch&&--input-text=$decryptedData&&--property-value=sampleData",
-      "DisplayInfo&&--input-text=Values matched for sampleData!"
+      "ExitIfValueDoesNotMatch&&--input-text=$decryptedData&&--property-value=$encryptionValue",
+      "DisplayInfo&&--input-text=Successfully encrypted and descrypted value $encryptionValue",
+      "--VencryptionValue=sampleTestData"
     ]
   },
   "supportingWorkflows": [

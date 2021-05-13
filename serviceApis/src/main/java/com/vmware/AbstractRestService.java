@@ -10,10 +10,7 @@ import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.RuntimeIOException;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,21 +32,21 @@ public abstract class AbstractRestService extends AbstractService {
         return connection.isUriTrusted(URI.create(baseUrl));
     }
 
-    protected void optimisticPost(String url, Object requestBody, RequestParam... params) {
-        optimisticPost(url, null, requestBody, params);
+    protected void post(String url, Object requestBody, RequestParam... params) {
+        post(url, null, requestBody, params);
     }
 
     /**
      * WIll try first to post the request.
      * If that fails, will then try to authenticate and re post the request.
      */
-    protected <T> T optimisticPost(String url, Class<T> responseConversionClass, Object requestBody, RequestParam... params) {
-        return optimisticPost(url, responseConversionClass, requestBody, Collections.emptyList(), params);
+    protected <T> T post(String url, Class<T> responseConversionClass, Object requestBody, RequestParam... params) {
+        return post(url, responseConversionClass, requestBody, Collections.emptyList(), params);
     }
 
 
-    protected <T> T optimisticPost(String url, Class<T> responseConversionClass, Object requestBody,
-                                   List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
+    protected <T> T post(String url, Class<T> responseConversionClass, Object requestBody,
+                         List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
         try {
             return connection.post(url, responseConversionClass, requestBody, params);
         } catch (NotAuthorizedException e) {
@@ -73,7 +70,7 @@ public abstract class AbstractRestService extends AbstractService {
      * WIll try first to get the request.
      * If that fails, will then try to authenticate and re get the request.
      */
-    protected <T> T optimisticGet(String url, Class<T> responseConversionClass, RequestParam... params) {
+    protected <T> T get(String url, Class<T> responseConversionClass, RequestParam... params) {
         try {
             return connection.get(url, responseConversionClass, params);
         } catch (NotAuthorizedException e) {
@@ -91,12 +88,12 @@ public abstract class AbstractRestService extends AbstractService {
         }
     }
 
-    protected <T> T optimisticPut(String url, Class<T> responseConversionClass, Object requestBody, RequestParam... params) {
-        return optimisticPut(url, responseConversionClass, requestBody, Collections.emptyList(), params);
+    protected <T> T put(String url, Class<T> responseConversionClass, Object requestBody, RequestParam... params) {
+        return put(url, responseConversionClass, requestBody, Collections.emptyList(), params);
     }
 
-    protected <T> T optimisticPut(String url, Class<T> responseConversionClass, Object requestBody, List<Class<? extends ApiException>> allowedExceptions,
-                                  RequestParam... params) {
+    protected <T> T put(String url, Class<T> responseConversionClass, Object requestBody, List<Class<? extends ApiException>> allowedExceptions,
+                        RequestParam... params) {
         try {
             return connection.put(url, responseConversionClass, requestBody, params);
         } catch (NotAuthorizedException e) {
@@ -115,5 +112,4 @@ public abstract class AbstractRestService extends AbstractService {
             return connection.put(url, requestBody, params);
         }
     }
-
 }

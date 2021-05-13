@@ -199,6 +199,7 @@
     "--use-owned-vapps-only"
   ],
   "LoadVapps": [
+    "--query-filter",
     "--username",
     "--vapp-json-file",
     "--use-owned-vapps-only"
@@ -243,6 +244,9 @@
     "--tracking-branch",
     "--parent"
   ],
+  "ExitIfTrivialCommit": [
+    "--trivial-reviewer-label"
+  ],
   "ParseText": [
     "--output-variable-name",
     "--regex",
@@ -271,6 +275,9 @@
     "--username",
     "--wait-time",
     "--wait-for-action"
+  ],
+  "SetReviewedByAsTrivial": [
+    "--trivial-reviewer-label"
   ],
   "MarkBugAsResolved": [
     "--username"
@@ -381,9 +388,13 @@
   ],
   "GenerateGitCommitStats": [
     "--author-emails",
+    "--trivial-reviewer-label",
     "--last-number-of-days",
     "--line-count-ranges",
     "--file-count-ranges"
+  ],
+  "BaseSslAction": [
+    "--keystore-password"
   ],
   "OpenVcdTenantApp": [
     "--vcd-tenant"
@@ -399,6 +410,12 @@
     "--database-username",
     "--source-file",
     "--database-schema-name"
+  ],
+  "LoadCertFromKeystore": [
+    "--file-data",
+    "--keystore-alias-password",
+    "--keystore-alias",
+    "--source-file"
   ],
   "LoadIssues": [
     "--use-epics",
@@ -450,6 +467,9 @@
     "--tracking-branch",
     "--sync-to-branch-latest"
   ],
+  "BaseCommitWithReviewAction": [
+    "--trivial-reviewer-label"
+  ],
   "LoadPerforcePatchFile": [
     "--diff-file"
   ],
@@ -459,6 +479,7 @@
     "--use-patch-command"
   ],
   "BaseSetReviewersList": [
+    "--trivial-reviewer-label",
     "--always-include-review-url"
   ],
   "ExecuteSqlStatement": [
@@ -467,6 +488,10 @@
     "--sql-statement",
     "--database-url-pattern",
     "--database-url"
+  ],
+  "DeleteVMs": [
+    "--query-filter",
+    "--username"
   ],
   "SyncCardsWithJiraIssues": [
     "--keep-missing-cards"
@@ -534,7 +559,8 @@
   ],
   "BaseSetUsersList": [
     "--search-by-usernames-only",
-    "--username"
+    "--username",
+    "--trivial-reviewer-label"
   ],
   "PushToTrackingBranch": [
     "--tracking-branch"

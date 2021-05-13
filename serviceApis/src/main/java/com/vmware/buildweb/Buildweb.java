@@ -38,7 +38,7 @@ public class Buildweb extends AbstractRestBuildService {
         String[] idParts = id.split("-");
         String buildType = idParts.length == 2 ? idParts[0] : "sb";
         String idForBuild = idParts.length == 2 ? idParts[1] : id;
-        return connection.get(addRelativePaths(baseUrl, buildType, "build", idForBuild), BuildwebBuild.class);
+        return get(addRelativePaths(baseUrl, buildType, "build", idForBuild), BuildwebBuild.class);
     }
 
     public void logOutputForBuilds(ReviewRequestDraft draft, int linesToShow, BuildStatus... results) {
@@ -64,7 +64,7 @@ public class Buildweb extends AbstractRestBuildService {
         if (build.buildStatus == BuildStatus.STARTING) {
             return null;
         }
-        BuildMachines machines = connection.get(addRelativePaths(baseUrl, build.buildMachinesUrl), BuildMachines.class);
+        BuildMachines machines = get(addRelativePaths(baseUrl, build.buildMachinesUrl), BuildMachines.class);
         BuildMachine buildMachine = machines.realBuildMachine();
         String logsUrl;
         if (build.buildStatus == BuildStatus.BUILDING) {
@@ -93,7 +93,7 @@ public class Buildweb extends AbstractRestBuildService {
     protected BuildStatus getResultForBuild(String url) {
         BuildwebId buildwebId = new BuildwebId(MatcherUtils.singleMatchExpected(url, "/(\\w\\w/\\d++)"));
         String buildApiUrl = baseUrl + buildwebId.buildApiPath();
-        BuildwebBuild build = optimisticGet(buildApiUrl, BuildwebBuild.class);
+        BuildwebBuild build = get(buildApiUrl, BuildwebBuild.class);
         return build.buildStatus;
     }
 

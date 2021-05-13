@@ -43,7 +43,6 @@ import static com.vmware.http.request.UrlParam.forceParam;
  * Represents the Vmware Vcloud Director Api
  */
 public class Vcd extends AbstractRestService {
-
     public static String AUTHORIZATION_HEADER = "x-vcloud-authorization";
     private String apiVersion;
     private String vcdOrg;
@@ -73,11 +72,11 @@ public class Vcd extends AbstractRestService {
     }
 
     public Map getResourceAsMap(String resourcePath, String acceptType) {
-        return optimisticGet(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, anAcceptHeader(acceptType + "+json;version=" + apiVersion));
+        return get(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, anAcceptHeader(acceptType + "+json;version=" + apiVersion));
     }
 
     public Map updateResourceFromMap(String resourcePath, Map resourceValue, String contentType, String acceptType) {
-        return optimisticPut(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, resourceValue,
+        return put(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, resourceValue,
                 aContentTypeHeader(contentType + "+json;version=" + apiVersion), anAcceptHeader(acceptType + "+json;version=" + apiVersion));
     }
 
@@ -90,19 +89,19 @@ public class Vcd extends AbstractRestService {
     }
 
     public <T extends ResourceType> T getResource(LinkType link, Class<T> resourceTypeClass) {
-        return optimisticGet(link.href, resourceTypeClass, acceptHeader(resourceTypeClass));
+        return get(link.href, resourceTypeClass, acceptHeader(resourceTypeClass));
     }
 
     public QueryResultVappType queryVappById(String id) {
-        QueryResultVappsType vapps = query("vApp", QueryResultVappsType.class, true, "id==" + id);
+        QueryResultVappsType vapps = queryVapps("id==" + id);
         if (vapps.record == null || vapps.record.isEmpty()) {
             throw new FatalException("Failed to find vapp for id " + id);
         }
         return vapps.record.get(0);
     }
 
-    public QueryResultVappsType queryVapps() {
-        QueryResultVappsType vapps = query("vApp", QueryResultVappsType.class, true);
+    public QueryResultVappsType queryVapps(String... filters) {
+        QueryResultVappsType vapps = query("vApp", QueryResultVappsType.class, true, filters);
         if (vapps.record != null) {
             String username = getUsername();
             vapps.record.forEach(vapp -> vapp.setOwnedByWorkflowUser(username.equalsIgnoreCase(vapp.ownerName)));
@@ -114,7 +113,11 @@ public class Vcd extends AbstractRestService {
     }
 
     public QueryResultVMsType queryVmsForVapp(String vappId) {
-        return query("vm", QueryResultVMsType.class, false, "container==" + vappId);
+        return queryVms("container==" + vappId);
+    }
+
+    public QueryResultVMsType queryVms(String... filters) {
+        return query("vm", QueryResultVMsType.class, true, filters);
     }
 
     public MetaDatasType getVappMetaData(LinkType metadataLink) {
@@ -126,7 +129,7 @@ public class Vcd extends AbstractRestService {
         if (filterValues.length > 0) {
             queryUrl += "&filter=" + Arrays.stream(filterValues).filter(Objects::nonNull).collect(Collectors.joining(";"));
         }
-        return optimisticGet(queryUrl, responseTypeClass, acceptHeader(responseTypeClass));
+        return get(queryUrl, responseTypeClass, acceptHeader(responseTypeClass));
     }
 
     public void waitForTaskToComplete(String taskHref, int amount, TimeUnit timeUnit) {
@@ -134,7 +137,7 @@ public class Vcd extends AbstractRestService {
 
         long waitTimeInMilliseconds = timeUnit.toMillis(amount);
         while (elapsedTimeInMilliseconds < waitTimeInMilliseconds) {
-            TaskType task = optimisticGet(taskHref, TaskType.class, taskAcceptHeader());
+            TaskType task = get(taskHref, TaskType.class, taskAcceptHeader());
             log.info("Task: {}, status: {}", task.operation, task.status);
             if ("SUCCESS".equalsIgnoreCase(task.status)) {
                 return;

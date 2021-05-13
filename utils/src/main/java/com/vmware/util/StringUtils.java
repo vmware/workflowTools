@@ -3,6 +3,7 @@ package com.vmware.util;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -351,7 +352,7 @@ public class StringUtils {
         return convertToPem(certificate.getEncoded(), BEGIN_CERT, END_CERT);
     }
 
-    public static String convertToPem(final PrivateKey key) {
+    public static String convertToPem(final Key key) {
         return convertToPem(key.getEncoded(), BEGIN_PRIVATE_KEY, END_PRIVATE_KEY);
     }
 

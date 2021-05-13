@@ -39,7 +39,7 @@ public class LoadVapps extends BaseVappAction {
 
     @Override
     public void process() {
-        QueryResultVappsType vappRecords = serviceLocator.getVcd().queryVapps();
+        QueryResultVappsType vappRecords = serviceLocator.getVcd().queryVapps(vcdConfig.queryFilters());
         vappRecords.record.forEach(this::populatedPoweredOnVmCount);
         List<QueryResultVappType> vapps = new ArrayList<>();
         vapps.addAll(parseVappJsonFiles());
