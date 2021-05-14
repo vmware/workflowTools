@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
   <version>1.0</version>
   <modules>
+    <module>appLoader</module>
     <module>core</module>
     <module>serviceApis</module>
     <module>config</module>
     <module>utils</module>
-    <module>appLoader</module>
   </modules>
 
   <build>

@@ -3,27 +3,35 @@ package com.vmware;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 
 public class WorkflowAppLoader {
-    private static final String RELEASE_DATE = "May_13_2021";
-    private static final String RELEASE_URL = "https://github.com/vmware/workflowTools/releases/download/" + RELEASE_DATE + "/workflow.jar";
-    private static final String RELEASE_NAME = "workflow-" + RELEASE_DATE + ".jar";
 
-    private final String tempDirectory;
+    private final String releaseDirectory;
     private final List<String> argValues;
-    private final boolean debugLog;
-    private final File expectedReleaseJar;
+    private final boolean debugLog, reset;
+    private final File releaseJar;
+    private final Map<String, String> manifestAttributes;
+    private final File testReleaseJar;
 
     public static void main(String[] args) {
         WorkflowAppLoader loader = new WorkflowAppLoader(args);
@@ -32,46 +40,43 @@ public class WorkflowAppLoader {
     }
 
     public WorkflowAppLoader(String[] args) {
-        this.tempDirectory = getTempDirectory();
-        this.argValues = Arrays.asList(args);
+        this.argValues = new ArrayList<>(Arrays.asList(args));
         this.debugLog = Stream.of("-d", "--debug", "-t", "--trace").anyMatch(argValues::contains);
-        this.expectedReleaseJar = new File(tempDirectory + File.separator + RELEASE_NAME);
+        this.reset = argValues.remove("--reset");
+        this.manifestAttributes = getManifestAttributes();
+        this.releaseDirectory = manifestAttributes.containsKey("releaseDirectory")
+                ? manifestAttributes.get("releaseDirectory") : System.getProperty("java.io.tmpdir");
+        this.releaseJar = new File(this.releaseDirectory + File.separator + manifestAttributes.get("releaseJarName"));
+        Optional<String> testReleaseJarPath = getArgValue("--test-release-jar");
+        this.testReleaseJar = testReleaseJarPath.map(File::new).orElse(null);
     }
 
     public void executeWorkflowJar() {
-        if (debugLog) {
-            System.out.println("Launching workflow jar with args " + argValues);
-        }
+        debug("Launching workflow jar with args " + argValues);
         try {
-            URLClassLoader urlClassLoader = new URLClassLoader(
-                    new URL[] {expectedReleaseJar.toURI().toURL()},
-                    this.getClass().getClassLoader()
-            );
-            Class classToLoad = Class.forName("com.vmware.WorkflowRunner", true, urlClassLoader);
-            Method method = classToLoad.getDeclaredMethod("runWorkflow", ClassLoader.class, List.class);
-            Object instance = classToLoad.newInstance();
-            method.invoke(instance, urlClassLoader, argValues);
+
+            URLClassLoader urlClassLoader = URLClassLoader.newInstance(new URL[] { releaseJar.toURI().toURL()}, getClass().getClassLoader());
+            Class<? extends AppLauncher> classToLoad = (Class<? extends AppLauncher>) urlClassLoader.loadClass(manifestAttributes.get("appMainClass"));
+            AppLauncher launcher = classToLoad.newInstance();
+            launcher.run(urlClassLoader, argValues);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public void downloadJarFileIfNeeded() {
-        if (debugLog) {
-            System.out.println("Expected release jar is " + expectedReleaseJar.getPath());
-        }
-        if (expectedReleaseJar.exists()) {
-            if (debugLog) {
-                System.out.println("Jar file " + expectedReleaseJar.getPath() + " already exists");
-            }
+        debug("Expected release jar is " + releaseJar.getPath());
+        if (releaseJar.exists() && !reset) {
+            debug("Jar file " + releaseJar.getPath() + " already exists");
             return;
         }
+        deleteOldReleasesIfNeeded();
         URL releaseURL = createReleaseUrl();
-        System.out.println("Downloading workflow release jar " + releaseURL.toString() + " to temp directory " + tempDirectory);
+        info("Downloading workflow release jar " + releaseURL.toString() + " to " + releaseJar.getPath());
 
         try {
             ReadableByteChannel readableByteChannel = Channels.newChannel(releaseURL.openStream());
-            FileOutputStream fileOutputStream = new FileOutputStream(expectedReleaseJar);
+            FileOutputStream fileOutputStream = new FileOutputStream(releaseJar);
             fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -79,24 +84,79 @@ public class WorkflowAppLoader {
 
     }
 
+    private void deleteOldReleasesIfNeeded() {
+        String deleteOldReleasesPattern = manifestAttributes.get("deleteOldReleaseJarPattern");
+        if (deleteOldReleasesPattern == null) {
+            debug("Delete old releases pattern not set, skipping deletion of old releases");
+        }
+        Pattern deleteJarPattern = Pattern.compile(deleteOldReleasesPattern);
+        File[] matchingReleases = new File(releaseDirectory).listFiles(file -> deleteJarPattern.matcher(file.getName()).matches());
+        Arrays.stream(matchingReleases).forEach(release -> {
+            info("Deleting old release " + release.getPath());
+            release.delete();
+        });
+    }
+
     private URL createReleaseUrl() {
+        if (testReleaseJar != null) {
+            info("Using test release file " + testReleaseJar.getPath());
+            try {
+                return testReleaseJar.toURI().toURL();
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         URL releaseURL;
         try {
-            releaseURL = URI.create(RELEASE_URL).toURL();
+            releaseURL = URI.create(manifestAttributes.get("releaseUrl")).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
         return releaseURL;
     }
 
-    private String getTempDirectory() {
+    private void debug(String message) {
+        if (debugLog) {
+            System.out.println(message);
+        }
+    }
+
+    private void info(String message) {
+        System.out.println(message);
+    }
+
+    private Map<String, String> getManifestAttributes() {
+        Optional<String> jarFilePath = getArgValue("--loader-jar-file");
+
+        InputStream manifestInputStream;
+        if (jarFilePath.isPresent()) {
+            info("Loading manifest from jar file " + jarFilePath.get());
+            try {
+                JarFile jarFile = new JarFile(jarFilePath.get());
+                ZipEntry manifestEntry = jarFile.getEntry(JarFile.MANIFEST_NAME);
+                manifestInputStream = jarFile.getInputStream(manifestEntry);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            manifestInputStream = getClass().getClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME);
+        }
+
         try {
-            File tempFile = File.createTempFile("sample", "txt");
-            String directory = tempFile.getParent();
-            tempFile.delete();
-            return directory;
+            Manifest manifest = new Manifest(manifestInputStream);
+            Attributes mainAttributes = manifest.getMainAttributes();
+            Set<Object> attributeKeys = mainAttributes.keySet();
+            Map<String, String> attributeValues = attributeKeys.stream().collect(Collectors.toMap(String::valueOf, key -> mainAttributes.getValue((Attributes.Name) key)));
+            debug("Manifest Attribute values " + attributeValues);
+            return attributeValues;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Optional<String> getArgValue(String argName) {
+        Optional<String> argValue = argValues.stream().filter(arg -> arg.startsWith(argName + "=")).map(arg -> arg.split("=")[1]).findFirst();
+        argValues.removeIf(arg -> arg.startsWith(argName + "="));
+        return argValue;
     }
 }

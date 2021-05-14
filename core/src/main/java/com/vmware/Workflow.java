@@ -83,8 +83,8 @@ public class Workflow {
     private String username = null;
     private final List<String> args;
 
-    public Workflow(ClassLoader classLoader, List<String> args) {
-        WorkflowConfig.realClassLoader = classLoader;
+    public Workflow(ClassLoader appClassLoader, List<String> args) {
+        WorkflowConfig.appClassLoader = appClassLoader;
         this.args = args;
     }
 
@@ -198,7 +198,7 @@ public class Workflow {
                 autocompleteList.add(workflow);
             }
         }
-        WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader);
+        WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.appClassLoader);
         // ! means that it won't show up if nothing is entered
         autocompleteList.addAll(workflowActions.getWorkflowActionClasses()
                 .stream().map(workflowAction -> "!" + workflowAction.getSimpleName()).collect(Collectors.toList()));
@@ -232,7 +232,7 @@ public class Workflow {
                 return;
             }
 
-            WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader);
+            WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.appClassLoader);
             List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
@@ -288,7 +288,7 @@ public class Workflow {
 
     private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods) {
         log.info("Checking that each action value in the workflows is valid");
-        WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader);
+        WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.appClassLoader);
         List<WorkflowAction> actions =
                 workflowActions.determineActions(StringUtils.join(config.workflows.keySet()));
         WorkflowActionValues actionValues = new WorkflowActionValues();

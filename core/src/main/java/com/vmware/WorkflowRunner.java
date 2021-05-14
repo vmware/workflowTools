@@ -11,19 +11,20 @@ import com.vmware.util.logging.SimpleLogFormatter;
 /**
  * Class that starts the workflow tools app.
  */
-public class WorkflowRunner {
+public class WorkflowRunner implements AppLauncher {
 
     public static void main(String[] args) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        new WorkflowRunner().runWorkflow(classLoader, Arrays.asList(args));
+        new WorkflowRunner().run(classLoader, Arrays.asList(args));
     }
 
-    public void runWorkflow(ClassLoader classLoader, List<String> args) {
+    @Override
+    public void run(ClassLoader appClassLoader, List<String> args) {
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
         globalLogger.addHandler(createHandler());
 
-        Workflow workflow = new Workflow(classLoader, args);
+        Workflow workflow = new Workflow(appClassLoader, args);
         workflow.runWorkflow();
     }
 

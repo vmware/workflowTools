@@ -11,26 +11,26 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
                     <finalName>appLoader</finalName>
                     <archive>
                         <manifest>
                             <mainClass>com.vmware.WorkflowAppLoader</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <appMainClass>com.vmware.WorkflowRunner</appMainClass>
+                            <deleteOldReleaseJarPattern>workflow-[\w_]+.jar</deleteOldReleaseJarPattern>
+                            <releaseJarName>workflow-May_14_2021.jar</releaseJarName>
+                            <releaseUrl>https://github.com/vmware/workflowTools/releases/download/May_13_2021/workflow.jar</releaseUrl>
+                        </manifestEntries>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                 </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id> <!-- this is used for inheritance merges -->
                         <phase>package</phase> <!-- bind to the packaging phase -->
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
