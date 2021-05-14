@@ -18,9 +18,9 @@ public class WorkflowActions {
     private WorkflowConfig workflowConfig;
     private List<Class<? extends BaseAction>> workflowActionClasses;
 
-    public WorkflowActions(WorkflowConfig workflowConfig) {
+    public WorkflowActions(WorkflowConfig workflowConfig, ClassLoader classLoader) {
         this.workflowConfig = workflowConfig;
-        workflowActionClasses = new WorkflowActionLister().findWorkflowActions();
+        workflowActionClasses = new WorkflowActionLister().findWorkflowActions(classLoader);
     }
 
     public List<Class<? extends BaseAction>> getWorkflowActionClasses() {

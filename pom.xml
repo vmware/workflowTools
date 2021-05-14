@@ -9,6 +9,7 @@
     <module>serviceApis</module>
     <module>config</module>
     <module>utils</module>
+    <module>appLoader</module>
   </modules>
 
   <build>

@@ -247,7 +247,8 @@ public class GenerateActionConfigMappings {
     }
 
     private static void validateAllActionsCanBeInstantiated() {
-        List<Class<? extends BaseAction>> workflowActions = new WorkflowActionLister().findWorkflowActions();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        List<Class<? extends BaseAction>> workflowActions = new WorkflowActionLister().findWorkflowActions(classLoader);
 
         log.info("Validating all workflow actions can be instantiated");
         WorkflowConfig config = new WorkflowConfig();

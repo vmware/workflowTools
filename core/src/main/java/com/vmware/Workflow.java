@@ -81,9 +81,10 @@ public class Workflow {
     private boolean firstTime = true;
     private boolean displayedShellInfoMessage = false;
     private String username = null;
-    private final String[] args;
+    private final List<String> args;
 
-    public Workflow(String[] args) {
+    public Workflow(ClassLoader classLoader, List<String> args) {
+        WorkflowConfig.realClassLoader = classLoader;
         this.args = args;
     }
 
@@ -154,7 +155,7 @@ public class Workflow {
             log.debug("Quitting");
             System.exit(0);
         }
-        String[] workflowTextPieces = splitWorkflowTextIntoArguments(workFlowText);
+        List<String> workflowTextPieces = splitWorkflowTextIntoArguments(workFlowText);
         configParser.updateWithRuntimeArguments(config, workflowTextPieces);
     }
 
@@ -165,7 +166,7 @@ public class Workflow {
         }
     }
 
-    private String[] splitWorkflowTextIntoArguments(String workFlowText) {
+    private List<String> splitWorkflowTextIntoArguments(String workFlowText) {
         String[] quotedTextPieces = workFlowText.split("[\"]");
         List<String> workflowTextPieces = new ArrayList<>();
         for (int i = 0; i < quotedTextPieces.length; i ++) {
@@ -183,7 +184,7 @@ public class Workflow {
                 workflowTextPieces.add(quotedTextPieces[i]);
             }
         }
-        return workflowTextPieces.toArray(new String[0]);
+        return workflowTextPieces;
     }
 
     private ArgumentCompleter createWorkflowCompleter() {
@@ -197,7 +198,7 @@ public class Workflow {
                 autocompleteList.add(workflow);
             }
         }
-        WorkflowActions workflowActions = new WorkflowActions(config);
+        WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader);
         // ! means that it won't show up if nothing is entered
         autocompleteList.addAll(workflowActions.getWorkflowActionClasses()
                 .stream().map(workflowAction -> "!" + workflowAction.getSimpleName()).collect(Collectors.toList()));
@@ -231,7 +232,7 @@ public class Workflow {
                 return;
             }
 
-            WorkflowActions workflowActions = new WorkflowActions(config);
+            WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader);
             List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
             updateWorkflowHistoryFile();
@@ -287,7 +288,7 @@ public class Workflow {
 
     private void checkAllActionsCanBeInstantiated(boolean runAllHelperMethods) {
         log.info("Checking that each action value in the workflows is valid");
-        WorkflowActions workflowActions = new WorkflowActions(config);
+        WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader);
         List<WorkflowAction> actions =
                 workflowActions.determineActions(StringUtils.join(config.workflows.keySet()));
         WorkflowActionValues actionValues = new WorkflowActionValues();

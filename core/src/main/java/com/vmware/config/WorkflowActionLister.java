@@ -27,9 +27,8 @@ import java.util.zip.ZipInputStream;
  */
 public class WorkflowActionLister {
 
-    public List<Class<? extends BaseAction>> findWorkflowActions() {
+    public List<Class<? extends BaseAction>> findWorkflowActions(ClassLoader classLoader) {
         try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             URL actionDirectoryUrl = classLoader.getResource("com/vmware/action");
             List<Class<? extends BaseAction>> actionsList = new ArrayList<Class<? extends BaseAction>>();
             if (actionDirectoryUrl.getFile().contains(".jar!")) {
@@ -39,12 +38,7 @@ public class WorkflowActionLister {
                 addClassesFromDirectory(directoryFile, actionsList, "com.vmware");
             }
 
-            Collections.sort(actionsList, new Comparator<Class<? extends BaseAction>>() {
-                @Override
-                public int compare(Class<? extends BaseAction> o1, Class<? extends BaseAction> o2) {
-                    return o1.getSimpleName().compareTo(o2.getSimpleName());
-                }
-            });
+            Collections.sort(actionsList, Comparator.comparing(Class::getSimpleName));
             return actionsList;
         } catch (IOException e) {
             throw new RuntimeIOException(e);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -30,7 +31,7 @@ public class WorkflowConfigParser {
     private final Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
     private final CommandLineArgumentsParser argsParser = new CommandLineArgumentsParser();
 
-    public WorkflowConfig parseWorkflowConfig(String username, String[] args) {
+    public WorkflowConfig parseWorkflowConfig(String username, List<String> args) {
         argsParser.generateArgumentMap(args);
 
         WorkflowConfig config = readInternalConfig();
@@ -106,7 +107,7 @@ public class WorkflowConfigParser {
         }
     }
 
-    public void updateWithRuntimeArguments(WorkflowConfig config, String[] args) {
+    public void updateWithRuntimeArguments(WorkflowConfig config, List<String> args) {
         argsParser.generateArgumentMap(args);
         applyRuntimeArguments(config);
         config.setupLogging();

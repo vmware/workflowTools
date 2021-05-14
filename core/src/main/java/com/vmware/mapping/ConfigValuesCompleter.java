@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.vmware.Workflow;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowAction;
@@ -40,7 +41,7 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
     public ConfigValuesCompleter(WorkflowConfig config) {
         this.configMappings = new ConfigMappings();
         this.config = config;
-        this.workflowActions = new WorkflowActions(config).getWorkflowActionClasses();
+        this.workflowActions = new WorkflowActions(config, WorkflowConfig.realClassLoader).getWorkflowActionClasses();
         super.values.addAll(configMappings.allConfigValues());
     }
 

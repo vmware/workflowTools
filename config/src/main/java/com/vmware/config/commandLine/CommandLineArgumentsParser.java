@@ -29,31 +29,32 @@ public class CommandLineArgumentsParser {
 
     private StringBuilder argumentsText;
 
-    public void generateArgumentMap(final String[] args) {
-        log.debug("Command line arguments; {}", Arrays.toString(args));
+    public void generateArgumentMap(final List<String> args) {
+        log.debug("Command line arguments; {}", args);
         argumentsText = new StringBuilder();
 
         argumentMap.clear();
 
-        for (int i = 0; i < args.length; i ++) {
+        for (int i = 0; i < args.size(); i ++) {
+            String arg = args.get(i);
             if (i > 0) {
                 argumentsText.append(" ");
             }
-            if (!args[i].startsWith("-")) {
-                argumentsText.append(args[i]);
+            if (!arg.startsWith("-")) {
+                argumentsText.append(arg);
                 continue;
             }
-            String[] paramPieces = StringUtils.splitOnlyOnce(args[i], "=");
+            String[] paramPieces = StringUtils.splitOnlyOnce(arg, "=");
             String paramName = paramPieces[0];
             argumentsText.append(paramName);
             String paramValue = null;
 
-            if (paramPieces.length == 1 && args[i].endsWith("=")) {
+            if (paramPieces.length == 1 && arg.endsWith("=")) {
                 paramValue = "";
             } else if (paramPieces.length == 2) {
                 paramValue = paramPieces[1];
-            } else if (i < args.length - 1 && !args[i+1].startsWith("-")) {
-                paramValue = args[++i];
+            } else if (i < args.size() - 1 && !args.get(i+1).startsWith("-")) {
+                paramValue = args.get(++i);
             }
             if (paramValue != null) {
                 argumentsText.append("=").append(paramValue.contains(" ") ? "\"" + paramValue + "\"" : paramValue);
@@ -62,8 +63,8 @@ public class CommandLineArgumentsParser {
             argumentMap.put(paramName, paramValue);
         }
         // add first variable as a possible workflow value if it does not start with -
-        if (args.length > 0 && !args[0].startsWith("-")) {
-            argumentMap.put("--possible-workflow", args[0]);
+        if (args.size() > 0 && !args.get(0).startsWith("-")) {
+            argumentMap.put("--possible-workflow", args.get(0));
         }
     }
 

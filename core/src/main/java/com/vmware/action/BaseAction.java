@@ -30,7 +30,6 @@ import com.vmware.config.section.VcdConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.CancelException;
-import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.scm.Git;

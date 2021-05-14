@@ -67,6 +67,8 @@ public class WorkflowConfig {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     private static final SimpleDateFormat timeFormat = new SimpleDateFormat("HHmmss");
 
+    public static ClassLoader realClassLoader;
+
     @SectionConfig
     public LoggingConfig loggingConfig;
 
