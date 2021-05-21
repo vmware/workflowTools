@@ -39,8 +39,6 @@ public class ConfigMappings {
         if (CollectionUtils.isNotEmpty(action.getOverriddenConfigValues())) {
             configValues.removeIf(workflowActionParameters::contains);
         }
-        List<String> configValuesToExclude = action.configFlagsToRemoveFromCompleter();
-        configValues.removeIf(configValuesToExclude::contains);
         configValues.remove("--file-data");
         return configValues;
     }
