@@ -86,8 +86,11 @@ public class JenkinsConfig {
     public String commitComparisonUrl;
 
     public boolean hasConfiguredArtifact() {
-        return StringUtils.isNotEmpty(jobArtifact) && jobBuildNumber != null
-                && (StringUtils.isNotEmpty(jobWithArtifact) ||  (jobsDisplayNames != null && jobsDisplayNames.length == 1));
+        return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;
+    }
+
+    public boolean hasConfiguredArtifactWithoutBuildNumber() {
+        return StringUtils.isNotEmpty(jobArtifact) && (StringUtils.isNotEmpty(jobWithArtifact) ||  (jobsDisplayNames != null && jobsDisplayNames.length == 1));
     }
 
     public void addJenkinsParametersFromConfigValues(Map<String, String> configValues, boolean overwriteJenkinsParameters) {

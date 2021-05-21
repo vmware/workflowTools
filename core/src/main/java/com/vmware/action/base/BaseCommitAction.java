@@ -133,7 +133,7 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     protected String jobWithArtifactName() {
-        if (!jenkinsConfig.hasConfiguredArtifact()) {
+        if (!jenkinsConfig.hasConfiguredArtifactWithoutBuildNumber()) {
             return null;
         }
         return StringUtils.isNotEmpty(jenkinsConfig.jobWithArtifact) ? jenkinsConfig.jobWithArtifact : jenkinsConfig.jobsDisplayNames[0];

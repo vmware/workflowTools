@@ -2,6 +2,7 @@ package com.vmware.action.jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
@@ -11,21 +12,20 @@ import com.vmware.jenkins.domain.JobBuildArtifact;
 import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
+import com.vmware.util.exception.CancelException;
 import com.vmware.util.input.InputUtils;
+import com.vmware.util.logging.LogLevel;
+import com.vmware.vcd.domain.QueryResultVMsType;
+import com.vmware.vcd.domain.QueryResultVappType;
 
 @ActionDescription("Download a specified artifact from a jenkins build.")
 public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
     public DownloadBuildArtifact(WorkflowConfig config) {
         super(config, true);
         super.addFailWorkflowIfBlankProperties("jobArtifact");
-    }
-
-    @Override
-    protected void failWorkflowIfConditionNotMet() {
-        super.failWorkflowIfConditionNotMet();
-        if (!jenkinsConfig.hasConfiguredArtifact() && draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl).isEmpty()) {
-            exitDueToFailureCheck("Jenkins artifact is not configured and there are no builds in the commit testing done section");
-        }
     }
 
     @Override
@@ -55,11 +55,26 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
     }
 
     private JobBuild determineBuildToUse() {
+        if (vappData.getSelectedVapp() != null && StringUtils.isNotBlank(vcdConfig.buildNumberInNamePattern)
+                && jenkinsConfig.hasConfiguredArtifactWithoutBuildNumber()) {
+            QueryResultVappType selectedVapp = vappData.getSelectedVapp();
+            JobBuild matchingJobBuild = getJobBuildForName(selectedVapp.name);
+            if (matchingJobBuild == null) {
+                QueryResultVMsType vms = serviceLocator.getVcd().queryVmsForVapp(selectedVapp.parseIdFromRef());
+                matchingJobBuild = vms.record.stream().map(vm -> getJobBuildForName(vm.name)).filter(Objects::nonNull).findFirst().orElse(null);
+            }
+            if (matchingJobBuild != null) {
+                return matchingJobBuild;
+            }
+        }
+
         List<JobBuild> matchingBuilds = draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl);
         if (draft.selectedBuild != null) {
             return matchingBuilds.get(draft.selectedBuild);
         }
-        if (matchingBuilds.size() == 1) {
+        if (matchingBuilds.isEmpty()) {
+            throw new CancelException(LogLevel.ERROR, "No matching builds found for url " + jenkinsConfig.jenkinsUrl);
+        } else if (matchingBuilds.size() == 1) {
             log.info("Using build {} as it is the only Jenkins build", matchingBuilds.get(0).name);
             draft.selectedBuild = 0;
             return matchingBuilds.get(0);
@@ -69,6 +84,18 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
             int selection = InputUtils.readSelection(choices, "Select jenkins builds to download artifact " + jenkinsConfig.jobArtifact + " for");
             draft.selectedBuild = selection;
             return matchingBuilds.get(selection);
+        }
+    }
+
+    private JobBuild getJobBuildForName(String name) {
+        String buildNumber = MatcherUtils.singleMatch(name, vcdConfig.buildNumberInNamePattern);
+        if (StringUtils.isInteger(buildNumber)) {
+            String jobName = jobWithArtifactName();
+            log.info("Found matching build {} from name {} for job {}", buildNumber, name, jobName);
+            String jobUrl = UrlUtils.addRelativePaths(jenkins.baseUrl, "job", jobName);
+            return new JobBuild(Integer.parseInt(buildNumber), jobUrl);
+        } else {
+            return null;
         }
     }
 }

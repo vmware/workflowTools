@@ -64,6 +64,9 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--query-filter", help = "Optional filter to use when querying Vapps or VMs")
     public String queryFilter;
 
+    @ConfigurableProperty(help = "Pattern for parsing build number for Vapp / Vm name")
+    public String buildNumberInNamePattern;
+
     public String[] queryFilters() {
         if (StringUtils.isEmpty(queryFilter)) {
             return new String[0];

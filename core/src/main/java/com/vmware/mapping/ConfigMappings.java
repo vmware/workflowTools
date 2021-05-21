@@ -33,8 +33,8 @@ public class ConfigMappings {
         return mappings.keySet();
     }
 
-    public Set<String> getUsableConfigValuesForAction(WorkflowAction action) {
-        Set<String> configValues = getConfigValuesForAction(action);
+    public Set<String> getAutoCompleteValuesForAction(WorkflowAction action) {
+        Set<String> configValues = getConfigValuesForAction(action, true);
         Set<String> workflowActionParameters = action.getWorkflowParameterNames();
         if (CollectionUtils.isNotEmpty(action.getOverriddenConfigValues())) {
             configValues.removeIf(workflowActionParameters::contains);
@@ -45,8 +45,8 @@ public class ConfigMappings {
         return configValues;
     }
 
-    public Set<String> getConfigValuesForAction(WorkflowAction action) {
-        Set<String> configValues = action.getConfigValues(mappings);
+    public Set<String> getConfigValuesForAction(WorkflowAction action, boolean autoCompleteValuesOnly) {
+        Set<String> configValues = action.getConfigValues(mappings, autoCompleteValuesOnly);
         // add global values
         configValues.add("--dry-run");
         configValues.add("--debug");

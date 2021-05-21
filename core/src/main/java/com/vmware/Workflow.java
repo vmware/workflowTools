@@ -346,7 +346,7 @@ public class Workflow {
                 sectionPadder.infoTitle();
                 sectionPadder = null;
             }
-            configOptions.addAll(configMappings.getUsableConfigValuesForAction(action));
+            configOptions.addAll(configMappings.getAutoCompleteValuesForAction(action));
             configValuesToRemove.addAll(action.configFlagsToAlwaysRemoveFromCompleter());
             config.addGeneratedVariables();
             List<WorkflowParameter> params = action.getOverriddenConfigValues();

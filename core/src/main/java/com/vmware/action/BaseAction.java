@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.vmware.ServiceLocator;
+import com.vmware.config.ActionDescription;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.WorkflowField;
@@ -37,6 +38,7 @@ import com.vmware.util.scm.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ActionDescription(value = "", configFlagsToExcludeFromCompleter = {"--variable", "--skip-if-variable-set", "--skip-if-variable-not-set"})
 public abstract class BaseAction implements Action {
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
@@ -123,6 +125,16 @@ public abstract class BaseAction implements Action {
     @Override
     public void checkIfActionShouldBeSkipped() {
         skipActionIfBlankProperties.forEach(this::skipActionIfUnset);
+        if (fileSystemConfig.skipIfVariableSet) {
+            failIfUnset("variable");
+            skipActionIfTrue(replacementVariables.hasVariable(fileSystemConfig.variable),
+                    fileSystemConfig.variable + " variable is set");
+        }
+        if (fileSystemConfig.skipIfVariableNotSet) {
+            failIfUnset("variable");
+            skipActionIfTrue(!replacementVariables.hasVariable(fileSystemConfig.variable),
+                    fileSystemConfig.variable + " variable is not set");
+        }
     }
 
     @Override

@@ -16,7 +16,7 @@ import com.vmware.util.exception.SkipActionException;
 
 import static com.vmware.util.ArrayUtils.subSection;
 
-@ActionDescription("Decrypts the specified property to the specified variable name.")
+@ActionDescription(value = "Decrypts the specified property to the specified variable name.")
 public class DecryptProperty extends BaseAction {
 
     public DecryptProperty(WorkflowConfig config) {

@@ -36,6 +36,7 @@ public class WorkflowAppLoader {
     public static void main(String[] args) {
         WorkflowAppLoader loader = new WorkflowAppLoader(args);
         loader.downloadJarFileIfNeeded();
+
         loader.executeWorkflowJar();
     }
 
@@ -47,8 +48,7 @@ public class WorkflowAppLoader {
         this.releaseDirectory = manifestAttributes.containsKey("releaseDirectory")
                 ? manifestAttributes.get("releaseDirectory") : System.getProperty("java.io.tmpdir");
         this.releaseJar = new File(this.releaseDirectory + File.separator + manifestAttributes.get("releaseJarName"));
-        Optional<String> testReleaseJarPath = getArgValue("--test-release-jar");
-        this.testReleaseJar = testReleaseJarPath.map(File::new).orElse(null);
+        this.testReleaseJar = getArgValue("--test-release-jar").map(File::new).orElse(null);
     }
 
     public void executeWorkflowJar() {

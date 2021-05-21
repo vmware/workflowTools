@@ -11,17 +11,11 @@ public class DownloadBuildArtifactIfNeeded extends DownloadBuildArtifact {
     }
 
     @Override
-    protected void failWorkflowIfConditionNotMet() {
-    }
-
-    @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        if (StringUtils.isNotBlank(jenkinsConfig.jobArtifact) && StringUtils.isNotBlank(fileSystemConfig.fileData) && !jenkinsConfig.alwaysDownload) {
+        if (StringUtils.isNotBlank(fileSystemConfig.fileData) && !jenkinsConfig.alwaysDownload) {
             skipActionDueTo("artifact {} has already been loaded, use flag --always-download to override and select a build to use",
                     jenkinsConfig.jobArtifact);
-        } else if (!jenkinsConfig.hasConfiguredArtifact() && draft.jobBuildsMatchingUrl(jenkinsConfig.jenkinsUrl).isEmpty()) {
-            skipActionDueTo("Jenkins artifact is not configured and there are no builds in the commit testing done section");
         }
     }
 

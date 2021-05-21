@@ -64,9 +64,8 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(config, workflowActions);
         valuesParser.parse(null, Arrays.asList(workflowString.split(",")), Collections.emptyList());
         for (WorkflowAction foundAction : valuesParser.getWorkflowActions()) {
-            Set<String> matchingConfigValues = configMappings.getUsableConfigValuesForAction(foundAction);
+            Set<String> matchingConfigValues = configMappings.getAutoCompleteValuesForAction(foundAction);
             valuesToRemove.addAll(foundAction.configFlagsToAlwaysRemoveFromCompleter());
-            matchingConfigValues.removeIf(values::contains);
             if (CollectionUtils.isNotEmpty(matchingConfigValues)) {
                 log.trace("Action {} added {} config flags", foundAction.getActionClassName(), matchingConfigValues);
             }

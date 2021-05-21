@@ -70,6 +70,15 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--output-variable-name", help = "Name of variable used for output")
     public String outputVariableName;
 
+    @ConfigurableProperty(commandLine = "--variable", help = "Name of variable to use")
+    public String variable;
+
+    @ConfigurableProperty(commandLine = "--skip-if-variable-set", help = "Skips action if the specified variable has a value")
+    public boolean skipIfVariableSet;
+
+    @ConfigurableProperty(commandLine = "--skip-if-variable-not-set", help = "Skips action if the specified variable does not have a value")
+    public boolean skipIfVariableNotSet;
+
     public boolean databaseConfigured() {
         return Stream.of(databaseUrl, databaseUsername, databasePassword).allMatch(StringUtils::isNotBlank);
     }

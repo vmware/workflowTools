@@ -33,6 +33,10 @@ public abstract class ResourceType {
         if (StringUtils.isEmpty(href)) {
             return null;
         }
-        return href.substring(href.lastIndexOf("/") + 1);
+        String vappId = href.substring(href.lastIndexOf("/") + 1);
+        if (vappId.startsWith("vapp-")) {
+            vappId = vappId.substring("vapp-".length());
+        }
+        return vappId;
     }
 }

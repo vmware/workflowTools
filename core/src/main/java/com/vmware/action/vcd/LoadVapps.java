@@ -52,9 +52,6 @@ public class LoadVapps extends BaseVappAction {
             queryResultVappType.poweredOnVmCount = queryResultVappType.otherAttributes.numberOfVMs;
         } else if ("MIXED".equalsIgnoreCase(queryResultVappType.status) && queryResultVappType.isOwnedByWorkflowUser()) {
             String vappId = queryResultVappType.parseIdFromRef();
-            if (vappId.startsWith("vapp-")) {
-                vappId = vappId.substring("vapp-".length());
-            }
             QueryResultVMsType vmsForVapp = serviceLocator.getVcd().queryVmsForVapp(vappId);
             queryResultVappType.poweredOnVmCount = (int) vmsForVapp.record.stream().filter(QueryResultVMType::isPoweredOn).count();
         }

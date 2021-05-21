@@ -22,6 +22,7 @@ import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.exception.SkipActionException;
 
 import static com.vmware.util.StringUtils.pluralizeDescription;
+import static java.util.Arrays.asList;
 
 public class WorkflowAction implements Action {
     private String sectionName;
@@ -49,28 +50,21 @@ public class WorkflowAction implements Action {
         List<String> configFlagsToRemoveFromCompleter = new ArrayList<>();
         do {
             ActionDescription actionDescription = classToCheck.getAnnotation(ActionDescription.class);
-            configFlagsToRemoveFromCompleter.addAll(Arrays.asList(actionDescription.configFlagsToExcludeFromCompleter()));
-            if (classToCheck.getSuperclass().getAnnotation(ActionDescription.class) != null) {
-                classToCheck = (Class<? extends BaseAction>) classToCheck.getSuperclass();
-            } else {
-                classToCheck = null;
-            }
-        } while (classToCheck != null);
+            configFlagsToRemoveFromCompleter.addAll(asList(actionDescription.configFlagsToExcludeFromCompleter()));
+            classToCheck = (Class<? extends BaseAction>) classToCheck.getSuperclass();
+        } while (classToCheck != BaseAction.class);
         return configFlagsToRemoveFromCompleter;
     }
 
     public List<String> configFlagsToAlwaysRemoveFromCompleter() {
         Class<? extends BaseAction> classToCheck = actionClass;
+
         List<String> configFlagsToAlwaysRemoveFromCompleter = new ArrayList<>();
         do {
             ActionDescription actionDescription = classToCheck.getAnnotation(ActionDescription.class);
-            configFlagsToAlwaysRemoveFromCompleter.addAll(Arrays.asList(actionDescription.configFlagsToAlwaysExcludeFromCompleter()));
-            if (classToCheck.getSuperclass().getAnnotation(ActionDescription.class) != null) {
-                classToCheck = (Class<? extends BaseAction>) classToCheck.getSuperclass();
-            } else {
-                classToCheck = null;
-            }
-        } while (classToCheck != null);
+            configFlagsToAlwaysRemoveFromCompleter.addAll(asList(actionDescription.configFlagsToAlwaysExcludeFromCompleter()));
+            classToCheck = (Class<? extends BaseAction>) classToCheck.getSuperclass();
+        } while (classToCheck != BaseAction.class);
         return configFlagsToAlwaysRemoveFromCompleter;
     }
 
@@ -159,21 +153,24 @@ public class WorkflowAction implements Action {
         return overriddenConfigValues.stream().map(WorkflowParameter::getName).collect(Collectors.toSet());
     }
 
-    public Set<String> getConfigValues(Map<String, List<String>> mappings) {
+    public Set<String> getConfigValues(Map<String, List<String>> mappings, boolean autoCompleteValuesOnly) {
         Set<String> configValues = new HashSet<String>();
-        Class classToGetValuesFor = actionClass;
-        while (classToGetValuesFor != Object.class) {
+        Class<? extends BaseAction> classToGetValuesFor = actionClass;
+        do {
             List<String> configValuesForClass = mappings.get(classToGetValuesFor.getSimpleName());
             if (configValuesForClass != null) {
                 configValues.addAll(configValuesForClass);
             }
             boolean ignoreSuperClass = false;
-            if (classToGetValuesFor != BaseAction.class && classToGetValuesFor.isAnnotationPresent(ActionDescription.class)) {
-                Class<? extends BaseAction> actionClass = classToGetValuesFor;
-                ignoreSuperClass = actionClass.getAnnotation(ActionDescription.class).ignoreConfigValuesInSuperclass();
+            if (classToGetValuesFor.isAnnotationPresent(ActionDescription.class)) {
+                if (autoCompleteValuesOnly) {
+                    List<String> configFlagsToExclude = asList(classToGetValuesFor.getAnnotation(ActionDescription.class).configFlagsToExcludeFromCompleter());
+                    configValues.removeIf(configFlagsToExclude::contains);
+                }
+                ignoreSuperClass = classToGetValuesFor.getAnnotation(ActionDescription.class).ignoreConfigValuesInSuperclass();
             }
-            classToGetValuesFor = ignoreSuperClass ? Object.class : classToGetValuesFor.getSuperclass();
-        }
+            classToGetValuesFor = ignoreSuperClass ? null : (Class<? extends BaseAction>) classToGetValuesFor.getSuperclass();
+        } while (classToGetValuesFor != null && classToGetValuesFor != BaseAction.class);
         return configValues;
     }
 
@@ -185,7 +182,7 @@ public class WorkflowAction implements Action {
     }
 
     private void setWorkflowParametersForAction(ConfigMappings mappings, List<WorkflowParameter> parameters) {
-        Set<String> allowedConfigValues = mappings.getConfigValuesForAction(this);
+        Set<String> allowedConfigValues = mappings.getConfigValuesForAction(this, false);
         Set<String> unknownParameters = parameters.stream().filter(param -> !paramIsAllowed(allowedConfigValues, param.getName()))
                 .map(WorkflowParameter::getName).collect(Collectors.toSet());
 

@@ -119,9 +119,9 @@
     "--disable-markdown"
   ],
   "DownloadBuildArtifactIfNeeded": [
+    "--job-artifact",
     "--always-download",
-    "--file-data",
-    "--job-artifact"
+    "--file-data"
   ],
   "SaveCert": [
     "--cipher-salt-length",
@@ -183,6 +183,7 @@
     "--vapp-metadata-name"
   ],
   "ExecuteLocalSqlStatementUsingPsql": [
+    "--output-variable-name",
     "--database-username",
     "--database-schema-name",
     "--sql-statement"
@@ -531,6 +532,11 @@
   "BaseBatchCloseReviews": [
     "--username"
   ],
+  "BaseAction": [
+    "--skip-if-variable-not-set",
+    "--variable",
+    "--skip-if-variable-set"
+  ],
   "ReplaceText": [
     "--file-data",
     "--replacement-text",
@@ -546,6 +552,7 @@
     "--database-schema-name"
   ],
   "DownloadBuildArtifact": [
+    "--username",
     "--job-with-artifact",
     "--job-build-number",
     "--file-data",
