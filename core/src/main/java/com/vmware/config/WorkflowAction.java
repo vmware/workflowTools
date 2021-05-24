@@ -1,6 +1,5 @@
 package com.vmware.config;
 
-import sun.jvm.hotspot.debugger.cdbg.BaseClass;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +17,7 @@ import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.action.trello.BaseTrelloAction;
 import com.vmware.mapping.ConfigMappings;
+import com.vmware.util.ReflectionUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.exception.SkipActionException;
@@ -29,6 +29,7 @@ public class WorkflowAction implements Action {
     private String sectionName;
     private WorkflowConfig config;
     private Class<? extends BaseAction> actionClass;
+    private List<Class<? extends BaseAction>> actionClassesToCheck;
     private BaseAction instantiatedAction;
 
     private List<WorkflowParameter> overriddenConfigValues;
@@ -39,6 +40,8 @@ public class WorkflowAction implements Action {
         this.sectionName = sectionName;
         this.config = config;
         this.actionClass = actionClass;
+        this.actionClassesToCheck = ReflectionUtils.collectClassHierarchyInDescendingOrder(actionClass).stream()
+                .map(clazz -> (Class<? extends BaseAction>) clazz).collect(Collectors.toList());
         setWorkflowParametersForAction(mappings, parameters);
     }
 
@@ -47,30 +50,15 @@ public class WorkflowAction implements Action {
     }
 
     public List<String> configFlagsToRemoveFromCompleter() {
-        Class classToCheck = actionClass;
-        List<String> configFlagsToRemoveFromCompleter = new ArrayList<>();
-        do {
-            if (classToCheck.isAnnotationPresent(ActionDescription.class)) {
-                ActionDescription actionDescription = ((Class<? extends BaseAction>) classToCheck).getAnnotation(ActionDescription.class);
-                configFlagsToRemoveFromCompleter.addAll(asList(actionDescription.configFlagsToExcludeFromCompleter()));
-            }
-            classToCheck = classToCheck.getSuperclass();
-        } while (classToCheck != Object.class);
-        return configFlagsToRemoveFromCompleter;
+        return actionClassesToCheck.stream().filter(clazz -> clazz.isAnnotationPresent(ActionDescription.class))
+                .map(actionClazz -> actionClazz.getAnnotation(ActionDescription.class).configFlagsToExcludeFromCompleter())
+                .flatMap(Arrays::stream).collect(Collectors.toList());
     }
 
     public List<String> configFlagsToAlwaysRemoveFromCompleter() {
-        Class classToCheck = actionClass;
-
-        List<String> configFlagsToAlwaysRemoveFromCompleter = new ArrayList<>();
-        do {
-            if (classToCheck.isAnnotationPresent(ActionDescription.class)) {
-                ActionDescription actionDescription = ((Class<? extends BaseAction>) classToCheck).getAnnotation(ActionDescription.class);
-                configFlagsToAlwaysRemoveFromCompleter.addAll(asList(actionDescription.configFlagsToAlwaysExcludeFromCompleter()));
-            }
-            classToCheck = classToCheck.getSuperclass();
-        } while (classToCheck != Object.class);
-        return configFlagsToAlwaysRemoveFromCompleter;
+        return actionClassesToCheck.stream().filter(clazz -> clazz.isAnnotationPresent(ActionDescription.class))
+                .map(actionClazz -> actionClazz.getAnnotation(ActionDescription.class).configFlagsToAlwaysExcludeFromCompleter())
+                .flatMap(Arrays::stream).collect(Collectors.toList());
     }
 
     public String getSectionName() {
@@ -160,22 +148,19 @@ public class WorkflowAction implements Action {
 
     public Set<String> getConfigValues(Map<String, List<String>> mappings, boolean autoCompleteValuesOnly) {
         Set<String> configValues = new HashSet<>();
-        Class<? extends BaseAction> classToGetValuesFor = actionClass;
-        do {
-            List<String> configValuesForClass = mappings.get(classToGetValuesFor.getSimpleName());
+        actionClassesToCheck.forEach(clazz -> {
+            List<String> configValuesForClass = mappings.get(clazz.getSimpleName());
             if (configValuesForClass != null) {
                 configValues.addAll(configValuesForClass);
             }
-            boolean ignoreSuperClass = false;
-            if (classToGetValuesFor.isAnnotationPresent(ActionDescription.class)) {
+            if (clazz.isAnnotationPresent(ActionDescription.class)) {
+                ActionDescription actionDescription = clazz.getAnnotation(ActionDescription.class);
                 if (autoCompleteValuesOnly) {
-                    List<String> configFlagsToExclude = asList(classToGetValuesFor.getAnnotation(ActionDescription.class).configFlagsToExcludeFromCompleter());
+                    List<String> configFlagsToExclude = asList(actionDescription.configFlagsToExcludeFromCompleter());
                     configValues.removeIf(configFlagsToExclude::contains);
                 }
-                ignoreSuperClass = classToGetValuesFor.getAnnotation(ActionDescription.class).ignoreConfigValuesInSuperclass();
             }
-            classToGetValuesFor = ignoreSuperClass ? null : (Class<? extends BaseAction>) classToGetValuesFor.getSuperclass();
-        } while (classToGetValuesFor != null && classToGetValuesFor != BaseAction.class);
+        });
         return configValues;
     }
 

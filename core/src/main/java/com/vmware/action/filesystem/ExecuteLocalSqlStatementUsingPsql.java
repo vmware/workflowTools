@@ -9,7 +9,7 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.logging.LogLevel;
 
-@ActionDescription("Execute a sql statement locally using psql.")
+@ActionDescription(value = "Execute a sql statement locally using psql.", configFlagsToExcludeFromCompleter = "--output-variable-name")
 public class ExecuteLocalSqlStatementUsingPsql extends BaseAction {
     public ExecuteLocalSqlStatementUsingPsql(WorkflowConfig config) {
         super(config);

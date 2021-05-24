@@ -17,6 +17,15 @@ import com.vmware.util.exception.RuntimeReflectiveOperationException;
  */
 public class ReflectionUtils {
 
+    public static List<Class> collectClassHierarchyInDescendingOrder(Class clazz) {
+        List<Class> classes = new ArrayList<>();
+        do {
+            classes.add(0, clazz);
+            clazz = clazz.getSuperclass();
+        } while (clazz != Object.class);
+        return classes;
+    }
+
     public static Class forName(String className) {
         try {
             return Class.forName(className);

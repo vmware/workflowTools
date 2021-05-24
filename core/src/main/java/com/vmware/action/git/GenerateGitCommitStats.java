@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static com.vmware.util.StringUtils.pluralize;
 
-@ActionDescription(value = "Generates stats for git commits.", ignoreConfigValuesInSuperclass = true)
+@ActionDescription(value = "Generates stats for git commits.")
 public class GenerateGitCommitStats extends BaseAction {
 
     private static final List<String> sizeNames = Arrays.asList("small", "medium", "large", "xlarge", "xxlarge", "xxxlarge", "giant");

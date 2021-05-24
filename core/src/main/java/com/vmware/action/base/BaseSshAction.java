@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Logger;
+import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 import com.vmware.util.StringUtils;
@@ -16,6 +17,7 @@ import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.vcd.domain.Sites;
 
+@ActionDescription(value = "Base ssh action", configFlagsToExcludeFromCompleter = "--use-database-host")
 public abstract class BaseSshAction extends BaseVappAction {
 
     public BaseSshAction(WorkflowConfig config) {
