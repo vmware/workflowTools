@@ -97,6 +97,9 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--skip-pipeline", help = "Skips pipeline in Gitlab")
     public boolean skipPipeline;
 
+    @ConfigurableProperty(commandLine = "--use-linked-bugzilla-id", help = "Use bugzilla id linked to the Jira issue instead of the issue key")
+    public boolean useLinkedBugzillaId;
+
     public CommitConfig() {}
 
     public CommitConfig(String reviewboardUrl, String buildwebUrl, String jenkinsUrl, String testingDoneLabel, String bugNumberLabel,

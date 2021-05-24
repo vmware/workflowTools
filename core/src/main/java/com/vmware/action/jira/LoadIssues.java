@@ -43,7 +43,6 @@ public class LoadIssues extends BaseBatchJiraAction {
 
     @Override
     public void process() {
-
         RapidView rapidView = jira.getRapidView(projectIssues.boardId);
         List<IssueTypeDefinition> typesToSearchFor = jiraConfig.includeAllIssueTypes ? null : Arrays.asList(jiraConfig.issueTypesToInclude);
         List<IssueSummary> backlogStories = rapidView.getIssues(typesToSearchFor, jiraConfig.includeSprintStories);

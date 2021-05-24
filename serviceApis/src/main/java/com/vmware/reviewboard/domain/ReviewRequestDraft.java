@@ -294,7 +294,7 @@ public class ReviewRequestDraft extends BaseEntity {
         return jobBuilds;
     }
 
-    public void setIssues(List<IssueInfo> issues, String noBugNumberLabel) {
+    public void setIssues(List<IssueInfo> issues, String noBugNumberLabel, boolean useLinkedBugzillaNumber) {
         this.issues.clear();
         this.issues.addAll(issues);
 
@@ -303,7 +303,11 @@ public class ReviewRequestDraft extends BaseEntity {
             if (issue == Issue.noBugNumber) {
                 bugNumbers = appendCsvValue(bugNumbers, noBugNumberLabel);
             } else {
-                bugNumbers = appendCsvValue(bugNumbers, issue.getKey());
+                String idToUse = useLinkedBugzillaNumber && StringUtils.isNotBlank(issue.getLinkedBugNumber()) ? issue.getLinkedBugNumber() : issue.getKey();
+                if (idToUse != null && !idToUse.equals(issue.getKey())) {
+                    log.info("Using linked bug number {} for issue {} as useLinkedBugzillaNumber is set to true", idToUse, issue.getKey());
+                }
+                bugNumbers = appendCsvValue(bugNumbers, idToUse);
             }
         }
     }

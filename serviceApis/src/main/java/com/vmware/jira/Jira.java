@@ -30,8 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.vmware.http.cookie.ApiAuthentication.jira;
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
@@ -205,14 +207,7 @@ public class Jira extends AbstractRestService {
     }
 
     private String generateNumericalEnumListAsInts(ComplexEnum... complexEnums) {
-        String statusText = "";
-        for (ComplexEnum enumValue : complexEnums) {
-            if (!statusText.isEmpty()) {
-                statusText += ",";
-            }
-            statusText += enumValue.getValue();
-        }
-        return statusText;
+        return Arrays.stream(complexEnums).map(ComplexEnum::getValue).map(String::valueOf).collect(Collectors.joining(","));
     }
 
     private String escapeUsername(String username) {

@@ -5,15 +5,17 @@ package com.vmware;
  */
 public interface IssueInfo {
 
-    public String getKey();
+    String getKey();
 
-    public String getWebUrl();
+    String getLinkedBugNumber();
 
-    public String getSummary();
+    String getWebUrl();
 
-    public String getDescription();
+    String getSummary();
 
-    public boolean isNotFound();
+    String getDescription();
 
-    public boolean isReal();
+    boolean isNotFound();
+
+    boolean isReal();
 }

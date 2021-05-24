@@ -88,6 +88,11 @@ public class Bug implements IssueInfo {
     }
 
     @Override
+    public String getLinkedBugNumber() {
+        return key;
+    }
+
+    @Override
     public String getSummary() {
         return summary;
     }

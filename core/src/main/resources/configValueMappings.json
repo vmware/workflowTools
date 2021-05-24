@@ -511,6 +511,7 @@
   ],
   "SetBugNumbers": [
     "--username",
+    "--use-linked-bugzilla-id",
     "--disable-bugzilla",
     "--disable-jira"
   ],

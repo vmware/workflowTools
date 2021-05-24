@@ -65,7 +65,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
                 waitingForBugNumbers = reenterBugNumber.equalsIgnoreCase("y");
             }
         }
-        draft.setIssues(issues, commitConfig.noBugNumberLabel);
+        draft.setIssues(issues, commitConfig.noBugNumberLabel, commitConfig.useLinkedBugzillaId);
         log.info("Bug numbers for commit: {}", draft.bugNumbers);
     }
 

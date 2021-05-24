@@ -106,7 +106,8 @@
   "jiraCustomFieldNames": {
     "storyPointsFieldName": "customfield_10062",
     "acceptanceCriteriaFieldName": "customfield_10100",
-    "parentEpicFieldName": "customfield_10830"
+    "parentEpicFieldName": "customfield_10830",
+    "bugzillaUrlFieldName" : "customfield_14231"
   },
   "fileCountRanges": [
     5,

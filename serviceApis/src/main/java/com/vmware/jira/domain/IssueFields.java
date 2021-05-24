@@ -52,7 +52,8 @@ public class IssueFields {
     @RuntimeFieldName("parentEpicFieldName")
     public String parentEpic;
 
-    public Issue parent;
+    @RuntimeFieldName("bugzillaUrlFieldName")
+    public String bugzillaUrl;
 
     public boolean storyPointsEqual(Number value) {
         if (storyPoints == null) {
