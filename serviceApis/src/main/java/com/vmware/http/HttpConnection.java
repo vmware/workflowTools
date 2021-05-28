@@ -254,7 +254,7 @@ public class HttpConnection {
                     String responseTextToShow = responseText.length() > 400
                             ? responseText.substring(0, 200) + "\n...\n" + responseText.substring(responseText.length() - 200)
                             : responseText;
-                    log.error("Failed to parse response text\n{}", responseTextToShow);
+                    log.error("Failed to parse response text for {} {}\n{}", activeConnection.getRequestMethod(), activeConnection.getURL(), responseTextToShow);
                     throw e;
                 }
             }
@@ -348,7 +348,7 @@ public class HttpConnection {
     }
 
     private String parseResponseText(HttpMethodType methodType) throws IOException {
-        String currentUrl = activeConnection.getURL().toExternalForm();
+        String currentUrl = activeConnection.getURL().toString();
         int responseCode = activeConnection.getResponseCode();
         String responseText;
         if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {

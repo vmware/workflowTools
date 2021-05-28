@@ -2,6 +2,7 @@ package com.vmware.action.jenkins;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -202,13 +203,15 @@ public class FindRealTestFailures extends BaseAction {
             return Collections.emptyMap();
         }
 
+        List<Job> failedJobs = new ArrayList<>();
+
         usableJobs.stream().parallel().forEach(job -> {
             try {
                 job.loadTestResultsFromDb();
                 fetchLatestTestResults(job, jobView.lastFetchAmount);
             } catch (Exception e) {
                 log.error("Failed to get full job details for {}\n{}", job.name, StringUtils.exceptionAsString(e));
-                throw e;
+                failedJobs.add(job);
             }
         });
 
@@ -217,7 +220,7 @@ public class FindRealTestFailures extends BaseAction {
 
         log.info("");
 
-        usableJobs.forEach(job -> {
+        usableJobs.stream().filter(job -> !failedJobs.contains(job)).forEach(job -> {
             job.saveFetchedBuildsInfo();
             boolean presumedPassedResultsAdded = job.addTestResultsToMasterList();
             job.saveTestResultsToDb(presumedPassedResultsAdded);
