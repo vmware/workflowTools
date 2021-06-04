@@ -151,33 +151,13 @@ public class FindRealTestFailures extends BaseAction {
         view.failingTestsCount = failingTestMethods.values().stream().mapToInt(List::size).sum();
         log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
 
-        final StringBuilder jobFragments = new StringBuilder("");
         final AtomicInteger counter = new AtomicInteger();
-        failingTestMethods.keySet().stream().sorted(comparing(jobDetails -> jobDetails.name)).forEach(key -> {
-            List<TestResult> failingTests = failingTestMethods.get(key);
-            String jobFragment = createJobFragment(counter.getAndIncrement(), key, failingTests);
-            if (jobFragments.length() > 0) {
-                jobFragments.append("\n");
-            }
-            jobFragments.append(jobFragment);
-        });
+        String jobsResultsHtml = failingTestMethods.keySet().stream().sorted(comparing(jobDetails -> jobDetails.name)).map(job -> {
+            List<TestResult> failingTests = failingTestMethods.get(job);
+            return createJobFragment(counter.getAndIncrement(), job, failingTests);
+        }).collect(Collectors.joining("\n"));
 
-        String resultsPage;
-        String footer = "Generated at " + generationDate;
-        if (includeViewsLink) {
-            footer = "<p/><a href=\"index.html\">Back</a><br/>" + footer;
-        }
-        if (!failingTestMethods.isEmpty()) {
-            String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
-            resultsPage = failuresPage.replace("#viewName", view.viewNameWithFailureCount());
-            resultsPage = resultsPage.replace("#body", jobFragments.toString());
-            resultsPage = resultsPage.replace("#footer", footer);
-            log.trace("Test Failures for view {}:\n{}", view.name, resultsPage);
-        } else {
-            String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
-            resultsPage = allPassedPage.replace("#viewName", view.name);
-            resultsPage = resultsPage.replace("#footer", footer);
-        }
+        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, failingTestMethods, jobsResultsHtml);
 
         File destinationFile = new File(fileSystemConfig.destinationFile);
         if (destinationFile.exists() && destinationFile.isDirectory()) {
@@ -189,6 +169,26 @@ public class FindRealTestFailures extends BaseAction {
             IOUtils.write(destinationFile, resultsPage);
         }
         viewPadder.infoTitle();
+    }
+
+    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods, String jobsTestResultsHtml) {
+        String resultsPage;
+        String footer = "Generated at " + generationDate;
+        if (includeViewsLink) {
+            footer = "<p/><a href=\"index.html\">Back</a><br/>" + footer;
+        }
+        if (!failingTestMethods.isEmpty()) {
+            String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
+            resultsPage = failuresPage.replace("#viewName", view.viewNameWithFailureCount());
+            resultsPage = resultsPage.replace("#body", jobsTestResultsHtml);
+            resultsPage = resultsPage.replace("#footer", footer);
+            log.trace("Test Failures for view {}:\n{}", view.name, resultsPage);
+        } else {
+            String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
+            resultsPage = allPassedPage.replace("#viewName", view.name);
+            resultsPage = resultsPage.replace("#footer", footer);
+        }
+        return resultsPage;
     }
 
     private Map<Job, List<TestResult>> findAllRealFailingTests(JobView jobView) {
@@ -222,8 +222,9 @@ public class FindRealTestFailures extends BaseAction {
 
         usableJobs.stream().filter(job -> !failedJobs.contains(job)).forEach(job -> {
             job.saveFetchedBuildsInfo();
-            boolean presumedPassedResultsAdded = job.addTestResultsToMasterList();
-            job.saveTestResultsToDb(presumedPassedResultsAdded);
+            boolean passResultsAdded = addPassResultsIfNeeded(job);
+            boolean presumedPassResultsAdded = job.addTestResultsToMasterList();
+            job.saveTestResultsToDb(passResultsAdded || presumedPassResultsAdded);
             job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToCheck);
 
             List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck);
@@ -238,8 +239,21 @@ public class FindRealTestFailures extends BaseAction {
         return allFailingTests;
     }
 
+    private boolean addPassResultsIfNeeded(Job job) {
+        boolean passResultsAdded = false;
+        if (dbUtils != null && job.hasSavedBuilds() && job.lastBuildWasSuccessful() && !job.hasSavedBuild(job.lastStableBuild.buildNumber)) {
+            JobBuild stableBuild = jenkinsExecutor.execute(jenkins -> jenkins.getJobBuildDetails(job.name, job.lastStableBuild.buildNumber));
+            dbUtils.insert(stableBuild);
+            passResultsAdded = job.addPassResultsForSavedTestResults(stableBuild);
+        }
+        return passResultsAdded;
+    }
+
     private void fetchLatestTestResults(Job job, int lastFetchAmount) {
         job.fetchedResults = Collections.emptyList();
+        if (job.lastBuildWasSuccessful()) {
+            log.info("No need to fetch latest results for job {} as last build was successful", job);
+        }
         int latestUsableBuildNumber = job.latestUsableBuildNumber();
         if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && job.hasSavedBuild(latestUsableBuildNumber)) {
             log.info("Saved builds for {} already include latest build {}", job.name, latestUsableBuildNumber);

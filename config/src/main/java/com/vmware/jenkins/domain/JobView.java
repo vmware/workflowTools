@@ -67,10 +67,6 @@ public class JobView extends BaseDbClass {
                 log.info("Skipping {} as there are no recent completed builds", job.name);
                 return false;
             }
-            if (job.lastBuildWasSuccessful()) {
-                log.info("Skipping {} as most recent build {} was successful", job.name, job.lastStableBuild.buildNumber);
-                return false;
-            }
             if (job.lastUnstableBuild == null) {
                 log.info("Skipping {} as there are no recent unstable builds", job.name);
                 return false;

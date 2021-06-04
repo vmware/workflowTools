@@ -205,7 +205,18 @@ public class Job extends BaseDbClass {
                     log.info("Adding presumed pass result for test {} in build {}", result.classAndTestName(), build.buildNumber);
                     result.addTestResult(new TestResult(result, build, PRESUMED_PASS));
                 }));
+
         return presumedPassResultsAdded.get();
+    }
+
+    public boolean addPassResultsForSavedTestResults(JobBuild stableBuild) {
+        AtomicBoolean passResultsAdded = new AtomicBoolean(false);
+        testResults.stream().filter(result -> !result.containsBuildNumbers(stableBuild.buildNumber)).forEach(result -> {
+            passResultsAdded.set(true);
+            log.info("Adding pass result for test {} in build {}", result.classAndTestName(), stableBuild.buildNumber);
+            result.addTestResult(new TestResult(result, stableBuild, PASS));
+        });
+        return passResultsAdded.get();
     }
 
     public void saveFetchedBuildsInfo() {
@@ -228,8 +239,8 @@ public class Job extends BaseDbClass {
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
     }
 
-    public void saveTestResultsToDb(boolean presumedPassedResultsAdded) {
-        if (dbUtils == null || (CollectionUtils.isEmpty(fetchedResults) && !presumedPassedResultsAdded)) {
+    public void saveTestResultsToDb(boolean passResultsAdded) {
+        if (dbUtils == null || (CollectionUtils.isEmpty(fetchedResults) && !passResultsAdded)) {
             return;
         }
 
@@ -275,6 +286,10 @@ public class Job extends BaseDbClass {
 
     public boolean hasSavedBuild(int buildNumber) {
         return savedBuilds != null && savedBuilds.stream().anyMatch(build -> build.buildNumber == buildNumber);
+    }
+
+    public boolean hasSavedBuilds() {
+        return CollectionUtils.isNotEmpty(savedBuilds);
     }
 
     public void removeOldBuilds(int maxJenkinsBuildsToCheck) {

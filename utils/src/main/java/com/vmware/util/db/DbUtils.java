@@ -128,6 +128,14 @@ public class DbUtils {
 
     }
 
+    public <T> void insert(T record) {
+        try (Connection connection = createConnection()) {
+            insert(connection, record);
+        } catch (SQLException se) {
+            throw new RuntimeException(se);
+        }
+    }
+
     public <T> void insert(Connection connection, T record) {
         insertIfNeeded(connection, record, null);
     }
