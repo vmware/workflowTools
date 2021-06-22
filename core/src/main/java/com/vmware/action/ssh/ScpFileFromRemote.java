@@ -47,6 +47,11 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
         } else {
             log.info("Copying file {} from {}@{} to {}", sourceFile, siteConfig.username, siteConfig.host, destinationFile);
         }
+        if (sshConfig.ignoreUnknownFile && StringUtils.isEmpty(sourceFile)) {
+            log.info("Ignoring that source file file is empty as ignoreUnknownFile is set to true");
+        } else if (StringUtils.isEmpty(sourceFile)) {
+            exitDueToFailureCheck("source file is empty");
+        }
         JSch jsch = new JSch();
         Session session = null;
         Channel channel = null;

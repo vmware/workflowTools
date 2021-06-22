@@ -22,8 +22,8 @@
                         <manifestEntries>
                             <appMainClass>com.vmware.WorkflowRunner</appMainClass>
                             <deleteOldReleaseJarPattern>workflowTools-[\w_]+.jar</deleteOldReleaseJarPattern>
-                            <releaseJarName>workflowTools-May_21_2021.jar</releaseJarName>
-                            <releaseUrl>https://github.com/vmware/workflowTools/releases/download/May_21_2021/workflowTools.jar</releaseUrl>
+                            <releaseJarName>workflowTools-latest.jar</releaseJarName>
+                            <releaseUrl>https://github.com/vmware/workflowTools/releases/download/latest/workflowTools.jar</releaseUrl>
                         </manifestEntries>
                     </archive>
                 </configuration>

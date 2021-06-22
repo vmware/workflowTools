@@ -86,16 +86,16 @@ public class FindRealTestFailures extends BaseAction {
         createDbUtilsIfNeeded();
         matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
         purgeVanillaTestResults();
+        long elapsedTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 
         if (destinationFile.isDirectory()) {
-            String viewListing = createViewListingHtml(matchingViews);
+            String viewListing = createViewListingHtml(matchingViews, elapsedTime);
             fileSystemConfig.destinationFile = fileSystemConfig.destinationFile + File.separator + "index.html";
             log.info("Saving view listing html file to {}", fileSystemConfig.destinationFile);
             IOUtils.write(new File(fileSystemConfig.destinationFile), viewListing);
         }
 
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        log.info("Took {} seconds", TimeUnit.MILLISECONDS.toSeconds(elapsedTime));
+        log.info("Took {} seconds", elapsedTime);
     }
 
     private void validateThatDestinationFileIsDirectoryIfNeeded(List<HomePage.View> matchingViews, File destinationFile) {
@@ -120,13 +120,13 @@ public class FindRealTestFailures extends BaseAction {
         }
     }
 
-    private String createViewListingHtml(List<HomePage.View> matchingViews) {
+    private String createViewListingHtml(List<HomePage.View> matchingViews, long elapsedTime) {
         Comparator<HomePage.View> viewComparator = Comparator.comparing(HomePage.View::htmlFileName);
         String viewListingHtml = matchingViews.stream().sorted(viewComparator)
                 .map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
         String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
         viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
-        viewListingPage = viewListingPage.replace("#date", generationDate);
+        viewListingPage = viewListingPage.replace("#footer", "Generated at " + generationDate + " in " + elapsedTime + " seconds");
         return viewListingPage.replace("#body", viewListingHtml);
     }
 
@@ -252,7 +252,7 @@ public class FindRealTestFailures extends BaseAction {
     private void fetchLatestTestResults(Job job, int lastFetchAmount) {
         job.fetchedResults = Collections.emptyList();
         if (job.lastBuildWasSuccessful()) {
-            log.info("No need to fetch latest results for job {} as last build was successful", job);
+            log.info("No need to fetch latest results for {} as last build {} was successful", job.name, job.lastStableBuild.buildNumber);
         }
         int latestUsableBuildNumber = job.latestUsableBuildNumber();
         if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && job.hasSavedBuild(latestUsableBuildNumber)) {
@@ -295,6 +295,7 @@ public class FindRealTestFailures extends BaseAction {
         String rowFragment = new ClasspathResource("/testFailuresTemplate/testFailureRows.html", this.getClass()).getText();
 
         String filledInJobFragment = jobFragment.replace("#url", fullDetails.url);
+        filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink());
         filledInJobFragment = filledInJobFragment.replace("#jobName", fullDetails.name);
         filledInJobFragment = filledInJobFragment.replace("#failingTestCount", pluralize(failingMethods.size(), "failing test"));
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);

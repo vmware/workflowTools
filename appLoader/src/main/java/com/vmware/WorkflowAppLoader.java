@@ -28,7 +28,7 @@ public class WorkflowAppLoader {
 
     private final String releaseDirectory;
     private final List<String> argValues;
-    private final boolean debugLog, reset;
+    private final boolean debugLog, update;
     private final File releaseJar;
     private final Map<String, String> manifestAttributes;
     private final File testReleaseJar;
@@ -43,7 +43,7 @@ public class WorkflowAppLoader {
     public WorkflowAppLoader(String[] args) {
         this.argValues = new ArrayList<>(Arrays.asList(args));
         this.debugLog = Stream.of("-d", "--debug", "-t", "--trace").anyMatch(argValues::contains);
-        this.reset = argValues.remove("--reset");
+        this.update = argValues.remove("--update");
         this.manifestAttributes = getManifestAttributes();
         this.releaseDirectory = manifestAttributes.containsKey("releaseDirectory")
                 ? manifestAttributes.get("releaseDirectory") : System.getProperty("java.io.tmpdir");
@@ -66,7 +66,7 @@ public class WorkflowAppLoader {
 
     public void downloadJarFileIfNeeded() {
         debug("Expected release jar is " + releaseJar.getPath());
-        if (releaseJar.exists() && !reset) {
+        if (releaseJar.exists() && !update) {
             debug("Jar file " + releaseJar.getPath() + " already exists");
             return;
         }

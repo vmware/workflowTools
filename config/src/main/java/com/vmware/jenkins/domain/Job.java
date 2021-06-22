@@ -332,4 +332,12 @@ public class Job extends BaseDbClass {
                     }
                 }).filter(result -> CollectionUtils.isNotEmpty(result.testRuns)).collect(toList());
     }
+
+    public String runningBuildLink() {
+        if (lastBuild != null && lastCompletedBuild != null && lastBuild.buildNumber > lastCompletedBuild.buildNumber) {
+            return "Current build <a href=\"" + lastBuild.consoleUrl() + "\">" + lastBuild.buildNumber +"</a>";
+        } else {
+            return "";
+        }
+    }
 }

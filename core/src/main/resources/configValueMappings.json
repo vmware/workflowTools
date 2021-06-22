@@ -443,9 +443,9 @@
     "--changelist-id"
   ],
   "ScpFileFromRemote": [
-    "--ignore-unknown",
     "--file-data",
     "--ssh-strict-host-checking",
+    "--ignore-unknown",
     "--destination-file",
     "--source-file"
   ],
