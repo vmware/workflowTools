@@ -49,6 +49,7 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
         }
         if (sshConfig.ignoreUnknownFile && StringUtils.isEmpty(sourceFile)) {
             log.info("Ignoring that source file file is empty as ignoreUnknownFile is set to true");
+            return;
         } else if (StringUtils.isEmpty(sourceFile)) {
             exitDueToFailureCheck("source file is empty");
         }
