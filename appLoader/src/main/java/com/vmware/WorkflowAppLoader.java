@@ -88,9 +88,13 @@ public class WorkflowAppLoader {
         String deleteOldReleasesPattern = manifestAttributes.get("deleteOldReleaseJarPattern");
         if (deleteOldReleasesPattern == null) {
             debug("Delete old releases pattern not set, skipping deletion of old releases");
+            return;
         }
         Pattern deleteJarPattern = Pattern.compile(deleteOldReleasesPattern);
         File[] matchingReleases = new File(releaseDirectory).listFiles(file -> deleteJarPattern.matcher(file.getName()).matches());
+        if (matchingReleases == null) {
+            return;
+        }
         Arrays.stream(matchingReleases).forEach(release -> {
             info("Deleting old release " + release.getPath());
             release.delete();

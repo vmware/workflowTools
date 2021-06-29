@@ -31,9 +31,6 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--max-builds", help = "Max number of jenkins builds to iterate over when checking for latest status of jenkins job")
     public int maxJenkinsBuildsToCheck;
 
-    @ConfigurableProperty(commandLine = "--build-failure-threshold", help = "Threshold for failing tests and config being considered a normal amount")
-    public int buildFailureThreshold;
-
     @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the names and parameters for the jenkins jobs to invoke. Separate jobs by commas and parameters by ampersands")
     public String jenkinsJobsToUse;
 

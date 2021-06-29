@@ -22,6 +22,10 @@ import com.vmware.util.db.AfterDbLoad;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
 
+import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NO_UPDATE_NEEDED;
+
 public class TestResult extends BaseDbClass {
     public String name;
     @Expose(serialize = false, deserialize = false)
@@ -235,23 +239,27 @@ public class TestResult extends BaseDbClass {
         return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
     }
 
-    public boolean removeUnimportantTestResultsForBuild(JobBuild build) {
+    public RemovalStatus removeUnimportantTestResultsForBuild(JobBuild build) {
         if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
-            return false;
+            return NOT_DELETABLE;
+        }
+        if (Stream.of(passedBuilds, presumedPassedBuilds, failedBuilds, skippedBuilds)
+                .filter(Objects::nonNull).flatMapToInt(Arrays::stream).noneMatch(id -> id == build.buildNumber)) {
+            return NO_UPDATE_NEEDED;
         }
         int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMapToInt(Arrays::stream).max().orElse(-1);
         int firstFailureAfterPass = failedBuilds != null ? Arrays.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1) : -1;
         int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
         int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
         if (newestPass == build.buildNumber || firstFailureOrSkipAfterPass == build.buildNumber) {
-            return false;
+            return NOT_DELETABLE;
         }
 
         passedBuilds = ArrayUtils.remove(passedBuilds, build.buildNumber);
         presumedPassedBuilds = ArrayUtils.remove(presumedPassedBuilds, build.buildNumber);
         failedBuilds = ArrayUtils.remove(failedBuilds, build.buildNumber);
         skippedBuilds = ArrayUtils.remove(skippedBuilds, build.buildNumber);
-        return true;
+        return DELETABLE;
     }
 
     @Override
@@ -299,6 +307,12 @@ public class TestResult extends BaseDbClass {
         public static boolean isPass(TestStatus status) {
             return status == PASS || status == PRESUMED_PASS;
         }
+    }
+
+    public enum RemovalStatus {
+        DELETABLE,
+        NOT_DELETABLE,
+        NO_UPDATE_NEEDED
     }
 }
 

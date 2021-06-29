@@ -28,10 +28,13 @@ import org.slf4j.LoggerFactory;
 
 import static com.vmware.BuildStatus.SUCCESS;
 import static com.vmware.BuildStatus.UNSTABLE;
+import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PRESUMED_PASS;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class Job extends BaseDbClass {
 
@@ -297,22 +300,23 @@ public class Job extends BaseDbClass {
             return;
         }
         usefulBuilds = dbUtils.query(JobBuild.class, "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
-        int lastBuildIndexPerConfig = Math.max(maxJenkinsBuildsToCheck - 1, 19); // keep a min of 20 builds
+        int lastBuildIndexPerConfig = Math.min(maxJenkinsBuildsToCheck - 1, 19); // keep a max of 20 builds
         JobBuild lastBuildToKeep = lastBuildIndexPerConfig >= usefulBuilds.size() ? usefulBuilds.get(usefulBuilds.size() - 1) : usefulBuilds.get(lastBuildIndexPerConfig);
         try (Connection connection = dbUtils.createConnection()) {
             List<JobBuild> existingJobBuildsToCheck = dbUtils.query(connection, JobBuild.class,
                     "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
-            List<JobBuild> buildsToRemove = existingJobBuildsToCheck.stream().filter(build -> testResults.stream()
-                    .allMatch(result -> result.removeUnimportantTestResultsForBuild(build))).collect(toList());
-            buildsToRemove.forEach(build -> dbUtils.delete(connection, build));
-            if (!buildsToRemove.isEmpty()) {
-                log.info("Removing old builds {} for {}", buildsToRemove.stream().map(JobBuild::buildNumber).collect(Collectors.joining(",")), name);
-                testResults.forEach(result -> dbUtils.update(connection, result));
-            } else {
-                log.debug("No old job builds to removed for {}", name);
-            }
+            existingJobBuildsToCheck.forEach(build -> {
+                Map<TestResult, TestResult.RemovalStatus> testResultsToUpdate = testResults.stream()
+                        .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build)));
+                testResultsToUpdate.entrySet().stream().filter(entry -> DELETABLE == entry.getValue())
+                        .forEach(entry -> dbUtils.update(connection, entry.getKey()));
+                if (testResultsToUpdate.entrySet().stream().noneMatch(entry -> NOT_DELETABLE == entry.getValue())) {
+                    log.info("Removing old build {} for {}", build.buildNumber, name);
+                    dbUtils.delete(connection, build);
+                    usefulBuilds.remove(build);
+                }
+            });
             connection.commit();
-            usefulBuilds.removeAll(buildsToRemove);
         } catch (SQLException se) {
             throw new RuntimeException(se);
         }
