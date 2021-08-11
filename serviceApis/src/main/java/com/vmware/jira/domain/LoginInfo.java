@@ -19,6 +19,9 @@ public class LoginInfo {
     @SerializedName("os_cookie")
     public String cookie;
 
+    @SerializedName("os_destination")
+    public String osDestination;
+
     public LoginInfo(UsernamePasswordCredentials credentials) {
         this.usernane = credentials.getUsername();
         try {
@@ -27,5 +30,6 @@ public class LoginInfo {
             throw new RuntimeIOException(e);
         }
         this.cookie = "true";
+        this.osDestination = "";
     }
 }

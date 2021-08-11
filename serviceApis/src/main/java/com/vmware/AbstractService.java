@@ -56,6 +56,9 @@ public abstract class AbstractService {
     public void setupAuthenticatedConnection() {
         int retryCount = 0;
         while (!isConnectionAuthenticated()) {
+            if (retryCount > MAX_LOGIN_RETRIES) {
+                throw new FatalException("Failed to successfully login after {} retries", (retryCount - 1));
+            }
             connectionIsAuthenticated = null;
             displayInputMessage(retryCount);
             try {
