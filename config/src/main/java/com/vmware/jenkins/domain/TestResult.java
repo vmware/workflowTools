@@ -27,6 +27,8 @@ import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NO_UPDATE_NEEDED;
 
 public class TestResult extends BaseDbClass {
+    private static final String SUSPECTS_TITLE = "Commits between last pass and first failure, guilty until proven innocent";
+    private static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
     public String name;
     @Expose(serialize = false, deserialize = false)
     public Long jobBuildId;
@@ -151,8 +153,9 @@ public class TestResult extends BaseDbClass {
             TestResult firstFailure = sortedTestRuns.get(sortedTestRuns.indexOf(lastPassingResult.get()) - 1);
             String suspectsUrl = commitComparisonUrl.replace("(first)", lastPassingResult.get().commitId)
                     .replace("(second)", firstFailure.commitId);
-            String suspectsLink = "<a class =\"suspects\" href=\"" + suspectsUrl + "\""
-                    + "title=\"Commits between last pass and first failure, guilty until proven innocent\">SUSPECTS</a>";
+
+            String suspectsLink = String.format("<a class =\"suspects\" href=\"%s\" title=\"%s\" %s>SUSPECTS</a>",
+                    suspectsUrl, SUSPECTS_TITLE, LINK_IN_NEW_TAB);
             return suspectsLink + System.lineSeparator() + resultLinks;
         } else {
             return resultLinks;
@@ -274,7 +277,8 @@ public class TestResult extends BaseDbClass {
     private String testResultLink(TestResult testResult) {
         String commitIdSuffix = StringUtils.isNotBlank(testResult.commitId) ? " with commit " + testResult.commitId : "";
         String title = testResult.status.getDescription() + " in build " + testResult.buildNumber + commitIdSuffix;
-        return String.format("<a class =\"%s\" href = \"%s\" title=\"%s\">%s</a>", testResult.status.cssClass, testResult.url, title, testResult.buildNumber);
+        return String.format("<a class =\"%s\" href = \"%s\" title=\"%s\" %s>%s</a>", testResult.status.cssClass, testResult.url, title,
+                LINK_IN_NEW_TAB, testResult.buildNumber);
     }
 
     private boolean containsBuildNumbers(int[] values, int... buildNumbers) {

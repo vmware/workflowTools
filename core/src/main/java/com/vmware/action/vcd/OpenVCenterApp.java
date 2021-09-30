@@ -21,7 +21,7 @@ public class OpenVCenterApp extends BaseSingleVappJsonAction {
     @Override
     public void process() {
         Sites.DeployedVM selectedVCenter = vcServerUrl();
-        SystemUtils.openUrl(selectedVCenter.endPointURI);
+        SystemUtils.openUrl(selectedVCenter.endPointURI + "/ui");
         log.info("Credentials: {}", selectedVCenter.credentials);
     }
 

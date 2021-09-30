@@ -45,8 +45,8 @@ public class WorkflowAppLoader {
         this.debugLog = Stream.of("-d", "--debug", "-t", "--trace").anyMatch(argValues::contains);
         this.update = argValues.remove("--update");
         this.manifestAttributes = getManifestAttributes();
-        this.releaseDirectory = manifestAttributes.containsKey("releaseDirectory")
-                ? manifestAttributes.get("releaseDirectory") : System.getProperty("java.io.tmpdir");
+
+        this.releaseDirectory = determineReleaseDirectory();
         this.releaseJar = new File(this.releaseDirectory + File.separator + manifestAttributes.get("releaseJarName"));
         this.testReleaseJar = getArgValue("--test-release-jar").map(File::new).orElse(null);
     }
@@ -155,6 +155,19 @@ public class WorkflowAppLoader {
             return attributeValues;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private String determineReleaseDirectory() {
+        if (manifestAttributes.containsKey("releaseDirectory")) {
+            return manifestAttributes.get("releaseDirectory");
+        } else {
+            String userHome = System.getProperty("user.home");
+            File releaseDirectory = new File(userHome + File.separator + ".workflowReleaseDirectory");
+            if (!releaseDirectory.exists()) {
+                releaseDirectory.mkdir();
+            }
+            return releaseDirectory.getAbsolutePath();
         }
     }
 
