@@ -47,7 +47,8 @@ public class WorkflowAppLoader {
         this.manifestAttributes = getManifestAttributes();
 
         this.releaseDirectory = determineReleaseDirectory();
-        this.releaseJar = new File(this.releaseDirectory + File.separator + manifestAttributes.get("releaseJarName"));
+        String releaseJarName = manifestAttributes.getOrDefault("releaseJarName", "workflowTools-latest.jar");
+        this.releaseJar = new File(this.releaseDirectory + File.separator + releaseJarName);
         this.testReleaseJar = getArgValue("--test-release-jar").map(File::new).orElse(null);
     }
 
@@ -112,7 +113,10 @@ public class WorkflowAppLoader {
         }
         URL releaseURL;
         try {
-            releaseURL = URI.create(manifestAttributes.get("releaseUrl")).toURL();
+            String url = manifestAttributes.getOrDefault("releaseUrl",
+                    "https://github.com/vmware/workflowTools/releases/download/latest/workflowTools.jar");
+            debug("Using workflow release url " + url);
+            releaseURL = URI.create(url).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
