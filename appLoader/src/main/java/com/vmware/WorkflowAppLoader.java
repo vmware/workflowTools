@@ -57,7 +57,8 @@ public class WorkflowAppLoader {
         try {
 
             URLClassLoader urlClassLoader = URLClassLoader.newInstance(new URL[] { releaseJar.toURI().toURL()}, getClass().getClassLoader());
-            Class<? extends AppLauncher> classToLoad = (Class<? extends AppLauncher>) urlClassLoader.loadClass(manifestAttributes.get("appMainClass"));
+            String mainClassName = manifestAttributes.getOrDefault("appMainClass", "com.vmware.WorkflowRunner");
+            Class<? extends AppLauncher> classToLoad = (Class<? extends AppLauncher>) urlClassLoader.loadClass(mainClassName);
             AppLauncher launcher = classToLoad.newInstance();
             launcher.run(urlClassLoader, argValues);
         } catch (Exception e) {
