@@ -852,6 +852,14 @@
       "selectVapp",
       "DeleteVapp"
     ],
+    "powerOnVapp": [
+      "selectVapp",
+      "PowerOnVapp"
+    ],
+    "powerOffVapp": [
+      "selectVapp",
+      "PowerOffVapp"
+    ],
     "renameVapp": [
       "selectVapp",
       "RenameVapp"
@@ -871,6 +879,10 @@
     "openVCenter": [
       "selectVcdSite",
       "OpenVCenterApp"
+    ],
+    "openVCenterMob": [
+      "selectVcdSite",
+      "OpenVCenterMob"
     ],
     "openNsxTManager": [
       "selectVcdSite",

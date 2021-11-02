@@ -88,6 +88,15 @@ public class Vcd extends AbstractRestService {
         return connection.put(link.href, TaskType.class, resourceType, contentTypeHeader(resourceType), taskAcceptHeader());
     }
 
+    public TaskType postResource(LinkType link, ResourceType resourceType) {
+        if (resourceType != null) {
+            return post(link.href, TaskType.class, resourceType, contentTypeHeader(resourceType), taskAcceptHeader());
+        } else {
+            return post(link.href, TaskType.class, (Object) null, taskAcceptHeader());
+        }
+    }
+
+
     public <T extends ResourceType> T getResource(LinkType link, Class<T> resourceTypeClass) {
         return get(link.href, resourceTypeClass, acceptHeader(resourceTypeClass));
     }

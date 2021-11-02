@@ -18,7 +18,8 @@ public abstract class ResourceType {
     }
 
     public LinkType getLinkByRel(String rel) {
-        return link.stream().filter(linkValue -> linkValue.rel.equals(rel)).findFirst().orElse(null);
+        return link.stream().filter(linkValue -> linkValue.rel.equals(rel)).findFirst()
+                .orElseThrow(() -> new FatalException("Failed to find link named " + rel));
     }
 
     public LinkType getLinkByRelAndType(String rel, String type) {

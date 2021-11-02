@@ -150,6 +150,11 @@
     "--username",
     "--disable-jira"
   ],
+  "PowerOnVapp": [
+    "--username",
+    "--wait-time",
+    "--wait-for-action"
+  ],
   "BaseSshAction": [
     "--ssh-password",
     "--ssh-username",
@@ -383,6 +388,11 @@
   ],
   "SetReviewId": [
     "--username"
+  ],
+  "PowerOffVapp": [
+    "--username",
+    "--wait-time",
+    "--wait-for-action"
   ],
   "ExitIfReusingPostgresDatabaseNotAllowed": [
     "--database-schema-name"
