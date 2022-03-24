@@ -135,7 +135,8 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
             }
 
             if (paramValue.contains(SANDBOX_BUILD_NUMBER)) {
-                String buildNumber = determineSandboxBuildNumber(buildwebConfig.buildDisplayName);
+                String buildNumber = StringUtils.isNotBlank(buildwebConfig.sandboxBuildNumber) ? buildwebConfig.sandboxBuildNumber :
+                        determineSandboxBuildNumber(buildwebConfig.buildDisplayName);
                 paramValue = paramValue.replace(SANDBOX_BUILD_NUMBER, buildNumber);
             }
 

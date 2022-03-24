@@ -112,12 +112,19 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private void createDbUtilsIfNeeded() {
-        if (fileSystemConfig.databaseConfigured()) {
-            log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
-            log.info("Using database {} to store test results",fileSystemConfig.databaseUrl);
-            dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
-                    fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
+        if (!fileSystemConfig.databaseConfigured()) {
+            return;
         }
+        log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
+        log.info("Using database {} to store test results",fileSystemConfig.databaseUrl);
+        dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
+                fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
+
+        if (jenkinsConfig.createTestFailuresDatabase) {
+            log.info("Executing database creation script");
+            dbUtils.executeSqlScript(new ClasspathResource("/testFailuresTemplate/databaseDdl.sql", this.getClass()).getText());
+        }
+
     }
 
     private String createViewListingHtml(List<HomePage.View> matchingViews, long elapsedTime) {

@@ -33,7 +33,7 @@ public abstract class BaseCommitCreateAction extends BaseCommitAction {
     }
 
     protected void commitUsingGit(String description) {
-        git.commit(draft.toText(commitConfig));
+        git.commit(draft.toText(commitConfig), gitRepoConfig.noVerify);
     }
 
     protected void commitUsingPerforce(String description) {

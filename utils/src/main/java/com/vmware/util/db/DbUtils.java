@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,6 +47,39 @@ public class DbUtils {
     public Connection createConnection() throws SQLException {
         return driver.connect(databaseUrl, dbProperties);
     }
+
+    public void executeSqlScript(String sqlScript) {
+        try (Connection connection = createConnection()) {
+            Scanner s = new Scanner(sqlScript);
+            s.useDelimiter("(;(\r)?\n)|(--\n)");
+            Statement statement = null;
+            try
+            {
+                statement = connection.createStatement();
+                while (s.hasNext())
+                {
+                    String line = s.next();
+                    if (line.startsWith("/*!") && line.endsWith("*/"))
+                    {
+                        int i = line.indexOf(' ');
+                        line = line.substring(i + 1, line.length() - " */".length());
+                    }
+
+                    if (line.trim().length() > 0)
+                    {
+                        statement.execute(line);
+                    }
+                }
+            }
+            finally
+            {
+                if (statement != null) statement.close();
+            }
+        } catch (SQLException se) {
+            throw new RuntimeException(se);
+        }
+    }
+
 
     public <T> T queryUnique(Class<T> recordClass, String query, Object... parameters) {
         List<T> records = query(recordClass, query, parameters);

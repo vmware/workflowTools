@@ -56,7 +56,9 @@ public class ExecuteSshCommand extends BaseSshAction {
         List<String> parameterNamesInCommand = MatcherUtils.allMatches(sshCommand, "(\\$[_\\w]+)");
         for (String parameterName : parameterNamesInCommand) {
             if (parameterName.equals(SANDBOX_BUILD_NUMBER)) {
-                sshCommand = sshCommand.replace(parameterName, determineSandboxBuildNumber(buildwebConfig.buildDisplayName));
+                String sandboxBuildNumber = StringUtils.isNotBlank(buildwebConfig.sandboxBuildNumber)
+                        ? buildwebConfig.sandboxBuildNumber : determineSandboxBuildNumber(buildwebConfig.buildDisplayName);
+                sshCommand = sshCommand.replace(parameterName, sandboxBuildNumber);
             } else {
                 String label = parameterName.length() < 2 ? parameterName :
                         parameterName.substring(0, 1).toUpperCase() + parameterName.substring(1).toLowerCase();

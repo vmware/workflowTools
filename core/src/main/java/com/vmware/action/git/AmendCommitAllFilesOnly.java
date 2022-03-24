@@ -19,7 +19,7 @@ public class AmendCommitAllFilesOnly extends BaseCommitAmendAction {
     @Override
     protected void commitUsingGit(String description) {
         String existingHeadRef = git.revParse("head");
-        git.amendCommitWithAllFileChanges(git.lastCommitBody());
+        git.amendCommitWithAllFileChanges(git.lastCommitBody(), gitRepoConfig.noVerify);
         git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 

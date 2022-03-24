@@ -47,10 +47,10 @@ public class TestGit {
         }
 
         git.addAllFiles();
-        git.commitWithAllFileChanges("Test commit");
+        git.commitWithAllFileChanges("Test commit", false);
 
         IOUtils.write(testFile, "Sample data");
-        git.commitWithAllFileChanges("Second Test commit");
+        git.commitWithAllFileChanges("Second Test commit", false);
     }
 
     @Before

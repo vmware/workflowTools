@@ -17,6 +17,6 @@ public class CommitAll extends BaseCommitCreateAction {
 
     @Override
     protected void commitUsingGit(String description) {
-        git.commitWithAllFileChanges(description);
+        git.commitWithAllFileChanges(description, gitRepoConfig.noVerify);
     }
 }

@@ -11,6 +11,7 @@ import com.vmware.util.logging.LogLevel;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
@@ -230,8 +231,8 @@ public class Git extends BaseScmWrapper {
         return Collections.unmodifiableMap(configValues);
     }
 
-    public void commit(String msg) {
-        executeCommitCommand("commit", msg);
+    public void commit(String msg, boolean noVerify) {
+        executeCommitCommand("commit", msg, noVerify);
     }
 
     public void addChangesToDefaultChangelist(String origin) {
@@ -242,21 +243,21 @@ public class Git extends BaseScmWrapper {
         }
     }
 
-    public void commitWithAllFileChanges(String msg) {
-        executeCommitCommand("commit --all", msg);
+    public void commitWithAllFileChanges(String msg, boolean noVerify) {
+        executeCommitCommand("commit --all", msg, noVerify);
     }
 
-    public void amendCommit(String msg) {
-        executeCommitCommand("commit --amend", msg);
+    public void amendCommit(String msg, boolean noVerify) {
+        executeCommitCommand("commit --amend", msg, noVerify);
     }
 
-    public void amendCommitWithAllFileChanges(String msg) {
-        executeCommitCommand("commit --amend --all", msg);
+    public void amendCommitWithAllFileChanges(String msg, boolean noVerify) {
+        executeCommitCommand("commit --amend --all", msg, noVerify);
     }
 
     public byte[] diffAsByteArray(String parentRef, String commitRef, boolean supportsRenames) {
         String output = diff(parentRef, commitRef, supportsRenames);
-        return output != null ? output.getBytes(Charset.forName("UTF8")) : null;
+        return output != null ? output.getBytes(StandardCharsets.UTF_8) : null;
     }
 
     public String diff(String parentRef, String commitRef, boolean supportsRenames) {
@@ -572,8 +573,11 @@ public class Git extends BaseScmWrapper {
         }
     }
 
-    private void executeCommitCommand(String commitCommand, String msg) {
-        executeScmCommand(commitCommand + " --file=-", msg, LogLevel.DEBUG);
+    private void executeCommitCommand(String commitCommand, String msg, boolean noVerify) {
+        String noVerifyText = noVerify ? " --no-verify" : "";
+        String fileText = StringUtils.isNotBlank(msg) ? " --file=-" : "";
+        LogLevel logLevel = !getAllChanges().isEmpty() ? LogLevel.INFO : LogLevel.DEBUG;
+        executeScmCommand(commitCommand + noVerifyText + fileText, msg, logLevel);
     }
 
     private void determineRootDirectory() {

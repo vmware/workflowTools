@@ -25,10 +25,10 @@ public class SelectVapp extends BaseVappAction {
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
         if (vcdConfig.useOwnedVappsOnly) {
-            super.failIfTrue(vappData.getVapps().isEmpty(), "no Vapps loaded");
+            super.failIfTrue(vappData.getVapps().isEmpty(), "no Vapps available");
         } else {
             super.failIfTrue(vappData.getVapps().isEmpty() && StringUtils.isEmpty(vcdConfig.vappJsonFile) && !jenkinsConfig.hasConfiguredArtifact(),
-                    "no Vapps loaded");
+                    "no Vapps available");
         }
     }
 

@@ -32,9 +32,11 @@ public class BuildwebConfig {
             methodNameForValueCalculation = "determineBuildwebBranch")
     public String buildwebBranch;
 
-
     @ConfigurableProperty(commandLine = "--build-type", help = "Buildweb build type to use, this is for a VMware specific tool")
     public String buildType;
+
+    @ConfigurableProperty(commandLine = "--sandbox-build-number", help = "Buildweb build number to use, this is for a VMware specific tool")
+    public String sandboxBuildNumber;
 
     @ConfigurableProperty(commandLine = "--component-builds", help = "Component builds value, this is for a VMware specific tool")
     public String componentBuilds;

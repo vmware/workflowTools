@@ -36,6 +36,7 @@
   ],
   "InvokeJenkinsJobs": [
     "--build-display-name",
+    "--sandbox-build-number",
     "--jenkins-jobs",
     "--wait-time",
     "--wait-for-action",
@@ -163,6 +164,12 @@
     "--ssh-site",
     "--use-database-host"
   ],
+  "AmendCommitAllFilesOnly": [
+    "--no-verify"
+  ],
+  "AmendCommitAll": [
+    "--no-verify"
+  ],
   "TailLogFile": [
     "--log-file",
     "--log-line-count",
@@ -239,6 +246,9 @@
   "WaitForJenkinsBuildsToComplete": [
     "--wait-time"
   ],
+  "BaseCommitCreateAction": [
+    "--no-verify"
+  ],
   "LoadAllIssuesForEpic": [
     "--epic-id"
   ],
@@ -292,10 +302,14 @@
     "--output-file",
     "--ssh-strict-host-checking",
     "--build-display-name",
+    "--sandbox-build-number",
     "--ssh-command"
   ],
   "LoadVappJson": [
     "--username"
+  ],
+  "CommitAll": [
+    "--no-verify"
   ],
   "DisplayAliasesForWorkflows": [
     "--output-file",
@@ -338,6 +352,9 @@
   ],
   "EnableDisableMergeTo": [
     "--disable-merge-to"
+  ],
+  "AmendCommitFilesOnly": [
+    "--no-verify"
   ],
   "ExitIfValueMatches": [
     "--property-value",
@@ -500,6 +517,9 @@
     "--database-url-pattern",
     "--database-url"
   ],
+  "BaseCommitAmendAction": [
+    "--no-verify"
+  ],
   "DeleteVMs": [
     "--query-filter",
     "--username"
@@ -509,6 +529,7 @@
   ],
   "FindRealTestFailures": [
     "--username",
+    "--create-test-failures-database",
     "--database-url",
     "--database-driver-class",
     "--database-driver-file",

@@ -82,6 +82,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Url for displaying comparison between two build commit ids. Needs to contain named groups first and second")
     public String commitComparisonUrl;
 
+    @ConfigurableProperty(help = "Will run test failures database creation script", commandLine = "--create-test-failures-database")
+    public boolean createTestFailuresDatabase;
+
     public boolean hasConfiguredArtifact() {
         return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;
     }
