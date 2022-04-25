@@ -40,22 +40,13 @@ public class LoadVapps extends BaseVappAction {
     @Override
     public void process() {
         QueryResultVappsType vappRecords = serviceLocator.getVcd().queryVapps(vcdConfig.queryFilters());
-        vappRecords.record.forEach(this::populatedPoweredOnVmCount);
         List<QueryResultVappType> vapps = new ArrayList<>();
         vapps.addAll(parseVappJsonFiles());
         vapps.addAll(vappRecords.record);
         vappData.setVapps(vapps);
     }
 
-    private void populatedPoweredOnVmCount(QueryResultVappType queryResultVappType) {
-        if ("POWERED_ON".equalsIgnoreCase(queryResultVappType.status)) {
-            queryResultVappType.poweredOnVmCount = queryResultVappType.otherAttributes.numberOfVMs;
-        } else if ("MIXED".equalsIgnoreCase(queryResultVappType.status) && queryResultVappType.isOwnedByWorkflowUser()) {
-            String vappId = queryResultVappType.parseIdFromRef();
-            QueryResultVMsType vmsForVapp = serviceLocator.getVcd().queryVmsForVapp(vappId);
-            queryResultVappType.poweredOnVmCount = (int) vmsForVapp.record.stream().filter(QueryResultVMType::isPoweredOn).count();
-        }
-    }
+
 
     private Collection<? extends QueryResultVappType> parseVappJsonFiles() {
         if (vcdConfig.vappJsonFiles == null) {

@@ -29,6 +29,7 @@ import com.vmware.vcd.domain.MetaDatasType;
 import com.vmware.vcd.domain.QueryResultVMsType;
 import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
+import com.vmware.vcd.domain.QuotaPools;
 import com.vmware.vcd.domain.ResourceType;
 import com.vmware.vcd.domain.TaskType;
 import com.vmware.vcd.domain.UserSession;
@@ -137,8 +138,12 @@ public class Vcd extends AbstractRestService {
         return getResource(metadataLink, MetaDatasType.class);
     }
 
+    public UserSession getCurrentSession() {
+        return get(cloudapiUrl + "/sessions/current", UserSession.class, acceptHeader(UserSession.class));
+    }
+
     public UserType getLoggedInUser() {
-        UserSession session = get(cloudapiUrl + "/sessions/current", UserSession.class, acceptHeader(UserSession.class));
+        UserSession session = getCurrentSession();
         String userId = StringUtils.substringAfterLast(session.user.id, ":");
         return get(apiUrl + "/admin/user/" + userId, UserType.class, acceptHeader(UserType.class));
     }
@@ -149,6 +154,11 @@ public class Vcd extends AbstractRestService {
             queryUrl += "&filter=" + Arrays.stream(filterValues).filter(Objects::nonNull).collect(Collectors.joining(";"));
         }
         return get(queryUrl, responseTypeClass, acceptHeader(responseTypeClass));
+    }
+
+    public QuotaPools getQuotaPools(String userId) {
+        String quotaUrl = String.format("%s/users/%s/quotas", cloudapiUrl, userId);
+        return get(quotaUrl, QuotaPools.class, acceptHeader(QuotaPools.class));
     }
 
     public void waitForTaskToComplete(String taskHref, int amount, TimeUnit timeUnit) {

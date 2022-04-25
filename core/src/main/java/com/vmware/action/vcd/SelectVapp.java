@@ -49,7 +49,7 @@ public class SelectVapp extends BaseVappAction {
             log.info("Using already selected Vapp {}", vappData.getSelectedVappName());
         } else {
             int selectedVapp = InputUtils.readSelection(vappData.vappLabels(),
-                    "Select Vapp (Total powered on owned VM count " + vappData.poweredOnVmCount() + ")");
+                    "Select Vapp (Total VM count " + vappData.totalVMs() + ")");
             vappData.setSelectedVappByIndex(selectedVapp);
         }
         if (StringUtils.isNotBlank(vappData.getSelectedVappName())) {
