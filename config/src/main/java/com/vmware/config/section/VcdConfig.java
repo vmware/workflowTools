@@ -7,10 +7,10 @@ import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
 
 public class VcdConfig {
-    @ConfigurableProperty(help = "Url for Vcloud Director")
+    @ConfigurableProperty(commandLine = "--vcd-url", help = "Url for Vcloud Director")
     public String vcdUrl;
 
-    @ConfigurableProperty(help = "Default Org to use for user login if none specified")
+    @ConfigurableProperty(commandLine = "--vcd-org", help = "Default Org to use for user login if none specified")
     public String defaultVcdOrg;
 
     @ConfigurableProperty(commandLine = "--vcd-sys-admin-username", help = "Username for the vcd sys admin user")
@@ -25,7 +25,7 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-check-quota", help = "Whether to check if user is over VM quota count")
     public boolean checkVmQuota;
 
-    @ConfigurableProperty(commandLine = "--vcd-vm-quota", help = "User VM quota count for Vcloud Director. Used if quota cannot be found in Vcloud Director")
+    @ConfigurableProperty(help = "User VM quota count for Vcloud Director. Used if quota cannot be found in Vcloud Director")
     public int vcdVmQuota;
 
     @ConfigurableProperty(commandLine = "--vapp-lease", help = "Lease value in days for the selected Vapp")

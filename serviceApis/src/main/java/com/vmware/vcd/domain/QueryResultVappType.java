@@ -1,8 +1,6 @@
 package com.vmware.vcd.domain;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

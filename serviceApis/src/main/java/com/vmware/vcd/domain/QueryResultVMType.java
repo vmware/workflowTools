@@ -15,4 +15,8 @@ public class QueryResultVMType extends ResourceType implements InputListSelectio
     public String getLabel() {
         return name + "(" + containerName + ") " + status;
     }
+
+    public String getStatus() {
+        return status;
+    }
 }

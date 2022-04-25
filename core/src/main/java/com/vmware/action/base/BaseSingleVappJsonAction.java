@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.vmware.config.ReplacementVariables;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.input.InputListSelection;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.Sites;
 
@@ -44,5 +45,16 @@ public abstract class BaseSingleVappJsonAction extends BaseSingleVappAction {
                 ? selectedVcdCell.deployment.ovfProperties.hostname : selectedVcdCell.endPointURI;
         replacementVariables.addVariable(ReplacementVariables.VariableName.VCD_CELL_NAME, selectedVcdCell.name);
         replacementVariables.addVariable(ReplacementVariables.VariableName.VCD_CELL_HOST_NAME, hostName);
+    }
+
+    protected Sites.DeployedVM selectDeployedVm(List<Sites.DeployedVM> deployedVMs, String vmDescription) {
+        if (deployedVMs.size() == 1) {
+            log.info("Using first {} {} as there is only one {}", vmDescription, deployedVMs.get(0).name, vmDescription);
+            return deployedVMs.get(0);
+        } else {
+            List<InputListSelection> values = deployedVMs.stream().map(vm -> ((InputListSelection) vm)).collect(Collectors.toList());
+            int selection = InputUtils.readSelection(values, "Select " + vmDescription);
+            return deployedVMs.get(selection);
+        }
     }
 }

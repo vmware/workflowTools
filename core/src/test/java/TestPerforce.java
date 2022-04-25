@@ -1,9 +1,12 @@
+import com.vmware.http.HttpConnection;
+import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.util.scm.FileChange;
 import com.vmware.util.scm.Perforce;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,6 +16,16 @@ import static org.junit.Assert.assertTrue;
 public class TestPerforce {
 
     private Perforce perforce = new Perforce("dbiggs-vcloud-sp-main", null);
+
+    @Test
+    public void bustLoadBalancer() {
+        IntStream.range(0, 10000).parallel().forEach(i -> {
+            HttpConnection connection = new HttpConnection(RequestBodyHandling.AsMultiPartFormEntity);
+            String pageText = connection.get("http://10.150.174.208/index.html", String.class);
+            System.out.println(i + " " + pageText);
+        });
+
+    }
 
     @Test
     public void canDetermineRootDirectory() {

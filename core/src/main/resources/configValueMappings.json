@@ -48,7 +48,9 @@
     "--sync-to-branch-latest"
   ],
   "LoadVappMetadataIfFound": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--file-data",
     "--vapp-metadata-name"
   ],
@@ -83,6 +85,8 @@
   ],
   "AuthenticateAllApis": [
     "--bugzilla-test-bug",
+    "--vcd-org",
+    "--vcd-url",
     "--username"
   ],
   "AbortJenkinsBuilds": [
@@ -152,9 +156,16 @@
     "--disable-jira"
   ],
   "PowerOnVapp": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--wait-time",
     "--wait-for-action"
+  ],
+  "ShowLoggedInUserDetails": [
+    "--vcd-org",
+    "--username",
+    "--vcd-url"
   ],
   "BaseSshAction": [
     "--ssh-password",
@@ -190,7 +201,9 @@
     "--parent"
   ],
   "SetVappMetadataIfNeeded": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--file-data",
     "--vapp-metadata-name"
   ],
@@ -213,7 +226,9 @@
   ],
   "LoadVapps": [
     "--query-filter",
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--vapp-json-file",
     "--use-owned-vapps-only"
   ],
@@ -274,11 +289,15 @@
     "--disable-bugzilla"
   ],
   "DeleteVappMetadataIfNeeded": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--vapp-metadata-name"
   ],
   "RenameVapp": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--wait-time"
   ],
   "SetSummary": [
@@ -288,7 +307,9 @@
     "--wait-time"
   ],
   "DeleteVapp": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--wait-time",
     "--wait-for-action"
   ],
@@ -306,7 +327,9 @@
     "--ssh-command"
   ],
   "LoadVappJson": [
-    "--username"
+    "--vcd-org",
+    "--username",
+    "--vcd-url"
   ],
   "CommitAll": [
     "--no-verify"
@@ -356,6 +379,11 @@
   "AmendCommitFilesOnly": [
     "--no-verify"
   ],
+  "ShowVappVmsStatus": [
+    "--vcd-org",
+    "--username",
+    "--vcd-url"
+  ],
   "ExitIfValueMatches": [
     "--property-value",
     "--input-text"
@@ -377,7 +405,9 @@
     "--autocomplete-workflow"
   ],
   "ExitIfVcdVmQuotaExceeded": [
-    "--vcd-vm-quota",
+    "--vcd-org",
+    "--username",
+    "--vcd-url",
     "--use-vapp-json"
   ],
   "ReadCertsFromUrl": [
@@ -407,7 +437,9 @@
     "--username"
   ],
   "PowerOffVapp": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--wait-time",
     "--wait-for-action"
   ],
@@ -484,7 +516,9 @@
     "--username"
   ],
   "UpdateVappLease": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--vapp-lease",
     "--wait-time"
   ],
@@ -522,7 +556,9 @@
   ],
   "DeleteVMs": [
     "--query-filter",
-    "--username"
+    "--vcd-org",
+    "--username",
+    "--vcd-url"
   ],
   "SyncCardsWithJiraIssues": [
     "--keep-missing-cards"
@@ -556,7 +592,9 @@
     "--own-boards-only"
   ],
   "DisplayVappMetadataKeys": [
-    "--username"
+    "--vcd-org",
+    "--username",
+    "--vcd-url"
   ],
   "DiscardUnpublishedReviews": [
     "--username"
@@ -584,7 +622,9 @@
     "--database-schema-name"
   ],
   "DownloadBuildArtifact": [
+    "--vcd-org",
     "--username",
+    "--vcd-url",
     "--job-with-artifact",
     "--job-build-number",
     "--file-data",

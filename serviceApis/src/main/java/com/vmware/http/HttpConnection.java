@@ -351,11 +351,20 @@ public class HttpConnection {
         String currentUrl = activeConnection.getURL().toString();
         int responseCode = activeConnection.getResponseCode();
         String responseText;
-        if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {
-            responseText = IOUtils.read(activeConnection.getInputStream());
-        } else {
-            responseText = IOUtils.read(activeConnection.getErrorStream());
+        try {
+            if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {
+                responseText = IOUtils.read(activeConnection.getInputStream());
+            } else {
+                responseText = IOUtils.read(activeConnection.getErrorStream());
+            }
+        } catch (IOException ioe) {
+            if (!ExceptionChecker.isStatusValid(responseCode)) {
+                responseText = ioe.getMessage();
+            } else {
+                throw ioe;
+            }
         }
+
 
         log.trace("Response\n{}", responseText);
         ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType, responseText);

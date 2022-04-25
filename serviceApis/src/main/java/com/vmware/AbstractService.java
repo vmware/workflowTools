@@ -97,7 +97,7 @@ public abstract class AbstractService {
 
     protected void saveApiToken(String apiToken, ApiAuthentication credentialsType) {
         String existingToken = readExistingApiToken(credentialsType);
-        if (apiToken == null || apiToken.equals(existingToken)) {
+        if (StringUtils.isEmpty(apiToken) || apiToken.equals(existingToken)) {
             return;
         }
         File apiTokenFile = determineApiTokenFile();

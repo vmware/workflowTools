@@ -283,7 +283,7 @@ public class WorkflowConfig {
     }
 
     public JenkinsJobsConfig getJenkinsJobsConfig() {
-        return jenkinsConfig.getJenkinsJobsConfig(this.username, gitRepoConfig.determineBranchName());
+        return jenkinsConfig.getJenkinsJobsConfig(this.username, gitRepoConfig.determineBranchName(), relevantAdditionalJobParameters());
     }
 
     public WorkflowFields getConfigurableFields() {
@@ -382,5 +382,16 @@ public class WorkflowConfig {
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
         }
+    }
+
+    private Map<String, String> relevantAdditionalJobParameters() {
+        if (jenkinsConfig.jenkinsJobsAdditionalParameters.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return jenkinsConfig.jenkinsJobsAdditionalParameters.entrySet().stream().filter(entry -> {
+            String propertyName = entry.getKey().split("\\|")[0];
+            String currentPropertyValue = String.valueOf(valueForField(configurableFields.getFieldByName(propertyName)).getValue());
+            return entry.getKey().equals(propertyName + "|" + currentPropertyValue);
+        }).collect(Collectors.toMap(entry -> entry.getKey().split("\\|")[0], Map.Entry::getValue));
     }
 }

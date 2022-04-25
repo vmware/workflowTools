@@ -15,7 +15,7 @@ import com.vmware.http.ssl.WorkflowCertificateManager;
 import static sun.security.provider.X509Factory.BEGIN_CERT;
 import static sun.security.provider.X509Factory.END_CERT;
 
-@ActionDescription("Reads certs from the speciifed url.")
+@ActionDescription("Reads certs from the specified url.")
 public class ReadCertsFromUrl extends BaseAction {
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -30,7 +30,6 @@ public class ReadCertsFromUrl extends BaseAction {
         X509Certificate[] certificates = new WorkflowCertificateManager().getCertificatesForUri(URI.create(fileSystemConfig.sourceUrl));
         fileSystemConfig.fileData = Arrays.stream(certificates).map(this::formatCrtFileContents).collect(Collectors.joining("\n"));
         log.debug("Cert data {}", fileSystemConfig.fileData);
-
     }
 
     private String formatCrtFileContents(final X509Certificate certificate) {

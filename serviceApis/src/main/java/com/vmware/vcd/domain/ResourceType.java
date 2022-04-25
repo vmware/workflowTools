@@ -40,4 +40,8 @@ public abstract class ResourceType {
         }
         return vappId;
     }
+
+    public String getName() {
+        return name;
+    }
 }

@@ -18,6 +18,7 @@ public class Sites {
         public List<DeployedVM> cells;
         public List<DeployedVM> vcServers;
         public List<DeployedVM> nsxManagers;
+        public List<DeployedVM> aviControllers;
         public DatabaseServer databaseServer;
     }
 

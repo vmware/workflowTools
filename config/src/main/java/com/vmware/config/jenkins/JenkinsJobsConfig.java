@@ -33,9 +33,12 @@ public class JenkinsJobsConfig {
 
     public static final String VAPP_JSON_VALUE = "$VAPP_JSON";
 
+    public static final String ADD_ADDITIONAL_PARAMS_KEY = "ADD_ADDITIONAL_PARAMS";
+
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Map<String, String> jenkinsJobsMappings = new HashMap<>();
+    private final Map<String, String> additionalJobParameters;
     private String branchName;
     private String vappJsonParameter;
 
@@ -55,11 +58,13 @@ public class JenkinsJobsConfig {
     }
 
     public JenkinsJobsConfig(String jenkinsJobsToUse, String[] jobsDisplayNames, Map<String, String> presetParameters,
-                             String jenkinsUrl, Map<String, String> jenkinsJobsMappings, String branchName, String vappJsonParameter) {
+                             String jenkinsUrl, Map<String, String> jenkinsJobsMappings, Map<String, String> additionalJobParameters,
+                             String branchName, String vappJsonParameter) {
         this.presetParameters = presetParameters;
         this.jobsDisplayNames = jobsDisplayNames;
         this.jenkinsUrl = jenkinsUrl;
         this.jenkinsJobsMappings = jenkinsJobsMappings;
+        this.additionalJobParameters = additionalJobParameters;
         this.branchName = branchName;
         this.vappJsonParameter = vappJsonParameter;
         parseJobsText(jenkinsJobsToUse);
@@ -103,14 +108,14 @@ public class JenkinsJobsConfig {
             job.name = jobName;
             String paramText = jobInfo.substring(ampersandIndex + 1);
             job.constructUrl(jenkinsUrl, jobName);
-            job.parameters = parseJobParameters(jobName, paramText.split("&"));
+            job.parameters = parseJobParameters(jobName, paramText.split("&"), false, additionalJobParameters);
         } else {
             job.constructUrl(jenkinsUrl, jobInfo);
         }
         jobs.add(job);
     }
 
-    private List<JobParameter> parseJobParameters(String jobName, String[] params) {
+    private List<JobParameter> parseJobParameters(String jobName, String[] params, boolean specifiedParametersOnly, Map<String, String> additionalJobParameters) {
         List<JobParameter> parameters = new ArrayList<>();
         for (String param : params) {
             String[] paramPieces = param.split("=");
@@ -118,13 +123,20 @@ public class JenkinsJobsConfig {
                 throw new FatalException(
                         "Parameter {} for job {} should be of the format name=value", param, jobName);
             }
+            String paramName = paramPieces[0];
             String paramValue = paramPieces[1];
             if (paramValue.contains(BRANCH_NAME)) {
                 paramValue = replaceBranchNameVariableWithValue(paramValue);
             }
-            parameters.add(new JobParameter(paramPieces[0], paramValue));
+            if (paramName.equals(ADD_ADDITIONAL_PARAMS_KEY) && additionalJobParameters.containsKey(paramValue)) {
+                List<JobParameter> additionalParams = parseJobParameters(jobName, additionalJobParameters.get(paramValue).split("&"), true,
+                        additionalJobParameters);
+                parameters.addAll(additionalParams);
+            } else {
+                parameters.add(new JobParameter(paramName, paramValue));
+            }
         }
-        expandParameterValues(jobName, parameters);
+        expandParameterValues(jobName, parameters, specifiedParametersOnly);
         return parameters;
     }
 
@@ -136,8 +148,8 @@ public class JenkinsJobsConfig {
         return paramValue;
     }
 
-    private void expandParameterValues(String jobName, List<JobParameter> parameters) {
-        boolean setDefaultUsernameParam = !presetParameters.containsKey(USERNAME_PARAM);
+    private void expandParameterValues(String jobName, List<JobParameter> parameters, boolean specifiedParametersOnly) {
+        boolean setDefaultUsernameParam = !specifiedParametersOnly && !presetParameters.containsKey(USERNAME_PARAM);
         Iterator<JobParameter> paramIter = parameters.iterator();
         Set<String> usedPresetParams = new HashSet<>();
         while (paramIter.hasNext()) {
@@ -186,7 +198,9 @@ public class JenkinsJobsConfig {
             log.debug("Adding preset value {} for Vapp json parameter {}", presetParameters.get(vappJsonParameter), vappJsonParameter);
             parameters.add(new JobParameter(vappJsonParameter, presetParameters.get(vappJsonParameter)));
         }
-        addUnusedPresetParameters(parameters, usedPresetParams);
+        if (!specifiedParametersOnly) {
+            addUnusedPresetParameters(parameters, usedPresetParams);
+        }
     }
 
     @Override
@@ -194,7 +208,7 @@ public class JenkinsJobsConfig {
         String jobText = "";
         for (Job job : jobs) {
             jobText = StringUtils.appendWithDelimiter(jobText, job.buildDisplayName + "|" + job.name, ",");
-            jobText = StringUtils.appendWithDelimiter(jobText, job.parameters, "&");
+            jobText = StringUtils.appendWithDelimiter(jobText, job.parameters, System.lineSeparator());
         }
         return jobText;
     }

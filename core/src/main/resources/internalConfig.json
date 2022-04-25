@@ -31,7 +31,7 @@
   "buildwebProject": "vcloud",
   "defaultBuildwebBranch": "sp-main",
   "buildType": "opt",
-  "vcdApiVersion": "32.0",
+  "vcdApiVersion": "35.0",
   "vcdSysAdminUser": "administrator",
   "vcdVmQuota": 40,
   "testbedParameter": "TESTBED_DESCRIPTOR_NAME",
@@ -868,6 +868,10 @@
       "selectVapp",
       "UpdateVappLease"
     ],
+    "showVappVms": [
+      "selectVapp",
+      "ShowVappVmsStatus"
+    ],
     "showVappJson": [
       "loadVappJson",
       "DisplayVappJson"
@@ -888,23 +892,30 @@
       "selectVcdSite",
       "OpenNsxTManagerApp"
     ],
-    "openVappProvider": [
+    "openAviController": [
+      "selectVcdSite",
+      "OpenAviController"
+    ],
+    "openVcdProvider": [
       "selectVcdSite",
       "OpenVcdProviderApp"
     ],
-    "openVappTenant": [
+    "openVcdTenant": [
       "selectVcdSite",
       "OpenVcdTenantApp"
+    ],
+    "executeVcdSsh": [
+      "executeVappSsh"
     ],
     "executeVappSsh": [
       "selectVcdCell",
       "ExecuteSshCommand"
     ],
-    "openVappSshShell": [
+    "openVcdSshShell": [
       "selectVcdCell",
       "OpenSshShell"
     ],
-    "openVappDatabaseSshShell": [
+    "openVcdDatabaseSshShell": [
       "selectVcdSite",
       "OpenSshShell&&--use-database-host=true"
     ],

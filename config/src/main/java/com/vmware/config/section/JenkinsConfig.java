@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -45,6 +46,9 @@ public class JenkinsConfig {
 
     @ConfigurableProperty(help = "Variables to use for jenkins jobs, can set specific values re command line as well, e.g. --JVAPP_NAME=test --JUSERNAME=dbiggs")
     public Map<String, String> jenkinsJobParameters = new TreeMap<>();
+
+    @ConfigurableProperty(help = "Used to add additional parameters to a job by matching against a config parameter. E.g. the key would be the username|usernameValue: properties")
+    public Map<String, String> jenkinsJobsAdditionalParameters = new TreeMap<>();
 
     @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
     public int logLineCount;
@@ -108,7 +112,7 @@ public class JenkinsConfig {
         }
     }
 
-    public JenkinsJobsConfig getJenkinsJobsConfig(String username, String targetBranch) {
+    public JenkinsJobsConfig getJenkinsJobsConfig(String username, String targetBranch, Map<String, String> relevantAdditionalParameters) {
         jenkinsJobParameters.put(JobParameter.USERNAME_PARAM, username);
         Map<String, String> presetParams = new HashMap<>(jenkinsJobParameters);
         if (useVappJsonParameter) {
@@ -116,8 +120,9 @@ public class JenkinsConfig {
         }
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
 
+
         return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, Collections.unmodifiableMap(presetParams), jenkinsUrl,
-                jobMappings, targetBranch, vappJsonParameter);
+                jobMappings, relevantAdditionalParameters, targetBranch, vappJsonParameter);
     }
 
 }

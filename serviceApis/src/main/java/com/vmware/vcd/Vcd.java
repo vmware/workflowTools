@@ -31,6 +31,8 @@ import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
 import com.vmware.vcd.domain.ResourceType;
 import com.vmware.vcd.domain.TaskType;
+import com.vmware.vcd.domain.UserSession;
+import com.vmware.vcd.domain.UserType;
 import com.vmware.vcd.domain.VcdMediaType;
 
 import static com.vmware.http.cookie.ApiAuthentication.vcd;
@@ -44,12 +46,13 @@ import static com.vmware.http.request.UrlParam.forceParam;
  */
 public class Vcd extends AbstractRestService {
     public static String AUTHORIZATION_HEADER = "x-vcloud-authorization";
-    private String apiVersion;
+    private final String apiVersion;
+    private final String cloudapiUrl;
     private String vcdOrg;
-
 
     public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
         super(vcdUrl, "api", null, username);
+        this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
@@ -61,6 +64,7 @@ public class Vcd extends AbstractRestService {
 
     public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg) {
         super(vcdUrl, "api", ApiAuthentication.vcd, username);
+        this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
@@ -133,6 +137,12 @@ public class Vcd extends AbstractRestService {
         return getResource(metadataLink, MetaDatasType.class);
     }
 
+    public UserType getLoggedInUser() {
+        UserSession session = get(cloudapiUrl + "/sessions/current", UserSession.class, acceptHeader(UserSession.class));
+        String userId = StringUtils.substringAfterLast(session.user.id, ":");
+        return get(apiUrl + "/admin/user/" + userId, UserType.class, acceptHeader(UserType.class));
+    }
+
     public <T extends ResourceType> T query(String queryType, Class<T> responseTypeClass, boolean includeLinks, String... filterValues) {
         String queryUrl = String.format("%s/query?type=%s&links=%s", apiUrl, queryType,  includeLinks);
         if (filterValues.length > 0) {
@@ -177,7 +187,7 @@ public class Vcd extends AbstractRestService {
             log.info("Appending org name {} to username {}", vcdOrg, credentials.getUsername());
             credentials = new UsernamePasswordCredentials(credentials.getUsername() + "@" + vcdOrg, credentials.getPassword());
         } else {
-            vcdOrg = StringUtils.splitOnlyOnce(credentials.getUsername(), ",")[1];
+            vcdOrg = StringUtils.splitOnlyOnce(credentials.getUsername(), "@")[1];
             log.info("Setting vcd org to {}", vcdOrg);
         }
 
@@ -205,7 +215,12 @@ public class Vcd extends AbstractRestService {
     }
 
     private String mediaType(Class<?> dto) {
-        return dto.getAnnotation(VcdMediaType.class).value() + "+json;version=" + apiVersion;
+        String mediaType = dto.getAnnotation(VcdMediaType.class).value();
+        if ("application/json".equalsIgnoreCase(mediaType)) {
+            return mediaType + ";version=" + apiVersion;
+        } else {
+            return dto.getAnnotation(VcdMediaType.class).value() + "+json;version=" + apiVersion;
+        }
     }
 
     private String loginWithCredentials(UsernamePasswordCredentials credentials) {
