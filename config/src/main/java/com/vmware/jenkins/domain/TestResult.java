@@ -105,6 +105,14 @@ public class TestResult extends BaseDbClass {
         return startedAt;
     }
 
+    public String fullTestNameWithExceptionInfo() {
+        if (StringUtils.isEmpty(exception)) {
+            return fullTestNameWithPackage() + " " + status;
+        } else {
+            return fullTestNameWithPackage() + " " + status + System.lineSeparator() + exception + System.lineSeparator();
+        }
+    }
+
     public String fullTestNameWithSkipInfo() {
         String fullTestName = classAndTestName();
         if (status == TestStatus.SKIP && similarSkips != null && similarSkips > 0) {

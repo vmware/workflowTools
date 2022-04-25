@@ -1,16 +1,17 @@
 package com.vmware.jenkins.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.vmware.BuildStatus;
 import com.vmware.util.StringUtils;
 
+import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static java.util.Arrays.stream;
 
@@ -79,6 +80,10 @@ public class TestResults {
             }
         }
         return loadedTestResults;
+    }
+
+    public List<TestResult> failedTestResults() {
+        return testResults().stream().filter(result -> result.status != PASS).sorted(Comparator.comparing(TestResult::getStartedAt)).collect(Collectors.toList());
     }
 
     public void setLoadedTestResults(List<TestResult> loadedTestResults) {

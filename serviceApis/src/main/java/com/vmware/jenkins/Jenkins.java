@@ -15,6 +15,7 @@ import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.HomePage;
+import com.vmware.jenkins.domain.TestResult;
 import com.vmware.jenkins.domain.TestResults;
 import com.vmware.jenkins.domain.JobView;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.vmware.http.cookie.ApiAuthentication.jenkins;
 
@@ -112,8 +114,20 @@ public class Jenkins extends AbstractRestBuildService {
                 .forEach(jobBuild -> {
                     Padder buildPadder = new Padder("Jenkins build {} status {}", jobBuild.buildNumber(), jobBuild.status);
                     buildPadder.infoTitle();
-                    String consoleOutput = IOUtils.tail(jobBuild.consoleUrl(), linesToShow);
-                    log.info(consoleOutput);
+                    if (jobBuild.status != BuildStatus.FAILURE && jobBuild.status != BuildStatus.UNSTABLE) {
+                        String consoleOutput = IOUtils.tail(jobBuild.logTextUrl(), linesToShow);
+                        log.info(consoleOutput);
+                    } else {
+                        List<TestResult> failedTests = getJobBuildTestResults(jobBuild).failedTestResults();
+                        if (failedTests.isEmpty()) {
+                            log.info("No failed tests found, showing last {} lines of log text", linesToShow);
+                            String consoleOutput = IOUtils.tail(jobBuild.logTextUrl(), linesToShow);
+                            log.info(consoleOutput);
+                        } else {
+                            List<String> failedTestsText = failedTests.stream().map(TestResult::fullTestNameWithExceptionInfo).collect(Collectors.toList());
+                            IntStream.range(0, Math.min(linesToShow, failedTests.size())).forEach(index -> log.info(failedTestsText.get(index)));
+                        }
+                    }
                     buildPadder.infoTitle();
                 });
     }
