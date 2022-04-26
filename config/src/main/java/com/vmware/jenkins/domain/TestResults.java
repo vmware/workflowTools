@@ -59,6 +59,9 @@ public class TestResults {
             return loadedTestResults;
         }
         loadedTestResults = new ArrayList<>();
+        if (packages == null) {
+            return loadedTestResults;
+        }
         for (Package pkg : packages) {
             for (Class clazz : pkg.classs) {
                 Set<String> usedUrls = new HashSet<>();

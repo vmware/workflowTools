@@ -84,6 +84,7 @@
     "--destination-file"
   ],
   "AuthenticateAllApis": [
+    "--disable-login",
     "--bugzilla-test-bug",
     "--vcd-org",
     "--vcd-url",
@@ -564,6 +565,7 @@
     "--keep-missing-cards"
   ],
   "FindRealTestFailures": [
+    "--disable-login",
     "--username",
     "--create-test-failures-database",
     "--database-url",

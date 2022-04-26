@@ -38,7 +38,7 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--job-display-names", help = "Display names to use for the jobs invoked")
     public String[] jobsDisplayNames;
 
-    @ConfigurableProperty(help = "Skips trying to log into jenkins if the server is not using user login module")
+    @ConfigurableProperty(commandLine = "--disable-login", help = "Skips trying to log into jenkins if the server is not using user login module")
     public boolean disableJenkinsLogin;
 
     @ConfigurableProperty(help = "Map of user friendly names for jenkins jobs to select from")
