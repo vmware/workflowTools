@@ -160,9 +160,9 @@ public class Jenkins extends AbstractRestBuildService {
     protected void checkAuthenticationAgainstServer() {
         if (disableLogin) {
             log.debug("Login is disabled for jenkins");
-            return;
+        } else {
+            connection.get(UrlUtils.addRelativePaths(baseUrl, "me/api/json"), User.class);
         }
-        connection.get(UrlUtils.addRelativePaths(baseUrl, "me/api/json"), User.class);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class Jenkins extends AbstractRestBuildService {
     @Override
     protected <T> T post(String url, Class<T> responseConversionClass, Object param, RequestParam... params) {
         if (usesCsrf) {
-            CsrfCrumb csrfCrumb = super.get(super.baseUrl + "crumbIssuer/api/json", CsrfCrumb.class);
+            CsrfCrumb csrfCrumb = super.get(UrlUtils.addRelativePaths(super.baseUrl, "crumbIssuer/api/json"), CsrfCrumb.class);
             RequestHeader csrfHeader = new RequestHeader(csrfCrumb.crumbRequestField, csrfCrumb.crumb);
             List<RequestParam> paramList = new ArrayList<>(Arrays.asList(params));
             paramList.add(csrfHeader);
