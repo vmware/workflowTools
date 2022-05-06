@@ -97,7 +97,7 @@ public class ServiceLocator {
         if (vcd == null) {
             VcdConfig vcdConfig = config.vcdConfig;
             SsoConfig ssoConfig = config.ssoConfig;
-            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
+            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, vcdConfig.vcdSsoLoginButtonId,
                     ssoConfig.ssoHeadless, ssoConfig);
         }
         return vcd;

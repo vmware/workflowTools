@@ -32,9 +32,10 @@ public class SsoClient {
         this.ssoConfig = ssoConfig;
     }
 
-    public String loginAndGetApiToken(String siteUrl) {
+    public String loginAndGetApiToken(String siteUrl, String ssoLoginButtonId) {
         String headlessText = ssoConfig.ssoHeadless ? " --headless" : "";
         String chromeCommand = "\"" + ssoConfig.chromePath + "\"" + headlessText + " --disable-gpu --remote-debugging-port=9223";
+        log.info("Using Google Chrome for SSO to get API token, launching with {}", chromeCommand);
         Process chromeProcess = CommandLineUtils.executeCommand(null, null, chromeCommand, (String) null);
         String startupText = IOUtils.readWithoutClosing(chromeProcess.getInputStream());
         log.debug(startupText);
@@ -47,7 +48,7 @@ public class SsoClient {
         devTools.sendMessage(ApiRequest.navigate(siteUrl));
         devTools.waitForDomContentEvent();
         //devTools.sendMessage(new ApiRequest("Page.startScreencast", Collections.singletonMap("everyNthFrame", 2)));
-        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoConfig.ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
+        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
         if (siteUrl.equalsIgnoreCase(response.getValue())) {
             log.info("Retrieved api token using SSO");
             String apiToken = devTools.evaluate(ssoConfig.ssoApiTokenJavaScript).getValue();
@@ -56,9 +57,9 @@ public class SsoClient {
             return apiToken;
         }
 
-        if (ssoConfig.ssoLoginButtonId != null && response.getDescrption() != null && response.getDescrption().contains(ssoConfig.ssoLoginButtonId)) {
-            log.info("Clicking SSO sign in element {}", ssoConfig.ssoLoginButtonId);
-            devTools.evaluate(ssoConfig.ssoLoginButtonId, ".click()");
+        if (ssoLoginButtonId != null && response.getDescrption() != null && response.getDescrption().contains(ssoLoginButtonId)) {
+            log.info("Clicking SSO sign in element {}", ssoLoginButtonId);
+            devTools.evaluate(ssoLoginButtonId, ".click()");
             devTools.waitForDomContentEvent();
             ApiResponse loginResponse = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoConfig.ssoSignInButtonId);
             if (siteUrl.equals(loginResponse.getValue())) {

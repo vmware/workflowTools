@@ -56,6 +56,7 @@ public class Vcd extends AbstractRestService {
     private final String cloudapiUrl;
     private final boolean useVcdSso;
     private final SsoConfig ssoConfig;
+    private final String ssoLoginButtonId;
     private String vcdOrg;
 
     public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
@@ -64,6 +65,7 @@ public class Vcd extends AbstractRestService {
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
         this.ssoConfig = null;
+        this.ssoLoginButtonId = null;
         this.useVcdSso = false;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -72,12 +74,13 @@ public class Vcd extends AbstractRestService {
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
-    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, boolean ssoHeadless, SsoConfig ssoConfig) {
+    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoLoginButtonId, boolean ssoHeadless, SsoConfig ssoConfig) {
         super(vcdUrl, "api", ApiAuthentication.vcd, username);
         this.useVcdSso = useVcdSso;
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
+        this.ssoLoginButtonId = ssoLoginButtonId;
         this.ssoConfig = ssoConfig;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -202,11 +205,10 @@ public class Vcd extends AbstractRestService {
             vcdOrg = InputUtils.readValueUntilNotBlank("Vcd Organization");
         }
         if (useVcdSso) {
-            log.info("Using SSO to get API token");
             SsoClient client = new SsoClient(ssoConfig);
             String apiToken;
             try {
-                apiToken = client.loginAndGetApiToken(UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs"));
+                apiToken = client.loginAndGetApiToken(UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs"), ssoLoginButtonId);
             } catch (RuntimeException e) {
                 log.debug(e.getMessage(), e);
                 log.info("Encountered exception when using SSO: {}", e.getMessage());

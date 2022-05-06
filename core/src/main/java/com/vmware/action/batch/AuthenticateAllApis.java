@@ -24,7 +24,7 @@ public class AuthenticateAllApis extends BaseAction {
     public void process() {
         checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl, config.username));
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
-                ssoConfig.ssoHeadless, ssoConfig));
+                vcdConfig.vcdSsoLoginButtonId, ssoConfig.ssoHeadless, ssoConfig));
         checkAuthentication(new Trello(trelloConfig.trelloUrl));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));

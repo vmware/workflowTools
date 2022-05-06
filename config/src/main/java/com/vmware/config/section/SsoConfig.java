@@ -16,9 +16,6 @@ public class SsoConfig {
     @ConfigurableProperty(help = "Javascript to execute to fetch api token")
     public String ssoApiTokenJavaScript;
 
-    @ConfigurableProperty(help = "Id of button / link to click to sign in with SSO")
-    public String ssoLoginButtonId;
-
     @ConfigurableProperty(help = "Id of input field for username when signing in with SSO")
     public String ssoUsernameInputId;
 
@@ -29,7 +26,7 @@ public class SsoConfig {
     public String ssoSignInButtonId;
 
     public boolean manualLoginConfigPresent() {
-        return Stream.of(chromePath, ssoApiTokenJavaScript, ssoLoginButtonId, ssoUsernameInputId, ssoPasswordInputId, ssoSignInButtonId)
+        return Stream.of(chromePath, ssoApiTokenJavaScript, ssoUsernameInputId, ssoPasswordInputId, ssoSignInButtonId)
                 .allMatch(StringUtils::isNotBlank);
     }
 }
