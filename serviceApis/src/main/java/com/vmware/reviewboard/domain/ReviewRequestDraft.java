@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -326,6 +327,9 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public List<JobBuild> jobBuildsMatchingUrl(String url) {
+        if (StringUtils.isEmpty(url)) {
+            return Collections.emptyList();
+        }
         List<JobBuild> builds = new ArrayList<>();
         for (JobBuild buildToCheck : jobBuilds) {
             if (buildToCheck.containsUrl(url)) {

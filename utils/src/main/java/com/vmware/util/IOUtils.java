@@ -16,6 +16,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +38,14 @@ public class IOUtils {
         try {
             write(new FileOutputStream(file), data);
         } catch (FileNotFoundException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
+    public static void write(File file, byte[] data) {
+        try {
+            Files.write(file.toPath(), data);
+        } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
     }

@@ -350,6 +350,7 @@ public class HttpConnection {
     private String parseResponseText(HttpMethodType methodType) throws IOException {
         String currentUrl = activeConnection.getURL().toString();
         int responseCode = activeConnection.getResponseCode();
+        log.debug("GET: {} {}", currentUrl, responseCode);
         String responseText;
         try {
             if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {

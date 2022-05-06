@@ -1,5 +1,7 @@
 package com.vmware.action;
 
+import java.io.IOException;
+
 public interface Action {
     /**
      * Setup method that will run asynchonrously, useful for setting up rest services

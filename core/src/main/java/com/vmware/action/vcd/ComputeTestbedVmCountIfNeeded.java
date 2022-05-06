@@ -42,15 +42,6 @@ public class ComputeTestbedVmCountIfNeeded extends BaseVappAction {
                 .map(job -> countVmsUsedInJob(testbedDirectory, job)).reduce(Integer::sum).orElse(0);
     }
 
-    private File determineRootDirectory() {
-        File repoDirectory = git.getRootDirectory();
-        if (repoDirectory != null) {
-            return repoDirectory;
-        } else {
-            return serviceLocator.getPerforce().getWorkingDirectory();
-        }
-    }
-
     private int countVmsUsedInJob(File testbedDirectory, Job job) {
         Optional<JobParameter> matchingParameter =
                 job.parameters.stream().filter(param -> param.name.equalsIgnoreCase(jenkinsConfig.testbedParameter)).findFirst();

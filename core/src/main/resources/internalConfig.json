@@ -1,4 +1,5 @@
 {
+  "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "defaultTopic": "Server",
   "reviewboardUrl": "https://reviewboard.eng.vmware.com",
   "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",

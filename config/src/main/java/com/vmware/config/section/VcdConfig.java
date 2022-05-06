@@ -67,6 +67,9 @@ public class VcdConfig {
     @ConfigurableProperty(help = "Pattern for parsing build number for Vapp / Vm name")
     public String buildNumberInNamePattern;
 
+    @ConfigurableProperty(commandLine = "--vcd-sso", help = "Use Single Sign On for getting Vcd api token")
+    public boolean vcdSso;
+
     public String[] queryFilters() {
         if (StringUtils.isEmpty(queryFilter)) {
             return new String[0];

@@ -5,6 +5,7 @@ import com.vmware.buildweb.Buildweb;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.JenkinsConfig;
+import com.vmware.config.section.SsoConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.gitlab.Gitlab;
 import com.vmware.jenkins.Jenkins;
@@ -95,7 +96,9 @@ public class ServiceLocator {
     public Vcd getVcd() {
         if (vcd == null) {
             VcdConfig vcdConfig = config.vcdConfig;
-            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg);
+            SsoConfig ssoConfig = config.ssoConfig;
+            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
+                    ssoConfig.ssoHeadless, ssoConfig);
         }
         return vcd;
     }

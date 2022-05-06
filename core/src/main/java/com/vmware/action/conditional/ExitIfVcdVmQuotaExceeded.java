@@ -21,6 +21,7 @@ public class ExitIfVcdVmQuotaExceeded extends BaseVappAction {
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
         super.skipActionIfTrue(jenkinsConfig.useVappJsonParameter, "useVappJsonParameter is set to true");
+        super.skipActionIfTrue(!vcdConfig.checkVmQuota, "checkVmQuota is set to false");
     }
 
     @Override

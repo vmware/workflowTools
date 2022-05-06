@@ -26,6 +26,7 @@ import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SshConfig;
 import com.vmware.config.section.SslConfig;
+import com.vmware.config.section.SsoConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.util.CommandLineUtils;
@@ -59,6 +60,7 @@ public abstract class BaseAction implements Action {
     protected final BuildwebConfig buildwebConfig;
     protected final SshConfig sshConfig;
     protected final VcdConfig vcdConfig;
+    protected final SsoConfig ssoConfig;
     protected final CommandLineConfig commandLineConfig;
     protected final FileSystemConfig fileSystemConfig;
     protected final SslConfig sslConfig;
@@ -99,6 +101,7 @@ public abstract class BaseAction implements Action {
         this.fileSystemConfig = config.fileSystemConfig;
         this.sslConfig = config.sslConfig;
         this.replacementVariables = config.replacementVariables;
+        this.ssoConfig = config.ssoConfig;
     }
 
     public void checkIfWorkflowShouldBeFailed() {

@@ -9,6 +9,8 @@ import com.vmware.http.credentials.UsernamePasswordCredentials;
  */
 public class RequestHeader extends RequestParam {
 
+    public static final String AUTHORIZATION = "Authorization";
+
     public RequestHeader(String name, String value) {
         super(name, value);
     }
@@ -23,11 +25,11 @@ public class RequestHeader extends RequestParam {
 
     public static RequestHeader aBasicAuthHeader(UsernamePasswordCredentials credentials) {
         String basicCredentials = Base64.getEncoder().encodeToString(credentials.toString().getBytes());
-        return new RequestHeader("Authorization", "Basic " + basicCredentials);
+        return new RequestHeader(AUTHORIZATION, "Basic " + basicCredentials);
     }
 
     public static RequestHeader aBearerAuthHeader(String authValue) {
-        return new RequestHeader("Authorization", "Bearer " + authValue);
+        return new RequestHeader(AUTHORIZATION, "Bearer " + authValue);
     }
 
     public static RequestHeader aRefererHeader(String value) {

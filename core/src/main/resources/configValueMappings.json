@@ -48,6 +48,8 @@
     "--sync-to-branch-latest"
   ],
   "LoadVappMetadataIfFound": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -86,6 +88,8 @@
   "AuthenticateAllApis": [
     "--disable-login",
     "--bugzilla-test-bug",
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--vcd-url",
     "--username"
@@ -157,6 +161,8 @@
     "--disable-jira"
   ],
   "PowerOnVapp": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -164,6 +170,8 @@
     "--wait-for-action"
   ],
   "ShowLoggedInUserDetails": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url"
@@ -202,6 +210,8 @@
     "--parent"
   ],
   "SetVappMetadataIfNeeded": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -227,6 +237,8 @@
   ],
   "LoadVapps": [
     "--query-filter",
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -290,12 +302,16 @@
     "--disable-bugzilla"
   ],
   "DeleteVappMetadataIfNeeded": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
     "--vapp-metadata-name"
   ],
   "RenameVapp": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -308,6 +324,8 @@
     "--wait-time"
   ],
   "DeleteVapp": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -328,6 +346,8 @@
     "--ssh-command"
   ],
   "LoadVappJson": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url"
@@ -381,6 +401,8 @@
     "--no-verify"
   ],
   "ShowVappVmsStatus": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url"
@@ -406,9 +428,12 @@
     "--autocomplete-workflow"
   ],
   "ExitIfVcdVmQuotaExceeded": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--vcd-check-quota",
     "--use-vapp-json"
   ],
   "ReadCertsFromUrl": [
@@ -438,6 +463,8 @@
     "--username"
   ],
   "PowerOffVapp": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -517,6 +544,8 @@
     "--username"
   ],
   "UpdateVappLease": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",
@@ -557,6 +586,8 @@
   ],
   "DeleteVMs": [
     "--query-filter",
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url"
@@ -594,6 +625,8 @@
     "--own-boards-only"
   ],
   "DisplayVappMetadataKeys": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url"
@@ -624,6 +657,8 @@
     "--database-schema-name"
   ],
   "DownloadBuildArtifact": [
+    "--sso-headless",
+    "--vcd-sso",
     "--vcd-org",
     "--username",
     "--vcd-url",

@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.vmware.AbstractRestService;
+import com.vmware.chrome.SsoClient;
+import com.vmware.config.section.SsoConfig;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.HttpResponse;
 import com.vmware.http.cookie.ApiAuthentication;
@@ -24,6 +26,8 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
 import com.vmware.vcd.domain.QueryResultVMsType;
@@ -38,6 +42,7 @@ import com.vmware.vcd.domain.VcdMediaType;
 
 import static com.vmware.http.cookie.ApiAuthentication.vcd;
 import static com.vmware.http.request.RequestHeader.aBasicAuthHeader;
+import static com.vmware.http.request.RequestHeader.aBearerAuthHeader;
 import static com.vmware.http.request.RequestHeader.aContentTypeHeader;
 import static com.vmware.http.request.RequestHeader.anAcceptHeader;
 import static com.vmware.http.request.UrlParam.forceParam;
@@ -46,9 +51,11 @@ import static com.vmware.http.request.UrlParam.forceParam;
  * Represents the Vmware Vcloud Director Api
  */
 public class Vcd extends AbstractRestService {
-    public static String AUTHORIZATION_HEADER = "x-vcloud-authorization";
+    public static String ACCESS_TOKEN_HEADER = "X-VMWARE-VCLOUD-ACCESS-TOKEN";
     private final String apiVersion;
     private final String cloudapiUrl;
+    private final boolean useVcdSso;
+    private final SsoConfig ssoConfig;
     private String vcdOrg;
 
     public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
@@ -56,23 +63,27 @@ public class Vcd extends AbstractRestService {
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
+        this.ssoConfig = null;
+        this.useVcdSso = false;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
         this.connection.setDisableHostnameVerification(true);
         String apiToken = loginWithCredentials(new UsernamePasswordCredentials(username + "@" + vcdOrg, password));
-        connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
+        connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
-    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg) {
+    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, boolean ssoHeadless, SsoConfig ssoConfig) {
         super(vcdUrl, "api", ApiAuthentication.vcd, username);
+        this.useVcdSso = useVcdSso;
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
+        this.ssoConfig = ssoConfig;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
         String apiToken = readExistingApiToken(ApiAuthentication.vcd);
         if (StringUtils.isNotEmpty(apiToken)) {
-            connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
+            connection.addStatefulParam(aBearerAuthHeader(apiToken));
         }
     }
 
@@ -186,7 +197,26 @@ public class Vcd extends AbstractRestService {
 
     @Override
     protected void loginManually() {
-        connection.removeStatefulParam(AUTHORIZATION_HEADER);
+        connection.removeStatefulParam(RequestHeader.AUTHORIZATION);
+        if (useVcdSso && StringUtils.isEmpty(vcdOrg)) {
+            vcdOrg = InputUtils.readValueUntilNotBlank("Vcd Organization");
+        }
+        if (useVcdSso) {
+            log.info("Using SSO to get API token");
+            SsoClient client = new SsoClient(ssoConfig);
+            String apiToken;
+            try {
+                apiToken = client.loginAndGetApiToken(UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs"));
+            } catch (RuntimeException e) {
+                log.debug(e.getMessage(), e);
+                log.info("Encountered exception when using SSO: {}", e.getMessage());
+                log.info("Failed to get api token via SSO, please enter api token");
+                apiToken = InputUtils.readValueUntilNotBlank("Bearer Api Token");
+            }
+            saveApiToken(apiToken, vcd);
+            connection.addStatefulParam(aBearerAuthHeader(apiToken));
+            return;
+        }
         if (StringUtils.isNotEmpty(vcdOrg)) {
             log.info("Using default org {}, enter username as username@[org name] to use a different org", vcdOrg);
         } else {
@@ -203,7 +233,7 @@ public class Vcd extends AbstractRestService {
 
         String apiToken = loginWithCredentials(credentials);
         saveApiToken(apiToken, ApiAuthentication.vcd);
-        connection.addStatefulParam(new RequestHeader(AUTHORIZATION_HEADER, apiToken));
+        connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
     @Override
@@ -239,9 +269,9 @@ public class Vcd extends AbstractRestService {
         log.debug("Logging into vcd at url {} with username {} and accept header {}", loginUrl, credentials.getUsername(), acceptHeader);
         HttpResponse response = connection.post(loginUrl, HttpResponse.class, (Object) null,
                 acceptHeader, aBasicAuthHeader(credentials));
-        List<String> authzHeaders = response.getHeaders().get(AUTHORIZATION_HEADER);
+        List<String> authzHeaders = response.getHeaders().get(ACCESS_TOKEN_HEADER);
         if (authzHeaders == null || authzHeaders.isEmpty()) {
-            throw new NotAuthorizedException("Could not find authorization header " + AUTHORIZATION_HEADER);
+            throw new NotAuthorizedException("Could not find access token header " + ACCESS_TOKEN_HEADER);
         }
         return authzHeaders.get(0);
     }
