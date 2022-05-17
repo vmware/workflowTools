@@ -23,9 +23,11 @@ public class AuthenticateAllApis extends BaseAction {
     @Override
     public void process() {
         checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl, config.username));
+        String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
-                vcdConfig.vcdSsoLoginButtonId, ssoConfig.ssoHeadless, ssoConfig));
-        checkAuthentication(new Trello(trelloConfig.trelloUrl));
+                ssoEmail, ssoConfig.ssoHeadless, ssoConfig));
+
+        checkAuthentication(new Trello(trelloConfig.trelloUrl, config.username, trelloConfig.trelloSso, ssoEmail, ssoConfig));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
         checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username));

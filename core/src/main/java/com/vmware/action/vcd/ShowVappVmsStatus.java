@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.vmware.action.base.BaseSingleVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StringUtils;
 import com.vmware.vcd.domain.QueryResultVMType;
 import com.vmware.vcd.domain.QueryResultVMsType;
 
@@ -22,6 +23,6 @@ public class ShowVappVmsStatus extends BaseSingleVappAction {
         QueryResultVMsType vmsForVapp = serviceLocator.getVcd().queryVmsForVapp(vappData.getSelectedVapp().parseIdFromRef());
         List<QueryResultVMType> vmsSortedByStatusAndName = vmsForVapp.record.stream().sorted(Comparator.comparing(QueryResultVMType::getStatus)
                 .thenComparing(QueryResultVMType::getName)).collect(Collectors.toList());
-        vmsSortedByStatusAndName.forEach(vm -> log.info("{} {}", vm.name, vm.status));
+        vmsSortedByStatusAndName.forEach(vm -> log.info("{} {} {}", vm.name, vm.status, StringUtils.isNotBlank(vm.ipAddress) ? vm.ipAddress : ""));
     }
 }

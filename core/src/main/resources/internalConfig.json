@@ -1,6 +1,6 @@
 {
   "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "vcdSsoLoginButtonId": "ssoLoginButton",
+  "chromeDebugPort": 9224,
   "defaultTopic": "Server",
   "reviewboardUrl": "https://reviewboard.eng.vmware.com",
   "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
@@ -906,6 +906,11 @@
       "selectVcdSite",
       "OpenVcdTenantApp"
     ],
+    "openVappVm": [
+      "selectVcdSite",
+      "SelectVappVm",
+      "OpenVappVm"
+    ],
     "executeVcdSsh": [
       "executeVappSsh"
     ],
@@ -914,7 +919,13 @@
       "ExecuteSshCommand"
     ],
     "openVcdSshShell": [
+      "selectVcdSite",
       "selectVcdCell",
+      "OpenSshShell"
+    ],
+    "openVappVmSshShell": [
+      "selectVcdSite",
+      "SelectVappVm",
       "OpenSshShell"
     ],
     "openVcdDatabaseSshShell": [

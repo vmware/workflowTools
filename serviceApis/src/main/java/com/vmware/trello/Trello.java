@@ -6,6 +6,11 @@
 package com.vmware.trello;
 
 import com.vmware.AbstractRestService;
+import com.vmware.chrome.ChromeDevTools;
+import com.vmware.chrome.SsoClient;
+import com.vmware.chrome.domain.ApiRequest;
+import com.vmware.chrome.domain.ApiResponse;
+import com.vmware.config.section.SsoConfig;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.Cookie;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
@@ -25,6 +30,7 @@ import com.vmware.trello.domain.StringValue;
 import com.vmware.trello.domain.Swimlane;
 import com.vmware.trello.domain.TokenApproval;
 import com.vmware.util.StringUtils;
+import com.vmware.util.ThreadUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
 
@@ -32,6 +38,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,16 +48,26 @@ import java.util.stream.Collectors;
 import static com.vmware.http.cookie.ApiAuthentication.trello;
 import static com.vmware.http.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
 import static com.vmware.http.request.RequestHeader.aRefererHeader;
+import static java.lang.String.format;
 
 public class Trello extends AbstractRestService {
+
+    private static final String SSO_LOGIN_BUTTON = "use-sso-button";
+
 
     private final String loginUrl;
     private final String sessionUrl;
     private final String webUrl;
+    private final boolean trelloSso;
+    private final String ssoEmail;
+    private final SsoConfig ssoConfig;
 
-    public Trello(String trelloUrl) {
-        super(createApiUrl(trelloUrl), "1/", trello, null);
+    public Trello(String trelloUrl, String username, boolean trelloSso, String ssoEmail, SsoConfig ssoConfig) {
+        super(createApiUrl(trelloUrl), "1/", trello, username);
         webUrl = UrlUtils.addTrailingSlash(trelloUrl);
+        this.trelloSso = trelloSso;
+        this.ssoEmail = ssoEmail;
+        this.ssoConfig = ssoConfig;
         this.loginUrl = webUrl + "1/authentication";
         this.sessionUrl = webUrl + "1/authorization/session";
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
@@ -165,22 +184,53 @@ public class Trello extends AbstractRestService {
     @Override
     protected void loginManually() {
         connection.resetParams();
-        UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello);
-        connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        connection.setUseSessionCookies(true);
-        // Trello seems to be particular over what is used as a dsc value, this one is copied from the browser
-        String dscValue = "eac1c0ee5fbaf55de92323e7abf75e4b19888ce430f95afe83e63885f8959eff";
-        connection.addCookie(new Cookie("dsc", dscValue));
-        AuthCode authCode = connection.post(loginUrl, AuthCode.class, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
-        connection.post(sessionUrl, new SessionAuthentication(authCode.code, dscValue), aRefererHeader("https://trello.com/login?returnUrl=%2Flogged-out"));
-        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
-        String apiTokenPage = connection.get(webUrl + "app-key", String.class);
-        List<UrlParam> authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
-        connection.setUseSessionCookies(false);
+        if (trelloSso) {
+            Consumer<ChromeDevTools> ssoNavigateFunction = devTools -> {
+                log.info("Using email {} for Trello SSO login", ssoEmail);
+                ThreadUtils.sleep(1, TimeUnit.SECONDS);
+                devTools.setValueById("user", ssoEmail.substring(0, ssoEmail.length() - 1));
+                devTools.evaluateById("user", ".focus()");
+                devTools.sendMessage(ApiRequest.sendInput(ssoEmail.substring(ssoEmail.length() - 1)));
+                ThreadUtils.sleep(1, TimeUnit.SECONDS);
+                devTools.clickById("login");
+            };
 
-        connection.addStatefulParams(authQueryParams);
+            Function<ChromeDevTools, String> apiTokenGenerator = devTools -> {
+                devTools.sendMessage(ApiRequest.navigate("https://trello.com/app-key/"));
+                devTools.waitForDomContentEvent();
+                String key = devTools.evaluateById("key", ".value").getValue();
+                String href = devTools.evaluate("document.querySelectorAll('[data-track-direct-object=\"generate token link\"]')[0]", ".href", "a").getValue();
+                devTools.sendMessage(ApiRequest.navigate(href));
+                devTools.waitForDomContentEvent();
+                devTools.clickById("approveButton");
+                devTools.waitForDomContentEvent();
+                ApiResponse apiToken = devTools.evaluate("document.getElementsByTagName(\"pre\")[0]", ".textContent", "pre");
+                return String.format("key=%s&token=%s", key, apiToken.getValue());
+            };
 
-        saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello);
+            String loginUrl = UrlUtils.addRelativePaths(baseUrl, "login");
+            SsoClient ssoClient = new SsoClient(ssoConfig, getUsername(), ssoEmail);
+            String keyAndToken = ssoClient.loginAndGetApiToken(webUrl + ".+?/boards", loginUrl, SSO_LOGIN_BUTTON, ssoNavigateFunction, apiTokenGenerator);
+            connection.addStatefulParamsFromUrlFragment(keyAndToken);
+            saveApiToken(keyAndToken, trello);
+        } else {
+            UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello, getUsername());
+            connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
+            connection.setUseSessionCookies(true);
+            // Trello seems to be particular over what is used as a dsc value, this one is copied from the browser
+            String dscValue = "eac1c0ee5fbaf55de92323e7abf75e4b19888ce430f95afe83e63885f8959eff";
+            connection.addCookie(new Cookie("dsc", dscValue));
+            AuthCode authCode = connection.post(loginUrl, AuthCode.class, new LoginInfo(credentials), aRefererHeader("https://trello.com/login"));
+            connection.post(sessionUrl, new SessionAuthentication(authCode.code, dscValue), aRefererHeader("https://trello.com/login?returnUrl=%2Flogged-out"));
+            connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
+            String apiTokenPage = connection.get(webUrl + "app-key", String.class);
+            List<UrlParam> authQueryParams = scrapeAuthInfoFromUI(apiTokenPage);
+            connection.setUseSessionCookies(false);
+
+            connection.addStatefulParams(authQueryParams);
+            saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello);
+        }
+
     }
 
     private void createSwimlane(Board board, String displayValue, String position) {

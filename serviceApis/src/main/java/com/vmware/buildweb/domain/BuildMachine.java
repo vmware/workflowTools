@@ -13,7 +13,7 @@ public class BuildMachine {
     @SerializedName("hosttype")
     public String hostType;
 
-    public boolean nonLauncherMachine() {
-        return hostName != null && !hostName.startsWith("build-launcher");
+    public boolean realBuildMachine() {
+        return hostType != null && hostType.startsWith("linux");
     }
 }

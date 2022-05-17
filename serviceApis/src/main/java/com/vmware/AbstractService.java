@@ -60,7 +60,7 @@ public abstract class AbstractService {
                 throw new FatalException("Failed to successfully login after {} retries", (retryCount - 1));
             }
             connectionIsAuthenticated = null;
-            displayInputMessage(retryCount);
+            displayInputMessageForLoginRetry(retryCount);
             try {
                 loginManually();
             } catch (NotAuthorizedException | ForbiddenException | NotFoundException e) {
@@ -117,7 +117,7 @@ public abstract class AbstractService {
      */
     protected abstract void loginManually();
 
-    private void displayInputMessage(int retryCount) {
+    protected void displayInputMessageForLoginRetry(int retryCount) {
         if (retryCount == 0) {
             String filePath = determineApiTokenFile().getPath();
             if (credentialsType.getCookieName() != null) {

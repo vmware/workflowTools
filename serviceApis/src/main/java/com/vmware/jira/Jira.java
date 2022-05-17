@@ -188,7 +188,7 @@ public class Jira extends AbstractRestService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(jira);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(jira, getUsername());
         connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
         connection.post(loginUrl, new LoginInfo(credentials));
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);

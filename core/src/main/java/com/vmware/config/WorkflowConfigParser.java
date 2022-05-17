@@ -89,7 +89,7 @@ public class WorkflowConfigParser {
             log.debug("Applying remote specific config values for git remote {}", remoteName);
             configurableFields.applyGitConfigValues(remoteName, gitConfigValues);
             String trackingBranchConfigPrefix = trackingBranch.replace('/', '.');
-            log.debug("Applying tracking branch specific config values for git tracking branch", trackingBranch);
+            log.debug("Applying tracking branch {} specific config values for git tracking branch", trackingBranch);
             configurableFields.applyGitConfigValues(trackingBranchConfigPrefix, gitConfigValues);
         }
     }
@@ -134,6 +134,7 @@ public class WorkflowConfigParser {
      */
     private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig) {
         String gitConfigFilePath = git.configValue("workflow.configFile");
+        log.debug("Git config file: {}", gitConfigFilePath);
         if (StringUtils.isEmpty(gitConfigFilePath)) {
             gitConfigFilePath = git.configValue("workflow.config"); // backwards compatibility
         }
@@ -179,6 +180,7 @@ public class WorkflowConfigParser {
     }
 
     private WorkflowConfig readExternalWorkflowConfig(File configFilePath) {
+        log.debug("Reading external config file {}", configFilePath.getAbsolutePath());
         if (!configFilePath.exists()) {
             throw new FatalException("Config file {} does not exist", configFilePath.getPath());
         }

@@ -16,8 +16,11 @@ public class UsernamePasswordAsker {
     private static UsernamePasswordCredentials testCredentials;
     private static Logger log = LoggerFactory.getLogger(UsernamePasswordAsker.class.getName());
 
+    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingApiToken, String defaultUsername) {
+        return askUserForUsernameAndPassword(missingApiToken, defaultUsername, "Password");
+    }
 
-    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingApiToken) {
+    public static UsernamePasswordCredentials askUserForUsernameAndPassword(ApiAuthentication missingApiToken, String defaultUsername, String passwordLabel) {
         if (testCredentials != null) {
             log.info("Using test credentials");
             return testCredentials;
@@ -25,8 +28,12 @@ public class UsernamePasswordAsker {
 
         log.info("Credentials are only used once for retrieving {}", missingApiToken.getDisplayType());
 
-        String username = InputUtils.readValue("Username");
-        String password = InputUtils.readPassword("Password");
+        String username = InputUtils.readValue("Username (defaults to " + defaultUsername + " if blank)");
+        if (StringUtils.isEmpty(username)) {
+            log.info("Using default username {}", defaultUsername);
+            username = defaultUsername;
+        }
+        String password = InputUtils.readPassword(passwordLabel);
 
         return new UsernamePasswordCredentials(username, password);
     }

@@ -70,9 +70,6 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-sso", help = "Use Single Sign On for getting Vcd api token")
     public boolean vcdSso;
 
-    @ConfigurableProperty(help = "Id of button to click to sign in with SSO for Vcd")
-    public String vcdSsoLoginButtonId;
-
     public String[] queryFilters() {
         if (StringUtils.isEmpty(queryFilter)) {
             return new String[0];

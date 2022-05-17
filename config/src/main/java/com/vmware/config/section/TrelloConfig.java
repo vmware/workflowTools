@@ -17,4 +17,7 @@ public class TrelloConfig {
 
     @ConfigurableProperty(commandLine = "-obo,--own-boards-only", help = "Disallow using a trello board owned by someone else")
     public boolean ownBoardsOnly;
+
+    @ConfigurableProperty(commandLine = "--trello-sso", help = "Use SSO to sign in for Trello")
+    public boolean trelloSso;
 }

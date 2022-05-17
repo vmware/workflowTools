@@ -26,14 +26,18 @@ import com.vmware.jenkins.domain.TestResults;
 import com.vmware.jenkins.domain.User;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
 
 import static com.vmware.http.cookie.ApiAuthentication.jenkins;
 
 public class Jenkins extends AbstractRestBuildService {
     private final boolean usesCsrf;
-    private final boolean disableLogin;
+    private String apiToken;
+    private boolean disableLogin;
+    private boolean apiTokenUsedForLogin;
 
     private HomePage homePage = null;
 
@@ -42,14 +46,10 @@ public class Jenkins extends AbstractRestBuildService {
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
+        apiToken = readExistingApiToken(credentialsType);
 
-        if (disableLogin) {
-            log.debug("Not attempting to read api token for Jenkins as disableLogin is true");
-            return;
-        }
-
-        String apiToken = readExistingApiToken(credentialsType);
         if (apiToken != null) {
+            apiTokenUsedForLogin = true;
             connection.setupBasicAuthHeader(new UsernamePasswordCredentials(username, apiToken));
         }
     }
@@ -167,8 +167,29 @@ public class Jenkins extends AbstractRestBuildService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType);
-        connection.setupBasicAuthHeader(credentials);
+        if (disableLogin) {
+            if (StringUtils.isNotBlank(apiToken) && !apiTokenUsedForLogin) {
+                log.info("Using api token as login is disabled");
+            } else {
+                apiToken = InputUtils.readValueUntilNotBlank("Api Token");
+            }
+            apiTokenUsedForLogin = true;
+            connection.setupBasicAuthHeader(new UsernamePasswordCredentials(getUsername(), apiToken));
+            connection.get(UrlUtils.addRelativePaths(baseUrl, "me/api/json"), User.class);
+            saveApiToken(apiToken, jenkins);
+        } else {
+            UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType, getUsername());
+            connection.setupBasicAuthHeader(credentials);
+            connection.get(UrlUtils.addRelativePaths(baseUrl, "me/api/json"), User.class);
+        }
+
+    }
+
+    @Override
+    protected void displayInputMessageForLoginRetry(int retryCount) {
+        if (!disableLogin) {
+            super.displayInputMessageForLoginRetry(retryCount);
+        }
     }
 
     private JobBuild getJobBuildDetails(String jobBuildUrl) {

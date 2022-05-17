@@ -27,7 +27,7 @@ public class TestTrelloApi extends BaseTests {
     @Before
     public void init() {
         String trelloUrl = testProperties.getProperty("trello.url");
-        trello = new Trello(trelloUrl);
+        trello = new Trello(trelloUrl, "dummy", false, null, null);
         trello.setupAuthenticatedConnection();
         testBoard = trello.createBoard(new Board("Test Board"));
     }

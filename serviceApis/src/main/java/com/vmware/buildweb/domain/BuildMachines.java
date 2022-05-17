@@ -10,7 +10,7 @@ public class BuildMachines {
     public BuildMachine[] buildMachines;
 
     public BuildMachine realBuildMachine() {
-        return Arrays.stream(buildMachines).filter(BuildMachine::nonLauncherMachine).findFirst()
+        return Arrays.stream(buildMachines).filter(BuildMachine::realBuildMachine).findFirst()
                 .orElseThrow(() -> new RuntimeException("No build machine found, build might still be starting"));
     }
 }

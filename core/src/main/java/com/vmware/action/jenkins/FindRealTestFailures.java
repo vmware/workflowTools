@@ -58,16 +58,24 @@ public class FindRealTestFailures extends BaseAction {
     @Override
     public void process() {
         log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, new Date().toString());
-        this.jenkinsExecutor = new BlockingExecutorService<>(6, () -> {
-            LoggerFactory.getLogger(FindRealTestFailures.class).debug("Creating new service");
-            return serviceLocator.newJenkins();
-        });
-        long startTime = System.currentTimeMillis();
-
-        HomePage homePage = serviceLocator.getJenkins().getHomePage();
-
+        File destinationFile = new File(fileSystemConfig.destinationFile);
+        createDbUtilsIfNeeded();
+        HomePage homePage;
+        if (jenkinsConfig.regenerateHtml) {
+            log.info("Regenerating failing tests html pages just from database test results");
+            homePage = new HomePage();
+            homePage.setDbUtils(dbUtils);
+            homePage.populateFromDatabase(jenkinsConfig.jenkinsView);
+        } else {
+            this.jenkinsExecutor = new BlockingExecutorService<>(6, () -> {
+                LoggerFactory.getLogger(FindRealTestFailures.class).debug("Creating new service");
+                return serviceLocator.newJenkins();
+            });
+            homePage = serviceLocator.getJenkins().getHomePage();
+        }
         List<HomePage.View> matchingViews = Arrays.stream(homePage.views).filter(view -> view.matches(jenkinsConfig.jenkinsView)).collect(toList());
 
+        long startTime = System.currentTimeMillis();
         if (matchingViews.isEmpty()) {
             exitDueToFailureCheck("No views found for name " + jenkinsConfig.jenkinsView);
         }
@@ -77,16 +85,19 @@ public class FindRealTestFailures extends BaseAction {
 
         generationDate = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy").format(new Date());
 
-        File destinationFile = new File(fileSystemConfig.destinationFile);
         validateThatDestinationFileIsDirectoryIfNeeded(matchingViews, destinationFile);
 
-        log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
-                jenkinsConfig.maxJenkinsBuildsToCheck);
+        if (this.jenkinsExecutor != null) {
+            log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
+                    jenkinsConfig.maxJenkinsBuildsToCheck);
 
-        createDbUtilsIfNeeded();
-        matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
-        purgeVanillaTestResults();
+            matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
+            purgeVanillaTestResults();
+        } else {
+            matchingViews.forEach(view -> createJobResultsHtmlPages(view, destinationFile.isDirectory(), homePage.failingTestsMap(view.name)));
+        }
         long elapsedTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+
 
         if (destinationFile.isDirectory()) {
             String viewListing = createViewListingHtml(matchingViews, elapsedTime);
@@ -95,7 +106,9 @@ public class FindRealTestFailures extends BaseAction {
             IOUtils.write(new File(fileSystemConfig.destinationFile), viewListing);
         }
 
-        log.info("Took {} seconds", elapsedTime);
+        if (elapsedTime > 0) {
+            log.info("Took {} seconds", elapsedTime);
+        }
     }
 
     private void validateThatDestinationFileIsDirectoryIfNeeded(List<HomePage.View> matchingViews, File destinationFile) {
@@ -145,9 +158,8 @@ public class FindRealTestFailures extends BaseAction {
         JobView jobView = jenkins.getFullViewDetails(view.url);
         log.info("Checking {} jobs for test failures", jobView.jobs.length);
 
-        final Map<Job, List<TestResult>> failingTestMethods;
         try {
-            failingTestMethods = findAllRealFailingTests(jobView);
+            addFailingTestForView(jobView);
         } catch (Exception e) {
             log.error("Failed to create page for view {}\n{}", view.name, StringUtils.exceptionAsString(e));
             view.failingTestsGenerationException = e;
@@ -155,9 +167,13 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
 
-        view.failingTestsCount = failingTestMethods.values().stream().mapToInt(List::size).sum();
-        log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
+        log.info("{} failing tests found for view {}", jobView.failingTestCount(), view.name);
 
+        createJobResultsHtmlPages(view, includeViewsLink, jobView.getFailedTests());
+        viewPadder.infoTitle();
+    }
+
+    private void createJobResultsHtmlPages(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods) {
         final AtomicInteger counter = new AtomicInteger();
         String jobsResultsHtml = failingTestMethods.keySet().stream().sorted(comparing(jobDetails -> jobDetails.name)).map(job -> {
             List<TestResult> failingTests = failingTestMethods.get(job);
@@ -175,7 +191,6 @@ public class FindRealTestFailures extends BaseAction {
             log.info("Saving test results to {}", destinationFile);
             IOUtils.write(destinationFile, resultsPage);
         }
-        viewPadder.infoTitle();
     }
 
     private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods, String jobsTestResultsHtml) {
@@ -198,16 +213,14 @@ public class FindRealTestFailures extends BaseAction {
         return resultsPage;
     }
 
-    private Map<Job, List<TestResult>> findAllRealFailingTests(JobView jobView) {
+    private void addFailingTestForView(JobView jobView) {
         jobView.setDbUtils(dbUtils);
         jobView.populateFromDb();
-
-        Map<Job, List<TestResult>> allFailingTests = new HashMap<>();
 
         List<Job> usableJobs = jobView.usableJobs(jenkinsConfig.maxJenkinsBuildsToCheck);
 
         if (usableJobs.isEmpty()) {
-            return Collections.emptyMap();
+            return;
         }
 
         List<Job> failedJobs = new ArrayList<>();
@@ -239,11 +252,9 @@ public class FindRealTestFailures extends BaseAction {
                 log.info("No consistently failing tests found for {}", job.name);
             } else {
                 log.info("Found {} for {}", pluralize(failingTests.size(), "consistently failing test"), job.name);
-                allFailingTests.put(job, failingTests);
+                jobView.addFailingTests(job, failingTests);
             }
         });
-
-        return allFailingTests;
     }
 
     private boolean addPassResultsIfNeeded(Job job) {

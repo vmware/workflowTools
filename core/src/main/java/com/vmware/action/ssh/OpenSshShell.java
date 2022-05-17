@@ -11,7 +11,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;
 
-@ActionDescription("Opems a ssh shell using the specified ssh site config.")
+@ActionDescription("Opens a ssh shell using the specified ssh site config.")
 public class OpenSshShell extends BaseSshAction {
 
     public OpenSshShell(WorkflowConfig config) {

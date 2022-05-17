@@ -131,7 +131,7 @@ public class Bugzilla extends AbstractService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType, getUsername());
         try {
             Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
             Integer sessionId = (Integer) result.get("id");

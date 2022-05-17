@@ -193,7 +193,7 @@ public class JenkinsJobsConfig {
             parameters.add(0, new JobParameter(USERNAME_PARAM, presetParameters.get(USERNAME_PARAM)));
         }
 
-        if (vappJsonParameter != null && presetParameters.containsKey(vappJsonParameter)) {
+        if (vappJsonParameter != null && presetParameters.containsKey(vappJsonParameter) && specifiedParametersOnly) {
             usedPresetParams.add(vappJsonParameter);
             log.debug("Adding preset value {} for Vapp json parameter {}", presetParameters.get(vappJsonParameter), vappJsonParameter);
             parameters.add(new JobParameter(vappJsonParameter, presetParameters.get(vappJsonParameter)));

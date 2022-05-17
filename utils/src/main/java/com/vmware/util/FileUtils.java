@@ -56,6 +56,18 @@ public class FileUtils {
         }
     }
 
+    public static File createTempDirectory(String prefix, boolean deleteOnExit) {
+        try {
+            Path path = Files.createTempDirectory(prefix);
+            if (deleteOnExit) {
+                path.toFile().deleteOnExit();
+            }
+            return path.toFile();
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
     public static String stripExtension(File file) {
         String nameWithExtension = file.getName();
         if (!nameWithExtension.contains(".")) {

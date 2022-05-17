@@ -6,6 +6,7 @@ import com.vmware.vcd.domain.VappData;
 public abstract class BaseVappAction extends BaseCommitAction {
     protected boolean checkVappJson;
     protected boolean checkIfSiteSelected;
+    protected boolean checkIfVmSelected;
     protected boolean checkIfCellSelected;
     protected boolean skipIfFileBasedVapp;
     protected VappData vappData;
@@ -21,6 +22,7 @@ public abstract class BaseVappAction extends BaseCommitAction {
         failIfTrue(checkVappJson && !vappData.jsonDataLoaded(), "no Vapp json loaded");
         failIfTrue((checkIfSiteSelected || checkIfCellSelected) && vappData.getSelectedSite() == null, "no vcd site selected");
         failIfTrue(checkIfCellSelected && vappData.getSelectedVcdCell() == null, "no vcd cell selected");
+        failIfTrue(checkIfVmSelected && vappData.getSelectedVm() == null, "no VM selected");
     }
 
     @Override

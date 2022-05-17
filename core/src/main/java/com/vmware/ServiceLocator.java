@@ -6,11 +6,13 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.SsoConfig;
+import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.gitlab.Gitlab;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.util.StringUtils;
 import com.vmware.util.scm.Git;
 import com.vmware.util.scm.Perforce;
 import com.vmware.trello.Trello;
@@ -97,7 +99,8 @@ public class ServiceLocator {
         if (vcd == null) {
             VcdConfig vcdConfig = config.vcdConfig;
             SsoConfig ssoConfig = config.ssoConfig;
-            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, vcdConfig.vcdSsoLoginButtonId,
+            String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
+            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, ssoEmail,
                     ssoConfig.ssoHeadless, ssoConfig);
         }
         return vcd;
@@ -105,7 +108,10 @@ public class ServiceLocator {
 
     public Trello getTrello() {
         if (trello == null) {
-            trello = new Trello(config.trelloConfig.trelloUrl);
+            SsoConfig ssoConfig = config.ssoConfig;
+            TrelloConfig trelloConfig = config.trelloConfig;
+            String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
+            trello = new Trello(trelloConfig.trelloUrl, config.username, trelloConfig.trelloSso, ssoEmail, ssoConfig);
         }
         return trello;
     }

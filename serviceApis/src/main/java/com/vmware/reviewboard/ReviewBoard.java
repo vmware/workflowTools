@@ -249,7 +249,7 @@ public class ReviewBoard extends AbstractRestService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(reviewBoard);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(reviewBoard, getUsername());
         connection.setupBasicAuthHeader(credentials);
     }
 

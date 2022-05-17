@@ -1,6 +1,8 @@
 package com.vmware.jenkins.domain;
 
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NO_UPDATE_NEEDE
 public class TestResult extends BaseDbClass {
     private static final String SUSPECTS_TITLE = "Commits between last pass and first failure, guilty until proven innocent";
     private static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
+    private static final SimpleDateFormat START_DAY_FORMATTER = new SimpleDateFormat("MMM dd");
     public String name;
     @Expose(serialize = false, deserialize = false)
     public Long jobBuildId;
@@ -86,6 +89,7 @@ public class TestResult extends BaseDbClass {
         this.jobBuildId = methodToClone.jobBuildId;
         this.status = status;
         this.commitId = build.commitId;
+        this.startedAt = build.buildTimestamp;
     }
 
     @AfterDbLoad
@@ -147,6 +151,24 @@ public class TestResult extends BaseDbClass {
         }
         this.dataProviderIndex = counter;
         this.url = urlToUse;
+    }
+
+    public void buildTestRunsFromStoredValues(List<JobBuild> savedBuilds) {
+        this.testRuns = new ArrayList<>();
+        addTestRuns(passedBuilds, TestStatus.PASS, savedBuilds);
+        addTestRuns(presumedPassedBuilds, TestStatus.PRESUMED_PASS, savedBuilds);
+        addTestRuns(failedBuilds, TestStatus.FAIL, savedBuilds);
+        addTestRuns(skippedBuilds, TestStatus.SKIP, savedBuilds);
+    }
+
+    private void addTestRuns(int[] builds, TestStatus status, List<JobBuild> savedBuilds) {
+        if (builds != null) {
+            Arrays.stream(builds).forEach(number -> {
+                JobBuild savedBuild = savedBuilds.stream().filter(build -> build.buildNumber == number).findFirst()
+                        .orElseThrow(() -> new RuntimeException("Expected to find saved build for build number " + number));
+                testRuns.add(new TestResult(this, savedBuild, status));
+            });
+        }
     }
 
     public String testLinks(String commitComparisonUrl) {
@@ -250,6 +272,10 @@ public class TestResult extends BaseDbClass {
         return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
     }
 
+    public boolean failedTest() {
+        return status == TestStatus.FAIL || status == TestStatus.SKIP;
+    }
+
     public RemovalStatus removeUnimportantTestResultsForBuild(JobBuild build) {
         if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
             return NOT_DELETABLE;
@@ -284,7 +310,8 @@ public class TestResult extends BaseDbClass {
 
     private String testResultLink(TestResult testResult) {
         String commitIdSuffix = StringUtils.isNotBlank(testResult.commitId) ? " with commit " + testResult.commitId : "";
-        String title = testResult.status.getDescription() + " in build " + testResult.buildNumber + commitIdSuffix;
+        String title = String.format("%s in build %s on %s%s", testResult.status.getDescription(), testResult.buildNumber,
+                START_DAY_FORMATTER.format(testResult.getStartedAt()), commitIdSuffix);
         return String.format("<a class =\"%s\" href = \"%s\" title=\"%s\" %s>%s</a>", testResult.status.cssClass, testResult.url, title,
                 LINK_IN_NEW_TAB, testResult.buildNumber);
     }

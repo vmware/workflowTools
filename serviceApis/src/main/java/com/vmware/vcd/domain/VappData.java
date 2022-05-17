@@ -16,6 +16,8 @@ public class VappData {
 
     private Sites.DeployedVM selectedVcdCell;
 
+    private Sites.VmInfo selectedVm;
+
     private int testbedTemplateVmCount;
 
     public VappData () {
@@ -103,5 +105,14 @@ public class VappData {
 
     public void setSelectedVcdCell(Sites.DeployedVM selectedVcdCell) {
         this.selectedVcdCell = selectedVcdCell;
+        this.selectedVm = selectedVcdCell;
+    }
+
+    public Sites.VmInfo getSelectedVm() {
+        return selectedVm;
+    }
+
+    public void setSelectedVm(Sites.VmInfo selectedVm) {
+        this.selectedVm = selectedVm;
     }
 }

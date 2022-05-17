@@ -53,6 +53,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--file-data",
     "--vapp-metadata-name"
   ],
@@ -88,10 +89,12 @@
   "AuthenticateAllApis": [
     "--disable-login",
     "--bugzilla-test-bug",
+    "--trello-sso",
     "--sso-headless",
     "--vcd-sso",
     "--vcd-org",
     "--vcd-url",
+    "--sso-email",
     "--username"
   ],
   "AbortJenkinsBuilds": [
@@ -166,6 +169,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--wait-time",
     "--wait-for-action"
   ],
@@ -174,7 +178,8 @@
     "--vcd-sso",
     "--vcd-org",
     "--username",
-    "--vcd-url"
+    "--vcd-url",
+    "--sso-email"
   ],
   "BaseSshAction": [
     "--ssh-password",
@@ -215,6 +220,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--file-data",
     "--vapp-metadata-name"
   ],
@@ -242,6 +248,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--vapp-json-file",
     "--use-owned-vapps-only"
   ],
@@ -307,6 +314,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--vapp-metadata-name"
   ],
   "RenameVapp": [
@@ -315,6 +323,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--wait-time"
   ],
   "SetSummary": [
@@ -329,6 +338,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--wait-time",
     "--wait-for-action"
   ],
@@ -350,7 +360,8 @@
     "--vcd-sso",
     "--vcd-org",
     "--username",
-    "--vcd-url"
+    "--vcd-url",
+    "--sso-email"
   ],
   "CommitAll": [
     "--no-verify"
@@ -405,7 +416,8 @@
     "--vcd-sso",
     "--vcd-org",
     "--username",
-    "--vcd-url"
+    "--vcd-url",
+    "--sso-email"
   ],
   "ExitIfValueMatches": [
     "--property-value",
@@ -433,6 +445,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--vcd-check-quota",
     "--use-vapp-json"
   ],
@@ -452,6 +465,11 @@
     "--username",
     "--disable-jira"
   ],
+  "ConvertCardsToJiraIssues": [
+    "--trello-sso",
+    "--username",
+    "--sso-email"
+  ],
   "OpenVcdProviderApp": [
     "--vcd-cell-index"
   ],
@@ -468,6 +486,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--wait-time",
     "--wait-for-action"
   ],
@@ -536,6 +555,11 @@
     "--destination-file",
     "--source-file"
   ],
+  "BaseTrelloAction": [
+    "--trello-sso",
+    "--username",
+    "--sso-email"
+  ],
   "SetCommitDetailsFromReview": [
     "--username",
     "--review-request-id"
@@ -549,6 +573,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--vapp-lease",
     "--wait-time"
   ],
@@ -590,9 +615,13 @@
     "--vcd-sso",
     "--vcd-org",
     "--username",
-    "--vcd-url"
+    "--vcd-url",
+    "--sso-email"
   ],
   "SyncCardsWithJiraIssues": [
+    "--trello-sso",
+    "--username",
+    "--sso-email",
     "--keep-missing-cards"
   ],
   "FindRealTestFailures": [
@@ -603,6 +632,7 @@
     "--database-driver-class",
     "--database-driver-file",
     "--max-builds",
+    "--regenerate-html",
     "--destination-file",
     "--jenkins-view"
   ],
@@ -629,7 +659,8 @@
     "--vcd-sso",
     "--vcd-org",
     "--username",
-    "--vcd-url"
+    "--vcd-url",
+    "--sso-email"
   ],
   "DiscardUnpublishedReviews": [
     "--username"
@@ -662,6 +693,7 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
+    "--sso-email",
     "--job-with-artifact",
     "--job-build-number",
     "--file-data",

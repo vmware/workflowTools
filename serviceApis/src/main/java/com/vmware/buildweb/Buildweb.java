@@ -25,7 +25,7 @@ import static com.vmware.util.UrlUtils.addRelativePaths;
 public class Buildweb extends AbstractRestBuildService {
 
     private final String buildwebUrl;
-    private String buildwebLogFileName;
+    private final String buildwebLogFileName;
 
     public Buildweb(String buildwebUrl, String buildwebApiUrl, String buildwebLogFileName, String username) {
         super(buildwebApiUrl, "/", ApiAuthentication.none, username);

@@ -188,11 +188,11 @@ public class Git extends BaseScmWrapper {
             log.debug("Returning empty string for git config value {} as git is not installed", propertyName);
             return "";
         }
-        if (!configValues.containsKey(propertyName)) {
+        if (!configValues.containsKey(propertyName.toLowerCase())) {
             log.debug("Returning empty string as config value {} was not found", propertyName);
             return "";
         }
-        return configValues.get(propertyName);
+        return configValues.get(propertyName.toLowerCase());
     }
 
     public String addConfigValue(String propertyName, String propertyValue) {
@@ -220,9 +220,9 @@ public class Git extends BaseScmWrapper {
         for (String valueAsText : valuesAsText) {
             String[] valuePieces = valueAsText.split("=");
             if (valuePieces.length == 2) {
-                values.put(valuePieces[0], valuePieces[1]);
+                values.put(valuePieces[0].toLowerCase(), valuePieces[1]);
             } else if (valuePieces.length == 1) {
-                values.put(valuePieces[0], "");
+                values.put(valuePieces[0].toLowerCase(), "");
             } else {
                 log.debug("{} git config value could not be parsed", valueAsText);
             }

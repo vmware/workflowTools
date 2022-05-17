@@ -89,6 +89,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Will run test failures database creation script", commandLine = "--create-test-failures-database")
     public boolean createTestFailuresDatabase;
 
+    @ConfigurableProperty(commandLine = "--regenerate-html", help = "Regenerate test failures from database only")
+    public boolean regenerateHtml;
+
     public boolean hasConfiguredArtifact() {
         return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;
     }

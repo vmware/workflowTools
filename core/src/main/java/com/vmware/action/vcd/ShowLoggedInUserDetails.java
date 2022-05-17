@@ -24,7 +24,7 @@ public class ShowLoggedInUserDetails extends BaseAction {
             return;
         }
 
-        log.info(loggedInUser.fullName);
+        log.info(loggedInUser.name + " - " + loggedInUser.fullName);
         Arrays.stream(quotaPools.quotaPools).forEach(quotaPool ->log.info("{} {} used of {} {}",
                 quotaPool.quotaPoolDefinition.quotaResourceName, quotaPool.quotaConsumed, quotaPool.quotaPoolDefinition.quota,
                 quotaPool.quotaPoolDefinition.quotaResourceUnit));

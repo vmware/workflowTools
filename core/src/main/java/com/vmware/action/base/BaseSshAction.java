@@ -37,13 +37,9 @@ public abstract class BaseSshAction extends BaseVappAction {
             Sites.DatabaseServer databaseConfig = site.databaseServer;
             log.info("Using database host {} for ssh site config", databaseConfig.host);
             return new SiteConfig(databaseConfig.host, 22, "root", databaseConfig.deployment.guestProperties.adminPassword);
-        } else if (vappData.getSelectedVcdCell() != null) {
-            Sites.DeployedVM cell = vappData.getSelectedVcdCell();
-            if (cell.deployment == null) {
-                throw new FatalException("No deployment section found for cell " + vappData.getSelectedVcdCell().name);
-            }
-            Sites.OvfProperties ovfProperties = cell.deployment.ovfProperties;
-            return new SiteConfig(ovfProperties.hostname, 22, cell.osCredentials.username, cell.osCredentials.password);
+        } else if (vappData.getSelectedVm() != null) {
+            Sites.VmInfo vm = vappData.getSelectedVm();
+            return new SiteConfig(vm.getHost(), 22, vm.getSshCredentials().username, vm.getSshCredentials().password);
         } else if (sshConfig.hasCommandLineSite()) {
             return sshConfig.commandLineSite();
         } else {

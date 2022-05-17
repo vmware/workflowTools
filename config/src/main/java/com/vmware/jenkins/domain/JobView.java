@@ -38,6 +38,10 @@ public class JobView extends BaseDbClass {
     @Expose(serialize = false, deserialize = false)
     private DbUtils dbUtils;
 
+    @DbSaveIgnore
+    @Expose(serialize = false, deserialize = false)
+    private Map<Job, List<TestResult>> failedTests = new HashMap<>();
+
     public void setDbUtils(DbUtils dbUtils) {
         this.dbUtils = dbUtils;
     }
@@ -53,6 +57,27 @@ public class JobView extends BaseDbClass {
             id = savedView.id;
             lastFetchAmount = savedView.lastFetchAmount;
         }
+    }
+
+    public void addFailingTests(Job job, List<TestResult> results) {
+        failedTests.put(job, results);
+    }
+
+    public Map<Job, List<TestResult>> getFailedTests() {
+        return failedTests;
+    }
+
+
+    public void populateJobsFromDb() {
+        this.jobs = dbUtils.query(Job.class,"SELECT * FROM JOB where VIEW_ID = ?", id).toArray(new Job[0]);
+        Arrays.stream(jobs).forEach(job -> job.setDbUtils(dbUtils));
+        Arrays.stream(jobs).forEach(job -> {
+            job.loadTestResultsFromDb();
+            List<TestResult> failedTests = job.getFailedTests();
+            if (!failedTests.isEmpty()) {
+                this.addFailingTests(job, failedTests);
+            }
+        });
     }
 
     public void updateInDb() {
@@ -96,5 +121,13 @@ public class JobView extends BaseDbClass {
             throw new RuntimeException(se);
         }
         return usableJobs;
+    }
+
+    public long failingTestCount() {
+        if (!failedTests.isEmpty()) {
+            return failedTests.values().stream().mapToInt(List::size).sum();
+        } else {
+            return Arrays.stream(jobs).mapToLong(Job::failingTestCount).sum();
+        }
     }
 }

@@ -145,6 +145,10 @@ public class Job extends BaseDbClass {
         return Collections.emptyList();
     }
 
+    public long failingTestCount() {
+        return testResults.stream().filter(TestResult::failedTest).count();
+    }
+
     public boolean lastBuildWasSuccessful() {
         if (lastStableBuild == null) {
             return false;
@@ -280,11 +284,16 @@ public class Job extends BaseDbClass {
                 result.commitId = build.commitId;
                 result.buildNumber = build.buildNumber;
                 result.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
+                result.buildTestRunsFromStoredValues(savedBuilds);
                 usedUrls.add(result.url);
             }));
         } catch (SQLException se) {
             throw new RuntimeException(se);
         }
+    }
+
+    public List<TestResult> getFailedTests() {
+        return this.testResults.stream().filter(TestResult::failedTest).collect(toList());
     }
 
     public boolean hasSavedBuild(int buildNumber) {

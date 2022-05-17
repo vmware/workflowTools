@@ -36,4 +36,15 @@ public class ApiRequest {
     public static ApiRequest evaluate(String expression) {
         return new ApiRequest("Runtime.evaluate", Collections.singletonMap("expression", expression));
     }
+
+    public static ApiRequest elementById(String elementId) {
+        return evaluate(String.format("document.getElementById('%s')", elementId));
+    }
+
+    public static ApiRequest sendInput(String text) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("type", "char");
+        params.put("text", text);
+        return new ApiRequest("Input.dispatchKeyEvent", params);
+    }
 }

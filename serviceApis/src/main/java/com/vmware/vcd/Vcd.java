@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.vmware.AbstractRestService;
+import com.vmware.chrome.ChromeDevTools;
 import com.vmware.chrome.SsoClient;
 import com.vmware.config.section.SsoConfig;
 import com.vmware.http.HttpConnection;
@@ -26,7 +28,6 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
-import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
@@ -51,12 +52,13 @@ import static com.vmware.http.request.UrlParam.forceParam;
  * Represents the Vmware Vcloud Director Api
  */
 public class Vcd extends AbstractRestService {
-    public static String ACCESS_TOKEN_HEADER = "X-VMWARE-VCLOUD-ACCESS-TOKEN";
+    public static final String ACCESS_TOKEN_HEADER = "X-VMWARE-VCLOUD-ACCESS-TOKEN";
+    private static final String SSO_LOGIN_BUTTON = "ssoLoginButton";
     private final String apiVersion;
     private final String cloudapiUrl;
     private final boolean useVcdSso;
+    private final String ssoEmail;
     private final SsoConfig ssoConfig;
-    private final String ssoLoginButtonId;
     private String vcdOrg;
 
     public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
@@ -65,7 +67,7 @@ public class Vcd extends AbstractRestService {
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
         this.ssoConfig = null;
-        this.ssoLoginButtonId = null;
+        this.ssoEmail = null;
         this.useVcdSso = false;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -74,13 +76,13 @@ public class Vcd extends AbstractRestService {
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
-    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoLoginButtonId, boolean ssoHeadless, SsoConfig ssoConfig) {
+    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoEmail, boolean ssoHeadless, SsoConfig ssoConfig) {
         super(vcdUrl, "api", ApiAuthentication.vcd, username);
         this.useVcdSso = useVcdSso;
+        this.ssoEmail = ssoEmail;
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
-        this.ssoLoginButtonId = ssoLoginButtonId;
         this.ssoConfig = ssoConfig;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -131,8 +133,8 @@ public class Vcd extends AbstractRestService {
     public QueryResultVappsType queryVapps(String... filters) {
         QueryResultVappsType vapps = query("vApp", QueryResultVappsType.class, true, filters);
         if (vapps.record != null) {
-            String username = getUsername();
-            vapps.record.forEach(vapp -> vapp.setOwnedByWorkflowUser(username.equalsIgnoreCase(vapp.ownerName)));
+            UserSession currentSession = getCurrentSession();
+            vapps.record.forEach(vapp -> vapp.setOwnedByWorkflowUser(currentSession.user.name.equalsIgnoreCase(vapp.ownerName)));
             Comparator<QueryResultVappType> vappSorter = Comparator.comparing(QueryResultVappType::isOwnedByWorkflowUser)
                     .reversed().thenComparing(QueryResultVappType::getLabel);
             vapps.record.sort(vappSorter);
@@ -205,12 +207,15 @@ public class Vcd extends AbstractRestService {
             vcdOrg = InputUtils.readValueUntilNotBlank("Vcd Organization");
         }
         if (useVcdSso) {
-            SsoClient client = new SsoClient(ssoConfig);
+            SsoClient client = new SsoClient(ssoConfig, getUsername(), ssoEmail);
             String apiToken;
             try {
-                apiToken = client.loginAndGetApiToken(UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs"), ssoLoginButtonId);
+                Consumer<ChromeDevTools> ssoNavigateFunction = ChromeDevTools::waitForDomContentEvent;
+                String siteUrl = UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs");
+                apiToken = client.loginAndGetApiToken(siteUrl, siteUrl, SSO_LOGIN_BUTTON,
+                        ssoNavigateFunction, (devTools) -> devTools.evaluate("this.localStorage.getItem('jwt')").getValue());
             } catch (RuntimeException e) {
-                log.debug(e.getMessage(), e);
+                log.debug(String.valueOf(e.getMessage()), e);
                 log.info("Encountered exception when using SSO: {}", e.getMessage());
                 log.info("Failed to get api token via SSO, please enter api token");
                 apiToken = InputUtils.readValueUntilNotBlank("Bearer Api Token");
@@ -224,7 +229,7 @@ public class Vcd extends AbstractRestService {
         } else {
             log.info("Enter username as username@[org name]");
         }
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(vcd);
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(vcd, getUsername());
         if (StringUtils.isNotEmpty(vcdOrg) && !credentials.getUsername().contains("@")) {
             log.info("Appending org name {} to username {}", vcdOrg, credentials.getUsername());
             credentials = new UsernamePasswordCredentials(credentials.getUsername() + "@" + vcdOrg, credentials.getPassword());
@@ -234,7 +239,7 @@ public class Vcd extends AbstractRestService {
         }
 
         String apiToken = loginWithCredentials(credentials);
-        saveApiToken(apiToken, ApiAuthentication.vcd);
+        saveApiToken(apiToken, vcd);
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 

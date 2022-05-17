@@ -6,6 +6,7 @@ public class QueryResultVMType extends ResourceType implements InputListSelectio
     public String container;
     public String containerName;
     public String status;
+    public String ipAddress;
 
     public boolean isPoweredOn() {
         return "POWERED_ON".equalsIgnoreCase(status);

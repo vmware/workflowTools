@@ -18,7 +18,7 @@ public class ApiResponse {
         return (String) getValueMap().get("type");
     }
 
-    public String getDescrption() {
+    public String getDescription() {
         return (String) getValueMap().get("description");
     }
 
@@ -36,6 +36,14 @@ public class ApiResponse {
 
     public String getClassName() {
         return (String) getValueMap().get("className");
+    }
+
+    public boolean matchesElementId(String elementId) {
+        return elementId != null && getDescription() != null && getDescription().contains("#" + elementId);
+    }
+
+    public boolean matchesUrl(String url) {
+        return getValue() != null && (getValue().equalsIgnoreCase(url) || getValue().matches(url));
     }
 
     private Map getValueMap() {
