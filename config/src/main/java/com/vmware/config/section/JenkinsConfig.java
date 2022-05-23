@@ -86,8 +86,11 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Url for displaying comparison between two build commit ids. Needs to contain named groups first and second")
     public String commitComparisonUrl;
 
-    @ConfigurableProperty(help = "Will run test failures database creation script", commandLine = "--create-test-failures-database")
+    @ConfigurableProperty(commandLine = "--create-test-failures-database", help = "Will run test failures database creation script")
     public boolean createTestFailuresDatabase;
+
+    @ConfigurableProperty(help = "Group Jobs by name pattern")
+    public String groupByNamePattern;
 
     @ConfigurableProperty(commandLine = "--regenerate-html", help = "Regenerate test failures from database only")
     public boolean regenerateHtml;

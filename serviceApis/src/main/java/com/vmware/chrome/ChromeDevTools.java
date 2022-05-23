@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.vmware.chrome.domain.ApiRequest;
 import com.vmware.chrome.domain.ApiResponse;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.RuntimeTimeoutException;
 
@@ -123,6 +124,10 @@ public class ChromeDevTools extends WebSocketClient {
 
     public ApiResponse setValueById(String elementId, String value) {
         return evaluate(String.format("document.getElementById('%s')", elementId), ".value = '" + value + "'","#" + elementId);
+    }
+
+    public String getValue(String elementScript) {
+        return waitForPredicate(ApiRequest.evaluate(elementScript), apiResponse -> StringUtils.isNotBlank(apiResponse.getValue()), 0, elementScript).getValue();
     }
 
     public ApiResponse evaluate(String locator, String operation, String testDescription) {

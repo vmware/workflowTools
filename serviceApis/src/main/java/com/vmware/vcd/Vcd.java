@@ -213,7 +213,7 @@ public class Vcd extends AbstractRestService {
                 Consumer<ChromeDevTools> ssoNavigateFunction = ChromeDevTools::waitForDomContentEvent;
                 String siteUrl = UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs");
                 apiToken = client.loginAndGetApiToken(siteUrl, siteUrl, SSO_LOGIN_BUTTON,
-                        ssoNavigateFunction, (devTools) -> devTools.evaluate("this.localStorage.getItem('jwt')").getValue());
+                        ssoNavigateFunction, (devTools) -> devTools.getValue("this.localStorage.getItem('jwt')"));
             } catch (RuntimeException e) {
                 log.debug(String.valueOf(e.getMessage()), e);
                 log.info("Encountered exception when using SSO: {}", e.getMessage());

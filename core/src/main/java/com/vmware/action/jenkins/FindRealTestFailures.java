@@ -167,7 +167,8 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
 
-        log.info("{} failing tests found for view {}", jobView.failingTestCount(), view.name);
+        view.failingTestsCount = jobView.failingTestCount();
+        log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
 
         createJobResultsHtmlPages(view, includeViewsLink, jobView.getFailedTests());
         viewPadder.infoTitle();
@@ -175,7 +176,16 @@ public class FindRealTestFailures extends BaseAction {
 
     private void createJobResultsHtmlPages(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods) {
         final AtomicInteger counter = new AtomicInteger();
-        String jobsResultsHtml = failingTestMethods.keySet().stream().sorted(comparing(jobDetails -> jobDetails.name)).map(job -> {
+        Comparator<Job> groupComparator = (first, second) -> {
+            if (first.name.matches(jenkinsConfig.groupByNamePattern) && !second.name.matches(jenkinsConfig.groupByNamePattern)) {
+                return -1;
+            } else if (second.name.matches(jenkinsConfig.groupByNamePattern) && !first.name.matches(jenkinsConfig.groupByNamePattern)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+        String jobsResultsHtml = failingTestMethods.keySet().stream().sorted(groupComparator.thenComparing(jobDetails -> jobDetails.name)).map(job -> {
             List<TestResult> failingTests = failingTestMethods.get(job);
             return createJobFragment(counter.getAndIncrement(), job, failingTests);
         }).collect(Collectors.joining("\n"));

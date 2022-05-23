@@ -63,6 +63,7 @@ public class SsoClient {
         devTools.sendMessage("Page.enable");
         devTools.sendMessage(ApiRequest.navigate(siteLoginUrl));
         devTools.waitForDomContentEvent();
+        ThreadUtils.sleep(1, TimeUnit.SECONDS);
         ApiResponse response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
 
         if (response.matchesElementId(ssoLoginButtonId)) {

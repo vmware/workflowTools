@@ -50,6 +50,10 @@ public class HomePage {
         public String name;
         public String url;
 
+        @Expose(serialize = false, deserialize = false)
+        public long failingTestsCount;
+        public Exception failingTestsGenerationException;
+
         public View() {
         }
 
@@ -58,10 +62,6 @@ public class HomePage {
             this.url = view.url;
             this.failingTestsCount = view.failingTestCount();
         }
-
-        @Expose(serialize = false, deserialize = false)
-        public long failingTestsCount;
-        public Exception failingTestsGenerationException;
 
         public String viewNameWithFailureCount() {
             if (failingTestsGenerationException != null) {

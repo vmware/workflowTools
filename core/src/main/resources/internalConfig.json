@@ -56,6 +56,7 @@
   "databaseDriverClass": "org.postgresql.Driver",
   "databaseUrlPattern": "jdbc:postgresql://$HOST:$PORT/$DB_NAME",
   "databaseSchemaName": "local",
+  "groupByNamePattern": ".+",
   "issueTypesToInclude": [
     8
   ],
