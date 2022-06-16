@@ -12,8 +12,8 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.ssl.WorkflowCertificateManager;
 
-import static sun.security.provider.X509Factory.BEGIN_CERT;
-import static sun.security.provider.X509Factory.END_CERT;
+import static com.vmware.util.StringUtils.BEGIN_CERT;
+import static com.vmware.util.StringUtils.END_CERT;
 
 @ActionDescription("Reads certs from the specified url.")
 public class ReadCertsFromUrl extends BaseAction {

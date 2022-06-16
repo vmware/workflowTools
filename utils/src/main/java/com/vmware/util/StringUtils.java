@@ -25,13 +25,13 @@ import com.vmware.util.exception.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static sun.security.provider.X509Factory.BEGIN_CERT;
-import static sun.security.provider.X509Factory.END_CERT;
-
 public class StringUtils {
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
     public static final String BEGIN_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----";
     public static final String END_PRIVATE_KEY = "-----END PRIVATE KEY-----";
+
+    public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
+    public static final String END_CERT = "-----END CERTIFICATE-----";
     public static final String BEGIN_ENCRYPTED_PRIVATE_KEY = "-----BEGIN ENCRYPTED PRIVATE KEY-----";
     public static final String END_ENCRYPTED_PRIVATE_KEY = "-----END ENCRYPTED PRIVATE KEY-----";
     public static final String NEW_LINE_CHAR = "\n";

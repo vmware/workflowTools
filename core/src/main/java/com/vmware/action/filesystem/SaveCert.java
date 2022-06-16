@@ -42,10 +42,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 
-import static com.vmware.util.StringUtils.BEGIN_PRIVATE_KEY;
-import static com.vmware.util.StringUtils.END_PRIVATE_KEY;
-import static sun.security.provider.X509Factory.BEGIN_CERT;
-import static sun.security.provider.X509Factory.END_CERT;
+import static com.vmware.util.StringUtils.*;
 
 @ActionDescription(value = "Saves the loaded cert. If keystore password is set, cert is saved to a keystore, otherwise as pem files.",
         configFlagsToAlwaysExcludeFromCompleter = {"--cipher-salt-length", "--new-keystore-type"})
