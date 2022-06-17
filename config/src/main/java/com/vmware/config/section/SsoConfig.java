@@ -28,6 +28,12 @@ public class SsoConfig {
     @ConfigurableProperty(help = "Id of input field for sign in button when signing in with SSO")
     public String ssoSignInButtonId;
 
+    @ConfigurableProperty(help = "Id of input field for email address when signing in with SSO")
+    public String emailAddressInputId;
+
+    @ConfigurableProperty(help = "Id of input field for submitting email address when signing in with SSO")
+    public String emailAddressSubmitButtonId;
+
     @ConfigurableProperty(help = "Id of input field for RSA passcode when signing in with SSO")
     public String ssoPasscodeInputId;
 

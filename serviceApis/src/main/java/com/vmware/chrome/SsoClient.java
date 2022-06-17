@@ -26,8 +26,10 @@ import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 
+import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,9 +75,12 @@ public class SsoClient {
             response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoConfig.ssoSignInButtonId, "userNameFormSubmit");
 
             if (response.matchesElementId("userNameFormSubmit")) {
+                if (StringUtils.isEmpty(email)) {
+                    throw new FatalException("No email specified for sso, specify --sso-email property or set a value for git user.email");
+                }
                 log.info("Using email {} for SSO", email);
-                devTools.setValueById("userInput", email);
-                devTools.clickById("userNameFormSubmit");
+                devTools.setValueById(ssoConfig.emailAddressInputId, email);
+                devTools.clickById(ssoConfig.emailAddressSubmitButtonId);
                 devTools.waitForDomContentEvent();
                 response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoConfig.ssoSignInButtonId);
             }
