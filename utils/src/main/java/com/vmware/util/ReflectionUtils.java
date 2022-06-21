@@ -45,9 +45,18 @@ public class ReflectionUtils {
         }
     }
 
-    public static void invokeMethod(Method method, Object instance) {
+    public static void invokeMethod(String methodName, Object instance, Class[] argTypes, Object[] args) {
         try {
-            method.invoke(instance);
+            Method method = instance.getClass().getMethod(methodName, argTypes);
+            method.invoke(instance, args);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeReflectiveOperationException(e);
+        }
+    }
+
+    public static void invokeMethod(Method method, Object instance, Object... args) {
+        try {
+            method.invoke(instance, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeReflectiveOperationException(e);
         }

@@ -16,7 +16,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * This parsing handler is to fix/workaround the "xsi" supporting issue, which
@@ -48,23 +47,6 @@ public class BugzParsingHandler extends XmlRpcResponseParser implements ContentH
         if (localName.equals("Apache2__RequestRec"))
             return;
         super.endElement(uri, localName, qName);
-    }
-
-    /**
-     * Receive notification of the beginning of a document.
-     */
-    @Override
-    public void startDocument() throws SAXException {
-        NamespaceSupport nc = null;
-        Object o = xr.getProperty(
-                "http://apache.org/xml/properties/internal/namespace-context");
-        if (o instanceof NamespaceSupport) {
-            nc = (NamespaceSupport) o;
-            nc.declarePrefix("xsi".intern(),
-                    "http://www.w3.org/2001/XMLSchema-instance".intern());
-        }
-
-        super.startDocument();
     }
 
     /**

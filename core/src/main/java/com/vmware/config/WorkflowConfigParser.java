@@ -62,7 +62,7 @@ public class WorkflowConfigParser {
         applyRuntimeArguments(config);
         config.setupLogging();
 
-        log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
+        log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
 
         parseUsernameIfBlank(config);
 

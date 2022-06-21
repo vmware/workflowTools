@@ -161,20 +161,12 @@ public class BugzXmlRpcTransport extends XmlRpcSunHttpTransport {
         XmlRpcResponseParser xp;
 
         try {
-            // no use:
-            // xr.setProperty(Constants.XERCES_PROPERTY_PREFIX +
-            // Constants.BUFFER_SIZE_PROPERTY, new Integer(62000));
-
-            xp = new BugzParsingHandler(xr, pConfig, getClient()
-                    .getTypeFactory());
+            xp = new BugzParsingHandler(xr, pConfig, getClient().getTypeFactory());
             xr.setContentHandler(xp);
-            if (log.isTraceEnabled()) {
-                String content = IOUtils.read(pStream);
-                log.trace("Response text from server\n{}", content);
-                xr.parse(new InputSource(new StringReader(content)));
-            } else {
-                xr.parse(new InputSource(pStream));
-            }
+            String content = IOUtils.read(pStream);
+            log.trace("Response text from server\n{}", content);
+            String contentWithoutXsi = content.replaceAll("xsi:type=\"[\\w]+:Apache2__RequestRec\"", "");
+            xr.parse(new InputSource(new StringReader(contentWithoutXsi)));
 
         } catch (SAXException e) {
             throw new XmlRpcClientException(
