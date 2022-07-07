@@ -62,7 +62,7 @@ public class SsoClient {
         ChromeTab chromeTab = connection.get("http://localhost:" + ssoConfig.chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
 
         ChromeDevTools devTools = new ChromeDevTools(URI.create(chromeTab.getWebSocketDebuggerUrl()));
-        devTools.sendMessage("Page.enable");
+        devTools.sendMessage(new ApiRequest("Page.enable"));
         devTools.sendMessage(ApiRequest.navigate(siteLoginUrl));
         devTools.waitForDomContentEvent();
         ThreadUtils.sleep(1, TimeUnit.SECONDS);

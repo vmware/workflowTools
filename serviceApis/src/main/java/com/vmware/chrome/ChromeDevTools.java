@@ -99,15 +99,6 @@ public class ChromeDevTools extends WebSocketClient {
     public void onMessage(ByteBuffer bytes) {
     }
 
-    /**
-     * Send a message.
-     *
-     * @param message
-     */
-    public ApiResponse sendMessage(String message) {
-        return sendMessage(new ApiRequest(message));
-    }
-
     public ApiResponse evaluate(String element) {
         return sendMessage(ApiRequest.evaluate(element));
     }
@@ -141,7 +132,7 @@ public class ChromeDevTools extends WebSocketClient {
     }
 
     public byte[] captureScreenshot() {
-        String screenshotData = sendMessage("Page.captureScreenshot").getData();
+        String screenshotData = sendMessage(new ApiRequest("Page.captureScreenshot")).getData();
         return Base64.getDecoder().decode(screenshotData);
     }
 
