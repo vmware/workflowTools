@@ -480,6 +480,11 @@
   "SetReviewId": [
     "--username"
   ],
+  "ConvertStringColumnToArray": [
+    "--database-url",
+    "--database-driver-class",
+    "--database-driver-file"
+  ],
   "PowerOffVapp": [
     "--sso-headless",
     "--vcd-sso",
@@ -627,14 +632,14 @@
   "FindRealTestFailures": [
     "--disable-login",
     "--username",
-    "--create-test-failures-database",
     "--database-url",
     "--database-driver-class",
     "--database-driver-file",
     "--max-builds",
     "--regenerate-html",
     "--destination-file",
-    "--jenkins-view"
+    "--jenkins-view",
+    "--create-test-failures-database"
   ],
   "DisplayInfo": [
     "--input-text"

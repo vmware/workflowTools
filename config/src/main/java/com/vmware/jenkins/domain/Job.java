@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gson.annotations.Expose;
@@ -26,8 +25,6 @@ import com.vmware.util.db.DbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.vmware.BuildStatus.SUCCESS;
-import static com.vmware.BuildStatus.UNSTABLE;
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
@@ -145,8 +142,11 @@ public class Job extends BaseDbClass {
         return Collections.emptyList();
     }
 
-    public long failingTestCount() {
-        return testResults.stream().filter(TestResult::failedTest).count();
+    public long failingTestCount(int lastFetchAmount) {
+        if (testResults == null) {
+            return 0;
+        }
+        return createFailingTestsList(lastFetchAmount).size();
     }
 
     public boolean lastBuildWasSuccessful() {
@@ -162,7 +162,12 @@ public class Job extends BaseDbClass {
     }
 
     public int latestUsableBuildNumber() {
-        return Stream.of(lastStableBuild, lastUnstableBuild).filter(Objects::nonNull).mapToInt(build -> build.buildNumber).max().orElse(-1);
+        int latestBuild = Stream.of(lastStableBuild, lastUnstableBuild).filter(Objects::nonNull).mapToInt(build -> build.buildNumber).max().orElse(-1);
+        if (latestBuild == -1 && CollectionUtils.isNotEmpty(savedBuilds)) {
+            return savedBuilds.stream().mapToInt(JobBuild::getBuildNumber).max().orElse(-1);
+        } else {
+            return latestBuild;
+        }
     }
 
     public void setDbUtils(DbUtils dbUtils) {
@@ -231,17 +236,11 @@ public class Job extends BaseDbClass {
             return;
         }
 
-        try (Connection connection = dbUtils.createConnection()) {
-            connection.setAutoCommit(false);
-            dbUtils.insertIfNeeded(connection, this, "SELECT * FROM JOB WHERE URL = ?", url);
-            usefulBuilds.forEach(build -> {
-                build.jobId = this.id;
-                dbUtils.insertIfNeeded(connection, build, "SELECT * FROM JOB_BUILD WHERE url = ?", build.url);
-            });
-            connection.commit();
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
+        dbUtils.insertIfNeeded(this, "SELECT * FROM JOB WHERE URL = ?", url);
+        usefulBuilds.forEach(build -> {
+            build.jobId = this.id;
+            dbUtils.insertIfNeeded(build, "SELECT * FROM JOB_BUILD WHERE url = ?", build.url);
+        });
 
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
     }
@@ -251,23 +250,15 @@ public class Job extends BaseDbClass {
             return;
         }
 
-        try (Connection connection = dbUtils.createConnection()) {
-            connection.setAutoCommit(false);
-
-            testResults.forEach(result -> {
-                result.jobBuildId = savedBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).map(build -> build.id)
-                        .findFirst().orElse(result.jobBuildId);
-                if (result.id != null) {
-                    dbUtils.update(connection, result);
-                } else {
-                    dbUtils.insert(connection, result);
-                }
-            });
-
-            connection.commit();
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
+        testResults.forEach(result -> {
+            result.jobBuildId = savedBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).map(build -> build.id)
+                    .findFirst().orElse(result.jobBuildId);
+            if (result.id != null) {
+                dbUtils.update(result);
+            } else {
+                dbUtils.insert(result);
+            }
+        });
     }
 
     public void loadTestResultsFromDb() {
@@ -276,24 +267,18 @@ public class Job extends BaseDbClass {
             return;
         }
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
-        try (Connection connection = dbUtils.createConnection()) {
-            this.testResults = dbUtils.query(connection, TestResult.class, "SELECT tr.* from TEST_RESULT tr"
+            this.testResults = dbUtils.query(TestResult.class, "SELECT tr.* from TEST_RESULT tr"
                     + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME, tr.PARAMETERS ASC", id);
             Set<String> usedUrls = new HashSet<>();
-            savedBuilds.forEach(build -> testResults.stream().filter(result -> result.jobBuildId.equals(build.id)).forEach(result -> {
-                result.commitId = build.commitId;
-                result.buildNumber = build.buildNumber;
-                result.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
-                result.buildTestRunsFromStoredValues(savedBuilds);
-                usedUrls.add(result.url);
-            }));
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
-    }
-
-    public List<TestResult> getFailedTests() {
-        return this.testResults.stream().filter(TestResult::failedTest).collect(toList());
+            testResults.forEach(result -> {
+                Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
+                matchingBuild.ifPresent(build -> {
+                    result.commitId = build.commitId;
+                    result.buildNumber = build.buildNumber;
+                    result.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
+                    usedUrls.add(result.url);
+                });
+            });
     }
 
     public boolean hasSavedBuild(int buildNumber) {
@@ -309,26 +294,25 @@ public class Job extends BaseDbClass {
             return;
         }
         usefulBuilds = dbUtils.query(JobBuild.class, "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
+        if (CollectionUtils.isEmpty(usefulBuilds)) {
+            return;
+        }
         int lastBuildIndexPerConfig = Math.min(maxJenkinsBuildsToCheck - 1, 19); // keep a max of 20 builds
         JobBuild lastBuildToKeep = lastBuildIndexPerConfig >= usefulBuilds.size() ? usefulBuilds.get(usefulBuilds.size() - 1) : usefulBuilds.get(lastBuildIndexPerConfig);
-        try (Connection connection = dbUtils.createConnection()) {
-            List<JobBuild> existingJobBuildsToCheck = dbUtils.query(connection, JobBuild.class,
-                    "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
-            existingJobBuildsToCheck.forEach(build -> {
-                Map<TestResult, TestResult.RemovalStatus> testResultsToUpdate = testResults.stream()
-                        .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build)));
-                testResultsToUpdate.entrySet().stream().filter(entry -> DELETABLE == entry.getValue())
-                        .forEach(entry -> dbUtils.update(connection, entry.getKey()));
-                if (testResultsToUpdate.entrySet().stream().noneMatch(entry -> NOT_DELETABLE == entry.getValue())) {
-                    log.info("Removing old build {} for {}", build.buildNumber, name);
-                    dbUtils.delete(connection, build);
-                    usefulBuilds.remove(build);
-                }
-            });
-            connection.commit();
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
+
+        List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
+                "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
+        existingJobBuildsToCheck.forEach(build -> {
+            Map<TestResult, TestResult.RemovalStatus> testResultsToUpdate = testResults.stream()
+                    .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build)));
+            testResultsToUpdate.entrySet().stream().filter(entry -> DELETABLE == entry.getValue())
+                    .forEach(entry -> dbUtils.update(entry.getKey()));
+            if (testResultsToUpdate.entrySet().stream().noneMatch(entry -> NOT_DELETABLE == entry.getValue())) {
+                log.info("Removing old build {} for {}", build.buildNumber, name);
+                dbUtils.delete(build);
+                usefulBuilds.remove(build);
+            }
+        });
     }
 
     public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck) {
@@ -337,8 +321,9 @@ public class Job extends BaseDbClass {
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
                     if (applicableBuilds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1) {
+                        List<JobBuild> buildsToCheck = usefulBuilds != null ? usefulBuilds : savedBuilds;
                         result.testRuns = applicableBuilds.stream().map(entry -> {
-                            JobBuild matchingBuild = usefulBuilds.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
+                            JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
                                     .orElseThrow(() -> new RuntimeException("Failed to find build with number " + entry.getKey() + " for job " + name));
                             return new TestResult(result, matchingBuild, entry.getValue());
                         }).collect(toList());

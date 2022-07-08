@@ -1,13 +1,14 @@
 package com.vmware.action.jenkins;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.vmware.BuildStatus.SUCCESS;
 import static com.vmware.BuildStatus.UNSTABLE;
+import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
 import static com.vmware.util.StringUtils.pluralize;
 import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Comparator.comparing;
@@ -52,11 +55,23 @@ public class FindRealTestFailures extends BaseAction {
 
     public FindRealTestFailures(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("jenkinsView", "destinationFile");
+    }
+
+    @Override
+    protected void failWorkflowIfConditionNotMet() {
+        super.failWorkflowIfConditionNotMet();
+        if (!jenkinsConfig.createTestFailuresDatabase) {
+            Stream.of("jenkinsView", "destinationFile").forEach(this::failIfUnset);
+        }
     }
 
     @Override
     public void process() {
+        if (jenkinsConfig.createTestFailuresDatabase) {
+            createDatabase();
+            return;
+        }
+
         log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, new Date().toString());
         File destinationFile = new File(fileSystemConfig.destinationFile);
         createDbUtilsIfNeeded();
@@ -98,6 +113,9 @@ public class FindRealTestFailures extends BaseAction {
         }
         long elapsedTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 
+        if (dbUtils != null) {
+            dbUtils.closeConnection();
+        }
 
         if (destinationFile.isDirectory()) {
             String viewListing = createViewListingHtml(matchingViews, elapsedTime);
@@ -109,6 +127,16 @@ public class FindRealTestFailures extends BaseAction {
         if (elapsedTime > 0) {
             log.info("Took {} seconds", elapsedTime);
         }
+    }
+
+    private void createDatabase() {
+        createDbUtilsIfNeeded();
+        if (dbUtils == null) {
+            exitDueToFailureCheck("Database connection not configured");
+        }
+        log.info("Executing database creation script");
+        dbUtils.executeSqlScript(new ClasspathResource("/testFailuresTemplate/databaseDdl.sql", this.getClass()).getText());
+        dbUtils.closeConnection();
     }
 
     private void validateThatDestinationFileIsDirectoryIfNeeded(List<HomePage.View> matchingViews, File destinationFile) {
@@ -128,16 +156,12 @@ public class FindRealTestFailures extends BaseAction {
         if (!fileSystemConfig.databaseConfigured()) {
             return;
         }
+        Stream.of("databaseDriverFile", "databaseDriverClass").forEach(this::failIfUnset);
         log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
-        log.info("Using database {} to store test results",fileSystemConfig.databaseUrl);
+        log.info("Using database {} to store test results", fileSystemConfig.databaseUrl);
         dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
                 fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
-
-        if (jenkinsConfig.createTestFailuresDatabase) {
-            log.info("Executing database creation script");
-            dbUtils.executeSqlScript(new ClasspathResource("/testFailuresTemplate/databaseDdl.sql", this.getClass()).getText());
-        }
-
+        dbUtils.createConnection();
     }
 
     private String createViewListingHtml(List<HomePage.View> matchingViews, long elapsedTime) {
@@ -246,10 +270,10 @@ public class FindRealTestFailures extends BaseAction {
         });
 
         jobView.lastFetchAmount = jenkinsConfig.maxJenkinsBuildsToCheck;
-        jobView.updateInDb();
 
         log.info("");
 
+        jobView.updateInDb();
         usableJobs.stream().filter(job -> !failedJobs.contains(job)).forEach(job -> {
             job.saveFetchedBuildsInfo();
             boolean passResultsAdded = addPassResultsIfNeeded(job);
@@ -346,8 +370,8 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
         String tableName = StringUtils.convertToDbName(TestResult.class.getSimpleName());
-        int purgedRecords = dbUtils.delete("DELETE FROM " + tableName + " WHERE STATUS = '" + TestResult.TestStatus.PASS.name()
-                + "' and coalesce(failed_builds, '') = '' and coalesce(skipped_builds, '') = ''");
+        int purgedRecords = dbUtils.delete("DELETE FROM " + tableName + " WHERE STATUS = '" + PASS.name() + "' "
+                + "and cardinality(failed_builds) = 0 and cardinality(skipped_builds) = 0");
         if (purgedRecords > 0) {
             log.info("Purged {} test results from database that have no failure information", purgedRecords);
         }

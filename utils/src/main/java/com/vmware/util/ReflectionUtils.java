@@ -1,14 +1,17 @@
 package com.vmware.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 
@@ -41,15 +44,6 @@ public class ReflectionUtils {
             Class[] parameterClassesArray = parameterClasses.toArray(new Class[parameterClasses.size()]);
             return clazz.getConstructor(parameterClassesArray).newInstance(constructorParameters);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeReflectiveOperationException(e);
-        }
-    }
-
-    public static void invokeMethod(String methodName, Object instance, Class[] argTypes, Object[] args) {
-        try {
-            Method method = instance.getClass().getMethod(methodName, argTypes);
-            method.invoke(instance, args);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeReflectiveOperationException(e);
         }
     }
@@ -113,17 +107,24 @@ public class ReflectionUtils {
     public static void setValue(Field field, Object instance, Object value) {
         try {
             Object instanceToUse = determineInstanceForField(field, instance);
-            if (field.getType() == int[].class && value != null && value.getClass() == String.class) {
-                int[] values = Arrays.stream(String.valueOf(value).split(",")).filter(StringUtils::isNotBlank).mapToInt(Integer::parseInt).toArray();
-                field.set(instance, values);
-            } else if (field.getType().isArray() && value != null && value.getClass() == Object[].class) {
-                String[] values = Arrays.stream((Object[]) value).map(val -> (String) val).toArray(String[]::new);
-                field.set(instance, values);
+            if (field.getType().isArray() && value != null && value.getClass() == Object[].class && field.getType() != Object[].class) {
+
+                Object[] objectValues = (Object[]) value;
+                Object typedArray = Array.newInstance(field.getType().getComponentType(), objectValues.length);
+                System.arraycopy(objectValues, 0, typedArray, 0, objectValues.length);
+                field.set(instance, typedArray);
+            } else if (field.getType().isArray() && value != null && java.sql.Array.class.isAssignableFrom(value.getClass())) {
+                Object[] objectValues = (Object[]) ((java.sql.Array) value).getArray();
+                Object typedArray = Array.newInstance(field.getType().getComponentType(), objectValues.length);
+                System.arraycopy(objectValues, 0, typedArray, 0, objectValues.length);
+                field.set(instance, typedArray);
             } else {
                 field.set(instanceToUse, value);
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeReflectiveOperationException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

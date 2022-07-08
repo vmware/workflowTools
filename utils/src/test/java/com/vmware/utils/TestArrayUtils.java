@@ -10,16 +10,16 @@ public class TestArrayUtils {
 
     @Test
     public void addToArray() {
-        int[] startingArray = new int[] {56, 23, 34};
-        int[] updatedArray = ArrayUtils.add(startingArray, 29);
-        assertEquals(Arrays.toString(new int[] {56, 23, 34, 29}), Arrays.toString(updatedArray));
+        Integer[] startingArray = new Integer[] {56, 23, 34};
+        Integer[] updatedArray = ArrayUtils.add(startingArray, 29);
+        assertEquals(Arrays.toString(new Integer[] {23, 29, 34, 56}), Arrays.toString(updatedArray));
     }
 
     @Test
     public void removeFromArray() {
-        int[] startingArray = new int[] {56, 23, 34};
-        int[] updatedArray = ArrayUtils.remove(startingArray, 23);
-        assertEquals(Arrays.toString(new int[] {56, 34}), Arrays.toString(updatedArray));
+        Integer[] startingArray = new Integer[] {56, 23, 34};
+        Integer[] updatedArray = ArrayUtils.remove(startingArray, 23);
+        assertEquals(Arrays.toString(new Integer[] {56, 34}), Arrays.toString(updatedArray));
     }
 
     @Test

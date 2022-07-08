@@ -5,6 +5,8 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.db.DbSaveIgnore;
 import com.vmware.util.db.DbUtils;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -117,9 +119,11 @@ public class HomePage {
         if (dbUtils == null) {
             return;
         }
-        this.jobViews = dbUtils.query(JobView.class, "SELECT * FROM JOB_VIEW WHERE NAME LIKE ?", matchingViewName);
+
+        this.jobViews = dbUtils.query(JobView.class, "SELECT * FROM JOB_VIEW WHERE REGEXP_LIKE(NAME, ?)", matchingViewName);
         this.jobViews.forEach(view -> view.setDbUtils(dbUtils));
         this.jobViews.forEach(JobView::populateJobsFromDb);
+
         this.views = jobViews.stream().map(View::new).toArray(View[]::new);
     }
 

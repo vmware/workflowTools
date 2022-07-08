@@ -1,8 +1,16 @@
 package com.vmware.jenkins.domain;
 
+import com.google.gson.annotations.Expose;
+import com.vmware.util.ArrayUtils;
+import com.vmware.util.CollectionUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
+import com.vmware.util.db.AfterDbLoad;
+import com.vmware.util.db.BaseDbClass;
+import com.vmware.util.db.DbSaveIgnore;
+
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,15 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import com.google.gson.annotations.Expose;
-import com.vmware.util.ArrayUtils;
-import com.vmware.util.CollectionUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.UrlUtils;
-import com.vmware.util.db.AfterDbLoad;
-import com.vmware.util.db.BaseDbClass;
-import com.vmware.util.db.DbSaveIgnore;
 
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
@@ -49,16 +48,16 @@ public class TestResult extends BaseDbClass {
     public Integer similarSkips;
 
     @Expose(serialize = false, deserialize = false)
-    public int[] failedBuilds;
+    public Integer[] failedBuilds;
 
     @Expose(serialize = false, deserialize = false)
-    public int[] skippedBuilds;
+    public Integer[] skippedBuilds;
 
     @Expose(serialize = false, deserialize = false)
-    public int[] passedBuilds;
+    public Integer[] passedBuilds;
 
     @Expose(serialize = false, deserialize = false)
-    public int[] presumedPassedBuilds;
+    public Integer[] presumedPassedBuilds;
 
     @DbSaveIgnore
     @Expose(serialize = false, deserialize = false)
@@ -153,24 +152,6 @@ public class TestResult extends BaseDbClass {
         this.url = urlToUse;
     }
 
-    public void buildTestRunsFromStoredValues(List<JobBuild> savedBuilds) {
-        this.testRuns = new ArrayList<>();
-        addTestRuns(passedBuilds, TestStatus.PASS, savedBuilds);
-        addTestRuns(presumedPassedBuilds, TestStatus.PRESUMED_PASS, savedBuilds);
-        addTestRuns(failedBuilds, TestStatus.FAIL, savedBuilds);
-        addTestRuns(skippedBuilds, TestStatus.SKIP, savedBuilds);
-    }
-
-    private void addTestRuns(int[] builds, TestStatus status, List<JobBuild> savedBuilds) {
-        if (builds != null) {
-            Arrays.stream(builds).forEach(number -> {
-                JobBuild savedBuild = savedBuilds.stream().filter(build -> build.buildNumber == number).findFirst()
-                        .orElseThrow(() -> new RuntimeException("Expected to find saved build for build number " + number));
-                testRuns.add(new TestResult(this, savedBuild, status));
-            });
-        }
-    }
-
     public String testLinks(String commitComparisonUrl) {
         List<TestResult> sortedTestRuns = testRuns.stream().sorted(Comparator.comparing(TestResult::buildNumber)).collect(Collectors.toList());
         String resultLinks = sortedTestRuns.stream().map(this::testResultLink).collect(Collectors.joining(System.lineSeparator()));
@@ -198,10 +179,10 @@ public class TestResult extends BaseDbClass {
 
     public List<Map.Entry<Integer, TestStatus>> buildsToUse(int limit) {
         Map<Integer, TestStatus> testStatusMap = new HashMap<>();
-        Stream.of(passedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.PASS));
-        Stream.of(presumedPassedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.PRESUMED_PASS));
-        Stream.of(failedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.FAIL));
-        Stream.of(skippedBuilds).filter(Objects::nonNull).flatMapToInt(IntStream::of).forEach(value -> testStatusMap.put(value, TestStatus.SKIP));
+        Optional.ofNullable(passedBuilds).ifPresent(values -> Arrays.stream(values).forEach(value -> testStatusMap.put(value, TestStatus.PASS)));
+        Optional.ofNullable(presumedPassedBuilds).ifPresent(values -> Arrays.stream(values).forEach(value -> testStatusMap.put(value, TestStatus.PRESUMED_PASS)));
+        Optional.ofNullable(failedBuilds).ifPresent(values -> Arrays.stream(values).forEach(value -> testStatusMap.put(value, TestStatus.FAIL)));
+        Optional.ofNullable(skippedBuilds).ifPresent(values -> Arrays.stream(values).forEach(value -> testStatusMap.put(value, TestStatus.SKIP)));
 
         Comparator<Map.Entry<Integer, TestStatus>> keyComparator = Map.Entry.<Integer, TestStatus>comparingByKey().reversed();
 
@@ -272,19 +253,15 @@ public class TestResult extends BaseDbClass {
         return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
     }
 
-    public boolean failedTest() {
-        return status == TestStatus.FAIL || status == TestStatus.SKIP;
-    }
-
     public RemovalStatus removeUnimportantTestResultsForBuild(JobBuild build) {
         if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
             return NOT_DELETABLE;
         }
         if (Stream.of(passedBuilds, presumedPassedBuilds, failedBuilds, skippedBuilds)
-                .filter(Objects::nonNull).flatMapToInt(Arrays::stream).noneMatch(id -> id == build.buildNumber)) {
+                .filter(Objects::nonNull).flatMap(Arrays::stream).noneMatch(id -> id.intValue() == build.buildNumber)) {
             return NO_UPDATE_NEEDED;
         }
-        int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMapToInt(Arrays::stream).max().orElse(-1);
+        int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMap(Arrays::stream).mapToInt(Integer::intValue).max().orElse(-1);
         int firstFailureAfterPass = failedBuilds != null ? Arrays.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1) : -1;
         int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
         int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
@@ -316,7 +293,7 @@ public class TestResult extends BaseDbClass {
                 LINK_IN_NEW_TAB, testResult.buildNumber);
     }
 
-    private boolean containsBuildNumbers(int[] values, int... buildNumbers) {
+    private boolean containsBuildNumbers(Integer[] values, int... buildNumbers) {
         if (values == null) {
             return false;
         }

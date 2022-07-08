@@ -1,6 +1,12 @@
 package com.vmware.util.db;
 
+import com.vmware.util.ReflectionUtils;
+import com.vmware.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,7 +20,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +29,6 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.vmware.util.ReflectionUtils;
-import com.vmware.util.StringUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DbUtils {
 
     private Logger log = LoggerFactory.getLogger(DbUtils.class);
@@ -38,48 +37,60 @@ public class DbUtils {
     private String databaseUrl;
     private Properties dbProperties;
 
+    private Connection currentConnection;
+
     public DbUtils(File databaseDriverFile, String databaseDriverClass, String databaseUrl, Properties dbProperties) {
         this.driver = createDatabaseDriver(databaseDriverFile, databaseDriverClass);
         this.databaseUrl = databaseUrl;
         this.dbProperties = dbProperties;
     }
 
-    public Connection createConnection() throws SQLException {
-        return driver.connect(databaseUrl, dbProperties);
-    }
-
-    public void executeSqlScript(String sqlScript) {
-        try (Connection connection = createConnection()) {
-            Scanner s = new Scanner(sqlScript);
-            s.useDelimiter("(;(\r)?\n)|(--\n)");
-            Statement statement = null;
-            try
-            {
-                statement = connection.createStatement();
-                while (s.hasNext())
-                {
-                    String line = s.next();
-                    if (line.startsWith("/*!") && line.endsWith("*/"))
-                    {
-                        int i = line.indexOf(' ');
-                        line = line.substring(i + 1, line.length() - " */".length());
-                    }
-
-                    if (line.trim().length() > 0)
-                    {
-                        statement.execute(line);
-                    }
-                }
-            }
-            finally
-            {
-                if (statement != null) statement.close();
-            }
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
+    public void createConnection() {
+        try {
+            currentConnection = driver.connect(databaseUrl, dbProperties);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    public void closeConnection() {
+        if (currentConnection != null) {
+            try {
+                currentConnection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            currentConnection = null;
+        }
+    }
+
+    public int executeUpdate(String sql) {
+        try (Statement statement = currentConnection.createStatement()) {
+            return statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void executeSqlScript(String sqlScript) {
+        Scanner s = new Scanner(sqlScript);
+        s.useDelimiter("(;(\r)?\n)|(--\n)");
+        try (Statement statement = currentConnection.createStatement()) {
+            while (s.hasNext()) {
+                String line = s.next();
+                if (line.startsWith("/*!") && line.endsWith("*/")) {
+                    int i = line.indexOf(' ');
+                    line = line.substring(i + 1, line.length() - " */".length());
+                }
+
+                if (line.trim().length() > 0) {
+                    statement.execute(line);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public <T> T queryUnique(Class<T> recordClass, String query, Object... parameters) {
         List<T> records = query(recordClass, query, parameters);
@@ -89,30 +100,9 @@ public class DbUtils {
         return !records.isEmpty() ? records.get(0) : null;
     }
 
-
-    public <T> T queryUnique(Connection connection, Class<T> recordClass, String query, Object... parameters) {
-        List<T> records = query(connection, recordClass, query, parameters);
-        if (records.size() > 1) {
-            throw new RuntimeException(records.size() + " records found for query " + query);
-        }
-        return !records.isEmpty() ? records.get(0) : null;
-    }
-
     public <T> List<T> query(Class<T> recordClass, String query, Object... parameters) {
-        if (driver == null) {
-            return Collections.emptyList();
-        }
-        try (Connection connection = createConnection()) {
-            return query(connection, recordClass, query, parameters);
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
-    }
-
-    public <T> List<T> query(Connection connection, Class<T> recordClass, String query, Object... parameters) {
         log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
-        try {
-            PreparedStatement statement = createStatement(connection, query, parameters);
+        try (PreparedStatement statement = createStatement(query, parameters)) {
             ResultSet results = statement.executeQuery();
             ResultSetMetaData resultMetaData = results.getMetaData();
             if (!BaseDbClass.class.isAssignableFrom(recordClass) && resultMetaData.getColumnCount() == 1) {
@@ -163,18 +153,10 @@ public class DbUtils {
     }
 
     public <T> void insert(T record) {
-        try (Connection connection = createConnection()) {
-            insert(connection, record);
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
+        insertIfNeeded(record, null);
     }
 
-    public <T> void insert(Connection connection, T record) {
-        insertIfNeeded(connection, record, null);
-    }
-
-    public <T> void insertIfNeeded(Connection connection, T record, String existsQuery, Object... existsQueryParams) {
+    public <T> void insertIfNeeded(T record, String existsQuery, Object... existsQueryParams) {
         throwExceptionIfNotDbClass(record.getClass());
 
         if (((BaseDbClass) record).id != null) {
@@ -182,17 +164,14 @@ public class DbUtils {
         }
 
         if (existsQuery != null) {
-            BaseDbClass existingRecord = (BaseDbClass) queryUnique(connection, record.getClass(), existsQuery, existsQueryParams);
+            BaseDbClass existingRecord = (BaseDbClass) queryUnique(record.getClass(), existsQuery, existsQueryParams);
             if (existingRecord != null) {
                 ((BaseDbClass) record).id = existingRecord.id;
                 return;
             }
         }
 
-
-        PreparedStatement insertStatement = createInsertStatement(connection, record);
-
-        try {
+        try (PreparedStatement insertStatement = createInsertStatement(record)) {
             insertStatement.executeUpdate();
 
             try (ResultSet keys = insertStatement.getGeneratedKeys()) {
@@ -207,17 +186,8 @@ public class DbUtils {
     }
 
     public <T> void update(T record) {
-        try (Connection connection = createConnection()) {
-            update(connection, record);
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
-    }
-
-    public <T> void update(Connection connection, T record) {
         throwExceptionIfNotDbClass(record.getClass());
-        try {
-            PreparedStatement updateStatement = createUpdateStatement(connection, record);
+        try (PreparedStatement updateStatement = createUpdateStatement(record)) {
             int rowsUpdated = updateStatement.executeUpdate();
             if (rowsUpdated != 1) {
                 throw new RuntimeException("Expected 1 row to be updated not " + rowsUpdated);
@@ -227,34 +197,25 @@ public class DbUtils {
         }
     }
 
-    public int delete(Connection connection, BaseDbClass record) {
+    public int delete(BaseDbClass record) {
         if (record.id == null) {
             return 0;
         }
         String tableName = StringUtils.convertToDbName(record.getClass().getSimpleName());
         String query = "DELETE FROM " + tableName + " WHERE id = ?";
-        return delete(connection, query, record.id);
+        return delete(query, record.id);
     }
 
-    public <T> int delete(String query, Object... parameters) {
-        try (Connection connection = createConnection()) {
-            return delete(connection, query, parameters);
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
-    }
-
-    public int delete(Connection connection, String query, Object... parameters) {
-        try {
-            log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
-            PreparedStatement deleteStatement = createStatement(connection, query, parameters);
+    public int delete(String query, Object... parameters) {
+        log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
+        try (PreparedStatement deleteStatement = createStatement(query, parameters)) {
             return deleteStatement.executeUpdate();
         } catch (SQLException se) {
             throw new RuntimeException(se);
         }
     }
 
-    private <T> PreparedStatement createInsertStatement(Connection connection, T record) {
+    private <T> PreparedStatement createInsertStatement(T record) {
         List<Field> fields = ReflectionUtils.getAllFieldsWithoutAnnotation(record.getClass(), DbSaveIgnore.class);
         String tableName = StringUtils.convertToDbName(record.getClass().getSimpleName());
         StringBuilder insertStatement = new StringBuilder("INSERT INTO ").append(tableName).append(" (");
@@ -270,15 +231,17 @@ public class DbUtils {
         log.debug(statementText);
 
         try {
-            return createStatementWithFieldValues(connection, record, fields, statementText);
+            return createStatementWithFieldValues(record, fields, statementText);
         } catch (SQLException se) {
             throw new RuntimeException(se);
         }
     }
 
-    private <T> PreparedStatement createUpdateStatement(Connection connection, T record) {
+    private <T> PreparedStatement createUpdateStatement(T record) {
         List<Field> fields = ReflectionUtils.getAllFieldsWithoutAnnotation(record.getClass(), DbSaveIgnore.class);
-        String tableName = StringUtils.convertToDbName(record.getClass().getSimpleName());
+        TableName tableNameAnnotation = record.getClass().getAnnotation(TableName.class);
+        String tableName = tableNameAnnotation != null ? tableNameAnnotation.value()
+                : StringUtils.convertToDbName(record.getClass().getSimpleName());
         StringBuilder updateStatement = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
 
         updateStatement.append(fields.stream().map(field -> convertToColumnName(field) + " = ?").collect(Collectors.joining(", ")));
@@ -289,7 +252,7 @@ public class DbUtils {
         log.debug(statementText);
 
         try {
-            PreparedStatement statement = createStatementWithFieldValues(connection, record, fields, statementText);
+            PreparedStatement statement = createStatementWithFieldValues(record, fields, statementText);
             statement.setLong(fields.size() + 1, ((BaseDbClass) record).id);
             return statement;
         } catch (SQLException se) {
@@ -297,9 +260,9 @@ public class DbUtils {
         }
     }
 
-    private <T> PreparedStatement createStatementWithFieldValues(Connection connection, T record, List<Field> fields, String statementToUse)
+    private <T> PreparedStatement createStatementWithFieldValues(T record, List<Field> fields, String statementToUse)
             throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(statementToUse, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement = currentConnection.prepareStatement(statementToUse, Statement.RETURN_GENERATED_KEYS);
 
         IntStream.range(0, fields.size()).forEach(i -> {
             try {
@@ -315,11 +278,10 @@ public class DbUtils {
     private <T> Object getValue(T record, Field field) {
         Object valueToUse = ReflectionUtils.getValue(field, record);
         if (valueToUse != null && valueToUse.getClass().isEnum()) {
-            valueToUse = valueToUse.toString();
-        } else if (valueToUse != null && valueToUse.getClass() == int[].class) {
-            valueToUse = Arrays.stream((int[])valueToUse).mapToObj(String::valueOf).collect(Collectors.joining(","));
+            return valueToUse.toString();
+        } else {
+            return valueToUse;
         }
-        return valueToUse;
     }
 
     private <T> void throwExceptionIfNotDbClass(Class record) {
@@ -328,8 +290,8 @@ public class DbUtils {
         }
     }
 
-    private <T> PreparedStatement createStatement(Connection connection, String query, Object[] parameters) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(query);
+    private <T> PreparedStatement createStatement(String query, Object[] parameters) throws SQLException {
+        PreparedStatement statement = currentConnection.prepareStatement(query);
         for (int i = 0; i < parameters.length; i++) {
             statement.setObject(i + 1, parameters[i]);
         }
@@ -363,5 +325,4 @@ public class DbUtils {
         }
         return driver;
     }
-
 }

@@ -11,14 +11,14 @@ public class ArrayUtils {
         return Arrays.asList(values).contains(valueToFind);
     }
 
-    public static int[] add(int[] existingValues, int value) {
+    public static Integer[] add(Integer[] existingValues, int value) {
         if (existingValues == null) {
-            return new int[] { value } ;
+            return new Integer[] { value } ;
         } else if (Arrays.binarySearch(existingValues, value) >= 0) {
             return existingValues;
         } else {
             int length = existingValues.length + 1;
-            int[] result = new int[length];
+            Integer[] result = new Integer[length];
             System.arraycopy(existingValues, 0, result, 0, existingValues.length);
             result[result.length - 1] = value;
             Arrays.sort(result);
@@ -26,11 +26,11 @@ public class ArrayUtils {
         }
     }
 
-    public static int[] remove(int[] existingValues, int value) {
+    public static Integer[] remove(Integer[] existingValues, int value) {
         if (existingValues == null || Arrays.stream(existingValues).noneMatch(i -> i == value)) {
             return existingValues;
         } else {
-            return Arrays.stream(existingValues).filter(i -> i != value).toArray();
+            return Arrays.stream(existingValues).filter(i -> i != value).toArray(Integer[]::new);
         }
     }
 

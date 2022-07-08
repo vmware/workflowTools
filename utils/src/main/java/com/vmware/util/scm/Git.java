@@ -585,7 +585,7 @@ public class Git extends BaseScmWrapper {
             log.trace("Previously ran root directory command output {}", Git.rootDirectoryCommandOutput);
             String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
             rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
-        } else {
+        } else if (CommandLineUtils.isCommandAvailable("git")) {
             Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
             String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
             rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;

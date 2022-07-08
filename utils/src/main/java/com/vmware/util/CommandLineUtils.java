@@ -53,7 +53,7 @@ public class CommandLineUtils {
     private static boolean checkForCommandUsingWhich(String command) {
         String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
         log.debug("{} which check [{}]", command, whichCheck);
-        return !whichCheck.trim().isEmpty();
+        return !whichCheck.trim().isEmpty() && !whichCheck.contains("no " + command + " in");
     }
 
     public static String executeCommand(String command, LogLevel logLevel) {

@@ -41,13 +41,10 @@ public class ExecuteSqlStatement extends BaseVappAction {
         log.debug("Connection properties: {}", connectionProperties.toString());
 
         DbUtils dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass, databaseUrl, connectionProperties);
-
-        try (Connection sqlConnection = dbUtils.createConnection()) {
-            int rowsAffected = sqlConnection.createStatement().executeUpdate(fileSystemConfig.sqlStatement);
-            log.info("{} affected", StringUtils.pluralize(rowsAffected, "row"));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        dbUtils.createConnection();
+        int rowsAffected = dbUtils.executeUpdate(fileSystemConfig.sqlStatement);
+        dbUtils.closeConnection();
+        log.info("{} affected", StringUtils.pluralize(rowsAffected, "row"));
     }
 
 

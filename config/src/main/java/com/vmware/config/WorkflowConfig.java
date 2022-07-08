@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -201,7 +203,7 @@ public class WorkflowConfig {
         if (isNotBlank(loggingConfig.outputLogFile) && !containsLoggingHandler) {
             log.info("Saving log output to {}", loggingConfig.outputLogFile);
             try {
-                StreamHandler streamHandler = new StreamHandler(new FileOutputStream(loggingConfig.outputLogFile), new SimpleLogFormatter());
+                StreamHandler streamHandler = new StreamHandler(Files.newOutputStream(Paths.get(loggingConfig.outputLogFile)), new SimpleLogFormatter());
                 globalLogger.addHandler(streamHandler);
             } catch (IOException e) {
                 throw new RuntimeException(e);

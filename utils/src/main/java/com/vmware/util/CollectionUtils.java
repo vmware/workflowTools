@@ -1,10 +1,11 @@
 package com.vmware.util;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 
 public class CollectionUtils {
-    public static boolean isEmpty(int[] collection) {
-        return collection == null || collection.length == 0;
+    public static boolean isEmpty(Object collection) {
+        return collection == null || Array.getLength(collection) == 0;
     }
 
     public static boolean isNotEmpty(int[] collection) {

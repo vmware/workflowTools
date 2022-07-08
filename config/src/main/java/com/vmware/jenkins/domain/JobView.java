@@ -1,24 +1,18 @@
 package com.vmware.jenkins.domain;
 
+import com.google.gson.annotations.Expose;
+import com.vmware.util.db.BaseDbClass;
+import com.vmware.util.db.DbSaveIgnore;
+import com.vmware.util.db.DbUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.annotations.Expose;
-import com.vmware.util.StringUtils;
-import com.vmware.util.UrlUtils;
-import com.vmware.util.db.BaseDbClass;
-import com.vmware.util.db.DbSaveIgnore;
-import com.vmware.util.db.DbUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.vmware.util.StringUtils.pluralize;
 import static java.util.stream.Collectors.toList;
 
 public class JobView extends BaseDbClass {
@@ -71,9 +65,10 @@ public class JobView extends BaseDbClass {
     public void populateJobsFromDb() {
         this.jobs = dbUtils.query(Job.class,"SELECT * FROM JOB where VIEW_ID = ?", id).toArray(new Job[0]);
         Arrays.stream(jobs).forEach(job -> job.setDbUtils(dbUtils));
+
         Arrays.stream(jobs).forEach(job -> {
             job.loadTestResultsFromDb();
-            List<TestResult> failedTests = job.getFailedTests();
+            List<TestResult> failedTests = job.createFailingTestsList(lastFetchAmount);
             if (!failedTests.isEmpty()) {
                 this.addFailingTests(job, failedTests);
             }
@@ -109,17 +104,13 @@ public class JobView extends BaseDbClass {
             return usableJobs;
         }
 
-        try (Connection connection = dbUtils.createConnection()) {
-            if (id == null) {
-                dbUtils.insertIfNeeded(connection, this, "SELECT * FROM JOB_VIEW WHERE NAME = ?", name);
-            }
-            usableJobs.forEach(job -> {
-                job.viewId = id;
-                dbUtils.insertIfNeeded(connection, job, "SELECT * FROM JOB WHERE URL = ?", job.url);
-            });
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
+        if (id == null) {
+            dbUtils.insertIfNeeded(this, "SELECT * FROM JOB_VIEW WHERE NAME = ?", name);
         }
+        usableJobs.forEach(job -> {
+            job.viewId = id;
+            dbUtils.insertIfNeeded(job, "SELECT * FROM JOB WHERE URL = ?", job.url);
+        });
         return usableJobs;
     }
 
@@ -127,7 +118,7 @@ public class JobView extends BaseDbClass {
         if (!failedTests.isEmpty()) {
             return failedTests.values().stream().mapToInt(List::size).sum();
         } else {
-            return Arrays.stream(jobs).mapToLong(Job::failingTestCount).sum();
+            return Arrays.stream(jobs).mapToLong(job -> job.failingTestCount(lastFetchAmount)).sum();
         }
     }
 }
