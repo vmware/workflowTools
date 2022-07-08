@@ -1,17 +1,15 @@
 package com.vmware.action.filesystem;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.stream.Stream;
-
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 import com.vmware.util.db.DbUtils;
 import com.vmware.vcd.domain.Sites;
+
+import java.io.File;
+import java.util.Properties;
+import java.util.stream.Stream;
 
 @ActionDescription("Executes the specified sql statement against the configured database. Assumes that it is an update command.")
 public class ExecuteSqlStatement extends BaseVappAction {

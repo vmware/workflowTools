@@ -5,12 +5,9 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.db.DbSaveIgnore;
 import com.vmware.util.db.DbUtils;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.function.IntFunction;
 import java.util.regex.PatternSyntaxException;
 
 public class HomePage {

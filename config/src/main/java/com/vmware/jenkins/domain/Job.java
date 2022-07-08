@@ -1,7 +1,15 @@
 package com.vmware.jenkins.domain;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.vmware.util.CollectionUtils;
+import com.vmware.util.UrlUtils;
+import com.vmware.util.db.BaseDbClass;
+import com.vmware.util.db.DbSaveIgnore;
+import com.vmware.util.db.DbUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,17 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.vmware.util.CollectionUtils;
-import com.vmware.util.UrlUtils;
-import com.vmware.util.db.BaseDbClass;
-import com.vmware.util.db.DbSaveIgnore;
-import com.vmware.util.db.DbUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
