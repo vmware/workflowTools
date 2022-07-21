@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,6 +48,9 @@ public class JenkinsConfig {
 
     @ConfigurableProperty(help = "Used to add additional parameters to a job by matching against a config parameter. E.g. the key would be the username|usernameValue: properties")
     public Map<String, String> jenkinsJobsAdditionalParameters = new TreeMap<>();
+
+    @ConfigurableProperty(help = "Override default behavior of using testng results by specifying an artifact name tha identifies a different type of job and a relative url for the tests")
+    public Map<String, String> testReportsUrlOverrides = new HashMap<>();
 
     @ConfigurableProperty(commandLine = "--log-line-count", help = "How many lines of the log to show")
     public int logLineCount;

@@ -83,7 +83,7 @@ public class ServiceLocator {
 
     public Jenkins newJenkins() {
         JenkinsConfig jenkinsConfig = config.jenkinsConfig;
-        return new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin);
+        return new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides);
     }
 
     public Buildweb getBuildweb() {

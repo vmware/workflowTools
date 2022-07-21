@@ -27,7 +27,7 @@ public class TestJenkinsApi extends BaseTests {
     public void init() {
         String jenkinsUrl = testProperties.getProperty("jenkins.url");
         jenkinsUsername = testProperties.getProperty("jenkins.username");
-        jenkins = new Jenkins(jenkinsUrl, jenkinsUsername, true, false);
+        jenkins = new Jenkins(jenkinsUrl, jenkinsUsername, true, false, null);
         jenkins.setupAuthenticatedConnection();
     }
 

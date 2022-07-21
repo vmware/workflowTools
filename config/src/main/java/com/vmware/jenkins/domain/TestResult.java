@@ -23,11 +23,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NO_UPDATE_NEEDED;
+import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.NOT_DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.NO_UPDATE_NEEDED;
+import static com.vmware.jenkins.domain.TestResults.JUNIT_ROOT;
 
 public class TestResult extends BaseDbClass {
+
     private static final String SUSPECTS_TITLE = "Commits between last pass and first failure, guilty until proven innocent";
     private static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
     private static final SimpleDateFormat START_DAY_FORMATTER = new SimpleDateFormat("MMM dd");
@@ -36,9 +38,17 @@ public class TestResult extends BaseDbClass {
     public Long jobBuildId;
 
     public TestStatus status;
+
+    @DbSaveIgnore
+    public boolean skipped;
+
     public String packagePath;
     public String className;
     public String exception;
+
+    @DbSaveIgnore
+    public String errorStackTrace;
+
     public double duration;
     public long startedAt;
     public String[] parameters;
@@ -116,8 +126,8 @@ public class TestResult extends BaseDbClass {
         }
     }
 
-    public String fullTestNameWithSkipInfo() {
-        String fullTestName = classAndTestName();
+    public String fullTestNameForDisplay() {
+        String fullTestName = JUNIT_ROOT.equals(packagePath) ? name : classAndTestName();
         if (status == TestStatus.SKIP && similarSkips != null && similarSkips > 0) {
             fullTestName = fullTestName + " (" + StringUtils.pluralize(similarSkips, "similar skip") + ")";
         }
@@ -134,19 +144,25 @@ public class TestResult extends BaseDbClass {
     }
 
     public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
+        String nameToUseForUrl = name;
+        String classNameToUseForUrl = className;
+        if (packagePath.equals(JUNIT_ROOT)) {
+            classNameToUseForUrl = className.replace(" ", "%20").replace("\"", "%22");
+            nameToUseForUrl = name.replace(" ", "_").replace("\"", "_");
+        }
         if (dataProviderIndex != null) {
-            this.url = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + dataProviderIndex);
+            this.url = UrlUtils.addRelativePaths(uiUrl, packagePath, classNameToUseForUrl, nameToUseForUrl + "_" + dataProviderIndex);
             return;
         }
 
-        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name);
+        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, classNameToUseForUrl, nameToUseForUrl);
         if (!usedUrls.contains(urlToUse)) {
             this.url = urlToUse;
             return;
         }
         int counter = 0;
         while (usedUrls.contains(urlToUse)) {
-            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, className, name + "_" + ++counter);
+            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, classNameToUseForUrl, nameToUseForUrl + "_" + ++counter);
         }
         this.dataProviderIndex = counter;
         this.url = urlToUse;
@@ -253,7 +269,7 @@ public class TestResult extends BaseDbClass {
         return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
     }
 
-    public RemovalStatus removeUnimportantTestResultsForBuild(JobBuild build) {
+    public BuildRemovalStatus removeUnimportantTestResultsForBuild(JobBuild build) {
         if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
             return NOT_DELETABLE;
         }
@@ -306,11 +322,19 @@ public class TestResult extends BaseDbClass {
 
     public enum TestStatus {
         PRESUMED_PASS("Presumed passed", "testPass"),
-        PASS("Passed", "testPass"), ABORTED("Aborted", "testFail"),
-        FAIL("Failed", "testFail"), SKIP("Skipped", "testSkip");
+        PASS("Passed", "testPass"),
+        SKIP("Skipped", "testSkip"),
+        ABORTED("Aborted", "testFail"),
+        FAIL("Failed", "testFail"),
+        // Test Statuses for Cypress Junit tests, they are only used for deserialization
+        PASSED, FIXED, REGRESSION, FAILED;
         private final String description;
         private final String cssClass;
 
+        TestStatus() {
+            this.description = null;
+            this.cssClass = null;
+        }
         TestStatus(String description, String cssClass) {
             this.description = description;
             this.cssClass = cssClass;
@@ -325,7 +349,7 @@ public class TestResult extends BaseDbClass {
         }
     }
 
-    public enum RemovalStatus {
+    public enum BuildRemovalStatus {
         DELETABLE,
         NOT_DELETABLE,
         NO_UPDATE_NEEDED

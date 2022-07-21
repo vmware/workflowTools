@@ -3,6 +3,7 @@ package com.vmware.jenkins.domain;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.util.CollectionUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
@@ -22,8 +23,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
-import static com.vmware.jenkins.domain.TestResult.RemovalStatus.DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.RemovalStatus.NOT_DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.DELETABLE;
+import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.NOT_DELETABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.PRESUMED_PASS;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
@@ -272,7 +273,13 @@ public class Job extends BaseDbClass {
                 matchingBuild.ifPresent(build -> {
                     result.commitId = build.commitId;
                     result.buildNumber = build.buildNumber;
-                    result.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
+                    String testReportsUIUrl;
+                    if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
+                        testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport");
+                    } else {
+                        testReportsUIUrl = build.getTestReportsUIUrl();
+                    }
+                    result.setUrlForTestMethod(testReportsUIUrl, usedUrls);
                     usedUrls.add(result.url);
                 });
             });
@@ -300,7 +307,8 @@ public class Job extends BaseDbClass {
         List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
                 "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
         existingJobBuildsToCheck.forEach(build -> {
-            Map<TestResult, TestResult.RemovalStatus> testResultsToUpdate = testResults.stream()
+            purgeVanillaTestResultsForBuild(build.id);
+            Map<TestResult, TestResult.BuildRemovalStatus> testResultsToUpdate = testResults.stream()
                     .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build)));
             testResultsToUpdate.entrySet().stream().filter(entry -> DELETABLE == entry.getValue())
                     .forEach(entry -> dbUtils.update(entry.getKey()));
@@ -318,12 +326,17 @@ public class Job extends BaseDbClass {
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
                     if (applicableBuilds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1) {
-                        List<JobBuild> buildsToCheck = usefulBuilds != null ? usefulBuilds : savedBuilds;
+                        List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
                         result.testRuns = applicableBuilds.stream().map(entry -> {
                             JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
-                                    .orElseThrow(() -> new RuntimeException("Failed to find build with number " + entry.getKey() + " for job " + name));
-                            return new TestResult(result, matchingBuild, entry.getValue());
-                        }).collect(toList());
+                                    .orElse(null);
+                            if (matchingBuild == null) {
+                                log.warn("Failed to find build with number {} for job {}", entry.getKey(), name);
+                                return null;
+                            } else {
+                                return new TestResult(result, matchingBuild, entry.getValue());
+                            }
+                        }).filter(Objects::nonNull).collect(toList());
                     }
                 }).filter(result -> CollectionUtils.isNotEmpty(result.testRuns)).collect(toList());
     }
@@ -333,6 +346,20 @@ public class Job extends BaseDbClass {
             return "Current build <a href=\"" + lastBuild.consoleUrl() + "\">" + lastBuild.buildNumber +"</a>";
         } else {
             return "";
+        }
+    }
+
+    private void purgeVanillaTestResultsForBuild(Long buildId) {
+        if (dbUtils == null) {
+            return;
+        }
+        String tableName = StringUtils.convertToDbName(TestResult.class.getSimpleName());
+        int purgedRecords = dbUtils.delete("DELETE FROM " + tableName + " WHERE STATUS = ? "
+                + " and (skipped_builds is null or cardinality(skipped_builds) = 0) and (failed_builds is null or cardinality(failed_builds) = 0) and JOB_BUILD_ID = ?",
+                PASS.name(), buildId);
+        if (purgedRecords > 0) {
+            log.info("Purged {} test results for job build {} from job {} that have no failure information",
+                    purgedRecords, buildId, name);
         }
     }
 }

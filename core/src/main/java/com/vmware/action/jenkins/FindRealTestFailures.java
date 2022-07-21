@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 
 import static com.vmware.BuildStatus.SUCCESS;
 import static com.vmware.BuildStatus.UNSTABLE;
-import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
 import static com.vmware.util.StringUtils.pluralize;
 import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Comparator.comparingLong;
@@ -103,7 +102,6 @@ public class FindRealTestFailures extends BaseAction {
                     jenkinsConfig.maxJenkinsBuildsToCheck);
 
             matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
-            purgeVanillaTestResults();
         } else {
             matchingViews.forEach(view -> createJobResultsHtmlPages(view, destinationFile.isDirectory(), homePage.failingTestsMap(view.name)));
         }
@@ -210,7 +208,7 @@ public class FindRealTestFailures extends BaseAction {
             return createJobFragment(counter.getAndIncrement(), job, failingTests);
         }).collect(Collectors.joining("\n"));
 
-        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, failingTestMethods, jobsResultsHtml);
+        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml);
 
         File destinationFile = new File(fileSystemConfig.destinationFile);
         if (destinationFile.exists() && destinationFile.isDirectory()) {
@@ -223,13 +221,13 @@ public class FindRealTestFailures extends BaseAction {
         }
     }
 
-    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods, String jobsTestResultsHtml) {
+    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, String jobsTestResultsHtml) {
         String resultsPage;
         String footer = "Generated at " + generationDate;
         if (includeViewsLink) {
             footer = "<p/><a href=\"index.html\">Back</a><br/>" + footer;
         }
-        if (!failingTestMethods.isEmpty()) {
+        if (StringUtils.isNotBlank(jobsTestResultsHtml)) {
             String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
             resultsPage = failuresPage.replace("#viewName", view.viewNameWithFailureCount());
             resultsPage = resultsPage.replace("#body", jobsTestResultsHtml);
@@ -351,7 +349,7 @@ public class FindRealTestFailures extends BaseAction {
         StringBuilder rowBuilder = new StringBuilder("");
         int index = 0;
         for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)).collect(toList())) {
-            String filledInRow = rowFragment.replace("#testName", method.fullTestNameWithSkipInfo());
+            String filledInRow = rowFragment.replace("#testName", method.fullTestNameForDisplay());
             filledInRow = filledInRow.replace("#testResultLinks", method.testLinks(jenkinsConfig.commitComparisonUrl));
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
             filledInRow = filledInRow.replace("#exception", method.exception != null ? method.exception.replace("\n", "<br/>") : "");
@@ -359,18 +357,6 @@ public class FindRealTestFailures extends BaseAction {
         }
         filledInJobFragment = filledInJobFragment.replace("#body", rowBuilder.toString());
         return filledInJobFragment;
-    }
-
-    private void purgeVanillaTestResults() {
-        if (dbUtils == null) {
-            return;
-        }
-        String tableName = StringUtils.convertToDbName(TestResult.class.getSimpleName());
-        int purgedRecords = dbUtils.delete("DELETE FROM " + tableName + " WHERE STATUS = '" + PASS.name() + "' "
-                + "and cardinality(failed_builds) = 0 and cardinality(skipped_builds) = 0");
-        if (purgedRecords > 0) {
-            log.info("Purged {} test results from database that have no failure information", purgedRecords);
-        }
     }
 
 }

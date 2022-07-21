@@ -3,6 +3,8 @@ package com.vmware.jenkins;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,13 +40,15 @@ public class Jenkins extends AbstractRestBuildService {
     private String apiToken;
     private boolean disableLogin;
     private boolean apiTokenUsedForLogin;
+    private Map<String, String> testReportUrlOverrides;
 
     private HomePage homePage = null;
 
-    public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin) {
+    public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin, Map<String, String> testReportUrlOverrides) {
         super(serverUrl, "api/json", jenkins, username);
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
+        this.testReportUrlOverrides = testReportUrlOverrides;
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
         apiToken = readExistingApiToken(credentialsType);
 
@@ -89,13 +93,27 @@ public class Jenkins extends AbstractRestBuildService {
 
     public TestResults getJobBuildTestResults(JobBuild jobBuild) {
         try {
-            TestResults results = get(jobBuild.getTestReportsApiUrl(), TestResults.class);
+            TestResults results = get(determineTestReportsApiUrl(jobBuild), TestResults.class);
             results.setBuild(jobBuild);
             return results;
         } catch (NotFoundException nfe) {
             log.info("Failed to find test results for job build {}", jobBuild.name);
             return new TestResults(jobBuild);
         }
+    }
+
+    private String determineTestReportsApiUrl(JobBuild jobBuild) {
+        String testReportsApiUrl = jobBuild.getTestReportsApiUrl();
+        if (jobBuild.artifacts != null && !testReportUrlOverrides.isEmpty()) {
+            Optional<Map.Entry<String, String>> testUrlOverride = testReportUrlOverrides.entrySet().stream()
+                    .filter(entry -> Arrays.stream(jobBuild.artifacts)
+                            .anyMatch(artifact -> artifact.fileName.equals(entry.getKey()))).findFirst();
+            if (testUrlOverride.isPresent()) {
+                String testResultsRelativePath = testUrlOverride.get().getValue();
+                testReportsApiUrl = UrlUtils.addRelativePaths(jobBuild.url, testResultsRelativePath);
+            }
+        }
+        return testReportsApiUrl;
     }
 
     public void abortJobBuild(JobBuild jobBuildToAbort) {
