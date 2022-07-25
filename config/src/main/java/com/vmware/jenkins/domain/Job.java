@@ -3,7 +3,6 @@ package com.vmware.jenkins.domain;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.util.CollectionUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
@@ -20,13 +19,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
-import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.NOT_DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.TestStatus.PASS;
-import static com.vmware.jenkins.domain.TestResult.TestStatus.PRESUMED_PASS;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.UPDATEABLE;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.CONTAINS_BUILD;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -172,8 +169,7 @@ public class Job extends BaseDbClass {
         this.dbUtils = dbUtils;
     }
 
-    public boolean addTestResultsToMasterList() {
-        List<TestResult> newTestResultsAdded = new ArrayList<>();
+    public void addTestResultsToMasterList() {
 
         fetchedResults.forEach(results -> {
             List<TestResult> resultsToAdd = results.testResults();
@@ -191,42 +187,11 @@ public class Job extends BaseDbClass {
                 if (matchingResult.isPresent()) {
                     matchingResult.get().addTestResult(resultToAdd);
                 } else {
-                    newTestResultsAdded.add(resultToAdd);
                     resultToAdd.addTestResult(resultToAdd);
                     testResults.add(resultToAdd);
                 }
             }
         });
-
-        testResults.removeIf(TestResult::noFailureInfo);
-
-        if (CollectionUtils.isEmpty(savedBuilds) || CollectionUtils.isEmpty(newTestResultsAdded)) {
-            return false;
-        }
-
-        AtomicBoolean presumedPassResultsAdded = new AtomicBoolean(false);
-
-        final int MAX_PRESUMED_PASS_RESULTS_TO_ADD = 10;
-        newTestResultsAdded.stream().filter(result -> result.status != PASS)
-                .forEach(result -> savedBuilds.stream().limit(MAX_PRESUMED_PASS_RESULTS_TO_ADD)
-                .filter(build -> !result.containsBuildNumbers(build.buildNumber))
-                .forEach(build -> {
-                    presumedPassResultsAdded.set(true);
-                    log.info("Adding presumed pass result for test {} in build {}", result.classAndTestName(), build.buildNumber);
-                    result.addTestResult(new TestResult(result, build, PRESUMED_PASS));
-                }));
-
-        return presumedPassResultsAdded.get();
-    }
-
-    public boolean addPassResultsForSavedTestResults(JobBuild stableBuild) {
-        AtomicBoolean passResultsAdded = new AtomicBoolean(false);
-        testResults.stream().filter(result -> !result.containsBuildNumbers(stableBuild.buildNumber)).forEach(result -> {
-            passResultsAdded.set(true);
-            log.info("Adding pass result for test {} in build {}", result.classAndTestName(), stableBuild.buildNumber);
-            result.addTestResult(new TestResult(result, stableBuild, PASS));
-        });
-        return passResultsAdded.get();
     }
 
     public void saveFetchedBuildsInfo() {
@@ -243,8 +208,8 @@ public class Job extends BaseDbClass {
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
     }
 
-    public void saveTestResultsToDb(boolean passResultsAdded) {
-        if (dbUtils == null || (CollectionUtils.isEmpty(fetchedResults) && !passResultsAdded)) {
+    public void saveTestResultsToDb() {
+        if (dbUtils == null || CollectionUtils.isEmpty(fetchedResults)) {
             return;
         }
 
@@ -266,7 +231,7 @@ public class Job extends BaseDbClass {
         }
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
             this.testResults = dbUtils.query(TestResult.class, "SELECT tr.* from TEST_RESULT tr"
-                    + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME, tr.PARAMETERS ASC", id);
+                    + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME ASC, tr.PARAMETERS ASC", id);
             Set<String> usedUrls = new HashSet<>();
             testResults.forEach(result -> {
                 Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
@@ -307,12 +272,17 @@ public class Job extends BaseDbClass {
         List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
                 "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
         existingJobBuildsToCheck.forEach(build -> {
-            purgeVanillaTestResultsForBuild(build.id);
-            Map<TestResult, TestResult.BuildRemovalStatus> testResultsToUpdate = testResults.stream()
-                    .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build)));
-            testResultsToUpdate.entrySet().stream().filter(entry -> DELETABLE == entry.getValue())
+            Map<TestResult, TestResult.TestStatusOnBuildRemoval> testResultsWithBuildsRemoved = testResults.stream()
+                    .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build, lastBuildToKeep.buildNumber)));
+            testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> UPDATEABLE == entry.getValue())
                     .forEach(entry -> dbUtils.update(entry.getKey()));
-            if (testResultsToUpdate.entrySet().stream().noneMatch(entry -> NOT_DELETABLE == entry.getValue())) {
+            testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> DELETEABLE == entry.getValue())
+                    .forEach(entry -> {
+                        log.info("Deleting test {}", entry.getKey().name);
+                        dbUtils.delete(entry.getKey());
+                        testResults.remove(entry.getKey());
+                    } );
+            if (testResultsWithBuildsRemoved.entrySet().stream().noneMatch(entry -> CONTAINS_BUILD == entry.getValue())) {
                 log.info("Removing old build {} for {}", build.buildNumber, name);
                 dbUtils.delete(build);
                 usefulBuilds.remove(build);
@@ -346,20 +316,6 @@ public class Job extends BaseDbClass {
             return "Current build <a href=\"" + lastBuild.consoleUrl() + "\">" + lastBuild.buildNumber +"</a>";
         } else {
             return "";
-        }
-    }
-
-    private void purgeVanillaTestResultsForBuild(Long buildId) {
-        if (dbUtils == null) {
-            return;
-        }
-        String tableName = StringUtils.convertToDbName(TestResult.class.getSimpleName());
-        int purgedRecords = dbUtils.delete("DELETE FROM " + tableName + " WHERE STATUS = ? "
-                + " and (skipped_builds is null or cardinality(skipped_builds) = 0) and (failed_builds is null or cardinality(failed_builds) = 0) and JOB_BUILD_ID = ?",
-                PASS.name(), buildId);
-        if (purgedRecords > 0) {
-            log.info("Purged {} test results for job build {} from job {} that have no failure information",
-                    purgedRecords, buildId, name);
         }
     }
 }

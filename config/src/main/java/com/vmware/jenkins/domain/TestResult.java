@@ -23,9 +23,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.NOT_DELETABLE;
-import static com.vmware.jenkins.domain.TestResult.BuildRemovalStatus.NO_UPDATE_NEEDED;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.UPDATEABLE;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.CONTAINS_BUILD;
+import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.NO_UPDATE_NEEDED;
 import static com.vmware.jenkins.domain.TestResults.JUNIT_ROOT;
 
 public class TestResult extends BaseDbClass {
@@ -269,27 +270,32 @@ public class TestResult extends BaseDbClass {
         return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
     }
 
-    public BuildRemovalStatus removeUnimportantTestResultsForBuild(JobBuild build) {
-        if (this.jobBuildId != null && this.jobBuildId.equals(build.id)) {
-            return NOT_DELETABLE;
+    public TestStatusOnBuildRemoval removeUnimportantTestResultsForBuild(JobBuild build, int lastBuildToKeepNumber) {
+        int newestRun = Stream.of(passedBuilds, presumedPassedBuilds, failedBuilds, skippedBuilds)
+                .filter(Objects::nonNull).flatMap(Arrays::stream).mapToInt(Integer::intValue).max().orElse(-1);
+
+        if (newestRun < lastBuildToKeepNumber) {
+            return DELETEABLE;
         }
+
         if (Stream.of(passedBuilds, presumedPassedBuilds, failedBuilds, skippedBuilds)
                 .filter(Objects::nonNull).flatMap(Arrays::stream).noneMatch(id -> id.intValue() == build.buildNumber)) {
             return NO_UPDATE_NEEDED;
         }
+
         int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMap(Arrays::stream).mapToInt(Integer::intValue).max().orElse(-1);
         int firstFailureAfterPass = failedBuilds != null ? Arrays.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1) : -1;
         int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
         int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
         if (newestPass == build.buildNumber || firstFailureOrSkipAfterPass == build.buildNumber) {
-            return NOT_DELETABLE;
+            return CONTAINS_BUILD;
         }
 
         passedBuilds = ArrayUtils.remove(passedBuilds, build.buildNumber);
         presumedPassedBuilds = ArrayUtils.remove(presumedPassedBuilds, build.buildNumber);
         failedBuilds = ArrayUtils.remove(failedBuilds, build.buildNumber);
         skippedBuilds = ArrayUtils.remove(skippedBuilds, build.buildNumber);
-        return DELETABLE;
+        return UPDATEABLE;
     }
 
     @Override
@@ -349,9 +355,11 @@ public class TestResult extends BaseDbClass {
         }
     }
 
-    public enum BuildRemovalStatus {
-        DELETABLE,
-        NOT_DELETABLE,
+    public enum TestStatusOnBuildRemoval {
+        UPDATEABLE,
+
+        DELETEABLE,
+        CONTAINS_BUILD,
         NO_UPDATE_NEEDED
     }
 }

@@ -270,9 +270,8 @@ public class FindRealTestFailures extends BaseAction {
         jobView.updateInDb();
         usableJobs.stream().filter(job -> !failedJobs.contains(job)).forEach(job -> {
             job.saveFetchedBuildsInfo();
-            boolean passResultsAdded = addPassResultsIfNeeded(job);
-            boolean presumedPassResultsAdded = job.addTestResultsToMasterList();
-            job.saveTestResultsToDb(passResultsAdded || presumedPassResultsAdded);
+            job.addTestResultsToMasterList();
+            job.saveTestResultsToDb();
             job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToCheck);
 
             List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck);
@@ -285,21 +284,8 @@ public class FindRealTestFailures extends BaseAction {
         });
     }
 
-    private boolean addPassResultsIfNeeded(Job job) {
-        boolean passResultsAdded = false;
-        if (dbUtils != null && job.hasSavedBuilds() && job.lastBuildWasSuccessful() && !job.hasSavedBuild(job.lastStableBuild.buildNumber)) {
-            JobBuild stableBuild = jenkinsExecutor.execute(jenkins -> jenkins.getJobBuildDetails(job.name, job.lastStableBuild.buildNumber));
-            dbUtils.insert(stableBuild);
-            passResultsAdded = job.addPassResultsForSavedTestResults(stableBuild);
-        }
-        return passResultsAdded;
-    }
-
     private void fetchLatestTestResults(Job job, int lastFetchAmount) {
         job.fetchedResults = Collections.emptyList();
-        if (job.lastBuildWasSuccessful()) {
-            log.info("No need to fetch latest results for {} as last build {} was successful", job.name, job.lastStableBuild.buildNumber);
-        }
         int latestUsableBuildNumber = job.latestUsableBuildNumber();
         if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && job.hasSavedBuild(latestUsableBuildNumber)) {
             log.info("Saved builds for {} already include latest build {}", job.name, latestUsableBuildNumber);
