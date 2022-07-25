@@ -327,7 +327,7 @@ public class TestResult extends BaseDbClass {
     }
 
     public enum TestStatus {
-        PRESUMED_PASS("Presumed passed", "testPass"),
+        PRESUMED_PASS("Presumed passed", "presumedTestPass"),
         PASS("Passed", "testPass"),
         SKIP("Skipped", "testSkip"),
         ABORTED("Aborted", "testFail"),

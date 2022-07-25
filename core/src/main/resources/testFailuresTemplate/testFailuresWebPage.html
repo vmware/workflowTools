@@ -97,7 +97,7 @@
             transform: rotate(90deg);
         }
 
-        .css-treeview .testFail, .css-treeview .testSkip, .css-treeview .testPass {
+        .css-treeview .testFail, .css-treeview .testSkip, .css-treeview .testPass, .css-treeview .presumedTestPass {
             padding: 3px 6px;
             color: black;
             text-decoration: none;
@@ -143,6 +143,15 @@
 
         .testPass:hover, .testPass:active {
             background-color: green;
+        }
+
+        .presumedTestPass
+        {
+            background-color: lightGray;
+        }
+
+        .presumedTestPass:hover, .presumedTestPass:active {
+            background-color: gray;
         }
 
         /* webkit adjacent element selector bugfix */
