@@ -8,6 +8,7 @@ import com.vmware.util.UrlUtils;
 import com.vmware.util.db.AfterDbLoad;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
@@ -250,6 +251,9 @@ public class TestResult extends BaseDbClass {
             skippedBuilds = ArrayUtils.add(skippedBuilds, testResult.buildNumber);
             break;
         }
+        if (testResult.status != TestStatus.PRESUMED_PASS) {
+            presumedPassedBuilds = ArrayUtils.remove(presumedPassedBuilds, testResult.buildNumber);
+        }
         if (testResult.buildNumber <= buildNumber) {
             return;
         }
@@ -264,10 +268,6 @@ public class TestResult extends BaseDbClass {
         this.exception = testResult.exception;
         this.startedAt = testResult.startedAt;
         this.duration = testResult.duration;
-    }
-
-    public boolean noFailureInfo() {
-        return status == TestStatus.PASS && CollectionUtils.isEmpty(failedBuilds) && CollectionUtils.isEmpty(skippedBuilds);
     }
 
     public TestStatusOnBuildRemoval removeUnimportantTestResultsForBuild(JobBuild build, int lastBuildToKeepNumber) {
@@ -288,6 +288,9 @@ public class TestResult extends BaseDbClass {
         int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
         int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
         if (newestPass == build.buildNumber || firstFailureOrSkipAfterPass == build.buildNumber) {
+            TestStatus statusForBuild = newestPass == build.buildNumber ? TestStatus.PASS :
+                    firstFailureAfterPass == build.buildNumber ? TestStatus.FAIL : TestStatus.SKIP;
+            LoggerFactory.getLogger(this.getClass()).info("Test {} {} still contains build {}", classAndTestName(), statusForBuild, build.name);
             return CONTAINS_BUILD;
         }
 

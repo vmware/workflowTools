@@ -158,6 +158,10 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
         return building ? BuildStatus.BUILDING : status;
     }
 
+    public boolean hasTestResults() {
+        return status == BuildStatus.SUCCESS || status == BuildStatus.UNSTABLE;
+    }
+
     public JobBuildArtifact getArtifactForPathPattern(String pathPattern) {
         return Arrays.stream(artifacts).filter(artifact -> artifact.matchesPathPattern(pathPattern)).findFirst()
                 .orElseThrow(() -> new RuntimeException("Could not find artifact for path pattern " + pathPattern + " for job " + name));
@@ -171,6 +175,9 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
         commitId = MatcherUtils.singleMatch(description, commitIdPattern);
         if (StringUtils.isEmpty(commitId)) {
             commitId = getJobBuildCommitId();
+        }
+        if (StringUtils.isEmpty(commitId)) {
+            this.commitId = "unknown";
         }
     }
 

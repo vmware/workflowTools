@@ -162,7 +162,9 @@ public class FindRealTestFailures extends BaseAction {
         Comparator<HomePage.View> viewComparator = Comparator.comparing(HomePage.View::htmlFileName);
         String viewListingHtml = matchingViews.stream().sorted(viewComparator)
                 .map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
+        long totalFailingTests = matchingViews.stream().mapToLong(view -> view.failingTestsCount).sum();
         String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
+        viewListingPage = viewListingPage.replace("#failingTestCount", String.valueOf(totalFailingTests));
         viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
         viewListingPage = viewListingPage.replace("#footer", "Generated at " + generationDate + " in " + elapsedTime + " seconds");
         return viewListingPage.replace("#body", viewListingHtml);
@@ -256,7 +258,7 @@ public class FindRealTestFailures extends BaseAction {
         usableJobs.stream().parallel().forEach(job -> {
             try {
                 job.loadTestResultsFromDb();
-                fetchLatestTestResults(job, jobView.lastFetchAmount);
+                fetchLatestTestResults(job);
             } catch (Exception e) {
                 log.error("Failed to get full job details for {}\n{}", job.name, StringUtils.exceptionAsString(e));
                 failedJobs.add(job);
@@ -284,29 +286,25 @@ public class FindRealTestFailures extends BaseAction {
         });
     }
 
-    private void fetchLatestTestResults(Job job, int lastFetchAmount) {
+    private void fetchLatestTestResults(Job job) {
         job.fetchedResults = Collections.emptyList();
-        int latestUsableBuildNumber = job.latestUsableBuildNumber();
-        if (lastFetchAmount >= jenkinsConfig.maxJenkinsBuildsToCheck && job.hasSavedBuild(latestUsableBuildNumber)) {
-            log.info("Saved builds for {} already include latest build {}", job.name, latestUsableBuildNumber);
-            return;
-        }
-
         List<JobBuild> builds = Arrays.asList(job.builds);
 
         final int numberOfBuildsToCheck = builds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ? jenkinsConfig.maxJenkinsBuildsToCheck : builds.size();
         final int lastBuildNumberToCheck = builds.get(numberOfBuildsToCheck - 1).buildNumber;
 
         List<JobBuild> usableBuilds = builds.stream()
-                .filter(build -> build.buildNumber >= lastBuildNumberToCheck && !job.hasSavedBuild(build.buildNumber))
+                .filter(build -> build.buildNumber >= lastBuildNumberToCheck && !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck))
                 .collect(toList());
         job.usefulBuilds = usableBuilds.stream().parallel()
                 .map(build -> jenkinsExecutor.execute(j -> j.getJobBuildDetails(build)))
                 .peek(build -> build.setCommitIdForBuild(jenkinsConfig.commitIdInDescriptionPattern))
                 .collect(toList());
-        job.usefulBuilds.removeIf(build -> build.status != SUCCESS && build.status != UNSTABLE);
+
+        job.usefulBuilds.removeIf(build -> build.status == null);
 
         List<Supplier<TestResults>> usableResultSuppliers = job.usefulBuilds.stream()
+                .filter(build -> build.status == SUCCESS || build.status == UNSTABLE)
                 .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build)))
                 .collect(toList());
 

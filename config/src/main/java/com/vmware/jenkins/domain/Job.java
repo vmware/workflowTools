@@ -21,10 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.UPDATEABLE;
-import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.CONTAINS_BUILD;
-import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -195,7 +194,7 @@ public class Job extends BaseDbClass {
     }
 
     public void saveFetchedBuildsInfo() {
-        if (dbUtils == null || (CollectionUtils.isEmpty(fetchedResults))) {
+        if (dbUtils == null) {
             return;
         }
 
@@ -250,40 +249,51 @@ public class Job extends BaseDbClass {
             });
     }
 
-    public boolean hasSavedBuild(int buildNumber) {
-        return savedBuilds != null && savedBuilds.stream().anyMatch(build -> build.buildNumber == buildNumber);
-    }
+    public boolean buildIsTooOld(int buildNumber, int maxBuildsToCheck) {
+        if (savedBuilds == null) {
+            return false;
+        }
 
-    public boolean hasSavedBuilds() {
-        return CollectionUtils.isNotEmpty(savedBuilds);
+        if (savedBuilds.stream().anyMatch(build -> build.buildNumber == buildNumber)) {
+            return true;
+        }
+
+        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasTestResults).collect(toList());
+        long numberOfNewerBuilds = usableBuilds.stream().filter(build -> build.buildNumber > buildNumber).count();
+        return numberOfNewerBuilds >= maxBuildsToCheck;
     }
 
     public void removeOldBuilds(int maxJenkinsBuildsToCheck) {
         if (dbUtils == null) {
             return;
         }
-        usefulBuilds = dbUtils.query(JobBuild.class, "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
-        if (CollectionUtils.isEmpty(usefulBuilds)) {
+        if (CollectionUtils.isEmpty(savedBuilds)) {
             return;
         }
-        int lastBuildIndexPerConfig = Math.min(maxJenkinsBuildsToCheck - 1, 19); // keep a max of 20 builds
-        JobBuild lastBuildToKeep = lastBuildIndexPerConfig >= usefulBuilds.size() ? usefulBuilds.get(usefulBuilds.size() - 1) : usefulBuilds.get(lastBuildIndexPerConfig);
+        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasTestResults).collect(toList());
+        JobBuild lastSavedBuildToKeep = maxJenkinsBuildsToCheck >= savedBuilds.size() ? savedBuilds.get(savedBuilds.size() - 1) : savedBuilds.get(maxJenkinsBuildsToCheck - 1);
+        JobBuild lastUsableBuildToKeep = maxJenkinsBuildsToCheck >= usableBuilds.size() ? usableBuilds.get(usableBuilds.size() - 1) : usableBuilds.get(maxJenkinsBuildsToCheck -1);
+
+        JobBuild lastBuildToKeep = lastUsableBuildToKeep != null && lastUsableBuildToKeep.buildNumber < lastSavedBuildToKeep.buildNumber
+                ? lastUsableBuildToKeep : lastSavedBuildToKeep;
 
         List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
                 "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
         existingJobBuildsToCheck.forEach(build -> {
+            log.info("Removing any unimportant test results for build {}", build.name);
             Map<TestResult, TestResult.TestStatusOnBuildRemoval> testResultsWithBuildsRemoved = testResults.stream()
                     .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build, lastBuildToKeep.buildNumber)));
             testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> UPDATEABLE == entry.getValue())
                     .forEach(entry -> dbUtils.update(entry.getKey()));
             testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> DELETEABLE == entry.getValue())
                     .forEach(entry -> {
-                        log.info("Deleting test {}", entry.getKey().name);
-                        dbUtils.delete(entry.getKey());
-                        testResults.remove(entry.getKey());
+                        TestResult testResult = entry.getKey();
+                        log.info("Deleting test {} {} with id {}", testResult.classAndTestName(), testResult.status, testResult.id);
+                        dbUtils.delete(testResult);
+                        testResults.remove(testResult);
                     } );
-            if (testResultsWithBuildsRemoved.entrySet().stream().noneMatch(entry -> CONTAINS_BUILD == entry.getValue())) {
-                log.info("Removing old build {} for {}", build.buildNumber, name);
+            if (testResults.stream().noneMatch(testResult -> testResult.containsBuildNumbers(build.buildNumber))) {
+                log.info("Removing build {}", build.name);
                 dbUtils.delete(build);
                 usefulBuilds.remove(build);
             }
