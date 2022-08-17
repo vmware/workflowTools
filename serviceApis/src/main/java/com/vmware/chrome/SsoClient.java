@@ -59,7 +59,7 @@ public class SsoClient {
         log.debug(startupText);
 
         HttpConnection connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
-        ChromeTab chromeTab = connection.get("http://localhost:" + ssoConfig.chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
+        ChromeTab chromeTab = connection.get("http://127.0.0.1:" + ssoConfig.chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
 
         ChromeDevTools devTools = new ChromeDevTools(URI.create(chromeTab.getWebSocketDebuggerUrl()));
         devTools.sendMessage(new ApiRequest("Page.enable"));
@@ -165,6 +165,6 @@ public class SsoClient {
         signInButtonOrSiteUrlMap.put(ApiRequest.evaluate("window.location.href"),
                 response -> response.matchesUrl(siteUrl));
 
-        return devTools.waitForAnyPredicate(signInButtonOrSiteUrlMap, 0, elementIds.toString() + " or " + siteUrl);
+        return devTools.waitForAnyPredicate(signInButtonOrSiteUrlMap, 0, elementIds + " or " + siteUrl);
     }
 }
