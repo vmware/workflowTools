@@ -3,7 +3,6 @@ package com.vmware.action.vcd;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.util.input.InputUtils;
 
 @ActionDescription("Saves a VCD refresh token.")

@@ -67,6 +67,7 @@ public class Vcd extends AbstractRestService {
     private boolean disableRefreshToken;
     private final SsoConfig ssoConfig;
     private String vcdOrg;
+    private String apiToken;
 
     public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
         super(vcdUrl, "api", null, username);
@@ -80,7 +81,7 @@ public class Vcd extends AbstractRestService {
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
         this.connection.setDisableHostnameVerification(true);
-        String apiToken = loginWithCredentials(new UsernamePasswordCredentials(username + "@" + vcdOrg, password));
+        apiToken = loginWithCredentials(new UsernamePasswordCredentials(username + "@" + vcdOrg, password));
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
@@ -97,14 +98,14 @@ public class Vcd extends AbstractRestService {
         this.ssoConfig = ssoConfig;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
-        String apiToken = readExistingApiToken(ApiAuthentication.vcd);
+        apiToken = readExistingApiToken(ApiAuthentication.vcd);
         if (StringUtils.isNotEmpty(apiToken)) {
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
         }
     }
 
     public void saveRefreshToken(String token) {
-        super.saveApiToken(token, ApiAuthentication.vcd_refresh_token);
+        super.saveApiToken(token, ApiAuthentication.vcd_refresh);
     }
 
     public Map getResourceAsMap(String resourcePath, String acceptType) {
@@ -210,6 +211,43 @@ public class Vcd extends AbstractRestService {
         }
     }
 
+    public void createRefreshTokenIfNeeded() {
+        if (StringUtils.isEmpty(vcdOrg) || disableRefreshToken) {
+            return;
+        }
+        String refreshToken = readExistingApiToken(ApiAuthentication.vcd_refresh);
+        if (StringUtils.isNotBlank(refreshToken)) {
+            log.info("Refresh token already exists in {}", determineApiTokenFile(ApiAuthentication.vcd_refresh).getPath());
+            return;
+        }
+        HttpResponse sessionResponse = get(cloudapiUrl + "/sessions/current", HttpResponse.class, acceptHeader(UserSession.class));
+        if (!sessionResponse.containsLink("add", "OAuthToken")) {
+            log.info("Logged in user doesn't have link for rel add and model OAuthToken");
+            return;
+        }
+
+        log.info("Attempting to create refresh token {}. Use config flag --disable-vcd-refresh to disable use of refresh tokens", refreshTokenName);
+        OauthClient oauthClient;
+        try {
+            oauthClient = post(UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "register"), OauthClient.class,
+                    new OauthClientRegistration(refreshTokenName), aBearerAuthHeader(apiToken));
+        } catch (BadRequestException bre) {
+            if (bre.getMessage().contains("token with the given name already exists")) {
+                log.error("Refresh token {} already exsits in VCD, use --vcd-refresh-token-name to specify a different name", refreshTokenName);
+                return;
+            } else {
+                throw bre;
+            }
+        }
+
+        OauthTokenRequest tokenRequest = new OauthTokenRequest(oauthClient.jwtGrantRequest(), oauthClient.clientId, apiToken);
+        connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
+        OauthToken token = post(UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "token"), OauthToken.class,
+                tokenRequest, aBearerAuthHeader(apiToken));
+        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
+        saveRefreshToken(token.refreshToken);
+    }
+
     @Override
     protected void checkAuthenticationAgainstServer() {
         queryVapps();
@@ -218,10 +256,10 @@ public class Vcd extends AbstractRestService {
     @Override
     protected void loginManually() {
         connection.removeStatefulParam(RequestHeader.AUTHORIZATION);
-        String refreshToken = readExistingApiToken(ApiAuthentication.vcd_refresh_token);
-        if (StringUtils.isNotBlank(refreshToken) && !disableRefreshToken && StringUtils.isNotBlank(vcdOrg)) {
-            log.info("Using refresh token from {}", determineApiTokenFile(ApiAuthentication.vcd_refresh_token).getPath());
-            String apiToken = createAccessTokenUsingRefreshToken(refreshToken);
+        String refreshToken = readExistingApiToken(ApiAuthentication.vcd_refresh);
+        if (StringUtils.isNotBlank(refreshToken) && StringUtils.isNotBlank(vcdOrg) && !disableRefreshToken) {
+            log.info("Using refresh token from {}", determineApiTokenFile(ApiAuthentication.vcd_refresh).getPath());
+            apiToken = createAccessTokenUsingRefreshToken(refreshToken);
             saveApiToken(apiToken, ApiAuthentication.vcd);
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
             return;
@@ -231,7 +269,6 @@ public class Vcd extends AbstractRestService {
         }
         if (useVcdSso) {
             SsoClient client = new SsoClient(ssoConfig, getUsername(), ssoEmail);
-            String apiToken;
             try {
                 Consumer<ChromeDevTools> ssoNavigateFunction = ChromeDevTools::waitForDomContentEvent;
                 String siteUrl = UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs");
@@ -244,8 +281,8 @@ public class Vcd extends AbstractRestService {
                 apiToken = InputUtils.readValueUntilNotBlank("Bearer Api Token");
             }
             saveApiToken(apiToken, vcd);
-            createRefreshTokenIfNeeded(apiToken);
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
+            createRefreshTokenIfNeeded();
             return;
         }
         if (StringUtils.isNotEmpty(vcdOrg)) {
@@ -262,25 +299,10 @@ public class Vcd extends AbstractRestService {
             log.info("Setting vcd org to {}", vcdOrg);
         }
 
-        String apiToken = loginWithCredentials(credentials);
+        apiToken = loginWithCredentials(credentials);
         saveApiToken(apiToken, vcd);
-        createRefreshTokenIfNeeded(apiToken);
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
-    }
-
-    private void createRefreshTokenIfNeeded(String apiToken) {
-        if (disableRefreshToken || StringUtils.isEmpty(vcdOrg)) {
-            return;
-        }
-        OauthClient oauthClient = post(UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "register"), OauthClient.class,
-                new OauthClientRegistration(refreshTokenName), aBearerAuthHeader(apiToken));
-
-        OauthTokenRequest tokenRequest = new OauthTokenRequest(oauthClient.jwtGrantRequest(), oauthClient.clientId, apiToken);
-        connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        OauthToken token = post(UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "token"), OauthToken.class,
-                tokenRequest, aBearerAuthHeader(apiToken));
-        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
-        saveRefreshToken(token.refreshToken);
+        createRefreshTokenIfNeeded();
     }
 
     @Override
@@ -332,5 +354,4 @@ public class Vcd extends AbstractRestService {
         connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
         return token.accessToken;
     }
-
 }

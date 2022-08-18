@@ -19,7 +19,8 @@ import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
 
 
-@ActionDescription("Loads a list of vapps from Vcloud Director owned by the logged in user.")
+@ActionDescription(value = "Loads a list of vapps from Vcloud Director owned by the logged in user.",
+        configFlagsToAlwaysExcludeFromCompleter = {"--vcd-refresh-token-name", "--disable-vcd-refresh"})
 public class LoadVapps extends BaseVappAction {
 
     private static final Gson gson = new ConfiguredGsonBuilder().build();

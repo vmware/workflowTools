@@ -25,4 +25,9 @@ public class HttpResponse {
     public Map<String, List<String>> getHeaders() {
         return new HashMap<>(headers);
     }
+
+    public boolean containsLink(String rel, String model) {
+        List<String> links = headers.get("Link");
+        return links.stream().anyMatch(link -> link.contains("rel=\"" + rel + "\"") && link.contains("model=\"" + model + "\""));
+    }
 }

@@ -12,7 +12,7 @@ public enum ApiAuthentication {
     jenkins(".jenkins-api-token.txt"),
     trello(".trello-api-token.txt"),
     vcd(".vcd-api-token.txt"),
-    vcd_refresh_token(".vcd-refresh-token.txt"),
+    vcd_refresh(".vcd-refresh-token.txt"),
     gitlab(".gitlab-access-token.txt"),
     none("");
 
