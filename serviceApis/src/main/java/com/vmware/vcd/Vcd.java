@@ -31,6 +31,10 @@ import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
+import com.vmware.vcd.domain.OauthClient;
+import com.vmware.vcd.domain.OauthClientRegistration;
+import com.vmware.vcd.domain.OauthToken;
+import com.vmware.vcd.domain.OauthTokenRequest;
 import com.vmware.vcd.domain.QueryResultVMsType;
 import com.vmware.vcd.domain.QueryResultVappType;
 import com.vmware.vcd.domain.QueryResultVappsType;
@@ -56,14 +60,18 @@ public class Vcd extends AbstractRestService {
     private static final String SSO_LOGIN_BUTTON = "ssoLoginButton";
     private final String apiVersion;
     private final String cloudapiUrl;
+    private final String oauthUrl;
     private final boolean useVcdSso;
     private final String ssoEmail;
+    private String refreshTokenName;
+    private boolean disableRefreshToken;
     private final SsoConfig ssoConfig;
     private String vcdOrg;
 
     public Vcd(String vcdUrl, String apiVersion, String username, String password, String vcdOrg) {
         super(vcdUrl, "api", null, username);
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
+        this.oauthUrl = baseUrl + "oauth";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
         this.ssoConfig = null;
@@ -76,11 +84,14 @@ public class Vcd extends AbstractRestService {
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
-    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoEmail, boolean ssoHeadless, SsoConfig ssoConfig) {
+    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoEmail, String refreshTokenName, boolean disableRefreshToken, boolean ssoHeadless, SsoConfig ssoConfig) {
         super(vcdUrl, "api", ApiAuthentication.vcd, username);
         this.useVcdSso = useVcdSso;
         this.ssoEmail = ssoEmail;
+        this.refreshTokenName = refreshTokenName;
+        this.disableRefreshToken = disableRefreshToken;
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
+        this.oauthUrl = baseUrl + "oauth/tenant";
         this.apiVersion = apiVersion;
         this.vcdOrg = vcdOrg;
         this.ssoConfig = ssoConfig;
@@ -90,6 +101,10 @@ public class Vcd extends AbstractRestService {
         if (StringUtils.isNotEmpty(apiToken)) {
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
         }
+    }
+
+    public void saveRefreshToken(String token) {
+        super.saveApiToken(token, ApiAuthentication.vcd_refresh_token);
     }
 
     public Map getResourceAsMap(String resourcePath, String acceptType) {
@@ -203,6 +218,14 @@ public class Vcd extends AbstractRestService {
     @Override
     protected void loginManually() {
         connection.removeStatefulParam(RequestHeader.AUTHORIZATION);
+        String refreshToken = readExistingApiToken(ApiAuthentication.vcd_refresh_token);
+        if (StringUtils.isNotBlank(refreshToken) && !disableRefreshToken && StringUtils.isNotBlank(vcdOrg)) {
+            log.info("Using refresh token from {}", determineApiTokenFile(ApiAuthentication.vcd_refresh_token).getPath());
+            String apiToken = createAccessTokenUsingRefreshToken(refreshToken);
+            saveApiToken(apiToken, ApiAuthentication.vcd);
+            connection.addStatefulParam(aBearerAuthHeader(apiToken));
+            return;
+        }
         if (useVcdSso && StringUtils.isEmpty(vcdOrg)) {
             vcdOrg = InputUtils.readValueUntilNotBlank("Vcd Organization");
         }
@@ -221,6 +244,7 @@ public class Vcd extends AbstractRestService {
                 apiToken = InputUtils.readValueUntilNotBlank("Bearer Api Token");
             }
             saveApiToken(apiToken, vcd);
+            createRefreshTokenIfNeeded(apiToken);
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
             return;
         }
@@ -240,13 +264,30 @@ public class Vcd extends AbstractRestService {
 
         String apiToken = loginWithCredentials(credentials);
         saveApiToken(apiToken, vcd);
+        createRefreshTokenIfNeeded(apiToken);
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
+    private void createRefreshTokenIfNeeded(String apiToken) {
+        if (disableRefreshToken || StringUtils.isEmpty(vcdOrg)) {
+            return;
+        }
+        OauthClient oauthClient = post(UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "register"), OauthClient.class,
+                new OauthClientRegistration(refreshTokenName), aBearerAuthHeader(apiToken));
+
+        OauthTokenRequest tokenRequest = new OauthTokenRequest(oauthClient.jwtGrantRequest(), oauthClient.clientId, apiToken);
+        connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
+        OauthToken token = post(UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "token"), OauthToken.class,
+                tokenRequest, aBearerAuthHeader(apiToken));
+        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
+        saveRefreshToken(token.refreshToken);
+    }
+
     @Override
-    protected File determineApiTokenFile() {
+    protected File determineApiTokenFile(ApiAuthentication apiAuthentication) {
         String homeFolder = System.getProperty("user.home");
-        return new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-vcd-api-token.txt");
+        return new File(homeFolder + "/." + vcdOrg.toLowerCase()
+                + "-" + apiAuthentication.getFileName().substring(1));
     }
 
     private RequestHeader taskAcceptHeader() {
@@ -281,6 +322,15 @@ public class Vcd extends AbstractRestService {
             throw new NotAuthorizedException("Could not find access token header " + ACCESS_TOKEN_HEADER);
         }
         return authzHeaders.get(0);
+    }
+
+    private String createAccessTokenUsingRefreshToken(String refreshToken) {
+        String tokenUrl = UrlUtils.addRelativePaths(oauthUrl, vcdOrg, "token");
+        connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
+        OauthToken token = connection.post(tokenUrl, OauthToken.class, new OauthTokenRequest("refresh_token", refreshToken),
+                acceptHeader(OauthToken.class));
+        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
+        return token.accessToken;
     }
 
 }

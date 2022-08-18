@@ -25,7 +25,7 @@ public class AuthenticateAllApis extends BaseAction {
         checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl, config.username));
         String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
-                ssoEmail, ssoConfig.ssoHeadless, ssoConfig));
+                ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig));
 
         checkAuthentication(new Trello(trelloConfig.trelloUrl, config.username, trelloConfig.trelloSso, ssoEmail, ssoConfig));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));

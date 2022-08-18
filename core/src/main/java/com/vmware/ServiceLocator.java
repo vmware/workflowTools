@@ -101,7 +101,7 @@ public class ServiceLocator {
             SsoConfig ssoConfig = config.ssoConfig;
             String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
             vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, ssoEmail,
-                    ssoConfig.ssoHeadless, ssoConfig);
+                    vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig);
         }
         return vcd;
     }

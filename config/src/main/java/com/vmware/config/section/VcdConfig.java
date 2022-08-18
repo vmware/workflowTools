@@ -70,6 +70,12 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-sso", help = "Use Single Sign On for getting Vcd api token")
     public boolean vcdSso;
 
+
+    @ConfigurableProperty(commandLine = "--vcd-refresh-token-name", help = "Name of VCD refresh token to create")
+    public String refreshTokenName;
+    @ConfigurableProperty(commandLine = "--disable-vcd-refresh", help = "Disable use of vcd refresh token")
+    public boolean disableVcdRefreshToken;
+
     public String[] queryFilters() {
         if (StringUtils.isEmpty(queryFilter)) {
             return new String[0];

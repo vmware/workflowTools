@@ -24,6 +24,16 @@
     "--vcd-sys-admin-username",
     "--source-url"
   ],
+  "SaveVcdRefreshToken": [
+    "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
+    "--vcd-sso",
+    "--vcd-org",
+    "--username",
+    "--vcd-url",
+    "--sso-email"
+  ],
   "WaitForMergeRequestToBeUpdated": [
     "--wait-time"
   ],
@@ -49,6 +59,8 @@
   ],
   "LoadVappMetadataIfFound": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -91,6 +103,8 @@
     "--bugzilla-test-bug",
     "--trello-sso",
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--vcd-url",
@@ -165,6 +179,8 @@
   ],
   "PowerOnVapp": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -175,6 +191,8 @@
   ],
   "ShowLoggedInUserDetails": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -216,6 +234,8 @@
   ],
   "SetVappMetadataIfNeeded": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -244,6 +264,8 @@
   "LoadVapps": [
     "--query-filter",
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -310,6 +332,8 @@
   ],
   "DeleteVappMetadataIfNeeded": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -319,6 +343,8 @@
   ],
   "RenameVapp": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -334,6 +360,8 @@
   ],
   "DeleteVapp": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -357,6 +385,8 @@
   ],
   "LoadVappJson": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -413,6 +443,8 @@
   ],
   "ShowVappVmsStatus": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -441,6 +473,8 @@
   ],
   "ExitIfVcdVmQuotaExceeded": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -487,6 +521,8 @@
   ],
   "PowerOffVapp": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -574,6 +610,8 @@
   ],
   "UpdateVappLease": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -617,6 +655,8 @@
   "DeleteVMs": [
     "--query-filter",
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -661,6 +701,8 @@
   ],
   "DisplayVappMetadataKeys": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
@@ -694,6 +736,8 @@
   ],
   "DownloadBuildArtifact": [
     "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
     "--username",
