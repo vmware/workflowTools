@@ -3,11 +3,9 @@ package com.vmware.chrome;
 import java.io.File;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,15 +20,22 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.vmware.chrome.domain.ApiRequest;
 import com.vmware.chrome.domain.ApiResponse;
+import com.vmware.chrome.domain.ChromeTab;
+import com.vmware.http.HttpConnection;
+import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.util.CommandLineUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeTimeoutException;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.vmware.util.FileUtils.createTempDirectory;
 
 public class ChromeDevTools extends WebSocketClient {
 
@@ -41,9 +46,25 @@ public class ChromeDevTools extends WebSocketClient {
     private CompletableFuture<ApiResponse> eventFuture;
     private CompletableFuture<ApiResponse> domContentEventFuture;
     private int currentRequestId;
+    private Process chromeProcess;
 
-    public ChromeDevTools(URI endpointURI) {
+    public static ChromeDevTools devTools(String chromePath, boolean ssoHeadless, int chromeDebugPort) {
+        HttpConnection connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
+        Process chromeProcess = null;
+        ChromeTab chromeTab = null;
+        try {
+            chromeTab = connection.get("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
+        } catch (FatalException uhe) {
+            chromeProcess = launchChrome(chromePath, ssoHeadless, chromeDebugPort);
+            chromeTab = connection.get("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
+        }
+
+        return new ChromeDevTools(URI.create(chromeTab.getWebSocketDebuggerUrl()), chromeProcess);
+    }
+
+    private ChromeDevTools(URI endpointURI, Process chromeProcess) {
         super(endpointURI);
+        this.chromeProcess = chromeProcess;
         try {
             super.connectBlocking();
         } catch (InterruptedException e) {
@@ -87,6 +108,18 @@ public class ChromeDevTools extends WebSocketClient {
     }
 
     @Override
+    public void close() {
+        super.close();
+        if (chromeProcess != null) {
+            chromeProcess.destroy();
+        }
+    }
+
+    public void closeDevToolsOnly() {
+        super.close();
+    }
+
+    @Override
     public void onClose(int i, String s, boolean b) {
 
     }
@@ -109,12 +142,17 @@ public class ChromeDevTools extends WebSocketClient {
     }
 
     public ApiResponse clickById(String elementId) {
-        evaluate(String.format("document.getElementById('%s')", elementId), ".disabled = false","#" + elementId);
-        return evaluate(String.format("document.getElementById('%s')", elementId), ".click()","#" + elementId);
+        return clickById(String.format("document.getElementById('%s')", elementId), "#" + elementId);
     }
 
-    public ApiResponse setValueById(String elementId, String value) {
-        return evaluate(String.format("document.getElementById('%s')", elementId), ".value = '" + value + "'","#" + elementId);
+    public ApiResponse clickById(String locator, String testDescription) {
+        evaluate(locator, ".disabled = false",testDescription);
+        return evaluate(locator, ".click()",testDescription);
+    }
+
+    public void setValueById(String elementId, String value) {
+        evaluate(String.format("document.getElementById('%s')", elementId), ".value = '" + value + "'","#" + elementId);
+        evaluate(String.format("document.getElementById('%s')", elementId), ".dispatchEvent(new Event('input', {bubbles: true}))","#" + elementId);
     }
 
     public String getValue(String elementScript) {
@@ -122,12 +160,8 @@ public class ChromeDevTools extends WebSocketClient {
     }
 
     public ApiResponse evaluate(String locator, String operation, String testDescription) {
-        waitForPredicate(ApiRequest.evaluate(locator), new Predicate<ApiResponse>() {
-            @Override
-            public boolean test(ApiResponse response) {
-                return response.getDescription() != null && response.getDescription().contains(testDescription);
-            }
-        }, 0, "element " + testDescription);
+        waitForPredicate(ApiRequest.evaluate(locator),
+                response -> response.getDescription() != null && response.getDescription().contains(testDescription), 0, "element " + testDescription);
         return sendMessage(ApiRequest.evaluate(locator + operation));
     }
 
@@ -200,5 +234,16 @@ public class ChromeDevTools extends WebSocketClient {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Process launchChrome(String chromePath, boolean ssoHeadless, int chromeDebugPort) {
+        String headParam = ssoHeadless ? "--headless" : "--no-first-run --disable-session-crashed-bubble --ignore-certificate-errors --user-data-dir="
+                + createTempDirectory("chromeTemp", true).getAbsolutePath();
+        String chromeCommand = "\"" + chromePath + "\" " + headParam + " --remote-debugging-port=" + chromeDebugPort;
+        LoggerFactory.getLogger(ChromeDevTools.class).info("Launching Chrome with command {}", chromeCommand);
+        Process chromeProcess = CommandLineUtils.executeCommand(null, null, chromeCommand, (String) null);
+        String startupText = IOUtils.readWithoutClosing(chromeProcess.getInputStream());
+        LoggerFactory.getLogger(ChromeDevTools.class).debug(startupText);
+        return chromeProcess;
     }
 }

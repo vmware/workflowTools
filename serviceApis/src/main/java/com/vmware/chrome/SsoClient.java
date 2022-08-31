@@ -1,7 +1,5 @@
 package com.vmware.chrome;
 
-import java.net.URI;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,25 +14,16 @@ import java.util.function.Predicate;
 
 import com.vmware.chrome.domain.ApiRequest;
 import com.vmware.chrome.domain.ApiResponse;
-import com.vmware.chrome.domain.ChromeTab;
 import com.vmware.config.section.SsoConfig;
-import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
-import com.vmware.http.request.body.RequestBodyHandling;
-import com.vmware.util.CommandLineUtils;
-import com.vmware.util.FileUtils;
-import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.ThreadUtils;
 
 import com.vmware.util.exception.FatalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.vmware.util.FileUtils.createTempDirectory;
-import static java.lang.String.format;
 
 public class SsoClient {
     private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -50,22 +39,11 @@ public class SsoClient {
 
     public String loginAndGetApiToken(String siteUrl, String siteLoginUrl, String ssoLoginButtonId, Consumer<ChromeDevTools> ssoNavigateConsumer,
                                       Function<ChromeDevTools, String> authenticationTokenFunction) {
-        String headParam = ssoConfig.ssoHeadless ? " --headless" : " --no-first-run --disable-session-crashed-bubble --user-data-dir="
-                + createTempDirectory("chromeSso", true).getAbsolutePath();
-        String chromeCommand = "\"" + ssoConfig.chromePath + "\"" + headParam + " --remote-debugging-port=" + ssoConfig.chromeDebugPort;
-        log.info("Using Google Chrome for SSO to get API token, launching with {}", chromeCommand);
-        Process chromeProcess = CommandLineUtils.executeCommand(null, null, chromeCommand, (String) null);
-        String startupText = IOUtils.readWithoutClosing(chromeProcess.getInputStream());
-        log.debug(startupText);
-
-        HttpConnection connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
-        ChromeTab chromeTab = connection.get("http://127.0.0.1:" + ssoConfig.chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
-
-        ChromeDevTools devTools = new ChromeDevTools(URI.create(chromeTab.getWebSocketDebuggerUrl()));
+        ChromeDevTools devTools = ChromeDevTools.devTools(ssoConfig.chromePath, ssoConfig.ssoHeadless, ssoConfig.chromeDebugPort);
         devTools.sendMessage(new ApiRequest("Page.enable"));
         devTools.sendMessage(ApiRequest.navigate(siteLoginUrl));
         devTools.waitForDomContentEvent();
-        ThreadUtils.sleep(1, TimeUnit.SECONDS);
+        ThreadUtils.sleep(2, TimeUnit.SECONDS);
         ApiResponse response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
 
         if (response.matchesElementId(ssoLoginButtonId)) {
@@ -90,7 +68,6 @@ public class SsoClient {
             log.info("Retrieving api token after successful login using SSO");
             String apiAuthentication = authenticationTokenFunction.apply(devTools);
             devTools.close();
-            chromeProcess.destroy();
             return apiAuthentication;
         }
 
@@ -101,7 +78,6 @@ public class SsoClient {
         log.info("Logging in via SSO login page");
         String apiToken = loginWithUsernameAndPassword(siteUrl, authenticationTokenFunction, devTools, 0);
         devTools.close();
-        chromeProcess.destroy();
         return apiToken;
     }
 

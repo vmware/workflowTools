@@ -7,6 +7,13 @@ import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
 
 public class FileSystemConfig {
+
+    @ConfigurableProperty(help = "Path to chrome executable")
+    public String chromePath;
+
+    @ConfigurableProperty(help = "Port to use for chrome remote debugging")
+    public int chromeDebugPort;
+    
     @ConfigurableProperty(commandLine = "--source-url", help = "Source url to copy certificates from")
     public String sourceUrl;
 
@@ -78,6 +85,12 @@ public class FileSystemConfig {
 
     @ConfigurableProperty(commandLine = "--skip-if-variable-not-set", help = "Skips action if the specified variable does not have a value")
     public boolean skipIfVariableNotSet;
+
+    @ConfigurableProperty(commandLine = "--auto-login", help = "Opens in Chrome and logs in using the credentials")
+    public boolean autoLogin;
+
+    @ConfigurableProperty(commandLine = "--repeat--count", help = "Repeating count")
+    public int repeatCount;
 
     public boolean databaseConfigured() {
         return Stream.of(databaseUrl, databaseUsername, databasePassword).allMatch(StringUtils::isNotBlank);

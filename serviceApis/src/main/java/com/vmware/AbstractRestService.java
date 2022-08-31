@@ -44,7 +44,6 @@ public abstract class AbstractRestService extends AbstractService {
         return post(url, responseConversionClass, requestBody, Collections.emptyList(), params);
     }
 
-
     protected <T> T post(String url, Class<T> responseConversionClass, Object requestBody,
                          List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
         try {

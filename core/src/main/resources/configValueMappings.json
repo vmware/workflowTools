@@ -20,8 +20,8 @@
   ],
   "UpdateVcdPublicCerts": [
     "--file-data",
-    "--vcd-sys-admin-password",
-    "--vcd-sys-admin-username",
+    "--vcd-password",
+    "--vcd-username",
     "--source-url"
   ],
   "SaveVcdRefreshToken": [
@@ -438,6 +438,10 @@
     "--property-name",
     "--file-data"
   ],
+  "RepeatText": [
+    "--file-data",
+    "--repeat--count"
+  ],
   "PostApprovalRequest": [
     "--approver"
   ],
@@ -517,6 +521,14 @@
   "OpenVcdProviderApp": [
     "--vcd-cell-index"
   ],
+  "ExecuteVcdApiRequests": [
+    "--file-data",
+    "--repeat--count",
+    "--vcd-password",
+    "--vcd-username",
+    "--source-url",
+    "--vcd-org"
+  ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--username",
     "--disable-jira"
@@ -544,6 +556,9 @@
   "ExitIfReusingPostgresDatabaseNotAllowed": [
     "--database-schema-name"
   ],
+  "BaseSingleVappJsonAction": [
+    "--auto-login"
+  ],
   "GenerateGitCommitStats": [
     "--author-emails",
     "--trivial-reviewer-label",
@@ -555,7 +570,7 @@
     "--keystore-password"
   ],
   "OpenVcdTenantApp": [
-    "--vcd-tenant"
+    "--vcd-org"
   ],
   "LoadVappsIfNeeded": [
     "--use-vapp-json",
@@ -563,6 +578,9 @@
   ],
   "DisplayConfig": [
     "--specific-properties"
+  ],
+  "OpenVCenterMob": [
+    "--auto-login"
   ],
   "CreatePostgresDatabaseFromFile": [
     "--database-username",
@@ -598,6 +616,9 @@
     "--job-display-names",
     "--job-with-artifact",
     "--changelist-id"
+  ],
+  "SelectVappVm": [
+    "--vm-name"
   ],
   "ScpFileFromRemote": [
     "--file-data",

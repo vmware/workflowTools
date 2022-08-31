@@ -14,7 +14,7 @@ public class VappData {
 
     private Sites.Site selectedSite;
 
-    private Sites.DeployedVM selectedVcdCell;
+    private Sites.VcdCell selectedVcdCell;
 
     private Sites.VmInfo selectedVm;
 
@@ -99,11 +99,11 @@ public class VappData {
         this.selectedSite = selectedSite;
     }
 
-    public Sites.DeployedVM getSelectedVcdCell() {
+    public Sites.VcdCell getSelectedVcdCell() {
         return selectedVcdCell;
     }
 
-    public void setSelectedVcdCell(Sites.DeployedVM selectedVcdCell) {
+    public void setSelectedVcdCell(Sites.VcdCell selectedVcdCell) {
         this.selectedVcdCell = selectedVcdCell;
         this.selectedVm = selectedVcdCell;
     }

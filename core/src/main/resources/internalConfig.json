@@ -872,7 +872,7 @@
       "selectVapp",
       "UpdateVappLease"
     ],
-    "showVappVms": [
+    "showVms": [
       "selectVapp",
       "ShowVappVmsStatus"
     ],
@@ -908,13 +908,22 @@
       "selectVcdSite",
       "OpenVcdTenantApp"
     ],
-    "openVappVm": [
+    "openVm": [
       "selectVcdSite",
       "SelectVappVm",
       "OpenVappVm"
     ],
-    "executeVcdSsh": [
-      "executeVappSsh"
+    "openVmAndLogin" : [
+      "openVm",
+      "--auto-login"
+    ],
+    "executeVcdApiRequests": [
+      "LoadFileData",
+      "ExecuteVcdApiRequests"
+    ],
+    "repeatText": [
+      "LoadFileData",
+      "RepeatText"
     ],
     "executeVappSsh": [
       "selectVcdCell",
@@ -925,7 +934,7 @@
       "selectVcdCell",
       "OpenSshShell"
     ],
-    "openVappVmSshShell": [
+    "openVmSshShell": [
       "selectVcdSite",
       "SelectVappVm",
       "OpenSshShell"

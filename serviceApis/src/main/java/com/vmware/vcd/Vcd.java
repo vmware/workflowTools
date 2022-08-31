@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.vmware.AbstractRestService;
 import com.vmware.chrome.ChromeDevTools;
@@ -29,6 +30,7 @@ import com.vmware.util.ThreadUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
+import com.vmware.vcd.domain.ApiRequest;
 import com.vmware.vcd.domain.LinkType;
 import com.vmware.vcd.domain.MetaDatasType;
 import com.vmware.vcd.domain.OauthClient;
@@ -115,6 +117,14 @@ public class Vcd extends AbstractRestService {
     public Map updateResourceFromMap(String resourcePath, Map resourceValue, String contentType, String acceptType) {
         return put(UrlUtils.addRelativePaths(apiUrl, resourcePath), Map.class, resourceValue,
                 aContentTypeHeader(contentType + "+json;version=" + apiVersion), anAcceptHeader(acceptType + "+json;version=" + apiVersion));
+    }
+
+    public HttpResponse executeRequest(ApiRequest apiRequest) {
+        RequestHeader acceptHeader = new RequestHeader("Accept", apiRequest.acceptType + ";version=" + apiVersion);
+        RequestHeader contentTypeHeader = StringUtils.isNotBlank(apiRequest.contentType)
+                ? new RequestHeader("Content-Type", apiRequest.contentType + ";version=" + apiVersion) : null;
+        RequestHeader[] headers = Stream.of(acceptHeader, contentTypeHeader).filter(Objects::nonNull).toArray(RequestHeader[]::new);
+        return connection.executeApiRequest(apiRequest.methodType, apiRequest.url, HttpResponse.class, apiRequest.requestBody, headers);
     }
 
     public TaskType deleteResource(LinkType deleteLink, boolean force) {

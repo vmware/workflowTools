@@ -16,6 +16,6 @@ public class OpenVappVm extends BaseSingleVappJsonAction {
     @Override
     public void process() {
         Sites.VmInfo selectedVm = vappData.getSelectedVm();
-        SystemUtils.openUrl(selectedVm.getUiUrl());
+        openUiUrl(selectedVm);
     }
 }

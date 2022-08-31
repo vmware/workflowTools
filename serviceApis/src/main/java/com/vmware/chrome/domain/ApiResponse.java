@@ -12,6 +12,8 @@ public class ApiResponse {
 
     public Result result;
 
+    public Error error;
+
     public Map exceptionDetails;
 
     public String getType() {
@@ -55,6 +57,14 @@ public class ApiResponse {
 
     public class Result {
         public Map result;
+
+        private String data;
+    }
+
+    public class Error {
+        public String code;
+
+        public String message;
 
         private String data;
     }

@@ -3,7 +3,6 @@ package com.vmware.action.vcd;
 import com.vmware.action.base.BaseSingleVappJsonAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.SystemUtils;
 import com.vmware.vcd.domain.Sites;
 
 @ActionDescription("Opens the selected Avi Controller management page")
@@ -22,8 +21,7 @@ public class OpenAviController extends BaseSingleVappJsonAction {
 
     @Override
     public void process() {
-        Sites.DeployedVM aviController = selectDeployedVm(vappData.getSelectedSite().aviControllers, "Avi Controller");
-        SystemUtils.openUrl(aviController.endPointURI);
-        log.info("Credentials: {}", aviController.credentials);
+        Sites.DeployedVM aviController = selectDeployedVm(vappData.getSelectedSite().aviControllerVms(), "Avi Controller");
+        openUiUrl(aviController);
     }
 }

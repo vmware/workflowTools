@@ -1,6 +1,7 @@
 package com.vmware.action.vcd;
 
 import com.vmware.action.base.BaseSingleVappJsonAction;
+import com.vmware.chrome.ChromeDevTools;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.SystemUtils;
@@ -15,20 +16,19 @@ public class OpenVcdProviderApp extends BaseSingleVappJsonAction {
 
     @Override
     public void process() {
-        String uiUrl = uiUrl() + "/provider";
-        SystemUtils.openUrl(uiUrl);
+        Sites.VcdCell uiCell = uiCell();
+        openUiUrl(uiCell);
     }
 
-    protected String uiUrl() {
+    protected Sites.VcdCell uiCell() {
         Sites.Site selectedSite = vappData.getSelectedSite();
         if (selectedSite.loadBalancer != null) {
             log.info("Using loadbalancer url {}", selectedSite.loadBalancer.endPointURI);
-            return selectedSite.loadBalancer.endPointURI;
+            return selectedSite.loadBalancer;
         }
         if (vappData.getSelectedVcdCell() == null) {
             selectVcdCell(selectedSite, vcdConfig.vcdCellIndex);
         }
-        Sites.DeployedVM selectedCell = vappData.getSelectedVcdCell();
-        return selectedCell.endPointURI;
+        return vappData.getSelectedVcdCell();
     }
 }

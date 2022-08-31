@@ -1,6 +1,7 @@
 package com.vmware.action.vcd;
 
 import com.vmware.action.base.BaseSingleVappJsonAction;
+import com.vmware.chrome.ChromeDevTools;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.SystemUtils;
@@ -22,8 +23,7 @@ public class OpenNsxTManagerApp extends BaseSingleVappJsonAction {
 
     @Override
     public void process() {
-        Sites.DeployedVM nsxTManager = selectDeployedVm(vappData.getSelectedSite().nsxManagers, "Nsx-T Manager");
-        SystemUtils.openUrl(nsxTManager.endPointURI);
-        log.info("Credentials: {}", nsxTManager.cliCredentials);
+        Sites.DeployedVM nsxTManager = selectDeployedVm(vappData.getSelectedSite().nsxTManagerVms(), "Nsx-T Manager");
+        openUiUrl(nsxTManager);
     }
 }

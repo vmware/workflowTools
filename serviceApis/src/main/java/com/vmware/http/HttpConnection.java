@@ -114,21 +114,23 @@ public class HttpConnection {
         requestParams.reset();
     }
 
+    public <T> T executeApiRequest(HttpMethodType methodType, String url, Class<T> responseConversionClass, Object requestObject, RequestParam[] params) {
+        setupConnection(url, methodType, params);
+        RequestBodyFactory.setRequestDataForConnection(this, requestObject);
+        return handleServerResponse(responseConversionClass, methodType, params);
+    }
+
+
     public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params) {
-        setupConnection(url, GET, params);
-        return handleServerResponse(responseConversionClass, GET, params);
+        return executeApiRequest(GET, url, responseConversionClass, null, params);
     }
 
     public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params) {
-        setupConnection(url, PUT, params);
-        RequestBodyFactory.setRequestDataForConnection(this, requestObject);
-        return handleServerResponse(responseConversionClass, PUT, params);
+        return executeApiRequest(PUT, url, responseConversionClass, requestObject, params);
     }
 
     public <T> T post(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params) {
-        setupConnection(url, POST, params);
-        RequestBodyFactory.setRequestDataForConnection(this, requestObject);
-        return handleServerResponse(responseConversionClass, POST, params);
+        return executeApiRequest(POST, url, responseConversionClass, requestObject, params);
     }
 
     public <T> T put(String url, Object requestObject, RequestParam... params) {
@@ -144,8 +146,7 @@ public class HttpConnection {
     }
 
     public <T> T delete(String url, Class<T> responseConversionClass, RequestParam... params) {
-        setupConnection(url, DELETE, params);
-        return handleServerResponse(responseConversionClass, DELETE, params);
+        return executeApiRequest(DELETE, url, responseConversionClass, null, params);
     }
 
     public boolean isUriTrusted(URI uri) {
@@ -371,5 +372,4 @@ public class HttpConnection {
         ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType, responseText);
         return responseText;
     }
-
 }

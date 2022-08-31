@@ -1,6 +1,5 @@
 package com.vmware.config.section;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.vmware.config.ConfigurableProperty;
@@ -13,11 +12,11 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-org", help = "Default Org to use for user login if none specified")
     public String defaultVcdOrg;
 
-    @ConfigurableProperty(commandLine = "--vcd-sys-admin-username", help = "Username for the vcd sys admin user")
-    public String vcdSysAdminUser;
+    @ConfigurableProperty(commandLine = "--vcd-username", help = "Username for the vcd sys admin user")
+    public String vcdUsername;
 
-    @ConfigurableProperty(commandLine = "--vcd-sys-admin-password", help = "Password for the vcd sys admin user")
-    public String vcdSysAdminPassword;
+    @ConfigurableProperty(commandLine = "--vcd-password", help = "Password for the vcd sys admin user")
+    public String vcdUserPassword;
 
     @ConfigurableProperty(help = "Api version to use for Vcloud Director")
     public String vcdApiVersion;
@@ -34,6 +33,9 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vapp-name", help = "Specicy vapp name to use, mainly used for scripting")
     public String vappName;
 
+    @ConfigurableProperty(commandLine = "--vm-name", help = "Specicy vm name to use, mainly used for scripting")
+    public String vmName;
+
     @ConfigurableProperty(commandLine = "--vcd-site-index", help = "Vcd site index in testbed json to use for ssh commands. Default is 1.")
     public Integer vcdSiteIndex;
 
@@ -42,9 +44,6 @@ public class VcdConfig {
 
     @ConfigurableProperty(help = "Directory to search for testbed templates")
     public String testbedTemplateDirectory;
-
-    @ConfigurableProperty(commandLine = "--vcd-tenant", help = "Name of tenant to open UI page for")
-    public String vcdTenant;
 
     @ConfigurableProperty(help = "Preset list of vapp json files")
     public List<String> vappJsonFiles;
@@ -69,7 +68,6 @@ public class VcdConfig {
 
     @ConfigurableProperty(commandLine = "--vcd-sso", help = "Use Single Sign On for getting Vcd api token")
     public boolean vcdSso;
-
 
     @ConfigurableProperty(commandLine = "--vcd-refresh-token-name", help = "Name of VCD refresh token to create")
     public String refreshTokenName;

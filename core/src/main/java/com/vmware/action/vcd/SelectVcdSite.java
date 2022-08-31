@@ -22,7 +22,6 @@ public class SelectVcdSite extends BaseSingleVappJsonAction {
             log.info("Using already selected site");
             return;
         }
-        log.info("Selected Vapp {}", vappData.getSelectedVappName());
         vappData.setSelectedSite(determineSite(vappData.getSelectedVapp().getVcdSites(), vcdConfig.vcdSiteIndex));
     }
 
