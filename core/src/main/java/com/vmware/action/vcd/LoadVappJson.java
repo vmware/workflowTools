@@ -28,6 +28,7 @@ public class LoadVappJson extends BaseSingleVappAction {
         Vcd vcd = serviceLocator.getVcd();
         LinkType metadataLink = selectedVapp.getLinkByRelAndType("down", "application/vnd.vmware.vcloud.metadata+xml");
         MetaDatasType metadata = vcd.getVappMetaData(metadataLink);
-        selectedVapp.parseJson(metadata.jsonMetadata());
+        fileSystemConfig.fileData = metadata.jsonMetadata();
+        selectedVapp.parseJson(fileSystemConfig.fileData);
     }
 }

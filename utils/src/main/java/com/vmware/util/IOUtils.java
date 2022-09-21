@@ -27,12 +27,15 @@ import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.DynamicLogger;
 import com.vmware.util.logging.LogLevel;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IOUtils {
 
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-    private static DynamicLogger logger = new DynamicLogger(LoggerFactory.getLogger(IOUtils.class));
+
+    private static Logger log = LoggerFactory.getLogger(IOUtils.class);
+    private static DynamicLogger logger = new DynamicLogger(log);
 
     public static void write(File file, String data) {
         try {
@@ -132,7 +135,8 @@ public class IOUtils {
             addLines(urlConnection.getInputStream(), lines);
             return StringUtils.join(lines, "\n");
         } catch (IOException e) {
-            throw new RuntimeIOException(e);
+            log.error("Failed to tail " + url, e);
+            return "";
         }
     }
 

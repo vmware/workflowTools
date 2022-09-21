@@ -139,10 +139,17 @@ public class TestResult extends BaseDbClass {
     public String classAndTestName() {
         String testName = className + "." + name;
         if (parameters != null && parameters.length > 0) {
-            String testParams = StringUtils.join(Arrays.asList(parameters), ",");
+            String testParams = String.join(",", parameters);
             testName += " (" + testParams + ")";
         }
         return testName;
+    }
+
+    public String fullPackageAndTestName() {
+        if (JUNIT_ROOT.equals(packagePath)) {
+            return className + "." + name;
+        }
+        return packagePath + "." + className + "." + name;
     }
 
     public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
@@ -299,6 +306,14 @@ public class TestResult extends BaseDbClass {
         failedBuilds = ArrayUtils.remove(failedBuilds, build.buildNumber);
         skippedBuilds = ArrayUtils.remove(skippedBuilds, build.buildNumber);
         return UPDATEABLE;
+    }
+
+    public boolean matchesByDataProviderIndex(TestResult testResult) {
+        if (!this.fullPackageAndTestName().equals(testResult.fullPackageAndTestName())) {
+            return false;
+        }
+
+        return Objects.equals(dataProviderIndex, testResult.dataProviderIndex);
     }
 
     @Override

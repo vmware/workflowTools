@@ -401,7 +401,8 @@
     "--vcd-org",
     "--username",
     "--vcd-url",
-    "--sso-email"
+    "--sso-email",
+    "--file-data"
   ],
   "CommitAll": [
     "--no-verify"

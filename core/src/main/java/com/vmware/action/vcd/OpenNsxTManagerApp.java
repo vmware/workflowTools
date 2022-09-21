@@ -18,7 +18,7 @@ public class OpenNsxTManagerApp extends BaseSingleVappJsonAction {
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
         Sites.Site selectedSite = vappData.getSelectedSite();
-        super.failIfTrue(selectedSite.nsxManagers == null || selectedSite.nsxManagers.isEmpty(), "no Nsx-T managers found in Vapp");
+        super.failIfTrue(selectedSite.nsxTManagerVms().isEmpty(), "no Nsx-T managers found in Vapp");
     }
 
     @Override

@@ -305,6 +305,15 @@ public class Job extends BaseDbClass {
                 .filter(result -> result.containsBuildNumbers(latestUsableBuildNumber()))
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
+                    if (result.parameters != null && result.parameters.length > 0) {
+                        List<TestResult> resultsForSameDataProviderIndex = testResults.stream()
+                                .filter(resultToCheck -> resultToCheck.buildNumber != result.buildNumber).filter(result::matchesByDataProviderIndex).collect(toList());
+                        resultsForSameDataProviderIndex.forEach(resultToAddBuildsFor -> {
+                            log.debug("Found other matching test result by data provider index {} for {}", result.dataProviderIndex, result.fullPackageAndTestName());
+                            List<Map.Entry<Integer, TestResult.TestStatus>> otherApplicableBuilds = resultToAddBuildsFor.buildsToUse(maxJenkinsBuildsToCheck);
+                            applicableBuilds.addAll(otherApplicableBuilds);
+                        });
+                    }
                     if (applicableBuilds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1) {
                         List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
                         result.testRuns = applicableBuilds.stream().map(entry -> {

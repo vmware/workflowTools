@@ -25,6 +25,8 @@ public class Sites {
         public VcdCell loadBalancer;
         public List<VcdCell> cells;
         public List<VcServer> vcServers;
+
+        public List<NsxTManager> globalNsxManagers;
         public List<NsxTManager> nsxManagers;
         public List<AviController> aviControllers;
         public DatabaseServer databaseServer;
@@ -38,7 +40,7 @@ public class Sites {
                 vms.add(loadBalancer);
             }
 
-            Stream.of(cells, vcServers, nsxManagers, aviControllers).filter(Objects::nonNull).flatMap(Collection::stream).forEach(vms::add);
+            Stream.of(cells, vcServers, globalNsxManagers, nsxManagers, aviControllers).filter(Objects::nonNull).flatMap(Collection::stream).forEach(vms::add);
             vms.add(databaseServer);
             vms.removeIf(Objects::isNull);
             return vms;
@@ -49,7 +51,9 @@ public class Sites {
         }
 
         public List<DeployedVM> nsxTManagerVms() {
-            return nsxManagers.stream().map(vc -> ((DeployedVM) vc)).collect(Collectors.toList());
+            return Stream.of(globalNsxManagers, nsxManagers)
+                    .filter(Objects::nonNull).flatMap(Collection::stream)
+                    .map(vc -> ((DeployedVM) vc)).collect(Collectors.toList());
         }
 
         public List<DeployedVM> aviControllerVms() {
