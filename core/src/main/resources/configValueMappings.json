@@ -215,6 +215,8 @@
     "--ssh-port",
     "--ssh-host",
     "--ssh-site",
+    "--ssh-password",
+    "--ssh-username",
     "--use-database-host"
   ],
   "AmendCommitAllFilesOnly": [

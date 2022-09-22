@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
@@ -86,6 +87,13 @@ public class QueryResultVappType extends ResourceType implements InputListSelect
         this.jsonData = jsonData;
         this.vcdSites.clear();
         this.vcdSites.addAll(sites.sites);
+    }
+
+    public void createSiteFromVms(QueryResultVMsType vms) {
+        this.vcdSites.clear();
+        Sites.Site site = new Sites().new Site();
+        site.unknownVms = vms.record.stream().map(Sites.VmInfo.class::cast).collect(Collectors.toList());
+        this.vcdSites.add(site);
     }
 
     public boolean jsonDataLoaded() {

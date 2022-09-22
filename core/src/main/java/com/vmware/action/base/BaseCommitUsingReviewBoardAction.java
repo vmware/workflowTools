@@ -6,6 +6,7 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
+import com.vmware.http.exception.InternalServerException;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
@@ -23,7 +24,7 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
     public void asyncSetup() {
         try {
             reviewBoard = serviceLocator.getReviewBoard();
-        } catch (FatalException re) {
+        } catch (FatalException | InternalServerException re) {
             this.reviewBoardException = re;
         }
     }

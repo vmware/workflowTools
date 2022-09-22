@@ -36,10 +36,17 @@ public abstract class BaseSshAction extends BaseVappAction {
             Sites.Site site = vappData.getSelectedSite();
             Sites.DatabaseServer databaseConfig = site.databaseServer;
             log.info("Using database host {} for ssh site config", databaseConfig.host);
-            return new SiteConfig(databaseConfig.host, 22, "root", databaseConfig.deployment.guestProperties.adminPassword);
+            return new SiteConfig(databaseConfig.host, 22, databaseConfig.getSshCredentials().username, databaseConfig.getSshCredentials().password);
         } else if (vappData.getSelectedVm() != null) {
             Sites.VmInfo vm = vappData.getSelectedVm();
-            return new SiteConfig(vm.getHost(), 22, vm.getSshCredentials().username, vm.getSshCredentials().password);
+            Sites.Credentials credentials = vm.getSshCredentials();
+            if (credentials == null) {
+                if (StringUtils.isEmpty(sshConfig.sshUsername) || StringUtils.isEmpty(sshConfig.sshPassword)) {
+                    throw new FatalException("No ssh credentials found for VM {}, Please set with --ssh-username and --ssh-password", vm.getName());
+                }
+                credentials = new Sites().new Credentials(sshConfig.sshUsername, sshConfig.sshPassword);
+            }
+            return new SiteConfig(vm.getHost(), 22, credentials.username, credentials.password);
         } else if (sshConfig.hasCommandLineSite()) {
             return sshConfig.commandLineSite();
         } else {

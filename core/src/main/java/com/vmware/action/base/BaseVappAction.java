@@ -1,6 +1,7 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.CollectionUtils;
 import com.vmware.vcd.domain.VappData;
 
 public abstract class BaseVappAction extends BaseCommitAction {
@@ -19,7 +20,7 @@ public abstract class BaseVappAction extends BaseCommitAction {
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
         failIfTrue(checkVappJson && vappData.noVappSelected(), "no Vapp selected");
-        failIfTrue(checkVappJson && !vappData.jsonDataLoaded(), "no Vapp json loaded");
+        failIfTrue(checkVappJson && !vappData.jsonDataLoaded() && CollectionUtils.isEmpty(vappData.getSelectedVapp().getVcdSites()), "no Vapp json loaded");
         failIfTrue((checkIfSiteSelected || checkIfCellSelected) && vappData.getSelectedSite() == null, "no vcd site selected");
         failIfTrue(checkIfCellSelected && vappData.getSelectedVcdCell() == null, "no vcd cell selected");
         failIfTrue(checkIfVmSelected && vappData.getSelectedVm() == null, "no VM selected");
