@@ -48,11 +48,11 @@ import static com.vmware.config.jira.IssueTypeDefinition.TechComm;
 public class Jira extends AbstractRestService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private String loginUrl;
-    private String searchUrl;
-    private String legacyApiUrl;
-    private String agileUrl;
-    private String greenhopperUrl;
+    private final String loginUrl;
+    private final String searchUrl;
+    private final String legacyApiUrl;
+    private final String agileUrl;
+    private final String greenhopperUrl;
 
     public Jira(String jiraUrl, String username, Map<String, String> customFieldNames) {
         super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, username);

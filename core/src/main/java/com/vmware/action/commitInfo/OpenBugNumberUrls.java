@@ -6,6 +6,8 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 import com.vmware.util.SystemUtils;
 
+import static com.vmware.util.StringUtils.pluralizeDescription;
+
 @ActionDescription("Opens the urls for the bug numbers in the commit.")
 public class OpenBugNumberUrls extends BaseCommitAction {
     public OpenBugNumberUrls(WorkflowConfig config) {
@@ -21,7 +23,7 @@ public class OpenBugNumberUrls extends BaseCommitAction {
     @Override
     public void process() {
         String[] bugNumbers = draft.bugNumbers.split(",");
-        log.info("Opening urls for bug number{} {}", bugNumbers.length > 1 ? "s" : "", draft.bugNumbers);
+        log.debug("Opening url for bug {} {}", pluralizeDescription(bugNumbers.length, "number"), draft.bugNumbers);
         for (String bugNumber : bugNumbers) {
             bugNumber = bugNumber.trim();
             Integer bugzillaNumber = bugzillaConfig.parseBugzillaBugNumber(bugNumber);

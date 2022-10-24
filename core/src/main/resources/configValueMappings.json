@@ -5,7 +5,8 @@
   ],
   "DisplayBuildOutputForBuildwebBuilds": [
     "--include-in-progress",
-    "--log-line-count"
+    "--log-line-count",
+    "--sandbox-build-number"
   ],
   "AppendTextToFile": [
     "--input-text",
@@ -132,6 +133,11 @@
     "--property-value",
     "--cipher-key",
     "--output-variable-name"
+  ],
+  "FindTestClassesRunOutOfOrder": [
+    "--log-line-count",
+    "--jenkins-jobs",
+    "--job-build-number"
   ],
   "BaseCommitReadAction": [
     "--set-empty-only"
@@ -521,6 +527,18 @@
     "--username",
     "--sso-email"
   ],
+  "PowerOffVm": [
+    "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
+    "--vcd-sso",
+    "--vcd-org",
+    "--username",
+    "--vcd-url",
+    "--sso-email",
+    "--wait-time",
+    "--wait-for-action"
+  ],
   "OpenVcdProviderApp": [
     "--vcd-cell-index"
   ],
@@ -579,6 +597,18 @@
     "--use-vapp-json",
     "--vcd-check-quota"
   ],
+  "PowerOnVm": [
+    "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
+    "--vcd-sso",
+    "--vcd-org",
+    "--username",
+    "--vcd-url",
+    "--sso-email",
+    "--wait-time",
+    "--wait-for-action"
+  ],
   "DisplayConfig": [
     "--specific-properties"
   ],
@@ -633,6 +663,16 @@
   "BaseTrelloAction": [
     "--trello-sso",
     "--username",
+    "--sso-email"
+  ],
+  "BaseSingleVappAction": [
+    "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
+    "--vcd-sso",
+    "--vcd-org",
+    "--username",
+    "--vcd-url",
     "--sso-email"
   ],
   "SetCommitDetailsFromReview": [

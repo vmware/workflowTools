@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,7 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
@@ -32,7 +32,9 @@ import static com.vmware.jenkins.domain.TestResults.JUNIT_ROOT;
 
 public class TestResult extends BaseDbClass {
 
-    private static final String SUSPECTS_TITLE = "Commits between last pass and first failure, guilty until proven innocent";
+
+    private static final String DIFF = "DIFF";
+    private static final String DIFF_TITLE = "Commits between %s and %s, guilty until proven innocent";
     private static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
     private static final SimpleDateFormat START_DAY_FORMATTER = new SimpleDateFormat("MMM dd");
     public String name;
@@ -179,23 +181,25 @@ public class TestResult extends BaseDbClass {
 
     public String testLinks(String commitComparisonUrl) {
         List<TestResult> sortedTestRuns = testRuns.stream().sorted(Comparator.comparing(TestResult::buildNumber)).collect(Collectors.toList());
-        String resultLinks = sortedTestRuns.stream().map(this::testResultLink).collect(Collectors.joining(System.lineSeparator()));
+        List<String> resultLinks = new ArrayList<>();
+        if (StringUtils.isNotBlank(commitComparisonUrl)) {
+            for (int i = 0; i < sortedTestRuns.size(); i++) {
+                TestResult currentTestResult = sortedTestRuns.get(i);
+                resultLinks.add(testResultLink(currentTestResult));
+                TestResult nextTestResult = i < sortedTestRuns.size() - 1 ? sortedTestRuns.get(i + 1) : null;
 
-        sortedTestRuns.sort(Comparator.comparing(TestResult::buildNumber).reversed());
-        Optional<TestResult> lastPassingResult =
-                IntStream.range(1, sortedTestRuns.size()).mapToObj(sortedTestRuns::get).filter(method -> TestStatus.isPass(method.status)).findFirst();
-
-        if (lastPassingResult.isPresent() && StringUtils.isNotBlank(commitComparisonUrl) && StringUtils.isNotBlank(lastPassingResult.get().commitId)) {
-            TestResult firstFailure = sortedTestRuns.get(sortedTestRuns.indexOf(lastPassingResult.get()) - 1);
-            String suspectsUrl = commitComparisonUrl.replace("(first)", lastPassingResult.get().commitId)
-                    .replace("(second)", firstFailure.commitId);
-
-            String suspectsLink = String.format("<a class =\"suspects\" href=\"%s\" title=\"%s\" %s>SUSPECTS</a>",
-                    suspectsUrl, SUSPECTS_TITLE, LINK_IN_NEW_TAB);
-            return suspectsLink + System.lineSeparator() + resultLinks;
-        } else {
-            return resultLinks;
+                if (nextTestResult != null && TestStatus.isPass(currentTestResult.status) && !TestStatus.isPass(nextTestResult.status)
+                        && StringUtils.isNotBlank(currentTestResult.commitId) && StringUtils.isNotBlank(nextTestResult.commitId)) {
+                    String suspectsUrl = commitComparisonUrl.replace("(first)", currentTestResult.commitId)
+                            .replace("(second)", nextTestResult.commitId);
+                    String suspectsTitle = String.format(DIFF_TITLE, currentTestResult.buildNumber, nextTestResult.buildNumber);
+                    String suspectsLink = String.format("<a class =\"suspects\" href=\"%s\" title=\"%s\" %s>%s</a>",
+                            suspectsUrl, suspectsTitle, LINK_IN_NEW_TAB, DIFF);
+                    resultLinks.add(suspectsLink);
+                }
+            }
         }
+        return String.join(System.lineSeparator(), resultLinks);
     }
 
     public boolean containsBuildNumbers(int... buildNumber) {

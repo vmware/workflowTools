@@ -32,6 +32,8 @@ public class Sites {
         public List<AviController> aviControllers;
         public DatabaseServer databaseServer;
 
+        public AmqpServer amqpServer;
+
         public List<VmInfo> unknownVms;
 
 
@@ -46,6 +48,7 @@ public class Sites {
 
             Stream.of(cells, vcServers, globalNsxManagers, nsxManagers, aviControllers, unknownVms).filter(Objects::nonNull).flatMap(Collection::stream).forEach(vms::add);
             vms.add(databaseServer);
+            vms.add(amqpServer);
             vms.removeIf(Objects::isNull);
             return vms;
         }
@@ -300,6 +303,17 @@ public class Sites {
         @Override
         public String getLoggedInUrlPattern() {
             return getUiUrl() + ".+?applications/dashboard";
+        }
+    }
+
+    public class AmqpServer extends DeployedVM {
+        @Override
+        public Credentials getSshCredentials() {
+            if (deployment != null && deployment.guestProperties != null && deployment.guestProperties.adminPassword != null) {
+                return new Credentials("root", deployment.guestProperties.adminPassword);
+            } else {
+                return super.getSshCredentials();
+            }
         }
     }
 

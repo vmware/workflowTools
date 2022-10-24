@@ -4,6 +4,7 @@ import com.vmware.action.base.BaseSingleVappJsonAction;
 import com.vmware.chrome.ChromeDevTools;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.CollectionUtils;
 import com.vmware.util.SystemUtils;
 import com.vmware.vcd.domain.Sites;
 
@@ -24,6 +25,9 @@ public class OpenVcdProviderApp extends BaseSingleVappJsonAction {
         Sites.Site selectedSite = vappData.getSelectedSite();
         if (selectedSite.loadBalancer != null) {
             log.info("Using loadbalancer url {}", selectedSite.loadBalancer.endPointURI);
+            if (selectedSite.loadBalancer.credentials == null && CollectionUtils.isNotEmpty(selectedSite.cells)) {
+                selectedSite.loadBalancer.credentials = selectedSite.cells.get(0).credentials;
+            }
             return selectedSite.loadBalancer;
         }
         if (vappData.getSelectedVcdCell() == null) {

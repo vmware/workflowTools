@@ -144,7 +144,7 @@
       "ReadPendingChangelist",
       "ExitIfCommitDoesNotHaveAChangelistId"
     ],
-    "openBugs": [
+    "openBug": [
       "ReadLastCommit",
       "ExitIfCommitHasNoBugNumber",
       "OpenBugNumberUrls"
@@ -513,6 +513,12 @@
       "CheckStatusOfReviewShipIts",
       "AmendCommit"
     ],
+    "checkSandboxStatus": [
+      "ReadLastCommit",
+      "CheckStatusOfBuildwebBuilds",
+      "DisplayBuildOutputForBuildwebBuilds",
+      "AmendCommit"
+    ],
     "resolveIssue": [
       "ReadLastCommit",
       "ExitIfCommitHasNoBugNumber",
@@ -864,6 +870,14 @@
       "selectVapp",
       "PowerOffVapp"
     ],
+    "powerOnVm": [
+      "selectVapp",
+      "PowerOnVm"
+    ],
+    "powerOffVm": [
+      "selectVapp",
+      "PowerOffVm"
+    ],
     "renameVapp": [
       "selectVapp",
       "RenameVapp"
@@ -909,8 +923,7 @@
       "OpenVcdTenantApp"
     ],
     "openVm": [
-      "selectVcdSite",
-      "SelectVappVm",
+      "selectVappVm",
       "OpenVappVm"
     ],
     "openVmAndLogin" : [
@@ -935,8 +948,7 @@
       "OpenSshShell"
     ],
     "openVmSshShell": [
-      "selectVcdSite",
-      "SelectVappVm",
+      "selectVappVm",
       "OpenSshShell"
     ],
     "openVcdDatabaseSshShell": [
@@ -971,6 +983,10 @@
       "LoadVapps",
       "SelectVapp",
       "ExitIfNoVappSelected"
+    ],
+    "selectVappVm": [
+      "selectVcdSite",
+      "SelectVappVm"
     ],
     "showVappMetadataKeys": [
       "selectVapp",
