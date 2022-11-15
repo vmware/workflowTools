@@ -11,6 +11,20 @@ public class ArrayUtils {
         return Arrays.asList(values).contains(valueToFind);
     }
 
+    public static Integer[] add(Integer[] existingValues, Integer[] values) {
+        if (values == null) {
+            return existingValues;
+        }
+        if (existingValues == null) {
+            return values;
+        }
+
+        for (Integer value : values) {
+            existingValues = add(existingValues, value);
+        }
+        return existingValues;
+    }
+
     public static Integer[] add(Integer[] existingValues, int value) {
         if (existingValues == null) {
             return new Integer[] { value } ;

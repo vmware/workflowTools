@@ -11,11 +11,11 @@ import com.vmware.util.SystemUtils;
 public class OpenFile extends BaseAction {
     public OpenFile(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("destinationFile");
+        super.addFailWorkflowIfBlankProperties("sourceFile");
     }
 
     @Override
     public void process() {
-        SystemUtils.openUrl(new File(fileSystemConfig.destinationFile).getAbsolutePath());
+        SystemUtils.openUrl(new File(fileSystemConfig.sourceFile).getAbsolutePath());
     }
 }

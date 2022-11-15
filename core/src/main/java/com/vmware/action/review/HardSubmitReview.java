@@ -27,6 +27,6 @@ public class HardSubmitReview extends BaseCommitUsingReviewBoardAction {
         reviewRequest.description = determineSubmittedDescription();
 
         reviewBoard.updateReviewRequest(reviewRequest);
-        log.info("Successfully marked review request as submitted");
+        log.info("Marked review request {} as submitted", reviewRequest.id);
     }
 }

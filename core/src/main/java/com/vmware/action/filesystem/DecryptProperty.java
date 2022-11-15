@@ -26,28 +26,15 @@ public class DecryptProperty extends BaseAction {
     }
 
     @Override
-    public void checkIfActionShouldBeSkipped() {
-        try {
-            super.checkIfActionShouldBeSkipped();
-        } catch (SkipActionException sae) {
-            if (StringUtils.isNotBlank(fileSystemConfig.outputVariableName)) {
-                replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
-            }
-            throw sae;
-        }
-    }
-
-    @Override
     public void process() {
         try {
             byte[] realKey = Base64.getDecoder().decode(sslConfig.cipherKey);
 
             String decryptedValue = decryptValue(realKey, fileSystemConfig.propertyValue);
             log.debug("Decrypted value {} for value {}", decryptedValue, fileSystemConfig.propertyValue);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, decryptedValue, false);
+            replacementVariables.addVariable(fileSystemConfig.outputVariableName, decryptedValue);
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
             throw new SkipActionException("failed to decrypt value {}. Check if the cipher key is correct.\n{}",
                     fileSystemConfig.propertyValue, StringUtils.exceptionAsString(e));
         }

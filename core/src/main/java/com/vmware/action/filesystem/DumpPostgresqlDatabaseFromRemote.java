@@ -34,7 +34,7 @@ public class DumpPostgresqlDatabaseFromRemote extends ScpFileFromRemote {
                 ? sshConfig.sourceDatabaseSchemaName : vappData.getSelectedSite().databaseServer.dbname;
         String outputFile = sourceSchemaName + new SimpleDateFormat("_yyyyddhh_HHmmss").format(new Date()) + ".sql";
         executeSshCommand(sourceDatabaseSiteConfig, String.format("pg_dump -U postgres -d %s -f %s", sourceSchemaName, outputFile));
-        copyFile(sourceDatabaseSiteConfig, outputFile, fileSystemConfig.destinationFile);
+        copyFile(sourceDatabaseSiteConfig, outputFile, fileSystemConfig.destinationFile, null);
         executeSshCommand(sourceDatabaseSiteConfig, "rm -f " + outputFile);
     }
 

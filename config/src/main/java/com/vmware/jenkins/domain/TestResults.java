@@ -1,8 +1,5 @@
 package com.vmware.jenkins.domain;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -12,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 
@@ -63,8 +61,11 @@ public class TestResults {
         return build;
     }
 
-    public int totalFailures() {
-        return failConfig + failCount;
+    public void addFetchedConfigFailure(TestResult testResult) {
+        testResult.packagePath = MatcherUtils.singleMatchExpected(testResult.url, "testngreports/(.+?)/");
+        testResult.buildNumber = build.buildNumber;
+        testResult.commitId = build.commitId;
+        testResults().add(testResult);
     }
 
     public List<TestResult> testResults() {
@@ -82,13 +83,7 @@ public class TestResults {
                         testResult.buildNumber = build.buildNumber;
                         testResult.commitId = build.commitId;
                         testResult.setUrlForTestMethod(build.getTestReportsUIUrl(), usedUrls);
-                        if (testResult.status == SKIP && StringUtils.isNotBlank(testResult.exception) && !usedSkipExceptions.contains(testResult.exception)) {
-                            testResult.similarSkips = Math.toIntExact(
-                                    stream(clazz.testResults).filter(method -> method.status == SKIP
-                                            && StringUtils.equals(method.exception, testResult.exception)).count() - 1);
-                            usedSkipExceptions.add(testResult.exception);
-                        }
-                        usedUrls.add(testResult.url);
+                        addExceptionForSkippedMethodIfNeeded(usedUrls, usedSkipExceptions, testResult, clazz.testResults);
                         loadedTestResults.add(testResult);
                     }
                 }
@@ -115,13 +110,7 @@ public class TestResults {
                     if (StringUtils.isNotBlank(testResult.errorStackTrace)) {
                         testResult.exception = testResult.errorStackTrace;
                     }
-                    if (testResult.status == SKIP && StringUtils.isNotBlank(testResult.exception) && !usedSkipExceptions.contains(testResult.exception)) {
-                        testResult.similarSkips = Math.toIntExact(
-                                stream(suite.testResults).filter(method -> method.status == SKIP
-                                        && StringUtils.equals(method.exception, testResult.exception)).count() - 1);
-                        usedSkipExceptions.add(testResult.exception);
-                    }
-                    usedUrls.add(testResult.url);
+                    addExceptionForSkippedMethodIfNeeded(usedUrls, usedSkipExceptions, testResult, suite.testResults);
                     loadedTestResults.add(testResult);
                 }
             }
@@ -131,12 +120,19 @@ public class TestResults {
         return loadedTestResults;
     }
 
-    public List<TestResult> failedTestResults() {
-        return testResults().stream().filter(result -> result.status != PASS).sorted(Comparator.comparing(TestResult::getStartedAt)).collect(Collectors.toList());
+    private void addExceptionForSkippedMethodIfNeeded(Set<String> usedUrls, Set<String> usedSkipExceptions, TestResult testResult, TestResult[] testResults) {
+        if (testResult.status == SKIP && StringUtils.isNotBlank(testResult.exception) && !usedSkipExceptions.contains(testResult.exception)) {
+            testResult.similarSkips = Math.toIntExact(
+                    stream(testResults).filter(method -> method.status == SKIP
+                            && StringUtils.equals(method.exception, testResult.exception)).count() - 1);
+            usedSkipExceptions.add(testResult.exception);
+        }
+        usedUrls.add(testResult.url);
+
     }
 
-    public void setLoadedTestResults(List<TestResult> loadedTestResults) {
-        this.loadedTestResults = loadedTestResults;
+    public List<TestResult> failedTestResults() {
+        return testResults().stream().filter(result -> result.status != PASS).sorted(Comparator.comparing(TestResult::getStartedAt)).collect(Collectors.toList());
     }
 
     public static class Package {

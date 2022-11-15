@@ -67,7 +67,7 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
 
-        log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, new Date().toString());
+        log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, new Date());
         File destinationFile = new File(fileSystemConfig.destinationFile);
         createDbUtilsIfNeeded();
         HomePage homePage;
@@ -100,6 +100,9 @@ public class FindRealTestFailures extends BaseAction {
         if (this.jenkinsExecutor != null) {
             log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
                     jenkinsConfig.maxJenkinsBuildsToCheck);
+            if (jenkinsConfig.forceRefetch) {
+                log.info("forceRefetch is set to true so all builds will be refetched");
+            }
 
             matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
         } else {
@@ -294,7 +297,8 @@ public class FindRealTestFailures extends BaseAction {
         final int lastBuildNumberToCheck = builds.get(numberOfBuildsToCheck - 1).buildNumber;
 
         List<JobBuild> usableBuilds = builds.stream()
-                .filter(build -> build.buildNumber >= lastBuildNumberToCheck && !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck))
+                .filter(build -> build.buildNumber >= lastBuildNumberToCheck
+                        && (jenkinsConfig.forceRefetch || !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck)))
                 .collect(toList());
         job.usefulBuilds = usableBuilds.stream().parallel()
                 .map(build -> jenkinsExecutor.execute(j -> j.getJobBuildDetails(build)))

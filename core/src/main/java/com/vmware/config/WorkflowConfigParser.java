@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,10 @@ public class WorkflowConfigParser {
         argsParser.generateArgumentMap(args);
 
         WorkflowConfig config = readInternalConfig();
+        if (config.mainWorkflowHelpMessages == null) {
+            config.mainWorkflowHelpMessages = new HashMap<>();
+        }
+        config.mainWorkflowHelpMessages.putAll(workflowHelpMessages());
         if (StringUtils.isNotEmpty(username)) {
             config.username = username;
         }
@@ -198,5 +203,10 @@ public class WorkflowConfigParser {
     private WorkflowConfig readInternalConfig() {
         Reader reader = new ClasspathResource("/internalConfig.json", this.getClass()).getReader();
         return gson.fromJson(reader, WorkflowConfig.class);
+    }
+
+    private Map<String, Map<String, String>> workflowHelpMessages() {
+        Reader reader = new ClasspathResource("/mainWorkflowsHelp.json", this.getClass()).getReader();
+        return new ConfiguredGsonBuilder().build().fromJson(reader, Map.class);
     }
 }

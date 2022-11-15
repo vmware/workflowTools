@@ -35,7 +35,7 @@ public class ExecuteLocalSqlStatementUsingPsql extends BaseAction {
             throw new FatalException(output);
         } else if (StringUtils.isNotBlank(output) && StringUtils.isNotBlank(fileSystemConfig.outputVariableName)) {
             log.info("Saving output {} to output variable {}", output, fileSystemConfig.outputVariableName);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, output, false);
+            replacementVariables.addVariable(fileSystemConfig.outputVariableName, output);
         } else if (StringUtils.isNotBlank(fileSystemConfig.outputVariableName)) {
             log.info("No value to set to output variable {}", fileSystemConfig.outputVariableName);
         }

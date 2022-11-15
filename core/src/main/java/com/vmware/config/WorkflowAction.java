@@ -16,11 +16,14 @@ import com.vmware.action.base.BaseCommitAction;
 import com.vmware.action.base.BaseIssuesProcessingAction;
 import com.vmware.action.base.BaseVappAction;
 import com.vmware.action.trello.BaseTrelloAction;
+import com.vmware.config.section.FileSystemConfig;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.util.ReflectionUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.exception.SkipActionException;
+import org.slf4j.LoggerFactory;
 
 import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Arrays.asList;
@@ -47,12 +50,6 @@ public class WorkflowAction implements Action {
 
     public String getActionClassName() {
         return actionClass.getSimpleName();
-    }
-
-    public List<String> configFlagsToRemoveFromCompleter() {
-        return actionClassesToCheck.stream().filter(clazz -> clazz.isAnnotationPresent(ActionDescription.class))
-                .map(actionClazz -> actionClazz.getAnnotation(ActionDescription.class).configFlagsToExcludeFromCompleter())
-                .flatMap(Arrays::stream).collect(Collectors.toList());
     }
 
     public List<String> configFlagsToAlwaysRemoveFromCompleter() {
@@ -107,6 +104,11 @@ public class WorkflowAction implements Action {
         try {
             instantiatedAction.checkIfActionShouldBeSkipped();
         } catch (SkipActionException ce) {
+            FileSystemConfig fileSystemConfig = config.fileSystemConfig;
+            if (StringUtils.isNotBlank(fileSystemConfig.outputVariableName) && !config.replacementVariables.hasVariable(fileSystemConfig.outputVariableName)) {
+                LoggerFactory.getLogger(actionClass).debug("Setting empty value for variable {}", fileSystemConfig.outputVariableName);
+                config.replacementVariables.addVariable(fileSystemConfig.outputVariableName, "");
+            }
             resetConfigValues();
             throw ce;
         }

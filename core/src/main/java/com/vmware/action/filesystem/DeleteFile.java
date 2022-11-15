@@ -21,9 +21,19 @@ public class DeleteFile extends BaseAction {
             log.info("File {} does not exist", sourceFile.getAbsolutePath());
             return;
         }
-        boolean fileDeleted = sourceFile.delete();
+        boolean fileDeleted = deleteFile(sourceFile);
         if (!fileDeleted) {
             log.warn("File {} might not be deleted!", sourceFile.getAbsolutePath());
         }
+    }
+
+    boolean deleteFile(File fileToBeDeleted) {
+        File[] allContents = fileToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteFile(file);
+            }
+        }
+        return fileToBeDeleted.delete();
     }
 }

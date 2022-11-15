@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.vmware.action.info.DisplayLineBreak;
 import com.vmware.action.info.DisplayInfo;
@@ -57,20 +58,6 @@ import jline.console.completer.ArgumentCompleter;
  * Main class for running the workflow application.
  */
 public class Workflow {
-    public static final List<String> BATCH_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("createTrelloBoardFromLabel", "createTrelloBoardFromFixVersion", "setStoryPointsForBoard", "closeOldReviews"));
-
-    public static final List<String> GIT_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("commit", "commitAll", "amendCommit", "amendCommitAll", "review", "pushable", "push", "merge")
-    );
-
-    public static final List<String> PERFORCE_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("moveOpenFilesToPendingChangelist", "review", "pushable", "submit"));
-
-    public static final List<String> VAPP_MAIN_WORKFLOWS = Collections.unmodifiableList(
-            Arrays.asList("deleteVapp", "renameVapp", "updateVappLease", "tailVappLogFile", "displayVappJson", "openVappProvider")
-    );
-
     private static final String QUIT_WORKFLOW = "q";
     private final Git git = new Git();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -89,8 +76,8 @@ public class Workflow {
     }
 
     private void init() {
-        readWorkflowHistoryFile();
         config = configParser.parseWorkflowConfig(username, args);
+        readWorkflowHistoryFile();
         username = config.username;
         serviceLocator = new ServiceLocator(config);
         askForWorkflowIfEmpty(firstTime);
@@ -106,8 +93,8 @@ public class Workflow {
         if (workflowHistory.isEmpty() || !workflowHistory.get(0).equals(argumentsText)) {
             workflowHistory.add(0, argumentsText);
         }
-        if (workflowHistory.size() > 10) {
-            workflowHistory.remove(10);
+        if (workflowHistory.size() > config.maxHistory) {
+            workflowHistory.remove(config.maxHistory);
         }
         String userHome = System.getProperty("user.home");
         File workflowHistoryFile = new File(userHome + File.separator + ".workflowHistory.txt");
@@ -121,6 +108,12 @@ public class Workflow {
             workflowHistory = new ArrayList<>();
         } else {
             workflowHistory = IOUtils.readLines(workflowHistoryFile);
+            if (workflowHistory.size() > config.maxHistory) {
+                log.info("Trimming workflow history from {} entries to {}", workflowHistory.size(), config.maxHistory);
+                if (workflowHistory.size() > config.maxHistory) {
+                    workflowHistory.subList(config.maxHistory, workflowHistory.size()).clear();
+                }
+            }
         }
     }
 

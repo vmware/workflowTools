@@ -24,27 +24,14 @@ public class UnwrapCipherKey extends BaseAction {
     }
 
     @Override
-    public void checkIfActionShouldBeSkipped() {
-        try {
-            super.checkIfActionShouldBeSkipped();
-        } catch (SkipActionException sae) {
-            if (StringUtils.isNotBlank(fileSystemConfig.outputVariableName)) {
-                replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
-            }
-            throw sae;
-        }
-    }
-
-    @Override
     public void process() {
         try {
             byte[] cipherKey = Base64.getDecoder().decode(sslConfig.cipherKey);
             byte[] realKey = unwrap(cipherKey, fileSystemConfig.propertyValue);
             String encodedRealKey = Base64.getEncoder().encodeToString(realKey);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, encodedRealKey, false);
+            replacementVariables.addVariable(fileSystemConfig.outputVariableName, encodedRealKey);
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
             throw new SkipActionException("failed to unwrap value {}. Check if the cipher key is correct.\n{}",
                     fileSystemConfig.propertyValue, StringUtils.exceptionAsString(e));
         }

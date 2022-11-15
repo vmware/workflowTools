@@ -27,28 +27,15 @@ public class EncryptProperty extends BaseAction {
     }
 
     @Override
-    public void checkIfActionShouldBeSkipped() {
-        try {
-            super.checkIfActionShouldBeSkipped();
-        } catch (SkipActionException sae) {
-            if (StringUtils.isNotBlank(fileSystemConfig.outputVariableName)) {
-                replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
-            }
-            throw sae;
-        }
-    }
-
-    @Override
     public void process() {
         try {
             byte[] realKey = Base64.getDecoder().decode(sslConfig.cipherKey);
 
             String encryptedValue = encrypt(realKey, fileSystemConfig.propertyValue);
             log.debug("Encrypted value {} for value {}", encryptedValue, fileSystemConfig.propertyValue);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, encryptedValue, false);
+            replacementVariables.addVariable(fileSystemConfig.outputVariableName, encryptedValue);
         } catch (Exception e) {
             log.debug(e.getMessage(), e);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
             throw new SkipActionException("failed to encrypt value {}\n{}", fileSystemConfig.propertyValue, StringUtils.exceptionAsString(e));
         }
     }

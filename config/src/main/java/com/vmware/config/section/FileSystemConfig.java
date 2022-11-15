@@ -32,6 +32,9 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--skip-backup", help = "Skip backup")
     public boolean skipBackup;
 
+    @ConfigurableProperty(commandLine = "--backup-file-pattern", help = "Regex pattern to build list of backup files")
+    public String backupFilePattern;
+
     @ConfigurableProperty(commandLine = "--overwrite-backup", help = "Overwrite existing file if present on backup")
     public boolean overwriteBackup;
 
@@ -68,7 +71,7 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--json-property-path", help = "Json property path")
     public String jsonPropertyPath;
 
-    @ConfigurableProperty(commandLine = "--file-data", help = "Read in file data directly from command line")
+    @ConfigurableProperty(commandLine = "--file-data", help = "Loaded file data")
     public String fileData;
 
     @ConfigurableProperty(commandLine = "--regex", help = "Regular expression to use")

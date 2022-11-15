@@ -36,10 +36,18 @@ public class TestResult extends BaseDbClass {
     private static final String DIFF = "DIFF";
     private static final String DIFF_TITLE = "Commits between %s and %s, guilty until proven innocent";
     private static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
-    private static final SimpleDateFormat START_DAY_FORMATTER = new SimpleDateFormat("MMM dd");
+    private static final SimpleDateFormat START_TIME_FORMATTER = new SimpleDateFormat("MMM dd hh:mm aa");
     public String name;
     @Expose(serialize = false, deserialize = false)
     public Long jobBuildId;
+
+    @DbSaveIgnore
+    @Expose(serialize = false, deserialize = false)
+    public Long jobId;
+
+    @DbSaveIgnore
+    @Expose(serialize = false, deserialize = false)
+    public boolean configMethodFailure;
 
     public TestStatus status;
 
@@ -100,6 +108,7 @@ public class TestResult extends BaseDbClass {
         this.className = methodToClone.className;
         this.parameters = methodToClone.parameters;
         this.jobBuildId = methodToClone.jobBuildId;
+        this.jobId = methodToClone.jobId;
         this.status = status;
         this.commitId = build.commitId;
         this.startedAt = build.buildTimestamp;
@@ -249,19 +258,25 @@ public class TestResult extends BaseDbClass {
             throw new RuntimeException("Bad build number for test " + testResult.name);
         }
         switch (testResult.status) {
-        case PRESUMED_PASS:
-            presumedPassedBuilds = ArrayUtils.add(presumedPassedBuilds, testResult.buildNumber);
-            break;
-        case PASS:
-            passedBuilds = ArrayUtils.add(passedBuilds, testResult.buildNumber);
-            break;
-        case FAIL:
-            failedBuilds = ArrayUtils.add(failedBuilds, testResult.buildNumber);
-            break;
-        case SKIP:
-            skippedBuilds = ArrayUtils.add(skippedBuilds, testResult.buildNumber);
-            break;
+            case PRESUMED_PASS:
+                presumedPassedBuilds = ArrayUtils.add(presumedPassedBuilds, testResult.buildNumber);
+                break;
+            case PASS:
+                passedBuilds = ArrayUtils.add(passedBuilds, testResult.buildNumber);
+                break;
+            case FAIL:
+                failedBuilds = ArrayUtils.add(failedBuilds, testResult.buildNumber);
+                break;
+            case SKIP:
+                skippedBuilds = ArrayUtils.add(skippedBuilds, testResult.buildNumber);
+                break;
         }
+
+        passedBuilds = ArrayUtils.add(passedBuilds, testResult.passedBuilds);
+        presumedPassedBuilds = ArrayUtils.add(presumedPassedBuilds, testResult.presumedPassedBuilds);
+        failedBuilds = ArrayUtils.add(failedBuilds, testResult.failedBuilds);
+        skippedBuilds = ArrayUtils.add(skippedBuilds, testResult.skippedBuilds);
+
         if (testResult.status != TestStatus.PRESUMED_PASS) {
             presumedPassedBuilds = ArrayUtils.remove(presumedPassedBuilds, testResult.buildNumber);
         }
@@ -279,6 +294,7 @@ public class TestResult extends BaseDbClass {
         this.exception = testResult.exception;
         this.startedAt = testResult.startedAt;
         this.duration = testResult.duration;
+        this.parameters = testResult.parameters;
     }
 
     public TestStatusOnBuildRemoval removeUnimportantTestResultsForBuild(JobBuild build, int lastBuildToKeepNumber) {
@@ -312,12 +328,15 @@ public class TestResult extends BaseDbClass {
         return UPDATEABLE;
     }
 
-    public boolean matchesByDataProviderIndex(TestResult testResult) {
-        if (!this.fullPackageAndTestName().equals(testResult.fullPackageAndTestName())) {
+    public boolean matchesByUrlPath(TestResult testResult) {
+        if (this.jobId == null || !this.jobId.equals(testResult.jobId)) {
             return false;
         }
+        return this.testPath().equalsIgnoreCase(testResult.testPath());
+    }
 
-        return Objects.equals(dataProviderIndex, testResult.dataProviderIndex);
+    public String testPath() {
+        return StringUtils.substringAfterLast(url, "testngreports/");
     }
 
     @Override
@@ -331,8 +350,7 @@ public class TestResult extends BaseDbClass {
 
     private String testResultLink(TestResult testResult) {
         String commitIdSuffix = StringUtils.isNotBlank(testResult.commitId) ? " with commit " + testResult.commitId : "";
-        String title = String.format("%s in build %s on %s%s", testResult.status.getDescription(), testResult.buildNumber,
-                START_DAY_FORMATTER.format(testResult.getStartedAt()), commitIdSuffix);
+        String title = String.format("%s on %s%s", testResult.status.getDescription(), START_TIME_FORMATTER.format(testResult.getStartedAt()), commitIdSuffix);
         return String.format("<a class =\"%s\" href = \"%s\" title=\"%s\" %s>%s</a>", testResult.status.cssClass, testResult.url, title,
                 LINK_IN_NEW_TAB, testResult.buildNumber);
     }

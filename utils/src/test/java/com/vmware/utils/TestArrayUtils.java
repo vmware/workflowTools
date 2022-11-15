@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +32,17 @@ public class TestArrayUtils {
         Integer[] startingArray = new Integer[] {56, 23, 34};
         Integer[] updatedArray = ArrayUtils.remove(startingArray, 23);
         assertEquals(Arrays.toString(new Integer[] {56, 34}), Arrays.toString(updatedArray));
+    }
+
+    @Test
+    public void maxCheck() {
+        Integer[] passedBuilds = new Integer[] {183, 184};
+        Integer[] presumedPassedBuilds = new Integer[] {181};
+        int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMap(Arrays::stream).mapToInt(Integer::intValue).max().orElse(-1);
+        assertEquals(184, newestPass);
+        Integer firstValue = 108;
+        int secondValue = 109;
+        assertTrue(secondValue > firstValue);
     }
 
     @Test

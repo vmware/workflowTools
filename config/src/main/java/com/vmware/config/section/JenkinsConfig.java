@@ -97,6 +97,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--regenerate-html", help = "Regenerate test failures from database only")
     public boolean regenerateHtml;
 
+    @ConfigurableProperty(commandLine = "--force-refetch", help = "Refetch test results for all builds from Jenkins")
+    public boolean forceRefetch;
+
     public boolean hasConfiguredArtifact() {
         return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;
     }

@@ -91,9 +91,9 @@
   "DecryptProperty": [
     "--cipher-salt-length",
     "--cipher",
+    "--output-variable-name",
     "--property-value",
-    "--cipher-key",
-    "--output-variable-name"
+    "--cipher-key"
   ],
   "SaveFileData": [
     "--file-data",
@@ -115,6 +115,10 @@
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
   ],
+  "CopyFile": [
+    "--destination-file",
+    "--source-file"
+  ],
   "LoadFileData": [
     "--file-data",
     "--source-file"
@@ -130,9 +134,9 @@
   "EncryptProperty": [
     "--cipher",
     "--cipher-salt-length",
+    "--output-variable-name",
     "--property-value",
-    "--cipher-key",
-    "--output-variable-name"
+    "--cipher-key"
   ],
   "FindTestClassesRunOutOfOrder": [
     "--log-line-count",
@@ -295,6 +299,9 @@
   "SetDefaultApprover": [
     "--approver"
   ],
+  "DeletePostgresDatabase": [
+    "--database-schema-name"
+  ],
   "SetJsonProperty": [
     "--file-data",
     "--property-value",
@@ -302,9 +309,9 @@
   ],
   "UnwrapCipherKey": [
     "--cipher",
+    "--output-variable-name",
     "--property-value",
-    "--cipher-key",
-    "--output-variable-name"
+    "--cipher-key"
   ],
   "SaveDiffToFile": [
     "--output-file"
@@ -370,6 +377,10 @@
     "--sso-email",
     "--wait-time"
   ],
+  "LoadFileAsVariable": [
+    "--output-variable-name",
+    "--source-file"
+  ],
   "SetSummary": [
     "--set-empty-only"
   ],
@@ -429,6 +440,13 @@
   ],
   "PushToPrecommitBranch": [
     "--username"
+  ],
+  "ExitIfVariableIsUnset": [
+    "--variable"
+  ],
+  "SetVariable": [
+    "--input-text",
+    "--variable"
   ],
   "BackupFile": [
     "--overwrite-backup",
@@ -557,11 +575,6 @@
   "SetReviewId": [
     "--username"
   ],
-  "ConvertStringColumnToArray": [
-    "--database-url",
-    "--database-driver-class",
-    "--database-driver-file"
-  ],
   "PowerOffVapp": [
     "--sso-headless",
     "--disable-vcd-refresh",
@@ -573,6 +586,11 @@
     "--sso-email",
     "--wait-time",
     "--wait-for-action"
+  ],
+  "SelectBackup": [
+    "--output-variable-name",
+    "--backup-file-pattern",
+    "--source-file"
   ],
   "ExitIfReusingPostgresDatabaseNotAllowed": [
     "--database-schema-name"
@@ -639,7 +657,7 @@
     "--use-vapp-json"
   ],
   "OpenFile": [
-    "--destination-file"
+    "--source-file"
   ],
   "SkipPipelineIfSet": [
     "--skip-pipeline"
@@ -657,8 +675,9 @@
     "--file-data",
     "--ssh-strict-host-checking",
     "--ignore-unknown",
-    "--destination-file",
-    "--source-file"
+    "--source-file",
+    "--output-variable-name",
+    "--destination-file"
   ],
   "BaseTrelloAction": [
     "--trello-sso",
@@ -749,6 +768,7 @@
     "--database-url",
     "--database-driver-class",
     "--database-driver-file",
+    "--force-refetch",
     "--max-builds",
     "--regenerate-html",
     "--destination-file",

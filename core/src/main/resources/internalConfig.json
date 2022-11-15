@@ -19,6 +19,7 @@
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 5,
   "maxCommitsToCheck": 500,
+  "maxHistory": 100,
   "commitIdInDescriptionPattern": "CL\\s+(\\w+)",
   "newKeystoreType": "PKCS12",
   "cipherKeyAlgorithm": "AES",
@@ -1018,8 +1019,10 @@
       "--specific-properties=buildInfo"
     ],
     "intro": [
+      "DisplayProjectDocumentationUrl",
       "GettingStarted",
-      "DisplayMainWorkflows"
+      "DisplayMainWorkflows",
+      "DisplayProjectDocumentationUrl"
     ],
     "help": [
       "DisplayApiTokensInfo",
@@ -1029,12 +1032,15 @@
       "DisplayMainWorkflows",
       "DisplayAdditionalWorkflows"
     ],
+    "man": [
+      "intro"
+    ],
     "openDoc": [
       "OpenProjectDocumentationUrl"
     ],
     "showRealTestFailures": [
       "FindRealTestFailures",
-      "OpenFile"
+      "OpenFile&&--source-file=$destinationFile"
     ],
     "showCommitsForEpic": [
       "LoadAllIssuesForEpic",

@@ -28,6 +28,7 @@ import com.vmware.jenkins.domain.TestResults;
 import com.vmware.jenkins.domain.User;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
+import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.input.InputUtils;
@@ -95,10 +96,40 @@ public class Jenkins extends AbstractRestBuildService {
         try {
             TestResults results = get(determineTestReportsApiUrl(jobBuild), TestResults.class);
             results.setBuild(jobBuild);
+            if (results.failConfig > 0) {
+                addFailedConfigTestsViaJobHtmlPage(jobBuild, results);
+            }
             return results;
         } catch (NotFoundException nfe) {
             log.info("Failed to find test results for job build {}", jobBuild.name);
             return new TestResults(jobBuild);
+        }
+    }
+
+    private void addFailedConfigTestsViaJobHtmlPage(JobBuild jobBuild, TestResults results) {
+        String testngReportsUrl = UrlUtils.addTrailingSlash(jobBuild.getTestReportsUIUrl());
+        String jobHtmlPage = connection.get(jobBuild.url, String.class);
+        String testFailurePattern = "<a href=\"(" + testngReportsUrl + ".+?)\">";
+        List<String> failedTestUrls = MatcherUtils.allMatches(jobHtmlPage, testFailurePattern);
+        if (failedTestUrls.isEmpty()) {
+            log.info("No failed config methods found for {} using url {} and pattern {}",
+                    jobBuild.name, jobBuild.url, testFailurePattern);
+            return;
+        }
+        List<TestResult> loadedTestResults = results.testResults();
+        failedTestUrls.removeIf(url -> loadedTestResults.stream().anyMatch(result -> url.equalsIgnoreCase(result.url)));
+        if (failedTestUrls.isEmpty()) {
+            log.info("No failed config methods found for {} using url {} and pattern {}",
+                    jobBuild.name, jobBuild.url, testFailurePattern);
+            return;
+        }
+        log.info("Found {} failed config methods for {}", failedTestUrls.size(), jobBuild.name);
+        for (String url : failedTestUrls) {
+            log.debug("Adding failed config method for url {}", url);
+            TestResult failedConfigResult = get(UrlUtils.addRelativePaths(url, "api/json"), TestResult.class);
+            failedConfigResult.url = url;
+            failedConfigResult.configMethodFailure = true;
+            results.addFetchedConfigFailure(failedConfigResult);
         }
     }
 

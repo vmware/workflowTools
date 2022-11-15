@@ -33,12 +33,16 @@ public class ReplacementVariables {
     }
 
     public void addVariable(VariableName name, String value) {
-        addVariable(name.name(), value, false);
+        addVariable(name.name(), value);
     }
 
     public void addConfigPropertyAsVariable(String name, String valueToAdd) {
-        addVariable(name, valueToAdd, false);
+        addVariable(name, valueToAdd);
         configPropertyNames.add(name);
+    }
+
+    public void addVariable(String name, String valueToAdd) {
+        addVariable(name, valueToAdd, false);
     }
 
     public void addVariable(String name, String valueToAdd, boolean isRuntime) {

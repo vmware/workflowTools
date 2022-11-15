@@ -130,13 +130,19 @@ public abstract class BaseAction implements Action {
         skipActionIfBlankProperties.forEach(this::skipActionIfUnset);
         if (fileSystemConfig.skipIfVariableSet) {
             failIfUnset("variable");
-            skipActionIfTrue(replacementVariables.hasVariable(fileSystemConfig.variable),
+            if (replacementVariables.hasVariable(fileSystemConfig.variable)) {
+                log.debug("Variable {} value: {}", fileSystemConfig.variable, replacementVariables.getVariable(fileSystemConfig.variable));
+            }
+            skipActionIfTrue(StringUtils.isNotEmpty(replacementVariables.getVariable(fileSystemConfig.variable)),
                     fileSystemConfig.variable + " variable is set");
         }
         if (fileSystemConfig.skipIfVariableNotSet) {
             failIfUnset("variable");
             skipActionIfTrue(!replacementVariables.hasVariable(fileSystemConfig.variable),
                     fileSystemConfig.variable + " variable is not set");
+            if (StringUtils.isEmpty(replacementVariables.getVariable(fileSystemConfig.variable))) {
+                skipActionDueTo(fileSystemConfig.variable + " variable is empty");
+            }
         }
     }
 

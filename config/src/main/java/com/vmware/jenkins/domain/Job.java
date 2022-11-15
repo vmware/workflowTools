@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.vmware.jenkins.domain.TestResult.TestStatus.SKIP;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.UPDATEABLE;
 import static java.util.stream.Collectors.toList;
@@ -169,24 +168,16 @@ public class Job extends BaseDbClass {
     }
 
     public void addTestResultsToMasterList() {
-
         fetchedResults.forEach(results -> {
             List<TestResult> resultsToAdd = results.testResults();
             for (TestResult resultToAdd : resultsToAdd) {
                 resultToAdd.jobBuildId = results.getBuild().id;
+                resultToAdd.jobId = results.getBuild().jobId;
                 Optional<TestResult> matchingResult = testResults.stream()
-                        .filter(result  -> result.fullTestNameWithPackage().equals(resultToAdd.fullTestNameWithPackage())).findFirst();
-                if (!matchingResult.isPresent()) {
-                    matchingResult = testResults.stream()
-                            .filter(result  -> (result.status == SKIP || resultToAdd.status == SKIP)
-                                    && result.fullTestNameWithoutParameters().equals(resultToAdd.fullTestNameWithoutParameters()))
-                            .findFirst();
-                    matchingResult.ifPresent(result -> log.debug("Matched result {} based on skip status", result.fullTestNameWithoutParameters()));
-                }
+                        .filter(result  -> result.matchesByUrlPath(resultToAdd)).findFirst();
                 if (matchingResult.isPresent()) {
                     matchingResult.get().addTestResult(resultToAdd);
                 } else {
-                    resultToAdd.addTestResult(resultToAdd);
                     testResults.add(resultToAdd);
                 }
             }
@@ -208,19 +199,53 @@ public class Job extends BaseDbClass {
     }
 
     public void saveTestResultsToDb() {
-        if (dbUtils == null || CollectionUtils.isEmpty(fetchedResults)) {
+        if (dbUtils == null) {
             return;
         }
 
         testResults.forEach(result -> {
-            result.jobBuildId = savedBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).map(build -> build.id)
-                    .findFirst().orElse(result.jobBuildId);
+            Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).findFirst();
+            matchingBuild.ifPresent(build -> {
+                result.jobBuildId = build.id;
+                result.jobId = build.jobId;
+            });
+        });
+
+        List<TestResult> duplicateTestResults = new ArrayList<>();
+
+        testResults.forEach(result -> {
+            if (result.id == null || result.parameters == null || result.parameters.length == 0) {
+                return;
+            }
+
+            List<TestResult> resultsForSameUrlPath = testResults.stream()
+                    .filter(resultToCheck -> resultToCheck != result && !duplicateTestResults.contains(resultToCheck))
+                    .filter(result::matchesByUrlPath).collect(toList());
+            if (resultsForSameUrlPath.isEmpty()) {
+                return;
+            }
+            resultsForSameUrlPath.forEach(duplicateResult -> {
+                log.info("Merging duplicate test result with url path {} for {}", result.testPath(), result.fullPackageAndTestName());
+                result.addTestResult(duplicateResult);
+                duplicateTestResults.add(duplicateResult);
+            });
+        });
+
+        duplicateTestResults.stream().filter(result -> result.id != null).forEach(result -> {
+            log.info("Removing duplicate result {}", result.fullPackageAndTestName());
+            dbUtils.delete(result);
+            testResults.remove(result);
+        });
+
+
+        testResults.forEach(result -> {
             if (result.id != null) {
                 dbUtils.update(result);
             } else {
                 dbUtils.insert(result);
             }
         });
+
     }
 
     public void loadTestResultsFromDb() {
@@ -229,24 +254,25 @@ public class Job extends BaseDbClass {
             return;
         }
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
-            this.testResults = dbUtils.query(TestResult.class, "SELECT tr.* from TEST_RESULT tr"
-                    + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME ASC, tr.PARAMETERS ASC", id);
-            Set<String> usedUrls = new HashSet<>();
-            testResults.forEach(result -> {
-                Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
-                matchingBuild.ifPresent(build -> {
-                    result.commitId = build.commitId;
-                    result.buildNumber = build.buildNumber;
-                    String testReportsUIUrl;
-                    if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
-                        testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport");
-                    } else {
-                        testReportsUIUrl = build.getTestReportsUIUrl();
-                    }
-                    result.setUrlForTestMethod(testReportsUIUrl, usedUrls);
-                    usedUrls.add(result.url);
-                });
+        this.testResults = dbUtils.query(TestResult.class, "SELECT tr.* from TEST_RESULT tr"
+                + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME ASC, tr.PARAMETERS ASC", id);
+        Set<String> usedUrls = new HashSet<>();
+        testResults.forEach(result -> {
+            Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
+            matchingBuild.ifPresent(build -> {
+                result.commitId = build.commitId;
+                result.buildNumber = build.buildNumber;
+                result.jobId = build.jobId;
+                String testReportsUIUrl;
+                if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
+                    testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport");
+                } else {
+                    testReportsUIUrl = build.getTestReportsUIUrl();
+                }
+                result.setUrlForTestMethod(testReportsUIUrl, usedUrls);
+                usedUrls.add(result.url);
             });
+        });
     }
 
     public boolean buildIsTooOld(int buildNumber, int maxBuildsToCheck) {
@@ -263,7 +289,7 @@ public class Job extends BaseDbClass {
         return numberOfNewerBuilds >= maxBuildsToCheck;
     }
 
-    public void removeOldBuilds(int maxJenkinsBuildsToCheck) {
+    public void removeOldBuilds(int maxJenkinsBuildsToKeep) {
         if (dbUtils == null) {
             return;
         }
@@ -271,8 +297,8 @@ public class Job extends BaseDbClass {
             return;
         }
         List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasTestResults).collect(toList());
-        JobBuild lastSavedBuildToKeep = maxJenkinsBuildsToCheck >= savedBuilds.size() ? savedBuilds.get(savedBuilds.size() - 1) : savedBuilds.get(maxJenkinsBuildsToCheck - 1);
-        JobBuild lastUsableBuildToKeep = maxJenkinsBuildsToCheck >= usableBuilds.size() ? usableBuilds.get(usableBuilds.size() - 1) : usableBuilds.get(maxJenkinsBuildsToCheck -1);
+        JobBuild lastSavedBuildToKeep = maxJenkinsBuildsToKeep >= savedBuilds.size() ? savedBuilds.get(savedBuilds.size() - 1) : savedBuilds.get(maxJenkinsBuildsToKeep - 1);
+        JobBuild lastUsableBuildToKeep = maxJenkinsBuildsToKeep >= usableBuilds.size() ? usableBuilds.get(usableBuilds.size() - 1) : usableBuilds.get(maxJenkinsBuildsToKeep -1);
 
         JobBuild lastBuildToKeep = lastUsableBuildToKeep != null && lastUsableBuildToKeep.buildNumber < lastSavedBuildToKeep.buildNumber
                 ? lastUsableBuildToKeep : lastSavedBuildToKeep;
@@ -301,21 +327,13 @@ public class Job extends BaseDbClass {
     }
 
     public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck) {
+        List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
         return testResults.stream().filter(result -> !TestResult.TestStatus.isPass(result.status))
                 .filter(result -> result.containsBuildNumbers(latestUsableBuildNumber()))
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
-                    if (result.parameters != null && result.parameters.length > 0) {
-                        List<TestResult> resultsForSameDataProviderIndex = testResults.stream()
-                                .filter(resultToCheck -> resultToCheck.buildNumber != result.buildNumber).filter(result::matchesByDataProviderIndex).collect(toList());
-                        resultsForSameDataProviderIndex.forEach(resultToAddBuildsFor -> {
-                            log.debug("Found other matching test result by data provider index {} for {}", result.dataProviderIndex, result.fullPackageAndTestName());
-                            List<Map.Entry<Integer, TestResult.TestStatus>> otherApplicableBuilds = resultToAddBuildsFor.buildsToUse(maxJenkinsBuildsToCheck);
-                            applicableBuilds.addAll(otherApplicableBuilds);
-                        });
-                    }
                     if (applicableBuilds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1) {
-                        List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
+
                         result.testRuns = applicableBuilds.stream().map(entry -> {
                             JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
                                     .orElse(null);

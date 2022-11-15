@@ -171,6 +171,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-s,--shell", help = "Run workflow in shell mode, will allow additional commands to be run")
     public boolean shellMode;
 
+    @ConfigurableProperty(commandLine = "-mh,--max-history", help = "Max number of workflow history commands to keep")
+    public int maxHistory;
+
     @ConfigurableProperty(commandLine = "--output-file", help = "File to store output to")
     public String outputFile;
 
@@ -179,6 +182,9 @@ public class WorkflowConfig {
 
     @ConfigurableProperty(commandLine = "--cancel-message", help = "Message to use if a canceling workflow")
     public String errorMessageForCancel;
+
+    @ConfigurableProperty(help = "Help messages for main workflows")
+    public Map<String, Map<String, String>> mainWorkflowHelpMessages;
 
     @Expose(serialize = false, deserialize = false)
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);

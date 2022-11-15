@@ -20,11 +20,10 @@ public class ReadPropertyAsVariable extends BaseAction {
 
         String propertyValue = properties.getProperty(fileSystemConfig.propertyName);
         if (propertyValue == null) {
-            log.info("Adding variable {} for property {} with empty string value", fileSystemConfig.outputVariableName, fileSystemConfig.propertyName);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, "", false);
+            log.info("Not adding variable {} as property {} was not found", fileSystemConfig.outputVariableName, fileSystemConfig.propertyName);
         } else {
             log.info("Adding variable {} for property {} with value {}", fileSystemConfig.outputVariableName, fileSystemConfig.propertyName, propertyValue);
-            replacementVariables.addVariable(fileSystemConfig.outputVariableName, propertyValue, false);
+            replacementVariables.addVariable(fileSystemConfig.outputVariableName, propertyValue);
         }
     }
 }

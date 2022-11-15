@@ -20,6 +20,6 @@ public class ParseText extends BaseAction {
         log.info("Parsing {} with regex {}", fileSystemConfig.inputText, fileSystemConfig.regex);
         String matchedValue = MatcherUtils.singleMatchExpected(fileSystemConfig.inputText, fileSystemConfig.regex);
         log.info("Setting variable {} with value {}", fileSystemConfig.outputVariableName, matchedValue);
-        replacementVariables.addVariable(fileSystemConfig.outputVariableName, matchedValue, false);
+        replacementVariables.addVariable(fileSystemConfig.outputVariableName, matchedValue);
     }
 }

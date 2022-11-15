@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +27,7 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
     private final String IN_MEMORY_FILE = "IN_MEMORY_FILE";
 
     public ScpFileFromRemote(WorkflowConfig config) {
-        this(config, Arrays.asList("sourceFile", "destinationFile"));
+        this(config, Collections.singletonList("sourceFile"));
     }
 
     public ScpFileFromRemote(WorkflowConfig config, List<String> failIfBlankProperties) {
@@ -36,13 +37,18 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
 
     @Override
     public void process() {
+        if (StringUtils.isEmpty(fileSystemConfig.destinationFile) && StringUtils.isEmpty(fileSystemConfig.outputVariableName)) {
+            exitDueToFailureCheck("properties destinationFile and outputVariableName are both not set");
+        }
         SiteConfig siteConfigToUse = createSshSiteConfig();
         siteConfigToUse.validate();
-        copyFile(siteConfigToUse, fileSystemConfig.sourceFile, fileSystemConfig.destinationFile);
+        copyFile(siteConfigToUse, fileSystemConfig.sourceFile, fileSystemConfig.destinationFile,fileSystemConfig.outputVariableName);
     }
 
-    protected void copyFile(SiteConfig siteConfig, String sourceFile, String destinationFile) {
-        if (IN_MEMORY_FILE.equals(destinationFile)) {
+    protected void copyFile(SiteConfig siteConfig, String sourceFile, String destinationFile, String outputVariableName) {
+        if (StringUtils.isEmpty(destinationFile)) {
+            log.info("Copying file {} from {}@{} as variable {}", sourceFile, siteConfig.username, siteConfig.host, outputVariableName);
+        } else if (IN_MEMORY_FILE.equals(destinationFile)) {
             log.info("Copying file {} from {}@{} into memory", sourceFile, siteConfig.username, siteConfig.host);
         } else {
             log.info("Copying file {} from {}@{} to {}", sourceFile, siteConfig.username, siteConfig.host, destinationFile);
@@ -65,11 +71,10 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
             channel.connect();
 
             ChannelSftp sftpChannel = (ChannelSftp) channel;
-            if (IN_MEMORY_FILE.equals(destinationFile)) {
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                sftpChannel.get(sourceFile, outputStream);
-                fileSystemConfig.fileData = outputStream.toString(StandardCharsets.UTF_8.name());
-                log.trace("File data {}", fileSystemConfig.fileData);
+            if (StringUtils.isEmpty(destinationFile)) {
+                replacementVariables.addVariable(outputVariableName, readFile(sftpChannel, sourceFile));
+            } else if (IN_MEMORY_FILE.equals(destinationFile)) {
+                fileSystemConfig.fileData = readFile(sftpChannel, sourceFile);
             } else {
                 sftpChannel.get(sourceFile, destinationFile);
             }
@@ -89,5 +94,13 @@ public class ScpFileFromRemote extends ExecuteSshCommand {
                 session.disconnect();
             }
         }
+    }
+
+    private String readFile(ChannelSftp sftpChannel, String sourceFile) throws SftpException, UnsupportedEncodingException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        sftpChannel.get(sourceFile, outputStream);
+        String fileData = outputStream.toString(StandardCharsets.UTF_8.name());
+        log.trace("File data {}", fileData);
+        return fileData;
     }
 }

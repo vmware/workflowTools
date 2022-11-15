@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ActionDescription("Displays a predefined list of the main workflows.")
 public class DisplayMainWorkflows extends BaseAction {
@@ -22,28 +23,15 @@ public class DisplayMainWorkflows extends BaseAction {
 
     @Override
     public void process() {
-        printWorkflows("Git", Workflow.GIT_MAIN_WORKFLOWS);
-        printWorkflows("Vapp", Workflow.VAPP_MAIN_WORKFLOWS);
-        printWorkflows("Perforce", Workflow.PERFORCE_MAIN_WORKFLOWS);
-        printWorkflows("Batch", Workflow.BATCH_MAIN_WORKFLOWS);
+        config.mainWorkflowHelpMessages.entrySet().forEach(this::printWorkflows);
     }
 
-    protected void printWorkflows(String workflowType, List<String> workflows) {
-        Map<String, String> workflowsHelp = realWorkflowsHelp();
-        Padder mainWorkflowsPadder = new Padder(workflowType + " Workflows");
+    protected void printWorkflows(Map.Entry<String, Map<String, String>> workflows) {
+        Padder mainWorkflowsPadder = new Padder(workflows.getKey() + " Workflows");
         mainWorkflowsPadder.infoTitle();
-        for (String mainWorkflow : workflows) {
-            if (!workflowsHelp.containsKey(mainWorkflow)) {
-                log.warn("No help found for workflow named {}!", mainWorkflow);
-                continue;
-            }
-            log.info("{} - {}", mainWorkflow, workflowsHelp.get(mainWorkflow));
+        for (Map.Entry<String, String> entry : workflows.getValue().entrySet()) {
+            log.info("{} - {}", entry.getKey(), entry.getValue());
         }
         mainWorkflowsPadder.infoTitle();
-    }
-
-    private Map<String, String> realWorkflowsHelp() {
-        Reader reader = new ClasspathResource("/mainWorkflowsHelp.json", this.getClass()).getReader();
-        return new ConfiguredGsonBuilder().build().fromJson(reader, Map.class);
     }
 }

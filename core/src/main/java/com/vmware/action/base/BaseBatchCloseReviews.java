@@ -51,7 +51,7 @@ public abstract class BaseBatchCloseReviews extends BaseAction {
                 openRequest.status = ReviewRequestStatus.submitted;
                 openRequest.description = String.format("Marked review that has had %s for more than %s days as submitted", reason, daysElapsedBeforeClose);
                 reviewBoard.updateReviewRequest(openRequest);
-                log.info("Successfully marked review request {} as submitted", openRequest.id);
+                log.info("Marked review request {} as submitted", openRequest.id);
             }
         }
         titlePadder.infoTitle();
