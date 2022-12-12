@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.vmware.http.HttpMethodType.DELETE;
 import static com.vmware.http.HttpMethodType.GET;
+import static com.vmware.http.HttpMethodType.PATCH;
 import static com.vmware.http.HttpMethodType.POST;
 import static com.vmware.http.HttpMethodType.PUT;
 import static com.vmware.http.request.RequestHeader.aBasicAuthHeader;
@@ -123,6 +124,10 @@ public class HttpConnection {
 
     public <T> T get(String url, Class<T> responseConversionClass, RequestParam... params) {
         return executeApiRequest(GET, url, responseConversionClass, null, params);
+    }
+
+    public <T> T patch(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params) {
+        return executeApiRequest(PATCH, url, responseConversionClass, requestObject, params);
     }
 
     public <T> T put(String url, Class<T> responseConversionClass, Object requestObject, RequestParam... params) {

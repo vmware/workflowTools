@@ -18,4 +18,12 @@ public class UserReview extends BaseEntity {
     public String getReviewUsername() {
         return getLink("user").getTitle();
     }
+
+    public Link getDiffCommentsLink() {
+        return getLink("diff_comments");
+    }
+
+    public Link getGeneralCommentsLink() {
+        return getLink("general_comments");
+    }
 }

@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -314,10 +316,13 @@ public class Workflow {
     }
 
     private void dryRunActions(List<WorkflowAction> actions) {
-        log.info("Executing in dry run mode");
-        log.info("Showing workflow actions that would have run for workflow argument [{}]", config.workflowsToRun);
+        log.info("Executing [{}] in dry run mode", config.workflowsToRun);
+        Optional<String> helpMessage = config.mainWorkflowHelpMessages.values().stream().map(values -> values.get(config.workflowsToRun)).filter(Objects::nonNull).findFirst();
+        helpMessage.ifPresent(log::info);
 
-        Padder actionsPadder = new Padder("Workflow Actions");
+        log.info("Showing workflow actions that would have run");
+        String actionTitle = config.workflows.containsKey(config.workflowsToRun) ? config.workflowsToRun : "Workflow Actions";
+        Padder actionsPadder = new Padder(actionTitle);
         actionsPadder.infoTitle();
 
         ConfigMappings configMappings = new ConfigMappings();
@@ -419,6 +424,8 @@ public class Workflow {
             log.info("{}{}={}", ReplacementVariables.CONFIG_PREFIX, key, replacementVariables.get(key));
         }
         variablePadder.infoTitle();
+
+        helpMessage.ifPresent(message -> log.info("{} - {}", config.workflowsToRun, message));
     }
 
     private void runActions(List<WorkflowAction> actions, WorkflowActionValues values) {

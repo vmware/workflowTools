@@ -7,6 +7,7 @@ package com.vmware.http;
 
 public enum HttpMethodType {
     GET,
+    PATCH,
     POST,
     PUT,
     DELETE

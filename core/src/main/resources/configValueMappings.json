@@ -100,9 +100,9 @@
     "--destination-file"
   ],
   "AuthenticateAllApis": [
+    "--trello-sso",
     "--disable-login",
     "--bugzilla-test-bug",
-    "--trello-sso",
     "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",

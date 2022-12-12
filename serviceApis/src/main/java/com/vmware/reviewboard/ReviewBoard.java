@@ -9,6 +9,9 @@ import com.vmware.http.request.UrlParam;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.reviewboard.domain.GeneralCommentsResponse;
+import com.vmware.reviewboard.domain.ReviewComment;
+import com.vmware.reviewboard.domain.DiffCommentsResponse;
 import com.vmware.reviewboard.domain.DiffToUpload;
 import com.vmware.reviewboard.domain.Link;
 import com.vmware.reviewboard.domain.Repository;
@@ -179,6 +182,16 @@ public class ReviewBoard extends AbstractRestService {
         return get(diffsLink.getHref(), ReviewRequestDiffsResponse.class).diffs;
     }
 
+    public ReviewComment[] getDiffCommentsForReview(Link diffCommentsLink) {
+        ReviewComment[] comments = get(diffCommentsLink.getHref(), DiffCommentsResponse.class).diffComments;
+        return comments != null ? comments : new ReviewComment[0];
+    }
+
+    public ReviewComment[] getGeneralCommentsForReview(Link commentsLink) {
+        ReviewComment[] comments = get(commentsLink.getHref(), GeneralCommentsResponse.class).generalComments;
+        return comments != null ? comments : new ReviewComment[0];
+    }
+
     public Repository getRepository(Link repositoryLink) {
         return get(repositoryLink.getHref(), RepositoryResponse.class).repository;
     }
@@ -188,23 +201,6 @@ public class ReviewBoard extends AbstractRestService {
         // need to add in a trailing newline for git apply to work correctly
         diffData += "\n";
         return diffData;
-    }
-
-    public String getShipItReviewerList(ReviewRequest reviewRequest) {
-        UserReview[] reviews = this.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
-
-        String reviewerList = "";
-        for (UserReview review : reviews) {
-            if (review.isPublic && review.ship_it) {
-                if (!reviewerList.contains(review.getReviewUsername())) {
-                    if (!reviewerList.isEmpty()) {
-                        reviewerList += ",";
-                    }
-                    reviewerList += review.getReviewUsername();
-                }
-            }
-        }
-        return reviewerList;
     }
 
     public UserReview getSoftSubmitReview(ReviewRequest reviewRequest) {

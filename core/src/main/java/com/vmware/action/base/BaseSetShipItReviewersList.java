@@ -2,7 +2,11 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.util.StringUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBoardAction {
 
@@ -25,14 +29,24 @@ public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBo
             return;
         }
 
-        String updatedReviewers = reviewBoard.getShipItReviewerList(draft.reviewRequest);
+        UserReview[] reviews = reviewBoard.getReviewsForReviewRequest(draft.reviewRequest.getReviewsLink());
+        String updatedReviewers = getShipItReviewerList(reviews);
 
         draft.shipItReviewers = updatedReviewers;
         if (updatedReviewers.isEmpty()) {
             log.info("No ship its yet");
-            return;
+        } else {
+            log.info("Ship its from users ({})", updatedReviewers);
         }
-        log.info("Ship its from users ({})", updatedReviewers);
     }
 
+    public String getShipItReviewerList(UserReview[] reviews) {
+        Set<String> reviewers = new HashSet<>();
+        for (UserReview review : reviews) {
+            if (review.isPublic && review.ship_it) {
+                reviewers.add(review.getReviewUsername());
+            }
+        }
+        return String.join(",", reviewers);
+    }
 }

@@ -14,6 +14,7 @@ public enum ApiAuthentication {
     vcd(".vcd-api-token.txt"),
     vcd_refresh(".vcd-refresh-token.txt"),
     gitlab(".gitlab-access-token.txt"),
+    github(".github-access-token.txt"),
     none("");
 
     private String cookieName;

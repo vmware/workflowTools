@@ -5,6 +5,7 @@ import com.vmware.http.cookie.CookieFileStore;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.reviewboard.ReviewBoard;
+import com.vmware.reviewboard.domain.ReviewComment;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDiff;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -123,10 +124,11 @@ public class TestReviewBoardApi extends BaseTests {
 
     @Test
     public void getUserReviewsForReviewRequest() {
-        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(1618019);
-        ReviewRequestDraft draft = reviewBoard.getReviewRequestDraft(reviewRequest.getDraftLink());
+        ReviewRequest reviewRequest = reviewBoard.getReviewRequestById(1958534);
         UserReview[] reviews = reviewBoard.getReviewsForReviewRequest(reviewRequest.getReviewsLink());
         assertTrue(reviews.length == 1);
+        ReviewComment[] diffComments = reviewBoard.getDiffCommentsForReview(reviews[0].getDiffCommentsLink());
+        assertTrue(diffComments.length > 0);
 
         assertTrue(reviews[0].isPublic);
         assertTrue(reviews[0].ship_it);

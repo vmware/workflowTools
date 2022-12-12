@@ -13,6 +13,7 @@ import com.vmware.jenkins.domain.TestResults;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
 import com.vmware.util.collection.BlockingExecutorService;
 import com.vmware.util.db.DbUtils;
 import com.vmware.util.logging.Padder;
@@ -210,7 +211,7 @@ public class FindRealTestFailures extends BaseAction {
         };
         String jobsResultsHtml = failingTestMethods.keySet().stream().sorted(groupComparator.thenComparing(jobDetails -> jobDetails.name)).map(job -> {
             List<TestResult> failingTests = failingTestMethods.get(job);
-            return createJobFragment(counter.getAndIncrement(), job, failingTests);
+            return createJobFragment(counter.getAndIncrement(), view.url, job, failingTests);
         }).collect(Collectors.joining("\n"));
 
         String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml);
@@ -234,7 +235,10 @@ public class FindRealTestFailures extends BaseAction {
         }
         if (StringUtils.isNotBlank(jobsTestResultsHtml)) {
             String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
-            resultsPage = failuresPage.replace("#viewName", view.viewNameWithFailureCount());
+            resultsPage = failuresPage.replace("#viewName", view.name);
+            resultsPage = resultsPage.replace("#viewUrl", view.url);
+            resultsPage = resultsPage.replace("#viewTotalFailures", String.valueOf(view.failingTestsCount));
+
             resultsPage = resultsPage.replace("#body", jobsTestResultsHtml);
             resultsPage = resultsPage.replace("#footer", footer);
             log.trace("Test Failures for view {}:\n{}", view.name, resultsPage);
@@ -309,7 +313,7 @@ public class FindRealTestFailures extends BaseAction {
 
         List<Supplier<TestResults>> usableResultSuppliers = job.usefulBuilds.stream()
                 .filter(build -> build.status == SUCCESS || build.status == UNSTABLE)
-                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build)))
+                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build, true)))
                 .collect(toList());
 
         if (job.usefulBuilds.isEmpty()) {
@@ -324,12 +328,15 @@ public class FindRealTestFailures extends BaseAction {
         }
     }
 
-    private String createJobFragment(int jobIndex, Job fullDetails, List<TestResult> failingMethods) {
+    private String createJobFragment(int jobIndex, String viewUrl, Job fullDetails, List<TestResult> failingMethods) {
         String jobFragment = new ClasspathResource("/testFailuresTemplate/jobFailures.html", this.getClass()).getText();
         String rowFragment = new ClasspathResource("/testFailuresTemplate/testFailureRows.html", this.getClass()).getText();
 
-        String filledInJobFragment = jobFragment.replace("#url", fullDetails.url);
-        filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink());
+        String jobPath = StringUtils.substringAfterLast(fullDetails.url, "/job/");
+        String jobUrlWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", jobPath);
+
+        String filledInJobFragment = jobFragment.replace("#url", jobUrlWithViewName);
+        filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink(viewUrl));
         filledInJobFragment = filledInJobFragment.replace("#jobName", fullDetails.name);
         filledInJobFragment = filledInJobFragment.replace("#failingTestCount", pluralize(failingMethods.size(), "failing test"));
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);
@@ -338,7 +345,7 @@ public class FindRealTestFailures extends BaseAction {
         int index = 0;
         for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)).collect(toList())) {
             String filledInRow = rowFragment.replace("#testName", method.fullTestNameForDisplay());
-            filledInRow = filledInRow.replace("#testResultLinks", method.testLinks(jenkinsConfig.commitComparisonUrl));
+            filledInRow = filledInRow.replace("#testResultLinks", method.testLinks(viewUrl, jenkinsConfig.commitComparisonUrl));
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
             filledInRow = filledInRow.replace("#exception", method.exception != null ? method.exception.replace("\n", "<br/>") : "");
             rowBuilder.append(filledInRow).append("\n");

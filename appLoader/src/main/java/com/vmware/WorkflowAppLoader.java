@@ -76,8 +76,7 @@ public class WorkflowAppLoader {
         URL releaseURL = createReleaseUrl();
         info("Downloading workflow release jar " + releaseURL.toString() + " to " + releaseJar.getPath());
 
-        try {
-            ReadableByteChannel readableByteChannel = Channels.newChannel(releaseURL.openStream());
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(releaseURL.openStream())) {
             FileOutputStream fileOutputStream = new FileOutputStream(releaseJar);
             fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
         } catch (IOException e) {

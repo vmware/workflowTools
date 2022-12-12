@@ -1,9 +1,9 @@
 {
   "git": {
-    "commit": "Walks you through creating a commit, allows you to select a JIRA or bug that is assigned to you, set reviewers etc.",
-    "commitAll": "Similar to commit but includes all edited files not just staged files",
-    "amendCommit": "Adds file changes to existing commit",
-    "amendCommitAll": "Similar to amendCommit but includes all edited files not just staged files",
+    "commit": "Walks you through creating a commit with staged files, allows you to select a JIRA or bug that is assigned to you, set reviewers etc.",
+    "commitAll": "Walks you through creating a commit with all edited files, allows you to select a JIRA or bug that is assigned to you, set reviewers etc.",
+    "amendCommit": "Adds staged file changes to existing commit",
+    "amendCommitAll": "Adds all edited files to existing commit",
     "sandbox": "Starts a sandbox build",
     "review": "Posts a review based on the information in the commit, sets bug number, reviewers on review",
     "pushable": "Checks if review has ship its, checks for checkstyle errors, checks status of buildweb and jenkins builds in testing done section",

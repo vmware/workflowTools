@@ -188,13 +188,13 @@ public class TestResult extends BaseDbClass {
         this.url = urlToUse;
     }
 
-    public String testLinks(String commitComparisonUrl) {
+    public String testLinks(String viewUrl, String commitComparisonUrl) {
         List<TestResult> sortedTestRuns = testRuns.stream().sorted(Comparator.comparing(TestResult::buildNumber)).collect(Collectors.toList());
         List<String> resultLinks = new ArrayList<>();
         if (StringUtils.isNotBlank(commitComparisonUrl)) {
             for (int i = 0; i < sortedTestRuns.size(); i++) {
                 TestResult currentTestResult = sortedTestRuns.get(i);
-                resultLinks.add(testResultLink(currentTestResult));
+                resultLinks.add(testResultLink(viewUrl, currentTestResult));
                 TestResult nextTestResult = i < sortedTestRuns.size() - 1 ? sortedTestRuns.get(i + 1) : null;
 
                 if (nextTestResult != null && TestStatus.isPass(currentTestResult.status) && !TestStatus.isPass(nextTestResult.status)
@@ -348,10 +348,12 @@ public class TestResult extends BaseDbClass {
         return text;
     }
 
-    private String testResultLink(TestResult testResult) {
+    private String testResultLink(String viewUrl, TestResult testResult) {
+        String testPath = StringUtils.substringAfterLast(testResult.url, "/job/");
+        String testUrlWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", testPath);
         String commitIdSuffix = StringUtils.isNotBlank(testResult.commitId) ? " with commit " + testResult.commitId : "";
         String title = String.format("%s on %s%s", testResult.status.getDescription(), START_TIME_FORMATTER.format(testResult.getStartedAt()), commitIdSuffix);
-        return String.format("<a class =\"%s\" href = \"%s\" title=\"%s\" %s>%s</a>", testResult.status.cssClass, testResult.url, title,
+        return String.format("<a class =\"%s\" href = \"%s\" title=\"%s\" %s>%s</a>", testResult.status.cssClass, testUrlWithViewName, title,
                 LINK_IN_NEW_TAB, testResult.buildNumber);
     }
 

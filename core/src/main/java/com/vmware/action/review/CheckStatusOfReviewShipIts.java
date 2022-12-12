@@ -14,6 +14,4 @@ public class CheckStatusOfReviewShipIts extends BaseSetShipItReviewersList {
     public void process() {
         checkShipItsForReview(draft);
     }
-
-
 }

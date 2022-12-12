@@ -3,6 +3,7 @@ package com.vmware.jenkins.domain;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.vmware.util.CollectionUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
@@ -348,9 +349,11 @@ public class Job extends BaseDbClass {
                 }).filter(result -> CollectionUtils.isNotEmpty(result.testRuns)).collect(toList());
     }
 
-    public String runningBuildLink() {
+    public String runningBuildLink(String viewUrl) {
         if (lastBuild != null && lastCompletedBuild != null && lastBuild.buildNumber > lastCompletedBuild.buildNumber) {
-            return "Current build <a href=\"" + lastBuild.consoleUrl() + "\">" + lastBuild.buildNumber +"</a>";
+            String consolePath = StringUtils.substringAfterLast(lastBuild.consoleUrl(), "/job/");
+            String consolePathWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", consolePath);
+            return "Current build <a href=\"" + consolePathWithViewName + "\">" + lastBuild.buildNumber +"</a>";
         } else {
             return "";
         }

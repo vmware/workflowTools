@@ -92,7 +92,7 @@ public class Jenkins extends AbstractRestBuildService {
         return getJobBuildDetails(new JobBuild(buildNumber, jobUrl));
     }
 
-    public TestResults getJobBuildTestResults(JobBuild jobBuild) {
+    public TestResults getJobBuildTestResults(JobBuild jobBuild, boolean includeFailedConfigTests) {
         try {
             TestResults results = get(determineTestReportsApiUrl(jobBuild), TestResults.class);
             results.setBuild(jobBuild);
@@ -109,6 +109,10 @@ public class Jenkins extends AbstractRestBuildService {
     private void addFailedConfigTestsViaJobHtmlPage(JobBuild jobBuild, TestResults results) {
         String testngReportsUrl = UrlUtils.addTrailingSlash(jobBuild.getTestReportsUIUrl());
         String jobHtmlPage = connection.get(jobBuild.url, String.class);
+        if (StringUtils.isEmpty(jobHtmlPage)) {
+            log.info("Failed to load {} when checking config tests", jobBuild.url);
+            return;
+        }
         String testFailurePattern = "<a href=\"(" + testngReportsUrl + ".+?)\">";
         List<String> failedTestUrls = MatcherUtils.allMatches(jobHtmlPage, testFailurePattern);
         if (failedTestUrls.isEmpty()) {
@@ -165,7 +169,7 @@ public class Jenkins extends AbstractRestBuildService {
                         String consoleOutput = IOUtils.tail(jobBuild.logTextUrl(), linesToShow);
                         log.info(consoleOutput);
                     } else {
-                        List<TestResult> failedTests = getJobBuildTestResults(jobBuild).failedTestResults();
+                        List<TestResult> failedTests = getJobBuildTestResults(jobBuild, false).failedTestResults();
                         if (failedTests.isEmpty()) {
                             log.info("No failed tests found, showing last {} lines of log text", linesToShow);
                             String consoleOutput = IOUtils.tail(jobBuild.logTextUrl(), linesToShow);
