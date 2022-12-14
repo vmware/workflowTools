@@ -25,9 +25,6 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 public class WorkflowAppLoader {
-
-    public static final String WORKFLOW_UPDATE_ON_START_SUFFIX = ".updateOnStart";
-
     private final String releaseDirectory;
     private final List<String> argValues;
     private final boolean debugLog, update;
@@ -70,18 +67,14 @@ public class WorkflowAppLoader {
 
     public void downloadJarFileIfNeeded() {
         debug("Expected release jar is " + releaseJar.getAbsolutePath());
-        File updateOnStartFile = new File(releaseJar.getAbsolutePath() + WORKFLOW_UPDATE_ON_START_SUFFIX);
-        if (updateOnStartFile.exists()) {
-            info("Auto updating workflow tools as file " + updateOnStartFile.getAbsolutePath() + " exists");
+        if (releaseJar.exists() && !releaseJar.canWrite()) {
+            info("Auto updating workflow tools");
         } else if (releaseJar.exists() && !update) {
             debug("Jar file " + releaseJar.getPath() + " already exists");
             return;
         }
         deleteOldReleasesIfNeeded();
         URL releaseURL = createReleaseUrl();
-        if (updateOnStartFile.exists()) {
-            debug("Deleting update on start file: " + updateOnStartFile.delete());
-        }
         info("Downloading workflow release jar " + releaseURL.toString() + " to " + releaseJar.getPath());
 
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(releaseURL.openStream())) {

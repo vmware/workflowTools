@@ -1,7 +1,6 @@
 package com.vmware;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -55,8 +54,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jline.console.completer.ArgumentCompleter;
-
-import static com.vmware.WorkflowAppLoader.WORKFLOW_UPDATE_ON_START_SUFFIX;
 
 /**
  * Main class for running the workflow application.
@@ -147,15 +144,14 @@ public class Workflow {
 
         long daysOld = TimeUnit.MILLISECONDS.toDays(new Date().getTime() - workflowJarFile.lastModified());
 
-        File updateOnStartFile = new File(jarFilePath + WORKFLOW_UPDATE_ON_START_SUFFIX);
-        if (updateOnStartFile.exists() && daysOld >= config.updateCheckInterval) {
+        if (!workflowJarFile.canWrite() && daysOld >= config.updateCheckInterval) {
             log.warn("workflow jar {} is older than {} days and a new version exists. It is recommended to run workflow --update to update it",
                     jarFilePath, daysOld);
             return;
-        } else if (updateOnStartFile.exists()) {
-            log.debug("Deleting update on start file {} as release is only {} days old",
-                    updateOnStartFile.getAbsolutePath(), daysOld);
-            log.debug("Deleted: " + updateOnStartFile.delete());
+        } else if (!workflowJarFile.canWrite()) {
+            log.debug("Marking jar file {} as writable as it is only {} days old",
+                    workflowJarFile.getAbsolutePath(), daysOld);
+            log.debug("Writable: " + workflowJarFile.setWritable(true));
             return;
         }
         if (daysOld >= config.updateCheckInterval) {
@@ -165,11 +161,8 @@ public class Workflow {
                 if (asset.updatedAt.getTime() > workflowJarFile.lastModified()) {
                     log.warn("workflow jar {} is {} days old and a new version exists. It is recommended to run workflow --update to update it",
                             jarFilePath, daysOld);
-                    try {
-                        new File(jarFilePath + WORKFLOW_UPDATE_ON_START_SUFFIX).createNewFile();
-                    } catch (IOException e) {
-                        log.info("Failed to create file " +  jarFilePath + WORKFLOW_UPDATE_ON_START_SUFFIX, e);
-                    }
+                    log.debug("Marking as read only so that it can be inferred that it needs to be updated");
+                    log.debug("Read only: " + workflowJarFile.setReadOnly());
                 } else {
                     log.debug("workflow jar {} is older than {} days. Last new version was on {}", jarFilePath, daysOld, asset.updatedAt);
                     log.debug("Updated last modified time: {}", workflowJarFile.setLastModified(new Date().getTime()));
