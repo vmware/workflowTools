@@ -1,6 +1,5 @@
 package com.vmware.config;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +34,7 @@ import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.FileSystemConfig;
 import com.vmware.config.section.GitRepoConfig;
+import com.vmware.config.section.GithubConfig;
 import com.vmware.config.section.GitlabConfig;
 import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.JiraConfig;
@@ -80,6 +80,9 @@ public class WorkflowConfig {
 
     @SectionConfig
     public GitlabConfig gitlabConfig;
+
+    @SectionConfig
+    public GithubConfig githubConfig;
 
     @SectionConfig
     public PerforceClientConfig perforceClientConfig;
@@ -186,6 +189,12 @@ public class WorkflowConfig {
     @ConfigurableProperty(help = "Help messages for main workflows")
     public Map<String, Map<String, String>> mainWorkflowHelpMessages;
 
+    @ConfigurableProperty(commandLine = "--update-check-interval", help = "Check for new version of workflow tools after specified amount of days")
+    public int updateCheckInterval;
+
+    @ConfigurableProperty(help = "Path to executable downloaded workflow jar")
+    public String workflowJarDownloadPath;
+
     @Expose(serialize = false, deserialize = false)
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);
 
@@ -226,6 +235,7 @@ public class WorkflowConfig {
     }
 
     public void addGeneratedVariables() {
+        replacementVariables.addVariable(ReplacementVariables.VariableName.HOME_DIR, System.getProperty("user.home"));
         replacementVariables.addVariable(ReplacementVariables.VariableName.UUID, UUID.randomUUID().toString());
         Date currentDate = new Date();
         replacementVariables.addVariable(ReplacementVariables.VariableName.DATE, dateFormat.format(currentDate));

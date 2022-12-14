@@ -1,9 +1,9 @@
 package com.vmware;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.vmware.action.info.DisplayLineBreak;
 import com.vmware.action.info.DisplayInfo;
@@ -34,6 +33,7 @@ import com.vmware.config.WorkflowConfigParser;
 import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
 import com.vmware.config.WorkflowParameter;
+import com.vmware.github.domain.ReleaseAsset;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.util.IOUtils;
@@ -56,11 +56,14 @@ import org.slf4j.LoggerFactory;
 
 import jline.console.completer.ArgumentCompleter;
 
+import static com.vmware.WorkflowAppLoader.WORKFLOW_UPDATE_ON_START_SUFFIX;
+
 /**
  * Main class for running the workflow application.
  */
 public class Workflow {
     private static final String QUIT_WORKFLOW = "q";
+
     private final Git git = new Git();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final WorkflowConfigParser configParser = new WorkflowConfigParser();
@@ -82,6 +85,7 @@ public class Workflow {
         readWorkflowHistoryFile();
         username = config.username;
         serviceLocator = new ServiceLocator(config);
+        checkForNewVersionOfWorkflowTools();
         askForWorkflowIfEmpty(firstTime);
         firstTime = false;
     }
@@ -127,6 +131,53 @@ public class Workflow {
         }
 
         askForWorkflow(firstTime);
+    }
+
+    private void checkForNewVersionOfWorkflowTools() {
+        if (config.updateCheckInterval == 0 || StringUtils.isEmpty(config.workflowJarDownloadPath)
+                || StringUtils.isEmpty(config.githubConfig.workflowGithubReleasePath)) {
+            return;
+        }
+
+        String jarFilePath = config.replacementVariables.replaceVariablesInValue(config.workflowJarDownloadPath);
+        File workflowJarFile = new File(jarFilePath);
+        if (!workflowJarFile.exists()) {
+            return;
+        }
+
+        long daysOld = TimeUnit.MILLISECONDS.toDays(new Date().getTime() - workflowJarFile.lastModified());
+
+        File updateOnStartFile = new File(jarFilePath + WORKFLOW_UPDATE_ON_START_SUFFIX);
+        if (updateOnStartFile.exists() && daysOld >= config.updateCheckInterval) {
+            log.warn("workflow jar {} is older than {} days and a new version exists. It is recommended to run workflow --update to update it",
+                    jarFilePath, daysOld);
+            return;
+        } else if (updateOnStartFile.exists()) {
+            log.debug("Deleting update on start file {} as release is only {} days old",
+                    updateOnStartFile.getAbsolutePath(), daysOld);
+            log.debug("Deleted: " + updateOnStartFile.delete());
+            return;
+        }
+        if (daysOld >= config.updateCheckInterval) {
+            ReleaseAsset[] releaseAssets = serviceLocator.getGithub().getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
+            if (releaseAssets != null && releaseAssets.length > 0) {
+                ReleaseAsset asset = releaseAssets[0];
+                if (asset.updatedAt.getTime() > workflowJarFile.lastModified()) {
+                    log.warn("workflow jar {} is {} days old and a new version exists. It is recommended to run workflow --update to update it",
+                            jarFilePath, daysOld);
+                    try {
+                        new File(jarFilePath + WORKFLOW_UPDATE_ON_START_SUFFIX).createNewFile();
+                    } catch (IOException e) {
+                        log.info("Failed to create file " +  jarFilePath + WORKFLOW_UPDATE_ON_START_SUFFIX, e);
+                    }
+                } else {
+                    log.debug("workflow jar {} is older than {} days. Last new version was on {}", jarFilePath, daysOld, asset.updatedAt);
+                    log.debug("Updated last modified time: {}", workflowJarFile.setLastModified(new Date().getTime()));
+                }
+            }
+        } else {
+            log.debug("Not checking for update to workflow jar {} as it is only {} days old", jarFilePath, daysOld);
+        }
     }
 
     private void askForWorkflow(boolean firstTime) {

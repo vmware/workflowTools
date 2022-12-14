@@ -8,6 +8,7 @@ import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.SsoConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
+import com.vmware.github.Github;
 import com.vmware.gitlab.Gitlab;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
@@ -27,6 +28,8 @@ public class ServiceLocator {
     private Git git;
 
     private Gitlab gitlab;
+
+    private Github github;
 
     private Perforce perforce;
 
@@ -136,5 +139,12 @@ public class ServiceLocator {
             gitlab = new Gitlab(config.gitlabConfig.gitlabUrl, config.username);
         }
         return gitlab;
+    }
+
+    public Github getGithub() {
+        if (github == null) {
+            github = new Github(config.githubConfig.githubUrl, config.username);
+        }
+        return github;
     }
 }

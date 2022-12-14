@@ -22,6 +22,8 @@ import java.util.logging.LogManager;
  */
 public class AddBuildInfoToInternalConfig {
 
+    private static final String CREATION_DATE = "Creation Date";
+
     private static final Logger log = LoggerFactory.getLogger(AddBuildInfoToInternalConfig.class);
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -54,7 +56,7 @@ public class AddBuildInfoToInternalConfig {
         WorkflowConfig workflowConfig = gson.fromJson(new FileReader(sourceConfigJsonFile), WorkflowConfig.class);
 
         workflowConfig.buildInfo = git.getLastCommitInfo();
-        workflowConfig.buildInfo.put("Creation Date", new Date().toString());
+        workflowConfig.buildInfo.put(CREATION_DATE, new Date().toString());
         log.info("Adding last commit info\n{}", workflowConfig.buildInfo);
         String jsonOutput = gson.toJson(workflowConfig);
         log.info("Saving to target config file {}", targetConfigJsonFilePath);

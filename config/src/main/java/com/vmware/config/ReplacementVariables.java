@@ -152,6 +152,7 @@ public class ReplacementVariables {
     public enum VariableName {
         LAST_DOWNLOADED_FILE_NAME,
         REPO_DIR,
+        HOME_DIR,
         BRANCH_NAME,
         BUILD_NUMBER,
         VAPP_NAME,

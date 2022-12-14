@@ -3,6 +3,7 @@
   "chromeDebugPort": 9224,
   "defaultTopic": "Server",
   "reviewboardUrl": "https://reviewboard.eng.vmware.com",
+  "githubUrl": "https://api.github.com",
   "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
   "jiraUrl": "https://jira-hzn.eng.vmware.com",
   "bugzillaUrl": "https://bugzilla.eng.vmware.com",
@@ -125,6 +126,9 @@
     100
   ],
   "keepMissingCards": false,
+  "updateCheckInterval": -1,
+  "workflowJarDownloadPath": "${HOME_DIR}/.workflowReleaseDirectory/workflowTools-latest.jar",
+  "workflowGithubReleasePath": "/repos/vmware/workflowTools/releases/43387689",
   "workflows": {
     "readNonTrivialCommit": [
       "ReadLastCommit",

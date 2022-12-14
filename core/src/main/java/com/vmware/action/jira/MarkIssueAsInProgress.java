@@ -6,6 +6,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.domain.IssueStatusDefinition;
 
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
+import static com.vmware.jira.domain.IssueStatusDefinition.InReview;
 import static com.vmware.jira.domain.IssueStatusDefinition.Open;
 import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
 
@@ -13,6 +14,6 @@ import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
 public class MarkIssueAsInProgress extends BaseTransitionJiraIssue {
 
     public MarkIssueAsInProgress(WorkflowConfig config) {
-        super(config, new IssueStatusDefinition[] {InProgress}, new IssueStatusDefinition[] {Open, Reopened});
+        super(config, new IssueStatusDefinition[] {InProgress}, new IssueStatusDefinition[] {Open, Reopened, InReview});
     }
 }

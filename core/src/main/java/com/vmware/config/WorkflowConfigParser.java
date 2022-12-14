@@ -180,8 +180,8 @@ public class WorkflowConfigParser {
         if (!repoWorkflowFile.exists()) {
             return;
         }
-        WorkflowConfig repoConfig = readExternalWorkflowConfig(repoWorkflowFile);
-        internalConfig.getConfigurableFields().overrideValues(repoConfig, repoWorkflowFile.getPath());
+        WorkflowConfig config = readExternalWorkflowConfig(repoWorkflowFile);
+        internalConfig.getConfigurableFields().overrideValues(config, repoWorkflowFile.getPath());
     }
 
     private WorkflowConfig readExternalWorkflowConfig(File configFilePath) {
