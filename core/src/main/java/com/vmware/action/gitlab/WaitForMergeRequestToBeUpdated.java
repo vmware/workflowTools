@@ -26,7 +26,7 @@ public class WaitForMergeRequestToBeUpdated extends BaseCommitWithMergeRequestAc
         }
         log.info("Waiting for merge request {} commit hash to be updated to match branch {} ref {}", draft.mergeRequestId(), currentBranch, headRef);
         Callable<Boolean> commitHashCheck = () -> {
-            MergeRequest mergeRequest = gitlab.getMergeRequest(draft.mergeRequestProjectId(), draft.mergeRequestId());
+            MergeRequest mergeRequest = gitlab.getMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId());
             draft.setGitlabMergeRequest(mergeRequest);
             log.info("Current merge request commit hash " + mergeRequest.sha);
             return headRef.equals(mergeRequest.sha);

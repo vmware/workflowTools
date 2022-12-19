@@ -70,7 +70,7 @@ public class WorkflowAppLoader {
         if (releaseJar.exists() && !releaseJar.canWrite()) {
             info("Auto updating workflow tools");
         } else if (releaseJar.exists() && !update) {
-            debug("Jar file " + releaseJar.getPath() + " already exists");
+            debug("Jar file %s already exists", releaseJar.getPath());
             return;
         }
         deleteOldReleasesIfNeeded();
@@ -124,14 +124,14 @@ public class WorkflowAppLoader {
         return releaseURL;
     }
 
-    private void debug(String message) {
+    private void debug(String message, String... params) {
         if (debugLog) {
-            System.out.println(message);
+            System.out.println(String.format(message, params));
         }
     }
 
-    private void info(String message) {
-        System.out.println(message);
+    private void info(String message, String... params) {
+        System.out.println(String.format(message, params));
     }
 
     private Map<String, String> getManifestAttributes() {

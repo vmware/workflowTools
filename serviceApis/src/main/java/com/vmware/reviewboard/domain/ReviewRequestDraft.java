@@ -547,15 +547,6 @@ public class ReviewRequestDraft extends BaseEntity {
         return hasMergeRequest() ? Integer.parseInt(StringUtils.substringAfterLast(mergeRequestUrl, "/")) : null;
     }
 
-    public boolean mergeRequestLoaded() {
-        return gitlabMergeRequest != null;
-    }
-
-    public Integer mergeRequestProjectId() {
-        return gitlabMergeRequest != null ? gitlabMergeRequest.projectId : null;
-    }
-
-
     private int totalLineChanges() {
         return lineInsertions + lineDeletions;
     }

@@ -14,7 +14,7 @@ public class ApproveMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        MergeRequestApprovals approvals = gitlab.getMergeRequestApprovals(draft.mergeRequestProjectId(), draft.mergeRequestId());
+        MergeRequestApprovals approvals = gitlab.getMergeRequestApprovals(gitlabConfig.gitlabProjectId, draft.mergeRequestId());
         if (approvals.approvalsRequired != null && approvals.approvalsRequired == 0) {
             log.info("No approvals required for merge request {}", draft.mergeRequestUrl);
             return;
@@ -30,7 +30,7 @@ public class ApproveMergeRequest extends BaseCommitWithMergeRequestAction {
         }
 
         log.info("Self approving merge request {}", draft.mergeRequestUrl);
-        MergeRequestApprovals updatedApprovals = gitlab.approveMergeRequest(draft.mergeRequestProjectId(), draft.mergeRequestId());
+        MergeRequestApprovals updatedApprovals = gitlab.approveMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId());
         if (!updatedApprovals.userHasApproved) {
             throw new FatalException("Merge request {} is not self approved", draft.mergeRequestUrl);
         }
