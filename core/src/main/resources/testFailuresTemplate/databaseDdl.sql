@@ -7,12 +7,18 @@ create table job_view (
 
 create table job (
     id identity primary key,
-    view_id bigint NOT NULL references job_view(id),
     name varchar(128) NOT NULL,
     url varchar(256) NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_job_url ON job(url);
+
+create table job_view_mapping (
+     id identity primary key,
+     view_id bigint NOT NULL references job_view(id),
+     job_id bigint NOT NULL references job(id)
+);
+
 
 create table job_build (
     id identity primary key,

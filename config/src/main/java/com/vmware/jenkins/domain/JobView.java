@@ -62,7 +62,7 @@ public class JobView extends BaseDbClass {
 
 
     public void populateJobsFromDb() {
-        this.jobs = dbUtils.query(Job.class,"SELECT * FROM JOB where VIEW_ID = ?", id).toArray(new Job[0]);
+        this.jobs = dbUtils.query(Job.class,"SELECT j.* FROM JOB j WHERE j.id in (SELECT jv.JOB_ID FROM JOB_VIEW_MAPPING jv WHERE jv.VIEW_ID = ?)", id).toArray(new Job[0]);
         Arrays.stream(jobs).forEach(job -> job.setDbUtils(dbUtils));
 
         Arrays.stream(jobs).forEach(job -> {
@@ -107,8 +107,9 @@ public class JobView extends BaseDbClass {
             dbUtils.insertIfNeeded(this, "SELECT * FROM JOB_VIEW WHERE NAME = ?", name);
         }
         usableJobs.forEach(job -> {
-            job.viewId = id;
             dbUtils.insertIfNeeded(job, "SELECT * FROM JOB WHERE URL = ?", job.url);
+            dbUtils.insertIfNeeded(new JobViewMapping(job.id, id),
+                    "SELECT * FROM JOB_VIEW_MAPPING WHERE JOB_ID = ? AND VIEW_ID = ?", job.id, id);
         });
         return usableJobs;
     }

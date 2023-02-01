@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.vmware.util.exception.CancelException;
 import com.vmware.util.exception.FatalException;
+import com.vmware.util.logging.LogLevel;
 
 public class VappData {
 
@@ -71,6 +73,8 @@ public class VappData {
     public void setSelectedVappByIndex(int index) {
         if (index < vapps.size()) {
             this.setSelectedVapp(vapps.get(index));
+        } else {
+            throw new CancelException(LogLevel.INFO, "no vapp selected");
         }
     }
 

@@ -108,7 +108,7 @@ public class Jenkins extends AbstractRestBuildService {
 
     private void addFailedConfigTestsViaJobHtmlPage(JobBuild jobBuild, TestResults results) {
         String testngReportsUrl = UrlUtils.addTrailingSlash(jobBuild.getTestReportsUIUrl());
-        String jobHtmlPage = connection.get(jobBuild.url, String.class);
+        String jobHtmlPage = get(testngReportsUrl, String.class);
         if (StringUtils.isEmpty(jobHtmlPage)) {
             log.info("Failed to load {} when checking config tests", jobBuild.url);
             return;

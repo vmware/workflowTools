@@ -54,6 +54,11 @@ public class ConfiguredGsonBuilder {
         return this;
     }
 
+    public ConfiguredGsonBuilder addDoubleAsIntMapper() {
+        builder.registerTypeAdapter(Double.class, new DoubleAsIntMapper());
+        return this;
+    }
+
     public ConfiguredGsonBuilder namingPolicy(FieldNamingPolicy namingPolicy) {
         builder.setFieldNamingPolicy(namingPolicy);
         return this;

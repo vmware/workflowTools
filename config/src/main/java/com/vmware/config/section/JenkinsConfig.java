@@ -34,6 +34,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the names and parameters for the jenkins jobs to invoke. Separate jobs by commas and parameters by ampersands")
     public String jenkinsJobsToUse;
 
+    @ConfigurableProperty(commandLine = "--overwritten-jenkins-jobs", help = "Overwrites the jobs to use")
+    public String overwrittenJenkinsJobs;
+
     @ConfigurableProperty(commandLine = "--job-display-names", help = "Display names to use for the jobs invoked")
     public String[] jobsDisplayNames;
 
@@ -58,11 +61,14 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--include-in-progress", help = "Display output for in progress builds")
     public boolean includeInProgressBuilds;
 
-    @ConfigurableProperty(help = "Name for Vapp metadata json Jenkins parameter")
+    @ConfigurableProperty(commandLine = "--vapp-json-parameter-name", help = "Name for Vapp metadata json Jenkins parameter")
     public String vappJsonParameter;
 
     @ConfigurableProperty(commandLine = "--use-vapp-json", help = "Use json metadata from Vapp")
     public boolean useVappJsonParameter;
+
+    @ConfigurableProperty(commandLine = "--vapp-json-update-file", help = "File to update vapp json with")
+    public String vappJsonUpdateFile;
 
     @ConfigurableProperty(help = "Name of the Jenkins parameter used for testbed template")
     public String testbedParameter;
@@ -132,7 +138,7 @@ public class JenkinsConfig {
         Map<String, String> jobMappings = Collections.unmodifiableMap(jenkinsJobsMappings);
 
 
-        return new JenkinsJobsConfig(jenkinsJobsToUse, jobsDisplayNames, Collections.unmodifiableMap(presetParams), jenkinsUrl,
+        return new JenkinsJobsConfig(jenkinsJobsToUse, overwrittenJenkinsJobs, jobsDisplayNames, Collections.unmodifiableMap(presetParams), jenkinsUrl,
                 jobMappings, relevantAdditionalParameters, targetBranch, vappJsonParameter);
     }
 

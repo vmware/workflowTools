@@ -118,7 +118,7 @@ public class HttpConnection {
     public <T> T executeApiRequest(HttpMethodType methodType, String url, Class<T> responseConversionClass, Object requestObject, RequestParam[] params) {
         setupConnection(url, methodType, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
-        return handleServerResponse(responseConversionClass, methodType, params);
+        return handleServerResponse(url, responseConversionClass, methodType, params);
     }
 
 
@@ -241,8 +241,8 @@ public class HttpConnection {
         }
     }
 
-    private <T> T handleServerResponse(final Class<T> responseConversionClass, HttpMethodType methodTypes, RequestParam[] params) {
-        String responseText = getResponseText(0, methodTypes, params);
+    private <T> T handleServerResponse(final String url, final Class<T> responseConversionClass, HttpMethodType methodType, RequestParam[] params) {
+        String responseText = getResponseText(0, methodType, params);
         if (responseConversionClass == HttpResponse.class) {
             return (T) new HttpResponse(responseText, activeConnection.getHeaderFields());
         }
@@ -279,7 +279,7 @@ public class HttpConnection {
     private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) {
         String responseText = "";
         try {
-            responseText = parseResponseText(methodType);
+            responseText = parseResponseText();
             cookieFileStore.addCookiesFromResponse(activeConnection);
         } catch (SSLException e) {
             String urlText = activeConnection.getURL().toString();
@@ -296,7 +296,9 @@ public class HttpConnection {
         } catch (UnknownHostException | SocketException e) {
             handleNetworkException(e);
         } catch (IOException ioe) {
-            throw new RuntimeIOException(ioe);
+            String requestMethod = activeConnection.getRequestMethod();
+            String url = activeConnection.getURL().toString();
+            throw new RuntimeIOException(ioe, "Failed on {} for {}", requestMethod, url);
         }
         return responseText;
     }
@@ -353,10 +355,11 @@ public class HttpConnection {
                 + "\nFailed to access host " + activeConnection.getURL().getHost());
     }
 
-    private String parseResponseText(HttpMethodType methodType) throws IOException {
+    private String parseResponseText() throws IOException {
+        String requestMethod = activeConnection.getRequestMethod();
         String currentUrl = activeConnection.getURL().toString();
         int responseCode = activeConnection.getResponseCode();
-        log.debug("GET: {} {}", currentUrl, responseCode);
+        log.debug("{}: {} {}", requestMethod, currentUrl, responseCode);
         String responseText;
         try {
             if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {
@@ -374,7 +377,7 @@ public class HttpConnection {
 
 
         log.trace("Response\n{}", responseText);
-        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType, responseText);
+        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, requestMethod, responseText);
         return responseText;
     }
 }

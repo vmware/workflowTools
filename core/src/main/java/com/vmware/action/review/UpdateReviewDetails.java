@@ -12,6 +12,7 @@ import com.vmware.reviewboard.domain.Link;
 import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
+import com.vmware.util.StringUtils;
 
 @ActionDescription("Updates the review request draft details (summary, description, testing done, bug number, groups, people).")
 public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
@@ -27,6 +28,9 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
         ReviewRequestDraft existingDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
         if (existingDraft != null) {
             draft.targetGroups = existingDraft.targetGroups;
+            if (StringUtils.isEmpty(draft.reviewedBy)) {
+                draft.reviewedBy = existingDraft.reviewedBy;
+            }
         }
 
         if (reviewBoardConfig.disableMarkdown) {
@@ -49,7 +53,9 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
             draft.reviewedBy = null;
         }
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
-        draft.reviewedBy = commitConfig.noReviewerLabel;
+        if (draft.reviewedBy == null) {
+            draft.reviewedBy = commitConfig.noReviewerLabel;
+        }
         log.info("Successfully updated review information");
     }
 

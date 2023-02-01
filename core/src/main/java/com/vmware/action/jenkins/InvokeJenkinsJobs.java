@@ -1,11 +1,13 @@
 package com.vmware.action.jenkins;
 
+import com.google.gson.Gson;
 import com.vmware.BuildStatus;
 import com.vmware.action.base.BaseCommitWithJenkinsBuildsAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 import com.vmware.config.jenkins.JenkinsJobsConfig;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobParameter;
@@ -17,6 +19,10 @@ import com.vmware.util.ThreadUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +51,9 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
 
         if (jenkinsConfig.jobsDisplayNames != null) {
             log.debug("Using job display names {}", Arrays.toString(jenkinsConfig.jobsDisplayNames));
+        }
+        if (jenkinsConfig.overwrittenJenkinsJobs != null) {
+            log.debug("Overwriting jobs with {}", jenkinsConfig.overwrittenJenkinsJobs);
         }
         int counter = 0;
         JenkinsJobsConfig jenkinsJobsConfig = config.getJenkinsJobsConfig();
@@ -149,7 +158,27 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
                 if (!vappData.jsonDataLoaded()) {
                     throw new FatalException("$VAPP_JSON paramter used but no Vapp Json loaded");
                 }
-                paramValue = vappData.getJsonData();
+                String jsonData = vappData.getJsonData();
+                if (StringUtils.isNotEmpty(jenkinsConfig.vappJsonUpdateFile)) {
+                    Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().addDoubleAsIntMapper().build();
+                    try {
+                        Map vappJson = gson.fromJson(jsonData, Map.class);
+                        Map updatedVappJson = gson.fromJson(new FileReader(jenkinsConfig.vappJsonUpdateFile), Map.class);
+                        log.debug("Updating vapp json properties {}", updatedVappJson.keySet());
+                        updateJson(vappJson, updatedVappJson);
+                        String updatedJson = gson.toJson(vappJson);
+                        log.trace(updatedJson);
+                        paramValue = URLEncoder.encode(updatedJson, "UTF-8");
+                    } catch (FileNotFoundException | UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    try {
+                        paramValue = URLEncoder.encode(jsonData, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
 
             parameter.value = paramValue;
@@ -157,6 +186,36 @@ public class InvokeJenkinsJobs extends BaseCommitWithJenkinsBuildsAction {
         }
 
         return new JobParameters(paramsToUse);
+    }
+
+    private void updateJson(Map<String, Object> vappJson, Map<String, Object> updatedVappJson) {
+        for (String jsonKey : new ArrayList<>(vappJson.keySet())) {
+            Object existingValue = vappJson.get(jsonKey);
+            if ((existingValue instanceof List || existingValue instanceof Map) && !updatedVappJson.containsKey(jsonKey)) {
+                continue;
+            }
+            Object updatedValue = updatedVappJson.get(jsonKey);
+            if (updatedValue == null) {
+                vappJson.remove(jsonKey);
+            } else if (existingValue instanceof List) {
+                List existingList = (List) existingValue;
+                List updatedList = (List) updatedValue;
+                for (int i = 0; i < existingList.size(); i++) {
+                    if (updatedList.size() <= i) {
+                        existingList.remove(i);
+                    } else if (existingList.get(i) instanceof Map) {
+                        Map<String, Object> existingMap = (Map<String, Object>) existingList.get(i);
+                        if (existingMap.values().stream().allMatch(value -> !value.getClass().isPrimitive())) {
+                            updateJson(existingMap, (Map<String, Object>) updatedList.get(i));
+                        } else {
+                            vappJson.put(jsonKey, updatedList.get(i));
+                        }
+                    }
+                }
+            } else {
+                vappJson.put(jsonKey, updatedValue);
+            }
+        }
     }
 
     private ParameterDefinition getDefinitionByName(List<ParameterDefinition> parameterDefinitions, String name) {

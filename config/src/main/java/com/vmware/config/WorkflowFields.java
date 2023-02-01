@@ -36,15 +36,18 @@ public class WorkflowFields {
     @Expose(serialize = false, deserialize = false)
     private List<WorkflowField> configurableFields = new ArrayList<>();
 
-    private List<String> loadedConfigFiles = new ArrayList<>();
+    private final List<String> loadedConfigFiles = new ArrayList<>();
 
-    private WorkflowConfig workflowConfig;
+    private final WorkflowConfig workflowConfig;
 
     public static boolean isSystemProperty(String propertyName) {
         if (ArrayUtils.contains(ADDITIONAL_ARGUMENT_NAMES, propertyName)) {
             return true;
         }
         if (propertyName.startsWith(JenkinsConfig.CONFIG_PREFIX)) {
+            return true;
+        }
+        if (propertyName.startsWith(WorkflowConfig.MACRO_PREFIX)) {
             return true;
         }
         return propertyName.startsWith(ReplacementVariables.CONFIG_PREFIX);
@@ -63,7 +66,7 @@ public class WorkflowFields {
             if (!matchingFields.isEmpty()) {
                 propertiesAffected.add(matchingFields.get(0).configAnnotation());
                 String value = configValues.get(configValueName);
-                matchingFields.forEach(matchingField -> setFieldValue(matchingField, value, source)); ;
+                matchingFields.forEach(matchingField -> setFieldValue(matchingField, value, source));
             } else if (!isSystemProperty(configValueName)) {
                 unknownConfigValues.add(configValueName);
             }
@@ -196,6 +199,10 @@ public class WorkflowFields {
         overriddenConfigSources.put(fieldName, source);
     }
 
+    public Set<String> fieldSources() {
+        return new HashSet<>(overriddenConfigSources.values());
+    }
+
     public void setFieldValue(String fieldName, Object value, String source) {
         List<WorkflowField> matchingFields = configurableFields.stream()
                 .filter(field -> field.getName().equals(fieldName)).collect(Collectors.toList());
@@ -209,6 +216,10 @@ public class WorkflowFields {
         Object validValue = field.determineValue(value);
         overriddenConfigSources.put(field.getName(), source);
         field.setValue(workflowConfig, validValue);
+    }
+
+    public int loadedConfigFilesSize() {
+        return loadedConfigFiles.size();
     }
 
     public String loadedConfigFilesText() {

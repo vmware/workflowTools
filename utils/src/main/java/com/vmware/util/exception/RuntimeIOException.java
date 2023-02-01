@@ -10,4 +10,8 @@ public class RuntimeIOException extends WorkflowRuntimeException {
     public RuntimeIOException(IOException cause) {
         super(cause);
     }
+
+    public RuntimeIOException(Throwable cause, String message, Object... arguments) {
+        super(cause, message, arguments);
+    }
 }

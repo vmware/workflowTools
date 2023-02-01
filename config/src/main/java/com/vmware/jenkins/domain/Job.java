@@ -37,9 +37,6 @@ public class Job extends BaseDbClass {
     @Expose(serialize = false, deserialize = false)
     public String buildDisplayName;
 
-    @Expose(serialize = false, deserialize = false)
-    public Long viewId;
-
     public String url;
 
     @DbSaveIgnore
@@ -266,7 +263,7 @@ public class Job extends BaseDbClass {
                 result.jobId = build.jobId;
                 String testReportsUIUrl;
                 if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
-                    testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport");
+                    testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport/");
                 } else {
                     testReportsUIUrl = build.getTestReportsUIUrl();
                 }

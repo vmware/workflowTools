@@ -16,7 +16,7 @@ public class ExceptionChecker {
 
     private static Logger log = LoggerFactory.getLogger(ExceptionChecker.class);
 
-    public static void throwExceptionIfStatusIsNotValid(String currentUrl, final int statusCode, HttpMethodType methodType, final String responseText) {
+    public static void throwExceptionIfStatusIsNotValid(String currentUrl, final int statusCode, String methodType, final String responseText) {
         if (isStatusValid(statusCode)) {
             return;
         }

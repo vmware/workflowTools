@@ -70,6 +70,8 @@ public class WorkflowConfig {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     private static final SimpleDateFormat timeFormat = new SimpleDateFormat("HHmmss");
 
+    public static final String MACRO_PREFIX = "--M";
+
     public static ClassLoader appClassLoader;
 
     @SectionConfig
@@ -174,6 +176,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "-s,--shell", help = "Run workflow in shell mode, will allow additional commands to be run")
     public boolean shellMode;
 
+    @ConfigurableProperty(help = "Map of macros to add additional workflow arguments")
+    public Map<String, Map<String, String>> macros = new HashMap<>();
+
     @ConfigurableProperty(commandLine = "-mh,--max-history", help = "Max number of workflow history commands to keep")
     public int maxHistory;
 
@@ -277,6 +282,23 @@ public class WorkflowConfig {
     public List<ConfigurableProperty> applyConfigValues(Map<String, String> configValues, String source, boolean overwriteJenkinsParameters) {
         if (configValues.isEmpty()) {
             return Collections.emptyList();
+        }
+        for (String configValueName : configValues.keySet()) {
+            if (configValueName.startsWith(WorkflowConfig.MACRO_PREFIX)) {
+                String macroName = configValueName.substring(WorkflowConfig.MACRO_PREFIX.length());
+                if (configurableFields.loadedConfigFilesSize() > 0 && !macros.containsKey(macroName)) {
+                    throw new FatalException("No macro named " + macroName);
+                }
+                if (macros.containsKey(macroName)) {
+                    Map<String, String> macroValue = macros.get(macroName);
+                    String macroSource = "Macro " + configValueName;
+                    // log only on second usage as this is applied twice
+                    if (configurableFields.fieldSources().contains(macroSource)) {
+                        log.info("Using macro {} with values {}", macroName, macroValue);
+                    }
+                    applyConfigValues(macroValue, macroSource, true);
+                }
+            }
         }
         jenkinsConfig.addJenkinsParametersFromConfigValues(configValues, overwriteJenkinsParameters);
         replacementVariables.addReplacementVariables(configValues, COMMAND_LINE_SOURCE.equals(source));

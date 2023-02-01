@@ -25,7 +25,7 @@ public class CommandLineArgumentsParser {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private Map<String, String> argumentMap = new HashMap<String, String>();
+    private final Map<String, String> argumentMap = new HashMap<String, String>();
 
     private StringBuilder argumentsText;
 

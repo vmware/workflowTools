@@ -244,6 +244,15 @@ public class ReviewRequestDraft extends BaseEntity {
         return isNotEmpty(bugNumbers) && !bugNumbers.equals(noBugNumberLabel);
     }
 
+    public String topic() {
+        return summary != null && summary.contains(":") ? summary.substring(0, summary.indexOf(":")) : null;
+    }
+
+    public String summaryWithoutTopic() {
+        return summary != null && summary.contains(":") ? summary.substring(summary.indexOf(":") + 1).trim() : summary;
+    }
+
+
     public boolean isTrivialCommit(String trivialReviewerLabel) {
         return reviewedBy.equals(trivialReviewerLabel);
     }
@@ -253,11 +262,11 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     private String fullTestingDoneSection(boolean includeResults) {
-        String sectionText = this.testingDone;
+        StringBuilder sectionText = new StringBuilder(this.testingDone);
         for (JobBuild build : jobBuilds) {
-            sectionText += "\n" + build.details(includeResults);
+            sectionText.append("\n").append(build.details(includeResults));
         }
-        return sectionText;
+        return sectionText.toString();
     }
 
     public JobBuild getMatchingJobBuild(Job job) {

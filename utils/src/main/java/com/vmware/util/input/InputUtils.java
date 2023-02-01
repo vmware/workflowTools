@@ -238,7 +238,9 @@ public class InputUtils {
 
         // add in reverse so that order is as user expects
         for (int i = values.length -1; i >= 0; i --) {
-            reader.getHistory().add(values[i]);
+            if (values[i] != null) {
+                reader.getHistory().add(values[i]);
+            }
         }
     }
 

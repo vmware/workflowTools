@@ -469,6 +469,8 @@ public class Workflow {
         }
         variablePadder.infoTitle();
 
+        configParser.getRuntimeArgumentsText();
+
         helpMessage.ifPresent(message -> log.info("{} - {}", config.workflowsToRun, message));
     }
 

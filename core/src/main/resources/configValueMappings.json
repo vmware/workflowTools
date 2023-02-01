@@ -46,12 +46,14 @@
     "--tracking-branch"
   ],
   "InvokeJenkinsJobs": [
+    "--vapp-json-update-file",
     "--build-display-name",
     "--sandbox-build-number",
     "--jenkins-jobs",
     "--wait-time",
     "--wait-for-action",
     "--ignore-jenkins-job-failure",
+    "--overwritten-jenkins-jobs",
     "--job-display-names"
   ],
   "SyncChangelist": [

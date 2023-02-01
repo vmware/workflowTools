@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -43,7 +44,7 @@ public class JenkinsJobsConfig {
     private String vappJsonParameter;
 
     private String[] jobsDisplayNames;
-    private Map<String, String> presetParameters = new TreeMap<>();
+    private Map<String, String> presetParameters;
 
     public String jenkinsUrl;
 
@@ -57,35 +58,37 @@ public class JenkinsJobsConfig {
         return jobs.size();
     }
 
-    public JenkinsJobsConfig(String jenkinsJobsToUse, String[] jobsDisplayNames, Map<String, String> presetParameters,
+    public JenkinsJobsConfig(String jenkinsJobsToUse, String overwrittenJobNames, String[] jobsDisplayNames, Map<String, String> presetParameters,
                              String jenkinsUrl, Map<String, String> jenkinsJobsMappings, Map<String, String> additionalJobParameters,
                              String branchName, String vappJsonParameter) {
-        this.presetParameters = presetParameters;
+        this.presetParameters = new HashMap<>(presetParameters);
         this.jobsDisplayNames = jobsDisplayNames;
         this.jenkinsUrl = jenkinsUrl;
         this.jenkinsJobsMappings = jenkinsJobsMappings;
         this.additionalJobParameters = additionalJobParameters;
         this.branchName = branchName;
         this.vappJsonParameter = vappJsonParameter;
-        parseJobsText(jenkinsJobsToUse);
+        parseJobsText(jenkinsJobsToUse, overwrittenJobNames);
     }
 
-    private void parseJobsText(String jenkinsJobsToUse) {
+    private void parseJobsText(String jenkinsJobsToUse, String overwrittenJobNamesToUse) {
         if (jenkinsJobsToUse == null) {
             return;
         }
         String[] jobs = jenkinsJobsToUse.split(",");
+        String[] overwrittenJobNames = StringUtils.isNotBlank(overwrittenJobNamesToUse) ? overwrittenJobNamesToUse.split(",") : new String[0];
         int jobCounter = 0;
         for (String jobInfo : jobs) {
-            parseJobInfo(jobInfo, jobCounter++);
+            String overwrittenJobName = overwrittenJobNames.length > jobCounter ? overwrittenJobNames[jobCounter] : null;
+            parseJobInfo(jobInfo, overwrittenJobName, jobCounter++);
         }
     }
 
-    private void parseJobInfo(String jobInfo, int jobCounter) {
+    private void parseJobInfo(String jobInfo, String overwrittenJobName, int jobCounter) {
         String mappedValue = jenkinsJobsMappings.get(jobInfo);
         Job job = new Job();
         if (mappedValue != null) {
-            job.name = jobInfo;
+            job.name = overwrittenJobName != null ? overwrittenJobName : jobInfo;
             jobInfo = mappedValue;
         } else if (!jobInfo.contains("&")) {
             log.info("Treating job text {} as jenkins job name since it didn't matching any mappings", jobInfo);
@@ -104,7 +107,7 @@ public class JenkinsJobsConfig {
         }
         if (jobInfo.contains("&")) {
             int ampersandIndex = jobInfo.indexOf("&");
-            String jobName = jobInfo.substring(0, ampersandIndex);
+            String jobName = overwrittenJobName != null ? overwrittenJobName : jobInfo.substring(0, ampersandIndex);
             job.name = jobName;
             String paramText = jobInfo.substring(ampersandIndex + 1);
             job.constructUrl(jenkinsUrl, jobName);
@@ -152,6 +155,26 @@ public class JenkinsJobsConfig {
         boolean setDefaultUsernameParam = !specifiedParametersOnly && !presetParameters.containsKey(USERNAME_PARAM);
         Iterator<JobParameter> paramIter = parameters.iterator();
         Set<String> usedPresetParams = new HashSet<>();
+
+        for (String presetParamName : presetParameters.keySet()) {
+            String presetParamValue = presetParameters.get(presetParamName);
+            if (!presetParamValue.startsWith("$PARAM:")) {
+                continue;
+            }
+
+            String paramNameToUseValueFor = presetParamValue.substring("$PARAM:".length());
+            Optional<String> paramValue = parameters.stream()
+                    .filter(param -> param.name.equals(paramNameToUseValueFor))
+                    .map(param -> param.value).findFirst();
+
+            paramValue.ifPresent(value -> {
+                log.debug("Using value {} of parameter {} for parameter {}",
+                        value, paramNameToUseValueFor, presetParamName);
+                presetParameters.put(presetParamName, value);
+            });
+
+        }
+
         while (paramIter.hasNext()) {
             JobParameter parameter = paramIter.next();
             String paramName = parameter.name;
@@ -198,6 +221,7 @@ public class JenkinsJobsConfig {
             log.debug("Adding preset value {} for Vapp json parameter {}", presetParameters.get(vappJsonParameter), vappJsonParameter);
             parameters.add(new JobParameter(vappJsonParameter, presetParameters.get(vappJsonParameter)));
         }
+
         if (!specifiedParametersOnly) {
             addUnusedPresetParameters(parameters, usedPresetParams);
         }

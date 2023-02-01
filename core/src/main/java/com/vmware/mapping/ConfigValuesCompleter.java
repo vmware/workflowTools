@@ -70,6 +70,9 @@ public class ConfigValuesCompleter extends ImprovedStringsCompleter implements C
                 log.trace("Action {} added {} config flags", foundAction.getActionClassName(), matchingConfigValues);
             }
             values.addAll(matchingConfigValues);
+            config.macros.entrySet().stream()
+                    .filter(macro -> matchingConfigValues.stream().anyMatch(macro.getValue().keySet()::contains))
+                    .forEach(macro -> values.add(WorkflowConfig.MACRO_PREFIX + macro.getKey()));
         }
         values.addAll(valuesParser.calculateJenkinsParameterConfigValues());
         values.addAll(valuesParser.calculateReplacementVariables());
