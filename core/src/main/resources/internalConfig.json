@@ -653,10 +653,10 @@
       "HardSubmitReview"
     ],
     "createMergeRequest": [
+      "PushToMergeBranch",
       "selectMergeRequest",
       "CreateMergeRequestIfNeeded",
-      "CopyMergeUrlToClipboard",
-      "PushToMergeBranch"
+      "CopyMergeUrlToClipboard"
     ],
     "pushToMergeBranch" : [
       "PushToMergeBranch"
