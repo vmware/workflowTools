@@ -2,6 +2,8 @@ package com.vmware.util;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class CollectionUtils {
     public static boolean isEmpty(Object collection) {
@@ -18,5 +20,12 @@ public class CollectionUtils {
 
     public static boolean isNotEmpty(Collection collection) {
         return collection != null && !collection.isEmpty();
+    }
+
+    public static <T> Stream<T> stream(List<T> values) {
+        if (values == null) {
+            return Stream.empty();
+        }
+        return values.stream();
     }
 }

@@ -30,7 +30,11 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
             draft.targetGroups = existingDraft.targetGroups;
             if (StringUtils.isEmpty(draft.reviewedBy)) {
                 draft.reviewedBy = existingDraft.reviewedBy;
+                log.info("Keeping reviewers {} from draft", draft.reviewedBy);
             }
+        } else if (StringUtils.isEmpty(draft.reviewedBy)) {
+            draft.reviewedBy = reviewRequest.getTargetReviewersAsString();
+            log.info("Keeping reviewers {} from review request", draft.reviewedBy);
         }
 
         if (reviewBoardConfig.disableMarkdown) {

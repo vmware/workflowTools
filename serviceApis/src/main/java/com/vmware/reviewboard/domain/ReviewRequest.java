@@ -2,14 +2,15 @@ package com.vmware.reviewboard.domain;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.util.CollectionUtils;
 import com.vmware.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ReviewRequest extends BaseEntity {
 
@@ -91,14 +92,7 @@ public class ReviewRequest extends BaseEntity {
     }
 
     public String getTargetReviewersAsString() {
-        String reviewersAsString = "";
-        for (Link user : targetUsers) {
-            if (!reviewersAsString.isEmpty()) {
-                reviewersAsString += ",";
-            }
-            reviewersAsString += user.getTitle();
-        }
-        return reviewersAsString;
+        return CollectionUtils.stream(targetUsers).map(Link::getTitle).collect(Collectors.joining(","));
     }
 
     public ReviewRequestDraft asDraft() {
