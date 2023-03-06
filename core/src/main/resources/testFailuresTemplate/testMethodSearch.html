@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>Search test methods</title>
+    <style>
+    </style>
+    <script type="application/javascript">
+        function searchForResultsIfEnter(event) {
+            if (event.key === "Enter") {
+                // Cancel the default action, if needed
+                event.preventDefault();
+                searchForResults();
+            }
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split('=');
+                if (decodeURIComponent(pair[0]) === variable) {
+                    return decodeURIComponent(pair[1]);
+                }
+            }
+            return undefined;
+        }
+
+
+
+        function searchForResults(){
+            var httprequest = new XMLHttpRequest();
+            httprequest.onreadystatechange = populateData(httprequest);
+
+            var testName = document.getElementById("name").value
+            const cgiEndpoint = getQueryVariable("cgiFile");
+            if (cgiEndpoint === undefined) {
+                document.getElementById("searchTitle").innerText = "Query param cgiFile needs to be set";
+                return;
+            }
+            var restEndpoint = "cgi-bin/" + cgiEndpoint + "?--test-name=" + testName;
+            var viewName = getQueryVariable("viewName");
+            if (viewName !== undefined) {
+                restEndpoint += "&--jenkins-view=" + viewName;
+                document.getElementById("searchTitle").innerText = "Search results for test method " + testName + " in view " + viewName;
+            } else {
+                restEndpoint += "&&--jenkins-view=";
+                document.getElementById("searchTitle").innerText = "Search results for test method " + testName;
+            }
+            document.getElementById("exception").innerHTML = "";
+            document.getElementById("results").innerHTML = "";
+
+            httprequest.open("GET", restEndpoint, true);
+            httprequest.send();
+
+            document.getElementById("resultsCount").innerText = "LOADING...";
+        }
+
+        function populateData(httprequest) {
+            return function() {
+                if (httprequest.readyState == 4 && httprequest.status == 200) {
+                    var tests;
+                    try {
+                        tests = JSON.parse(httprequest.responseText);
+                    } catch(e) {
+                        document.getElementById("exception").innerHTML = httprequest.responseText;
+                        document.getElementById("resultsCount").innerText = "";
+                    }
+                    var testsTable = document.getElementById("results");
+                    document.getElementById("resultsCount").innerHTML = "Matching tests count: " + tests.length;
+                    var currentStatus = "";
+                    var headerRow = testsTable.insertRow(-1);
+                    headerRow.appendChild(createHeaderRow("Build"));
+                    headerRow.appendChild(createHeaderRow("Date"));
+                    headerRow.appendChild(createHeaderRow("Name"));
+                    for(var i=0; i < tests.length; i++){
+                        if (i > 0 && currentStatus !== tests[i].status) {
+                            //console.log("Inserting row for " + currentStatus + " changing to " + tests[i].status);
+                            var emptyRow = testsTable.insertRow(-1);
+                            emptyRow.setAttribute("height", "50");
+                        }
+                        currentStatus = tests[i].status;
+                        var row = testsTable.insertRow(-1);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        cell1.innerHTML = tests[i].buildName;
+                        cell2.innerHTML = tests[i].startedAt;
+                        cell3.innerHTML = tests[i].name + " <a href ='" + tests[i].url + "'>" + tests[i].status + "</a>";
+                    }
+                }
+            };
+        }
+
+        function createHeaderRow(title) {
+            var headerCell = document.createElement("TH");
+            headerCell.innerHTML = title;
+            headerCell.setAttribute("align", "left");
+            return headerCell;
+        }
+
+    </script>
+</head>
+<body>
+<label>Enter name of test method</label>
+<input id="name" type="text" size="60" onkeypress="searchForResultsIfEnter(event)" />
+<input type="button" value="Search" onclick="searchForResults()" />
+
+<h2 id="searchTitle"></h2>
+<pre id="exception"></pre>
+
+<h3 id="resultsCount"></h3>
+<table id="results" style="width: 100%" border="1">
+</table>
+</body>
+</html>

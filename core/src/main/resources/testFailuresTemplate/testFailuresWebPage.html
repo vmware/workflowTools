@@ -177,9 +177,19 @@
     </style>
 </head>
 <body>
-<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures test failures)</h2>
+<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures test failures in #consistentFailuresJobsCount jobs)</h2>
 <ul class="css-treeview">
     #body
+    <li><input type="checkbox" id="inconsistentFailuresJobs" /><label for="inconsistentFailuresJobs"><b>#inconsistentFailuresJobsCount Jobs with no consistent test failures</b></label>
+        <ul>
+            #inconsistentFailuresJobs
+        </ul>
+    </li>
+    <li><input type="checkbox" id="passingJobs" /><label for="passingJobs"><b>#passingJobsCount Passing Jobs</b></label>
+        <ul>
+            #passingJobs
+        </ul>
+    </li>
 </ul>
 #footer
 </body>

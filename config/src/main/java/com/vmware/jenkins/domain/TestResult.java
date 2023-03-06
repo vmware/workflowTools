@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +34,7 @@ public class TestResult extends BaseDbClass {
 
     private static final String DIFF = "DIFF";
     private static final String DIFF_TITLE = "Commits between %s and %s, guilty until proven innocent";
-    private static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
+    protected static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
     private static final SimpleDateFormat START_TIME_FORMATTER = new SimpleDateFormat("MMM dd hh:mm aa");
     public String name;
     @Expose(serialize = false, deserialize = false)
@@ -163,29 +162,40 @@ public class TestResult extends BaseDbClass {
         return packagePath + "." + className + "." + name;
     }
 
-    public void setUrlForTestMethod(String uiUrl, Set<String> usedUrls) {
+    public void setUrlForTestMethod(String uiUrl, Map<String, String[]> usedUrls) {
+        String testPathWithoutDataProviderIndex = testPathWithoutDataProviderIndex();
+
+        if (dataProviderIndex != null) {
+            this.url = UrlUtils.addRelativePaths(uiUrl, testPathWithoutDataProviderIndex + "_" + dataProviderIndex);
+            return;
+        }
+
+        String urlToUse = UrlUtils.addRelativePaths(uiUrl, testPathWithoutDataProviderIndex);
+        if (!usedUrls.containsKey(urlToUse)) {
+            this.url = urlToUse;
+            return;
+        }
+        String[] parametersForUrl = usedUrls.get(urlToUse);
+        if (parametersForUrl != null && Arrays.equals(parametersForUrl, this.parameters)) {
+            this.url = urlToUse;
+            return;
+        }
+        int counter = 0;
+        while (usedUrls.containsKey(urlToUse)) {
+            urlToUse = UrlUtils.addRelativePaths(uiUrl, testPathWithoutDataProviderIndex + "_" + ++counter);
+        }
+        this.dataProviderIndex = counter;
+        this.url = urlToUse;
+    }
+
+    public String testPathWithoutDataProviderIndex() {
         String nameToUseForUrl = name;
         String classNameToUseForUrl = className;
         if (packagePath.equals(JUNIT_ROOT)) {
             classNameToUseForUrl = className.replace(" ", "%20").replace("\"", "%22");
             nameToUseForUrl = name.replace(" ", "_").replace("\"", "_");
         }
-        if (dataProviderIndex != null) {
-            this.url = UrlUtils.addRelativePaths(uiUrl, packagePath, classNameToUseForUrl, nameToUseForUrl + "_" + dataProviderIndex);
-            return;
-        }
-
-        String urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, classNameToUseForUrl, nameToUseForUrl);
-        if (!usedUrls.contains(urlToUse)) {
-            this.url = urlToUse;
-            return;
-        }
-        int counter = 0;
-        while (usedUrls.contains(urlToUse)) {
-            urlToUse = UrlUtils.addRelativePaths(uiUrl, packagePath, classNameToUseForUrl, nameToUseForUrl + "_" + ++counter);
-        }
-        this.dataProviderIndex = counter;
-        this.url = urlToUse;
+        return UrlUtils.addRelativePaths(packagePath, classNameToUseForUrl, nameToUseForUrl);
     }
 
     public String testLinks(String viewUrl, String commitComparisonUrl) {
@@ -213,6 +223,15 @@ public class TestResult extends BaseDbClass {
 
     public boolean containsBuildNumbers(int... buildNumber) {
         return Stream.of(passedBuilds, presumedPassedBuilds, skippedBuilds, failedBuilds).anyMatch(values -> containsBuildNumbers(values, buildNumber));
+    }
+
+    public void refreshFromMatchingBuild(JobBuild build) {
+        commitId = build.commitId;
+        buildNumber = build.buildNumber;
+        jobId = build.jobId;
+        if (!containsBuildNumbers(buildNumber)) {
+            addTestResult(this);
+        }
     }
 
     public List<Map.Entry<Integer, TestStatus>> buildsToUse(int limit) {
@@ -301,7 +320,7 @@ public class TestResult extends BaseDbClass {
         int newestRun = Stream.of(passedBuilds, presumedPassedBuilds, failedBuilds, skippedBuilds)
                 .filter(Objects::nonNull).flatMap(Arrays::stream).mapToInt(Integer::intValue).max().orElse(-1);
 
-        if (newestRun < lastBuildToKeepNumber) {
+        if (newestRun < lastBuildToKeepNumber && build.isNonFailureBuild()) {
             return DELETEABLE;
         }
 

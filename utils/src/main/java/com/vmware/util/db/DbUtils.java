@@ -46,6 +46,7 @@ public class DbUtils {
 
     public void createConnection() {
         try {
+            log.debug("Connecting to {}", databaseUrl);
             currentConnection = driver.connect(databaseUrl, dbProperties);
         } catch (SQLException e) {
             throw new RuntimeException(e);

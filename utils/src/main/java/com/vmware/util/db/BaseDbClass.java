@@ -6,4 +6,8 @@ public class BaseDbClass {
     @DbSaveIgnore
     @Expose(serialize = false, deserialize = false)
     public Long id;
+
+    public Long getId() {
+        return id;
+    }
 }

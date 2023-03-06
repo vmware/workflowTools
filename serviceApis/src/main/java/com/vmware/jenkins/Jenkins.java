@@ -53,7 +53,7 @@ public class Jenkins extends AbstractRestBuildService {
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
         apiToken = readExistingApiToken(credentialsType);
 
-        if (apiToken != null) {
+        if (!disableLogin && apiToken != null) {
             apiTokenUsedForLogin = true;
             connection.setupBasicAuthHeader(new UsernamePasswordCredentials(username, apiToken));
         }
@@ -92,7 +92,7 @@ public class Jenkins extends AbstractRestBuildService {
         return getJobBuildDetails(new JobBuild(buildNumber, jobUrl));
     }
 
-    public TestResults getJobBuildTestResults(JobBuild jobBuild, boolean includeFailedConfigTests) {
+    public TestResults getJobBuildTestResults(JobBuild jobBuild) {
         try {
             TestResults results = get(determineTestReportsApiUrl(jobBuild), TestResults.class);
             results.setBuild(jobBuild);
@@ -169,7 +169,7 @@ public class Jenkins extends AbstractRestBuildService {
                         String consoleOutput = IOUtils.tail(jobBuild.logTextUrl(), linesToShow);
                         log.info(consoleOutput);
                     } else {
-                        List<TestResult> failedTests = getJobBuildTestResults(jobBuild, false).failedTestResults();
+                        List<TestResult> failedTests = getJobBuildTestResults(jobBuild).failedTestResults();
                         if (failedTests.isEmpty()) {
                             log.info("No failed tests found, showing last {} lines of log text", linesToShow);
                             String consoleOutput = IOUtils.tail(jobBuild.logTextUrl(), linesToShow);

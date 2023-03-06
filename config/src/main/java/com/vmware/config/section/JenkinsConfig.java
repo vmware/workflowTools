@@ -97,14 +97,20 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--create-test-failures-database", help = "Will run test failures database creation script")
     public boolean createTestFailuresDatabase;
 
-    @ConfigurableProperty(help = "Group Jobs by name pattern")
-    public String groupByNamePattern;
+    @ConfigurableProperty(help = "Group Jobs by name patterns")
+    public String[] groupByNamePatterns;
 
     @ConfigurableProperty(commandLine = "--regenerate-html", help = "Regenerate test failures from database only")
     public boolean regenerateHtml;
 
     @ConfigurableProperty(commandLine = "--force-refetch", help = "Refetch test results for all builds from Jenkins")
     public boolean forceRefetch;
+
+    @ConfigurableProperty(commandLine = "--test-name", help = "Test name to search for in test database")
+    public String testName;
+
+    @ConfigurableProperty(help = "Url to use to search by test method name")
+    public String testMethodNameSearchUrl;
 
     public boolean hasConfiguredArtifact() {
         return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;

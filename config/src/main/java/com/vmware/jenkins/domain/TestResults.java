@@ -2,8 +2,10 @@ package com.vmware.jenkins.domain;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,7 +78,7 @@ public class TestResults {
         if (packages != null) {
             for (Package pkg : packages) {
                 for (Class clazz : pkg.classs) {
-                    Set<String> usedUrls = new HashSet<>();
+                    Map<String, String[]> usedUrls = new HashMap<>();
                     Set<String> usedSkipExceptions = new HashSet<>();
                     for (TestResult testResult : clazz.testResults) {
                         testResult.packagePath = pkg.name;
@@ -91,7 +93,7 @@ public class TestResults {
         }
         if (suites != null) {
             for (Suite suite : suites) {
-                Set<String> usedUrls = new HashSet<>();
+                Map<String, String[]> usedUrls = new HashMap<>();
                 Set<String> usedSkipExceptions = new HashSet<>();
                 for (TestResult testResult : suite.testResults) {
                     testResult.packagePath = JUNIT_ROOT;
@@ -120,15 +122,14 @@ public class TestResults {
         return loadedTestResults;
     }
 
-    private void addExceptionForSkippedMethodIfNeeded(Set<String> usedUrls, Set<String> usedSkipExceptions, TestResult testResult, TestResult[] testResults) {
+    private void addExceptionForSkippedMethodIfNeeded(Map<String, String[]> usedUrls, Set<String> usedSkipExceptions, TestResult testResult, TestResult[] testResults) {
         if (testResult.status == SKIP && StringUtils.isNotBlank(testResult.exception) && !usedSkipExceptions.contains(testResult.exception)) {
             testResult.similarSkips = Math.toIntExact(
                     stream(testResults).filter(method -> method.status == SKIP
                             && StringUtils.equals(method.exception, testResult.exception)).count() - 1);
             usedSkipExceptions.add(testResult.exception);
         }
-        usedUrls.add(testResult.url);
-
+        usedUrls.put(testResult.url, testResult.parameters);
     }
 
     public List<TestResult> failedTestResults() {

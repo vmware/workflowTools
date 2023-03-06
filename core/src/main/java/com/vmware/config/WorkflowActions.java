@@ -1,6 +1,8 @@
 package com.vmware.config;
 
 import com.vmware.action.BaseAction;
+import com.vmware.util.logging.DynamicLogger;
+import com.vmware.util.logging.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +31,16 @@ public class WorkflowActions {
 
     public List<WorkflowAction> determineActions(String workflowString) {
         List<String> possibleActions = workflowConfig.workflows.get(workflowString);
+        DynamicLogger dynamicLogger = new DynamicLogger(log);
+        LogLevel logLevelToUse = workflowConfig.scriptMode ? LogLevel.DEBUG : LogLevel.INFO;
         if (possibleActions != null) {
-            log.info("Using workflow {}", workflowString);
+            dynamicLogger.log(logLevelToUse, "Using workflow {}", workflowString);
             log.debug("Using workflow values {}", possibleActions.toString());
         } else {
-            log.info("Treating workflow argument {} as a custom workflow string as it did not match any existing workflows", workflowString);
+            dynamicLogger.log(logLevelToUse, "Using custom workflow argument {}", workflowString);
             possibleActions = Arrays.asList(workflowString.split(","));
         }
-        log.info("");
+        log.debug("");
 
         WorkflowValuesParser valuesParser = new WorkflowValuesParser(workflowConfig, workflowActionClasses);
         valuesParser.parse(null, possibleActions, Collections.emptyList());

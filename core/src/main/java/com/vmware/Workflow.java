@@ -131,7 +131,10 @@ public class Workflow {
     }
 
     private void checkForNewVersionOfWorkflowTools() {
-        if (config.updateCheckInterval == 0 || StringUtils.isEmpty(config.workflowJarDownloadPath)
+        if (config.scriptMode) {
+            return;
+        }
+        if (config.updateCheckInterval < 0 || StringUtils.isEmpty(config.workflowJarDownloadPath)
                 || StringUtils.isEmpty(config.githubConfig.workflowGithubReleasePath)) {
             return;
         }
@@ -274,7 +277,9 @@ public class Workflow {
             WorkflowActions workflowActions = new WorkflowActions(config, WorkflowConfig.appClassLoader);
             List<WorkflowAction> actions = workflowActions.determineActions(workflowToRun);
             // update history file after all the workflow has been determined to be valid
-            updateWorkflowHistoryFile();
+            if (!config.scriptMode) {
+                updateWorkflowHistoryFile();
+            }
             if (config.dryRun) {
                 dryRunActions(actions);
             } else {
@@ -307,7 +312,7 @@ public class Workflow {
     }
 
     private void runWorkflowAgain() {
-        if (config != null && config.shellMode) {
+        if (config != null && config.shellMode && !config.scriptMode) {
             runWorkflow();
         }
     }

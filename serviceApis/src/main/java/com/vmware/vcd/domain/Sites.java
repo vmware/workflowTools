@@ -263,7 +263,7 @@ public class Sites {
 
         @Override
         public String getLoginButtonLocator() {
-            return "document.getElementsByTagName(\"button\")[0]";
+            return "document.getElementsByName(\"submit-btn\")[0]";
         }
 
         @Override

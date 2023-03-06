@@ -53,6 +53,10 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
     @SerializedName("timestamp")
     public long buildTimestamp;
 
+    @DbSaveIgnore
+    @Expose(serialize = false, deserialize = false)
+    private boolean hasSavedTestResults;
+
     public JobBuild() {
     }
 
@@ -158,8 +162,16 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
         return building ? BuildStatus.BUILDING : status;
     }
 
-    public boolean hasTestResults() {
+    public boolean isNonFailureBuild() {
         return status == BuildStatus.SUCCESS || status == BuildStatus.UNSTABLE;
+    }
+
+    public boolean hasSavedTestResults() {
+        return hasSavedTestResults;
+    }
+
+    public void setHasSavedTestResults(boolean hasSavedTestResults) {
+        this.hasSavedTestResults = hasSavedTestResults;
     }
 
     public JobBuildArtifact getArtifactForPathPattern(String pathPattern) {

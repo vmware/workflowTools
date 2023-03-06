@@ -1,6 +1,7 @@
 package com.vmware.jenkins.domain;
 
 import com.google.gson.annotations.Expose;
+import com.vmware.util.StringUtils;
 import com.vmware.util.db.BaseDbClass;
 import com.vmware.util.db.DbSaveIgnore;
 import com.vmware.util.db.DbUtils;
@@ -80,19 +81,14 @@ public class JobView extends BaseDbClass {
         }
     }
 
-    public List<Job> usableJobs(int maxJenkinsBuildsToCheck) {
+    public List<Job> usableJobs(String jobNameFilter) {
         List<Job> usableJobs = Arrays.stream(jobs).filter(job -> {
+            if (StringUtils.isNotBlank(jobNameFilter) && !job.name.matches(jobNameFilter)) {
+                log.info("Skipping {} as it didn't match job filter {}", job.name, jobNameFilter);
+                return false;
+            }
             if (job.lastCompletedBuild == null) {
                 log.info("Skipping {} as there are no recent completed builds", job.name);
-                return false;
-            }
-            if (job.lastUnstableBuild == null) {
-                log.info("Skipping {} as there are no recent unstable builds", job.name);
-                return false;
-            }
-
-            if (job.lastUnstableBuildAge() > maxJenkinsBuildsToCheck) {
-                log.info("Skipping {} as last unstable build was {} builds ago", job.name, job.lastUnstableBuildAge());
                 return false;
             }
             job.setDbUtils(dbUtils);

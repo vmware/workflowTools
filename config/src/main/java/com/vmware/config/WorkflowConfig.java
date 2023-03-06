@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,9 +17,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.StreamHandler;
 import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
@@ -203,6 +201,9 @@ public class WorkflowConfig {
     @Expose(serialize = false, deserialize = false)
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);
 
+    @ConfigurableProperty(commandLine = "--script-mode", help = "Flag to set minimize logging in script mode")
+    public boolean scriptMode;
+
     @Expose(serialize = false, deserialize = false)
     private final WorkflowFields configurableFields;
     private Map<String, String> commandlineArgMap;
@@ -219,12 +220,13 @@ public class WorkflowConfig {
         globalLogger.setLevel(logLevelToUse.getLevel());
 
         Handler[] handlers = globalLogger.getHandlers();
-        boolean containsLoggingHandler = Arrays.stream(handlers).anyMatch(handler -> handler.getClass() == StreamHandler.class);
+        boolean containsLoggingHandler = Arrays.stream(handlers).anyMatch(handler -> handler.getClass() == FileHandler.class);
         if (isNotBlank(loggingConfig.outputLogFile) && !containsLoggingHandler) {
             log.info("Saving log output to {}", loggingConfig.outputLogFile);
             try {
-                StreamHandler streamHandler = new StreamHandler(Files.newOutputStream(Paths.get(loggingConfig.outputLogFile)), new SimpleLogFormatter());
-                globalLogger.addHandler(streamHandler);
+                FileHandler fileHandler = new FileHandler(loggingConfig.outputLogFile);
+                fileHandler.setFormatter(new SimpleLogFormatter());
+                globalLogger.addHandler(fileHandler);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

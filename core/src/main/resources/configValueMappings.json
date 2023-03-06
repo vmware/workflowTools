@@ -747,6 +747,13 @@
   "BaseCommitAmendAction": [
     "--no-verify"
   ],
+  "FindJobsContainingTest": [
+    "--database-url",
+    "--database-driver-class",
+    "--database-driver-file",
+    "--jenkins-view",
+    "--test-name"
+  ],
   "DeleteVMs": [
     "--query-filter",
     "--sso-headless",
@@ -770,6 +777,7 @@
     "--database-url",
     "--database-driver-class",
     "--database-driver-file",
+    "--job-with-artifact",
     "--force-refetch",
     "--max-builds",
     "--regenerate-html",

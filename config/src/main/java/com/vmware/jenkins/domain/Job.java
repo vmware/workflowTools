@@ -2,6 +2,7 @@ package com.vmware.jenkins.domain;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.vmware.BuildStatus;
 import com.vmware.util.CollectionUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
@@ -11,15 +12,18 @@ import com.vmware.util.db.DbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
@@ -29,6 +33,7 @@ import static java.util.stream.Collectors.toMap;
 
 public class Job extends BaseDbClass {
 
+    private static final SimpleDateFormat START_TIME_FORMATTER = new SimpleDateFormat("MMM dd hh:mm aa");
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public String name;
@@ -71,6 +76,9 @@ public class Job extends BaseDbClass {
 
     @DbSaveIgnore
     public JobBuild lastStableBuild;
+
+    @DbSaveIgnore
+    public JobBuild lastFailedBuild;
 
     @DbSaveIgnore
     public JobBuild lastUnstableBuild;
@@ -141,6 +149,10 @@ public class Job extends BaseDbClass {
     }
 
     public boolean lastBuildWasSuccessful() {
+        if (CollectionUtils.isNotEmpty(savedBuilds)) {
+            return savedBuilds.get(0).status == BuildStatus.SUCCESS;
+        }
+
         if (lastStableBuild == null) {
             return false;
         }
@@ -154,6 +166,9 @@ public class Job extends BaseDbClass {
 
     public int latestUsableBuildNumber() {
         int latestBuild = Stream.of(lastStableBuild, lastUnstableBuild).filter(Objects::nonNull).mapToInt(build -> build.buildNumber).max().orElse(-1);
+        if (lastFailedBuild != null && lastFailedBuild.buildNumber - latestBuild > 2) {
+            latestBuild = lastFailedBuild.buildNumber;
+        }
         if (latestBuild == -1 && CollectionUtils.isNotEmpty(savedBuilds)) {
             return savedBuilds.stream().mapToInt(JobBuild::getBuildNumber).max().orElse(-1);
         } else {
@@ -176,6 +191,8 @@ public class Job extends BaseDbClass {
                 if (matchingResult.isPresent()) {
                     matchingResult.get().addTestResult(resultToAdd);
                 } else {
+                    log.info("Found new test {} in build {}", resultToAdd.classAndTestName(), results.getBuild().name);
+                    resultToAdd.addTestResult(resultToAdd);
                     testResults.add(resultToAdd);
                 }
             }
@@ -201,24 +218,23 @@ public class Job extends BaseDbClass {
             return;
         }
 
+        List<TestResult> duplicateTestResults = new ArrayList<>();
+
         testResults.forEach(result -> {
+            if (result.id == null) {
+                return;
+            }
+
             Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> build.buildNumber.equals(result.buildNumber)).findFirst();
             matchingBuild.ifPresent(build -> {
                 result.jobBuildId = build.id;
                 result.jobId = build.jobId;
             });
-        });
-
-        List<TestResult> duplicateTestResults = new ArrayList<>();
-
-        testResults.forEach(result -> {
-            if (result.id == null || result.parameters == null || result.parameters.length == 0) {
-                return;
-            }
 
             List<TestResult> resultsForSameUrlPath = testResults.stream()
-                    .filter(resultToCheck -> resultToCheck != result && !duplicateTestResults.contains(resultToCheck))
-                    .filter(result::matchesByUrlPath).collect(toList());
+                    .filter(testResult -> testResult.name.equals(result.name))
+                    .filter(result::matchesByUrlPath)
+                    .filter(resultToCheck -> resultToCheck != result && !duplicateTestResults.contains(resultToCheck)).collect(toList());
             if (resultsForSameUrlPath.isEmpty()) {
                 return;
             }
@@ -252,24 +268,44 @@ public class Job extends BaseDbClass {
             return;
         }
         savedBuilds = dbUtils.query(JobBuild.class, "SELECT * from JOB_BUILD WHERE JOB_ID = ? ORDER BY BUILD_NUMBER DESC", id);
-        this.testResults = dbUtils.query(TestResult.class, "SELECT tr.* from TEST_RESULT tr"
-                + " JOIN JOB_BUILD jb ON tr.job_build_id = jb.id WHERE jb.JOB_ID = ? ORDER BY tr.NAME ASC, tr.PARAMETERS ASC", id);
-        Set<String> usedUrls = new HashSet<>();
-        testResults.forEach(result -> {
-            Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
-            matchingBuild.ifPresent(build -> {
-                result.commitId = build.commitId;
-                result.buildNumber = build.buildNumber;
-                result.jobId = build.jobId;
-                String testReportsUIUrl;
-                if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
-                    testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport/");
-                } else {
-                    testReportsUIUrl = build.getTestReportsUIUrl();
+        testResults = new ArrayList<>();
+        for (JobBuild savedBuild : savedBuilds) {
+            List<TestResult> testResultsForBuild = dbUtils.query(TestResult.class, "SELECT * from TEST_RESULT WHERE JOB_BUILD_ID = ?", savedBuild.id);
+            Map<String, String[]> usedUrls = new HashMap<>();
+            List<TestResult> testResultsWithDataProviderIndex = testResultsForBuild.stream().filter(testResult -> testResult.dataProviderIndex != null).collect(toList());
+            testResultsWithDataProviderIndex.forEach(result -> {
+                if (result.parameters == null || result.parameters.length == 0) {
+                    result.dataProviderIndex = null;
                 }
-                result.setUrlForTestMethod(testReportsUIUrl, usedUrls);
-                usedUrls.add(result.url);
+                String testPathWithoutDPIndex = result.testPathWithoutDataProviderIndex();
+                long matchingTestCount = testResultsForBuild.stream().filter(testResult -> testResult.testPathWithoutDataProviderIndex().equals(testPathWithoutDPIndex)).count();
+                if (matchingTestCount <= 1) {
+                    log.info("Removing bad data provider index {} for test {}", result.dataProviderIndex, result.classAndTestName());
+                    result.dataProviderIndex = null;
+                }
             });
+
+            testResultsForBuild.forEach(result -> {
+                Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
+                matchingBuild.ifPresent(build -> {
+                    result.refreshFromMatchingBuild(build);
+
+                    String testReportsUIUrl;
+                    if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
+                        testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport/");
+                    } else {
+                        testReportsUIUrl = build.getTestReportsUIUrl();
+                    }
+                    result.setUrlForTestMethod(testReportsUIUrl, usedUrls);
+                    usedUrls.put(result.url, result.parameters);
+                });
+            });
+            testResults.addAll(testResultsForBuild);
+        }
+
+        savedBuilds.forEach(build -> {
+            boolean buildHasTestResultsSaved = testResults.stream().filter(result -> build.jobId.equals(result.jobId)).anyMatch(result -> result.containsBuildNumbers(build.buildNumber));
+            build.setHasSavedTestResults(buildHasTestResultsSaved);
         });
     }
 
@@ -282,7 +318,7 @@ public class Job extends BaseDbClass {
             return true;
         }
 
-        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasTestResults).collect(toList());
+        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasSavedTestResults).collect(toList());
         long numberOfNewerBuilds = usableBuilds.stream().filter(build -> build.buildNumber > buildNumber).count();
         return numberOfNewerBuilds >= maxBuildsToCheck;
     }
@@ -294,15 +330,17 @@ public class Job extends BaseDbClass {
         if (CollectionUtils.isEmpty(savedBuilds)) {
             return;
         }
-        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasTestResults).collect(toList());
+        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasSavedTestResults).collect(toList());
+
         JobBuild lastSavedBuildToKeep = maxJenkinsBuildsToKeep >= savedBuilds.size() ? savedBuilds.get(savedBuilds.size() - 1) : savedBuilds.get(maxJenkinsBuildsToKeep - 1);
-        JobBuild lastUsableBuildToKeep = maxJenkinsBuildsToKeep >= usableBuilds.size() ? usableBuilds.get(usableBuilds.size() - 1) : usableBuilds.get(maxJenkinsBuildsToKeep -1);
+        JobBuild lastUsableBuildToKeep = usableBuilds.isEmpty() ? null
+                : maxJenkinsBuildsToKeep >= usableBuilds.size() ? usableBuilds.get(usableBuilds.size() - 1) : usableBuilds.get(maxJenkinsBuildsToKeep -1);
 
         JobBuild lastBuildToKeep = lastUsableBuildToKeep != null && lastUsableBuildToKeep.buildNumber < lastSavedBuildToKeep.buildNumber
                 ? lastUsableBuildToKeep : lastSavedBuildToKeep;
 
         List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
-                "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ?", id, lastBuildToKeep.buildNumber);
+                "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ? ORDER BY BUILD_NUMBER ASC", id, lastBuildToKeep.buildNumber);
         existingJobBuildsToCheck.forEach(build -> {
             log.info("Removing any unimportant test results for build {}", build.name);
             Map<TestResult, TestResult.TestStatusOnBuildRemoval> testResultsWithBuildsRemoved = testResults.stream()
@@ -318,20 +356,39 @@ public class Job extends BaseDbClass {
                     } );
             if (testResults.stream().noneMatch(testResult -> testResult.containsBuildNumbers(build.buildNumber))) {
                 log.info("Removing build {}", build.name);
-                dbUtils.delete(build);
+                try {
+                    dbUtils.delete(build);
+                } catch (RuntimeException re) {
+                    if (re.getCause() instanceof SQLIntegrityConstraintViolationException) {
+                        log.error("Failed to delete build {} with id {} due to existing tests", build.name, build.id);
+                        List<TestResult> existingTests = dbUtils.query(TestResult.class, "SELECT * FROM TEST_RESULT WHERE JOB_BUILD_ID = ?", build.id);
+                        existingTests.forEach(testResult -> log.info(testResult.classAndTestName()));
+                    }
+                    throw re;
+                }
+
                 usefulBuilds.remove(build);
             }
         });
     }
 
     public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck) {
+        return createFailingTestsList(maxJenkinsBuildsToCheck,
+                entries -> entries.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1);
+    }
+
+    public List<TestResult> latestFailingTests(int maxJenkinsBuildsToCheck) {
+        return createFailingTestsList(maxJenkinsBuildsToCheck, entries -> !entries.isEmpty());
+    }
+
+    private List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck, Function<List<Map.Entry<Integer, TestResult.TestStatus>>, Boolean> includeTestResultFunction) {
         List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
+        int buildNumberToUse = latestUsableBuildNumber();
         return testResults.stream().filter(result -> !TestResult.TestStatus.isPass(result.status))
-                .filter(result -> result.containsBuildNumbers(latestUsableBuildNumber()))
+                .filter(result -> result.containsBuildNumbers(buildNumberToUse))
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
-                    if (applicableBuilds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1) {
-
+                    if (includeTestResultFunction.apply(applicableBuilds)) {
                         result.testRuns = applicableBuilds.stream().map(entry -> {
                             JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
                                     .orElse(null);
@@ -342,6 +399,8 @@ public class Job extends BaseDbClass {
                                 return new TestResult(result, matchingBuild, entry.getValue());
                             }
                         }).filter(Objects::nonNull).collect(toList());
+                    } else {
+                        result.testRuns = new ArrayList<>();
                     }
                 }).filter(result -> CollectionUtils.isNotEmpty(result.testRuns)).collect(toList());
     }
@@ -350,7 +409,19 @@ public class Job extends BaseDbClass {
         if (lastBuild != null && lastCompletedBuild != null && lastBuild.buildNumber > lastCompletedBuild.buildNumber) {
             String consolePath = StringUtils.substringAfterLast(lastBuild.consoleUrl(), "/job/");
             String consolePathWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", consolePath);
-            return "Current build <a href=\"" + consolePathWithViewName + "\">" + lastBuild.buildNumber +"</a>";
+            return "Running <a href=\"" + consolePathWithViewName + "\">" + lastBuild.buildNumber +"</a>";
+        } else {
+            return "";
+        }
+    }
+
+    public String latestBuildLink(String viewUrl) {
+        JobBuild build = CollectionUtils.isNotEmpty(savedBuilds) ? savedBuilds.get(0) : lastCompletedBuild;
+        if (build != null) {
+            String buildPath = StringUtils.substringAfterLast(build.getTestReportsUIUrl(), "/job/");
+            String buildPathWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", buildPath);
+            String titleAttribute = build.buildTimestamp > 0 ? String.format(" title=\"%s with commit %s\"", START_TIME_FORMATTER.format(new Date(build.buildTimestamp)), build.commitId) : "";
+            return "Latest <a href=\"" + buildPathWithViewName + "\"" + titleAttribute + ">" + build.buildNumber +"</a>";
         } else {
             return "";
         }

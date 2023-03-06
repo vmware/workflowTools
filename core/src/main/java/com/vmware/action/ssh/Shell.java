@@ -56,7 +56,7 @@ public class Shell{
 
         }
         catch(Exception e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 

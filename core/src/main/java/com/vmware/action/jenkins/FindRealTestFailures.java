@@ -11,6 +11,7 @@ import com.vmware.jenkins.domain.JobView;
 import com.vmware.jenkins.domain.TestResult;
 import com.vmware.jenkins.domain.TestResults;
 import com.vmware.util.ClasspathResource;
+import com.vmware.util.CollectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
@@ -33,8 +34,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.vmware.BuildStatus.FAILURE;
 import static com.vmware.BuildStatus.SUCCESS;
 import static com.vmware.BuildStatus.UNSTABLE;
 import static com.vmware.util.StringUtils.pluralize;
@@ -44,6 +47,8 @@ import static java.util.stream.Collectors.toList;
 
 @ActionDescription("Finds real test failures for a Jenkins View. Real failures are tests that are continuously failing as opposed to one offs.")
 public class FindRealTestFailures extends BaseAction {
+
+    protected static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
 
     private BlockingExecutorService<Jenkins> jenkinsExecutor;
     private String generationDate;
@@ -79,7 +84,7 @@ public class FindRealTestFailures extends BaseAction {
             homePage.populateFromDatabase(jenkinsConfig.jenkinsView);
         } else {
             this.jenkinsExecutor = new BlockingExecutorService<>(6, () -> {
-                LoggerFactory.getLogger(FindRealTestFailures.class).debug("Creating new service");
+                LoggerFactory.getLogger(FindRealTestFailures.class).debug("Creating new jenkins service");
                 return serviceLocator.newJenkins();
             });
             homePage = serviceLocator.getJenkins().getHomePage();
@@ -103,6 +108,9 @@ public class FindRealTestFailures extends BaseAction {
                     jenkinsConfig.maxJenkinsBuildsToCheck);
             if (jenkinsConfig.forceRefetch) {
                 log.info("forceRefetch is set to true so all builds will be refetched");
+            }
+            if (StringUtils.isNotBlank(jenkinsConfig.jobWithArtifact)) {
+                log.info("Only using jobs matching pattern {}", jenkinsConfig.jobWithArtifact);
             }
 
             matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
@@ -156,7 +164,7 @@ public class FindRealTestFailures extends BaseAction {
         }
         Stream.of("databaseDriverFile", "databaseDriverClass").forEach(this::failIfUnset);
         log.debug("Using database driver {} and class {}", fileSystemConfig.databaseDriverFile, fileSystemConfig.databaseDriverClass);
-        log.info("Using database {} to store test results", fileSystemConfig.databaseUrl);
+        log.info("Using database {} for test results", fileSystemConfig.databaseUrl);
         dbUtils = new DbUtils(new File(fileSystemConfig.databaseDriverFile), fileSystemConfig.databaseDriverClass,
                 fileSystemConfig.databaseUrl, fileSystemConfig.dbConnectionProperties());
         dbUtils.createConnection();
@@ -170,7 +178,14 @@ public class FindRealTestFailures extends BaseAction {
         String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
         viewListingPage = viewListingPage.replace("#failingTestCount", String.valueOf(totalFailingTests));
         viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
-        viewListingPage = viewListingPage.replace("#footer", "Generated at " + generationDate + " in " + elapsedTime + " seconds");
+
+        String footer = "";
+        if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
+            footer += "<p/><a href=\"" + jenkinsConfig.testMethodNameSearchUrl + "\" " + LINK_IN_NEW_TAB + ">Search test methods</a><br/>";
+        }
+        footer += "Generated at " + generationDate + " in " + elapsedTime + " seconds";
+
+        viewListingPage = viewListingPage.replace("#footer", footer);
         return viewListingPage.replace("#body", viewListingHtml);
     }
 
@@ -200,21 +215,40 @@ public class FindRealTestFailures extends BaseAction {
 
     private void createJobResultsHtmlPages(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods) {
         final AtomicInteger counter = new AtomicInteger();
-        Comparator<Job> groupComparator = (first, second) -> {
-            if (first.name.matches(jenkinsConfig.groupByNamePattern) && !second.name.matches(jenkinsConfig.groupByNamePattern)) {
-                return -1;
-            } else if (second.name.matches(jenkinsConfig.groupByNamePattern) && !first.name.matches(jenkinsConfig.groupByNamePattern)) {
-                return 1;
-            } else {
+
+        Comparator<Map.Entry<Job, List<TestResult>>> groupComparator = (first, second) -> {
+            if (jenkinsConfig.groupByNamePatterns == null || jenkinsConfig.groupByNamePatterns.length == 0) {
                 return 0;
             }
-        };
-        String jobsResultsHtml = failingTestMethods.keySet().stream().sorted(groupComparator.thenComparing(jobDetails -> jobDetails.name)).map(job -> {
-            List<TestResult> failingTests = failingTestMethods.get(job);
-            return createJobFragment(counter.getAndIncrement(), view.url, job, failingTests);
-        }).collect(Collectors.joining("\n"));
 
-        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml);
+            int noMatchIndex = jenkinsConfig.groupByNamePatterns.length + 1;
+            Integer firstMatchIndex = IntStream.range(0, jenkinsConfig.groupByNamePatterns.length)
+                    .filter(index  -> first.getKey().name.matches(jenkinsConfig.groupByNamePatterns[index])).findFirst().orElse(noMatchIndex);
+            Integer secondMatchIndex = IntStream.range(0, jenkinsConfig.groupByNamePatterns.length)
+                    .filter(index  -> second.getKey().name.matches(jenkinsConfig.groupByNamePatterns[index])).findFirst().orElse(noMatchIndex);
+
+            return firstMatchIndex.compareTo(secondMatchIndex);
+
+        };
+        List<String> jobsResultsHtml = failingTestMethods.entrySet().stream()
+                .filter(entry -> CollectionUtils.isNotEmpty(entry.getValue()))
+                .sorted(groupComparator.thenComparing(entry -> entry.getKey().name))
+                .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        List<String> jobsPassingHtml = failingTestMethods.entrySet().stream()
+                .filter(entry -> CollectionUtils.isEmpty(entry.getValue()) && entry.getKey().lastBuildWasSuccessful())
+                .sorted(groupComparator.thenComparing(entry -> entry.getKey().name))
+                .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        List<String> inconsistentJobsHtml = failingTestMethods.entrySet().stream()
+                .filter(entry -> CollectionUtils.isEmpty(entry.getValue()) && !entry.getKey().lastBuildWasSuccessful())
+                .sorted(groupComparator.thenComparing(entry -> entry.getKey().name))
+                .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getKey().latestFailingTests(jenkinsConfig.maxJenkinsBuildsToCheck)))
+                .collect(Collectors.toList());
+
+        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml, inconsistentJobsHtml, jobsPassingHtml);
 
         File destinationFile = new File(fileSystemConfig.destinationFile);
         if (destinationFile.exists() && destinationFile.isDirectory()) {
@@ -227,26 +261,42 @@ public class FindRealTestFailures extends BaseAction {
         }
     }
 
-    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, String jobsTestResultsHtml) {
+    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, List<String> consistentFailuresJobsHtml,
+                                             List<String> inconsistentFailuresJobsHtml, List<String> jobsPassingHtml) {
         String resultsPage;
-        String footer = "Generated at " + generationDate;
-        if (includeViewsLink) {
-            footer = "<p/><a href=\"index.html\">Back</a><br/>" + footer;
+        String footer = "";
+        if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
+            String queryCharacter = jenkinsConfig.testMethodNameSearchUrl.contains("?") ? "&" : "?";
+            String searchUrl = jenkinsConfig.testMethodNameSearchUrl + queryCharacter + "viewName=" + view.name;
+            footer += "<p/><a href=\"" + searchUrl + "\" " + LINK_IN_NEW_TAB + ">Search test methods</a><br/>";
         }
-        if (StringUtils.isNotBlank(jobsTestResultsHtml)) {
+        if (includeViewsLink) {
+            footer += "<p/><a href=\"index.html\">Back</a><br/>";
+        }
+        footer += "Generated at " + generationDate;
+        if (consistentFailuresJobsHtml.isEmpty() && inconsistentFailuresJobsHtml.isEmpty()) {
+            String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
+            resultsPage = allPassedPage.replace("#viewName", view.name);
+            resultsPage = resultsPage.replace("#viewUrl", view.url);
+            resultsPage = resultsPage.replace("#footer", footer);
+        } else {
             String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
             resultsPage = failuresPage.replace("#viewName", view.name);
             resultsPage = resultsPage.replace("#viewUrl", view.url);
             resultsPage = resultsPage.replace("#viewTotalFailures", String.valueOf(view.failingTestsCount));
+            resultsPage = resultsPage.replace("#consistentFailuresJobsCount", String.valueOf(consistentFailuresJobsHtml.size()));
 
-            resultsPage = resultsPage.replace("#body", jobsTestResultsHtml);
+            resultsPage = resultsPage.replace("#body", String.join("\n", consistentFailuresJobsHtml));
+
+            resultsPage = resultsPage.replace("#inconsistentFailuresJobsCount", String.valueOf(inconsistentFailuresJobsHtml.size()));
+            resultsPage = resultsPage.replace("#inconsistentFailuresJobs", String.join("\n", inconsistentFailuresJobsHtml));
+            resultsPage = resultsPage.replace("#passingJobsCount", String.valueOf(jobsPassingHtml.size()));
+            resultsPage = resultsPage.replace("#passingJobs", String.join("\n", jobsPassingHtml));
+
             resultsPage = resultsPage.replace("#footer", footer);
             log.trace("Test Failures for view {}:\n{}", view.name, resultsPage);
-        } else {
-            String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
-            resultsPage = allPassedPage.replace("#viewName", view.name);
-            resultsPage = resultsPage.replace("#footer", footer);
         }
+
         return resultsPage;
     }
 
@@ -254,7 +304,7 @@ public class FindRealTestFailures extends BaseAction {
         jobView.setDbUtils(dbUtils);
         jobView.populateFromDb();
 
-        List<Job> usableJobs = jobView.usableJobs(jenkinsConfig.maxJenkinsBuildsToCheck);
+        List<Job> usableJobs = jobView.usableJobs(jenkinsConfig.jobWithArtifact);
 
         if (usableJobs.isEmpty()) {
             return;
@@ -277,20 +327,29 @@ public class FindRealTestFailures extends BaseAction {
         log.info("");
 
         jobView.updateInDb();
-        usableJobs.stream().filter(job -> !failedJobs.contains(job)).forEach(job -> {
+        List<Job> jobsToCheckForFailingTests = usableJobs.stream().filter(job -> !failedJobs.contains(job)).collect(toList());
+
+        Date dbUpdateStart = new Date();
+
+        jobsToCheckForFailingTests.forEach(job -> {
             job.saveFetchedBuildsInfo();
             job.addTestResultsToMasterList();
             job.saveTestResultsToDb();
             job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToCheck);
+        });
 
+        jobsToCheckForFailingTests.forEach(job -> {
             List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck);
             if (failingTests.isEmpty()) {
                 log.info("No consistently failing tests found for {}", job.name);
+                jobView.addFailingTests(job, failingTests);
             } else {
                 log.info("Found {} for {}", pluralize(failingTests.size(), "consistently failing test"), job.name);
                 jobView.addFailingTests(job, failingTests);
             }
         });
+
+        log.info("Created failing test lists for {} jobs in {} milliseconds", jobsToCheckForFailingTests.size(), new Date().getTime() - dbUpdateStart.getTime());
     }
 
     private void fetchLatestTestResults(Job job) {
@@ -304,6 +363,7 @@ public class FindRealTestFailures extends BaseAction {
                 .filter(build -> build.buildNumber >= lastBuildNumberToCheck
                         && (jenkinsConfig.forceRefetch || !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck)))
                 .collect(toList());
+
         job.usefulBuilds = usableBuilds.stream().parallel()
                 .map(build -> jenkinsExecutor.execute(j -> j.getJobBuildDetails(build)))
                 .peek(build -> build.setCommitIdForBuild(jenkinsConfig.commitIdInDescriptionPattern))
@@ -312,8 +372,8 @@ public class FindRealTestFailures extends BaseAction {
         job.usefulBuilds.removeIf(build -> build.status == null);
 
         List<Supplier<TestResults>> usableResultSuppliers = job.usefulBuilds.stream()
-                .filter(build -> build.status == SUCCESS || build.status == UNSTABLE)
-                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build, true)))
+                .filter(build -> build.status == SUCCESS || build.status == UNSTABLE || build.status == FAILURE)
+                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build)))
                 .collect(toList());
 
         if (job.usefulBuilds.isEmpty()) {
@@ -329,7 +389,8 @@ public class FindRealTestFailures extends BaseAction {
     }
 
     private String createJobFragment(int jobIndex, String viewUrl, Job fullDetails, List<TestResult> failingMethods) {
-        String jobFragment = new ClasspathResource("/testFailuresTemplate/jobFailures.html", this.getClass()).getText();
+        String jobFragmentFile = failingMethods.isEmpty() ? "/testFailuresTemplate/jobNoFailures.html" : "/testFailuresTemplate/jobFailures.html";
+        String jobFragment = new ClasspathResource(jobFragmentFile, this.getClass()).getText();
         String rowFragment = new ClasspathResource("/testFailuresTemplate/testFailureRows.html", this.getClass()).getText();
 
         String jobPath = StringUtils.substringAfterLast(fullDetails.url, "/job/");
@@ -337,11 +398,12 @@ public class FindRealTestFailures extends BaseAction {
 
         String filledInJobFragment = jobFragment.replace("#url", jobUrlWithViewName);
         filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink(viewUrl));
+        filledInJobFragment = filledInJobFragment.replace("#latestBuildLink", fullDetails.latestBuildLink(viewUrl));
         filledInJobFragment = filledInJobFragment.replace("#jobName", fullDetails.name);
         filledInJobFragment = filledInJobFragment.replace("#failingTestCount", pluralize(failingMethods.size(), "failing test"));
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);
 
-        StringBuilder rowBuilder = new StringBuilder("");
+        StringBuilder rowBuilder = new StringBuilder();
         int index = 0;
         for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)).collect(toList())) {
             String filledInRow = rowFragment.replace("#testName", method.fullTestNameForDisplay());
