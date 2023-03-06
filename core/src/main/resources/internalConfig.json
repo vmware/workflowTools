@@ -1,7 +1,6 @@
 {
   "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "chromeDebugPort": 9224,
-  "serverPort": 9001,
   "defaultTopic": "Server",
   "reviewboardUrl": "https://reviewboard.eng.vmware.com",
   "githubUrl": "https://api.github.com",

@@ -2,7 +2,6 @@ package com.vmware.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -118,22 +117,6 @@ public class IOUtils {
 
     public static String read(InputStream inputStream) {
         return read(inputStream, null);
-    }
-
-    public static byte[] readBytes(InputStream inputStream) {
-        int nRead;
-        byte[] data = new byte[16384];
-
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        try {
-            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeIOException(ioe);
-        }
-
-        return buffer.toByteArray();
     }
 
     public static String read(InputStream inputStream, LogLevel printLinesLevel) {

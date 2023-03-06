@@ -16,10 +16,6 @@ public class ClasspathResource {
         return IOUtils.read(classToUseAsLoader.getResourceAsStream(fileName));
     }
 
-    public byte[] getBytes() {
-        return IOUtils.readBytes(classToUseAsLoader.getResourceAsStream(fileName));
-    }
-
     public InputStreamReader getReader() {
         return new InputStreamReader(classToUseAsLoader.getResourceAsStream(fileName));
     }
