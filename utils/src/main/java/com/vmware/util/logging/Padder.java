@@ -4,8 +4,6 @@ import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.logging.Level;
-
 /**
  * Used to generate consistent titles.
  * Output looks like ********** TITLE **********

@@ -1,14 +1,10 @@
 package com.vmware.util.logging;
 
-import com.vmware.util.logging.LogLevel;
-
 import java.text.SimpleDateFormat;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
 
 /**
  * JDK Logger formatter. Used to format all log output.
@@ -23,7 +19,7 @@ public class SimpleLogFormatter extends Formatter {
 
         Level logLevel = Logger.getLogger("com.vmware").getLevel();
         if (record.getMessage().isEmpty() && logLevel != Level.FINER && logLevel != Level.FINEST) {
-            return NEW_LINE_CHAR;
+            return System.lineSeparator();
         }
 
         // Create a StringBuilder to contain the formatted record
@@ -47,7 +43,7 @@ public class SimpleLogFormatter extends Formatter {
         // Get the formatted message (includes localization
         // and substitution of parameters) and add it to the buffer
         sb.append(formatMessage(record));
-        sb.append(NEW_LINE_CHAR);
+        sb.append(System.lineSeparator());
 
         return sb.toString();
     }

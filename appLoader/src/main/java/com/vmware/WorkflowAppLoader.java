@@ -1,5 +1,7 @@
 package com.vmware;
 
+import com.vmware.util.logging.WorkflowConsoleHandler;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,10 +12,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,16 +21,19 @@ import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 public class WorkflowAppLoader {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS");
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final String releaseDirectory;
     private final List<String> argValues;
-    private final boolean debugLog, update, traceLog;
+    private final boolean update;
     private final File releaseJar;
     private final Map<String, String> manifestAttributes;
     private final File testReleaseJar;
@@ -38,14 +41,19 @@ public class WorkflowAppLoader {
     public static void main(String[] args) {
         WorkflowAppLoader loader = new WorkflowAppLoader(args);
         loader.downloadJarFileIfNeeded();
-
         loader.executeWorkflowJar();
     }
 
     public WorkflowAppLoader(String[] args) {
         this.argValues = new ArrayList<>(Arrays.asList(args));
-        this.debugLog = Stream.of("-d", "--debug").anyMatch(argValues::contains);
-        this.traceLog = Stream.of("-t", "--trace").anyMatch(argValues::contains);
+        LogManager.getLogManager().reset();
+        java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
+        globalLogger.addHandler(new WorkflowConsoleHandler());
+
+        boolean debugLog = Stream.of("-d", "--debug").anyMatch(argValues::contains);
+        boolean traceLog = Stream.of("-t", "--trace").anyMatch(argValues::contains);
+        globalLogger.setLevel(traceLog ? Level.FINEST : debugLog ? Level.FINE : Level.INFO);
+
         this.update = argValues.remove("--update");
         this.manifestAttributes = getManifestAttributes();
 
@@ -56,7 +64,7 @@ public class WorkflowAppLoader {
     }
 
     public void executeWorkflowJar() {
-        debug("Launching workflow jar with args " + argValues);
+        logger.fine("Launching workflow jar with args " + argValues);
         try {
 
             URLClassLoader urlClassLoader = URLClassLoader.newInstance(new URL[] { releaseJar.toURI().toURL()}, getClass().getClassLoader());
@@ -70,16 +78,16 @@ public class WorkflowAppLoader {
     }
 
     public void downloadJarFileIfNeeded() {
-        debug("Expected release jar is " + releaseJar.getAbsolutePath());
+        logger.fine("Expected release jar is " + releaseJar.getAbsolutePath());
         if (releaseJar.exists() && !releaseJar.canWrite()) {
-            info("Auto updating workflow tools");
+            logger.info("Auto updating workflow tools");
         } else if (releaseJar.exists() && !update) {
-            debug("Jar file %s already exists", releaseJar.getPath());
+            logger.fine(() -> String.format("Jar file %s already exists", releaseJar.getPath()));
             return;
         }
         deleteOldReleasesIfNeeded();
         URL releaseURL = createReleaseUrl();
-        info("Downloading workflow release jar " + releaseURL.toString() + " to " + releaseJar.getPath());
+        logger.info("Downloading workflow release jar " + releaseURL.toString() + " to " + releaseJar.getPath());
 
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(releaseURL.openStream())) {
             FileOutputStream fileOutputStream = new FileOutputStream(releaseJar);
@@ -93,7 +101,7 @@ public class WorkflowAppLoader {
     private void deleteOldReleasesIfNeeded() {
         String deleteOldReleasesPattern = manifestAttributes.get("deleteOldReleaseJarPattern");
         if (deleteOldReleasesPattern == null) {
-            debug("Delete old releases pattern not set, skipping deletion of old releases");
+            logger.fine("Delete old releases pattern not set, skipping deletion of old releases");
             return;
         }
         Pattern deleteJarPattern = Pattern.compile(deleteOldReleasesPattern);
@@ -102,14 +110,14 @@ public class WorkflowAppLoader {
             return;
         }
         Arrays.stream(matchingReleases).forEach(release -> {
-            info("Deleting old release " + release.getPath());
+            logger.info("Deleting old release " + release.getPath());
             release.delete();
         });
     }
 
     private URL createReleaseUrl() {
         if (testReleaseJar != null) {
-            info("Using test release file " + testReleaseJar.getPath());
+            logger.info("Using test release file " + testReleaseJar.getPath());
             try {
                 return testReleaseJar.toURI().toURL();
             } catch (MalformedURLException e) {
@@ -120,7 +128,7 @@ public class WorkflowAppLoader {
         try {
             String url = manifestAttributes.getOrDefault("releaseUrl",
                     "https://github.com/vmware/workflowTools/releases/download/latest/workflowTools.jar");
-            debug("Using workflow release url " + url);
+            logger.fine("Using workflow release url " + url);
             releaseURL = URI.create(url).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -128,31 +136,12 @@ public class WorkflowAppLoader {
         return releaseURL;
     }
 
-    private void debug(String message, String... params) {
-        log("DEBUG", message, params);
-    }
-
-    private void info(String message, String... params) {
-        log("INFO", message, params);
-    }
-
-    private void log(String level, String message, String... params) {
-        if (traceLog) {
-            String classAndMethodName = this.getClass().getSimpleName() + "." + Thread.currentThread().getStackTrace()[3].getMethodName();
-            System.out.printf(dateFormat.format(new Date()) + " " + classAndMethodName + " " + level + ": " + message + "%n", (Object[]) params);
-        } else if (debugLog) {
-            System.out.printf(level + ": " + message + "%n", (Object[]) params);
-        } else if ("INFO".equalsIgnoreCase(level)) {
-            System.out.printf((message) + "%n", (Object[]) params);
-        }
-    }
-
     private Map<String, String> getManifestAttributes() {
         Optional<String> jarFilePath = getArgValue("--loader-jar-file");
 
         InputStream manifestInputStream;
         if (jarFilePath.isPresent()) {
-            info("Loading manifest from jar file " + jarFilePath.get());
+            logger.info("Loading manifest from jar file " + jarFilePath.get());
             try {
                 JarFile jarFile = new JarFile(jarFilePath.get());
                 ZipEntry manifestEntry = jarFile.getEntry(JarFile.MANIFEST_NAME);
@@ -169,7 +158,7 @@ public class WorkflowAppLoader {
             Attributes mainAttributes = manifest.getMainAttributes();
             Set<Object> attributeKeys = mainAttributes.keySet();
             Map<String, String> attributeValues = attributeKeys.stream().collect(Collectors.toMap(String::valueOf, key -> mainAttributes.getValue((Attributes.Name) key)));
-            debug("Manifest Attribute values " + attributeValues);
+            logger.fine("Manifest Attribute values " + attributeValues);
             return attributeValues;
         } catch (IOException e) {
             throw new RuntimeException(e);

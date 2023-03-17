@@ -2,7 +2,6 @@ package com.vmware.action.ssh;
 
 import java.io.File;
 
-import com.vmware.action.base.BaseSingleVappJsonAction;
 import com.vmware.action.base.BaseSshAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;

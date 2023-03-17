@@ -5,7 +5,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
-import java.util.stream.Stream;
 
 import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.logging.LogLevel;

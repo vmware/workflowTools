@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +15,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.vmware.action.base.BaseSshAction;
-import com.vmware.action.base.BaseVappAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.ssh.SiteConfig;

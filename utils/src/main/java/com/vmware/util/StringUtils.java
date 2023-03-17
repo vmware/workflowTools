@@ -33,7 +33,6 @@ public class StringUtils {
     public static final String END_CERT = "-----END CERTIFICATE-----";
     public static final String BEGIN_ENCRYPTED_PRIVATE_KEY = "-----BEGIN ENCRYPTED PRIVATE KEY-----";
     public static final String END_ENCRYPTED_PRIVATE_KEY = "-----END ENCRYPTED PRIVATE KEY-----";
-    public static final String NEW_LINE_CHAR = "\n";
 
     private static Logger log = LoggerFactory.getLogger(StringUtils.class.getName());
 

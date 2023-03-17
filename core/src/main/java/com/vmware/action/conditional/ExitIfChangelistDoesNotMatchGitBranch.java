@@ -11,16 +11,7 @@ import com.vmware.util.scm.diff.PendingChangelistToGitDiffCreator;
 import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.vmware.util.scm.FileChange.containsChangesOfType;
 import static com.vmware.util.scm.FileChangeType.added;

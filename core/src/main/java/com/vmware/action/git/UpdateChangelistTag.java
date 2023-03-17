@@ -3,7 +3,6 @@ package com.vmware.action.git;
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.StringUtils;
 import com.vmware.util.logging.LogLevel;
 
 import java.util.List;

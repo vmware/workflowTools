@@ -8,29 +8,41 @@
     <artifactId>appLoader</artifactId>
     <packaging>jar</packaging>
     <version>1.0</version>
+    <dependencies>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>logging</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <finalName>appLoader</finalName>
                     <archive>
                         <manifest>
                             <mainClass>com.vmware.WorkflowAppLoader</mainClass>
                         </manifest>
                         <manifestEntries>
-                            <appMainClass>com.vmware.WorkflowRunner</appMainClass>
                             <deleteOldReleaseJarPattern>workflowTools-[\w_]+.jar</deleteOldReleaseJarPattern>
                             <releaseJarName>workflowTools-latest.jar</releaseJarName>
                             <releaseUrl>https://github.com/vmware/workflowTools/releases/download/latest/workflowTools.jar</releaseUrl>
                         </manifestEntries>
                     </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id> <!-- this is used for inheritance merges -->
                         <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

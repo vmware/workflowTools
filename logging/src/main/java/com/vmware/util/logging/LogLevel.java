@@ -1,7 +1,5 @@
 package com.vmware.util.logging;
 
-import com.vmware.util.exception.FatalException;
-
 import java.util.logging.Level;
 
 /**
@@ -34,7 +32,7 @@ public enum LogLevel {
                 return logLevel;
             }
         }
-        throw new FatalException("No log level found for level " + level.getName());
+        throw new RuntimeException("No log level found for level " + level.getName());
     }
 
     public static LogLevel fromJschLevel(int level) {

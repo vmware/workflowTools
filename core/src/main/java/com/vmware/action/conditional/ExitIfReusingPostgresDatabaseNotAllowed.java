@@ -3,7 +3,6 @@ package com.vmware.action.conditional;
 import com.vmware.action.BaseAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.util.CommandLineUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.SystemUtils;
 import com.vmware.util.exception.CancelException;
