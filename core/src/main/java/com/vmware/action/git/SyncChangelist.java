@@ -3,13 +3,13 @@ package com.vmware.action.git;
 import com.vmware.action.base.BaseLinkedPerforceCommitUsingGitAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.util.StopwatchUtils;
 import com.vmware.util.scm.FileChange;
 import com.vmware.util.scm.FileChangeType;
 import com.vmware.util.scm.GitChangelistRef;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +22,7 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
 
     @Override
     public void process() {
-        Date startingDate = new Date();
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         log.info("Syncing changes to changelist {}", draft.perforceChangelistId);
         List<FileChange> gitDiffChanges = git.getChangesInDiff(gitRepoConfig.trackingBranchPath(), "head");
         log.debug("Git diff change count {}", gitDiffChanges.size());
@@ -49,8 +49,7 @@ public class SyncChangelist extends BaseLinkedPerforceCommitUsingGitAction {
         perforce.openFilesForEditIfNeeded(draft.perforceChangelistId, missingChanges);
         copyChangedFilesToClient(gitDiffChanges);
         perforce.renameAddOrDeleteFiles(draft.perforceChangelistId, missingChanges);
-        long elapsedTime = System.currentTimeMillis() - startingDate.getTime();
-        long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime);
+        long elapsedTimeInSeconds = stopwatch.elapsedTime(TimeUnit.SECONDS);
         String plural = elapsedTimeInSeconds == 1 ? "" : "s";
         log.info("Synced changes to changelist {} in {} second{}\n", draft.perforceChangelistId,
                 elapsedTimeInSeconds, plural);

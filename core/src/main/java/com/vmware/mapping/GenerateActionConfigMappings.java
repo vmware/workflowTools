@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.regex.Matcher;
@@ -34,8 +33,8 @@ import com.vmware.util.FileUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.logging.SimpleLogFormatter;
 
+import com.vmware.util.logging.WorkflowConsoleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +179,7 @@ public class GenerateActionConfigMappings {
     public static void main(String[] args) throws IOException {
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        globalLogger.addHandler(createHandler());
+        globalLogger.addHandler(new WorkflowConsoleHandler());
         globalLogger.setLevel(Level.INFO);
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -265,12 +264,5 @@ public class GenerateActionConfigMappings {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private static ConsoleHandler createHandler() {
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleLogFormatter());
-        handler.setLevel(Level.FINEST);
-        return handler;
     }
 }

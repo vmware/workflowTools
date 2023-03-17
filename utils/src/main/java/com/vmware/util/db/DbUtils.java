@@ -1,6 +1,7 @@
 package com.vmware.util.db;
 
 import com.vmware.util.ReflectionUtils;
+import com.vmware.util.StopwatchUtils;
 import com.vmware.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,9 @@ public class DbUtils {
     public void createConnection() {
         try {
             log.debug("Connecting to {}", databaseUrl);
+            StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
             currentConnection = driver.connect(databaseUrl, dbProperties);
+            log.debug("Connected in {} milliseconds", stopwatch.elapsedTime());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -101,6 +104,7 @@ public class DbUtils {
     }
 
     public <T> List<T> query(Class<T> recordClass, String query, Object... parameters) {
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
         try (PreparedStatement statement = createStatement(query, parameters)) {
             ResultSet results = statement.executeQuery();
@@ -110,6 +114,7 @@ public class DbUtils {
                 while (results.next()) {
                     values.add((T) results.getObject(1));
                 }
+                log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
                 return values;
             } else if (!BaseDbClass.class.isAssignableFrom(recordClass)) {
                throw new RuntimeException("Cannot query for multiple values without using a class that extends " + BaseDbClass.class.getSimpleName());
@@ -144,6 +149,7 @@ public class DbUtils {
                 ReflectionUtils.invokeAllMethodsWithAnnotation(record, AfterDbLoad.class);
                 records.add(record);
             }
+            log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
             return records;
 
         } catch (SQLException se) {

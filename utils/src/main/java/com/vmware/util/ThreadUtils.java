@@ -1,6 +1,5 @@
 package com.vmware.util;
 
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -27,31 +26,22 @@ public class ThreadUtils {
     }
 
     public static void waitForCallable(Callable<Boolean> condition, long totalTimeToWaitInSeconds, long timeBetweenRetriesInSeconds, String reason) {
-        Date startTime = new Date();
-        long elapsedTimeInSeconds = 0;
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         try {
             boolean callableSucceeded = condition.call();
-            while (!callableSucceeded && elapsedTimeInSeconds < totalTimeToWaitInSeconds) {
+            while (!callableSucceeded && stopwatch.elapsedTime(TimeUnit.SECONDS) < totalTimeToWaitInSeconds) {
                 ThreadUtils.sleep(timeBetweenRetriesInSeconds, TimeUnit.SECONDS);
-                elapsedTimeInSeconds = determineElapsedTime(startTime);
-                log.debug("Retrying after {} seconds", elapsedTimeInSeconds);
+                log.debug("Retrying after {} seconds", stopwatch.elapsedTime(TimeUnit.SECONDS));
                 callableSucceeded = condition.call();
             }
             if (!callableSucceeded) {
-                throw new RuntimeException("Timed out after " + elapsedTimeInSeconds + " seconds. " + reason);
+                throw new RuntimeException("Timed out after " + stopwatch.elapsedTime(TimeUnit.SECONDS) + " seconds. " + reason);
             } else {
-                log.info("Completed after {} seconds", elapsedTimeInSeconds);
+                log.info("Completed after {} seconds", stopwatch.elapsedTime(TimeUnit.SECONDS));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static long determineElapsedTime(Date startTime) {
-        long elapsedTimeInSeconds;
-        long elapsedTimeInMilliseconds = System.currentTimeMillis() - startTime.getTime();
-        elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTimeInMilliseconds);
-        return elapsedTimeInSeconds;
     }
 
     private static long determineRetryWaitPeriod(long totalSeconds) {

@@ -37,8 +37,17 @@ public class Git extends BaseScmWrapper {
     private static String trackingBranch;
     private static String rootDirectoryCommandOutput;
     private static Map<String, String> configValues;
-    private Boolean gitInstalled;
+    private static Boolean gitInstalled;
     private File rootDirectory;
+
+    public static boolean isGitInstalled() {
+        if (gitInstalled != null) {
+            return gitInstalled;
+        }
+        gitInstalled = isCommandAvailable("git");
+
+        return gitInstalled;
+    }
 
     public Git() {
         super(ScmType.git);
@@ -189,7 +198,6 @@ public class Git extends BaseScmWrapper {
             return "";
         }
         if (!configValues.containsKey(propertyName.toLowerCase())) {
-            log.debug("Returning empty string as config value {} was not found", propertyName);
             return "";
         }
         return configValues.get(propertyName.toLowerCase());
@@ -218,13 +226,11 @@ public class Git extends BaseScmWrapper {
         String[] valuesAsText = configText.split("[\r\n]+");
         Map<String, String> values = new HashMap<String, String>();
         for (String valueAsText : valuesAsText) {
-            String[] valuePieces = valueAsText.split("=");
+            String[] valuePieces = StringUtils.splitOnlyOnce(valueAsText, "=");
             if (valuePieces.length == 2) {
                 values.put(valuePieces[0].toLowerCase(), valuePieces[1]);
-            } else if (valuePieces.length == 1) {
-                values.put(valuePieces[0].toLowerCase(), "");
             } else {
-                log.debug("{} git config value could not be parsed", valueAsText);
+                values.put(valuePieces[0].toLowerCase(), "");
             }
         }
         configValues = values;
@@ -368,7 +374,6 @@ public class Git extends BaseScmWrapper {
 
     public String getTrackingBranch() {
         if (Git.trackingBranch != null) {
-            log.trace("Already parsed tracking branch value of {}", Git.trackingBranch);
             return Git.trackingBranch;
         }
         String branchName = currentBranch();
@@ -550,15 +555,6 @@ public class Git extends BaseScmWrapper {
         return commitInfo;
     }
 
-    public boolean isGitInstalled() {
-        if (gitInstalled != null) {
-            return gitInstalled;
-        }
-        gitInstalled = isCommandAvailable("git");
-
-        return gitInstalled;
-    }
-
     private void checkRefsAreValid(String... refs) {
         for (String ref : refs) {
             revParse(ref);
@@ -582,13 +578,13 @@ public class Git extends BaseScmWrapper {
 
     private void determineRootDirectory() {
         if (Git.rootDirectoryCommandOutput != null) {
-            log.trace("Previously ran root directory command output {}", Git.rootDirectoryCommandOutput);
             String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
             rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
-        } else if (CommandLineUtils.isCommandAvailable("git")) {
+        } else if (isGitInstalled()) {
             Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
             String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
             rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
+            log.trace("Git root directory {}", Git.rootDirectoryCommandOutput);
         }
     }
 

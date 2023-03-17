@@ -2,6 +2,7 @@ package com.vmware.util.logging;
 
 import com.vmware.util.logging.LogLevel;
 
+import java.text.SimpleDateFormat;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -16,6 +17,7 @@ import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
  */
 public class SimpleLogFormatter extends Formatter {
 
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS");
 
     public String format(LogRecord record) {
 
@@ -32,7 +34,7 @@ public class SimpleLogFormatter extends Formatter {
             if (className.contains(".")) {
                 className = className.substring(className.lastIndexOf(".") + 1);
             }
-            sb.append(className).append(".").append(record.getSourceMethodName()).append(" ");
+            sb.append(dateFormat.format(record.getMillis())).append(" ").append(className).append(".").append(record.getSourceMethodName()).append(" ");
         }
 
         if (logLevel != Level.INFO || (record.getLevel() == Level.WARNING || record.getLevel() == Level.SEVERE)) {

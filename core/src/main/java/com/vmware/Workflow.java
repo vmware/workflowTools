@@ -55,13 +55,14 @@ import org.slf4j.LoggerFactory;
 
 import jline.console.completer.ArgumentCompleter;
 
+import static com.vmware.util.StopwatchUtils.timeRunnable;
+
 /**
  * Main class for running the workflow application.
  */
 public class Workflow {
     private static final String QUIT_WORKFLOW = "q";
 
-    private final Git git = new Git();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final WorkflowConfigParser configParser = new WorkflowConfigParser();
     private List<String> workflowHistory;
@@ -283,9 +284,8 @@ public class Workflow {
             if (config.dryRun) {
                 dryRunActions(actions);
             } else {
-                Date startingDate = new Date();
-                runActions(actions, new WorkflowActionValues());
-                outputTotalExecutionTime(startingDate);
+                long totalElapsedTimeInMs = timeRunnable(() -> runActions(actions, new WorkflowActionValues()));
+                outputTotalExecutionTime(totalElapsedTimeInMs);
             }
             runWorkflowAgain();
         } catch (UnknownWorkflowValueException e) {
@@ -317,12 +317,13 @@ public class Workflow {
         }
     }
 
-    private void outputTotalExecutionTime(Date startingDate) {
+    private void outputTotalExecutionTime(long totalElapsedTimeInMs) {
         if (log.isDebugEnabled()) {
             log.info("");
-            long totalElapsedTimeInMs = System.currentTimeMillis() - startingDate.getTime();
             if (totalElapsedTimeInMs < 10) {
-                log.trace("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
+                log.trace("Workflow execution time {} milliseconds", totalElapsedTimeInMs);
+            } else if (totalElapsedTimeInMs < TimeUnit.SECONDS.toMillis(10)){
+                log.debug("Workflow execution time {} milliseconds", totalElapsedTimeInMs);
             } else {
                 log.debug("Workflow execution time {} seconds", TimeUnit.MILLISECONDS.toSeconds(totalElapsedTimeInMs));
             }
@@ -417,7 +418,7 @@ public class Workflow {
 
         Padder configPadder = new Padder("Config Options");
         configPadder.infoTitle();
-        if (git.isGitInstalled()) {
+        if (Git.isGitInstalled()) {
             log.info("Config values can also be set by executing git config [name in square brackets] [configValue]");
         }
 
@@ -451,7 +452,7 @@ public class Workflow {
                     source = configurableFields.getFieldValueSource(matchingField.getName());
                 }
                 String gitConfigValue = "";
-                if (git.isGitInstalled()) {
+                if (Git.isGitInstalled()) {
                     gitConfigValue = "[" + matchingField.getName() + "]";
                 }
                 if (counter++ >= 5 && counter++ % 5 == 1) {
@@ -502,10 +503,8 @@ public class Workflow {
                 }
             }
             waitForAsyncActionSetupToFinish(actionsSetup, waitTimeInMilliSeconds, action);
-            Date startingDate = new Date();
-            runAction(action, values);
-            long elapsedTime = System.currentTimeMillis() - startingDate.getTime();
-            executionTimesPerAction.put(action.getClass().getSimpleName(), elapsedTime);
+            long elapsedTime = timeRunnable(() -> runAction(action, values));
+            executionTimesPerAction.put(action.getActionClassName(), elapsedTime);
         }
         outputExecutionTimes(executionTimesPerAction);
     }
@@ -543,7 +542,7 @@ public class Workflow {
         log.info("");
         log.debug("Execution time per action");
         for (String actionName : executionTimesPerAction.keySet()) {
-            log.debug("{} - {} ms", actionName, executionTimesPerAction.get(actionName));
+            log.debug("{} - {} milliseconds", actionName, executionTimesPerAction.get(actionName));
         }
     }
 

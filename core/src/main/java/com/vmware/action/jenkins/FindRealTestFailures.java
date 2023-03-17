@@ -14,6 +14,7 @@ import com.vmware.util.ClasspathResource;
 import com.vmware.util.CollectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.StopwatchUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.collection.BlockingExecutorService;
 import com.vmware.util.db.DbUtils;
@@ -72,8 +73,8 @@ public class FindRealTestFailures extends BaseAction {
             createDatabase();
             return;
         }
-
-        log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, new Date());
+        generationDate = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy").format(new Date());
+        log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, generationDate);
         File destinationFile = new File(fileSystemConfig.destinationFile);
         createDbUtilsIfNeeded();
         HomePage homePage;
@@ -91,15 +92,13 @@ public class FindRealTestFailures extends BaseAction {
         }
         List<HomePage.View> matchingViews = Arrays.stream(homePage.views).filter(view -> view.matches(jenkinsConfig.jenkinsView)).collect(toList());
 
-        long startTime = System.currentTimeMillis();
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         if (matchingViews.isEmpty()) {
             exitDueToFailureCheck("No views found for name " + jenkinsConfig.jenkinsView);
         }
 
         log.info("Matched {} views to view name {}", matchingViews.size(), jenkinsConfig.jenkinsView);
         log.info("View names: {}", matchingViews.stream().map(view -> view.name).collect(Collectors.joining(", ")));
-
-        generationDate = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy").format(new Date());
 
         validateThatDestinationFileIsDirectoryIfNeeded(matchingViews, destinationFile);
 
@@ -117,7 +116,7 @@ public class FindRealTestFailures extends BaseAction {
         } else {
             matchingViews.forEach(view -> createJobResultsHtmlPages(view, destinationFile.isDirectory(), homePage.failingTestsMap(view.name)));
         }
-        long elapsedTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+        long elapsedTime = stopwatch.elapsedTime(TimeUnit.SECONDS);
 
         if (dbUtils != null) {
             dbUtils.closeConnection();
@@ -329,7 +328,7 @@ public class FindRealTestFailures extends BaseAction {
         jobView.updateInDb();
         List<Job> jobsToCheckForFailingTests = usableJobs.stream().filter(job -> !failedJobs.contains(job)).collect(toList());
 
-        Date dbUpdateStart = new Date();
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
 
         jobsToCheckForFailingTests.forEach(job -> {
             job.saveFetchedBuildsInfo();
@@ -349,7 +348,7 @@ public class FindRealTestFailures extends BaseAction {
             }
         });
 
-        log.info("Created failing test lists for {} jobs in {} milliseconds", jobsToCheckForFailingTests.size(), new Date().getTime() - dbUpdateStart.getTime());
+        log.info("Created failing test lists for {} jobs in {} milliseconds", jobsToCheckForFailingTests.size(), stopwatch.elapsedTime());
     }
 
     private void fetchLatestTestResults(Job job) {

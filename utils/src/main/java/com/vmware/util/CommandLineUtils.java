@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -72,13 +71,13 @@ public class CommandLineUtils {
         if (environmentVariables != null) {
             builder.environment().putAll(environmentVariables);
         }
-        Date startingDate = new Date();
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         Padder titlePadder = new Padder(command);
         titlePadder.logTitle(logLevel);
         Process statusProcess = executeCommand(workingDirectory, environmentVariables, command, inputText);
 
         String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
-        long elapsedMilliseconds = System.currentTimeMillis() - startingDate.getTime();
+        long elapsedMilliseconds = stopwatch.elapsedTime();
         if (elapsedMilliseconds < 10) {
             dynamicLogger.log(LogLevel.TRACE, "Execution time {} milliseconds", elapsedMilliseconds);
         } else if (elapsedMilliseconds < 1000) {

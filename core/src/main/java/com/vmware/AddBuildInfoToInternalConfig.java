@@ -3,9 +3,9 @@ package com.vmware;
 import com.google.gson.Gson;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.util.logging.WorkflowConsoleHandler;
 import com.vmware.util.scm.Git;
 import com.vmware.util.IOUtils;
-import com.vmware.util.logging.SimpleLogFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Date;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -29,7 +28,7 @@ public class AddBuildInfoToInternalConfig {
     public static void main(String[] args) throws FileNotFoundException {
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        globalLogger.addHandler(createHandler());
+        globalLogger.addHandler(new WorkflowConsoleHandler());
         globalLogger.setLevel(Level.INFO);
 
         if (args.length == 0) {
@@ -44,12 +43,12 @@ public class AddBuildInfoToInternalConfig {
         File targetConfigJsonFile = new File(targetConfigJsonFilePath);
 
 
-        Git git = new Git(new File(moduleBaseDirectory));
-        if (!git.isGitInstalled()) {
+        if (!Git.isGitInstalled()) {
             System.out.println("Git is not installed, cannot add git version info");
             return;
         }
 
+        Git git = new Git(new File(moduleBaseDirectory));
         log.info("Loading internalConfig.json");
         Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
 
@@ -62,12 +61,4 @@ public class AddBuildInfoToInternalConfig {
         log.info("Saving to target config file {}", targetConfigJsonFilePath);
         IOUtils.write(targetConfigJsonFile, jsonOutput);
     }
-
-    private static ConsoleHandler createHandler() {
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleLogFormatter());
-        handler.setLevel(Level.FINEST);
-        return handler;
-    }
-
 }
