@@ -10,8 +10,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,9 +27,10 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 public class WorkflowAppLoader {
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS");
     private final String releaseDirectory;
     private final List<String> argValues;
-    private final boolean debugLog, update;
+    private final boolean debugLog, update, traceLog;
     private final File releaseJar;
     private final Map<String, String> manifestAttributes;
     private final File testReleaseJar;
@@ -41,7 +44,8 @@ public class WorkflowAppLoader {
 
     public WorkflowAppLoader(String[] args) {
         this.argValues = new ArrayList<>(Arrays.asList(args));
-        this.debugLog = Stream.of("-d", "--debug", "-t", "--trace").anyMatch(argValues::contains);
+        this.debugLog = Stream.of("-d", "--debug").anyMatch(argValues::contains);
+        this.traceLog = Stream.of("-t", "--trace").anyMatch(argValues::contains);
         this.update = argValues.remove("--update");
         this.manifestAttributes = getManifestAttributes();
 
@@ -125,13 +129,22 @@ public class WorkflowAppLoader {
     }
 
     private void debug(String message, String... params) {
-        if (debugLog) {
-            System.out.println(String.format(message, params));
-        }
+        log("DEBUG", message, params);
     }
 
     private void info(String message, String... params) {
-        System.out.println(String.format(message, params));
+        log("INFO", message, params);
+    }
+
+    private void log(String level, String message, String... params) {
+        if (traceLog) {
+            String classAndMethodName = this.getClass().getSimpleName() + "." + Thread.currentThread().getStackTrace()[3].getMethodName();
+            System.out.printf(dateFormat.format(new Date()) + " " + classAndMethodName + " " + level + ": " + message + "%n", (Object[]) params);
+        } else if (debugLog) {
+            System.out.printf(level + ": " + message + "%n", (Object[]) params);
+        } else if ("INFO".equalsIgnoreCase(level)) {
+            System.out.printf((message) + "%n", (Object[]) params);
+        }
     }
 
     private Map<String, String> getManifestAttributes() {

@@ -17,7 +17,7 @@ import static com.vmware.util.StringUtils.NEW_LINE_CHAR;
  */
 public class SimpleLogFormatter extends Formatter {
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS");
 
     public String format(LogRecord record) {
 
