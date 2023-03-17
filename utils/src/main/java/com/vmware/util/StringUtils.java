@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.Key;
-import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
@@ -71,7 +70,7 @@ public class StringUtils {
         return textWithStartAndEnd.substring(start.length(), textWithStartAndEnd.lastIndexOf(end));
     }
 
-    public static boolean textStartsWithValue(String text, String... valuesToCheck) {
+    public static boolean startsWith(String text, String... valuesToCheck) {
         return Arrays.stream(valuesToCheck).anyMatch(text::startsWith);
     }
 

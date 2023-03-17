@@ -24,7 +24,7 @@ public class ExecuteLocalSqlStatementUsingPsql extends BaseAction {
                 fileSystemConfig.databaseSchemaName, fileSystemConfig.sqlStatement);
         String output = StringUtils.trim(CommandLineUtils.executeCommand(command, LogLevel.INFO));
 
-        if (StringUtils.textStartsWithValue(output, "psql: error")) {
+        if (StringUtils.startsWith(output, "psql: error")) {
             throw new FatalException(output);
         }
 

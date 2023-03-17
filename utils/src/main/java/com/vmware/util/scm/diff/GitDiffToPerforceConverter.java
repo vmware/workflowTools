@@ -128,7 +128,7 @@ public class GitDiffToPerforceConverter implements DiffConverter {
         } else if (diffLine.equals(" ")) {
             // removing just to be consistent with perforce diffs
             lineToAdd = "";
-        } else if (!StringUtils.textStartsWithValue(diffLine, VALUES_TO_IGNORE)) {
+        } else if (!StringUtils.startsWith(diffLine, VALUES_TO_IGNORE)) {
             lineToAdd = diffLine;
         }
         if (fileChange != null) {

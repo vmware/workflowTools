@@ -46,7 +46,7 @@ public class PerforceDiffToGitConverter implements DiffConverter {
         while (lineIter.hasNext()) {
             String line = lineIter.next();
             minusMatcher.reset(line);
-            if (StringUtils.textStartsWithValue(line, VALUES_TO_IGNORE)) {
+            if (StringUtils.startsWith(line, VALUES_TO_IGNORE)) {
                 continue;
             }
 

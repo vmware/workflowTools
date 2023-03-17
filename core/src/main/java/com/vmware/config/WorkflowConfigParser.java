@@ -137,7 +137,9 @@ public class WorkflowConfigParser {
      */
     private void applySpecifiedConfigFiles(CommandLineArgumentsParser argsParser, WorkflowConfig internalConfig) {
         String gitConfigFilePath = git.configValue("workflow.configFile");
-        log.debug("Git config file: {}", gitConfigFilePath);
+        if (StringUtils.isNotBlank(gitConfigFilePath)) {
+            log.debug("Git config file: {}", gitConfigFilePath);
+        }
         if (StringUtils.isEmpty(gitConfigFilePath)) {
             gitConfigFilePath = git.configValue("workflow.config"); // backwards compatibility
         }

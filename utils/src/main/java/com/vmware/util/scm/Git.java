@@ -10,7 +10,6 @@ import com.vmware.util.logging.LogLevel;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -35,6 +34,7 @@ import static com.vmware.util.CommandLineUtils.isCommandAvailable;
  */
 public class Git extends BaseScmWrapper {
     private static String trackingBranch;
+    private static String currentBranch;
     private static String rootDirectoryCommandOutput;
     private static Map<String, String> configValues;
     private static Boolean gitInstalled;
@@ -186,7 +186,11 @@ public class Git extends BaseScmWrapper {
     }
 
     public String currentBranch() {
-        return executeScmCommand("rev-parse --abbrev-ref HEAD");
+        if (currentBranch != null) {
+            return currentBranch;
+        }
+        currentBranch = executeScmCommand("rev-parse --abbrev-ref HEAD");
+        return currentBranch;
     }
 
     public String configValue(String propertyName) {
@@ -374,31 +378,15 @@ public class Git extends BaseScmWrapper {
 
     public String getTrackingBranch() {
         if (Git.trackingBranch != null) {
-            return Git.trackingBranch;
+            return Git.trackingBranch.equals("") ? null : Git.trackingBranch;
         }
         String branchName = currentBranch();
-        String headRef = revParse("HEAD");
-
-        String branchOutput = executeScmCommand("branch -vv");
-
-        Matcher trackingBranchMatcher = Pattern.compile(branchName + "\\s*(\\w+)\\s*\\[(.+?)\\]").matcher(branchOutput);
-        if (!trackingBranchMatcher.find()) {
-            return null;
+        String trackingBranchOutput = executeScmCommand("rev-parse --abbrev-ref " + branchName + "@{upstream}");
+        if (trackingBranchOutput.startsWith("fatal") || !trackingBranchOutput.contains("/")) {
+            Git.trackingBranch = "";
+        } else {
+            Git.trackingBranch = trackingBranchOutput;
         }
-
-        String refFragment = trackingBranchMatcher.group(1);
-        if (!headRef.startsWith(refFragment)) {
-            return null;
-        }
-
-        String trackingBranch = trackingBranchMatcher.group(2);
-        int colonIndex = trackingBranch.indexOf(":");
-        if (colonIndex != -1) {
-            trackingBranch = trackingBranch.substring(0, colonIndex);
-        }
-
-        log.debug("Parsed tracking branch {} from git branch -vv", trackingBranch);
-        Git.trackingBranch = trackingBranch;
         return trackingBranch;
     }
 
@@ -456,13 +444,6 @@ public class Git extends BaseScmWrapper {
 
     @Override
     protected String checkIfCommandFailed(String gitOutput) {
-        if (StringUtils.isEmpty(gitOutput)) {
-            return null;
-        }
-
-        if (gitOutput.trim().startsWith("fatal:")) {
-            return System.getProperty("user.dir") + " is not in a git repository";
-        }
         return null;
     }
 
@@ -578,12 +559,12 @@ public class Git extends BaseScmWrapper {
 
     private void determineRootDirectory() {
         if (Git.rootDirectoryCommandOutput != null) {
-            String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
-            rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
+            boolean fatalOutput = StringUtils.startsWith(rootDirectoryCommandOutput, "fatal:");
+            rootDirectory = !fatalOutput ? new File(rootDirectoryCommandOutput) : null;
         } else if (isGitInstalled()) {
             Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
-            String commandCheckOutput = checkIfCommandFailed(rootDirectoryCommandOutput);
-            rootDirectory = commandCheckOutput == null ? new File(rootDirectoryCommandOutput) : null;
+            boolean fatalOutput = StringUtils.startsWith(rootDirectoryCommandOutput, "fatal:");
+            rootDirectory = !fatalOutput ? new File(rootDirectoryCommandOutput) : null;
             log.trace("Git root directory {}", Git.rootDirectoryCommandOutput);
         }
     }
