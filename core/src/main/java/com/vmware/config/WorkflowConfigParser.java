@@ -72,8 +72,6 @@ public class WorkflowConfigParser {
         parseUsernameIfBlank(config);
 
         config.applyReplacementVariables();
-
-        log.trace("Workflow Config\n{}", gson.toJson(config));
         return config;
     }
 

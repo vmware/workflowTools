@@ -89,9 +89,9 @@ public class GitRepoConfig {
             return "";
         }
         String targetBranchValue = git.currentBranch();
-        log.debug("Using local git branch {}", targetBranchValue);
+        log.debug("Local git branch {}", targetBranchValue);
         if (StringUtils.isNotEmpty(targetBranch)) {
-            log.info("Setting branch property to {} (read from application config)", targetBranch);
+            log.info("Overwriting branch property to {} (read from application config)", targetBranch);
             targetBranchValue = targetBranch;
         }
         return targetBranchValue;

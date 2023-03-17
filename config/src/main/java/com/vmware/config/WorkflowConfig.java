@@ -396,7 +396,7 @@ public class WorkflowConfig {
             existingValue = updatedValue;
             updatedValue = replacementVariables.replaceVariablesInValue(existingValue);
             if (!existingValue.equals(updatedValue)) {
-                log.trace(existingValue + " " + updatedValue);
+                log.trace("Updated {} to {}", existingValue, updatedValue);
             }
         } while(!existingValue.equals(updatedValue));
         return updatedValue;
