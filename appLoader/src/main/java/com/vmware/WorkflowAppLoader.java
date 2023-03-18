@@ -58,7 +58,7 @@ public class WorkflowAppLoader {
         this.manifestAttributes = getManifestAttributes();
 
         this.releaseDirectory = determineReleaseDirectory();
-        String releaseJarName = manifestAttributes.getOrDefault("releaseJarName", "workflowTools-latest.jar");
+        String releaseJarName = manifestAttributes.get("releaseJarName");
         this.releaseJar = new File(this.releaseDirectory + File.separator + releaseJarName);
         this.testReleaseJar = getArgValue("--test-release-jar").map(File::new).orElse(null);
     }
@@ -68,7 +68,7 @@ public class WorkflowAppLoader {
         try {
 
             URLClassLoader urlClassLoader = URLClassLoader.newInstance(new URL[] { releaseJar.toURI().toURL()}, getClass().getClassLoader());
-            String mainClassName = manifestAttributes.getOrDefault("appMainClass", "com.vmware.WorkflowRunner");
+            String mainClassName = manifestAttributes.get("appMainClass");
             Class<? extends AppLauncher> classToLoad = (Class<? extends AppLauncher>) urlClassLoader.loadClass(mainClassName);
             AppLauncher launcher = classToLoad.newInstance();
             launcher.run(urlClassLoader, argValues);
@@ -126,8 +126,10 @@ public class WorkflowAppLoader {
         }
         URL releaseURL;
         try {
-            String url = manifestAttributes.getOrDefault("releaseUrl",
-                    "https://github.com/vmware/workflowTools/releases/download/latest/workflowTools.jar");
+            String url = manifestAttributes.get("releaseUrl");
+            if (url == null || url.isEmpty()) {
+                throw new RuntimeException("No releaseUrl specified in manifest attributes");
+            }
             logger.fine("Using workflow release url " + url);
             releaseURL = URI.create(url).toURL();
         } catch (MalformedURLException e) {
