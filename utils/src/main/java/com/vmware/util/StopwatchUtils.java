@@ -13,8 +13,12 @@ public class StopwatchUtils {
         Stopwatch stopwatch = start();
         try {
             callable.run();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            } else {
+                throw e;
+            }
         }
         return stopwatch.elapsedTime(TimeUnit.MILLISECONDS);
     }
@@ -31,7 +35,7 @@ public class StopwatchUtils {
         }
 
         public long elapsedTime(TimeUnit timeUnit) {
-            return TimeUnit.MILLISECONDS.convert(elapsedTime(), timeUnit);
+            return timeUnit.convert(elapsedTime(), TimeUnit.MILLISECONDS);
         }
     }
 }

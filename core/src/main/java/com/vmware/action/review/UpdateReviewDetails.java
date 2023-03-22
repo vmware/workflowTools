@@ -1,14 +1,11 @@
 package com.vmware.action.review;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
-import com.vmware.reviewboard.domain.Link;
 import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
@@ -71,7 +68,7 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
         String mergeBaseRef = git.revParse(mergeBase);
         int counter = 1;
         String lastCommitRef = git.revParse("HEAD~" + counter);
-        List<String> linksForDependantRequests = new ArrayList<>();
+        Set<String> linksForDependantRequests = new LinkedHashSet<>();
         while (!lastCommitRef.equals(mergeBaseRef)) {
             String commitText = git.commitText(counter++);
             ReviewRequestDraft draftForCommit = new ReviewRequestDraft(commitText, commitConfig);

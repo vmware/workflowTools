@@ -114,7 +114,7 @@ public class FindRealTestFailures extends BaseAction {
 
             matchingViews.forEach(view -> saveResultsPageForView(view, destinationFile.isDirectory()));
         } else {
-            matchingViews.forEach(view -> createJobResultsHtmlPages(view, destinationFile.isDirectory(), homePage.failingTestsMap(view.name)));
+            matchingViews.forEach(view -> createJobResultsHtmlPages(view, destinationFile.isDirectory(), homePage.jobTestMap(view.name)));
         }
         long elapsedTime = stopwatch.elapsedTime(TimeUnit.SECONDS);
 
@@ -208,11 +208,11 @@ public class FindRealTestFailures extends BaseAction {
         view.failingTestsCount = jobView.failingTestCount();
         log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
 
-        createJobResultsHtmlPages(view, includeViewsLink, jobView.getFailedTests());
+        createJobResultsHtmlPages(view, includeViewsLink, jobView.getJobTestMap());
         viewPadder.infoTitle();
     }
 
-    private void createJobResultsHtmlPages(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> failingTestMethods) {
+    private void createJobResultsHtmlPages(HomePage.View view, boolean includeViewsLink, Map<Job, List<TestResult>> jobTestResults) {
         final AtomicInteger counter = new AtomicInteger();
 
         Comparator<Map.Entry<Job, List<TestResult>>> groupComparator = (first, second) -> {
@@ -229,23 +229,28 @@ public class FindRealTestFailures extends BaseAction {
             return firstMatchIndex.compareTo(secondMatchIndex);
 
         };
-        List<String> jobsResultsHtml = failingTestMethods.entrySet().stream()
+        List<String> jobsResultsHtml = jobTestResults.entrySet().stream()
                 .filter(entry -> CollectionUtils.isNotEmpty(entry.getValue()))
                 .sorted(groupComparator.thenComparing(entry -> entry.getKey().name))
                 .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        List<String> jobsPassingHtml = failingTestMethods.entrySet().stream()
+        List<String> jobsPassingHtml = jobTestResults.entrySet().stream()
                 .filter(entry -> CollectionUtils.isEmpty(entry.getValue()) && entry.getKey().lastBuildWasSuccessful())
                 .sorted(groupComparator.thenComparing(entry -> entry.getKey().name))
                 .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        List<String> inconsistentJobsHtml = failingTestMethods.entrySet().stream()
+        Map<Job, List<TestResult>> inconsistentFailingTests = jobTestResults.entrySet().stream()
                 .filter(entry -> CollectionUtils.isEmpty(entry.getValue()) && !entry.getKey().lastBuildWasSuccessful())
-                .sorted(groupComparator.thenComparing(entry -> entry.getKey().name))
-                .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getKey().latestFailingTests(jenkinsConfig.maxJenkinsBuildsToCheck)))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getKey().latestFailingTests(jenkinsConfig.maxJenkinsBuildsToCheck)));
+
+
+        List<String> inconsistentJobsHtml = inconsistentFailingTests.entrySet().stream()
+                .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+        view.inconsistentFailingTestCount = inconsistentFailingTests.values().stream().mapToLong(List::size).sum();
+        view.inconsistentFailingJobsCount = inconsistentFailingTests.size();
 
         String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml, inconsistentJobsHtml, jobsPassingHtml);
 

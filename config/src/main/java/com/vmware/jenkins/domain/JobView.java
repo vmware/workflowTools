@@ -34,7 +34,7 @@ public class JobView extends BaseDbClass {
 
     @DbSaveIgnore
     @Expose(serialize = false, deserialize = false)
-    private Map<Job, List<TestResult>> failedTests = new HashMap<>();
+    private Map<Job, List<TestResult>> jobTestMap = new HashMap<>();
 
     public void setDbUtils(DbUtils dbUtils) {
         this.dbUtils = dbUtils;
@@ -54,11 +54,11 @@ public class JobView extends BaseDbClass {
     }
 
     public void addFailingTests(Job job, List<TestResult> results) {
-        failedTests.put(job, results);
+        jobTestMap.put(job, results);
     }
 
-    public Map<Job, List<TestResult>> getFailedTests() {
-        return failedTests;
+    public Map<Job, List<TestResult>> getJobTestMap() {
+        return jobTestMap;
     }
 
 
@@ -111,8 +111,8 @@ public class JobView extends BaseDbClass {
     }
 
     public long failingTestCount() {
-        if (!failedTests.isEmpty()) {
-            return failedTests.values().stream().mapToInt(List::size).sum();
+        if (!jobTestMap.isEmpty()) {
+            return jobTestMap.values().stream().mapToInt(List::size).sum();
         } else {
             return Arrays.stream(jobs).mapToLong(job -> job.failingTestCount(lastFetchAmount)).sum();
         }

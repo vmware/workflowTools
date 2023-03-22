@@ -51,6 +51,13 @@ public class HomePage {
 
         @Expose(serialize = false, deserialize = false)
         public long failingTestsCount;
+
+        @Expose(serialize = false, deserialize = false)
+        public long inconsistentFailingTestCount;
+
+        @Expose(serialize = false, deserialize = false)
+        public long inconsistentFailingJobsCount;
+
         public Exception failingTestsGenerationException;
 
         public View() {
@@ -65,6 +72,10 @@ public class HomePage {
         public String viewNameWithFailureCount() {
             if (failingTestsGenerationException != null) {
                 return name + " (failed with error " + StringUtils.truncateStringIfNeeded(failingTestsGenerationException.getMessage(), 80) + ")";
+            } else if (failingTestsCount == 0 && inconsistentFailingTestCount > 0) {
+                return name + " (" + inconsistentFailingTestCount + " inconsistent test failures)";
+            } else if (failingTestsCount == 0 && inconsistentFailingJobsCount > 0) {
+                return name + " (" + inconsistentFailingJobsCount + " inconsistent job failures)";
             } else if (failingTestsCount == 0) {
                 return name + " (no test failures)";
             } else {
@@ -124,8 +135,8 @@ public class HomePage {
         this.views = jobViews.stream().map(View::new).toArray(View[]::new);
     }
 
-    public Map<Job, List<TestResult>> failingTestsMap(String viewName) {
+    public Map<Job, List<TestResult>> jobTestMap(String viewName) {
         return jobViews.stream().filter(view -> view.name.equals(viewName)).findFirst()
-                .orElseThrow(() -> new RuntimeException("Expected to find view named " + viewName)).getFailedTests();
+                .orElseThrow(() -> new RuntimeException("Expected to find view named " + viewName)).getJobTestMap();
     }
 }

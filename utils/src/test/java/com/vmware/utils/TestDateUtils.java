@@ -1,5 +1,6 @@
 package com.vmware.utils;
 
+import com.vmware.util.StopwatchUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,5 +53,12 @@ public class TestDateUtils {
 
         long weekendMinutes = DateUtils.weekendMinutesBetween(fridayDate, wednesdayDate);
         assertEquals(TimeUnit.DAYS.toMinutes(4), weekendMinutes);
+    }
+
+    @Test
+    public void testStopwatch() throws InterruptedException {
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
+        Thread.sleep(1000);
+        assertEquals(1, stopwatch.elapsedTime(TimeUnit.SECONDS));
     }
 }

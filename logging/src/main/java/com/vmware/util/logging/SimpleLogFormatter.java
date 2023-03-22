@@ -16,7 +16,6 @@ public class SimpleLogFormatter extends Formatter {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SSS");
 
     public String format(LogRecord record) {
-
         Level logLevel = Logger.getLogger("com.vmware").getLevel();
         if (record.getMessage().isEmpty() && logLevel != Level.FINER && logLevel != Level.FINEST) {
             return System.lineSeparator();
