@@ -95,6 +95,12 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--repeat--count", help = "Repeating count")
     public int repeatCount;
 
+    @ConfigurableProperty(commandLine = "--http-server-port", help = "Port for http server")
+    public int httpServerPort;
+
+    @ConfigurableProperty(commandLine = "--http-server-status-code", help = "Http Status code to return for http server")
+    public int httpServerStatusCode;
+
     public boolean databaseConfigured() {
         return Stream.of(databaseUrl, databaseUsername, databasePassword).allMatch(StringUtils::isNotBlank);
     }

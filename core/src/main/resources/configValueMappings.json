@@ -686,6 +686,10 @@
     "--username",
     "--sso-email"
   ],
+  "StartDummyHttpServer": [
+    "--http-server-status-code",
+    "--http-server-port"
+  ],
   "BaseSingleVappAction": [
     "--sso-headless",
     "--disable-vcd-refresh",

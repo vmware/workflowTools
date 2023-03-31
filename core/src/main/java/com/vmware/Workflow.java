@@ -513,11 +513,11 @@ public class Workflow {
         while (!actionsSetup.contains(action)) {
             String actionName = action.getActionClassName();
             int waitTimeValue = waitTimeInMilliSeconds.get();
-            if (waitTimeValue > 30000) {
+            if (waitTimeValue > TimeUnit.SECONDS.toMillis(30)) {
                 log.error(actionName + ".asyncSetup failed to finish in 30 seconds");
                 System.exit(1);
             }
-            if (waitTimeValue > 0 && waitTimeValue % 1000 == 0) {
+            if (waitTimeValue > 1000) {
                 log.debug("Waiting for {}.asyncSetup to finish, waited {} seconds",
                         actionName, TimeUnit.MILLISECONDS.toSeconds(waitTimeValue));
             }

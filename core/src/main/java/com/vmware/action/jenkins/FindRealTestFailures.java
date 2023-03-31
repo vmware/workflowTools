@@ -118,15 +118,15 @@ public class FindRealTestFailures extends BaseAction {
         }
         long elapsedTime = stopwatch.elapsedTime(TimeUnit.SECONDS);
 
-        if (dbUtils != null) {
-            dbUtils.closeConnection();
-        }
-
         if (destinationFile.isDirectory()) {
             String viewListing = createViewListingHtml(matchingViews, elapsedTime);
             fileSystemConfig.destinationFile = fileSystemConfig.destinationFile + File.separator + "index.html";
             log.info("Saving view listing html file to {}", fileSystemConfig.destinationFile);
             IOUtils.write(new File(fileSystemConfig.destinationFile), viewListing);
+        }
+
+        if (dbUtils != null) {
+            dbUtils.closeConnection();
         }
 
         if (elapsedTime > 0) {
@@ -175,14 +175,17 @@ public class FindRealTestFailures extends BaseAction {
                 .map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
         long totalFailingTests = matchingViews.stream().mapToLong(view -> view.failingTestsCount).sum();
         String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
-        viewListingPage = viewListingPage.replace("#failingTestCount", String.valueOf(totalFailingTests));
+        viewListingPage = viewListingPage.replace("#failingTestCount", String.format("%,d", totalFailingTests));
         viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
 
         String footer = "";
         if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
             footer += "<p/><a href=\"" + jenkinsConfig.testMethodNameSearchUrl + "\" " + LINK_IN_NEW_TAB + ">Search test methods</a><br/>";
         }
-        footer += "Generated at " + generationDate + " in " + elapsedTime + " seconds";
+        footer += String.format("Generated at %s in %s seconds", generationDate, elapsedTime);
+        if (dbUtils != null) {
+            footer += String.format(" (%,d saved test results)", dbUtils.queryUnique(Integer.class, "SELECT COUNT(*) FROM TEST_RESULT"));
+        }
 
         viewListingPage = viewListingPage.replace("#footer", footer);
         return viewListingPage.replace("#body", viewListingHtml);

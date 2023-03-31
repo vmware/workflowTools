@@ -78,12 +78,11 @@ public class CommandLineUtils {
 
         String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
         long elapsedMilliseconds = stopwatch.elapsedTime();
-        if (elapsedMilliseconds > 50 && elapsedMilliseconds < 1000) {
+        if (elapsedMilliseconds > 50 && elapsedMilliseconds < 2000) {
             dynamicLogger.log(LogLevel.DEBUG, "Execution time {} milliseconds", elapsedMilliseconds);
-        } else if (elapsedMilliseconds >= 1000) {
+        } else if (elapsedMilliseconds >= 2000) {
             long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds);
-            String plural = elapsedTimeInSeconds == 1 ? "" : "s";
-            dynamicLogger.log(LogLevel.INFO, "Execution time {} second{}", elapsedTimeInSeconds, plural);
+            dynamicLogger.log(LogLevel.INFO, "Execution time {} seconds", elapsedTimeInSeconds);
         }
 
         titlePadder.logTitle(logLevel);
