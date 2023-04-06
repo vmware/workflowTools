@@ -222,7 +222,7 @@ public class Jenkins extends AbstractRestBuildService {
     protected void loginManually() {
         if (disableLogin) {
             if (StringUtils.isNotBlank(apiToken) && !apiTokenUsedForLogin) {
-                log.info("Using api token as login is disabled");
+                log.debug("Using api token as login is disabled");
             } else {
                 apiToken = InputUtils.readValueUntilNotBlank("Api Token");
             }

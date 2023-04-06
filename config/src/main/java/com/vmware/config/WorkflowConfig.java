@@ -195,9 +195,6 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--update-check-interval", help = "Check for new version of workflow tools after specified amount of days")
     public int updateCheckInterval;
 
-    @ConfigurableProperty(help = "Path to executable downloaded workflow jar")
-    public String workflowJarDownloadPath;
-
     @Expose(serialize = false, deserialize = false)
     public ReplacementVariables replacementVariables = new ReplacementVariables(this);
 

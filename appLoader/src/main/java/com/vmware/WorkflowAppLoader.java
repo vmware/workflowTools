@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
+import static com.vmware.AppLauncher.WORKFLOW_JAR;
+
 public class WorkflowAppLoader {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final String releaseDirectory;
@@ -68,6 +70,7 @@ public class WorkflowAppLoader {
         try {
 
             URLClassLoader urlClassLoader = URLClassLoader.newInstance(new URL[] { releaseJar.toURI().toURL()}, getClass().getClassLoader());
+            System.setProperty(WORKFLOW_JAR, releaseJar.getAbsolutePath());
             String mainClassName = manifestAttributes.get("appMainClass");
             Class<? extends AppLauncher> classToLoad = (Class<? extends AppLauncher>) urlClassLoader.loadClass(mainClassName);
             AppLauncher launcher = classToLoad.newInstance();

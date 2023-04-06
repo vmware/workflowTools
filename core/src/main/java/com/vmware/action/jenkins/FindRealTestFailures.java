@@ -22,7 +22,9 @@ import com.vmware.util.logging.Padder;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -184,11 +186,34 @@ public class FindRealTestFailures extends BaseAction {
         }
         footer += String.format("Generated at %s in %s seconds", generationDate, elapsedTime);
         if (dbUtils != null) {
-            footer += String.format(" (%,d saved test results)", dbUtils.queryUnique(Integer.class, "SELECT COUNT(*) FROM TEST_RESULT"));
+            String databaseSize = StringUtils.isNotBlank(fileSystemConfig.databaseSizeQuery) ?
+                    humanReadableSize(dbUtils.queryUnique(String.class, fileSystemConfig.databaseSizeQuery)) : "";
+            footer += String.format(" (%,d saved test results%s)",dbUtils.queryUnique(Integer.class,
+                    "SELECT COUNT(*) FROM TEST_RESULT"), databaseSize);
         }
 
         viewListingPage = viewListingPage.replace("#footer", footer);
         return viewListingPage.replace("#body", viewListingHtml);
+    }
+
+    private String humanReadableSize(String bytes) {
+        if (!StringUtils.isLong(bytes)) {
+            log.debug("Database size {} is not a long value", bytes);
+            return "";
+        }
+        long bytesValue = Long.parseLong(bytes);
+        long absB = bytesValue == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytesValue);
+        if (absB < 1024) {
+            return " " + bytes + " B";
+        }
+        long value = absB;
+        CharacterIterator ci = new StringCharacterIterator("KMGTPE");
+        for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10) {
+            value >>= 10;
+            ci.next();
+        }
+        value *= Long.signum(bytesValue);
+        return String.format(" %.1f %cB", value / 1024.0, ci.current());
     }
 
     private void saveResultsPageForView(HomePage.View view, boolean includeViewsLink) {

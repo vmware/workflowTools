@@ -62,6 +62,9 @@ public class FileSystemConfig {
     @ConfigurableProperty(commandLine = "--database-schema-name", help = "Database schema name to copy database as")
     public String databaseSchemaName;
 
+    @ConfigurableProperty(commandLine = "--database-size-query", help = "Sql query to get size of database in bytes")
+    public String databaseSizeQuery;
+
     @ConfigurableProperty(commandLine = "--input-text", help = "Text to use")
     public String inputText;
 

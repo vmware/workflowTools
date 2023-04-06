@@ -127,7 +127,6 @@
   ],
   "keepMissingCards": false,
   "updateCheckInterval": -1,
-  "workflowJarDownloadPath": "${HOME_DIR}/.workflowReleaseDirectory/workflowTools-latest.jar",
   "workflowGithubReleasePath": "/repos/vmware/workflowTools/releases/43387689",
   "httpServerPort": 9005,
   "httpServerStatusCode": 200,

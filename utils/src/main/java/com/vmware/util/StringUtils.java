@@ -104,6 +104,18 @@ public class StringUtils {
         }
     }
 
+    public static boolean isLong(String value) {
+        if (isEmpty(value)) {
+            return false;
+        }
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public static String truncateStringIfNeeded(String value, int maxLength) {
         if (value == null || value.length() <= maxLength) {
             return value;

@@ -6,6 +6,7 @@ import java.util.List;
  * Main class for jar application
  */
 public interface AppLauncher {
+    String WORKFLOW_JAR = "WORKFLOW_JAR";
     /**
      * Launches application
      *

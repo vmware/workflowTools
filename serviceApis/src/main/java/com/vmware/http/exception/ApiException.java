@@ -3,11 +3,19 @@ package com.vmware.http.exception;
 public abstract class ApiException extends RuntimeException {
 
     protected ApiException(final int status, final String errorText) {
-        super("Status " + status + " Message: " + errorText);
+        super(createReadableErrorMessage(status, errorText));
     }
 
     protected ApiException(final int status, final String errorText, Throwable throwable) {
-        super("Status " + status + " Message: " + errorText, throwable);
+        super(createReadableErrorMessage(status, errorText), throwable);
+    }
+
+    private static String createReadableErrorMessage(int status, String errorText) {
+        if (errorText == null) {
+            return "Status " + status;
+        } else {
+            return "Status " + status + " " + errorText.replace("\\n\\t", "\n   ");
+        }
     }
 
 }

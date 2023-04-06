@@ -563,7 +563,10 @@
     "--vcd-cell-index"
   ],
   "ExecuteVcdApiRequests": [
+    "--wait-time",
+    "--wait-for-action",
     "--file-data",
+    "--check-point",
     "--repeat--count",
     "--vcd-password",
     "--vcd-username",
@@ -778,6 +781,7 @@
   "FindRealTestFailures": [
     "--disable-login",
     "--username",
+    "--database-size-query",
     "--database-url",
     "--database-driver-class",
     "--database-driver-file",

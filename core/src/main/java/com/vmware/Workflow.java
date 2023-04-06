@@ -33,6 +33,7 @@ import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
 import com.vmware.config.WorkflowParameter;
 import com.vmware.github.domain.ReleaseAsset;
+import com.vmware.http.exception.ApiException;
 import com.vmware.mapping.ConfigMappings;
 import com.vmware.mapping.ConfigValuesCompleter;
 import com.vmware.util.IOUtils;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
 
 import jline.console.completer.ArgumentCompleter;
 
+import static com.vmware.AppLauncher.WORKFLOW_JAR;
 import static com.vmware.util.StopwatchUtils.timeRunnable;
 
 /**
@@ -135,12 +137,15 @@ public class Workflow {
         if (config.scriptMode) {
             return;
         }
-        if (config.updateCheckInterval < 0 || StringUtils.isEmpty(config.workflowJarDownloadPath)
-                || StringUtils.isEmpty(config.githubConfig.workflowGithubReleasePath)) {
+        if (config.updateCheckInterval < 0 || StringUtils.isEmpty(config.githubConfig.workflowGithubReleasePath)) {
             return;
         }
 
-        String jarFilePath = config.replacementVariables.replaceVariablesInValue(config.workflowJarDownloadPath);
+        String jarFilePath = System.getProperty(WORKFLOW_JAR);
+        log.debug("Loaded Workflow Jar Path {}", jarFilePath);
+        if (StringUtils.isEmpty(jarFilePath)) {
+            return;
+        }
         File workflowJarFile = new File(jarFilePath);
         if (!workflowJarFile.exists()) {
             return;
@@ -173,7 +178,7 @@ public class Workflow {
                 }
             }
         } else {
-            log.debug("Not checking for update to workflow jar {} as it is only {} days old", jarFilePath, daysOld);
+            log.debug("Not checking for update to workflow jar {} as it is only {} days old, checking after {} days", jarFilePath, daysOld, config.updateCheckInterval);
         }
     }
 
@@ -300,12 +305,12 @@ public class Workflow {
                 new DynamicLogger(log).log(ee.getLogLevel(), "Canceling as " + ee.getMessage());
             }
             runWorkflowAgain();
-        } catch (FatalException iie) {
+        } catch (FatalException | ApiException ex) {
             log.info("");
             if (log.isDebugEnabled()) {
-                throw iie;
+                throw ex;
             } else {
-                log.error(iie.getMessage());
+                log.error(ex.getMessage());
                 runWorkflowAgain();
             }
         }

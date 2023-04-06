@@ -22,7 +22,7 @@ public class ExceptionChecker {
         }
         log.debug("Response {} for {} url {}: {}", statusCode, methodType, currentUrl, responseText);
 
-        String fullResponseText = currentUrl + "\n" + responseText;
+        String fullResponseText = methodType + " " + currentUrl + "\n" + responseText;
 
         switch (statusCode) {
             case DoesNotExistException.STATUS_CODE:
