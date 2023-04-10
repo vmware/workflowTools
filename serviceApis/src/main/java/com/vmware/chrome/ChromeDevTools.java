@@ -53,10 +53,10 @@ public class ChromeDevTools extends WebSocketClient {
         Process chromeProcess = null;
         ChromeTab chromeTab = null;
         try {
-            chromeTab = connection.get("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
+            chromeTab = connection.put("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class, (Object) null);
         } catch (FatalException uhe) {
             chromeProcess = launchChrome(chromePath, ssoHeadless, chromeDebugPort);
-            chromeTab = connection.get("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class);
+            chromeTab = connection.put("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class, (Object) null);
         }
 
         return new ChromeDevTools(URI.create(chromeTab.getWebSocketDebuggerUrl()), chromeProcess);
