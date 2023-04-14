@@ -22,11 +22,11 @@ public class HardSubmitReview extends BaseCommitUsingReviewBoardAction {
             return;
         }
 
-        log.debug("Marking review request as submitted");
+        log.info("Marking review request as submitted");
         reviewRequest.status = ReviewRequestStatus.submitted;
         reviewRequest.description = determineSubmittedDescription();
 
         reviewBoard.updateReviewRequest(reviewRequest);
-        log.info("Marked review request {} as submitted", reviewRequest.id);
+        log.debug("Marked review request {} as submitted", reviewRequest.id);
     }
 }

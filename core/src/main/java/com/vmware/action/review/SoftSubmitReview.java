@@ -35,7 +35,7 @@ public class SoftSubmitReview extends BaseCommitUsingReviewBoardAction {
         review.isPublic = true;
 
         reviewBoard.createUserReview(reviewRequest, review);
-        log.info("Successfully added review request submitted comment");
+        log.debug("Successfully added review request submitted comment");
     }
 
 
