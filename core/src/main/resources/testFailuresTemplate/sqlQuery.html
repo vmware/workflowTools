@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>Search test methods</title>
+    <style>
+    </style>
+    <script type="application/javascript">
+        function searchForRecordsIfEnter(event) {
+            if (event.key === "Enter") {
+                // Cancel the default action, if needed
+                event.preventDefault();
+                searchForRecords();
+            }
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split('=');
+                if (decodeURIComponent(pair[0]) === variable) {
+                    return decodeURIComponent(pair[1]);
+                }
+            }
+            return undefined;
+        }
+
+
+
+        function searchForRecords(){
+            var httprequest = new XMLHttpRequest();
+            httprequest.onreadystatechange = populateData(httprequest);
+
+            var sqlQuery = document.getElementById("sqlQuery").value
+            const cgiEndpoint = getQueryVariable("cgiEndpoint");
+            if (cgiEndpoint === undefined) {
+                document.getElementById("searchTitle").innerText = "Query param cgiEndpoint needs to be set";
+                return;
+            }
+            var restEndpoint = "cgi-bin/" + cgiEndpoint + "?--sql-statement=" + sqlQuery;
+            document.getElementById("searchTitle").innerText = "Records for query " + sqlQuery;
+            document.getElementById("exception").innerHTML = "";
+            document.getElementById("records").innerHTML = "";
+
+            httprequest.open("GET", restEndpoint, true);
+            httprequest.send();
+
+            document.getElementById("recordsCount").innerText = "LOADING...";
+        }
+
+        function populateData(httprequest) {
+            return function() {
+                if (httprequest.readyState == 4 && httprequest.status == 200) {
+                    var records;
+                    try {
+                        records = JSON.parse(httprequest.responseText);
+                    } catch(e) {
+                        document.getElementById("exception").innerHTML = httprequest.responseText;
+                        document.getElementById("recordsCount").innerText = "";
+                    }
+                    var recordsTable = document.getElementById("records");
+                    document.getElementById("recordsCount").innerHTML = "Matching records count: " + records.length;
+                    const keys = Object.keys(records[0]);
+                    for(var i=0; i < records.length; i++){
+                        if (i === 0) {
+                            const headerRow = recordsTable.insertRow(-1);
+                            for(var headerCellCount = 0; headerCellCount < keys.length; headerCellCount++){
+                                headerRow.appendChild(createHeaderRow(keys[headerCellCount]));
+                            }
+                        }
+                        const row = recordsTable.insertRow(-1);
+                        for(var cellCount = 0; cellCount < keys.length; cellCount++){
+                            var cell = row.insertCell(cellCount);
+                            cell.innerHTML = records[i][keys[cellCount]];
+                        }
+                    }
+                } else if (httprequest.status >= 400 && httprequest.status <= 500) {
+                    document.getElementById("exception").innerHTML = httprequest.responseText;
+                    document.getElementById("recordsCount").innerText = "";
+                }
+            };
+        }
+
+        function createHeaderRow(title) {
+            var headerCell = document.createElement("TH");
+            headerCell.innerHTML = title;
+            headerCell.setAttribute("align", "left");
+            return headerCell;
+        }
+
+    </script>
+</head>
+<body>
+<label>SQL Query</label>
+<input id="sqlQuery" type="text" size="150" onkeypress="searchForRecordsIfEnter(event)" />
+<input type="button" value="Search" onclick="searchForRecords()" />
+
+<h2 id="searchTitle"></h2>
+<pre id="exception"></pre>
+
+<h3 id="recordsCount"></h3>
+<table id="records" style="width: 100%" border="1">
+</table>
+</body>
+</html>

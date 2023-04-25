@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
@@ -108,49 +109,38 @@ public class DbUtils {
         log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
         try (PreparedStatement statement = createStatement(query, parameters)) {
             ResultSet results = statement.executeQuery();
+
             ResultSetMetaData resultMetaData = results.getMetaData();
-            if (!BaseDbClass.class.isAssignableFrom(recordClass) && resultMetaData.getColumnCount() == 1) {
+            if (BaseDbClass.class.isAssignableFrom(recordClass)) {
+                return createRecordList(recordClass, stopwatch, results);
+            } else if (Map.class.isAssignableFrom(recordClass)) {
+                List<T> values = new ArrayList<>();
+                while (results.next()) {
+                    Map record = new HashMap();
+                    for (int i = 1; i <= resultMetaData.getColumnCount(); i++) {
+                        String name = resultMetaData.getColumnName(i);
+                        Object value = results.getObject(name);
+                        if (value instanceof Array) {
+                            record.put(name, ((Array) value).getArray());
+                        } else {
+                            record.put(name, value);
+                        }
+                    }
+                    values.add((T) record);
+                }
+                log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
+                return values;
+            } else if (resultMetaData.getColumnCount() == 1) {
                 List<T> values = new ArrayList<>();
                 while (results.next()) {
                     values.add((T) results.getObject(1));
                 }
                 log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
                 return values;
-            } else if (!BaseDbClass.class.isAssignableFrom(recordClass)) {
+            }
+            else {
                throw new RuntimeException("Cannot query for multiple values without using a class that extends " + BaseDbClass.class.getSimpleName());
             }
-
-            List<Field> fieldsForClass = ReflectionUtils.getAllFieldsWithoutAnnotation(recordClass, null);
-
-            Map<Field, Integer> fieldColumnMappings = new HashMap<>();
-            for (int i = 1; i <= resultMetaData.getColumnCount(); i++) {
-                String columnName = resultMetaData.getColumnName(i);
-                String expectedFieldName = StringUtils.convertFromDbName(columnName);
-                Optional<Field> matchingField = fieldsForClass.stream().filter(field -> field.getName().equals(expectedFieldName)).findFirst();
-                if (matchingField.isPresent()) {
-                    fieldColumnMappings.put(matchingField.get(), i);
-                }
-            }
-
-            List<T> records = new ArrayList<>();
-            while (results.next()) {
-                T record = (T) ReflectionUtils.newInstance(recordClass);
-                fieldColumnMappings.forEach((key, value) -> {
-                    try {
-                        Object valueToUse = results.getObject(value);
-                        if (key.getType().isEnum() && valueToUse instanceof String) {
-                            valueToUse = createEnumValue(key.getType(), valueToUse.toString());
-                        }
-                        ReflectionUtils.setValue(key, record, valueToUse);
-                    } catch (SQLException se) {
-                        throw new RuntimeException(se);
-                    }
-                });
-                ReflectionUtils.invokeAllMethodsWithAnnotation(record, AfterDbLoad.class);
-                records.add(record);
-            }
-            log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
-            return records;
 
         } catch (SQLException se) {
             throw new RuntimeException(se);
@@ -330,5 +320,39 @@ public class DbUtils {
             throw new RuntimeException(e);
         }
         return driver;
+    }
+
+    private <T> List<T> createRecordList(Class<T> recordClass, StopwatchUtils.Stopwatch stopwatch, ResultSet results) throws SQLException {
+        List<Field> fieldsForClass = ReflectionUtils.getAllFieldsWithoutAnnotation(recordClass, null);
+
+        Map<Field, Integer> fieldColumnMappings = new HashMap<>();
+        for (int i = 1; i <= results.getMetaData().getColumnCount(); i++) {
+            String columnName = results.getMetaData().getColumnName(i);
+            String expectedFieldName = StringUtils.convertFromDbName(columnName);
+            Optional<Field> matchingField = fieldsForClass.stream().filter(field -> field.getName().equals(expectedFieldName)).findFirst();
+            if (matchingField.isPresent()) {
+                fieldColumnMappings.put(matchingField.get(), i);
+            }
+        }
+
+        List<T> records = new ArrayList<>();
+        while (results.next()) {
+            T record = (T) ReflectionUtils.newInstance(recordClass);
+            fieldColumnMappings.forEach((key, value) -> {
+                try {
+                    Object valueToUse = results.getObject(value);
+                    if (key.getType().isEnum() && valueToUse instanceof String) {
+                        valueToUse = createEnumValue(key.getType(), valueToUse.toString());
+                    }
+                    ReflectionUtils.setValue(key, record, valueToUse);
+                } catch (SQLException se) {
+                    throw new RuntimeException(se);
+                }
+            });
+            ReflectionUtils.invokeAllMethodsWithAnnotation(record, AfterDbLoad.class);
+            records.add(record);
+        }
+        log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
+        return records;
     }
 }

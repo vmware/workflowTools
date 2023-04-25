@@ -1,9 +1,12 @@
 package com.vmware.config;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,6 +72,8 @@ public class WorkflowConfig {
     private static final SimpleDateFormat timeFormat = new SimpleDateFormat("HHmmss");
 
     public static final String MACRO_PREFIX = "--M";
+
+    public static final String QUERY_STRING_COMMAND_LINE = "--query-string";
 
     public static ClassLoader appClassLoader;
 
@@ -201,6 +206,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--script-mode", help = "Flag to set minimize logging in script mode")
     public boolean scriptMode;
 
+    @ConfigurableProperty(commandLine = QUERY_STRING_COMMAND_LINE, help = "Runtime arguments in HTML query string format")
+    public String queryString;
+
     @Expose(serialize = false, deserialize = false)
     private final WorkflowFields configurableFields;
     private Map<String, String> commandlineArgMap;
@@ -283,7 +291,15 @@ public class WorkflowConfig {
             return Collections.emptyList();
         }
         for (String configValueName : configValues.keySet()) {
-            if (configValueName.startsWith(WorkflowConfig.MACRO_PREFIX)) {
+            if (WorkflowConfig.QUERY_STRING_COMMAND_LINE.equals(configValueName)) {
+                String decodedQueryString = decodeValue(configValues.get(configValueName));
+                log.debug("Decoded query string: {}", decodedQueryString);
+                String[] queryArguments = decodedQueryString.split("&");
+                Map<String, String> queryArgMap = Arrays.stream(queryArguments)
+                        .map(arg -> StringUtils.splitOnlyOnce(arg,"="))
+                        .collect(Collectors.toMap(arg -> arg[0], arg -> arg.length > 1 ? arg[1] : ""));
+                applyConfigValues(queryArgMap, "Query String", true);
+            } else if (configValueName.startsWith(WorkflowConfig.MACRO_PREFIX)) {
                 String macroName = configValueName.substring(WorkflowConfig.MACRO_PREFIX.length());
                 if (configurableFields.loadedConfigFilesSize() > 0 && !macros.containsKey(macroName)) {
                     throw new FatalException("No macro named " + macroName);
@@ -436,5 +452,13 @@ public class WorkflowConfig {
             String currentPropertyValue = String.valueOf(valueForField(configurableFields.getFieldByName(propertyName)).getValue());
             return entry.getKey().equals(propertyName + "|" + currentPropertyValue);
         }).collect(Collectors.toMap(entry -> entry.getKey().split("\\|")[0], Map.Entry::getValue));
+    }
+
+    private String decodeValue(String value) {
+        try {
+            return URLDecoder.decode(value, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

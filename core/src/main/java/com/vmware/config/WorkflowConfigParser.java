@@ -54,6 +54,7 @@ public class WorkflowConfigParser {
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
         config.setupLogging();
+        log.debug("Runtime arguments: {}", args);
 
         String gitRemoteValue = git.configValue(String.format("remote.%s.url", config.gitRepoConfig.defaultGitRemote));
         config.setGitRemoteUrlAsReviewBoardRepo(gitRemoteValue);

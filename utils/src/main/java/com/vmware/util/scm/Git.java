@@ -193,6 +193,18 @@ public class Git extends BaseScmWrapper {
         return currentBranch;
     }
 
+    public Map<String, String> allBranches() {
+        String branchesText = executeScmCommand("branch -vv");
+        return Arrays.stream(branchesText.split(System.lineSeparator()))
+                .map(StringUtils::trim).collect(Collectors.toMap(branch -> {
+            int spaceIndex = branch.indexOf(" ");
+            return branch.substring(0, spaceIndex);
+        }, branch -> {
+            int spaceIndex = branch.indexOf(" ");
+            return branch.substring(spaceIndex).trim();
+        }));
+    }
+
     public String configValue(String propertyName) {
         if (configValues == null) {
             configValues = configValues();
@@ -293,6 +305,11 @@ public class Git extends BaseScmWrapper {
             System.exit(1);
         }
         log.info("Successfully ran git p4 submit");
+    }
+
+    public void deleteBranch(String branch) {
+        String deleteCommand = String.format("branch -D %s", branch);
+        executeScmCommand(deleteCommand, LogLevel.INFO);
     }
 
     public void deleteRemoteBranch(String remote, String remoteBranch) {

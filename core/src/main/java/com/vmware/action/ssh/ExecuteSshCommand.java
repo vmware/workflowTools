@@ -107,7 +107,9 @@ public class ExecuteSshCommand extends BaseSshAction {
         channel.connect((int) TimeUnit.SECONDS.toMillis(5));
         waitForChannelToFinish(channel);
         commandOutputPadder.infoTitle();
-        writer.close();
+        if (writer != null) {
+            writer.close();
+        }
     }
 
     private BufferedWriter outputWriter() {
@@ -117,8 +119,7 @@ public class ExecuteSshCommand extends BaseSshAction {
                 log.info("Saving output to {}", outputFile.getAbsolutePath());
                 return new BufferedWriter(new FileWriter(outputFile));
             } else {
-                log.debug("Displaying on command line as no output file is specified");
-                return new BufferedWriter(new PrintWriter(System.out));
+                return null;
             }
         } catch (IOException e) {
             throw new RuntimeIOException(e);

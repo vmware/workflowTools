@@ -32,9 +32,9 @@
             httprequest.onreadystatechange = populateData(httprequest);
 
             var testName = document.getElementById("name").value
-            const cgiEndpoint = getQueryVariable("cgiFile");
+            const cgiEndpoint = getQueryVariable("cgiEndpoint");
             if (cgiEndpoint === undefined) {
-                document.getElementById("searchTitle").innerText = "Query param cgiFile needs to be set";
+                document.getElementById("searchTitle").innerText = "Query param cgiEndpoint needs to be set";
                 return;
             }
             var restEndpoint = "cgi-bin/" + cgiEndpoint + "?--test-name=" + testName;
@@ -87,6 +87,9 @@
                         cell2.innerHTML = tests[i].startedAt;
                         cell3.innerHTML = tests[i].name + " <a href ='" + tests[i].url + "'>" + tests[i].status + "</a>";
                     }
+                } else if (httprequest.status >= 400 && httprequest.status <= 500) {
+                    document.getElementById("exception").innerHTML = httprequest.responseText;
+                    document.getElementById("resultsCount").innerText = "";
                 }
             };
         }

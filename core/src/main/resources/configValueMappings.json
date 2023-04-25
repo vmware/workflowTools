@@ -580,6 +580,14 @@
   "SetReviewId": [
     "--username"
   ],
+  "ExecuteSelectSqlStatementAsJson": [
+    "--database-driver-class",
+    "--database-driver-file",
+    "--sql-statement",
+    "--script-mode",
+    "--database-url-pattern",
+    "--database-url"
+  ],
   "PowerOffVapp": [
     "--sso-headless",
     "--disable-vcd-refresh",

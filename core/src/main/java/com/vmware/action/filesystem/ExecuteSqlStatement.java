@@ -46,7 +46,7 @@ public class ExecuteSqlStatement extends BaseVappAction {
     }
 
 
-    private Properties determineConnectionProperties() {
+    protected Properties determineConnectionProperties() {
         if (fileSystemConfig.databaseConfigured()) {
             Properties properties = fileSystemConfig.dbConnectionProperties();
             properties.remove("url");
