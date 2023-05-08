@@ -270,10 +270,12 @@ public class Git extends BaseScmWrapper {
     }
 
     public void amendCommit(String msg, boolean noVerify) {
+        checkIfLastCommitHasSameAuthor();
         executeCommitCommand("commit --amend", msg, noVerify);
     }
 
     public void amendCommitWithAllFileChanges(String msg, boolean noVerify) {
+        checkIfLastCommitHasSameAuthor();
         executeCommitCommand("commit --amend --all", msg, noVerify);
     }
 
@@ -398,11 +400,10 @@ public class Git extends BaseScmWrapper {
             return Git.trackingBranch.equals("") ? null : Git.trackingBranch;
         }
         String branchName = currentBranch();
-        String trackingBranchOutput = executeScmCommand("rev-parse --abbrev-ref " + branchName + "@{upstream}");
-        if (trackingBranchOutput.startsWith("fatal") || !trackingBranchOutput.contains("/")) {
+        try {
+            Git.trackingBranch = executeScmCommand("rev-parse --abbrev-ref " + branchName + "@{upstream}");
+        } catch (FatalException fe) {
             Git.trackingBranch = "";
-        } else {
-            Git.trackingBranch = trackingBranchOutput;
         }
         return trackingBranch;
     }
@@ -470,6 +471,15 @@ public class Git extends BaseScmWrapper {
             return "git";
         } else {
             return "git -C " + workingDirectory.getPath();
+        }
+    }
+
+    private void checkIfLastCommitHasSameAuthor() {
+        String authorEmail = configValue("user.email");
+        String lastCommitAuthor = executeScmCommand("log -1 --format=%ae head");
+        if (!authorEmail.equals(lastCommitAuthor)) {
+            throw new FatalException("Last commit has author of {}. Can only amend commits for current author {}",
+                    lastCommitAuthor, authorEmail);
         }
     }
 

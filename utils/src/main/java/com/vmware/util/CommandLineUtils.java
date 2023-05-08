@@ -92,7 +92,7 @@ public class CommandLineUtils {
             throw new RuntimeException(e);
         }
         if (statusProcess.exitValue() != 0) {
-            throw new FatalException("Command {} failed with status code {1}", command, statusProcess.exitValue());
+            throw new FatalException("Command {} failed with status code {}", command, statusProcess.exitValue());
         }
         return output;
     }
