@@ -278,6 +278,11 @@
     "--publish-description",
     "--publish-as-trivial"
   ],
+  "DownloadBuildLog": [
+    "--job-build-number",
+    "--job-with-artifact",
+    "--file-data"
+  ],
   "SelectVapp": [
     "--vapp-name",
     "--job-artifact",
@@ -336,6 +341,9 @@
   "LoadAllIssuesForEpic": [
     "--epic-id"
   ],
+  "RunPrecommitHooksIfNeeded": [
+    "--no-verify"
+  ],
   "DeleteJsonProperty": [
     "--file-data",
     "--json-property-path"
@@ -349,8 +357,8 @@
   ],
   "ParseText": [
     "--output-variable-name",
-    "--regex",
-    "--input-text"
+    "--input-text",
+    "--regex"
   ],
   "BaseBatchBugzillaAction": [
     "--username",

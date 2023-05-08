@@ -29,13 +29,15 @@ import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Arrays.asList;
 
 public class WorkflowAction implements Action {
-    private String sectionName;
-    private WorkflowConfig config;
-    private Class<? extends BaseAction> actionClass;
-    private List<Class<? extends BaseAction>> actionClassesToCheck;
+    private final String sectionName;
+    private final WorkflowConfig config;
+    private final Class<? extends BaseAction> actionClass;
+    private final List<Class<? extends BaseAction>> actionClassesToCheck;
+
+    private final List<WorkflowParameter> overriddenConfigValues = new ArrayList<>();
+
     private BaseAction instantiatedAction;
 
-    private List<WorkflowParameter> overriddenConfigValues;
 
     private Map<String, CalculatedProperty> existingValuesForConfig;
 
@@ -175,8 +177,8 @@ public class WorkflowAction implements Action {
 
     private void setWorkflowParametersForAction(ConfigMappings mappings, List<WorkflowParameter> parameters) {
         Set<String> allowedConfigValues = mappings.getConfigValuesForAction(this, false);
-        Set<String> unknownParameters = parameters.stream().filter(param -> !paramIsAllowed(allowedConfigValues, param.getName()))
-                .map(WorkflowParameter::getName).collect(Collectors.toSet());
+        Set<String> unknownParameters = parameters.stream().map(WorkflowParameter::getName)
+                .filter(name -> !paramIsAllowed(allowedConfigValues, name)).collect(Collectors.toSet());
 
         if (!unknownParameters.isEmpty()) {
             Set<String> allConfigValues = mappings.allConfigValues();
@@ -185,8 +187,17 @@ public class WorkflowAction implements Action {
                 throw new FatalException("Unknown {} {} for action {}",
                         pluralizeDescription(completelyUnknownParams.size(), "parameter"), completelyUnknownParams, getActionClassName());
             }
+        };
+        for (WorkflowParameter parameter : parameters) {
+            if (unknownParameters.contains(parameter.getName())) {
+                continue;
+            }
+            if (overriddenConfigValues.stream().noneMatch(param -> param.getName().equals(parameter.getName()))) {
+                overriddenConfigValues.add(parameter);
+            } else {
+                LoggerFactory.getLogger(this.getClass()).debug("Config value {} already overridden", parameter.getName());
+            }
         }
-        this.overriddenConfigValues = parameters.stream().filter(param -> !unknownParameters.contains(param.getName())).collect(Collectors.toList());
     }
 
     private boolean paramIsAllowed(Set<String> allowedConfigValues, String propertyName) {

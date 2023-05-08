@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.vmware.action.BaseAction;
 import com.vmware.config.section.JenkinsConfig;
@@ -47,8 +48,7 @@ public class WorkflowValuesParser {
         for (String workflowValue : workflowValues) {
             String[] workflowPieces = workflowValue.split("&&-");
             String workflowName = workflowPieces[0];
-            workflowPieces[0] = null;
-            List<WorkflowParameter> parameters = Arrays.stream(workflowPieces).filter(Objects::nonNull)
+            List<WorkflowParameter> parameters = Arrays.stream(workflowPieces, 1, workflowPieces.length)
                     .map(value -> "-" + value).map(WorkflowParameter::new).collect(Collectors.toList());
             parameters.addAll(workflowParameters);
 

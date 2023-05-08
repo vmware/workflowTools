@@ -64,7 +64,7 @@ public class InputUtils {
                 }
             }
         }
-        selections = selections.stream().map(selection -> (selection -1)).collect(Collectors.toList());
+        selections = selections.stream().map(selection -> (selection - 1)).collect(Collectors.toList());
         return selections;
     }
 

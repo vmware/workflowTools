@@ -86,6 +86,14 @@ public class CommandLineUtils {
         }
 
         titlePadder.logTitle(logLevel);
+        try {
+            statusProcess.waitFor(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (statusProcess.exitValue() != 0) {
+            throw new FatalException("Command {} failed with status code {1}", command, statusProcess.exitValue());
+        }
         return output;
     }
 

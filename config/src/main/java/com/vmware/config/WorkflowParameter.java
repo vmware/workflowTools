@@ -4,9 +4,9 @@ import com.vmware.util.StringUtils;
 
 public class WorkflowParameter {
 
-    private String name;
+    private final String name;
 
-    private String value;
+    private final String value;
 
     public WorkflowParameter(String name, String value) {
         this.name = name;

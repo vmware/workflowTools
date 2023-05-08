@@ -17,7 +17,8 @@ public class ParseText extends BaseAction {
 
     @Override
     public void process() {
-        log.info("Parsing {} with regex {}", fileSystemConfig.inputText, fileSystemConfig.regex);
+        log.info("Using regex {} for parsing", fileSystemConfig.regex);
+        log.debug("Parsing {} with regex {}", fileSystemConfig.inputText, fileSystemConfig.regex);
         String matchedValue = MatcherUtils.singleMatchExpected(fileSystemConfig.inputText, fileSystemConfig.regex);
         log.info("Setting variable {} with value {}", fileSystemConfig.outputVariableName, matchedValue);
         replacementVariables.addVariable(fileSystemConfig.outputVariableName, matchedValue);

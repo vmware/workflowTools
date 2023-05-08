@@ -55,6 +55,7 @@ import com.vmware.util.exception.RuntimeReflectiveOperationException;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.SimpleLogFormatter;
 
+import com.vmware.util.logging.WorkflowConsoleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,7 +237,13 @@ public class WorkflowConfig {
                 throw new RuntimeException(e);
             }
         }
-        Optional<Handler> consoleHandler = Arrays.stream(handlers).filter(handler -> handler.getClass() == ConsoleHandler.class).findFirst();
+        Optional<Handler> consoleHandler = Arrays.stream(handlers)
+                .filter(handler -> ConsoleHandler.class.isAssignableFrom(handler.getClass())).findFirst();
+        if (consoleHandler.isPresent() && consoleHandler.get() instanceof WorkflowConsoleHandler) {
+            WorkflowConsoleHandler workflowConsoleHandler = (WorkflowConsoleHandler) consoleHandler.get();
+            workflowConsoleHandler.setRedirectErrorOutputToSystemOut(scriptMode);
+        }
+
         if (loggingConfig.silent && consoleHandler.isPresent()) {
             log.info("Suppressing console output as silent flag is set to true");
             globalLogger.removeHandler(consoleHandler.get());

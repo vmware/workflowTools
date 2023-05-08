@@ -14,6 +14,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -94,6 +96,14 @@ public class IOUtils {
         try {
             return read(new FileInputStream(file));
         } catch (FileNotFoundException e) {
+            throw new RuntimeIOException(e);
+        }
+    }
+
+    public static String read(URI uri) {
+        try {
+            return read(uri.toURL().openStream());
+        } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
     }

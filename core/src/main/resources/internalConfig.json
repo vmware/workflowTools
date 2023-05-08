@@ -206,6 +206,7 @@
     ],
     "commitAll": [
       "ExitIfNoChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "setCommitDetails",
       "CommitAll",
       "MarkIssueAsInProgress",
@@ -213,12 +214,14 @@
     ],
     "commitAllOffline": [
       "ExitIfNoChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "setCommitDetailsOffline",
       "CommitAll",
       "DisplayLastCommit"
     ],
     "commit": [
       "ExitIfNoStagedChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "setCommitDetails",
       "Commit",
       "MarkIssueAsInProgress",
@@ -226,12 +229,14 @@
     ],
     "commitOffline": [
       "ExitIfNoStagedChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "setCommitDetailsOffline",
       "Commit",
       "DisplayLastCommit"
     ],
     "quickCommitAll": [
       "ExitIfNoChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "SetSummary",
       "SetDescription",
       "CommitAll",
@@ -239,6 +244,7 @@
     ],
     "quickCommit": [
       "ExitIfNoStagedChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "SetSummary",
       "SetDescription",
       "Commit",
@@ -246,12 +252,14 @@
     ],
     "amendCommit": [
       "ExitIfNoStagedChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "DisplayLastCommit",
       "ExitIfConfirmationNotGiven",
       "AmendCommitFilesOnly"
     ],
     "amendCommitAll": [
       "ExitIfNoChangesDetectedByGit",
+      "RunPrecommitHooksIfNeeded",
       "DisplayLastCommit",
       "ExitIfConfirmationNotGiven",
       "AmendCommitAllFilesOnly"
