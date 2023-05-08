@@ -586,14 +586,15 @@ public class Git extends BaseScmWrapper {
 
     private void determineRootDirectory() {
         if (Git.rootDirectoryCommandOutput != null) {
-            boolean fatalOutput = StringUtils.startsWith(rootDirectoryCommandOutput, "fatal:");
-            rootDirectory = !fatalOutput ? new File(rootDirectoryCommandOutput) : null;
+            rootDirectory = StringUtils.isEmpty(Git.rootDirectoryCommandOutput) ? null : new File(rootDirectoryCommandOutput);
         } else if (isGitInstalled()) {
-            Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
-            boolean fatalOutput = StringUtils.startsWith(rootDirectoryCommandOutput, "fatal:");
-            rootDirectory = !fatalOutput ? new File(rootDirectoryCommandOutput) : null;
-            log.trace("Git root directory {}", Git.rootDirectoryCommandOutput);
+            try {
+                Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
+                log.trace("Git root directory {}", Git.rootDirectoryCommandOutput);
+                rootDirectory = new File(rootDirectoryCommandOutput);
+            } catch (FatalException fe) {
+                Git.rootDirectoryCommandOutput = "";
+            }
         }
     }
-
 }
