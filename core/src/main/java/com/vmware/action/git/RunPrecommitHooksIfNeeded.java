@@ -28,7 +28,8 @@ public class RunPrecommitHooksIfNeeded extends BaseAction {
             log.debug("noVerify is set to true, not running pre-commit hook");
         }
         File rootDirectory = git.getRootDirectory();
-        File precommitFile = new File(rootDirectory.getAbsolutePath() + File.separator + ".git" + File.separator + "pre-commit");
+        File precommitFile = new File(rootDirectory.getAbsolutePath()
+                + File.separator + ".git" + File.separator + "hooks" + File.separator + "pre-commit");
         if (!precommitFile.exists()) {
             log.debug("Pre-commit file {} does not exist", precommitFile.getAbsolutePath());
             return;
