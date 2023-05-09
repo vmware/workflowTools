@@ -44,8 +44,11 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "--since-date", help = "Commits since date")
     public Date sinceDate;
 
-    @ConfigurableProperty(commandLine = "--no-verify", help = "Skip running of pre-commit hooks")
+    @ConfigurableProperty(commandLine = "--no-verify", help = "Skip running of pre-commit and commit-msg hooks by git")
     public boolean noVerify;
+
+    @ConfigurableProperty(commandLine = "--no-precommit", help = "Skip running of pre-commit file by workflow tools setting commit details")
+    public boolean noPreCommit;
 
     public String trackingBranchPath() {
         return String.valueOf(determineTrackingBranchPath().getValue());

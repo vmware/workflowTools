@@ -24,8 +24,9 @@ public class RunPrecommitHooksIfNeeded extends BaseAction {
 
     @Override
     public void process() {
-        if (gitRepoConfig.noVerify) {
-            log.debug("noVerify is set to true, not running pre-commit hook");
+        if (gitRepoConfig.noPreCommit) {
+            log.debug("noPreCommit is set to true, not running pre-commit hook");
+            return;
         }
         File rootDirectory = git.getRootDirectory();
         File precommitFile = new File(rootDirectory.getAbsolutePath()

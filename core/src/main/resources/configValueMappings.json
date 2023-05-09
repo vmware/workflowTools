@@ -342,7 +342,7 @@
     "--epic-id"
   ],
   "RunPrecommitHooksIfNeeded": [
-    "--no-verify"
+    "--no-precommit"
   ],
   "DeleteJsonProperty": [
     "--file-data",
