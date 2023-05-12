@@ -6,8 +6,10 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.util.scm.FileChange;
+import com.vmware.util.scm.FileChangeType;
 import com.vmware.util.scm.Perforce;
 import com.vmware.util.scm.diff.DiffConverter;
+import com.vmware.util.scm.diff.GitDiffParser;
 import com.vmware.util.scm.diff.GitDiffToPerforceConverter;
 import com.vmware.util.scm.diff.PerforceDiffToGitConverter;
 import com.vmware.util.CommandLineUtils;
@@ -37,7 +39,6 @@ public class ApplyPatch extends BaseCommitAction {
         String patchData = draft.draftPatchData;
         RepoType repoType = draft.repoType;
 
-        List<FileChange> fileChanges = null;
         boolean isPerforceClient = !git.workingDirectoryIsInGitRepo();
         if (isPerforceClient) {
             exitIfPerforceClientCannotBeUsed();
@@ -50,11 +51,12 @@ public class ApplyPatch extends BaseCommitAction {
         } else if (isPerforceClient){
             diffConverter = new GitDiffToPerforceConverter(getLoggedInPerforceClient(), "");
             diffConverter.convert(patchData); // used to generate file changes
+        } else {
+            diffConverter = new GitDiffParser();
+            diffConverter.convert(patchData); // used to generate file changes
         }
 
-        if (diffConverter != null) {
-            fileChanges = diffConverter.getFileChanges();
-        }
+        List<FileChange> fileChanges = diffConverter.getFileChanges();
 
         String changelistId = null;
         if (isPerforceClient) {
@@ -77,6 +79,18 @@ public class ApplyPatch extends BaseCommitAction {
         } else {
             printPatchResult(result);
         }
+        if (!isPerforceClient) {
+            fileChanges.stream().filter(fileChange -> fileChange.getChangeType() == FileChangeType.added)
+                    .forEach(fileChange -> {
+                File fileToAdd = new File(git.getRootDirectory().getAbsolutePath()
+                        + File.separator + fileChange.getLastFileAffected());
+                if (fileToAdd.exists()) {
+                    git.addFile(fileToAdd.getAbsolutePath());
+                } else {
+                    log.warn("Expected new file {} to exist, cannot stage for commit", fileToAdd.getAbsolutePath());
+                }
+            });
+        }
         if (isPerforceClient) {
             serviceLocator.getPerforce().renameAddOrDeleteFiles(changelistId, fileChanges);
         }
@@ -98,7 +112,7 @@ public class ApplyPatch extends BaseCommitAction {
                 break;
             default:
                 cancelWithMessage(LogLevel.WARN, "Not applying patch, patch is stored in workflow.patch");
-         }
+        }
         return result;
     }
 

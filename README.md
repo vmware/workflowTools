@@ -35,5 +35,4 @@ Running the tests in restApis requires updating the following file<br/>
 <b>restApis/stc/test/resources/test.properties</b><br/>
 The jenkins, reviewboard and jira urls in there should be changed to match your actual servers.
 
-If someone has interest in adding perforce support to match the existing git support, that would really be appreciated.<br/>
 Email me at dbiggs at vmare.com if you have questions.

@@ -622,6 +622,7 @@
   "GenerateGitCommitStats": [
     "--author-emails",
     "--trivial-reviewer-label",
+    "--commit-topics-to-ignore",
     "--last-number-of-days",
     "--line-count-ranges",
     "--file-count-ranges"

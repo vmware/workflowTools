@@ -416,6 +416,10 @@ public class Git extends BaseScmWrapper {
         executeScmCommand("add --all");
     }
 
+    public void addFile(String filePath) {
+        executeScmCommand("add " + filePath);
+    }
+
     public String reset(String ref) {
         return executeScmCommand("reset --hard " + ref);
     }

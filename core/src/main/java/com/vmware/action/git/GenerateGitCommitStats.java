@@ -60,8 +60,6 @@ public class GenerateGitCommitStats extends BaseAction {
 
         TitledHashMap<String, Integer> trivialAuthorCounts = new TitledHashMap<>("trivial");
         TitledHashMap<String, Integer> noBugNumberCounts = new TitledHashMap<>("No bug number");
-        TitledHashMap<String, Integer> onelineTestingDoneCounts = new TitledHashMap<>("oneliners");
-        TitledHashMap<String, Integer> shortTestingDoneCounts = new TitledHashMap<>("short description");
         int numberOfCommitsChecked = 0;
         List<String> commitsSinceDate = git.commitsSince(oldestDateToCheckAgainst);
         log.info("Read {} commits from repo {} since date {}", commitsSinceDate.size() - 1,
@@ -75,6 +73,12 @@ public class GenerateGitCommitStats extends BaseAction {
             if (StringUtils.isEmpty(authorEmail)) {
                 continue;
             }
+            if (commitConfig.commitTopicsToIgnore != null) {
+                if (Arrays.stream(commitConfig.commitTopicsToIgnore).anyMatch(topic -> topic.equals(draft.topic()))) {
+                    continue;
+                }
+            }
+
             numberOfCommitsChecked++;
             incrementCount(authorEmail, totalCounts);
             if (draft.isTrivialCommit(commitConfig.trivialReviewerLabel)) {
@@ -94,12 +98,6 @@ public class GenerateGitCommitStats extends BaseAction {
             if (!draft.hasBugNumber(commitConfig.noBugNumberLabel)) {
                 incrementCount(authorEmail, noBugNumberCounts);
             }
-            if (StringUtils.isEmpty(draft.testingDone) || !draft.testingDone.contains("\n")) {
-                incrementCount(authorEmail, onelineTestingDoneCounts);
-            }
-            if (StringUtils.isEmpty(draft.testingDone) || draft.testingDone.length() < 40) {
-                incrementCount(authorEmail, shortTestingDoneCounts);
-            }
             if ("all".equalsIgnoreCase(statsConfig.authorEmailsForCommits) || draft.matchesAuthor(statsConfig.authorEmailsForCommits)) {
                 if (!commitSummariesForAuthor.containsKey(draft.authorEmail)) {
                     commitSummariesForAuthor.put(draft.authorEmail, new ArrayList<>());
@@ -110,25 +108,34 @@ public class GenerateGitCommitStats extends BaseAction {
         log.debug("Successfully parsed {} commits", numberOfCommitsChecked);
 
         countRanges.add(0, totalCounts);
-        printResults(countRanges, "Total counts");
-        printResults(Arrays.asList(trivialAuthorCounts, noBugNumberCounts), "Simple commit counts");
-        printResults(Arrays.asList(shortTestingDoneCounts, onelineTestingDoneCounts), "Short Testing done counts");
 
-        if (!commitSummariesForAuthor.isEmpty()) {
+        if ("all".equals(statsConfig.authorEmailsForCommits) && !commitSummariesForAuthor.isEmpty()) {
             printCommitSummaries(commitSummariesForAuthor);
         }
+
+        if (!trivialAuthorCounts.isEmpty()) {
+            printResults(Arrays.asList(trivialAuthorCounts, noBugNumberCounts), "Simple commit counts");
+        }
+
+        printResults(countRanges, "Total counts");
+
+        if (!"all".equals(statsConfig.authorEmailsForCommits) && !commitSummariesForAuthor.isEmpty()) {
+            printCommitSummaries(commitSummariesForAuthor);
+        }
+
         if (!"all".equals(statsConfig.authorEmailsForCommits)) {
             log.info("Use --author-emails=all to show individual commit summaries for all users");
         }
     }
 
     private void printCommitSummaries(Map<String, List<String>> commitSummariesForAuthor) {
-        List<String> sortedAuthors = commitSummariesForAuthor.keySet().stream().sorted().collect(Collectors.toList());
-        for (String authorEmail : sortedAuthors) {
-            Padder authorPadder = new Padder("Commits ({}) for {}", commitSummariesForAuthor.get(authorEmail).size(), authorEmail);
+        List<Map.Entry<String, List<String>>> summaries = commitSummariesForAuthor.entrySet().stream()
+                .sorted(Comparator.comparingInt(summary -> summary.getValue().size())).collect(Collectors.toList());
+        for (Map.Entry<String, List<String>> summary : summaries) {
+            Padder authorPadder = new Padder("Commits ({}) for {}", summary.getValue().size(), summary.getKey());
             authorPadder.infoTitle();
-            for (String summary : commitSummariesForAuthor.get(authorEmail)) {
-                log.info(summary);
+            for (String summaryLine : summary.getValue()) {
+                log.info(summaryLine);
             }
             authorPadder.infoTitle();
         }
@@ -143,21 +150,17 @@ public class GenerateGitCommitStats extends BaseAction {
     }
 
     private void printResults(List<TitledHashMap<String, Integer>> stats, String overallTitle) {
-        Comparator<Map.Entry<String, Integer>> countComparator = Comparator.comparing(new Function<Map.Entry<String,Integer>, Integer>() {
-            @Override
-            public Integer apply(Map.Entry<String,Integer> entry) {
-                return entry.getValue();
-            }
-        }).reversed();
+        Comparator<Map.Entry<String, Integer>> countComparator =
+                Comparator.comparing((Function<Map.Entry<String, Integer>, Integer>) Map.Entry::getValue).reversed();
 
 
-            Padder titlePadder = new Padder(overallTitle);
-            titlePadder.infoTitle();
-            TitledHashMap<String, Integer> primaryStat = stats.get(0);
-            primaryStat.entrySet().stream().sorted(countComparator)
-                    .forEachOrdered(entry -> log.info("{}: {}{} {}", entry.getKey(), stats.size() > 1 ? primaryStat.getTitle() + ": " : "",
-                            entry.getValue(), additionalStats(stats, entry.getKey())));
-            titlePadder.infoTitle();
+        Padder titlePadder = new Padder(overallTitle);
+        titlePadder.infoTitle();
+        TitledHashMap<String, Integer> primaryStat = stats.get(0);
+        primaryStat.entrySet().stream().sorted(countComparator)
+                .forEachOrdered(entry -> log.info("{}: {}{} {}", entry.getKey(), stats.size() > 1 ? primaryStat.getTitle() + ": " : "",
+                        entry.getValue(), additionalStats(stats, entry.getKey())));
+        titlePadder.infoTitle();
     }
 
     private String additionalStats(List<TitledHashMap<String, Integer>> statsList, String key) {
