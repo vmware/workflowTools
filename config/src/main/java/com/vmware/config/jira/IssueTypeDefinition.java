@@ -1,11 +1,11 @@
 package com.vmware.config.jira;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vmware.util.StringUtils;
 import com.vmware.util.complexenum.ComplexEnum;
 import com.vmware.util.exception.FatalException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     Bug(1),
