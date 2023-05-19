@@ -7,8 +7,10 @@ import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.json.ConfiguredGsonBuilder;
+import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.http.request.UrlParam;
+import com.vmware.jira.domain.AccessToken;
 import com.vmware.jira.domain.Issue;
 import com.vmware.jira.domain.IssueResolution;
 import com.vmware.jira.domain.IssueResolutionDefinition;
@@ -18,17 +20,19 @@ import com.vmware.jira.domain.IssueTransition;
 import com.vmware.jira.domain.IssueTransitions;
 import com.vmware.jira.domain.IssueUpdate;
 import com.vmware.jira.domain.IssuesResponse;
-import com.vmware.jira.domain.LoginInfo;
 import com.vmware.jira.domain.MenuItem;
 import com.vmware.jira.domain.MenuSection;
 import com.vmware.jira.domain.MenuSections;
 import com.vmware.jira.domain.SearchRequest;
 import com.vmware.jira.domain.greenhopper.RapidView;
 import com.vmware.trello.domain.StringValue;
+import com.vmware.util.IOUtils;
+import com.vmware.util.UrlUtils;
 import com.vmware.util.complexenum.ComplexEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +66,12 @@ public class Jira extends AbstractRestService {
         this.legacyApiUrl = baseUrl + "rest/api/1.0/";
         this.agileUrl = baseUrl + "rest/agile/1.0/";
         this.greenhopperUrl = baseUrl + "rest/greenhopper/1.0/";
+
+        File accessTokenFile = new File(System.getProperty("user.home") + File.separator + ApiAuthentication.jira.getFileName());
+        if (accessTokenFile.exists()) {
+            log.debug("Using jira access token {}", accessTokenFile);
+            connection.addStatefulParam(RequestHeader.aBearerAuthHeader(IOUtils.read(accessTokenFile)));
+        }
     }
 
     public List<MenuItem> getRecentBoardItems() {
@@ -189,17 +199,15 @@ public class Jira extends AbstractRestService {
     @Override
     protected void loginManually() {
         UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(jira, getUsername());
-        connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
-        connection.post(loginUrl, new LoginInfo(credentials));
-        connection.setRequestBodyHandling(RequestBodyHandling.AsStringJsonEntity);
+        connection.setupBasicAuthHeader(credentials);
+        AccessToken token = connection.post(UrlUtils.addRelativePaths(baseUrl, "/rest/pat/latest/tokens"), AccessToken.class, new AccessToken("WorkflowTools"));
+        connection.addStatefulParam(RequestHeader.aBearerAuthHeader(token.rawToken));
+        saveApiToken(token.rawToken, jira);
     }
 
     @Override
     protected void checkAuthenticationAgainstServer() {
         connection.get(baseUrl + "rest/auth/1/session",null);
-        if (!connection.hasCookie(jira)) {
-            log.warn("Cookie {} should have been retrieved from jira login!", jira.getCookieName());
-        }
     }
 
     public String urlBaseForKey(String key) {

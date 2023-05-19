@@ -2,6 +2,7 @@ package com.vmware.http.credentials;
 
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +39,19 @@ public class UsernamePasswordAsker {
         return new UsernamePasswordCredentials(username, password);
     }
 
-    public static void setTestCredentials() throws IOException {
+    public static void setTestCredentials() {
         String userHome = System.getProperty( "user.home" );
         File credentialsFile = new File(userHome + File.separator + ".credentials.properties");
         if (!credentialsFile.exists()) {
             return;
         }
         Properties credProps = new Properties();
-        credProps.load(new FileReader(credentialsFile));
-        UsernamePasswordCredentials credentials =
+        try {
+            credProps.load(new FileReader(credentialsFile));
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
+        UsernamePasswordAsker.testCredentials =
                 new UsernamePasswordCredentials(credProps.getProperty("username"), credProps.getProperty("password"));
-        UsernamePasswordAsker.testCredentials = credentials;
     }
 }
