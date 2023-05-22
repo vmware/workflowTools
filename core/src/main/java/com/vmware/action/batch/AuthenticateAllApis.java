@@ -27,7 +27,7 @@ public class AuthenticateAllApis extends BaseAction {
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
                 ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig));
 
-        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username));
+        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username, serviceLocator.reviewBoardCredentialsType()));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
         checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides));

@@ -81,6 +81,11 @@ public class CookieFileStore {
         return null;
     }
 
+    public void removeCookie(String cookieName) {
+        authCookies.removeIf(cookie -> cookieName.equals(cookie.getName()));
+        sessionCookies.removeIf(cookie -> cookieName.equals(cookie.getName()));
+    }
+
     public void addCookieIfUseful(Cookie cookieToCheck) {
         ApiAuthentication apiAuthentication = ApiAuthentication.loadByName(cookieToCheck.getName());
         if (apiAuthentication == null) {

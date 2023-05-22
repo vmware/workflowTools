@@ -4,11 +4,15 @@ import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
 import com.vmware.http.request.UrlParam;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.reviewboard.domain.ApiToken;
+import com.vmware.reviewboard.domain.ApiTokenRequest;
+import com.vmware.reviewboard.domain.ApiTokenResponseEntity;
 import com.vmware.reviewboard.domain.GeneralCommentsResponse;
 import com.vmware.reviewboard.domain.ReviewComment;
 import com.vmware.reviewboard.domain.DiffCommentsResponse;
@@ -32,16 +36,22 @@ import com.vmware.reviewboard.domain.ServerInfo;
 import com.vmware.reviewboard.domain.ServerInfoResponse;
 import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.reviewboard.domain.UserReviewsResponse;
+import com.vmware.util.IOUtils;
+import com.vmware.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
 import static com.vmware.http.cookie.ApiAuthentication.reviewBoard;
+import static com.vmware.http.cookie.ApiAuthentication.reviewBoard_token;
+import static com.vmware.http.request.RequestHeader.AUTHORIZATION;
 import static com.vmware.http.request.RequestHeader.anAcceptHeader;
 import static com.vmware.reviewboard.domain.ReviewRequestDraft.aDraftForPublishingAReview;
 import static com.vmware.reviewboard.domain.ReviewRequestStatus.all;
@@ -51,11 +61,19 @@ public class ReviewBoard extends AbstractRestService {
     private ServerInfo cachedServerInfo = null;
     private RootList cachedRootList = null;
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public ReviewBoard(String reviewboardUrl, String username) {
-        super(reviewboardUrl, "api/", ApiAuthentication.reviewBoard, username);
+    public ReviewBoard(String reviewboardUrl, String username, ApiAuthentication credentialsType) {
+        super(reviewboardUrl, "api/", credentialsType, username);
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
+        if (credentialsType == reviewBoard_token) {
+            connection.removeCookie(reviewBoard.getCookieName());
+            File tokenFile = new File(System.getProperty("user.home") + File.separator + credentialsType.getFileName());
+            if (tokenFile.exists()) {
+                log.debug("Using reviewboard access token file {}", tokenFile.getAbsolutePath());
+                connection.addStatefulParam(new RequestHeader(AUTHORIZATION, "token " + IOUtils.read(tokenFile)));
+            }
+        }
     }
 
     public RootList getRootLinkList() {
@@ -245,14 +263,21 @@ public class ReviewBoard extends AbstractRestService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(reviewBoard, getUsername());
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType, getUsername());
         connection.setupBasicAuthHeader(credentials);
+
+        if (credentialsType == reviewBoard_token) {
+            String tokenUrl = UrlUtils.addRelativePaths(apiUrl, "users", getUsername(), "api-tokens/");
+            ApiToken apiToken = connection.post(tokenUrl, ApiTokenResponseEntity.class, new ApiTokenRequest()).apiToken;
+            saveApiToken(apiToken.token, credentialsType);
+            connection.addStatefulParam(new RequestHeader(AUTHORIZATION, "token " + apiToken.token));
+        }
     }
 
     @Override
     public void checkAuthenticationAgainstServer() {
         getServerInfo();
-        if (!connection.hasCookie(reviewBoard)) {
+        if (credentialsType == reviewBoard && !connection.hasCookie(reviewBoard)) {
             log.warn("Cookie {} should have been retrieved from reviewboard login!", reviewBoard.getCookieName());
         }
     }

@@ -10,6 +10,7 @@ import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
 import com.vmware.github.Github;
 import com.vmware.gitlab.Gitlab;
+import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
@@ -69,7 +70,7 @@ public class ServiceLocator {
 
     public ReviewBoard getReviewBoard() {
         if (reviewBoard == null) {
-            reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username);
+            reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType());
             if (reviewBoard.isConnectionAuthenticated()) {
                 reviewBoard.updateServerTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
             }
@@ -146,5 +147,9 @@ public class ServiceLocator {
             github = new Github(config.githubConfig.githubUrl, config.username);
         }
         return github;
+    }
+
+    public ApiAuthentication reviewBoardCredentialsType() {
+        return config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
     }
 }

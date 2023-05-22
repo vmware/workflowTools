@@ -6,6 +6,7 @@ package com.vmware.http.cookie;
  */
 public enum ApiAuthentication {
     reviewBoard("rbsessionid", ".post-review-cookies.txt"),
+    reviewBoard_token(".rb-api-token.txt"),
     jira(".jira-access-token.txt"),
     bugzilla_login_id("Bugzilla_login", ".bugzilla-login-id.txt"),
     bugzilla_cookie("Bugzilla_logincookie", ".bugzilla-cookies.txt"),

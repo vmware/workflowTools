@@ -45,7 +45,7 @@ public class TestReviewBoardApi extends BaseTests {
         String reviewboardUrl = testProperties.getProperty("reviewboard.url");
         String username = testProperties.getProperty("reviewboard.username");
 
-        reviewBoard = new ReviewBoard(reviewboardUrl, username);
+        reviewBoard = new ReviewBoard(reviewboardUrl, username, ApiAuthentication.reviewBoard_token);
         reviewBoard.setupAuthenticatedConnection();
         reviewBoard.updateServerTimeZone("yyyy-MM-dd'T'HH:mm:ss");
 

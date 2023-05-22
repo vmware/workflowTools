@@ -42,6 +42,9 @@ public class ReviewBoardConfig {
     @ConfigurableProperty(commandLine = "--search-by-usernames-only", help = "Search reviewboard for users by username only")
     public boolean searchByUsernamesOnly;
 
+    @ConfigurableProperty(commandLine = "--use-rb-api-token", help = "Use api loging for authenticaiton. Workflow tools will create an api token if one deesn't exist")
+    public boolean useRbApiToken;
+
     @ConfigurableProperty(help = "Adds review groups if a commit has file changes that match a file mapping")
     public Map<String, String> reviewGroupFileMappings = new TreeMap<>();
 }

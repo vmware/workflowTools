@@ -69,7 +69,7 @@ public class Jira extends AbstractRestService {
 
         File accessTokenFile = new File(System.getProperty("user.home") + File.separator + ApiAuthentication.jira.getFileName());
         if (accessTokenFile.exists()) {
-            log.debug("Using jira access token {}", accessTokenFile);
+            log.debug("Using jira access token file {}", accessTokenFile.getAbsolutePath());
             connection.addStatefulParam(RequestHeader.aBearerAuthHeader(IOUtils.read(accessTokenFile)));
         }
     }

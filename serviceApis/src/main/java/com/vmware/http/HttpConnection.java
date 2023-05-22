@@ -111,6 +111,10 @@ public class HttpConnection {
         cookieFileStore.addCookieIfUseful(cookie);
     }
 
+    public void removeCookie(String cookieName) {
+        cookieFileStore.removeCookie(cookieName);
+    }
+
     public void resetParams() {
         requestParams.reset();
     }
