@@ -14,6 +14,6 @@ import static com.vmware.jira.domain.IssueStatusDefinition.Reopened;
 public class MarkIssueAsInProgress extends BaseTransitionJiraIssue {
 
     public MarkIssueAsInProgress(WorkflowConfig config) {
-        super(config, new IssueStatusDefinition[] {InProgress}, new IssueStatusDefinition[] {Open, Reopened, InReview});
+        super(config, new IssueStatusDefinition[] {InProgress}, new IssueStatusDefinition[] {Open, Reopened});
     }
 }

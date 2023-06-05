@@ -83,7 +83,6 @@ public abstract class BaseTransitionJiraIssue extends BaseCommitAction {
     }
 
     private void transitionIssueToStatus(String bugNumber, IssueFields issueFields, IssueStatusDefinition toStatus, boolean isLast) {
-
         IssueStatusDefinition currentStatus = issueFields.status.def;
         if (currentStatus.equals(toStatus)) {
             if (isLast) {
