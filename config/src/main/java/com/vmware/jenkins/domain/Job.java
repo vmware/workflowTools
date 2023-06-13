@@ -362,9 +362,10 @@ public class Job extends BaseDbClass {
                     if (re.getCause() instanceof SQLIntegrityConstraintViolationException) {
                         log.error("Failed to delete build {} with id {} due to existing tests", build.name, build.id);
                         List<TestResult> existingTests = dbUtils.query(TestResult.class, "SELECT * FROM TEST_RESULT WHERE JOB_BUILD_ID = ?", build.id);
-                        existingTests.forEach(testResult -> log.info(testResult.classAndTestName()));
+                        existingTests.forEach(testResult -> log.info("Existing test: {}", testResult.classAndTestName()));
+                    } else {
+                        throw re;
                     }
-                    throw re;
                 }
 
                 usefulBuilds.remove(build);

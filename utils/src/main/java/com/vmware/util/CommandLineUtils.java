@@ -44,15 +44,25 @@ public class CommandLineUtils {
     }
 
     private static boolean checkForCommandUsingWhere(String command) {
-        String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
-        log.debug("{} where check [{}]", command, whereCheck);
-        return !whereCheck.contains("Could not find files");
+        try {
+            String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
+            log.debug("{} where check [{}]", command, whereCheck);
+            return !whereCheck.contains("Could not find files");
+        } catch (FatalException fe) {
+            log.debug("where {} failed with output {}", command, fe.getMessage());
+            return false;
+        }
     }
 
     private static boolean checkForCommandUsingWhich(String command) {
-        String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
-        log.debug("{} which check [{}]", command, whichCheck);
-        return !whichCheck.trim().isEmpty() && !whichCheck.contains("no " + command + " in");
+        try {
+            String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
+            log.debug("{} which check [{}]", command, whichCheck);
+            return !whichCheck.trim().isEmpty() && !whichCheck.contains("no " + command + " in");
+        } catch (FatalException fe) {
+            log.debug("which {} failed with output {}", command, fe.getMessage());
+            return false;
+        }
     }
 
     public static String executeCommand(String command, LogLevel logLevel) {
