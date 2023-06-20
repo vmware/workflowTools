@@ -657,7 +657,6 @@
       "prepareCommitForPush",
       "createMergeRequest",
       "WaitForMergeRequestToBeUpdated",
-      "ApproveMergeRequest",
       "AssignMergeRequestToBot",
       "HardSubmitReview"
     ],
@@ -706,7 +705,6 @@
     ],
     "createAndAcceptMergeRequest": [
       "createMergeRequest",
-      "ApproveMergeRequest",
       "AcceptMergeRequest"
     ],
     "reopenAndResolveIssues": [
