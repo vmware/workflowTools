@@ -1,8 +1,5 @@
 package com.vmware.action.review;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.vmware.action.base.BaseCommitUsingReviewBoardAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -10,6 +7,9 @@ import com.vmware.reviewboard.domain.RepoType;
 import com.vmware.reviewboard.domain.ReviewRequest;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.StringUtils;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @ActionDescription("Updates the review request draft details (summary, description, testing done, bug number, groups, people).")
 public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
@@ -21,6 +21,8 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
     public void process() {
         ReviewRequest reviewRequest = draft.reviewRequest;
         log.info("Updating information for review " + reviewRequest.id);
+        String description = draft.description;
+        String testingDone = draft.testingDone;
 
         ReviewRequestDraft existingDraft = reviewBoard.getReviewRequestDraftWithExceptionHandling(reviewRequest.getDraftLink());
         if (existingDraft != null) {
@@ -43,6 +45,9 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
             draft.descriptionTextType = "markdown";
             draft.testingDoneTextType = "markdown";
         }
+
+        draft.description = StringUtils.urlEncode(description);
+        draft.testingDone = StringUtils.urlEncode(testingDone);
         draft.commitId = determineCommitId();
         log.debug("Review commit id set to {}", draft.commitId);
 
@@ -54,6 +59,8 @@ public class UpdateReviewDetails extends BaseCommitUsingReviewBoardAction {
             draft.reviewedBy = null;
         }
         reviewBoard.updateReviewRequestDraft(reviewRequest.getDraftLink(), draft);
+        draft.description = description;
+        draft.testingDone = testingDone;
         if (draft.reviewedBy == null) {
             draft.reviewedBy = commitConfig.noReviewerLabel;
         }

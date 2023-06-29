@@ -3,6 +3,8 @@ package com.vmware.util;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.Key;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -90,6 +92,17 @@ public class StringUtils {
         }
         existingValue += valueToAdd;
         return existingValue;
+    }
+
+    public static String urlEncode(String value) {
+        if (isEmpty(value)) {
+            return value;
+        }
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     public static boolean isInteger(String value) {

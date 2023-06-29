@@ -22,6 +22,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -116,9 +117,9 @@ public class DbUtils {
             } else if (Map.class.isAssignableFrom(recordClass)) {
                 List<T> values = new ArrayList<>();
                 while (results.next()) {
-                    Map record = new HashMap();
+                    Map record = new LinkedHashMap();
                     for (int i = 1; i <= resultMetaData.getColumnCount(); i++) {
-                        String name = resultMetaData.getColumnName(i);
+                        String name = resultMetaData.getColumnLabel(i);
                         Object value = results.getObject(name);
                         if (value instanceof Array) {
                             record.put(name, ((Array) value).getArray());
