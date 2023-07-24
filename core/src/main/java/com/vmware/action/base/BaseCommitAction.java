@@ -50,7 +50,7 @@ public abstract class BaseCommitAction extends BaseAction {
         } else {
             gitReason = "not in git repo";
         }
-        perforceReason = perforceClientCannotBeUsed();
+        perforceReason = reasonPerforceClientCannotBeUsed();
         if (StringUtils.isNotEmpty(gitReason) && StringUtils.isNotEmpty(perforceReason)) {
             exitDueToFailureCheck(gitReason + " and " + perforceReason);
         }
@@ -59,7 +59,7 @@ public abstract class BaseCommitAction extends BaseAction {
     protected String readLastChange() {
         if (git.workingDirectoryIsInGitRepo()) {
             return git.lastCommitText();
-        } else if (perforceClientCannotBeUsed() == null) {
+        } else if (reasonPerforceClientCannotBeUsed() == null) {
             return readPendingChangelistText();
         } else {
             log.warn("Not in git repo and config value perforceClientName is not set, can't read last change");
@@ -70,7 +70,7 @@ public abstract class BaseCommitAction extends BaseAction {
     protected List<FileChange> getFileChangesInLastCommit() {
         if (git.workingDirectoryIsInGitRepo()) {
             return git.getChangesInDiff("head~1", "head");
-        } else if (perforceClientCannotBeUsed() == null) {
+        } else if (reasonPerforceClientCannotBeUsed() == null) {
             String changelistId = determineChangelistIdToUse();
             return serviceLocator.getPerforce().getFileChangesForPendingChangelist(changelistId);
         } else {
@@ -79,12 +79,12 @@ public abstract class BaseCommitAction extends BaseAction {
         }
     }
 
-    protected boolean commitTextHasNoChanges(boolean includeJobResultsInCommit) {
+    protected boolean commitTextHasChanges(boolean includeJobResultsInCommit) {
         ReviewRequestDraft existingDraft = new ReviewRequestDraft(readLastChange(), commitConfig);
         String existingCommitText = existingDraft.toText(commitConfig);
         String updatedCommitText = updatedCommitText(includeJobResultsInCommit);
 
-        return existingCommitText.equals(updatedCommitText);
+        return !existingCommitText.equals(updatedCommitText);
     }
 
     protected String updatedCommitText(boolean includeJobResultsInCommit) {
@@ -92,14 +92,14 @@ public abstract class BaseCommitAction extends BaseAction {
     }
 
     protected Perforce getLoggedInPerforceClient() {
-        String reasonForFailing = perforceClientCannotBeUsed();
+        String reasonForFailing = reasonPerforceClientCannotBeUsed();
         if (StringUtils.isNotEmpty(reasonForFailing)) {
             throw new FatalException("Exiting as " + reasonForFailing);
         }
         return serviceLocator.getPerforce();
     }
 
-    protected String perforceClientCannotBeUsed() {
+    protected String reasonPerforceClientCannotBeUsed() {
         if (!CommandLineUtils.isCommandAvailable("p4")) {
             return "p4 command is not available";
         }

@@ -95,7 +95,7 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
         String fullPath;
         if (git.workingDirectoryIsInGitRepo()) {
             fullPath = git.fullPath(relativePath);
-        } else if (perforceClientCannotBeUsed() == null) {
+        } else if (reasonPerforceClientCannotBeUsed() == null) {
             fullPath = getLoggedInPerforceClient().fullPath(relativePath);
         } else {
             throw new FatalException("File path " + relativePath + " does not exist");

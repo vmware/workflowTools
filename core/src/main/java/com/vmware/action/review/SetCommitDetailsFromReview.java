@@ -51,8 +51,8 @@ public class SetCommitDetailsFromReview extends BaseCommitAction {
         if (StringUtils.isEmpty(reviewAsDraft.summary) && StringUtils.isEmpty(reviewAsDraft.description)) {
             throw new FatalException("Summary and description and blank for review request {} and no draft found for request", reviewId);
         }
-        log.info("Using review request {} ({}) for commit details", reviewAsDraft.id, reviewRequest.summary);
-        draft.id = reviewAsDraft.id;
+        log.info("Using review request {} ({}) for commit details", reviewRequest.id, reviewAsDraft.summary);
+        draft.id = String.valueOf(reviewRequest.id);
         draft.summary = StringUtils.truncateStringIfNeeded(reviewAsDraft.summary, commitConfig.maxSummaryLength);
         draft.description = StringUtils.addNewLinesIfNeeded(reviewAsDraft.description, commitConfig.maxDescriptionLength, 0);
 

@@ -36,7 +36,7 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     }
 
     private boolean commitHasNoChanges() {
-        if (!commitTextHasNoChanges(includeJobResultsInCommit)) {
+        if (commitTextHasChanges(includeJobResultsInCommit)) {
             return false;
         }
 

@@ -117,9 +117,9 @@ public class ApplyPatch extends BaseCommitAction {
     }
 
     private void exitIfPerforceClientCannotBeUsed() {
-        String perforceClientCannotBeUsed = perforceClientCannotBeUsed();
-        if (perforceClientCannotBeUsed != null) {
-            throw new RuntimeException(perforceClientCannotBeUsed);
+        String reason = reasonPerforceClientCannotBeUsed();
+        if (reason != null) {
+            throw new RuntimeException(reason);
         }
     }
 

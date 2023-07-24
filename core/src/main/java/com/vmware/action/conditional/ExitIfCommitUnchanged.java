@@ -12,7 +12,7 @@ public class ExitIfCommitUnchanged extends BaseCommitAction {
 
     @Override
     public void process() {
-        if (!commitTextHasNoChanges(true)) {
+        if (commitTextHasChanges(true)) {
             return;
         }
 
