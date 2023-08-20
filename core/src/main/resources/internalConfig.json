@@ -680,6 +680,7 @@
       "prepareCommitForMerge",
       "updateMergeRequestFromCommit",
       "WaitForMergeRequestToBeUpdated",
+      "ApproveMergeRequest",
       "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
       "AssignMergeRequestToBot",
       "HardSubmitReview"
