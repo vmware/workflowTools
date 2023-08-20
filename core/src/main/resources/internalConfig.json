@@ -60,6 +60,8 @@
   "databaseUrlPattern": "jdbc:postgresql://$HOST:$PORT/$DB_NAME",
   "databaseSchemaName": "local",
   "groupByNamePattern": ".+",
+  "approvalRuleName": "Reviewers",
+  "approvalsRequired": 1,
   "issueTypesToInclude": [
     8
   ],
@@ -92,7 +94,6 @@
   "bugNumberLabel": "Bug Number:",
   "reviewedByLabel": "Reviewed by:",
   "reviewUrlLabel": "Review URL:",
-  "mergeUrlLabel": "Merge URL:",
   "pipelineLabel": "Run Pipeline:",
   "noPipelineLabel": "NO",
   "mergeToLabel": "Merge to:",
@@ -448,6 +449,16 @@
       "FormatCommitText",
       "AmendCommitWithoutJobResults"
     ],
+    "prepareCommitForMerge": [
+      "selectMergeRequest",
+      "ExitIfCommitFailsCheckstyle",
+      "ExitIfReviewHasNoShipIts",
+      "SetReviewedByAsShipItsList",
+      "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
+      "SetReviewedByAsApproverList",
+      "FormatCommitText",
+      "AmendCommitWithoutJobResults"
+    ],
     "push": [
       "pushHarder"
     ],
@@ -526,6 +537,18 @@
       "CheckCommitForCheckstyleErrors",
       "CheckStatusOfReviewShipIts",
       "DisplayOpenReviewComments",
+      "AmendCommit"
+    ],
+    "mergeable": [
+      "ReadLastCommit",
+      "CheckStatusOfJenkinsBuilds",
+      "DisplayBuildOutputForJenkinsJobs",
+      "CheckStatusOfBuildwebBuilds",
+      "DisplayBuildOutputForBuildwebBuilds",
+      "CheckCommitForCheckstyleErrors",
+      "SelectMatchingMergeRequest",
+      "CheckStatusOfMergeRequestApprovals",
+      "DisplayOpenDiffNotes",
       "AmendCommit"
     ],
     "checkSandboxStatus": [
@@ -654,19 +677,31 @@
       "--disable-merge-to"
     ],
     "merge": [
-      "prepareCommitForPush",
-      "createMergeRequest",
+      "prepareCommitForMerge",
+      "updateMergeRequestFromCommit",
       "WaitForMergeRequestToBeUpdated",
+      "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
       "AssignMergeRequestToBot",
       "HardSubmitReview"
     ],
     "createMergeRequest": [
-      "PushToMergeBranch",
+      "syncMergeRequestFromCommit",
+      "UpdateMergeRequestApprovers",
+      "UpdateMergeRequestReviewers"
+    ],
+    "updateMergeRequest" : [
+      "createMergeRequest"
+    ],
+    "syncMergeRequestFromCommit": [
       "selectMergeRequest",
+      "PushToMergeBranch",
       "CreateMergeRequestIfNeeded",
       "CopyMergeUrlToClipboard"
     ],
     "pushToMergeBranch" : [
+      "ReadLastCommit",
+      "SetEmptyReviewUrlIfNeeded",
+      "AmendCommitWithoutJobResults",
       "PushToMergeBranch"
     ],
     "openMerge": [
@@ -1071,6 +1106,8 @@
     "setCommitDetailsWithoutConfirmation",
     "selectAndConvertBoard",
     "prepareCommitForPush",
+    "prepareCommitForMerge",
+    "syncMergeRequestFromCommit",
     "setCommitDetails",
     "setCommitDetailsOffline",
     "setReviewDetails",

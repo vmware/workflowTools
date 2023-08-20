@@ -47,7 +47,7 @@ public class TestReviewBoardApi extends BaseTests {
 
         reviewBoard = new ReviewBoard(reviewboardUrl, username, ApiAuthentication.reviewBoard_token);
         reviewBoard.setupAuthenticatedConnection();
-        reviewBoard.updateServerTimeZone("yyyy-MM-dd'T'HH:mm:ss");
+        reviewBoard.updateClientTimeZone("yyyy-MM-dd'T'HH:mm:ss");
 
         String NO_GROUPS = "";
         sampleRequest = new ReviewRequestDraft("Summary", "Description", "Testing", "HS-1054", username, NO_GROUPS, "testBranch");

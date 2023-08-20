@@ -44,6 +44,7 @@ public abstract class AbstractRestService extends AbstractService {
         return post(url, responseConversionClass, requestBody, Collections.emptyList(), params);
     }
 
+
     protected <T> T post(String url, Class<T> responseConversionClass, Object requestBody,
                          List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
         try {
@@ -109,6 +110,31 @@ public abstract class AbstractRestService extends AbstractService {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
             return connection.put(url, requestBody, params);
+        }
+    }
+
+    protected <T> T delete(String url, RequestParam... params) {
+        return delete(url, Collections.emptyList(), params);
+    }
+
+    protected <T> T delete(String url,
+                           List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
+        try {
+            return connection.delete(url, params);
+        } catch (NotAuthorizedException e) {
+            if (allowedExceptionTypes.contains(e.getClass())) {
+                throw e;
+            }
+            connectionIsAuthenticated = false;
+            setupAuthenticatedConnection();
+            return connection.delete(url, params);
+        } catch (ForbiddenException e) {
+            if (allowedExceptionTypes.contains(e.getClass())) {
+                throw e;
+            }
+            connectionIsAuthenticated = false;
+            setupAuthenticatedConnection();
+            return connection.delete(url, params);
         }
     }
 }

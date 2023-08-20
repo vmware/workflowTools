@@ -72,7 +72,7 @@ public class ServiceLocator {
         if (reviewBoard == null) {
             reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType());
             if (reviewBoard.isConnectionAuthenticated()) {
-                reviewBoard.updateServerTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
+                reviewBoard.updateClientTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
             }
         }
         return reviewBoard;

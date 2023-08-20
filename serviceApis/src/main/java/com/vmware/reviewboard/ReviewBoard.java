@@ -247,7 +247,7 @@ public class ReviewBoard extends AbstractRestService {
         return getVersion().compareTo("1.7.13") >= 0;
     }
 
-    public void updateServerTimeZone(String serverDateFormat) {
+    public void updateClientTimeZone(String serverDateFormat) {
         String serverTimeZone = getServerInfo().site.serverTimeZone;
         connection.updateTimezoneAndFormat(TimeZone.getTimeZone(serverTimeZone), serverDateFormat);
     }
@@ -257,7 +257,7 @@ public class ReviewBoard extends AbstractRestService {
             return;
         }
         super.setupAuthenticatedConnection();
-        updateServerTimeZone(reviewBoardDateFormat);
+        updateClientTimeZone(reviewBoardDateFormat);
     }
 
     @Override

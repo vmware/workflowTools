@@ -131,7 +131,6 @@ public class CommitConfig {
         appendLabelToPattern(builder, mergeToLabel);
         appendLabelToPattern(builder, approvedByLabel);
         appendLabelToPattern(builder, pipelineLabel);
-        appendLabelToPattern(builder, mergeUrlLabel);
         appendLabelToPattern(builder, "\\s+\\d+\\s+files*\\s+changed");
         builder.append("($))");
         return builder.toString();
@@ -146,7 +145,6 @@ public class CommitConfig {
         appendLabelToPattern(builder, mergeToLabel);
         appendLabelToPattern(builder, approvedByLabel);
         appendLabelToPattern(builder, pipelineLabel);
-        appendLabelToPattern(builder, mergeUrlLabel);
         appendLabelToPattern(builder, "\\s+\\d+\\s+ file\\w*\\s+changed");
         builder.append("($))");
         return builder.toString();
@@ -170,10 +168,6 @@ public class CommitConfig {
 
     public String generatePipelinePattern() {
         return pipelineLabel.trim() + "\\s*(.+)$";
-    }
-
-    public String generateMergeUrlPattern() {
-        return mergeUrlLabel.trim() + "\\s*(.+)$";
     }
 
     public String generateApprovedByPattern() {
@@ -222,10 +216,6 @@ public class CommitConfig {
 
     public String getPipelineLabel() {
         return padLabel(pipelineLabel);
-    }
-
-    public String getMergeUrlLabel() {
-        return padLabel(mergeUrlLabel);
     }
 
     private void appendLabelToPattern(StringBuilder builder, String label) {

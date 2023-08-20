@@ -1,6 +1,7 @@
 package com.vmware.gitlab.domain;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class MergeRequest {
     public Integer id;
@@ -41,6 +42,10 @@ public class MergeRequest {
     public Integer assigneeId;
 
     public ApprovalUser[] appovedBy;
+
+    @SerializedName("reviewer_ids")
+    @Expose(deserialize = false)
+    public long[] reviewerIds;
 
     public boolean canBeMerged() {
         return "can_be_merged".equalsIgnoreCase(mergeStatus);

@@ -21,7 +21,7 @@ public class WaitForMergeRequestToBeUpdated extends BaseCommitWithMergeRequestAc
         String headRef = git.revParse("HEAD");
         String currentBranch = git.currentBranch();
         if (headRef.equals(draft.getGitlabMergeRequest().sha)) {
-            log.info("Merge request {} commit hash already matches branch {} ref {}", draft.mergeRequestId(), currentBranch, headRef);
+            log.debug("Merge request {} commit hash already matches branch {} ref {}", draft.mergeRequestId(), currentBranch, headRef);
             return;
         }
         log.info("Waiting for merge request {} commit hash to be updated to match branch {} ref {}", draft.mergeRequestId(), currentBranch, headRef);

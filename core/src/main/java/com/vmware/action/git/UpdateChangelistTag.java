@@ -28,7 +28,7 @@ public class UpdateChangelistTag extends BaseLinkedPerforceCommitUsingGitAction 
                 log.info("Updating {} from {} revision to {}", expectedTagName, existingRevision, headRevision);
                 git.updateTag(expectedTagName, LogLevel.DEBUG);
             } else {
-                log.debug("{} already matches head revision", expectedTagName, headRevision);
+                log.debug("{} already matches head revision {}", expectedTagName, headRevision);
             }
         }
     }

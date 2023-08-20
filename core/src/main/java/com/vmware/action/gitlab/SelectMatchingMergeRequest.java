@@ -9,7 +9,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.gitlab.domain.MergeRequest;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Selects the matching merger request in Gitlab by merge branch. Load by id if merge request id found in commit.")
+@ActionDescription("Selects the matching merger request in Gitlab by merge branch.")
 public class SelectMatchingMergeRequest extends BaseCommitUsingGitlabAction {
     public SelectMatchingMergeRequest(WorkflowConfig config) {
         super(config);

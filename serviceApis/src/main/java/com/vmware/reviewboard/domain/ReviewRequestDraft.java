@@ -228,7 +228,6 @@ public class ReviewRequestDraft extends BaseEntity {
         this.reviewedBy = parseSingleLineFromText(commitText, commitConfig.generateReviewedByPattern(), "Reviewers");
         this.approvedBy = parseSingleLineFromText(commitText, commitConfig.generateApprovedByPattern(), "Approved by");
         this.pipeline = parseSingleLineFromText(commitText, commitConfig.generatePipelinePattern(), "Run Pipeline");
-        this.mergeRequestUrl = parseSingleLineFromText(commitText, commitConfig.generateMergeUrlPattern(), "Merge URL");
         this.mergeToValues = parseRepeatingSingleLineFromText(commitText, commitConfig.generateMergeToPattern(), "Merge To");
 
         this.filesChanged = parseValueFromText(commitText, "(\\d+) files* changed", "Files Changed");
@@ -459,9 +458,6 @@ public class ReviewRequestDraft extends BaseEntity {
         }
         if (isNotEmpty(pipeline)) {
             builder.append("\n").append(commitConfig.getPipelineLabel()).append(pipeline);
-        }
-        if (hasMergeRequest()) {
-            builder.append("\n").append(commitConfig.getMergeUrlLabel()).append(mergeRequestUrl);
         }
         return builder.toString();
     }

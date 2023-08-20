@@ -21,4 +21,10 @@ public class GitlabConfig {
 
     @ConfigurableProperty(help = "User if of the bot used for merging merge requests")
     public Integer mergeBotUserId;
+
+    @ConfigurableProperty(commandLine = "--approval-rule-name", help = "Name of the approval rule to add reviewers to")
+    public String approvalRuleName;
+
+    @ConfigurableProperty(commandLine = "--approvals-required", help = "Number of approvals required for the merge request")
+    public int approvalsRequired;
 }

@@ -338,6 +338,9 @@
   "BaseCommitCreateAction": [
     "--no-verify"
   ],
+  "ExitIfMergeRequestDoesNotHaveRequiredApprovals": [
+    "--trivial-reviewer-label"
+  ],
   "LoadAllIssuesForEpic": [
     "--epic-id"
   ],
@@ -629,6 +632,11 @@
   ],
   "BaseSslAction": [
     "--keystore-password"
+  ],
+  "UpdateMergeRequestApprovers": [
+    "--trivial-reviewer-label",
+    "--approvals-required",
+    "--approval-rule-name"
   ],
   "OpenVcdTenantApp": [
     "--vcd-org"

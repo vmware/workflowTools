@@ -14,7 +14,7 @@ public class RemoveReviewUrl extends BaseCommitAction {
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        if (StringUtils.isEmpty(draft.id)) {
+        if (StringUtils.isEmpty(draft.id) && !reviewBoardConfig.alwaysIncludeReviewUrl) {
             skipActionDueTo("no review url found in commit");
         }
     }

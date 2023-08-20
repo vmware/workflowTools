@@ -1,12 +1,18 @@
 package com.vmware.gitlab;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import com.google.gson.FieldNamingPolicy;
 import com.vmware.AbstractRestService;
 import com.vmware.gitlab.domain.MergeAcceptRequest;
 import com.vmware.gitlab.domain.MergeRequest;
+import com.vmware.gitlab.domain.MergeRequestApprovalRule;
 import com.vmware.gitlab.domain.MergeRequestApprovals;
+import com.vmware.gitlab.domain.MergeRequestNote;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
@@ -25,7 +31,8 @@ public class Gitlab extends AbstractRestService {
     public Gitlab(String baseUrl, String username) {
         super(baseUrl, "api/v4", ApiAuthentication.gitlab, username);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
-                new ConfiguredGsonBuilder().namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
+                new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS")
+                        .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
         String apiToken = readExistingApiToken(ApiAuthentication.gitlab);
         if (StringUtils.isNotBlank(apiToken)) {
             connection.addStatefulParam(new RequestHeader(PRIVATE_TOKEN_HEADER, apiToken));
@@ -46,6 +53,27 @@ public class Gitlab extends AbstractRestService {
 
     public MergeRequestApprovals getMergeRequestApprovals(int projectId, int mergeRequestId) {
         return get(mergeRequestUrl(projectId, mergeRequestId) + "/approvals", MergeRequestApprovals.class);
+    }
+
+    public MergeRequestApprovalRule[] getMergeRequestApprovalRules(int projectId, int mergeRequestId) {
+        return get(mergeRequestUrl(projectId, mergeRequestId) + "/approval_rules", MergeRequestApprovalRule[].class);
+    }
+
+    public Set<MergeRequestNote> getOpenMergeRequestNotes(int projectId, int mergeRequestId) {
+        MergeRequestNote[] notes = get(mergeRequestUrl(projectId, mergeRequestId) + "/notes", MergeRequestNote[].class);
+        return Arrays.stream(notes).filter(note -> note.type == MergeRequestNote.Type.DiffNote).collect(Collectors.toSet());
+    }
+
+    public MergeRequestApprovalRule createMergeRequestApprovalRule(int projectId, int mergeRequestId, MergeRequestApprovalRule rule) {
+        return post(mergeRequestUrl(projectId, mergeRequestId) + "/approval_rules", MergeRequestApprovalRule.class, rule);
+    }
+
+    public MergeRequestApprovalRule updateMergeRequestApprovalRule(int projectId, int mergeRequestId, MergeRequestApprovalRule rule) {
+        return put(mergeRequestUrl(projectId, mergeRequestId) + "/approval_rules/" + rule.id, MergeRequestApprovalRule.class, rule);
+    }
+
+    public void deleteMergeRequestApprovalRule(int projectId, int mergeRequestId, long ruleId) {
+        delete(mergeRequestUrl(projectId, mergeRequestId) + "/approval_rules/" + ruleId);
     }
 
     public MergeRequestApprovals approveMergeRequest(int projectId, int mergeRequestId) {
@@ -98,8 +126,12 @@ public class Gitlab extends AbstractRestService {
         connection.addStatefulParam(new RequestHeader(PRIVATE_TOKEN_HEADER, privateToken));
     }
 
+    private String projectUrl(int projectId) {
+        return apiUrl + "/projects/" + projectId;
+    }
+
     private String mergeRequestsUrl(int projectId) {
-        return apiUrl + "/projects/" + projectId + "/merge_requests";
+        return projectUrl(projectId) + "/merge_requests";
     }
 
     private String mergeRequestUrl(int projectId, int requestId) {
