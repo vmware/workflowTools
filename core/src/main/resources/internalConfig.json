@@ -678,7 +678,7 @@
     ],
     "merge": [
       "prepareCommitForMerge",
-      "updateMergeRequestFromCommit",
+      "syncMergeRequestFromCommit",
       "WaitForMergeRequestToBeUpdated",
       "ApproveMergeRequest",
       "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
@@ -686,6 +686,7 @@
       "HardSubmitReview"
     ],
     "createMergeRequest": [
+      "selectMergeRequest",
       "syncMergeRequestFromCommit",
       "UpdateMergeRequestApprovers",
       "UpdateMergeRequestReviewers"
@@ -694,7 +695,6 @@
       "createMergeRequest"
     ],
     "syncMergeRequestFromCommit": [
-      "selectMergeRequest",
       "PushToMergeBranch",
       "CreateMergeRequestIfNeeded",
       "CopyMergeUrlToClipboard"
