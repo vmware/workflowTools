@@ -27,9 +27,12 @@ public class SelectMatchingMergeRequest extends BaseCommitUsingGitlabAction {
             log.info("Found matching merge request {}", matchingRequest.get().webUrl);
             draft.setGitlabMergeRequest(matchingRequest.get());
         } else {
-            log.info("Failed to find matching merge request");
+            if (gitlabConfig.failIfNoMergeRequestFound) {
+                cancelWithMessage("no matching merge request was found");
+            } else {
+                log.info("Failed to find matching merge request");
+            }
         }
-
     }
 
     private boolean matches(MergeRequest mergeRequest, String sourceMergeBranch, String targetMergeBranch) {

@@ -1,6 +1,5 @@
 package com.vmware.gitlab.domain;
 
-import com.google.gson.annotations.SerializedName;
 import com.vmware.util.StringUtils;
 
 import java.util.Arrays;
@@ -16,7 +15,6 @@ public class MergeRequestApprovals {
 
     public ApprovalUser[] approvedBy;
 
-    @SerializedName("suggested_approvers")
     public User[] suggestedApprovers;
 
 

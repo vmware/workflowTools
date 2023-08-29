@@ -12,7 +12,8 @@ import com.vmware.gitlab.domain.MergeAcceptRequest;
 import com.vmware.gitlab.domain.MergeRequest;
 import com.vmware.gitlab.domain.MergeRequestApprovalRule;
 import com.vmware.gitlab.domain.MergeRequestApprovals;
-import com.vmware.gitlab.domain.MergeRequestNote;
+import com.vmware.gitlab.domain.MergeRequestCommitVersion;
+import com.vmware.gitlab.domain.MergeRequestDiscussion;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
@@ -59,9 +60,13 @@ public class Gitlab extends AbstractRestService {
         return get(mergeRequestUrl(projectId, mergeRequestId) + "/approval_rules", MergeRequestApprovalRule[].class);
     }
 
-    public Set<MergeRequestNote> getOpenMergeRequestNotes(int projectId, int mergeRequestId) {
-        MergeRequestNote[] notes = get(mergeRequestUrl(projectId, mergeRequestId) + "/notes", MergeRequestNote[].class);
-        return Arrays.stream(notes).filter(note -> note.type == MergeRequestNote.Type.DiffNote).collect(Collectors.toSet());
+    public Set<MergeRequestDiscussion> getOpenMergeRequestDiscussions(int projectId, int mergeRequestId) {
+        MergeRequestDiscussion[] discussions = get(mergeRequestUrl(projectId, mergeRequestId) + "/discussions", MergeRequestDiscussion[].class);
+        return Arrays.stream(discussions).filter(MergeRequestDiscussion::isOpenDiffDiscussion).collect(Collectors.toSet());
+    }
+
+    public MergeRequestCommitVersion[] getOpenMergeRequestCommitVersions(int projectId, int mergeRequestId) {
+        return get(mergeRequestUrl(projectId, mergeRequestId) + "/versions", MergeRequestCommitVersion[].class);
     }
 
     public MergeRequestApprovalRule createMergeRequestApprovalRule(int projectId, int mergeRequestId, MergeRequestApprovalRule rule) {

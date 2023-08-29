@@ -19,7 +19,7 @@ public class ExitIfMergeRequestDoesNotHaveRequiredApprovals extends BaseCommitWi
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        skipActionIfTrue(StringUtils.isLong(draft.id), "as reviewboard request " + draft.id + " is associated with this commit");
+        skipActionIfTrue(StringUtils.isLong(draft.id), "reviewboard request " + draft.id + " is associated with this commit");
     }
 
     @Override
@@ -29,7 +29,8 @@ public class ExitIfMergeRequestDoesNotHaveRequiredApprovals extends BaseCommitWi
         }
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
         MergeRequestApprovals approvals = gitlab.getMergeRequestApprovals(mergeRequest.projectId, mergeRequest.iid);
-        if (approvals.approvalsLeft != null && approvals.approvalsLeft > 0) {
+        if (approvals.approvalsLeft != null && (approvals.approvalsLeft > 1
+                || (approvals.approvalsLeft == 1 && (approvals.userHasApproved || !approvals.userCanApprove)))) {
             cancelWithMessage(approvals.approvalInfo());
         } else {
             draft.shipItReviewers = approvals.approvedBy != null ? Arrays.stream(approvals.approvedBy)

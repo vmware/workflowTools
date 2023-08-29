@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 public class DateUtils {
 
     public static Date parseDate(String dateValue) {
-        Date date = parseDate(dateValue, "EEE MMM dd HH:mm:ss yyyy zzzzz");
+        Date date = parseDate(dateValue, "EEE MMM dd HH:mm:ss yyyy zzzzz", false);
         if (date == null) {
-            date = parseDate(dateValue, "EEE MMM dd HH:mm:ss yyyy");
+            date = parseDate(dateValue, "EEE MMM dd HH:mm:ss yyyy", true);
         }
         return date;
     }
@@ -45,13 +45,18 @@ public class DateUtils {
         return weekendMinutes;
     }
 
-    private static Date parseDate(String dateValue, String pattern) {
+    private static Date parseDate(String dateValue, String pattern, boolean logError) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         try {
             return dateFormat.parse(dateValue);
         } catch (ParseException e) {
-            LoggerFactory.getLogger(DateUtils.class)
-                    .debug("Failed to parse {} from {}: {}", dateValue, pattern, e.getMessage());
+            if (logError) {
+                LoggerFactory.getLogger(DateUtils.class)
+                        .debug("Failed to parse {} from {}: {}", dateValue, pattern, e.getMessage());
+            } else {
+                LoggerFactory.getLogger(DateUtils.class)
+                        .trace("Failed to parse {} from {}: {}", dateValue, pattern, e.getMessage());
+            }
             return null;
         }
     }

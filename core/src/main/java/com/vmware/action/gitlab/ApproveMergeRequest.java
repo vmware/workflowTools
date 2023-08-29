@@ -34,5 +34,6 @@ public class ApproveMergeRequest extends BaseCommitWithMergeRequestAction {
         if (!updatedApprovals.userHasApproved) {
             throw new FatalException("Merge request {} is not self approved", draft.mergeRequestUrl);
         }
+        draft.setGitlabMergeRequest(gitlab.getMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId()));
     }
 }

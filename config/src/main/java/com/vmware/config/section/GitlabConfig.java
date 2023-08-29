@@ -27,4 +27,16 @@ public class GitlabConfig {
 
     @ConfigurableProperty(commandLine = "--approvals-required", help = "Number of approvals required for the merge request")
     public int approvalsRequired;
+
+    @ConfigurableProperty(commandLine = "--allow-self-approval", help = "Allows self approval for a merge request")
+    public boolean allowSelfApproval;
+
+    @ConfigurableProperty(commandLine = "--fail-if-no-merge-request-found", help = "Fail workflow if no merge request found")
+    public boolean failIfNoMergeRequestFound;
+
+    @ConfigurableProperty(help = "Prefix for draft merge request")
+    public String draftMergeRequestPrefix;
+
+    @ConfigurableProperty(commandLine = "--mark-as-draft", help = "Whether to mark merge request as a draft")
+    public boolean markAsDraft;
 }

@@ -34,9 +34,6 @@ public class CommitConfig {
     @ConfigurableProperty(help = "Label for trivial reviewer", commandLine = "--trivial-reviewer-label")
     public String trivialReviewerLabel;
 
-    @ConfigurableProperty(help = "Label for no reviewer")
-    public String noReviewerLabel;
-
     @ConfigurableProperty(help = "Label for merge to value")
     public String mergeToLabel;
 

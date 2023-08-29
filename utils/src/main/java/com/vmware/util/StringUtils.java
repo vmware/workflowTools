@@ -363,6 +363,13 @@ public class StringUtils {
         return value != null ? value.trim() : null;
     }
 
+    public static String replaceLineBreakWithHtmlBrTag(String text) {
+        if (text == null) {
+            return text;
+        }
+        return text.replace(System.lineSeparator(), "<br/>");
+    }
+
     public static List<String> splitAndTrim(String value, String delimeter) {
         if (value == null) {
             return Collections.emptyList();

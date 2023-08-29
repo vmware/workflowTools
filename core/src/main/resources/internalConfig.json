@@ -62,6 +62,7 @@
   "groupByNamePattern": ".+",
   "approvalRuleName": "Reviewers",
   "approvalsRequired": 1,
+  "draftMergeRequestPrefix": "Draft:",
   "issueTypesToInclude": [
     8
   ],
@@ -100,7 +101,6 @@
   "approvedByLabel": "Approved by:",
   "noBugNumberLabel": "none",
   "trivialReviewerLabel": "trivial",
-  "noReviewerLabel": "nobody",
   "alwaysIncludeReviewUrl": false,
   "noReviewNumberLabel": "none",
   "logLevel": "INFO",
@@ -545,11 +545,11 @@
       "DisplayBuildOutputForJenkinsJobs",
       "CheckStatusOfBuildwebBuilds",
       "DisplayBuildOutputForBuildwebBuilds",
+      "AmendCommit",
       "CheckCommitForCheckstyleErrors",
-      "SelectMatchingMergeRequest",
+      "SelectMatchingMergeRequest&&--fail-if-no-merge-request-found",
       "CheckStatusOfMergeRequestApprovals",
-      "DisplayOpenDiffNotes",
-      "AmendCommit"
+      "DisplayOpenDiffNotes"
     ],
     "checkSandboxStatus": [
       "ReadLastCommit",
@@ -678,7 +678,7 @@
     ],
     "merge": [
       "prepareCommitForMerge",
-      "syncMergeRequestFromCommit",
+      "syncMergeRequestFromCommit&&--mark-as-draft=false",
       "WaitForMergeRequestToBeUpdated",
       "ApproveMergeRequest",
       "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
@@ -687,52 +687,60 @@
     ],
     "createMergeRequest": [
       "selectMergeRequest",
-      "syncMergeRequestFromCommit",
-      "UpdateMergeRequestApprovers",
-      "UpdateMergeRequestReviewers"
+      "syncMergeRequestFromCommit"
     ],
     "updateMergeRequest" : [
-      "createMergeRequest"
+      "updateMergeRequestDetails",
+      "pushCommitToMergeBranch"
     ],
     "syncMergeRequestFromCommit": [
-      "PushToMergeBranch",
+      "pushCommitToMergeBranch",
       "CreateMergeRequestIfNeeded",
+      "UpdateMergeRequestDetails",
+      "CopyMergeUrlToClipboard"
+    ],
+    "updateMergeRequestDetails" : [
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "UpdateMergeRequestDetails",
       "CopyMergeUrlToClipboard"
     ],
     "pushToMergeBranch" : [
       "ReadLastCommit",
+      "pushCommitToMergeBranch"
+    ],
+    "pushCommitToMergeBranch" : [
       "SetEmptyReviewUrlIfNeeded",
       "AmendCommitWithoutJobResults",
       "PushToMergeBranch"
     ],
     "openMerge": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "OpenMergeRequest"
     ],
     "copyMergeUrl": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "CopyMergeUrlToClipboard"
     ],
     "closeMergeRequest": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "CloseMergeRequest",
       "DeleteMergeBranch"
     ],
     "approveMergeRequest": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "ApproveMergeRequest"
     ],
     "assignMergeRequestToBot": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "AssignMergeRequestToBot",
       "HardSubmitReview"
     ],
     "rebaseMergeRequest": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "RebaseMergeRequest"
     ],
     "acceptMergeRequest": [
-      "selectMergeRequest",
+      "selectMergeRequest&&--fail-if-no-merge-request-found",
       "AcceptMergeRequest"
     ],
     "selectMergeRequest": [
@@ -1118,6 +1126,7 @@
     "selectVcdCell",
     "selectVcdSite",
     "selectMergeRequest",
+    "pushCommitToMergeBranch",
     "testEncryption"
   ]
 }

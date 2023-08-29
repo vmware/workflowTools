@@ -8,6 +8,8 @@ public class MergeRequest {
 
     public Integer iid;
 
+    public User author;
+
     @Expose(deserialize = false)
     public int targetProjectId;
 
@@ -19,6 +21,8 @@ public class MergeRequest {
     public String targetBranch;
 
     public String title;
+
+    public String description;
 
     public String sha;
 
@@ -43,11 +47,24 @@ public class MergeRequest {
 
     public ApprovalUser[] appovedBy;
 
+    @SerializedName("diff_refs")
+    public DiffRefs diffRefs;
+
     @SerializedName("reviewer_ids")
     @Expose(deserialize = false)
     public long[] reviewerIds;
 
     public boolean canBeMerged() {
         return "can_be_merged".equalsIgnoreCase(mergeStatus);
+    }
+
+    public class DiffRefs {
+        @SerializedName("base_sha")
+        public String baseSha;
+        @SerializedName("head_sha")
+        public String headSha;
+        @SerializedName("start_sha")
+        public String startSha;
+
     }
 }

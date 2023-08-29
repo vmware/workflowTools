@@ -96,6 +96,10 @@ public class Git extends BaseScmWrapper {
         return executeScmCommand("hash-object {}", file.getPath());
     }
 
+    public String show(String ref) {
+        return executeScmCommand("show {}", LogLevel.TRACE, ref);
+    }
+
     public void catFile(String fromRef, String filePath, String toFilePath) {
         checkRefsAreValid(fromRef);
         String command = String.format("git cat-file -p %s:%s", fromRef, filePath);

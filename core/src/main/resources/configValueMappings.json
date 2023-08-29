@@ -154,6 +154,7 @@
   ],
   "UpdateReviewDetails": [
     "--tracking-branch",
+    "--trivial-reviewer-label",
     "--groups",
     "--disable-markdown"
   ],
@@ -338,6 +339,9 @@
   "BaseCommitCreateAction": [
     "--no-verify"
   ],
+  "SelectMatchingMergeRequest": [
+    "--fail-if-no-merge-request-found"
+  ],
   "ExitIfMergeRequestDoesNotHaveRequiredApprovals": [
     "--trivial-reviewer-label"
   ],
@@ -512,6 +516,10 @@
   "OpenSshShell": [
     "--ssh-strict-host-checking"
   ],
+  "UpdateMergeRequestDetails": [
+    "--trivial-reviewer-label",
+    "--mark-as-draft"
+  ],
   "DisplayFileData": [
     "--file-data"
   ],
@@ -572,6 +580,9 @@
   ],
   "OpenVcdProviderApp": [
     "--vcd-cell-index"
+  ],
+  "CreateMergeRequestIfNeeded": [
+    "--mark-as-draft"
   ],
   "ExecuteVcdApiRequests": [
     "--wait-time",
@@ -636,6 +647,7 @@
   "UpdateMergeRequestApprovers": [
     "--trivial-reviewer-label",
     "--approvals-required",
+    "--allow-self-approval",
     "--approval-rule-name"
   ],
   "OpenVcdTenantApp": [

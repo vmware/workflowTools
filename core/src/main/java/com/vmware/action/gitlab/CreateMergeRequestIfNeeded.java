@@ -20,7 +20,7 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
     @Override
     public void process() {
         MergeRequest mergeRequest = new MergeRequest();
-        mergeRequest.title = draft.summary;
+        mergeRequest.title = gitlabConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
         mergeRequest.targetProjectId = gitlabConfig.gitlabProjectId;
         mergeRequest.sourceBranch = determineSourceMergeBranch();
         mergeRequest.targetBranch = determineTargetMergeBranch();

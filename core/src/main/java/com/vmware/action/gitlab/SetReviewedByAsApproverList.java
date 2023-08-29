@@ -20,7 +20,7 @@ public class SetReviewedByAsApproverList extends BaseCommitWithMergeRequestActio
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        skipActionIfTrue(StringUtils.isLong(draft.id), "as reviewboard request " + draft.id + " is associated with this commit");
+        skipActionIfTrue(StringUtils.isLong(draft.id), "reviewboard request " + draft.id + " is associated with this commit");
     }
 
     @Override

@@ -15,21 +15,29 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ActionDescription("Updates the reviewers for the merge request")
-public class UpdateMergeRequestReviewers extends BaseCommitWithMergeRequestAction {
-    public UpdateMergeRequestReviewers(WorkflowConfig config) {
-        super(config, true);
-    }
+import static com.vmware.util.StringUtils.replaceLineBreakWithHtmlBrTag;
 
-    @Override
-    public void checkIfActionShouldBeSkipped() {
-        super.checkIfActionShouldBeSkipped();
-        skipActionIfTrue(StringUtils.isLong(draft.id), "as reviewboard request " + draft.id + " is associated with this commit");
+@ActionDescription("Updates the title, description and reviewers for a merge request")
+public class UpdateMergeRequestDetails extends BaseCommitWithMergeRequestAction {
+    public UpdateMergeRequestDetails(WorkflowConfig config) {
+        super(config, true, true);
     }
 
     @Override
     public void process() {
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
+        log.info("Updating details for merge request {}", mergeRequest.iid);
+        mergeRequest.title = gitlabConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
+        mergeRequest.description = replaceLineBreakWithHtmlBrTag(draft.description) + "\n\n" + commitConfig.testingDoneLabel
+                + " " + replaceLineBreakWithHtmlBrTag(draft.testingDone);
+        mergeRequest.reviewerIds = determineReviewerIds(mergeRequest);
+        draft.setGitlabMergeRequest(gitlab.updateMergeRequest(mergeRequest));
+    }
+
+    private long[] determineReviewerIds(MergeRequest mergeRequest) {
+        if (draft.isTrivialCommit(commitConfig.trivialReviewerLabel)) {
+            return new long[0];
+        }
         MergeRequestApprovals approvals =
                 gitlab.getMergeRequestApprovals(mergeRequest.projectId, mergeRequest.iid);
         final Set<User> approversToCheck = new LinkedHashSet<>(Arrays.asList(approvals.suggestedApprovers));
@@ -45,20 +53,7 @@ public class UpdateMergeRequestReviewers extends BaseCommitWithMergeRequestActio
             }
             return matchingUser;
         }).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
-        updateMergeRequestReviewersToMatch(users);
+        return users.stream().mapToLong(user -> user.id).toArray();
     }
 
-    private void updateMergeRequestReviewersToMatch(Set<User> users) {
-        MergeRequest mergeRequest = draft.getGitlabMergeRequest();
-        long[] reviewerIds = users.stream().mapToLong(user -> user.id).toArray();
-        if (reviewerIds == mergeRequest.reviewerIds) {
-            log.info("Reviewer already match for merge request");
-            return;
-        }
-
-        log.debug("Updating reviewers for merge request");
-        mergeRequest.reviewerIds = reviewerIds;
-        draft.setGitlabMergeRequest(gitlab.updateMergeRequest(mergeRequest));
-
-    }
 }
