@@ -15,6 +15,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,8 @@ public class TestResult extends BaseDbClass {
     @Expose(serialize = false, deserialize = false)
     public Long jobId;
 
-    @DbSaveIgnore
     @Expose(serialize = false, deserialize = false)
-    public boolean configMethodFailure;
+    public Boolean configMethod;
 
     public TestStatus status;
 
@@ -128,6 +128,21 @@ public class TestResult extends BaseDbClass {
 
     public long getStartedAt() {
         return startedAt;
+    }
+
+    /**
+     * Expected order of execution, used for comparing test results if they have the same startedAt value
+     */
+    public int executionOrder(String beforeConfigMethodPattern, String afterConfigMethodPattern) {
+        if (Boolean.TRUE.equals(configMethod) && name.matches(beforeConfigMethodPattern)) {
+            return 0;
+        } else if (Boolean.TRUE.equals(configMethod) && name.matches(afterConfigMethodPattern)) {
+            return 3;
+        } else if (Boolean.TRUE.equals(configMethod)) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
     public String fullTestNameWithExceptionInfo() {
@@ -221,6 +236,16 @@ public class TestResult extends BaseDbClass {
         return String.join(System.lineSeparator(), resultLinks);
     }
 
+    public List<Summary> allTestRunSummaries(List<JobBuild> buildsForJob) {
+        List<Summary> summaries = new ArrayList<>();
+        ArrayUtils.stream(passedBuilds).map(buildNumber -> new Summary(findBuildByNumber(buildsForJob, buildNumber), TestStatus.PASS, urlForBuild(buildNumber))).forEach(summaries::add);
+        ArrayUtils.stream(presumedPassedBuilds).map(buildNumber -> new Summary(findBuildByNumber(buildsForJob, buildNumber), TestStatus.PRESUMED_PASS, urlForBuild(buildNumber))).forEach(summaries::add);
+        ArrayUtils.stream(skippedBuilds).map(buildNumber -> new Summary(findBuildByNumber(buildsForJob, buildNumber), TestStatus.SKIP, urlForBuild(buildNumber))).forEach(summaries::add);
+        ArrayUtils.stream(failedBuilds).map(buildNumber -> new Summary(findBuildByNumber(buildsForJob, buildNumber), TestStatus.FAIL, urlForBuild(buildNumber))).forEach(summaries::add);
+        summaries.sort(Comparator.comparingInt(TestResult.Summary::getBuildNumber));
+        return summaries;
+    }
+
     public boolean containsBuildNumbers(int... buildNumber) {
         return Stream.of(passedBuilds, presumedPassedBuilds, skippedBuilds, failedBuilds).anyMatch(values -> containsBuildNumbers(values, buildNumber));
     }
@@ -248,7 +273,7 @@ public class TestResult extends BaseDbClass {
         List<Map.Entry<Integer, TestStatus>> passingBuilds = testStatusMap.entrySet().stream().filter(entry -> TestStatus.isPass(entry.getValue()))
                 .sorted(Map.Entry.comparingByKey()).collect(Collectors.toList());
 
-        if (buildsToUse.stream().noneMatch(entry -> TestStatus.isPass(entry.getValue())) && CollectionUtils.isNotEmpty(passingBuilds)) {
+        if (buildsToUse.size() > 1 && buildsToUse.stream().noneMatch(entry -> TestStatus.isPass(entry.getValue())) && CollectionUtils.isNotEmpty(passingBuilds)) {
             Map.Entry<Integer, TestStatus> lastPassingBuild = passingBuilds.get(passingBuilds.size() - 1);
             buildsToUse.remove(buildsToUse.size() - 1);
             buildsToUse.add(lastPassingBuild);
@@ -299,11 +324,14 @@ public class TestResult extends BaseDbClass {
         if (testResult.status != TestStatus.PRESUMED_PASS) {
             presumedPassedBuilds = ArrayUtils.remove(presumedPassedBuilds, testResult.buildNumber);
         }
-        if (testResult.buildNumber <= buildNumber) {
+        if (testResult.buildNumber < buildNumber) {
             return;
         }
 
         // update to latest build result
+        if (testResult.configMethod != null) {
+            this.configMethod = testResult.configMethod;
+        }
         this.jobBuildId = testResult.jobBuildId;
         this.url = testResult.url;
         this.dataProviderIndex = testResult.dataProviderIndex;
@@ -329,9 +357,9 @@ public class TestResult extends BaseDbClass {
             return NO_UPDATE_NEEDED;
         }
 
-        int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).filter(Objects::nonNull).flatMap(Arrays::stream).mapToInt(Integer::intValue).max().orElse(-1);
-        int firstFailureAfterPass = failedBuilds != null ? Arrays.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1) : -1;
-        int firstSkipAfterPass = skippedBuilds != null ? Arrays.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1) : -1;
+        int newestPass = Stream.of(passedBuilds, presumedPassedBuilds).flatMap(ArrayUtils::stream).mapToInt(Integer::intValue).max().orElse(-1);
+        int firstFailureAfterPass = ArrayUtils.stream(failedBuilds).filter(failure -> failure > newestPass).findFirst().orElse(-1);
+        int firstSkipAfterPass = ArrayUtils.stream(skippedBuilds).filter(skip -> skip > newestPass).findFirst().orElse(-1);
         int firstFailureOrSkipAfterPass = Stream.of(firstFailureAfterPass, firstSkipAfterPass).filter(val -> val != -1).mapToInt(val -> val).min().orElse(-1);
         if (newestPass == build.buildNumber || firstFailureOrSkipAfterPass == build.buildNumber) {
             TestStatus statusForBuild = newestPass == build.buildNumber ? TestStatus.PASS :
@@ -356,6 +384,10 @@ public class TestResult extends BaseDbClass {
 
     public String testPath() {
         return StringUtils.substringAfterLast(url, "testngreports/");
+    }
+
+    public boolean isSkippedConfigMethod() {
+        return Boolean.TRUE.equals(configMethod) && status == TestStatus.SKIP;
     }
 
     @Override
@@ -383,8 +415,16 @@ public class TestResult extends BaseDbClass {
         return Arrays.stream(buildNumbers).allMatch(buildNumber -> Arrays.stream(values).anyMatch(value -> value == buildNumber));
     }
 
+    private JobBuild findBuildByNumber(List<JobBuild> builds, int buildNumber) {
+        return builds.stream().filter(build -> build.buildNumber.equals(buildNumber)).findFirst().orElse(new JobBuild());
+    }
+
     private int buildNumber() {
         return buildNumber;
+    }
+
+    private String urlForBuild(int buildNumber) {
+        return url.replace("/" + this.buildNumber + "/", "/" + buildNumber + "/");
     }
 
     public enum TestStatus {
@@ -416,6 +456,43 @@ public class TestResult extends BaseDbClass {
         }
     }
 
+    public class Summary {
+        private int buildNumber;
+        private String commitId;
+        private TestStatus status;
+        private String url;
+
+        private String buildDate;
+
+        public Summary(JobBuild build, TestStatus status, String url) {
+            this.buildNumber = build.buildNumber;
+            this.buildDate = START_TIME_FORMATTER.format(new Date(build.buildTimestamp));
+            this.commitId = build.commitId;
+            this.status = status;
+            this.url = url;
+        }
+
+        public int getBuildNumber() {
+            return buildNumber;
+        }
+
+        public String getCommitId() {
+            return commitId;
+        }
+
+        public TestStatus getStatus() {
+            return status;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public String getBuildDate() {
+            return buildDate;
+        }
+    }
+
     public enum TestStatusOnBuildRemoval {
         UPDATEABLE,
 
@@ -423,5 +500,7 @@ public class TestResult extends BaseDbClass {
         CONTAINS_BUILD,
         NO_UPDATE_NEEDED
     }
+
+
 }
 

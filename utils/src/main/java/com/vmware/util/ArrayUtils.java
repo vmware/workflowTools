@@ -1,8 +1,16 @@
 package com.vmware.util;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class ArrayUtils {
+
+    public static <T> Stream<T> stream(T[] values) {
+        if (values == null) {
+            return Stream.empty();
+        }
+        return Arrays.stream(values);
+    }
 
     public static <T> boolean contains(final T[] values, final T valueToFind) {
         if (values == null) {

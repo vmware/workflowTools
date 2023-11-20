@@ -31,6 +31,12 @@ public class JenkinsConfig {
     @ConfigurableProperty(commandLine = "--max-builds", help = "Max number of jenkins builds to iterate over when checking for latest status of jenkins job")
     public int maxJenkinsBuildsToCheck;
 
+    @ConfigurableProperty(commandLine = "--max-builds-to-keep", help = "Max number of jenkins builds to keep in test results database, cannot be smaller than the maxJenkinsBuildsToCheck")
+    public int maxJenkinsBuildsToKeep;
+
+    @ConfigurableProperty(commandLine = "--number-of-failures", help = "Number of failures needed to consider a test consistently failing")
+    public int numberOfFailuresNeededToBeConsistentlyFailing;
+
     @ConfigurableProperty(commandLine = "-j,--jenkins-jobs", help = "Sets the names and parameters for the jenkins jobs to invoke. Separate jobs by commas and parameters by ampersands")
     public String jenkinsJobsToUse;
 
@@ -100,17 +106,35 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Group Jobs by name patterns")
     public String[] groupByNamePatterns;
 
-    @ConfigurableProperty(commandLine = "--regenerate-html", help = "Regenerate test failures from database only")
+    @ConfigurableProperty(commandLine = "--regenerate-html", help = "Regenerate failures from database only")
     public boolean regenerateHtml;
 
-    @ConfigurableProperty(commandLine = "--force-refetch", help = "Refetch test results for all builds from Jenkins")
-    public boolean forceRefetch;
+    @ConfigurableProperty(commandLine = "--refetch-count", help = "Refetch test results for latest number of builds from Jenkins. E.g. a value of 1 means refetch the latest build per job")
+    public int refetchCount;
 
     @ConfigurableProperty(commandLine = "--test-name", help = "Test name to search for in test database")
     public String testName;
 
     @ConfigurableProperty(help = "Url to use to search by test method name")
     public String testMethodNameSearchUrl;
+
+    @ConfigurableProperty(help = "Regex pattern to parse log id from exception message")
+    public String testIdPattern;
+
+    @ConfigurableProperty(help = "Url template to use for creating a log url using a logging id")
+    public String testLogIdUrlTemplate;
+
+    @ConfigurableProperty(help = "Url template to use for creating a log url using the test name")
+    public String testNameLogUrlTemplate;
+
+    @ConfigurableProperty(help = "Number of days after which to show job date")
+    public int daysOldForShowingJobDate;
+
+    @ConfigurableProperty(help = "Regex pattern to match before config methods if they ran at the same time as say skipped methods")
+    public String beforeConfigMethodPattern;;
+
+    @ConfigurableProperty(help = "Regex pattern to match after config methods if they ran at the same time as say skipped methods")
+    public String afterConfigMethodPattern;
 
     public boolean hasConfiguredArtifact() {
         return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;

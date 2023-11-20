@@ -33,6 +33,7 @@ public class ExecuteSelectSqlStatementAsJson extends ExecuteSqlStatement {
         LogLevel logLevel = config.scriptMode ? LogLevel.DEBUG : LogLevel.INFO;
         DynamicLogger logger = new DynamicLogger(log);
         logger.log(logLevel, "Executing sql statement \"{}\" using database url {}", fileSystemConfig.sqlStatement, databaseUrl);
+        fileSystemConfig.sqlStatement = fileSystemConfig.sqlStatement.replace("*", "%");
         Properties connectionProperties = determineConnectionProperties();
         log.debug("Connection properties: {}", connectionProperties.toString());
 

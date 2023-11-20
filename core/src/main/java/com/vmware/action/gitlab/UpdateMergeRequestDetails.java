@@ -30,7 +30,11 @@ public class UpdateMergeRequestDetails extends BaseCommitWithMergeRequestAction 
         mergeRequest.title = gitlabConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
         mergeRequest.description = replaceLineBreakWithHtmlBrTag(draft.description) + "\n\n" + commitConfig.testingDoneLabel
                 + " " + replaceLineBreakWithHtmlBrTag(draft.testingDone);
-        mergeRequest.reviewerIds = determineReviewerIds(mergeRequest);
+        if (draft.hasReviewNumber()) {
+            log.debug("Not setting reviewer ids as merge request is already associated with a reviewboard review");
+        } else {
+            mergeRequest.reviewerIds = determineReviewerIds(mergeRequest);
+        }
         draft.setGitlabMergeRequest(gitlab.updateMergeRequest(mergeRequest));
     }
 

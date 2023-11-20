@@ -372,6 +372,23 @@
     "--default-jira-component",
     "--disable-bugzilla"
   ],
+  "FindTestFailures": [
+    "--disable-login",
+    "--username",
+    "--database-size-query",
+    "--database-url",
+    "--database-driver-class",
+    "--database-driver-file",
+    "--job-with-artifact",
+    "--refetch-count",
+    "--max-builds-to-keep",
+    "--max-builds",
+    "--regenerate-html",
+    "--destination-file",
+    "--number-of-failures",
+    "--jenkins-view",
+    "--create-test-failures-database"
+  ],
   "DeleteVappMetadataIfNeeded": [
     "--sso-headless",
     "--disable-vcd-refresh",
@@ -814,21 +831,6 @@
     "--username",
     "--sso-email",
     "--keep-missing-cards"
-  ],
-  "FindRealTestFailures": [
-    "--disable-login",
-    "--username",
-    "--database-size-query",
-    "--database-url",
-    "--database-driver-class",
-    "--database-driver-file",
-    "--job-with-artifact",
-    "--force-refetch",
-    "--max-builds",
-    "--regenerate-html",
-    "--destination-file",
-    "--jenkins-view",
-    "--create-test-failures-database"
   ],
   "DisplayInfo": [
     "--input-text"

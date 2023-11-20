@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -33,7 +34,9 @@ import static java.util.stream.Collectors.toMap;
 
 public class Job extends BaseDbClass {
 
-    private static final SimpleDateFormat START_TIME_FORMATTER = new SimpleDateFormat("MMM dd hh:mm aa");
+    private static final SimpleDateFormat START_TIME_TOOLTIP_FORMATTER = new SimpleDateFormat("MMM dd hh:mm aa");
+
+    private static final SimpleDateFormat START_TIME_FORMATTER = new SimpleDateFormat("MMM dd");
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public String name;
@@ -141,11 +144,26 @@ public class Job extends BaseDbClass {
         return Collections.emptyList();
     }
 
-    public long failingTestCount(int lastFetchAmount) {
+    public long failingTestCount(int lastFetchAmount, int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (testResults == null) {
             return 0;
         }
-        return createFailingTestsList(lastFetchAmount).size();
+        return createFailingTestsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing).size();
+    }
+
+    public long failingTestMethodCount() {
+        if (testResults == null) {
+            return 0;
+        }
+        return testResults.stream().filter(testResult ->
+                !Boolean.TRUE.equals(testResult.configMethod) && !TestResult.TestStatus.isPass(testResult.status)).count();
+    }
+
+    public long totalTestMethodCount() {
+        if (testResults == null) {
+            return 0;
+        }
+        return testResults.stream().filter(testResult -> !Boolean.TRUE.equals(testResult.configMethod)).count();
     }
 
     public boolean lastBuildWasSuccessful() {
@@ -272,18 +290,6 @@ public class Job extends BaseDbClass {
         for (JobBuild savedBuild : savedBuilds) {
             List<TestResult> testResultsForBuild = dbUtils.query(TestResult.class, "SELECT * from TEST_RESULT WHERE JOB_BUILD_ID = ?", savedBuild.id);
             Map<String, String[]> usedUrls = new HashMap<>();
-            List<TestResult> testResultsWithDataProviderIndex = testResultsForBuild.stream().filter(testResult -> testResult.dataProviderIndex != null).collect(toList());
-            testResultsWithDataProviderIndex.forEach(result -> {
-                if (result.parameters == null || result.parameters.length == 0) {
-                    result.dataProviderIndex = null;
-                }
-                String testPathWithoutDPIndex = result.testPathWithoutDataProviderIndex();
-                long matchingTestCount = testResultsForBuild.stream().filter(testResult -> testResult.testPathWithoutDataProviderIndex().equals(testPathWithoutDPIndex)).count();
-                if (matchingTestCount <= 1) {
-                    log.info("Removing bad data provider index {} for test {}", result.dataProviderIndex, result.classAndTestName());
-                    result.dataProviderIndex = null;
-                }
-            });
 
             testResultsForBuild.forEach(result -> {
                 Optional<JobBuild> matchingBuild = savedBuilds.stream().filter(build -> result.jobBuildId.equals(build.id)).findFirst();
@@ -373,9 +379,9 @@ public class Job extends BaseDbClass {
         });
     }
 
-    public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck) {
+    public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck, int numberOfFailuresNeededToBeConsistentlyFailing) {
         return createFailingTestsList(maxJenkinsBuildsToCheck,
-                entries -> entries.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() > 1);
+                entries -> entries.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() >= numberOfFailuresNeededToBeConsistentlyFailing);
     }
 
     public List<TestResult> latestFailingTests(int maxJenkinsBuildsToCheck) {
@@ -386,6 +392,7 @@ public class Job extends BaseDbClass {
         List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
         int buildNumberToUse = latestUsableBuildNumber();
         return testResults.stream().filter(result -> !TestResult.TestStatus.isPass(result.status))
+                .filter(result -> !result.isSkippedConfigMethod())
                 .filter(result -> result.containsBuildNumbers(buildNumberToUse))
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
@@ -416,13 +423,25 @@ public class Job extends BaseDbClass {
         }
     }
 
-    public String latestBuildLink(String viewUrl) {
+    public String latestBuildLink(String viewUrl, int daysOldToIncludeDate) {
         JobBuild build = CollectionUtils.isNotEmpty(savedBuilds) ? savedBuilds.get(0) : lastCompletedBuild;
         if (build != null) {
             String buildPath = StringUtils.substringAfterLast(build.getTestReportsUIUrl(), "/job/");
             String buildPathWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", buildPath);
-            String titleAttribute = build.buildTimestamp > 0 ? String.format(" title=\"%s with commit %s\"", START_TIME_FORMATTER.format(new Date(build.buildTimestamp)), build.commitId) : "";
-            return "Latest <a href=\"" + buildPathWithViewName + "\"" + titleAttribute + ">" + build.buildNumber +"</a>";
+            Date startDate = new Date(build.buildTimestamp);
+            String titleAttribute = build.buildTimestamp > 0 ? String.format(" title=\"%s with commit %s\"",
+                    START_TIME_TOOLTIP_FORMATTER.format(startDate), build.commitId) : "";
+            String buildDateAndDuration;
+            String jobDate = new Date().getTime() > (build.buildTimestamp + TimeUnit.DAYS.toMillis(daysOldToIncludeDate))
+                    ? "<b>" + START_TIME_FORMATTER.format(startDate) + "</b>": "";
+            if (build.duration != null && build.duration > 0) {
+                long durationInHours = TimeUnit.MILLISECONDS.toHours(build.duration);
+                long durationInMinutes = TimeUnit.MILLISECONDS.toMinutes(build.duration - TimeUnit.HOURS.toMillis(durationInHours));
+                buildDateAndDuration = " (" + jobDate + (jobDate.isEmpty() ? "" : " ")  + durationInHours + " hrs " + durationInMinutes + " mins)";
+            } else {
+                buildDateAndDuration = jobDate.isEmpty() ? "" : " (" + jobDate + ")";
+            }
+            return "Latest <a href=\"" + buildPathWithViewName + "\"" + titleAttribute + ">" + build.buildNumber + "</a>" + buildDateAndDuration;
         } else {
             return "";
         }

@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
-    <title>#viewName Test Failures</title>
+    <title>#viewName Test and Config Method Failures</title>
     <style>
         /*
          * CSS3 Treeview. No JavaScript
@@ -177,10 +177,10 @@
     </style>
 </head>
 <body>
-<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures test failures in #consistentFailuresJobsCount jobs)</h2>
+<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures failures in #consistentFailuresJobsCount jobs)</h2>
 <ul class="css-treeview">
     #body
-    <li><input type="checkbox" id="inconsistentFailuresJobs" /><label for="inconsistentFailuresJobs"><b>#inconsistentFailuresJobsCount Jobs with no consistent test failures</b></label>
+    <li><input type="checkbox" id="inconsistentFailuresJobs" /><label for="inconsistentFailuresJobs"><b>#inconsistentFailuresJobsCount Jobs with no inconsistent failures</b></label>
         <ul>
             #inconsistentFailuresJobs
         </ul>

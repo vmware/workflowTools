@@ -45,5 +45,7 @@ public class TestArrayUtils {
         assertEquals(-3, Arrays.binarySearch(values, 37));
         assertEquals(2, Arrays.binarySearch(values, 56));
         assertEquals(-4, Arrays.binarySearch(values, 600));
+
+        assertEquals("one and two and one is four", String.format("%1$s and %s and %1$s is four", "one", "two"));
     }
 }

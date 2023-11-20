@@ -33,8 +33,9 @@ public class DownloadBuildArtifact extends BaseCommitWithJenkinsBuildsAction {
         JobBuild buildDetails = getJobBuildDetails();
         replacementVariables.addVariable(ReplacementVariables.VariableName.BUILD_NUMBER, buildDetails.number());
 
-        String fullUrl = buildDetails.fullUrlForArtifact(jenkinsConfig.jobArtifact);
         JobBuildArtifact matchingArtifact = buildDetails.getArtifactForPathPattern(jenkinsConfig.jobArtifact);
+        String fullUrl = buildDetails.fullUrlForArtifact(matchingArtifact);
+
         String downloadedFileName = FileUtils.appendToFileName(matchingArtifact.fileName, buildDetails.number());
         log.info("Downloading build artifact {}", fullUrl);
         fileSystemConfig.fileData = IOUtils.read(fullUrl);

@@ -7,6 +7,7 @@ import com.vmware.jenkins.domain.JobParameter;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.HomePage;
 import com.vmware.http.exception.NotFoundException;
+import com.vmware.jenkins.domain.TestResults;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,8 +28,7 @@ public class TestJenkinsApi extends BaseTests {
     public void init() {
         String jenkinsUrl = testProperties.getProperty("jenkins.url");
         jenkinsUsername = testProperties.getProperty("jenkins.username");
-        jenkins = new Jenkins(jenkinsUrl, jenkinsUsername, true, false, null);
-        jenkins.setupAuthenticatedConnection();
+        jenkins = new Jenkins(jenkinsUrl, jenkinsUsername, true, true, null);
     }
 
     @Test
@@ -70,6 +70,13 @@ public class TestJenkinsApi extends BaseTests {
         Matcher tokenMatcher = Pattern.compile("name=\"_\\.apiToken\"\\s+value=\"(\\w+)\"").matcher(sampleText);
         assertTrue(tokenMatcher.find());
         assertEquals("a2b4a16b93169028a466451b82a6bec1", tokenMatcher.group(1));
+    }
+
+    @Test
+    public void getTests() {
+        JobBuild build = jenkins.getJobBuildDetails("CToT4-Networking-Legacy-sp-main-postgres-Continuous", 2254);
+        TestResults results = jenkins.getJobBuildTestResultsViaTestNGResultFiles(build);
+        assertNotNull(results);
     }
 
 }

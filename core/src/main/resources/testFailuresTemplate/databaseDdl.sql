@@ -30,7 +30,8 @@ create table job_build (
     status varchar(32) NOT NULL,
     failed_count int NOT NULL,
     skipped_count int NOT NULL,
-    build_timestamp bigint NOT NULL
+    build_timestamp bigint NOT NULL,
+    duration bigint NOT NULL
 );
 
 create table test_result (
@@ -49,5 +50,6 @@ create table test_result (
     duration double NOT NULL,
     started_at bigint NOT NULL,
     similar_skips int,
-    data_provider_index int
+    data_provider_index int,
+    config_method bool
 );

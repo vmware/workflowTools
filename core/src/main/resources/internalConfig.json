@@ -19,6 +19,10 @@
   "waitForBlockingWorkflowAction": false,
   "ignoreJenkinsJobFailure": false,
   "maxJenkinsBuildsToCheck": 5,
+  "maxJenkinsBuildsToKeep": 10,
+  "numberOfFailuresNeededToBeConsistentlyFailing": 2,
+  "beforeConfigMethodPattern": "^setup.+",
+  "afterConfigMethodPattern": "^cleanup.+",
   "maxCommitsToCheck": 500,
   "maxHistory": 100,
   "commitIdInDescriptionPattern": "CL\\s+(\\w+)",
@@ -41,6 +45,7 @@
   "vcdVmQuota": 40,
   "testbedParameter": "TESTBED_DESCRIPTOR_NAME",
   "vappJsonParameter": "TESTBED_JSON",
+  "daysOldForShowingJobDate": 3,
   "rsyncFlags": "azvh",
   "defaultGitRemote": "origin",
   "remoteBranches": {
@@ -1094,8 +1099,8 @@
     "openDoc": [
       "OpenProjectDocumentationUrl"
     ],
-    "showRealTestFailures": [
-      "FindRealTestFailures",
+    "showTestFailures": [
+      "FindTestFailures",
       "OpenFile&&--source-file=$destinationFile"
     ],
     "showCommitsForEpic": [

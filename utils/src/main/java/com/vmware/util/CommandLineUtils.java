@@ -92,7 +92,7 @@ public class CommandLineUtils {
             dynamicLogger.log(LogLevel.DEBUG, "Execution time {} milliseconds", elapsedMilliseconds);
         } else if (elapsedMilliseconds >= 2000) {
             long elapsedTimeInSeconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMilliseconds);
-            dynamicLogger.log(LogLevel.INFO, "Execution time {} seconds", elapsedTimeInSeconds);
+            dynamicLogger.log(LogLevel.INFO, "Execution time {} seconds for command {}", elapsedTimeInSeconds, command);
         }
 
         titlePadder.logTitle(logLevel);

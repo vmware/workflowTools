@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.regex.PatternSyntaxException;
 
+import static com.vmware.util.StringUtils.pluralize;
+
 public class HomePage {
 
     public Job[] jobs;
@@ -53,6 +55,12 @@ public class HomePage {
         public long failingTestsCount;
 
         @Expose(serialize = false, deserialize = false)
+        public long failingTestMethodsCount;
+
+        @Expose(serialize = false, deserialize = false)
+        public long totalTestMethodsCount;
+
+        @Expose(serialize = false, deserialize = false)
         public long inconsistentFailingTestCount;
 
         @Expose(serialize = false, deserialize = false)
@@ -63,23 +71,23 @@ public class HomePage {
         public View() {
         }
 
-        public View(JobView view) {
+        public View(JobView view, int numberOfFailuresNeededToBeConsistentlyFailing) {
             this.name = view.name;
             this.url = view.url;
-            this.failingTestsCount = view.failingTestCount();
+            this.failingTestsCount = view.failingTestCount(numberOfFailuresNeededToBeConsistentlyFailing);
         }
 
         public String viewNameWithFailureCount() {
             if (failingTestsGenerationException != null) {
                 return name + " (failed with error " + StringUtils.truncateStringIfNeeded(failingTestsGenerationException.getMessage(), 80) + ")";
             } else if (failingTestsCount == 0 && inconsistentFailingTestCount > 0) {
-                return name + " (" + inconsistentFailingTestCount + " inconsistent test failures)";
+                return name + " (" + pluralize(inconsistentFailingTestCount, "inconsistent failure") + ")";
             } else if (failingTestsCount == 0 && inconsistentFailingJobsCount > 0) {
-                return name + " (" + inconsistentFailingJobsCount + " inconsistent job failures)";
+                return name + " (" + pluralize(inconsistentFailingJobsCount, "inconsistent job failure") + ")";
             } else if (failingTestsCount == 0) {
-                return name + " (no test failures)";
+                return name + " (no test or config method failures)";
             } else {
-                return name + " (" + failingTestsCount + " test failures)";
+                return name + " (" + pluralize(failingTestsCount, "failure") + ")";
             }
         }
 
@@ -123,16 +131,16 @@ public class HomePage {
         }
     }
 
-    public void populateFromDatabase(String matchingViewName) {
+    public void populateFromDatabase(String matchingViewName, int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (dbUtils == null) {
             return;
         }
 
         this.jobViews = dbUtils.query(JobView.class, "SELECT * FROM JOB_VIEW WHERE REGEXP_LIKE(NAME, ?)", matchingViewName);
         this.jobViews.forEach(view -> view.setDbUtils(dbUtils));
-        this.jobViews.forEach(JobView::populateJobsFromDb);
+        this.jobViews.forEach(view -> view.populateJobsFromDb(numberOfFailuresNeededToBeConsistentlyFailing));
 
-        this.views = jobViews.stream().map(View::new).toArray(View[]::new);
+        this.views = jobViews.stream().map(jobView -> new HomePage.View(jobView, numberOfFailuresNeededToBeConsistentlyFailing)).toArray(View[]::new);
     }
 
     public Map<Job, List<TestResult>> jobTestMap(String viewName) {

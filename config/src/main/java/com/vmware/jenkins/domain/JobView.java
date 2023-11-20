@@ -62,13 +62,13 @@ public class JobView extends BaseDbClass {
     }
 
 
-    public void populateJobsFromDb() {
+    public void populateJobsFromDb(int numberOfFailuresNeededToBeConsistentlyFailing) {
         this.jobs = dbUtils.query(Job.class,"SELECT j.* FROM JOB j WHERE j.id in (SELECT jv.JOB_ID FROM JOB_VIEW_MAPPING jv WHERE jv.VIEW_ID = ?)", id).toArray(new Job[0]);
         Arrays.stream(jobs).forEach(job -> job.setDbUtils(dbUtils));
 
         Arrays.stream(jobs).forEach(job -> {
             job.loadTestResultsFromDb();
-            List<TestResult> failedTests = job.createFailingTestsList(lastFetchAmount);
+            List<TestResult> failedTests = job.createFailingTestsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing);
             if (!failedTests.isEmpty()) {
                 this.addFailingTests(job, failedTests);
             }
@@ -110,11 +110,19 @@ public class JobView extends BaseDbClass {
         return usableJobs;
     }
 
-    public long failingTestCount() {
+    public long failingTestCount(int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (!jobTestMap.isEmpty()) {
             return jobTestMap.values().stream().mapToInt(List::size).sum();
         } else {
-            return Arrays.stream(jobs).mapToLong(job -> job.failingTestCount(lastFetchAmount)).sum();
+            return Arrays.stream(jobs).mapToLong(job -> job.failingTestCount(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing)).sum();
         }
+    }
+
+    public long failingTestMethodCount() {
+        return Arrays.stream(jobs).mapToLong(Job::failingTestMethodCount).sum();
+    }
+
+    public long totalTestMethodCount() {
+        return Arrays.stream(jobs).mapToLong(Job::totalTestMethodCount).sum();
     }
 }

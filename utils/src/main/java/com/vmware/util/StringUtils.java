@@ -8,6 +8,8 @@ import java.net.URLEncoder;
 import java.security.Key;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -272,9 +274,19 @@ public class StringUtils {
         return value == null || value.isEmpty();
     }
 
+    public static String substringBefore(String value, String valueToCheckFor) {
+        if (value == null || !value.contains(valueToCheckFor)) {
+            return value;
+        }
+        return value.substring(0, value.indexOf(valueToCheckFor));
+    }
+
     public static String substringAfterLast(String value, String valueToCheckFor) {
         if (value == null) {
             return null;
+        }
+        if (!value.contains(valueToCheckFor)) {
+            return value;
         }
         return value.substring(value.lastIndexOf(valueToCheckFor) + valueToCheckFor.length());
     }
@@ -305,6 +317,29 @@ public class StringUtils {
             builder.append(value);
         }
         return builder.toString();
+    }
+
+    public static String humanReadableSize(String bytes) {
+        if (!StringUtils.isLong(bytes)) {
+            log.debug("Bytes size {} is not a long value", bytes);
+            return "";
+        }
+        return humanReadableSize(Long.parseLong(bytes));
+    }
+
+    public static String humanReadableSize(long bytesValue) {
+        long absB = bytesValue == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytesValue);
+        if (absB < 1024) {
+            return bytesValue + " B";
+        }
+        long value = absB;
+        CharacterIterator ci = new StringCharacterIterator("KMGTPE");
+        for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10) {
+            value >>= 10;
+            ci.next();
+        }
+        value *= Long.signum(bytesValue);
+        return String.format("%.1f %cB", value / 1024.0, ci.current());
     }
 
     public static String convertObjectToString(Object value) {

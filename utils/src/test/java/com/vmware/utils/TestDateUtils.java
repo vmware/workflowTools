@@ -6,6 +6,10 @@ import org.junit.Test;
 
 import com.vmware.util.DateUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -60,5 +64,12 @@ public class TestDateUtils {
         StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         Thread.sleep(1000);
         assertEquals(1, stopwatch.elapsedTime(TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void parseDates() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        Date parsedDate = new Date(TimeUnit.SECONDS.toMillis(Instant.parse("2023-10-29T02:40:06Z").getEpochSecond()));
+        System.out.println(parsedDate.toString());
     }
 }

@@ -9,8 +9,11 @@ import com.vmware.jenkins.domain.JobBuild;
 import com.vmware.jenkins.domain.TestResult;
 import com.vmware.util.StringUtils;
 import com.vmware.util.db.DbUtils;
+import com.vmware.util.exception.RuntimeIOException;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,13 +73,22 @@ public class FindJobsContainingTest extends BaseAction {
         IntStream.range(0, testResults.size()).forEach(index -> {
             TestResult testResult = testResults.get(index);
             JobBuild jobBuild = dbUtils.queryUnique(JobBuild.class, "SELECT * FROM JOB_BUILD jb WHERE jb.id = ?", testResult.jobBuildId);
+            List<JobBuild> buildsForJob = dbUtils.query(JobBuild.class, "SELECT * FROM JOB_BUILD WHERE job_id = ?", jobBuild.jobId);
+            testResult.buildNumber = jobBuild.buildNumber;
             testResult.setUrlForTestMethod(jobBuild.getTestReportsUIUrl(), usedUrls);
             Map<String, Object> resultValues = new HashMap<>();
             resultValues.put("buildName", jobBuild.name);
-            resultValues.put("startedAt", dateFormat.format(testResult.startedAt));
+            resultValues.put("lastRunDate", dateFormat.format(testResult.startedAt));
+            resultValues.put("id", testResult.id);
             resultValues.put("name", testResult.classAndTestName());
-            resultValues.put("status", testResult.status);
-            resultValues.put("url", testResult.url);
+            resultValues.put("testRuns", testResult.allTestRunSummaries(buildsForJob));
+            if (StringUtils.isNotBlank(testResult.exception)) {
+                try {
+                    resultValues.put("exception", URLEncoder.encode(testResult.exception, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeIOException(e);
+                }
+            }
 
             values.add(resultValues);
         });

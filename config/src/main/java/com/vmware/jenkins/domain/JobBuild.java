@@ -1,7 +1,9 @@
 package com.vmware.jenkins.domain;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -52,6 +54,8 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
 
     @SerializedName("timestamp")
     public long buildTimestamp;
+
+    public Long duration;
 
     @DbSaveIgnore
     @Expose(serialize = false, deserialize = false)
@@ -153,9 +157,8 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
         return UrlUtils.addRelativePaths(getTestReportsUIUrl(), "api/json?depth=3");
     }
 
-    public String fullUrlForArtifact(String pathPattern) {
-        JobBuildArtifact matchingArtifact = getArtifactForPathPattern(pathPattern);
-        return UrlUtils.addRelativePaths(url, "artifact", matchingArtifact.relativePath);
+    public String fullUrlForArtifact(JobBuildArtifact artifact) {
+        return UrlUtils.addRelativePaths(url, "artifact", artifact.relativePath);
     }
 
     public BuildStatus realResult() {
@@ -177,6 +180,10 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
     public JobBuildArtifact getArtifactForPathPattern(String pathPattern) {
         return Arrays.stream(artifacts).filter(artifact -> artifact.matchesPathPattern(pathPattern)).findFirst()
                 .orElseThrow(() -> new RuntimeException("Could not find artifact for path pattern " + pathPattern + " for job " + name));
+    }
+
+    public List<JobBuildArtifact> getArtifactsForPathPattern(String pathPattern) {
+        return Arrays.stream(artifacts).filter(artifact -> artifact.matchesPathPattern(pathPattern)).collect(Collectors.toList());
     }
 
     public String number() {

@@ -11,6 +11,7 @@ import com.vmware.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class UpdateMergeRequestApprovers extends BaseCommitWithMergeRequestActio
         Optional<MergeRequestApprovalRule> matchingRule = Arrays.stream(approvalRules)
                 .filter(rule -> gitlabConfig.approvalRuleName.equals(rule.name)).findFirst();
 
-        Set<String> reviewersFromDraft = StringUtils.isEmpty(draft.reviewedBy) ? Collections.emptySet() :
+        Set<String> reviewersFromDraft = StringUtils.isEmpty(draft.reviewedBy) ? new HashSet<>() :
                 Arrays.stream(draft.reviewedBy.split(",")).filter(value -> !StringUtils.isLong(value))
                         .map(String::trim).collect(Collectors.toSet());
         if (gitlabConfig.allowSelfApproval) {

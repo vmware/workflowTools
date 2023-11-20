@@ -1,13 +1,5 @@
 package com.vmware.jenkins;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.vmware.AbstractRestBuildService;
 import com.vmware.BuildStatus;
 import com.vmware.http.HttpConnection;
@@ -21,20 +13,35 @@ import com.vmware.jenkins.domain.CsrfCrumb;
 import com.vmware.jenkins.domain.HomePage;
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobBuild;
+import com.vmware.jenkins.domain.JobBuildArtifact;
 import com.vmware.jenkins.domain.JobParameters;
 import com.vmware.jenkins.domain.JobView;
+import com.vmware.jenkins.domain.TestNGResultsFile;
 import com.vmware.jenkins.domain.TestResult;
 import com.vmware.jenkins.domain.TestResults;
 import com.vmware.jenkins.domain.User;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
+import com.vmware.util.StopwatchUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.vmware.http.cookie.ApiAuthentication.jenkins;
+import static com.vmware.util.StringUtils.humanReadableSize;
 
 public class Jenkins extends AbstractRestBuildService {
     private final boolean usesCsrf;
@@ -106,6 +113,48 @@ public class Jenkins extends AbstractRestBuildService {
         }
     }
 
+    public TestResults getJobBuildTestResultsViaTestNGResultFiles(JobBuild jobBuild) {
+        try {
+            List<TestResult> allResults = new ArrayList<>();
+            List<JobBuildArtifact> testngResultsXmlFiles = jobBuild.getArtifactsForPathPattern(".+testng-results.xml");
+            if (testngResultsXmlFiles.isEmpty()) {
+                log.info("No testNG results files found for build {}, fetching via jenkins page", jobBuild.name);
+                return getJobBuildTestResults(jobBuild);
+            }
+            for (JobBuildArtifact testngFile : testngResultsXmlFiles) {
+                String artifactUrl = jobBuild.fullUrlForArtifact(testngFile);
+                try {
+                    List<TestResult> results = getTestResults(jobBuild, artifactUrl);
+                    allResults.addAll(results);
+                } catch (SAXException spe) {
+                    log.error("Failed to parse artifact " + artifactUrl + " " + spe.getMessage() + ", retrying", spe);
+                    try {
+                        List<TestResult> results = getTestResults(jobBuild, artifactUrl);
+                        allResults.addAll(results);
+                    } catch (SAXException e) {
+                        log.error("Failed again to parse artifact " + artifactUrl + " " + spe.getMessage(), spe);
+                    }
+                }
+            }
+            return new TestResults(jobBuild, allResults);
+        } catch (NotFoundException nfe) {
+            log.info("Failed to find test results for job build {}", jobBuild.name);
+            return new TestResults(jobBuild);
+        }
+    }
+
+    private List<TestResult> getTestResults(JobBuild jobBuild, String artifactUrl) throws SAXException {
+        log.debug("Fetching {}", artifactUrl);
+        StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
+        String fileContent = get(artifactUrl, String.class);
+        if (stopwatch.elapsedTime(TimeUnit.SECONDS) >= 1) {
+            log.info("Fetched {} ({}) in {} ms", artifactUrl, humanReadableSize(fileContent.getBytes().length), stopwatch.elapsedTime());
+        } else {
+            log.debug("Fetched {} ({}) in {} ms", artifactUrl, humanReadableSize(fileContent.getBytes().length), stopwatch.elapsedTime());
+        }
+        return new TestNGResultsFile(jobBuild, fileContent).getTestResults();
+    }
+
     private void addFailedConfigTestsViaJobHtmlPage(JobBuild jobBuild, TestResults results) {
         String testngReportsUrl = UrlUtils.addTrailingSlash(jobBuild.getTestReportsUIUrl());
         String jobHtmlPage = get(testngReportsUrl, String.class);
@@ -132,7 +181,7 @@ public class Jenkins extends AbstractRestBuildService {
             log.debug("Adding failed config method for url {}", url);
             TestResult failedConfigResult = get(UrlUtils.addRelativePaths(url, "api/json"), TestResult.class);
             failedConfigResult.url = url;
-            failedConfigResult.configMethodFailure = true;
+            failedConfigResult.configMethod = true;
             results.addFetchedConfigFailure(failedConfigResult);
         }
     }

@@ -13,6 +13,7 @@ import com.vmware.jenkins.domain.TestResults;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.CollectionUtils;
 import com.vmware.util.IOUtils;
+import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
 import com.vmware.util.StopwatchUtils;
 import com.vmware.util.UrlUtils;
@@ -22,9 +23,8 @@ import com.vmware.util.logging.Padder;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.text.CharacterIterator;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,8 +48,8 @@ import static com.vmware.util.StringUtils.pluralizeDescription;
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.toList;
 
-@ActionDescription("Finds real test failures for a Jenkins View. Real failures are tests that are continuously failing as opposed to one offs.")
-public class FindRealTestFailures extends BaseAction {
+@ActionDescription("Finds test and config failures for a Jenkins View.")
+public class FindTestFailures extends BaseAction {
 
     protected static final String LINK_IN_NEW_TAB = "target=\"_blank\" rel=\"noopener noreferrer\"";
 
@@ -57,7 +57,7 @@ public class FindRealTestFailures extends BaseAction {
     private String generationDate;
     private DbUtils dbUtils;
 
-    public FindRealTestFailures(WorkflowConfig config) {
+    public FindTestFailures(WorkflowConfig config) {
         super(config);
     }
 
@@ -76,7 +76,8 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
         generationDate = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy").format(new Date());
-        log.info("Checking for failing tests matching view pattern {} on {}", jenkinsConfig.jenkinsView, generationDate);
+        log.info("Checking for failing tests matching view pattern {} on {}, tests are considered failing if there are {} or more failures",
+                jenkinsConfig.jenkinsView, generationDate, jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
         File destinationFile = new File(fileSystemConfig.destinationFile);
         createDbUtilsIfNeeded();
         HomePage homePage;
@@ -84,10 +85,10 @@ public class FindRealTestFailures extends BaseAction {
             log.info("Regenerating failing tests html pages just from database test results");
             homePage = new HomePage();
             homePage.setDbUtils(dbUtils);
-            homePage.populateFromDatabase(jenkinsConfig.jenkinsView);
+            homePage.populateFromDatabase(jenkinsConfig.jenkinsView, jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
         } else {
             this.jenkinsExecutor = new BlockingExecutorService<>(6, () -> {
-                LoggerFactory.getLogger(FindRealTestFailures.class).debug("Creating new jenkins service");
+                LoggerFactory.getLogger(FindTestFailures.class).debug("Creating new jenkins service");
                 return serviceLocator.newJenkins();
             });
             homePage = serviceLocator.getJenkins().getHomePage();
@@ -104,11 +105,19 @@ public class FindRealTestFailures extends BaseAction {
 
         validateThatDestinationFileIsDirectoryIfNeeded(matchingViews, destinationFile);
 
+        if (jenkinsConfig.maxJenkinsBuildsToCheck > jenkinsConfig.maxJenkinsBuildsToKeep) {
+            log.info("Setting max builds to keep to {} as that is the amount of builds to check", jenkinsConfig.maxJenkinsBuildsToCheck);
+            jenkinsConfig.maxJenkinsBuildsToKeep = jenkinsConfig.maxJenkinsBuildsToCheck;
+        }
+
         if (this.jenkinsExecutor != null) {
-            log.info("Checking last {} builds for tests that are failing in the latest build and have failed in previous builds as well",
-                    jenkinsConfig.maxJenkinsBuildsToCheck);
-            if (jenkinsConfig.forceRefetch) {
-                log.info("forceRefetch is set to true so all builds will be refetched");
+            log.info("Checking last {} for tests that are failing in the latest build and have failed in previous builds as well",
+                    StringUtils.pluralize(jenkinsConfig.maxJenkinsBuildsToCheck, "build"));
+            if (dbUtils != null) {
+                log.info("Keeping last {} in test results database", StringUtils.pluralize(jenkinsConfig.maxJenkinsBuildsToKeep, "build"));
+            }
+            if (jenkinsConfig.refetchCount > 0) {
+                log.info("refetchCount is set to {} so {} builds will be refetched", jenkinsConfig.refetchCount, jenkinsConfig.refetchCount);
             }
             if (StringUtils.isNotBlank(jenkinsConfig.jobWithArtifact)) {
                 log.info("Only using jobs matching pattern {}", jenkinsConfig.jobWithArtifact);
@@ -182,38 +191,18 @@ public class FindRealTestFailures extends BaseAction {
 
         String footer = "";
         if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
-            footer += "<p/><a href=\"" + jenkinsConfig.testMethodNameSearchUrl + "\" " + LINK_IN_NEW_TAB + ">Search test methods</a><br/>";
+            footer += "<p/>" + constructAnchorUsingNewTab(jenkinsConfig.testMethodNameSearchUrl, "Search test methods") + "<br/>";
         }
         footer += String.format("Generated at %s in %s seconds", generationDate, elapsedTime);
         if (dbUtils != null) {
             String databaseSize = StringUtils.isNotBlank(fileSystemConfig.databaseSizeQuery) ?
-                    humanReadableSize(dbUtils.queryUnique(String.class, fileSystemConfig.databaseSizeQuery)) : "";
-            footer += String.format(" (%,d saved test results%s)",dbUtils.queryUnique(Integer.class,
+                    " " + StringUtils.humanReadableSize(dbUtils.queryUnique(String.class, fileSystemConfig.databaseSizeQuery)) : "";
+            footer += String.format(" (%,d saved results%s)",dbUtils.queryUnique(Integer.class,
                     "SELECT COUNT(*) FROM TEST_RESULT"), databaseSize);
         }
 
         viewListingPage = viewListingPage.replace("#footer", footer);
         return viewListingPage.replace("#body", viewListingHtml);
-    }
-
-    private String humanReadableSize(String bytes) {
-        if (!StringUtils.isLong(bytes)) {
-            log.debug("Database size {} is not a long value", bytes);
-            return "";
-        }
-        long bytesValue = Long.parseLong(bytes);
-        long absB = bytesValue == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytesValue);
-        if (absB < 1024) {
-            return " " + bytes + " B";
-        }
-        long value = absB;
-        CharacterIterator ci = new StringCharacterIterator("KMGTPE");
-        for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10) {
-            value >>= 10;
-            ci.next();
-        }
-        value *= Long.signum(bytesValue);
-        return String.format(" %.1f %cB", value / 1024.0, ci.current());
     }
 
     private void saveResultsPageForView(HomePage.View view, boolean includeViewsLink) {
@@ -222,7 +211,7 @@ public class FindRealTestFailures extends BaseAction {
 
         Jenkins jenkins = serviceLocator.getJenkins();
         JobView jobView = jenkins.getFullViewDetails(view.url);
-        log.info("Checking {} jobs for test failures", jobView.jobs.length);
+        log.info("Checking {} jobs for failures", jobView.jobs.length);
 
         try {
             addFailingTestForView(jobView);
@@ -233,7 +222,9 @@ public class FindRealTestFailures extends BaseAction {
             return;
         }
 
-        view.failingTestsCount = jobView.failingTestCount();
+        view.failingTestsCount = jobView.failingTestCount(jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
+        view.failingTestMethodsCount = jobView.failingTestMethodCount();
+        view.totalTestMethodsCount = jobView.totalTestMethodCount();
         log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
 
         createJobResultsHtmlPages(view, includeViewsLink, jobView.getJobTestMap());
@@ -300,12 +291,14 @@ public class FindRealTestFailures extends BaseAction {
         if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
             String queryCharacter = jenkinsConfig.testMethodNameSearchUrl.contains("?") ? "&" : "?";
             String searchUrl = jenkinsConfig.testMethodNameSearchUrl + queryCharacter + "viewName=" + view.name;
-            footer += "<p/><a href=\"" + searchUrl + "\" " + LINK_IN_NEW_TAB + ">Search test methods</a><br/>";
+            footer += "<p/>" + constructAnchorUsingNewTab(searchUrl, "Search test methods") + "<br/>";
         }
         if (includeViewsLink) {
             footer += "<p/><a href=\"index.html\">Back</a><br/>";
         }
-        footer += "Generated at " + generationDate;
+        double passingRate = view.totalTestMethodsCount > 0 ? ((view.totalTestMethodsCount - view.failingTestMethodsCount) / (double) view.totalTestMethodsCount) * 100 : 0;
+        footer += "Generated at " + generationDate + " - " + new DecimalFormat("#.##").format(passingRate)
+                + "% pass rate (" + view.failingTestMethodsCount + " tests failing out of " + view.totalTestMethodsCount + " test methods)";
         if (consistentFailuresJobsHtml.isEmpty() && inconsistentFailuresJobsHtml.isEmpty()) {
             String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
             resultsPage = allPassedPage.replace("#viewName", view.name);
@@ -326,7 +319,7 @@ public class FindRealTestFailures extends BaseAction {
             resultsPage = resultsPage.replace("#passingJobs", String.join("\n", jobsPassingHtml));
 
             resultsPage = resultsPage.replace("#footer", footer);
-            log.trace("Test Failures for view {}:\n{}", view.name, resultsPage);
+            log.trace("Failures for view {}:\n{}", view.name, resultsPage);
         }
 
         return resultsPage;
@@ -367,11 +360,11 @@ public class FindRealTestFailures extends BaseAction {
             job.saveFetchedBuildsInfo();
             job.addTestResultsToMasterList();
             job.saveTestResultsToDb();
-            job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToCheck);
+            job.removeOldBuilds(jenkinsConfig.maxJenkinsBuildsToKeep);
         });
 
         jobsToCheckForFailingTests.forEach(job -> {
-            List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck);
+            List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck, jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
             if (failingTests.isEmpty()) {
                 log.info("No consistently failing tests found for {}", job.name);
                 jobView.addFailingTests(job, failingTests);
@@ -388,12 +381,20 @@ public class FindRealTestFailures extends BaseAction {
         job.fetchedResults = Collections.emptyList();
         List<JobBuild> builds = Arrays.asList(job.builds);
 
+        if (jenkinsConfig.refetchCount > jenkinsConfig.maxJenkinsBuildsToCheck) {
+            log.info("refetchCount {} is greater than maxJenkinsBuildsToCheck {}, setting to same value",
+                    jenkinsConfig.refetchCount, jenkinsConfig.maxJenkinsBuildsToCheck);
+            jenkinsConfig.refetchCount = jenkinsConfig.maxJenkinsBuildsToCheck;
+        }
         final int numberOfBuildsToCheck = builds.size() > jenkinsConfig.maxJenkinsBuildsToCheck ? jenkinsConfig.maxJenkinsBuildsToCheck : builds.size();
         final int lastBuildNumberToCheck = builds.get(numberOfBuildsToCheck - 1).buildNumber;
+        final Integer lastBuildNumberToRefetch = jenkinsConfig.refetchCount > 0 ?
+                builds.get(Math.min(builds.size(), jenkinsConfig.refetchCount) - 1).buildNumber : null;
 
         List<JobBuild> usableBuilds = builds.stream()
                 .filter(build -> build.buildNumber >= lastBuildNumberToCheck
-                        && (jenkinsConfig.forceRefetch || !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck)))
+                        && ((lastBuildNumberToRefetch != null && build.buildNumber >= lastBuildNumberToRefetch)
+                        || !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck)))
                 .collect(toList());
 
         job.usefulBuilds = usableBuilds.stream().parallel()
@@ -405,7 +406,7 @@ public class FindRealTestFailures extends BaseAction {
 
         List<Supplier<TestResults>> usableResultSuppliers = job.usefulBuilds.stream()
                 .filter(build -> build.status == SUCCESS || build.status == UNSTABLE || build.status == FAILURE)
-                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResults(build)))
+                .map(build -> (Supplier<TestResults>) () -> jenkinsExecutor.execute(j -> j.getJobBuildTestResultsViaTestNGResultFiles(build)))
                 .collect(toList());
 
         if (job.usefulBuilds.isEmpty()) {
@@ -430,22 +431,57 @@ public class FindRealTestFailures extends BaseAction {
 
         String filledInJobFragment = jobFragment.replace("#url", jobUrlWithViewName);
         filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink(viewUrl));
-        filledInJobFragment = filledInJobFragment.replace("#latestBuildLink", fullDetails.latestBuildLink(viewUrl));
+        filledInJobFragment = filledInJobFragment.replace("#latestBuildLink", fullDetails.latestBuildLink(viewUrl, jenkinsConfig.daysOldForShowingJobDate));
         filledInJobFragment = filledInJobFragment.replace("#jobName", fullDetails.name);
         filledInJobFragment = filledInJobFragment.replace("#failingTestCount", pluralize(failingMethods.size(), "failing test"));
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);
 
         StringBuilder rowBuilder = new StringBuilder();
         int index = 0;
-        for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)).collect(toList())) {
+        for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)
+                .thenComparingInt(testResult -> testResult.executionOrder(jenkinsConfig.beforeConfigMethodPattern, jenkinsConfig.afterConfigMethodPattern))).collect(toList())) {
             String filledInRow = rowFragment.replace("#testName", method.fullTestNameForDisplay());
             filledInRow = filledInRow.replace("#testResultLinks", method.testLinks(viewUrl, jenkinsConfig.commitComparisonUrl));
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
-            filledInRow = filledInRow.replace("#exception", method.exception != null ? method.exception.replace("\n", "<br/>") : "");
+            if (StringUtils.isNotBlank(method.exception)) {
+                String exceptionText = method.exception.replace("\n", "<br/>");
+                if (StringUtils.isNotBlank(jenkinsConfig.testIdPattern) && StringUtils.isNotBlank(jenkinsConfig.testLogIdUrlTemplate)) {
+                    String logId = MatcherUtils.singleMatch(exceptionText, jenkinsConfig.testIdPattern);
+                    if (StringUtils.isNotBlank(logId)) {
+                        String logUrl = constructPartialLogUrl(jenkinsConfig.testLogIdUrlTemplate, method)
+                                .replace("#logId", logId);
+                        exceptionText = exceptionText.replaceFirst(logId, constructAnchorUsingNewTab(logUrl, logId));
+                    }
+                }
+                if (StringUtils.isNotBlank(jenkinsConfig.testNameLogUrlTemplate)) {
+                    String logUrl = constructPartialLogUrl(jenkinsConfig.testNameLogUrlTemplate, method)
+                            .replace("#jobName", fullDetails.name.toLowerCase());
+                    exceptionText += " " + constructAnchorUsingNewTab(logUrl, "Test logs");
+                }
+
+                filledInRow = filledInRow.replace("#exception", exceptionText);
+            } else {
+                filledInRow = filledInRow.replace("#exception", "");
+            }
+
             rowBuilder.append(filledInRow).append("\n");
         }
         filledInJobFragment = filledInJobFragment.replace("#body", rowBuilder.toString());
         return filledInJobFragment;
     }
 
+    private String constructPartialLogUrl(String template, TestResult method) {
+        final long thirtySecondsInMillis = TimeUnit.SECONDS.toMillis(30);
+        long startTimeMillis = method.startedAt > thirtySecondsInMillis ? method.startedAt - thirtySecondsInMillis : method.startedAt;
+        long durationMillis = (long) (method.duration * 1000);
+        long endTimeMillis = method.startedAt + durationMillis + thirtySecondsInMillis; // pad by thirty seconds both sides
+        return template.replace("#testName", method.name)
+                .replace("#buildNumber", String.valueOf(method.buildNumber))
+                .replace("#startTimeMillis", String.valueOf(startTimeMillis))
+                .replace("#endTimeMillis", String.valueOf(endTimeMillis));
+    }
+
+    private String constructAnchorUsingNewTab(String url, String text) {
+        return "<a href = \"" + url + "\" " + LINK_IN_NEW_TAB + ">" + text + "</a>";
+    }
 }

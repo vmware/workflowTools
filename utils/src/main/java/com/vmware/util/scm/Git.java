@@ -525,7 +525,7 @@ public class Git extends BaseScmWrapper {
 
     private List<FileChange> getChanges(boolean includeUnStagedChanges) {
         List<FileChange> changes = new ArrayList<>();
-        String gitStatusOutput = executeScmCommand("status --porcelain" );
+        String gitStatusOutput = executeScmCommand("status --porcelain -uno" );
 
         String pattern = String.format("^(\\s*)(%s+)\\s+(.+)", FileChangeType.allValuesAsGitPattern());
         Matcher changesMatcher = Pattern.compile(pattern, Pattern.MULTILINE).matcher(gitStatusOutput);

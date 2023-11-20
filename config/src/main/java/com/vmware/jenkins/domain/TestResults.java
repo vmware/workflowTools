@@ -1,5 +1,11 @@
 package com.vmware.jenkins.domain;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.vmware.util.MatcherUtils;
+import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,12 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
-import com.vmware.util.UrlUtils;
 
 import static com.vmware.jenkins.domain.TestResult.TestStatus.FAIL;
 import static com.vmware.jenkins.domain.TestResult.TestStatus.FAILED;
@@ -50,6 +50,14 @@ public class TestResults {
     }
 
     public TestResults(JobBuild build) {
+        this.setBuild(build);
+    }
+
+    public TestResults(JobBuild build, List<TestResult> results) {
+        this.loadedTestResults = new ArrayList<>(results);
+        this.failConfig = (int) loadedTestResults.stream().filter(testResult -> Boolean.TRUE.equals(testResult.configMethod) && testResult.status != PASS).count();
+        this.failCount = (int) loadedTestResults.stream().filter(testResult -> testResult.status == FAIL).count();
+        this.skipCount = (int) loadedTestResults.stream().filter(testResult -> testResult.status == SKIP).count();
         this.setBuild(build);
     }
 
