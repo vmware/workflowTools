@@ -14,8 +14,8 @@ import com.vmware.util.ClasspathResource;
 import com.vmware.util.CollectionUtils;
 import com.vmware.util.IOUtils;
 import com.vmware.util.MatcherUtils;
-import com.vmware.util.StringUtils;
 import com.vmware.util.StopwatchUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.collection.BlockingExecutorService;
 import com.vmware.util.db.DbUtils;
@@ -23,7 +23,6 @@ import com.vmware.util.logging.Padder;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +74,7 @@ public class FindTestFailures extends BaseAction {
             createDatabase();
             return;
         }
-        generationDate = new SimpleDateFormat("EEE MMM dd hh:mm:ss aa zzz yyyy").format(new Date());
+        generationDate = new SimpleDateFormat("EEE MMM dd hh:mm aa zzz").format(new Date());
         log.info("Checking for failing tests matching view pattern {} on {}, tests are considered failing if there are {} or more failures",
                 jenkinsConfig.jenkinsView, generationDate, jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
         File destinationFile = new File(fileSystemConfig.destinationFile);
@@ -297,8 +296,8 @@ public class FindTestFailures extends BaseAction {
             footer += "<p/><a href=\"index.html\">Back</a><br/>";
         }
         double passingRate = view.totalTestMethodsCount > 0 ? ((view.totalTestMethodsCount - view.failingTestMethodsCount) / (double) view.totalTestMethodsCount) * 100 : 0;
-        footer += "Generated at " + generationDate + " - " + new DecimalFormat("#.##").format(passingRate)
-                + "% pass rate (" + view.failingTestMethodsCount + " tests failing out of " + view.totalTestMethodsCount + " test methods)";
+        footer +=  String.format("Generated at %s - %.2f%% pass rate (%,d tests failing out of %,d test methods)",
+                generationDate, passingRate, view.failingTestMethodsCount, view.totalTestMethodsCount);
         if (consistentFailuresJobsHtml.isEmpty() && inconsistentFailuresJobsHtml.isEmpty()) {
             String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
             resultsPage = allPassedPage.replace("#viewName", view.name);
