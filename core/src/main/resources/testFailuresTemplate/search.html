@@ -1,8 +1,68 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-    <title>Search test methods</title>
+    <title>Search test or config methods</title>
     <style>
+        a
+        {
+            color: #00f;
+            text-decoration: none;
+        }
+
+        a:hover
+        {
+            text-decoration: underline;
+        }
+
+        a,
+        {
+            display: inline-block;
+            height: 16px;
+            line-height: 16px;
+        }
+
+        .FAIL, .SKIP, .PASS, .PRESUMED_PASS {
+            padding: 3px 6px;
+            color: black;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .FAIL
+        {
+            background-color: lightcoral;
+        }
+
+        .FAIL:hover, .FAIL:active {
+            background-color: red;
+        }
+
+        .SKIP
+        {
+            background-color: yellow;
+        }
+
+        .SKIP:hover, .SKIP:active {
+            background-color: darkkhaki;
+        }
+
+        .PASS
+        {
+            background-color: lightgreen;
+        }
+
+        .PASS:hover, .PASS:active {
+            background-color: green;
+        }
+
+        .PRESUMED_PASS
+        {
+            background-color: lightGray;
+        }
+
+        .PRESUMED_PASS:hover, .PRESUMED_PASS:active {
+            background-color: gray;
+        }
     </style>
     <script type="application/javascript">
         function searchForResultsIfEnter(event) {
@@ -31,20 +91,20 @@
             var httprequest = new XMLHttpRequest();
             httprequest.onreadystatechange = populateData(httprequest);
 
-            var testName = document.getElementById("name").value
+            var name = document.getElementById("name").value
             const cgiEndpoint = getQueryVariable("cgiEndpoint");
             if (cgiEndpoint === undefined) {
                 document.getElementById("searchTitle").innerText = "Query param cgiEndpoint needs to be set";
                 return;
             }
-            var restEndpoint = "cgi-bin/" + cgiEndpoint + "?--test-name=" + testName;
+            var restEndpoint = "cgi-bin/" + cgiEndpoint + "?--test-name=" + name;
             var viewName = getQueryVariable("viewName");
             if (viewName !== undefined) {
                 restEndpoint += "&--jenkins-view=" + viewName;
-                document.getElementById("searchTitle").innerText = "Search results for test method " + testName + " in view " + viewName;
+                document.getElementById("searchTitle").innerText = "Search results for name " + name + " in view " + viewName;
             } else {
-                restEndpoint += "&&--jenkins-view=";
-                document.getElementById("searchTitle").innerText = "Search results for test method " + testName;
+                restEndpoint += "&--jenkins-view=";
+                document.getElementById("searchTitle").innerText = "Search results for name " + name;
             }
             document.getElementById("exception").innerHTML = "";
             document.getElementById("results").innerHTML = "";
@@ -66,13 +126,15 @@
                         document.getElementById("resultsCount").innerText = "";
                     }
                     var testsTable = document.getElementById("results");
-                    document.getElementById("resultsCount").innerHTML = "Matching tests count: " + tests.length;
+                    document.getElementById("resultsCount").innerHTML = "Matching results count: " + tests.length;
                     var currentStatus = "";
                     var headerRow = testsTable.insertRow(-1);
-                    headerRow.appendChild(createHeaderRow("Build"));
-                    headerRow.appendChild(createHeaderRow("Date"));
+                    headerRow.appendChild(createHeaderRow("Id"));
                     headerRow.appendChild(createHeaderRow("Name"));
-                    for(var i=0; i < tests.length; i++){
+                    headerRow.appendChild(createHeaderRow("Last Build"));
+                    headerRow.appendChild(createHeaderRow("Last Run"));
+                    headerRow.appendChild(createHeaderRow('Runs'));
+                    for (var i=0; i < tests.length; i++) {
                         if (i > 0 && currentStatus !== tests[i].status) {
                             //console.log("Inserting row for " + currentStatus + " changing to " + tests[i].status);
                             var emptyRow = testsTable.insertRow(-1);
@@ -80,12 +142,23 @@
                         }
                         currentStatus = tests[i].status;
                         var row = testsTable.insertRow(-1);
-                        var cell1 = row.insertCell(0);
-                        var cell2 = row.insertCell(1);
-                        var cell3 = row.insertCell(2);
-                        cell1.innerHTML = tests[i].buildName;
-                        cell2.innerHTML = tests[i].startedAt;
-                        cell3.innerHTML = tests[i].name + " <a href ='" + tests[i].url + "'>" + tests[i].status + "</a>";
+                        row.insertCell(0).innerHTML = tests[i].id;
+                        row.insertCell(1).innerHTML = tests[i].name;
+                        row.insertCell(2).innerHTML = tests[i].buildName;
+                        row.insertCell(3).innerHTML = tests[i].lastRunDate;
+
+                        var testRunsCell = row.insertCell(4);
+                        for (var x = 0; x < tests[i].testRuns.length - 1; x++) {
+                            const testRun = tests[i].testRuns[x];
+                            testRunsCell.innerHTML += "  <a class='" + testRun.status + "' href ='" + testRun.url + "' title='" + statusText(testRun) + " on " + testRun.buildDate + " with commit " + testRun.commitId + "'>" + testRun.buildNumber + "</a>";
+                        }
+			            const latestTestRun = tests[i].testRuns[tests[i].testRuns.length - 1];
+                        if (tests[i].exception) {
+                            const decodedException = decodeURIComponent(tests[i].exception.replaceAll("+", " "));  
+                            testRunsCell.innerHTML += " <a class = '" + latestTestRun.status + "' href ='" + latestTestRun.url + "' title='" + statusText(latestTestRun) + " on " + latestTestRun.buildDate + " with commit " + latestTestRun.commitId + "\n" + decodedException + "'>" + latestTestRun.buildNumber + "</a>";
+                        } else {
+                            testRunsCell.innerHTML += " <a class = '" + latestTestRun.status + "' href ='" + latestTestRun.url + "' title='" + statusText(latestTestRun) + " on " + latestTestRun.buildDate + " with commit " + latestTestRun.commitId + "'>" + latestTestRun.buildNumber + "</a>";
+                        }
                     }
                 } else if (httprequest.status >= 400 && httprequest.status <= 500) {
                     document.getElementById("exception").innerHTML = httprequest.responseText;
@@ -101,10 +174,25 @@
             return headerCell;
         }
 
+        function statusText(testRun) {
+            switch (testRun.status) {
+                case 'PASS':
+                    return 'Passed';
+                case 'PRESUMED_PASS':
+                    return 'Presumed passed';
+                case 'FAIL':
+                    return 'Failed';
+                case 'SKIP':
+                    return 'Skipped';
+                default:
+                    return status;
+            }
+        }
+
     </script>
 </head>
 <body>
-<label>Enter name of test method</label>
+<label>Search</label>
 <input id="name" type="text" size="60" onkeypress="searchForResultsIfEnter(event)" />
 <input type="button" value="Search" onclick="searchForResults()" />
 

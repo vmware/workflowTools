@@ -190,7 +190,7 @@ public class FindTestFailures extends BaseAction {
 
         String footer = "";
         if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
-            footer += "<p/>" + constructAnchorUsingNewTab(jenkinsConfig.testMethodNameSearchUrl, "Search test methods") + "<br/>";
+            footer += "<p/>" + constructAnchorUsingNewTab(jenkinsConfig.testMethodNameSearchUrl, "Search saved results") + "<br/>";
         }
         footer += String.format("Generated at %s in %s seconds", generationDate, elapsedTime);
         if (dbUtils != null) {
@@ -290,7 +290,7 @@ public class FindTestFailures extends BaseAction {
         if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
             String queryCharacter = jenkinsConfig.testMethodNameSearchUrl.contains("?") ? "&" : "?";
             String searchUrl = jenkinsConfig.testMethodNameSearchUrl + queryCharacter + "viewName=" + view.name;
-            footer += "<p/>" + constructAnchorUsingNewTab(searchUrl, "Search test methods") + "<br/>";
+            footer += "<p/>" + constructAnchorUsingNewTab(searchUrl, "Search saved results") + "<br/>";
         }
         if (includeViewsLink) {
             footer += "<p/><a href=\"index.html\">Back</a><br/>";

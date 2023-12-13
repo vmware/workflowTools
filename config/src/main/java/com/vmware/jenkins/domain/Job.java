@@ -297,7 +297,7 @@ public class Job extends BaseDbClass {
                     result.refreshFromMatchingBuild(build);
 
                     String testReportsUIUrl;
-                    if (result.packagePath.equals(TestResults.JUNIT_ROOT)) {
+                    if (result.packagePath.equals(JenkinsTestResults.JUNIT_ROOT)) {
                         testReportsUIUrl = UrlUtils.addRelativePaths(build.url, "testReport/");
                     } else {
                         testReportsUIUrl = build.getTestReportsUIUrl();
