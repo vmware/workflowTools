@@ -24,11 +24,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.vmware.jenkins.domain.JenkinsTestResults.JUNIT_ROOT;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.UPDATEABLE;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.CONTAINS_BUILD;
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.NO_UPDATE_NEEDED;
-import static com.vmware.jenkins.domain.TestResults.JUNIT_ROOT;
 
 public class TestResult extends BaseDbClass {
 
@@ -111,6 +111,7 @@ public class TestResult extends BaseDbClass {
         this.status = status;
         this.commitId = build.commitId;
         this.startedAt = build.buildTimestamp;
+        this.configMethod = methodToClone.configMethod;
     }
 
     @AfterDbLoad

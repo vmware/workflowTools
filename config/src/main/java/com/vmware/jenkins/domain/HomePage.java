@@ -61,10 +61,7 @@ public class HomePage {
         public long totalTestMethodsCount;
 
         @Expose(serialize = false, deserialize = false)
-        public long inconsistentFailingTestCount;
-
-        @Expose(serialize = false, deserialize = false)
-        public long inconsistentFailingJobsCount;
+        public long failingJobsWithNoTestFailuresCount;
 
         public Exception failingTestsGenerationException;
 
@@ -75,15 +72,15 @@ public class HomePage {
             this.name = view.name;
             this.url = view.url;
             this.failingTestsCount = view.failingTestCount(numberOfFailuresNeededToBeConsistentlyFailing);
+            this.failingTestMethodsCount = view.failingTestMethodCount();
+            this.totalTestMethodsCount = view.totalTestMethodCount();
         }
 
         public String viewNameWithFailureCount() {
             if (failingTestsGenerationException != null) {
                 return name + " (failed with error " + StringUtils.truncateStringIfNeeded(failingTestsGenerationException.getMessage(), 80) + ")";
-            } else if (failingTestsCount == 0 && inconsistentFailingTestCount > 0) {
-                return name + " (" + pluralize(inconsistentFailingTestCount, "inconsistent failure") + ")";
-            } else if (failingTestsCount == 0 && inconsistentFailingJobsCount > 0) {
-                return name + " (" + pluralize(inconsistentFailingJobsCount, "inconsistent job failure") + ")";
+            } else if (failingTestsCount == 0 && failingJobsWithNoTestFailuresCount > 0) {
+                return name + " (" + pluralize(failingJobsWithNoTestFailuresCount, "job failure") + ")";
             } else if (failingTestsCount == 0) {
                 return name + " (no test or config method failures)";
             } else {
@@ -131,7 +128,7 @@ public class HomePage {
         }
     }
 
-    public void populateFromDatabase(String matchingViewName, int numberOfFailuresNeededToBeConsistentlyFailing) {
+    public void populateFromDb(String matchingViewName, int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (dbUtils == null) {
             return;
         }

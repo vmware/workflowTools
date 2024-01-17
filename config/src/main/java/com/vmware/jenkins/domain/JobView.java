@@ -119,7 +119,7 @@ public class JobView extends BaseDbClass {
     }
 
     public long failingTestMethodCount() {
-        return Arrays.stream(jobs).mapToLong(Job::failingTestMethodCount).sum();
+        return Arrays.stream(jobs).mapToLong(job -> job.failingTestMethodCount(lastFetchAmount, 1)).sum();
     }
 
     public long totalTestMethodCount() {

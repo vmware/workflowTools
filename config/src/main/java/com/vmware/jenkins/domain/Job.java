@@ -151,13 +151,13 @@ public class Job extends BaseDbClass {
         return createFailingTestsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing).size();
     }
 
-    public long failingTestMethodCount() {
+    public long failingTestMethodCount(int lastFetchAmount, int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (testResults == null) {
             return 0;
         }
-        return testResults.stream().filter(testResult ->
-                !Boolean.TRUE.equals(testResult.configMethod) && !TestResult.TestStatus.isPass(testResult.status)).count();
+        return createFailingTestMethodsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing).size();
     }
+
 
     public long totalTestMethodCount() {
         if (testResults == null) {
@@ -380,36 +380,49 @@ public class Job extends BaseDbClass {
     }
 
     public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck, int numberOfFailuresNeededToBeConsistentlyFailing) {
-        return createFailingTestsList(maxJenkinsBuildsToCheck,
-                entries -> entries.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() >= numberOfFailuresNeededToBeConsistentlyFailing);
+        return createFailingTestsList(result -> !result.isSkippedConfigMethod(), result -> {
+            List<Map.Entry<Integer, TestResult.TestStatus>> builds = result.buildsToUse(maxJenkinsBuildsToCheck);
+            if (builds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() >= numberOfFailuresNeededToBeConsistentlyFailing) {
+                return builds;
+            } else {
+                return Collections.emptyList();
+            }
+        });
+    }
+
+    public List<TestResult> createFailingTestMethodsList(int maxJenkinsBuildsToCheck, int numberOfFailuresNeededToBeConsistentlyFailing) {
+        return createFailingTestsList(result -> !Boolean.TRUE.equals(result.configMethod), result -> {
+            List<Map.Entry<Integer, TestResult.TestStatus>> builds = result.buildsToUse(maxJenkinsBuildsToCheck);
+            if (builds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() >= numberOfFailuresNeededToBeConsistentlyFailing) {
+                return builds;
+            } else {
+                return Collections.emptyList();
+            }
+        });
     }
 
     public List<TestResult> latestFailingTests(int maxJenkinsBuildsToCheck) {
-        return createFailingTestsList(maxJenkinsBuildsToCheck, entries -> !entries.isEmpty());
+        return createFailingTestsList(result -> !result.isSkippedConfigMethod(), result -> result.buildsToUse(maxJenkinsBuildsToCheck));
     }
 
-    private List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck, Function<List<Map.Entry<Integer, TestResult.TestStatus>>, Boolean> includeTestResultFunction) {
+    private List<TestResult> createFailingTestsList(Function<TestResult, Boolean> useTestResultFunction, Function<TestResult, List<Map.Entry<Integer, TestResult.TestStatus>>> buildsToUseFunction) {
         List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
         int buildNumberToUse = latestUsableBuildNumber();
         return testResults.stream().filter(result -> !TestResult.TestStatus.isPass(result.status))
-                .filter(result -> !result.isSkippedConfigMethod())
                 .filter(result -> result.containsBuildNumbers(buildNumberToUse))
+                .filter(useTestResultFunction::apply)
                 .peek(result -> {
-                    List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = result.buildsToUse(maxJenkinsBuildsToCheck);
-                    if (includeTestResultFunction.apply(applicableBuilds)) {
-                        result.testRuns = applicableBuilds.stream().map(entry -> {
-                            JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
-                                    .orElse(null);
-                            if (matchingBuild == null) {
-                                log.warn("Failed to find build with number {} for job {}", entry.getKey(), name);
-                                return null;
-                            } else {
-                                return new TestResult(result, matchingBuild, entry.getValue());
-                            }
-                        }).filter(Objects::nonNull).collect(toList());
-                    } else {
-                        result.testRuns = new ArrayList<>();
-                    }
+                    List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = buildsToUseFunction.apply(result);
+                    result.testRuns = applicableBuilds.stream().map(entry -> {
+                        JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
+                                .orElse(null);
+                        if (matchingBuild == null) {
+                            log.warn("Failed to find build with number {} for job {}", entry.getKey(), name);
+                            return null;
+                        } else {
+                            return new TestResult(result, matchingBuild, entry.getValue());
+                        }
+                    }).filter(Objects::nonNull).collect(toList());
                 }).filter(result -> CollectionUtils.isNotEmpty(result.testRuns)).collect(toList());
     }
 

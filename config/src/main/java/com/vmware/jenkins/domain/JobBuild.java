@@ -46,6 +46,12 @@ public class JobBuild extends BaseDbClass implements InputListSelection {
     @SerializedName("result")
     public BuildStatus status;
 
+    @Expose(serialize = false, deserialize = false)
+    public int failedCount;
+
+    @Expose(serialize = false, deserialize = false)
+    public int skippedCount;
+
     @SerializedName("timestamp")
     public long buildTimestamp;
 
