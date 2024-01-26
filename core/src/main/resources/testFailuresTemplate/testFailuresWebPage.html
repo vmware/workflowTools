@@ -207,6 +207,10 @@
                 jobsList.sort(function (a,b) { return compareByValue(a, b, "skippedTestCount")});
             } else if (sortOption === 'skipDesc') {
                 jobsList.sort(function (a,b) { return compareByValue(b, a, "skippedTestCount")});
+            } else if (sortOption === 'dateAsc') {
+                jobsList.sort(function (a,b) { return compareByValue(a, b, "dateTime")});
+            } else if (sortOption === 'dateDesc') {
+                jobsList.sort(function (a,b) { return compareByValue(b, a, "dateTime")});
             }
 
             for (var x = 0; x < jobsList.length; x++) {
@@ -247,15 +251,17 @@
 
 </head>
 <body>
-<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures failures in #consistentFailuresJobsCount jobs)
+<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs)
 <select id="jobSortOptions" onchange="sortOptionChange()" style="visibility: hidden">
     <option value="default">By Default</option>
     <option value="totalFailureDesc">By Total Failures</option>
     <option value="testFailureDesc">By Test Failures</option>
     <option value="skipDesc">By Skips</option>
+    <option value="dateDesc">By Date</option>
     <option value="totalFailureAsc">By Total Failures Ascending</option>
     <option value="testFailureAsc">By Test Failures Ascending</option>
     <option value="skipAsc">By Skips Ascending</option>
+    <option value="dateAsc">By Date Ascending</option>
 </select>
 </h2>
 <h3 id="jobLoadingText">LOADING...</h3>

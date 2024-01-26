@@ -2,8 +2,10 @@ package com.vmware.jenkins.domain;
 
 import com.google.gson.annotations.Expose;
 import com.vmware.util.StringUtils;
+import com.vmware.util.UrlUtils;
 import com.vmware.util.db.DbSaveIgnore;
 import com.vmware.util.db.DbUtils;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,10 @@ public class HomePage {
         public String url;
 
         @Expose(serialize = false, deserialize = false)
-        public long failingTestsCount;
+        public long failureCount;
+
+        @Expose(serialize = false, deserialize = false)
+        public long skipCount;
 
         @Expose(serialize = false, deserialize = false)
         public long failingTestMethodsCount;
@@ -71,25 +76,27 @@ public class HomePage {
         public View(JobView view, int numberOfFailuresNeededToBeConsistentlyFailing) {
             this.name = view.name;
             this.url = view.url;
-            this.failingTestsCount = view.failingTestCount(numberOfFailuresNeededToBeConsistentlyFailing);
-            this.failingTestMethodsCount = view.failingTestMethodCount();
+            List<TestResult> failures = view.failures(numberOfFailuresNeededToBeConsistentlyFailing);
+            this.failureCount = failures.stream().filter(failure -> failure.status != TestResult.TestStatus.SKIP).count();
+            this.skipCount = failures.stream().filter(failure -> failure.status == TestResult.TestStatus.SKIP).count();
+            this.failingTestMethodsCount = failures.stream().filter(failure -> !Boolean.TRUE.equals(failure.configMethod)).count();
             this.totalTestMethodsCount = view.totalTestMethodCount();
         }
 
         public String viewNameWithFailureCount() {
             if (failingTestsGenerationException != null) {
                 return name + " (failed with error " + StringUtils.truncateStringIfNeeded(failingTestsGenerationException.getMessage(), 80) + ")";
-            } else if (failingTestsCount == 0 && failingJobsWithNoTestFailuresCount > 0) {
+            } else if ((failureCount == 0 && skipCount == 0) && failingJobsWithNoTestFailuresCount > 0) {
                 return name + " (" + pluralize(failingJobsWithNoTestFailuresCount, "job failure") + ")";
-            } else if (failingTestsCount == 0) {
-                return name + " (no test or config method failures)";
+            } else if (failureCount == 0 && skipCount == 0) {
+                return name + " (all green!)";
             } else {
-                return name + " (" + pluralize(failingTestsCount, "failure") + ")";
+                return name + " (" + pluralize(failureCount, "failure") + ", " + pluralize(skipCount, "skip") + ")";
             }
         }
 
         public String listHtmlFragment() {
-            return "<li><a href = \"" + htmlFileName() + "\" " + titleAttribute() + ">" + viewNameWithFailureCount() + "</a></li>";
+            return String.format("<li><a href = \"%s\"%s>%s</a></li>", htmlFileName(), titleAttribute(), viewNameWithFailureCount());
         }
 
         public boolean matches(String value) {
@@ -111,6 +118,14 @@ public class HomePage {
             return name.trim().replace(" ", "-") + ".html";
         }
 
+        public void fixViewUrlIfNeeded() {
+            if (url.contains("/view")) {
+                return;
+            }
+            LoggerFactory.getLogger(this.getClass()).info("Fixing url for view {}. Existing url is {}", name, url);
+            url = UrlUtils.addRelativePaths(url, "view", name);
+        }
+
         private String nameInUrl() {
             String nameInUrl = StringUtils.substringAfterLast(url, "/view/");
             if (nameInUrl.endsWith("/")) {
@@ -124,7 +139,7 @@ public class HomePage {
                 return "";
             }
             String messageWithoutDoubleQuotes = failingTestsGenerationException.getMessage().replace("\"", "'");
-            return "title=\"" + messageWithoutDoubleQuotes + "\"";
+            return " title=\"" + messageWithoutDoubleQuotes + "\"";
         }
     }
 

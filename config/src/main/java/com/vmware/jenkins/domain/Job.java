@@ -37,6 +37,7 @@ public class Job extends BaseDbClass {
     private static final SimpleDateFormat START_TIME_TOOLTIP_FORMATTER = new SimpleDateFormat("MMM dd hh:mm aa");
 
     private static final SimpleDateFormat START_TIME_FORMATTER = new SimpleDateFormat("MMM dd");
+    private static final SimpleDateFormat START_TIME_WITH_YEAR_FORMATTER = new SimpleDateFormat("MMM dd yyyy");
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public String name;
@@ -144,18 +145,11 @@ public class Job extends BaseDbClass {
         return Collections.emptyList();
     }
 
-    public long failingTestCount(int lastFetchAmount, int numberOfFailuresNeededToBeConsistentlyFailing) {
+    public List<TestResult> failures(int lastFetchAmount, int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (testResults == null) {
-            return 0;
+            return Collections.emptyList();
         }
-        return createFailingTestsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing).size();
-    }
-
-    public long failingTestMethodCount(int lastFetchAmount, int numberOfFailuresNeededToBeConsistentlyFailing) {
-        if (testResults == null) {
-            return 0;
-        }
-        return createFailingTestMethodsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing).size();
+        return createFailingTestsList(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing);
     }
 
 
@@ -380,7 +374,7 @@ public class Job extends BaseDbClass {
     }
 
     public List<TestResult> createFailingTestsList(int maxJenkinsBuildsToCheck, int numberOfFailuresNeededToBeConsistentlyFailing) {
-        return createFailingTestsList(result -> !result.isSkippedConfigMethod(), result -> {
+        return createFailingTestsList(result -> {
             List<Map.Entry<Integer, TestResult.TestStatus>> builds = result.buildsToUse(maxJenkinsBuildsToCheck);
             if (builds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() >= numberOfFailuresNeededToBeConsistentlyFailing) {
                 return builds;
@@ -390,27 +384,12 @@ public class Job extends BaseDbClass {
         });
     }
 
-    public List<TestResult> createFailingTestMethodsList(int maxJenkinsBuildsToCheck, int numberOfFailuresNeededToBeConsistentlyFailing) {
-        return createFailingTestsList(result -> !Boolean.TRUE.equals(result.configMethod), result -> {
-            List<Map.Entry<Integer, TestResult.TestStatus>> builds = result.buildsToUse(maxJenkinsBuildsToCheck);
-            if (builds.stream().filter(entry -> !TestResult.TestStatus.isPass(entry.getValue())).count() >= numberOfFailuresNeededToBeConsistentlyFailing) {
-                return builds;
-            } else {
-                return Collections.emptyList();
-            }
-        });
-    }
-
-    public List<TestResult> latestFailingTests(int maxJenkinsBuildsToCheck) {
-        return createFailingTestsList(result -> !result.isSkippedConfigMethod(), result -> result.buildsToUse(maxJenkinsBuildsToCheck));
-    }
-
-    private List<TestResult> createFailingTestsList(Function<TestResult, Boolean> useTestResultFunction, Function<TestResult, List<Map.Entry<Integer, TestResult.TestStatus>>> buildsToUseFunction) {
+    private List<TestResult> createFailingTestsList(Function<TestResult, List<Map.Entry<Integer, TestResult.TestStatus>>> buildsToUseFunction) {
         List<JobBuild> buildsToCheck = savedBuilds != null ? savedBuilds : usefulBuilds;
         int buildNumberToUse = latestUsableBuildNumber();
         return testResults.stream().filter(result -> !TestResult.TestStatus.isPass(result.status))
                 .filter(result -> result.containsBuildNumbers(buildNumberToUse))
-                .filter(useTestResultFunction::apply)
+                .filter(result -> !result.isSkippedConfigMethod())
                 .peek(result -> {
                     List<Map.Entry<Integer, TestResult.TestStatus>> applicableBuilds = buildsToUseFunction.apply(result);
                     result.testRuns = applicableBuilds.stream().map(entry -> {
@@ -445,8 +424,10 @@ public class Job extends BaseDbClass {
             String titleAttribute = build.buildTimestamp > 0 ? String.format(" title=\"%s with commit %s\"",
                     START_TIME_TOOLTIP_FORMATTER.format(startDate), build.commitId) : "";
             String buildDateAndDuration;
+            SimpleDateFormat startTimeFormatterToUse = new Date().getTime() > (build.buildTimestamp + TimeUnit.DAYS.toMillis(90))
+                    ? START_TIME_WITH_YEAR_FORMATTER : START_TIME_FORMATTER;
             String jobDate = new Date().getTime() > (build.buildTimestamp + TimeUnit.DAYS.toMillis(daysOldToIncludeDate))
-                    ? "<b>" + START_TIME_FORMATTER.format(startDate) + "</b>": "";
+                    ? "<b>" + startTimeFormatterToUse.format(startDate) + "</b>": "";
             if (build.duration != null && build.duration > 0) {
                 long durationInHours = TimeUnit.MILLISECONDS.toHours(build.duration);
                 long durationInMinutes = TimeUnit.MILLISECONDS.toMinutes(build.duration - TimeUnit.HOURS.toMillis(durationInHours));
@@ -458,5 +439,10 @@ public class Job extends BaseDbClass {
         } else {
             return "";
         }
+    }
+
+    public String latestBuildDateTime() {
+        JobBuild build = CollectionUtils.isNotEmpty(savedBuilds) ? savedBuilds.get(0) : lastCompletedBuild;
+        return build != null ? String.valueOf(build.buildTimestamp) : "";
     }
 }

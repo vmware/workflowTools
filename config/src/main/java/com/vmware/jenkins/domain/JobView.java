@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,16 +111,13 @@ public class JobView extends BaseDbClass {
         return usableJobs;
     }
 
-    public long failingTestCount(int numberOfFailuresNeededToBeConsistentlyFailing) {
+    public List<TestResult> failures(int numberOfFailuresNeededToBeConsistentlyFailing) {
         if (!jobTestMap.isEmpty()) {
-            return jobTestMap.values().stream().mapToInt(List::size).sum();
+            return jobTestMap.values().stream().flatMap(Collection::stream).collect(toList());
         } else {
-            return Arrays.stream(jobs).mapToLong(job -> job.failingTestCount(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing)).sum();
+            return Arrays.stream(jobs).map(job -> job.failures(lastFetchAmount, numberOfFailuresNeededToBeConsistentlyFailing))
+                    .flatMap(Collection::stream).collect(toList());
         }
-    }
-
-    public long failingTestMethodCount() {
-        return Arrays.stream(jobs).mapToLong(job -> job.failingTestMethodCount(lastFetchAmount, 1)).sum();
     }
 
     public long totalTestMethodCount() {

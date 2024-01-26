@@ -178,6 +178,7 @@ public class DbUtils {
             }
 
         } catch (SQLException se) {
+            log.error("Failed to insert record, exists query was {} with params {}", existsQuery, existsQueryParams);
             throw new RuntimeException(se);
         }
     }

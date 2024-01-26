@@ -91,6 +91,7 @@ public class FindTestFailures extends BaseAction {
                 return serviceLocator.newJenkins();
             });
             homePage = serviceLocator.getJenkins().getHomePage();
+            Arrays.stream(homePage.views).forEach(HomePage.View::fixViewUrlIfNeeded);
         }
         List<HomePage.View> matchingViews = Arrays.stream(homePage.views).filter(view -> view.matches(jenkinsConfig.jenkinsView)).collect(toList());
 
@@ -183,9 +184,11 @@ public class FindTestFailures extends BaseAction {
         Comparator<HomePage.View> viewComparator = Comparator.comparing(HomePage.View::htmlFileName);
         String viewListingHtml = matchingViews.stream().sorted(viewComparator)
                 .map(HomePage.View::listHtmlFragment).collect(Collectors.joining("\n"));
-        long totalFailingTests = matchingViews.stream().mapToLong(view -> view.failingTestsCount).sum();
+        long totalFailures = matchingViews.stream().mapToLong(view -> view.failureCount).sum();
+        long totalSkips = matchingViews.stream().mapToLong(view -> view.skipCount).sum();
         String viewListingPage = new ClasspathResource("/testFailuresTemplate/viewListing.html", this.getClass()).getText();
-        viewListingPage = viewListingPage.replace("#failingTestCount", String.format("%,d", totalFailingTests));
+        viewListingPage = viewListingPage.replace("#failureCount", String.format("%,d", totalFailures));
+        viewListingPage = viewListingPage.replace("#skipCount", String.format("%,d", totalSkips));
         viewListingPage = viewListingPage.replace("#viewPattern", jenkinsConfig.jenkinsView);
 
         String footer = "";
@@ -221,10 +224,12 @@ public class FindTestFailures extends BaseAction {
             return;
         }
 
-        view.failingTestsCount = jobView.failingTestCount(jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
-        view.failingTestMethodsCount = jobView.failingTestMethodCount();
+        List<TestResult> failures = jobView.failures(jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
+        view.failureCount = failures.stream().filter(failure -> failure.status != TestResult.TestStatus.SKIP).count();
+        view.skipCount = failures.stream().filter(failure -> failure.status == TestResult.TestStatus.SKIP).count();
+        view.failingTestMethodsCount = failures.stream().filter(failure -> !Boolean.TRUE.equals(failure.configMethod)).count();
         view.totalTestMethodsCount = jobView.totalTestMethodCount();
-        log.info("{} failing tests found for view {}", view.failingTestsCount, view.name);
+        log.info("{} failing tests found for view {}", view.failureCount, view.name);
 
         createJobResultsHtmlPages(view, includeViewsLink, jobView.getJobTestMap());
         viewPadder.infoTitle();
@@ -261,7 +266,7 @@ public class FindTestFailures extends BaseAction {
 
         Map<Job, List<TestResult>> failingJobsWithNoTestFailures = jobTestResults.entrySet().stream()
                 .filter(entry -> CollectionUtils.isEmpty(entry.getValue()) && !entry.getKey().lastBuildWasSuccessful())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getKey().latestFailingTests(jenkinsConfig.maxJenkinsBuildsToCheck)));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getKey().createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck, 0)));
 
 
         List<String> failingJobsWithNoTestFailuresHtml = failingJobsWithNoTestFailures.entrySet().stream()
@@ -295,7 +300,7 @@ public class FindTestFailures extends BaseAction {
             footer += "<p/><a href=\"index.html\">Back</a><br/>";
         }
         double passingRate = view.totalTestMethodsCount > 0 ? ((view.totalTestMethodsCount - view.failingTestMethodsCount) / (double) view.totalTestMethodsCount) * 100 : 0;
-        footer +=  String.format("Generated at %s - %.2f%% pass rate (%,d tests failing out of %,d test methods)",
+        footer +=  String.format("Generated at %s - %.2f%% pass rate (%,d tests not passing out of %,d test methods)",
                 generationDate, passingRate, view.failingTestMethodsCount, view.totalTestMethodsCount);
         if (consistentFailuresJobsHtml.isEmpty() && failingJobsWithNoTestFailuresHtml.isEmpty()) {
             String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
@@ -306,7 +311,8 @@ public class FindTestFailures extends BaseAction {
             String failuresPage = new ClasspathResource("/testFailuresTemplate/testFailuresWebPage.html", this.getClass()).getText();
             resultsPage = failuresPage.replace("#viewName", view.name);
             resultsPage = resultsPage.replace("#viewUrl", view.url);
-            resultsPage = resultsPage.replace("#viewTotalFailures", String.valueOf(view.failingTestsCount));
+            resultsPage = resultsPage.replace("#viewTotalFailures", String.valueOf(view.failureCount));
+            resultsPage = resultsPage.replace("#viewTotalSkips", String.valueOf(view.skipCount));
             resultsPage = resultsPage.replace("#consistentFailuresJobsCount", String.valueOf(consistentFailuresJobsHtml.size()));
 
             resultsPage = resultsPage.replace("#body", String.join("\n", consistentFailuresJobsHtml));
@@ -433,22 +439,28 @@ public class FindTestFailures extends BaseAction {
         filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink(viewUrl));
         filledInJobFragment = filledInJobFragment.replace("#latestBuildLink", fullDetails.latestBuildLink(viewUrl, jenkinsConfig.daysOldForShowingJobDate));
         if (skippedTestCount > 0) {
-            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (" + pluralize(failedTestCount, "test")
+            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (" + pluralize(failedTestCount, "failure")
                     + ", " + pluralize(skippedTestCount, "skip") + ")");
+        } else if (failedTestCount > 0) {
+            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (" + pluralize(failedTestCount, "failure") + ")");
         } else {
-            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (" + pluralize(failedTestCount, "test") + ")");
+            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name);
         }
 
         filledInJobFragment = filledInJobFragment.replace("#totalFailingCount", String.valueOf(failingMethods.size()));
         filledInJobFragment = filledInJobFragment.replace("#skippedTestCount", String.valueOf(skippedTestCount));
         filledInJobFragment = filledInJobFragment.replace("#failingTestCount", String.valueOf(failedTestCount));
+        filledInJobFragment = filledInJobFragment.replace("#dateTime", fullDetails.latestBuildDateTime());
 
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);
 
         StringBuilder rowBuilder = new StringBuilder();
         int index = 0;
-        for (TestResult method : failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)
-                .thenComparingInt(testResult -> testResult.executionOrder(jenkinsConfig.beforeConfigMethodPattern, jenkinsConfig.afterConfigMethodPattern))).collect(toList())) {
+
+        List<TestResult> sortedMethods = failingMethods.stream().sorted(comparingLong(TestResult::getStartedAt)
+                .thenComparingInt(testResult -> testResult.executionOrder(jenkinsConfig.beforeConfigMethodPattern, jenkinsConfig.afterConfigMethodPattern))).collect(toList());
+
+        for (TestResult method : sortedMethods)  {
             String filledInRow = rowFragment.replace("#testName", method.fullTestNameForDisplay());
             filledInRow = filledInRow.replace("#testResultLinks", method.testLinks(viewUrl, jenkinsConfig.commitComparisonUrl));
             filledInRow = filledInRow.replace("#itemId", "item-" + jobIndex + "-" + index++);
