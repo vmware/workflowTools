@@ -264,17 +264,18 @@ public class FindTestFailures extends BaseAction {
                 .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        Map<Job, List<TestResult>> failingJobsWithNoTestFailures = jobTestResults.entrySet().stream()
+        Map<Job, List<TestResult>> failingJobsWithNoFailures = jobTestResults.entrySet().stream()
                 .filter(entry -> CollectionUtils.isEmpty(entry.getValue()) && !entry.getKey().lastBuildWasSuccessful())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getKey().createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck, 0)));
 
 
-        List<String> failingJobsWithNoTestFailuresHtml = failingJobsWithNoTestFailures.entrySet().stream()
+        List<String> failingJobsWithNoFailuresHtml = failingJobsWithNoFailures.entrySet().stream()
                 .map(entry -> createJobFragment(counter.getAndIncrement(), view.url, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-        view.failingJobsWithNoTestFailuresCount = failingJobsWithNoTestFailures.size();
+        view.failingJobsWithNoFailuresCount = failingJobsWithNoFailures.size();
 
-        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml, failingJobsWithNoTestFailuresHtml, jobsPassingHtml);
+        log.info("Creating results html page for view " + view.name);
+        String resultsPage = createTestResultsHtmlPage(view, includeViewsLink, jobsResultsHtml, failingJobsWithNoFailuresHtml, jobsPassingHtml);
 
         File destinationFile = new File(fileSystemConfig.destinationFile);
         if (destinationFile.exists() && destinationFile.isDirectory()) {
@@ -288,7 +289,7 @@ public class FindTestFailures extends BaseAction {
     }
 
     private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, List<String> consistentFailuresJobsHtml,
-                                             List<String> failingJobsWithNoTestFailuresHtml, List<String> jobsPassingHtml) {
+                                             List<String> failingJobsWithNoFailuresHtml, List<String> jobsPassingHtml) {
         String resultsPage;
         String footer = "";
         if (StringUtils.isNotBlank(jenkinsConfig.testMethodNameSearchUrl)) {
@@ -302,7 +303,7 @@ public class FindTestFailures extends BaseAction {
         double passingRate = view.totalTestMethodsCount > 0 ? ((view.totalTestMethodsCount - view.failingTestMethodsCount) / (double) view.totalTestMethodsCount) * 100 : 0;
         footer +=  String.format("Generated at %s - %.2f%% pass rate (%,d tests not passing out of %,d test methods)",
                 generationDate, passingRate, view.failingTestMethodsCount, view.totalTestMethodsCount);
-        if (consistentFailuresJobsHtml.isEmpty() && failingJobsWithNoTestFailuresHtml.isEmpty()) {
+        if (consistentFailuresJobsHtml.isEmpty() && failingJobsWithNoFailuresHtml.isEmpty()) {
             String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
             resultsPage = allPassedPage.replace("#viewName", view.name);
             resultsPage = resultsPage.replace("#viewUrl", view.url);
@@ -317,8 +318,8 @@ public class FindTestFailures extends BaseAction {
 
             resultsPage = resultsPage.replace("#body", String.join("\n", consistentFailuresJobsHtml));
 
-            resultsPage = resultsPage.replace("#failingJobsWithNoTestFailuresCount", String.valueOf(failingJobsWithNoTestFailuresHtml.size()));
-            resultsPage = resultsPage.replace("#failingJobsWithNoTestFailures", String.join("\n", failingJobsWithNoTestFailuresHtml));
+            resultsPage = resultsPage.replace("#failingJobsWithNoFailuresCount", String.valueOf(failingJobsWithNoFailuresHtml.size()));
+            resultsPage = resultsPage.replace("#failingJobsWithNoFailures", String.join("\n", failingJobsWithNoFailuresHtml));
             resultsPage = resultsPage.replace("#passingJobsCount", String.valueOf(jobsPassingHtml.size()));
             resultsPage = resultsPage.replace("#passingJobs", String.join("\n", jobsPassingHtml));
 
@@ -439,17 +440,17 @@ public class FindTestFailures extends BaseAction {
         filledInJobFragment = filledInJobFragment.replace("#runningBuildLink", fullDetails.runningBuildLink(viewUrl));
         filledInJobFragment = filledInJobFragment.replace("#latestBuildLink", fullDetails.latestBuildLink(viewUrl, jenkinsConfig.daysOldForShowingJobDate));
         if (skippedTestCount > 0) {
-            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (" + pluralize(failedTestCount, "failure")
-                    + ", " + pluralize(skippedTestCount, "skip") + ")");
+            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (<em>" + pluralize(failedTestCount, "failure")
+                    + ", " + pluralize(skippedTestCount, "skip") + "</em>)");
         } else if (failedTestCount > 0) {
-            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (" + pluralize(failedTestCount, "failure") + ")");
+            filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name + " (<em>" + pluralize(failedTestCount, "failure") + "</em>)");
         } else {
             filledInJobFragment = filledInJobFragment.replace("#jobLabel", fullDetails.name);
         }
 
-        filledInJobFragment = filledInJobFragment.replace("#totalFailingCount", String.valueOf(failingMethods.size()));
-        filledInJobFragment = filledInJobFragment.replace("#skippedTestCount", String.valueOf(skippedTestCount));
-        filledInJobFragment = filledInJobFragment.replace("#failingTestCount", String.valueOf(failedTestCount));
+        filledInJobFragment = filledInJobFragment.replace("#totalNonPassingCount", String.valueOf(failingMethods.size()));
+        filledInJobFragment = filledInJobFragment.replace("#skippedCount", String.valueOf(skippedTestCount));
+        filledInJobFragment = filledInJobFragment.replace("#failingCount", String.valueOf(failedTestCount));
         filledInJobFragment = filledInJobFragment.replace("#dateTime", fullDetails.latestBuildDateTime());
 
         filledInJobFragment = filledInJobFragment.replace("#itemId", "item-" + jobIndex);

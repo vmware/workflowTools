@@ -66,7 +66,7 @@ public class HomePage {
         public long totalTestMethodsCount;
 
         @Expose(serialize = false, deserialize = false)
-        public long failingJobsWithNoTestFailuresCount;
+        public long failingJobsWithNoFailuresCount;
 
         public Exception failingTestsGenerationException;
 
@@ -86,8 +86,8 @@ public class HomePage {
         public String viewNameWithFailureCount() {
             if (failingTestsGenerationException != null) {
                 return name + " (failed with error " + StringUtils.truncateStringIfNeeded(failingTestsGenerationException.getMessage(), 80) + ")";
-            } else if ((failureCount == 0 && skipCount == 0) && failingJobsWithNoTestFailuresCount > 0) {
-                return name + " (" + pluralize(failingJobsWithNoTestFailuresCount, "job failure") + ")";
+            } else if ((failureCount == 0 && skipCount == 0) && failingJobsWithNoFailuresCount > 0) {
+                return name + " (" + pluralize(failingJobsWithNoFailuresCount, "job failure") + ")";
             } else if (failureCount == 0 && skipCount == 0) {
                 return name + " (all green!)";
             } else {

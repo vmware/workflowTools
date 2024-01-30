@@ -174,10 +174,14 @@
                 }
             }
         }
+
+        em {
+            font-style: normal;
+        }
     </style>
     <script>
 
-        var defaultJobList = [];
+        let defaultJobList = [];
 
         function compareByValue(a, b, attributeName) {
             const aValue = parseInt(a.getAttribute(attributeName));
@@ -186,90 +190,219 @@
         }
 
         function sortJobs(sortOption) {
-            var jobsContainer = document.getElementById("jobList");
-            var failingJobsWithNoTestFailures =  document.getElementById("failingJobsWithNoTestFailuresItem");
+            let jobsContainer = document.getElementById("jobList");
+            let failingJobsWithNoFailures =  document.getElementById("failingJobsWithNoFailuresItem");
 
-            var jobsList = [];
-            for (var i = 0; i < defaultJobList.length; i++) {
-                jobsList[i] = defaultJobList[i];
+            let jobsList = [];
+            let jobCounter = 0;
+            for (let i = 0; i < defaultJobList.length; i++) {
+                if (defaultJobList[i].style.display !== 'none') {
+                    jobsList[jobCounter++] = defaultJobList[i];
+                }
             }
             console.log(jobsList.length + " jobs found for sorting by " + sortOption);
 
-            if (sortOption === 'totalFailureAsc') {
-                jobsList.sort(function (a,b) { return compareByValue(a, b, "totalFailingCount")});
-            } else if (sortOption === 'totalFailureDesc') {
-                jobsList.sort(function (a,b) { return compareByValue(b, a, "totalFailingCount")});
-            } else if (sortOption === 'testFailureAsc') {
-                jobsList.sort(function (a,b) { return compareByValue(a, b, "failingTestCount")});
-            } else if (sortOption === 'testFailureDesc') {
-                jobsList.sort(function (a,b) { return compareByValue(b, a, "failingTestCount")});
+            if (sortOption === 'totalNonPassingAsc') {
+                jobsList.sort(function (a,b) { return compareByValue(a, b, "totalNonPassingCount")});
+            } else if (sortOption === 'totalNonPassingDesc') {
+                jobsList.sort(function (a,b) { return compareByValue(b, a, "totalNonPassingCount")});
+            } else if (sortOption === 'failureAsc') {
+                jobsList.sort(function (a,b) { return compareByValue(a, b, "failingCount")});
+            } else if (sortOption === 'failureDesc') {
+                jobsList.sort(function (a,b) { return compareByValue(b, a, "failingCount")});
             } else if (sortOption === 'skipAsc') {
-                jobsList.sort(function (a,b) { return compareByValue(a, b, "skippedTestCount")});
+                jobsList.sort(function (a,b) { return compareByValue(a, b, "skippedCount")});
             } else if (sortOption === 'skipDesc') {
-                jobsList.sort(function (a,b) { return compareByValue(b, a, "skippedTestCount")});
+                jobsList.sort(function (a,b) { return compareByValue(b, a, "skippedCount")});
             } else if (sortOption === 'dateAsc') {
                 jobsList.sort(function (a,b) { return compareByValue(a, b, "dateTime")});
             } else if (sortOption === 'dateDesc') {
                 jobsList.sort(function (a,b) { return compareByValue(b, a, "dateTime")});
             }
 
-            for (var x = 0; x < jobsList.length; x++) {
-                jobsContainer.insertBefore(jobsList[x], failingJobsWithNoTestFailures);
+            for (let x = 0; x < jobsList.length; x++) {
+                jobsContainer.insertBefore(jobsList[x], failingJobsWithNoFailures);
             }
 
         }
 
+        function methodShouldBeShown(filterOption, latestResultIndex, firstNonPassIndex, lastPassIndex) {
+            if (filterOption === 'allNonPassing') {
+                return true;
+            } else if (filterOption === 'newNonPassing' && firstNonPassIndex === latestResultIndex) {
+                return true;
+            } else if (filterOption === 'recentNonPassing' && firstNonPassIndex > lastPassIndex && latestResultIndex - firstNonPassIndex <= 1) {
+                return true;
+            } else if (filterOption === 'consistentlyFailing' && latestResultIndex - lastPassIndex > 1) {
+                return true;
+            } else if (filterOption === 'inconsistentlyFailing' && latestResultIndex - lastPassIndex === 1 && firstNonPassIndex < lastPassIndex) {
+                return true;
+            } else if (filterOption === 'neverPassed' && lastPassIndex === -1) {
+                return true;
+            } else if (filterOption === 'notPassingForLongTime' && lastPassIndex > -1 && latestResultIndex - lastPassIndex > (latestResultIndex - 2)) {
+                return true;
+            }
+            return false;
+        }
+
+        function filterMethods(filterOption) {
+            console.log('Filtering by ' + filterOption);
+            let jobsContainer = document.getElementById("jobList");
+            let jobs = jobsContainer.getElementsByClassName('jobItem');
+            let viewFailCount = 0, viewSkipCount = 0, jobCount = 0;
+            for (const job of jobs) {
+                const failingMethods = job.getElementsByClassName("failingMethod");
+                let jobFailCount = 0, jobSkipCount = 0;
+
+                for (const failingMethod of failingMethods) {
+                    const methodLinks = failingMethod.getElementsByTagName("a");
+
+                    let latestIndex = -1, firstNonPassIndex = -1, lastPassIndex = -1, lastFailIndex = -1, lastSkipIndex = -1;
+                    for (const methodLink of methodLinks) {
+                        //console.log(index + ' ' + methodLink.innerText);
+                        if (methodLink.className === 'presumedTestPass' || methodLink.className === 'testPass') {
+                            latestIndex++;
+                            lastPassIndex = latestIndex;
+                        } else if (methodLink.className === 'testFail') {
+                            latestIndex++;
+                            lastFailIndex = latestIndex;
+                            if (firstNonPassIndex === -1) {
+                                firstNonPassIndex = latestIndex;
+                            }
+                        } else if (methodLink.className === 'testSkip') {
+                            latestIndex++;
+                            lastSkipIndex = latestIndex;
+                            if (firstNonPassIndex === -1) {
+                                firstNonPassIndex = latestIndex;
+                            }
+                        }
+                    }
+                    let showMethod = methodShouldBeShown(filterOption, latestIndex, firstNonPassIndex, lastPassIndex);
+
+                    if (showMethod) {
+                        failingMethod.style.display = 'block';
+                        if (lastFailIndex > lastSkipIndex) {
+                            jobFailCount++;
+                        } else {
+                            jobSkipCount++;
+                        }
+                    } else {
+                        failingMethod.style.display = 'none';
+                    }
+                }
+                job.setAttribute('totalNonPassingCount', String(jobFailCount + jobSkipCount));
+                job.setAttribute('failingCount', String(jobFailCount));
+                job.setAttribute('skippedCount', String(jobSkipCount));
+                if (jobFailCount + jobSkipCount > 0) {
+                     let failSkipCountTag = job.getElementsByTagName("em")[0];
+                     if (jobSkipCount > 0) {
+                         failSkipCountTag.innerHTML = pluralize(jobFailCount, 'failure') + ', ' + pluralize(jobSkipCount, 'skip');
+                     } else {
+                         failSkipCountTag.innerHTML = pluralize(jobFailCount, 'failure');
+                     }
+                    job.style.display = 'block';
+                    viewFailCount += jobFailCount;
+                    viewSkipCount += jobSkipCount;
+                    jobCount++;
+                } else {
+                    job.style.display = 'none';
+                }
+            }
+
+            let viewFailSkipCounts = document.getElementById('viewFailSkipCounts');
+            viewFailSkipCounts.innerHTML = pluralize(viewFailCount, 'failure') + ' / ' + pluralize(viewSkipCount, 'skip') + ' in ' + pluralize(jobCount, 'job');
+        }
+
+        function pluralize(value, suffix) {
+            if (value ===  1) {
+                return value + ' ' + suffix;
+            } else {
+                return value + ' ' + suffix + 's';
+            }
+        }
+
         function sortOptionChange() {
-            var jobSortOptions = document.getElementById("jobSortOptions");
+            let jobSortOptions = document.getElementById("jobSortOptions");
             sortJobs(jobSortOptions.value);
             if (localStorage) {
                 localStorage.setItem("testFailures.sortOption", jobSortOptions.value);
             }
         }
 
+        function filterOptionChange() {
+            let filterMethodOptions = document.getElementById("filterMethodOptions");
+            filterMethods(filterMethodOptions.value);
+            if (localStorage) {
+                localStorage.setItem("testFailures.filterMethodOption", filterMethodOptions.value);
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
-            var jobSortOptions = document.getElementById("jobSortOptions");
-            var sortOption = localStorage ? localStorage.getItem("testFailures.sortOption") : undefined;
+            let filterMethodOptions = document.getElementById("filterMethodOptions");
+            let filterOption = localStorage ? localStorage.getItem("testFailures.filterMethodOption") : undefined;
+            if (filterOption) {
+                filterMethodOptions.value = filterOption;
+            }
+
+            let jobSortOptions = document.getElementById("jobSortOptions");
+            let sortOption = localStorage ? localStorage.getItem("testFailures.sortOption") : undefined;
             if (sortOption) {
                 jobSortOptions.value = sortOption;
             }
-            var jobsContainer = document.getElementById("jobList");
-            var jobs = jobsContainer.getElementsByClassName("jobItem");
-            for (var i = 0; i < jobs.length; i++) {
+            let jobsContainer = document.getElementById("jobList");
+            let jobs = jobsContainer.getElementsByClassName("jobItem");
+            for (let i = 0; i < jobs.length; i++) {
                 defaultJobList[i] = jobs[i];
             }
-            if (sortOption && sortOption !== 'name') {
+
+            if (filterOption && filterOption !== 'allNonPassing') {
+                filterMethods(filterOption);
+            }
+            
+            if (sortOption && sortOption !== 'default') {
                 sortJobs(sortOption)
             }
 
-            var jobLoadingText = document.getElementById("jobLoadingText");
+            let jobLoadingText = document.getElementById("jobLoadingText");
             jobLoadingText.style.display = "none";
             jobsContainer.style.display = "block";
             jobSortOptions.style.visibility = "visible";
+            filterMethodOptions.style.visibility = "visible";
         });
     </script>
 
 </head>
 <body>
-<h2><a href = "#viewUrl">#viewName</a> (#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs)
+<h2><a href = "#viewUrl">#viewName</a> (<em id="viewFailSkipCounts">#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs</em>)
 <select id="jobSortOptions" onchange="sortOptionChange()" style="visibility: hidden">
-    <option value="default">By Default</option>
-    <option value="totalFailureDesc">By Total Failures</option>
-    <option value="testFailureDesc">By Test Failures</option>
-    <option value="skipDesc">By Skips</option>
-    <option value="dateDesc">By Date</option>
-    <option value="totalFailureAsc">By Total Failures Ascending</option>
-    <option value="testFailureAsc">By Test Failures Ascending</option>
-    <option value="skipAsc">By Skips Ascending</option>
-    <option value="dateAsc">By Date Ascending</option>
+    <option disabled> -- Sort Jobs By -- </option>
+    <option value="default">Default Sort</option>
+    <option value="totalNonPassingDesc">Total Non Passing</option>
+    <option value="failureDesc">Failures</option>
+    <option value="skipDesc">Skips</option>
+    <option value="dateDesc">Date</option>
+    <option value="totalNonPassingAsc">Total Non Passing Ascending</option>
+    <option value="failureAsc">Failures Ascending</option>
+    <option value="skipAsc">Skips Ascending</option>
+    <option value="dateAsc">Date Ascending</option>
+</select>
+<select id="filterMethodOptions" onchange="filterOptionChange()" style="visibility: hidden">
+    <option disabled> -- Filter Results By -- </option>
+    <option value="allNonPassing">All failures / skips</option>
+    <option value="newNonPassing">New failures / skips</option>
+    <option value="recentNonPassing">Recent failures / skips</option>
+    <option value="consistentlyFailing">Consistently Not Passing</option>
+    <option value="inconsistentlyFailing">Inconsistently Not Passing</option>
+    <option value="neverPassed">Never Passed</option>
+    <option value="notPassingForLongTime">Not Passing For Long Time</option>
 </select>
 </h2>
 <h3 id="jobLoadingText">LOADING...</h3>
 <ul id="jobList" class="css-treeview" style="display: none">
     #body
-    <li id="failingJobsWithNoTestFailuresItem"><input type="checkbox" id="failingJobsWithNoTestFailures" /><label for="failingJobsWithNoTestFailures"><b>#failingJobsWithNoTestFailuresCount Failing Jobs with no test failures</b></label>
+    <li id="failingJobsWithNoFailuresItem"><input type="checkbox" id="failingJobsWithNoFailures" /><label for="failingJobsWithNoFailures"><b>#failingJobsWithNoFailuresCount Failing Jobs with no test failures</b></label>
         <ul>
-            #failingJobsWithNoTestFailures
+            #failingJobsWithNoFailures
         </ul>
     </li>
     <li id="passingJobsItem"><input type="checkbox" id="passingJobs" /><label for="passingJobs"><b>#passingJobsCount Passing Jobs</b></label>
