@@ -294,12 +294,12 @@
                 job.setAttribute('failingCount', String(jobFailCount));
                 job.setAttribute('skippedCount', String(jobSkipCount));
                 if (jobFailCount + jobSkipCount > 0) {
-                     let failSkipCountTag = job.getElementsByTagName("em")[0];
-                     if (jobSkipCount > 0) {
-                         failSkipCountTag.innerHTML = pluralize(jobFailCount, 'failure') + ', ' + pluralize(jobSkipCount, 'skip');
-                     } else {
-                         failSkipCountTag.innerHTML = pluralize(jobFailCount, 'failure');
-                     }
+                    let failSkipCountTag = job.getElementsByTagName("em")[0];
+                    if (jobSkipCount > 0) {
+                        failSkipCountTag.innerHTML = pluralize(jobFailCount, 'failure') + ', ' + pluralize(jobSkipCount, 'skip');
+                    } else {
+                        failSkipCountTag.innerHTML = pluralize(jobFailCount, 'failure');
+                    }
                     job.style.display = 'block';
                     viewFailCount += jobFailCount;
                     viewSkipCount += jobSkipCount;
@@ -310,7 +310,7 @@
             }
 
             let viewFailSkipCounts = document.getElementById('viewFailSkipCounts');
-            viewFailSkipCounts.innerHTML = pluralize(viewFailCount, 'failure') + ' / ' + pluralize(viewSkipCount, 'skip') + ' in ' + pluralize(jobCount, 'job');
+            viewFailSkipCounts.innerHTML = '(' + pluralize(viewFailCount, 'failure') + ' / ' + pluralize(viewSkipCount, 'skip') + ' in ' + pluralize(jobCount, 'job') + ')';
         }
 
         function pluralize(value, suffix) {
@@ -337,15 +337,69 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
+        function showContent() {
             let filterMethodOptions = document.getElementById("filterMethodOptions");
-            let filterOption = localStorage ? localStorage.getItem("testFailures.filterMethodOption") : undefined;
+            let jobSortOptions = document.getElementById("jobSortOptions");
+            let jobsContainer = document.getElementById("jobList");
+            let jobLoadingText = document.getElementById("jobLoadingText");
+            if (jobLoadingText.style.display === 'none') {
+                console.log("Content already shown");
+                return;
+            }
+            console.log("Showing content");
+            jobLoadingText.style.display = "none";
+            jobsContainer.style.display = "block";
+            jobSortOptions.style.visibility = "visible";
+            filterMethodOptions.style.visibility = "visible";
+            let viewFailSkipCounts = document.getElementById('viewFailSkipCounts');
+            viewFailSkipCounts.style.visibility = 'visible';
+        }
+
+        function showContentIfDefaultValues() {
+            console.log('Checking if localStorage values are defaults')
+            if (localStorage) {
+                let sortOption = localStorage.getItem("testFailures.sortOption");
+                let filterOption = localStorage.getItem("testFailures.filterMethodOption");
+                console.log('Sort option: ' + sortOption + ', filter option: ' + filterOption);
+                if ((sortOption === null || sortOption === 'default') && (filterOption === null || filterOption === 'allNonPassing')) {
+                    showContent();
+                }
+            } else {
+                showContent();
+            }
+        }
+
+        function waitForElm(selector) {
+            return new Promise(resolve => {
+                if (document.querySelector(selector)) {
+                    return resolve(document.querySelector(selector));
+                }
+
+                const observer = new MutationObserver(mutations => {
+                    if (document.querySelector(selector)) {
+                        observer.disconnect();
+                        resolve(document.querySelector(selector));
+                    }
+                });
+
+                // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+                observer.observe(document.documentElement, {
+                    childList: true,
+                    subtree: true
+                });
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("DOM Content Loaded");
+            let filterMethodOptions = document.getElementById("filterMethodOptions");
+            let filterOption = localStorage ? localStorage.getItem("testFailures.filterMethodOption") : null;
             if (filterOption) {
                 filterMethodOptions.value = filterOption;
             }
 
             let jobSortOptions = document.getElementById("jobSortOptions");
-            let sortOption = localStorage ? localStorage.getItem("testFailures.sortOption") : undefined;
+            let sortOption = localStorage ? localStorage.getItem("testFailures.sortOption") : null;
             if (sortOption) {
                 jobSortOptions.value = sortOption;
             }
@@ -362,35 +416,35 @@
             if (sortOption && sortOption !== 'default') {
                 sortJobs(sortOption)
             }
-
-            let jobLoadingText = document.getElementById("jobLoadingText");
-            jobLoadingText.style.display = "none";
-            jobsContainer.style.display = "block";
-            jobSortOptions.style.visibility = "visible";
-            filterMethodOptions.style.visibility = "visible";
+            showContent();
         });
+
+        waitForElm('.css-treeview').then((elm) => {
+            showContentIfDefaultValues();
+        });
+
     </script>
 
 </head>
 <body>
-<h2><a href = "#viewUrl">#viewName</a> (<em id="viewFailSkipCounts">#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs</em>)
+<h2><a href = "#viewUrl">#viewName</a> <em id="viewFailSkipCounts" style="visibility: hidden">(#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs)</em>
 <select id="jobSortOptions" onchange="sortOptionChange()" style="visibility: hidden">
     <option disabled> -- Sort Jobs By -- </option>
     <option value="default">Default Sort</option>
-    <option value="totalNonPassingDesc">Total Non Passing</option>
+    <option value="totalNonPassingDesc">Total Failures / Skips</option>
     <option value="failureDesc">Failures</option>
     <option value="skipDesc">Skips</option>
     <option value="dateDesc">Date</option>
-    <option value="totalNonPassingAsc">Total Non Passing Ascending</option>
+    <option value="totalNonPassingAsc">Total Failures / Skips Ascending</option>
     <option value="failureAsc">Failures Ascending</option>
     <option value="skipAsc">Skips Ascending</option>
     <option value="dateAsc">Date Ascending</option>
 </select>
 <select id="filterMethodOptions" onchange="filterOptionChange()" style="visibility: hidden">
     <option disabled> -- Filter Results By -- </option>
-    <option value="allNonPassing">All failures / skips</option>
-    <option value="newNonPassing">New failures / skips</option>
-    <option value="recentNonPassing">Recent failures / skips</option>
+    <option value="allNonPassing">All Failures / Skips</option>
+    <option value="newNonPassing">New Failures / Skips</option>
+    <option value="recentNonPassing">Recent Failures / Skips</option>
     <option value="consistentlyFailing">Consistently Not Passing</option>
     <option value="inconsistentlyFailing">Inconsistently Not Passing</option>
     <option value="neverPassed">Never Passed</option>
