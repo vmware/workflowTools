@@ -9,7 +9,7 @@ import com.vmware.util.UrlUtils;
 @ActionDescription("Copies the review board url to the clipboard. Handy for pasting it into a browser.")
 public class CopyReviewUrlToClipboard extends BaseCommitUsingReviewBoardAction {
     public CopyReviewUrlToClipboard(WorkflowConfig config) {
-        super(config);
+        super(config, false);
     }
 
 

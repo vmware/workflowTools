@@ -338,15 +338,16 @@
         }
 
         function showContent() {
-            let filterMethodOptions = document.getElementById("filterMethodOptions");
-            let jobSortOptions = document.getElementById("jobSortOptions");
             let jobsContainer = document.getElementById("jobList");
-            let jobLoadingText = document.getElementById("jobLoadingText");
-            if (jobLoadingText.style.display === 'none') {
+            if (jobsContainer.style.display === 'block') {
                 console.log("Content already shown");
                 return;
             }
             console.log("Showing content");
+            let jobLoadingText = document.getElementById("jobLoadingText");
+            let filterMethodOptions = document.getElementById("filterMethodOptions");
+            let jobSortOptions = document.getElementById("jobSortOptions");
+
             jobLoadingText.style.display = "none";
             jobsContainer.style.display = "block";
             jobSortOptions.style.visibility = "visible";
@@ -454,7 +455,7 @@
 <h3 id="jobLoadingText">LOADING...</h3>
 <ul id="jobList" class="css-treeview" style="display: none">
     #body
-    <li id="failingJobsWithNoFailuresItem"><input type="checkbox" id="failingJobsWithNoFailures" /><label for="failingJobsWithNoFailures"><b>#failingJobsWithNoFailuresCount Failing Jobs with no test failures</b></label>
+    <li id="failingJobsWithNoFailuresItem" #failingJobsWithNoFailuresItemStyle><input type="checkbox" id="failingJobsWithNoFailures" /><label for="failingJobsWithNoFailures"><b>#failingJobsWithNoFailuresCount Failing Jobs with no test failures</b></label>
         <ul>
             #failingJobsWithNoFailures
         </ul>

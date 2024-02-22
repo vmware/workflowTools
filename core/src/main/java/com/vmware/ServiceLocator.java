@@ -19,6 +19,7 @@ import com.vmware.util.scm.Git;
 import com.vmware.util.scm.Perforce;
 import com.vmware.trello.Trello;
 import com.vmware.vcd.Vcd;
+import org.slf4j.LoggerFactory;
 
 /**
  * Centralized locator for git, perforce, jenkins, jira, reviewboard and trello instances.
@@ -48,7 +49,9 @@ public class ServiceLocator {
 
     private Vcd vcd;
 
-    private WorkflowConfig config;
+    private RuntimeException reviewBoardException;
+
+    private final WorkflowConfig config;
 
     public ServiceLocator(WorkflowConfig config) {
         this.config = config;
@@ -69,11 +72,21 @@ public class ServiceLocator {
     }
 
     public ReviewBoard getReviewBoard() {
+        if (reviewBoardException != null) {
+            LoggerFactory.getLogger(this.getClass()).debug(reviewBoardException.getMessage(), reviewBoardException);
+            return null;
+        }
         if (reviewBoard == null) {
-            reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType());
-            if (reviewBoard.isConnectionAuthenticated()) {
-                reviewBoard.updateClientTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
+            try {
+                reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType());
+                if (reviewBoard.isConnectionAuthenticated()) {
+                    reviewBoard.updateClientTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
+                }
+            } catch (RuntimeException re) {
+                this.reviewBoardException = re;
+                LoggerFactory.getLogger(this.getClass()).debug(reviewBoardException.getMessage(), reviewBoardException);
             }
+
         }
         return reviewBoard;
     }
@@ -147,6 +160,10 @@ public class ServiceLocator {
             github = new Github(config.githubConfig.githubUrl, config.username);
         }
         return github;
+    }
+
+    public RuntimeException getReviewBoardException() {
+        return reviewBoardException;
     }
 
     public ApiAuthentication reviewBoardCredentialsType() {

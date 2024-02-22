@@ -4,6 +4,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.util.StringUtils;
+import com.vmware.util.exception.FatalException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +13,7 @@ public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBo
 
 
     public BaseSetShipItReviewersList(WorkflowConfig config) {
-        super(config);
+        super(config, false);
     }
 
     protected void checkShipItsForReview(ReviewRequestDraft draft) {
@@ -27,6 +28,10 @@ public abstract class BaseSetShipItReviewersList extends BaseCommitUsingReviewBo
         if (!draft.reviewRequest.isPublic) {
             log.info("Review has not been published yet");
             return;
+        }
+
+        if (serviceLocator.getReviewBoardException() != null) {
+            throw new FatalException("ReviewBoard is not responding so cannot check ship its", serviceLocator.getReviewBoardException());
         }
 
         UserReview[] reviews = reviewBoard.getReviewsForReviewRequest(draft.reviewRequest.getReviewsLink());

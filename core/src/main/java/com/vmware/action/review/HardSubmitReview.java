@@ -10,7 +10,7 @@ import com.vmware.reviewboard.domain.ReviewRequestStatus;
 public class HardSubmitReview extends BaseCommitUsingReviewBoardAction {
 
     public HardSubmitReview(WorkflowConfig config) {
-        super(config);
+        super(config, false);
     }
 
     @Override

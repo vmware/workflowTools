@@ -10,7 +10,7 @@ import com.vmware.reviewboard.domain.UserReview;
 @ActionDescription("For the associated review, adds a comment to review board that the review has been submitted. Leaves the review open for further reviews.")
 public class SoftSubmitReview extends BaseCommitUsingReviewBoardAction {
     public SoftSubmitReview(WorkflowConfig config) {
-        super(config);
+        super(config, false);
     }
 
     @Override

@@ -39,7 +39,7 @@ public class OpenSshShell extends BaseSshAction {
             channel = (ChannelShell) session.openChannel("shell");
             channel.setInputStream(new BufferedInputStream(System.in), true);
             channel.setOutputStream(System.out);
-            channel.setPtySize(150, 24, 640, 600);
+            channel.setPtySize(150, 60, 640, 1200);
             channel.connect((int) TimeUnit.SECONDS.toMillis(30));
 
             waitForChannelToFinish(channel);

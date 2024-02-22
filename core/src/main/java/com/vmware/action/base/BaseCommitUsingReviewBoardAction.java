@@ -14,30 +14,35 @@ import com.vmware.util.exception.FatalException;
 
 public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithReviewAction {
     protected ReviewBoard reviewBoard;
-    private RuntimeException reviewBoardException;
+    private final boolean failIfReviewBoardIsDown;
 
     public BaseCommitUsingReviewBoardAction(WorkflowConfig config) {
+        this(config, true);
+    }
+
+    public BaseCommitUsingReviewBoardAction(WorkflowConfig config, boolean failIfReviewBoardIsDown) {
         super(config);
+        this.failIfReviewBoardIsDown = failIfReviewBoardIsDown;
     }
 
     @Override
     public void asyncSetup() {
-        try {
-            reviewBoard = serviceLocator.getReviewBoard();
-        } catch (FatalException | InternalServerException re) {
-            this.reviewBoardException = re;
-        }
+        reviewBoard = serviceLocator.getReviewBoard();
     }
 
     @Override
-    protected void failWorkflowIfConditionNotMet() {
-        if (reviewBoardException != null) {
-            throw reviewBoardException;
+    public void checkIfWorkflowShouldBeFailed() {
+        super.checkIfWorkflowShouldBeFailed();
+        if (failIfReviewBoardIsDown && serviceLocator.getReviewBoardException() != null) {
+            throw new FatalException("Cannot continue as ReviewBoard is down", serviceLocator.getReviewBoardException());
         }
     }
 
     @Override
     public void preprocess() {
+        if (serviceLocator.getReviewBoardException() != null) {
+            return;
+        }
         reviewBoard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
         if (draft != null && StringUtils.isInteger(draft.id) && draft.reviewRequest == null) {
             draft.reviewRequest = reviewBoard.getReviewRequestById(Integer.parseInt(draft.id));

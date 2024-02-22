@@ -216,7 +216,7 @@ public class FindTestFailures extends BaseAction {
         log.info("Checking {} jobs for failures", jobView.jobs.length);
 
         try {
-            addFailingTestForView(jobView);
+            addFailingTestsForView(jobView);
         } catch (Exception e) {
             log.error("Failed to create page for view {}\n{}", view.name, StringUtils.exceptionAsString(e));
             view.failingTestsGenerationException = e;
@@ -319,7 +319,10 @@ public class FindTestFailures extends BaseAction {
             resultsPage = resultsPage.replace("#body", String.join("\n", consistentFailuresJobsHtml));
 
             resultsPage = resultsPage.replace("#failingJobsWithNoFailuresCount", String.valueOf(failingJobsWithNoFailuresHtml.size()));
+            String failingJobsWithNoFailuresStyle = failingJobsWithNoFailuresHtml.isEmpty() ? "style=\"display: none\"" : "";
+            resultsPage = resultsPage.replace("#failingJobsWithNoFailuresItemStyle", failingJobsWithNoFailuresStyle);
             resultsPage = resultsPage.replace("#failingJobsWithNoFailures", String.join("\n", failingJobsWithNoFailuresHtml));
+
             resultsPage = resultsPage.replace("#passingJobsCount", String.valueOf(jobsPassingHtml.size()));
             resultsPage = resultsPage.replace("#passingJobs", String.join("\n", jobsPassingHtml));
 
@@ -330,7 +333,7 @@ public class FindTestFailures extends BaseAction {
         return resultsPage;
     }
 
-    private void addFailingTestForView(JobView jobView) {
+    private void addFailingTestsForView(JobView jobView) {
         jobView.setDbUtils(dbUtils);
         jobView.populateFromDb();
 
