@@ -107,7 +107,7 @@ public class DbUtils {
 
     public <T> List<T> query(Class<T> recordClass, String query, Object... parameters) {
         StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
-        log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
+        log.trace("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
         try (PreparedStatement statement = createStatement(query, parameters)) {
             ResultSet results = statement.executeQuery();
 
@@ -129,14 +129,14 @@ public class DbUtils {
                     }
                     values.add((T) record);
                 }
-                log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
+                log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
                 return values;
             } else if (resultMetaData.getColumnCount() == 1) {
                 List<T> values = new ArrayList<>();
                 while (results.next()) {
                     values.add((T) results.getObject(1));
                 }
-                log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
+                log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
                 return values;
             }
             else {
@@ -205,7 +205,7 @@ public class DbUtils {
     }
 
     public int delete(String query, Object... parameters) {
-        log.debug("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
+        log.trace("{}{}{}", query, System.lineSeparator(), Arrays.toString(parameters));
         try (PreparedStatement deleteStatement = createStatement(query, parameters)) {
             return deleteStatement.executeUpdate();
         } catch (SQLException se) {
@@ -226,7 +226,7 @@ public class DbUtils {
         insertStatement.append(")");
 
         String statementText = insertStatement.toString();
-        log.debug(statementText);
+        log.trace(statementText);
 
         try {
             return createStatementWithFieldValues(record, fields, statementText);
@@ -247,7 +247,7 @@ public class DbUtils {
         updateStatement.append(" WHERE ID = ?");
 
         String statementText = updateStatement.toString();
-        log.debug(statementText);
+        log.trace(statementText);
 
         try {
             PreparedStatement statement = createStatementWithFieldValues(record, fields, statementText);
@@ -354,7 +354,7 @@ public class DbUtils {
             ReflectionUtils.invokeAllMethodsWithAnnotation(record, AfterDbLoad.class);
             records.add(record);
         }
-        log.debug("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
+        log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
         return records;
     }
 }

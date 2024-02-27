@@ -1,5 +1,6 @@
 package com.vmware;
 
+import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.WorkflowConsoleHandler;
 
 import java.io.File;
@@ -50,11 +51,14 @@ public class WorkflowAppLoader {
         this.argValues = new ArrayList<>(Arrays.asList(args));
         LogManager.getLogManager().reset();
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        globalLogger.addHandler(new WorkflowConsoleHandler());
-
         boolean debugLog = Stream.of("-d", "--debug").anyMatch(argValues::contains);
         boolean traceLog = Stream.of("-t", "--trace").anyMatch(argValues::contains);
-        globalLogger.setLevel(traceLog ? Level.FINEST : debugLog ? Level.FINE : Level.INFO);
+
+        // log at least at debug level in case debug output logging is being saved
+        LogLevel globalLoggingLevel = traceLog ? LogLevel.TRACE : LogLevel.DEBUG;
+        globalLogger.setLevel(globalLoggingLevel.getLevel());
+        LogLevel handlerLevel = traceLog ? LogLevel.TRACE : debugLog ? LogLevel.DEBUG : LogLevel.INFO;
+        globalLogger.addHandler(new WorkflowConsoleHandler(handlerLevel.getLevel()));
 
         this.update = argValues.remove("--update");
         this.manifestAttributes = getManifestAttributes();

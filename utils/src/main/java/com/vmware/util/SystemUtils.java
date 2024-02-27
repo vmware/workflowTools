@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class SystemUtils {
 
-    private static Logger log = LoggerFactory.getLogger(SystemUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemUtils.class);
 
     public static void openUrl(String url) {
         if (StringUtils.isEmpty(url)) {

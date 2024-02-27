@@ -27,7 +27,7 @@ public class PublishReview extends BaseCommitUsingReviewBoardAction {
 
         String trivialText = commitConfig.publishAsTrivial ? " as trivial" : "";
         if (StringUtils.isNotBlank(commitConfig.reviewChangeDescription)) {
-            log.info("Publishing review request {}{} with change description {}", reviewRequest.id, trivialText, commitConfig.reviewChangeDescription);
+            log.info("Publishing review request {}{} with change description \"{}\"", reviewRequest.id, trivialText, commitConfig.reviewChangeDescription);
         } else {
             log.info("Publishing review request {}{}", reviewRequest.id, trivialText);
         }

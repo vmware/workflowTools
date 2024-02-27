@@ -250,6 +250,7 @@
             let jobsContainer = document.getElementById("jobList");
             let jobs = jobsContainer.getElementsByClassName('jobItem');
             let viewFailCount = 0, viewSkipCount = 0, jobCount = 0;
+            let nowInMilliseconds = new Date().getTime();
             for (const job of jobs) {
                 const failingMethods = job.getElementsByClassName("failingMethod");
                 let jobFailCount = 0, jobSkipCount = 0;
@@ -277,7 +278,13 @@
                             }
                         }
                     }
-                    let showMethod = methodShouldBeShown(filterOption, latestIndex, firstNonPassIndex, lastPassIndex);
+                    let showMethod;
+                    if (filterOption === 'lastThreeDays') {
+                        const threeDaysInMillis = 1000 * 3600 * 72;
+                        showMethod = nowInMilliseconds - parseInt(job.getAttribute('dateTime')) < threeDaysInMillis;
+                    } else {
+                        showMethod = methodShouldBeShown(filterOption, latestIndex, firstNonPassIndex, lastPassIndex);
+                    }
 
                     if (showMethod) {
                         failingMethod.style.display = 'block';
@@ -446,6 +453,7 @@
     <option value="allNonPassing">All Failures / Skips</option>
     <option value="newNonPassing">New Failures / Skips</option>
     <option value="recentNonPassing">Recent Failures / Skips</option>
+    <option value="lastThreeDays">Failures / Skips For Last Three Days</option>
     <option value="consistentlyFailing">Consistently Not Passing</option>
     <option value="inconsistentlyFailing">Inconsistently Not Passing</option>
     <option value="neverPassed">Never Passed</option>

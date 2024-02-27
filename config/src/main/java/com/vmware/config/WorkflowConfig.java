@@ -220,28 +220,31 @@ public class WorkflowConfig {
 
     public void setupLogging() {
         java.util.logging.Logger globalLogger = java.util.logging.Logger.getLogger("com.vmware");
-        Level existingLevel = globalLogger.getLevel();
-        LogLevel logLevelToUse = loggingConfig.determineLogLevel();
 
-        globalLogger.setLevel(logLevelToUse.getLevel());
+        addLogHandlerIfNeeded(globalLogger, loggingConfig.outputLogFile, LogLevel.INFO);
+        addLogHandlerIfNeeded(globalLogger, loggingConfig.outputDebugLogFile, LogLevel.DEBUG);
 
         Handler[] handlers = globalLogger.getHandlers();
-        boolean containsLoggingHandler = Arrays.stream(handlers).anyMatch(handler -> handler.getClass() == FileHandler.class);
-        if (isNotBlank(loggingConfig.outputLogFile) && !containsLoggingHandler) {
-            log.info("Saving log output to {}", loggingConfig.outputLogFile);
-            try {
-                FileHandler fileHandler = new FileHandler(loggingConfig.outputLogFile);
-                fileHandler.setFormatter(new SimpleLogFormatter());
-                globalLogger.addHandler(fileHandler);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         Optional<Handler> consoleHandler = Arrays.stream(handlers)
                 .filter(handler -> ConsoleHandler.class.isAssignableFrom(handler.getClass())).findFirst();
         if (consoleHandler.isPresent() && consoleHandler.get() instanceof WorkflowConsoleHandler) {
             WorkflowConsoleHandler workflowConsoleHandler = (WorkflowConsoleHandler) consoleHandler.get();
             workflowConsoleHandler.setRedirectErrorOutputToSystemOut(scriptMode);
+        }
+
+        LogLevel logLevelToUse = loggingConfig.determineLogLevel();
+        if (logLevelToUse == LogLevel.TRACE) {
+            globalLogger.setLevel(logLevelToUse.getLevel());
+        } else if (logLevelToUse == LogLevel.DEBUG || StringUtils.isNotBlank(loggingConfig.outputDebugLogFile)) {
+            globalLogger.setLevel(LogLevel.DEBUG.getLevel());
+        } else {
+            globalLogger.setLevel(LogLevel.INFO.getLevel());
+        }
+
+        Level existingLevel = null;
+        if (consoleHandler.isPresent()) {
+            existingLevel = consoleHandler.get().getLevel();
+            consoleHandler.get().setLevel(logLevelToUse.getLevel());
         }
 
         if (loggingConfig.silent && consoleHandler.isPresent()) {
@@ -250,6 +253,25 @@ public class WorkflowConfig {
         }
         if (existingLevel == null || logLevelToUse.getLevel().intValue() != existingLevel.intValue()) {
             log.debug("Using log level {}", logLevelToUse);
+        }
+    }
+
+    private void addLogHandlerIfNeeded(java.util.logging.Logger globalLogger, String logFile, LogLevel loggerLevel) {
+        if (StringUtils.isEmpty(logFile)) {
+            return;
+        }
+        Handler[] handlers = globalLogger.getHandlers();
+        boolean containsInfoLoggingHandler = Arrays.stream(handlers).anyMatch(handler -> handler instanceof FileHandler && handler.getLevel() == loggerLevel.getLevel());
+        if (!containsInfoLoggingHandler) {
+            log.info("Saving {} log output to {}", loggerLevel, logFile);
+            try {
+                FileHandler fileHandler = new FileHandler(logFile);
+                fileHandler.setLevel(loggerLevel.getLevel());
+                fileHandler.setFormatter(new SimpleLogFormatter(loggerLevel.getLevel()));
+                globalLogger.addHandler(fileHandler);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

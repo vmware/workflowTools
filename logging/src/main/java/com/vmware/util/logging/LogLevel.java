@@ -12,7 +12,7 @@ public enum LogLevel {
     INFO(Level.INFO),
     DEBUG(Level.FINE),
     TRACE(Level.FINEST);
-    private Level level;
+    private final Level level;
 
     LogLevel(Level level) {
         this.level = level;

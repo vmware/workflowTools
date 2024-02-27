@@ -342,7 +342,7 @@ public class Job extends BaseDbClass {
         List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
                 "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ? ORDER BY BUILD_NUMBER ASC", id, lastBuildToKeep.buildNumber);
         existingJobBuildsToCheck.forEach(build -> {
-            log.info("Removing any unimportant test results for build {}", build.name);
+            log.debug("Removing any unimportant test results for build {}", build.name);
             Map<TestResult, TestResult.TestStatusOnBuildRemoval> testResultsWithBuildsRemoved = testResults.stream()
                     .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build, lastBuildToKeep.buildNumber)));
             testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> UPDATEABLE == entry.getValue())

@@ -10,8 +10,12 @@ public class WorkflowConsoleHandler extends java.util.logging.ConsoleHandler {
     private boolean redirectErrorOutputToSystemOut;
 
     public WorkflowConsoleHandler() {
-        setFormatter(new SimpleLogFormatter());
-        setLevel(Level.FINEST);
+        this(Level.INFO);
+    }
+
+    public WorkflowConsoleHandler(Level level) {
+        setFormatter(new SimpleLogFormatter(level));
+        this.setLevel(level);
     }
 
     public void setRedirectErrorOutputToSystemOut(boolean redirectErrorOutputToSystemOut) {
@@ -25,6 +29,9 @@ public class WorkflowConsoleHandler extends java.util.logging.ConsoleHandler {
 
     @Override
     public void publish(LogRecord record) {
+        if (!isLoggable(record)) {
+            return;
+        }
         if (redirectErrorOutputToSystemOut) {
             super.publish(record);
             return;

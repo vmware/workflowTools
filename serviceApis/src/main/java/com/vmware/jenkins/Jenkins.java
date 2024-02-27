@@ -123,6 +123,7 @@ public class Jenkins extends AbstractRestBuildService {
             }
             for (JobBuildArtifact testngFile : testngResultsXmlFiles) {
                 String artifactUrl = jobBuild.fullUrlForArtifact(testngFile);
+
                 try {
                     TestResults results = getTestResults(jobBuild, artifactUrl);
                     allResults.combineTestResults(results);

@@ -365,7 +365,7 @@ public class TestResult extends BaseDbClass {
         if (newestPass == build.buildNumber || firstFailureOrSkipAfterPass == build.buildNumber) {
             TestStatus statusForBuild = newestPass == build.buildNumber ? TestStatus.PASS :
                     firstFailureAfterPass == build.buildNumber ? TestStatus.FAIL : TestStatus.SKIP;
-            LoggerFactory.getLogger(this.getClass()).info("Test {} {} still contains build {}", classAndTestName(), statusForBuild, build.name);
+            LoggerFactory.getLogger(this.getClass()).debug("Test {} {} still contains build {}", classAndTestName(), statusForBuild, build.name);
             return CONTAINS_BUILD;
         }
 
