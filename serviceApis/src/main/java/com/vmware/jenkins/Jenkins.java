@@ -29,7 +29,6 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
-import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +41,7 @@ import java.util.stream.IntStream;
 
 import static com.vmware.http.cookie.ApiAuthentication.jenkins;
 import static com.vmware.util.StringUtils.humanReadableSize;
+import static com.vmware.util.ThreadUtils.retryFunctionUntilSucceeds;
 
 public class Jenkins extends AbstractRestBuildService {
     private final boolean usesCsrf;
@@ -115,27 +115,18 @@ public class Jenkins extends AbstractRestBuildService {
 
     public TestResults getJobBuildTestResultsViaTestNGResultFiles(JobBuild jobBuild) {
         try {
+            log.info("Fetching build {}", jobBuild.name);
             TestResults allResults = new TestResults(jobBuild);
-            List<JobBuildArtifact> testngResultsXmlFiles = jobBuild.getArtifactsForPathPattern(".+testng-results.xml");
+            List<JobBuildArtifact> testngResultsXmlFiles = jobBuild.getArtifactsForPathPattern(".+testng-results.xml$");
             if (testngResultsXmlFiles.isEmpty()) {
                 log.info("No testNG results files found for build {}, fetching via jenkins page", jobBuild.name);
                 return getJobBuildTestResults(jobBuild);
             }
             for (JobBuildArtifact testngFile : testngResultsXmlFiles) {
                 String artifactUrl = jobBuild.fullUrlForArtifact(testngFile);
-
-                try {
-                    TestResults results = getTestResults(jobBuild, artifactUrl);
-                    allResults.combineTestResults(results);
-                } catch (SAXException spe) {
-                    log.error("Failed to parse artifact " + artifactUrl + " " + spe.getMessage() + ", retrying", spe);
-                    try {
-                        TestResults results = getTestResults(jobBuild, artifactUrl);
-                        allResults.combineTestResults(results);
-                    } catch (SAXException e) {
-                        log.error("Failed again to parse artifact " + artifactUrl + " " + spe.getMessage(), spe);
-                    }
-                }
+                TestResults results = retryFunctionUntilSucceeds((retryCount) -> getTestResults(jobBuild, artifactUrl),
+                        "parsing artifact " + artifactUrl, HttpConnection.MAX_REQUEST_RETRIES);
+                allResults.combineTestResults(results);
             }
             return allResults;
         } catch (NotFoundException nfe) {
@@ -144,12 +135,12 @@ public class Jenkins extends AbstractRestBuildService {
         }
     }
 
-    private TestResults getTestResults(JobBuild jobBuild, String artifactUrl) throws SAXException {
+    private TestResults getTestResults(JobBuild jobBuild, String artifactUrl) {
         log.debug("Fetching {}", artifactUrl);
         StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         String fileContent = get(artifactUrl, String.class);
-        if (stopwatch.elapsedTime(TimeUnit.SECONDS) >= 1) {
-            log.info("Fetched {} ({}) in {} ms", artifactUrl, humanReadableSize(fileContent.getBytes().length), stopwatch.elapsedTime());
+        if (stopwatch.elapsedTime(TimeUnit.SECONDS) > 1) {
+            log.info("Fetched {} ({}) in {} seconds", artifactUrl, humanReadableSize(fileContent.getBytes().length), stopwatch.elapsedTime(TimeUnit.SECONDS));
         } else {
             log.debug("Fetched {} ({}) in {} ms", artifactUrl, humanReadableSize(fileContent.getBytes().length), stopwatch.elapsedTime());
         }
@@ -292,9 +283,9 @@ public class Jenkins extends AbstractRestBuildService {
     }
 
     @Override
-    protected void displayInputMessageForLoginRetry(int retryCount) {
+    protected void displayInputMessageForFirstLoginFailure() {
         if (!disableLogin) {
-            super.displayInputMessageForLoginRetry(retryCount);
+            super.displayInputMessageForFirstLoginFailure();
         }
     }
 

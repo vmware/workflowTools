@@ -399,11 +399,14 @@ public class FindTestFailures extends BaseAction {
         final Integer lastBuildNumberToRefetch = jenkinsConfig.refetchCount > 0 ?
                 builds.get(Math.min(builds.size(), jenkinsConfig.refetchCount) - 1).buildNumber : null;
 
-        List<JobBuild> usableBuilds = builds.stream()
-                .filter(build -> build.buildNumber >= lastBuildNumberToCheck
-                        && ((lastBuildNumberToRefetch != null && build.buildNumber >= lastBuildNumberToRefetch)
-                        || !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck)))
-                .collect(toList());
+        List<JobBuild> buildsToCheck = builds.stream().filter(build -> build.buildNumber >= lastBuildNumberToCheck).collect(toList());
+
+        List<JobBuild> usableBuilds = buildsToCheck.stream()
+                .filter(build -> (lastBuildNumberToRefetch != null && build.buildNumber >= lastBuildNumberToRefetch)
+                        || !job.buildIsTooOld(build.buildNumber, jenkinsConfig.maxJenkinsBuildsToCheck)).collect(toList());
+
+
+        job.deleteBuildsMarkedAsDeleteIfPossible(buildsToCheck);
 
         job.usefulBuilds = usableBuilds.stream().parallel()
                 .map(build -> jenkinsExecutor.execute(j -> j.getJobBuildDetails(build)))
@@ -422,7 +425,7 @@ public class FindTestFailures extends BaseAction {
                     numberOfBuildsToCheck, builds.size(), lastBuildNumberToCheck);
         } else {
             String buildsToFetch = job.usefulBuilds.stream().map(JobBuild::buildNumber).collect(Collectors.joining(","));
-            log.info("Fetching {} {} for {}. Checking last {} of {} builds. Last build number checked was {}",
+            log.debug("Fetching {} {} for {}. Checking last {} of {} builds. Last build number checked was {}",
                     pluralizeDescription(usableBuilds.size(), "build"), buildsToFetch, job.name, numberOfBuildsToCheck,
                     builds.size(), lastBuildNumberToCheck);
             job.fetchedResults = usableResultSuppliers.stream().parallel().map(Supplier::get).filter(Objects::nonNull).collect(toList());

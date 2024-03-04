@@ -56,9 +56,9 @@ import static com.vmware.http.request.RequestHeader.anAcceptHeader;
  */
 public class HttpConnection {
 
-    private static Logger log = LoggerFactory.getLogger(HttpConnection.class.getName());
-    private static int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
-    private static final int MAX_REQUEST_RETRIES = 3;
+    private static final Logger log = LoggerFactory.getLogger(HttpConnection.class.getName());
+    private static final int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
+    public static final int MAX_REQUEST_RETRIES = 3;
 
     private final CookieFileStore cookieFileStore;
     private WorkflowCertificateManager workflowCertificateManager = null;

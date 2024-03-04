@@ -25,6 +25,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.vmware.jenkins.domain.TestResult.TestStatusOnBuildRemoval.DELETEABLE;
@@ -318,8 +320,9 @@ public class Job extends BaseDbClass {
             return true;
         }
 
-        List<JobBuild> usableBuilds = savedBuilds.stream().filter(JobBuild::hasSavedTestResults).collect(toList());
-        long numberOfNewerBuilds = usableBuilds.stream().filter(build -> build.buildNumber > buildNumber).count();
+        List<JobBuild> buildsToCheck = savedBuilds.stream().filter(build ->build.hasSavedTestResults() || build.status == BuildStatus.MARKED_FOR_DELETION)
+                .collect(toList());
+        long numberOfNewerBuilds = buildsToCheck.stream().filter(build -> build.buildNumber > buildNumber).count();
         return numberOfNewerBuilds >= maxBuildsToCheck;
     }
 
@@ -339,35 +342,32 @@ public class Job extends BaseDbClass {
         JobBuild lastBuildToKeep = lastUsableBuildToKeep != null && lastUsableBuildToKeep.buildNumber < lastSavedBuildToKeep.buildNumber
                 ? lastUsableBuildToKeep : lastSavedBuildToKeep;
 
+        String buildNumbersToKeep = savedBuilds.stream().filter(build -> build.buildNumber >= lastBuildToKeep.buildNumber).map(JobBuild::buildNumber).collect(Collectors.joining(","));
+
         List<JobBuild> existingJobBuildsToCheck = dbUtils.query(JobBuild.class,
-                "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ? ORDER BY BUILD_NUMBER ASC", id, lastBuildToKeep.buildNumber);
+                "SELECT * FROM JOB_BUILD WHERE JOB_ID = ? AND BUILD_NUMBER < ? AND STATUS != ? ORDER BY BUILD_NUMBER ASC",
+                id, lastBuildToKeep.buildNumber, BuildStatus.MARKED_FOR_DELETION.name());
         existingJobBuildsToCheck.forEach(build -> {
-            log.debug("Removing any unimportant test results for build {}", build.name);
+            log.debug("Checking for any unimportant test results for build {}", build.name);
             Map<TestResult, TestResult.TestStatusOnBuildRemoval> testResultsWithBuildsRemoved = testResults.stream()
                     .collect(toMap(result -> result, result -> result.removeUnimportantTestResultsForBuild(build, lastBuildToKeep.buildNumber)));
             testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> UPDATEABLE == entry.getValue())
                     .forEach(entry -> dbUtils.update(entry.getKey()));
-            testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> DELETEABLE == entry.getValue())
-                    .forEach(entry -> {
-                        TestResult testResult = entry.getKey();
-                        log.info("Deleting test {} {} with id {}", testResult.classAndTestName(), testResult.status, testResult.id);
-                        dbUtils.delete(testResult);
-                        testResults.remove(testResult);
-                    } );
-            if (testResults.stream().noneMatch(testResult -> testResult.containsBuildNumbers(build.buildNumber))) {
-                log.info("Removing build {}", build.name);
-                try {
-                    dbUtils.delete(build);
-                } catch (RuntimeException re) {
-                    if (re.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                        log.error("Failed to delete build {} with id {} due to existing tests", build.name, build.id);
-                        List<TestResult> existingTests = dbUtils.query(TestResult.class, "SELECT * FROM TEST_RESULT WHERE JOB_BUILD_ID = ?", build.id);
-                        existingTests.forEach(testResult -> log.info("Existing test: {}", testResult.classAndTestName()));
-                    } else {
-                        throw re;
-                    }
-                }
+            List<Map.Entry<TestResult, TestResult.TestStatusOnBuildRemoval>> testResultsToRemove = testResultsWithBuildsRemoved.entrySet().stream().filter(entry -> DELETEABLE == entry.getValue()).collect(toList());
+            if (!testResultsToRemove.isEmpty()) {
+                log.info("Removing test results for build {} as it is older than build {}, keeping builds {}", build.name, lastBuildToKeep.name, buildNumbersToKeep);
+            }
 
+            testResultsToRemove.forEach(entry -> {
+                TestResult testResult = entry.getKey();
+                log.info("Deleting test {} {} with id {}", testResult.classAndTestName(), testResult.status, testResult.id);
+                dbUtils.delete(testResult);
+                testResults.remove(testResult);
+            });
+            if (testResults.stream().noneMatch(testResult -> testResult.containsBuildNumbers(build.buildNumber))) {
+                log.info("Marking build {} for deletion as it is older than build {}, keeping builds {}", build.name, lastBuildToKeep.name, buildNumbersToKeep);
+                build.status = BuildStatus.MARKED_FOR_DELETION;
+                dbUtils.update(build);
                 usefulBuilds.remove(build);
             }
         });
@@ -396,7 +396,7 @@ public class Job extends BaseDbClass {
                         JobBuild matchingBuild = buildsToCheck.stream().filter(build -> build.buildNumber.equals(entry.getKey())).findFirst()
                                 .orElse(null);
                         if (matchingBuild == null) {
-                            log.warn("Failed to find build with number {} for job {}", entry.getKey(), name);
+                            log.warn("Failed to find build {} #{}", name, entry.getKey());
                             return null;
                         } else {
                             return new TestResult(result, matchingBuild, entry.getValue());
@@ -444,5 +444,28 @@ public class Job extends BaseDbClass {
     public String latestBuildDateTime() {
         JobBuild build = CollectionUtils.isNotEmpty(savedBuilds) ? savedBuilds.get(0) : lastCompletedBuild;
         return build != null ? String.valueOf(build.buildTimestamp) : "";
+    }
+
+    public void deleteBuildsMarkedAsDeleteIfPossible(List<JobBuild> buildsToCheck) {
+        if (CollectionUtils.isEmpty(buildsToCheck) || CollectionUtils.isEmpty(savedBuilds)) {
+            return;
+        }
+
+        savedBuilds.stream().filter(savedBuild -> savedBuild.status == BuildStatus.MARKED_FOR_DELETION)
+                .filter(savedBuild -> buildsToCheck.stream().noneMatch(buildToCheck -> buildToCheck.buildNumber.equals(savedBuild.buildNumber)))
+                .forEach(build -> {
+                    log.info("Deleting build {}", build.name);
+                    try {
+                        dbUtils.delete(build);
+                    } catch (RuntimeException re) {
+                        if (re.getCause() instanceof SQLIntegrityConstraintViolationException) {
+                            log.error("Failed to delete build {} with id {} due to existing tests", build.name, build.id);
+                            List<TestResult> existingTests = dbUtils.query(TestResult.class, "SELECT * FROM TEST_RESULT WHERE JOB_BUILD_ID = ?", build.id);
+                            existingTests.forEach(testResult -> log.info("Existing test: {}", testResult.classAndTestName()));
+                        } else {
+                            throw re;
+                        }
+                    }
+                });
     }
 }

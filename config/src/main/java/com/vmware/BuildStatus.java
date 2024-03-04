@@ -12,7 +12,8 @@ public enum BuildStatus {
     FAILURE,
     ABORTED,
     BUILDING,
-    STARTING;
+    STARTING,
+    MARKED_FOR_DELETION;
 
     public static String generateResultPattern() {
         String patternValues = StringUtils.appendWithDelimiter("", EnumSet.allOf(BuildStatus.class), "|");

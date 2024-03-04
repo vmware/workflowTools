@@ -36,8 +36,8 @@ public class IOUtils {
 
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
-    private static Logger log = LoggerFactory.getLogger(IOUtils.class);
-    private static DynamicLogger logger = new DynamicLogger(log);
+    private static final Logger log = LoggerFactory.getLogger(IOUtils.class);
+    private static final DynamicLogger logger = new DynamicLogger(log);
 
     public static void write(File file, String data) {
         try {

@@ -34,12 +34,12 @@ import static java.util.stream.Collectors.toList;
 public class TestNGXmlTestResults extends TestResults {
     private final SimpleDateFormat DATE_FORMAT_WITH_TIME_ZONE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss ZZZ");
 
-    public TestNGXmlTestResults(JobBuild build, String text) throws SAXException {
+    public TestNGXmlTestResults(JobBuild build, String text) {
         this.build = build;
         parseTestResultsFromTestNGXmlFile(text);
     }
 
-    private void parseTestResultsFromTestNGXmlFile(String text) throws SAXException {
+    private void parseTestResultsFromTestNGXmlFile(String text) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -66,7 +66,7 @@ public class TestNGXmlTestResults extends TestResults {
             this.skipConfig = (int) results.stream().filter(result -> Boolean.TRUE.equals(result.configMethod) && result.status == TestResult.TestStatus.SKIP).count();
             this.failConfig = (int) results.stream().filter(result -> Boolean.TRUE.equals(result.configMethod) && result.status == TestResult.TestStatus.FAIL).count();
             this.loadedTestResults = results;
-        } catch (ParserConfigurationException | IOException e) {
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
     }

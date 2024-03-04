@@ -6,6 +6,7 @@ import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.util.IOUtils;
 import com.vmware.util.StringUtils;
+import com.vmware.util.ThreadUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
 
@@ -54,23 +55,22 @@ public abstract class AbstractService {
     }
 
     public void setupAuthenticatedConnection() {
-        int retryCount = 0;
-        while (!isConnectionAuthenticated()) {
-            if (retryCount > MAX_LOGIN_RETRIES) {
-                throw new FatalException("Failed to successfully login after {} retries", (retryCount - 1));
+        connectionIsAuthenticated = ThreadUtils.retryFunctionUntilSucceeds((retryCount) -> {
+            if (isConnectionAuthenticated()) {
+                return true;
             }
             connectionIsAuthenticated = null;
-            displayInputMessageForLoginRetry(retryCount);
+            if (retryCount == 0) {
+                displayInputMessageForFirstLoginFailure();
+            }
             try {
                 loginManually();
+                return true;
             } catch (NotAuthorizedException | ForbiddenException | NotFoundException e) {
-                if (retryCount >= MAX_LOGIN_RETRIES) {
-                    throw e;
-                }
                 connectionIsAuthenticated = false;
+                throw e;
             }
-            retryCount++;
-        }
+        },this.getClass().getSimpleName() + " login", MAX_LOGIN_RETRIES);
     }
 
     public abstract boolean isBaseUriTrusted();
@@ -117,19 +117,13 @@ public abstract class AbstractService {
      */
     protected abstract void loginManually();
 
-    protected void displayInputMessageForLoginRetry(int retryCount) {
-        if (retryCount == 0) {
-            String filePath = determineApiTokenFile(credentialsType).getPath();
-            if (credentialsType.getCookieName() != null) {
-                log.info("Valid {} cookie ({}) not found in file {}", credentialsType.name(),
-                        credentialsType.getCookieName(), filePath);
-            } else {
-                log.info("Valid {} token not found in file {}", credentialsType.name(), filePath);
-            }
-        } else  {
-            log.info("");
-            log.warn("Login failure");
-            log.info("Retrying login, attempt {} of {}", retryCount, MAX_LOGIN_RETRIES);
+    protected void displayInputMessageForFirstLoginFailure() {
+        String filePath = determineApiTokenFile(credentialsType).getPath();
+        if (credentialsType.getCookieName() != null) {
+            log.info("Valid {} cookie ({}) not found in file {}", credentialsType.name(),
+                    credentialsType.getCookieName(), filePath);
+        } else {
+            log.info("Valid {} token not found in file {}", credentialsType.name(), filePath);
         }
     }
 

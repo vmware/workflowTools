@@ -245,7 +245,7 @@
             return false;
         }
 
-        function filterMethods(filterOption) {
+        function filterMethods(filterOption, searchText) {
             console.log('Filtering by ' + filterOption);
             let jobsContainer = document.getElementById("jobList");
             let jobs = jobsContainer.getElementsByClassName('jobItem');
@@ -284,6 +284,10 @@
                         showMethod = nowInMilliseconds - parseInt(job.getAttribute('dateTime')) < threeDaysInMillis;
                     } else {
                         showMethod = methodShouldBeShown(filterOption, latestIndex, firstNonPassIndex, lastPassIndex);
+                    }
+
+                    if (showMethod && searchText) {
+                        showMethod = failingMethod.innerText.indexOf(searchText) > -1;
                     }
 
                     if (showMethod) {
@@ -336,9 +340,10 @@
             }
         }
 
-        function filterOptionChange() {
+        function filterChange() {
             let filterMethodOptions = document.getElementById("filterMethodOptions");
-            filterMethods(filterMethodOptions.value);
+            let searchTests = document.getElementById("searchTests");
+            filterMethods(filterMethodOptions.value, searchTests.value);
             if (localStorage) {
                 localStorage.setItem("testFailures.filterMethodOption", filterMethodOptions.value);
             }
@@ -435,31 +440,35 @@
 
 </head>
 <body>
-<h2><a href = "#viewUrl">#viewName</a> <em id="viewFailSkipCounts" style="visibility: hidden">(#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs)</em>
-<select id="jobSortOptions" onchange="sortOptionChange()" style="visibility: hidden">
-    <option disabled> -- Sort Jobs By -- </option>
-    <option value="default">Default Sort</option>
-    <option value="totalNonPassingDesc">Total Failures / Skips</option>
-    <option value="failureDesc">Failures</option>
-    <option value="skipDesc">Skips</option>
-    <option value="dateDesc">Date</option>
-    <option value="totalNonPassingAsc">Total Failures / Skips Ascending</option>
-    <option value="failureAsc">Failures Ascending</option>
-    <option value="skipAsc">Skips Ascending</option>
-    <option value="dateAsc">Date Ascending</option>
-</select>
-<select id="filterMethodOptions" onchange="filterOptionChange()" style="visibility: hidden">
-    <option disabled> -- Filter Results By -- </option>
-    <option value="allNonPassing">All Failures / Skips</option>
-    <option value="newNonPassing">New Failures / Skips</option>
-    <option value="recentNonPassing">Recent Failures / Skips</option>
-    <option value="lastThreeDays">Failures / Skips For Last Three Days</option>
-    <option value="consistentlyFailing">Consistently Not Passing</option>
-    <option value="inconsistentlyFailing">Inconsistently Not Passing</option>
-    <option value="neverPassed">Never Passed</option>
-    <option value="notPassingForLongTime">Not Passing For Long Time</option>
-</select>
-</h2>
+<div style="width: fit-content">
+    <h2><a href = "#viewUrl">#viewName</a> <em id="viewFailSkipCounts" style="visibility: hidden">(#viewTotalFailures failures / #viewTotalSkips skips in #consistentFailuresJobsCount jobs)</em>
+        <select id="jobSortOptions" onchange="sortOptionChange()" style="visibility: hidden">
+            <option disabled> -- Sort Jobs By -- </option>
+            <option value="default">Default Sort</option>
+            <option value="totalNonPassingDesc">Total Failures / Skips</option>
+            <option value="failureDesc">Failures</option>
+            <option value="skipDesc">Skips</option>
+            <option value="dateDesc">Date</option>
+            <option value="totalNonPassingAsc">Total Failures / Skips Ascending</option>
+            <option value="failureAsc">Failures Ascending</option>
+            <option value="skipAsc">Skips Ascending</option>
+            <option value="dateAsc">Date Ascending</option>
+        </select>
+        <select id="filterMethodOptions" onchange="filterChange()" style="visibility: hidden">
+            <option disabled> -- Filter Results By -- </option>
+            <option value="allNonPassing">All Failures / Skips</option>
+            <option value="newNonPassing">New Failures / Skips</option>
+            <option value="recentNonPassing">Recent Failures / Skips</option>
+            <option value="lastThreeDays">Failures / Skips For Last Three Days</option>
+            <option value="consistentlyFailing">Consistently Not Passing</option>
+            <option value="inconsistentlyFailing">Inconsistently Not Passing</option>
+            <option value="neverPassed">Never Passed</option>
+            <option value="notPassingForLongTime">Not Passing For Long Time</option>
+        </select>
+        <br/>
+        <input id="searchTests" type="text" placeholder="Search tests by name or failure details" onchange="filterChange()" style="width:99%" />
+    </h2>
+</div>
 <h3 id="jobLoadingText">LOADING...</h3>
 <ul id="jobList" class="css-treeview" style="display: none">
     #body

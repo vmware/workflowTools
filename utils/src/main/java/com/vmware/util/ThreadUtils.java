@@ -1,10 +1,11 @@
 package com.vmware.util;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.function.IntFunction;
 
 public class ThreadUtils {
 
@@ -42,6 +43,25 @@ public class ThreadUtils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <R> R retryFunctionUntilSucceeds(IntFunction<R> function, String description, int retryCount) {
+        int counter = 0;
+        RuntimeException exceptionToThrow = null;
+        while (counter <= retryCount) {
+            if (counter > 0) {
+                log.info("Retry {} of {} for {}", counter, retryCount, description);
+            }
+            try {
+                return function.apply(counter);
+            } catch (RuntimeException e) {
+                log.error("Failed " + description, e);
+                exceptionToThrow = e;
+                counter++;
+            }
+        }
+        log.error("Failed {} after {} retries", description, retryCount);
+        throw exceptionToThrow;
     }
 
     private static long determineRetryWaitPeriod(long totalSeconds) {
