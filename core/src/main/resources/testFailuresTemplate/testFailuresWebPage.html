@@ -184,6 +184,9 @@
         let defaultJobList = [];
 
         function compareByValue(a, b, attributeName) {
+            if (attributeName === 'name') {
+                return a.innerText.localeCompare(b.innerText);
+            }
             const aValue = parseInt(a.getAttribute(attributeName));
             const bValue = parseInt(b.getAttribute(attributeName));
             return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
@@ -202,7 +205,11 @@
             }
             console.log(jobsList.length + " jobs found for sorting by " + sortOption);
 
-            if (sortOption === 'totalNonPassingAsc') {
+            if (sortOption === 'nameAsc') {
+                jobsList.sort(function (a, b) { return compareByValue(a, b, "name")});
+            } else if (sortOption === 'nameDesc') {
+                jobsList.sort(function (a,b) { return compareByValue(b, a, "name")});
+            } else if (sortOption === 'totalNonPassingAsc') {
                 jobsList.sort(function (a,b) { return compareByValue(a, b, "totalNonPassingCount")});
             } else if (sortOption === 'totalNonPassingDesc') {
                 jobsList.sort(function (a,b) { return compareByValue(b, a, "totalNonPassingCount")});
@@ -445,10 +452,12 @@
         <select id="jobSortOptions" onchange="sortOptionChange()" style="visibility: hidden">
             <option disabled> -- Sort Jobs By -- </option>
             <option value="default">Default Sort</option>
+            <option value="nameAsc">Name</option>
             <option value="totalNonPassingDesc">Total Failures / Skips</option>
             <option value="failureDesc">Failures</option>
             <option value="skipDesc">Skips</option>
             <option value="dateDesc">Date</option>
+            <option value="nameDesc">Name Descending</option>
             <option value="totalNonPassingAsc">Total Failures / Skips Ascending</option>
             <option value="failureAsc">Failures Ascending</option>
             <option value="skipAsc">Skips Ascending</option>
@@ -466,7 +475,7 @@
             <option value="notPassingForLongTime">Not Passing For Long Time</option>
         </select>
         <br/>
-        <input id="searchTests" type="text" placeholder="Search tests by name or failure details" onchange="filterChange()" style="width:99%" />
+        <input id="searchTests" type="text" placeholder="Search tests by name or failure details" onchange="filterChange()" style="width:100%; box-sizing: border-box" />
     </h2>
 </div>
 <h3 id="jobLoadingText">LOADING...</h3>

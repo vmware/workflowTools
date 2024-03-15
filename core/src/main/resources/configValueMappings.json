@@ -212,16 +212,6 @@
     "--vcd-url",
     "--sso-email"
   ],
-  "CreateVcdRefreshToken": [
-    "--sso-headless",
-    "--disable-vcd-refresh",
-    "--vcd-refresh-token-name",
-    "--vcd-sso",
-    "--vcd-org",
-    "--username",
-    "--vcd-url",
-    "--sso-email"
-  ],
   "BaseSshAction": [
     "--ssh-password",
     "--ssh-username",

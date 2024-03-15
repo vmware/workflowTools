@@ -1,6 +1,7 @@
 package com.vmware.vcd;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -67,6 +68,7 @@ public class Vcd extends AbstractRestService {
     private final String ssoEmail;
     private String refreshTokenName;
     private boolean disableRefreshToken;
+    private boolean useSiteSpecificToken;
     private final SsoConfig ssoConfig;
     private String vcdOrg;
     private String apiToken;
@@ -232,7 +234,7 @@ public class Vcd extends AbstractRestService {
         }
         HttpResponse sessionResponse = get(cloudapiUrl + "/sessions/current", HttpResponse.class, acceptHeader(UserSession.class));
         if (!sessionResponse.containsLink("add", "OAuthToken")) {
-            log.info("Logged in user doesn't have link for rel add and model OAuthToken");
+            log.info("Logged in user doesn't have link for rel add with model OAuthToken");
             return;
         }
 
@@ -260,7 +262,8 @@ public class Vcd extends AbstractRestService {
 
     @Override
     protected void checkAuthenticationAgainstServer() {
-        queryVapps();
+        String queryVappsUrl = String.format("%s/query?type=%s", apiUrl, "vApp");
+        connection.get(queryVappsUrl, QueryResultVappsType.class);
     }
 
     @Override
@@ -268,11 +271,21 @@ public class Vcd extends AbstractRestService {
         connection.removeStatefulParam(RequestHeader.AUTHORIZATION);
         String refreshToken = readExistingApiToken(ApiAuthentication.vcd_refresh);
         if (StringUtils.isNotBlank(refreshToken) && StringUtils.isNotBlank(vcdOrg) && !disableRefreshToken) {
-            log.info("Using refresh token from {}", determineApiTokenFile(ApiAuthentication.vcd_refresh).getPath());
-            apiToken = createAccessTokenUsingRefreshToken(refreshToken);
-            saveApiToken(apiToken, ApiAuthentication.vcd);
-            connection.addStatefulParam(aBearerAuthHeader(apiToken));
-            return;
+            File refreshTokenFile = determineApiTokenFile(ApiAuthentication.vcd_refresh);
+            log.info("Using refresh token from {}", refreshTokenFile.getPath());
+            try {
+                apiToken = createAccessTokenUsingRefreshToken(refreshToken);
+                saveApiToken(apiToken, ApiAuthentication.vcd);
+                connection.addStatefulParam(aBearerAuthHeader(apiToken));
+                return;
+            } catch (BadRequestException bre) {
+                log.info("Failed to get api token for refresh token", bre);
+                String vcdHostName = URI.create(baseUrl).getHost();
+                if (!refreshTokenFile.getName().contains(vcdHostName)) {
+                    log.info("Creating site specific refresh token for {}", vcdHostName);
+                    useSiteSpecificToken = true;
+                }
+            }
         }
         if (useVcdSso && StringUtils.isEmpty(vcdOrg)) {
             vcdOrg = InputUtils.readValueUntilNotBlank("Vcd Organization");
@@ -318,8 +331,14 @@ public class Vcd extends AbstractRestService {
     @Override
     protected File determineApiTokenFile(ApiAuthentication apiAuthentication) {
         String homeFolder = System.getProperty("user.home");
-        return new File(homeFolder + "/." + vcdOrg.toLowerCase()
+
+        File apiOrgTokenFile = new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-" + URI.create(baseUrl).getHost()
                 + "-" + apiAuthentication.getFileName().substring(1));
+        if (apiOrgTokenFile.exists() || useSiteSpecificToken) {
+            useSiteSpecificToken = true;
+            return apiOrgTokenFile;
+        }
+        return new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-" + apiAuthentication.getFileName().substring(1));
     }
 
     private RequestHeader taskAcceptHeader() {
