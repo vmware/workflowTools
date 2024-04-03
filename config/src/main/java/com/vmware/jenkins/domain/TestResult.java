@@ -420,7 +420,7 @@ public class TestResult extends BaseDbClass {
         return builds.stream().filter(build -> build.buildNumber.equals(buildNumber)).findFirst().orElse(new JobBuild());
     }
 
-    private int buildNumber() {
+    public int buildNumber() {
         return buildNumber;
     }
 

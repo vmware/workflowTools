@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -174,15 +175,8 @@ public class Job extends BaseDbClass {
                 || lastUnstableBuild == null || lastStableBuild.buildNumber > lastUnstableBuild.buildNumber;
     }
 
-    public int lastUnstableBuildAge() {
-        return lastCompletedBuild.buildNumber - lastUnstableBuild.buildNumber;
-    }
-
     public int latestUsableBuildNumber() {
         int latestBuild = Stream.of(lastStableBuild, lastUnstableBuild).filter(Objects::nonNull).mapToInt(build -> build.buildNumber).max().orElse(-1);
-        if (lastFailedBuild != null && lastFailedBuild.buildNumber - latestBuild > 2) {
-            latestBuild = lastFailedBuild.buildNumber;
-        }
         if (latestBuild == -1 && CollectionUtils.isNotEmpty(savedBuilds)) {
             return savedBuilds.stream().mapToInt(JobBuild::getBuildNumber).max().orElse(-1);
         } else {
@@ -421,8 +415,9 @@ public class Job extends BaseDbClass {
             String buildPath = StringUtils.substringAfterLast(build.getTestReportsUIUrl(), "/job/");
             String buildPathWithViewName = UrlUtils.addRelativePaths(viewUrl, "job", buildPath);
             Date startDate = new Date(build.buildTimestamp);
-            String titleAttribute = build.buildTimestamp > 0 ? String.format(" title=\"%s with commit %s\"",
-                    START_TIME_TOOLTIP_FORMATTER.format(startDate), build.commitId) : "";
+            String buildCssClass = "build" + build.status;
+            String titleAttribute = build.buildTimestamp > 0 ? String.format(" title=\"%s status on %s with commit %s\"",
+                    build.status, START_TIME_TOOLTIP_FORMATTER.format(startDate), build.commitId) : "";
             String buildDateAndDuration;
             SimpleDateFormat startTimeFormatterToUse = new Date().getTime() > (build.buildTimestamp + TimeUnit.DAYS.toMillis(90))
                     ? START_TIME_WITH_YEAR_FORMATTER : START_TIME_FORMATTER;
@@ -435,7 +430,8 @@ public class Job extends BaseDbClass {
             } else {
                 buildDateAndDuration = jobDate.isEmpty() ? "" : " (" + jobDate + ")";
             }
-            return "Latest <a href=\"" + buildPathWithViewName + "\"" + titleAttribute + ">" + build.buildNumber + "</a>" + buildDateAndDuration;
+            return String.format("Latest <a class = \"%s\"href=\"%s\"%s>%s</a>%s",
+                    buildCssClass, buildPathWithViewName, titleAttribute, build.buildNumber, buildDateAndDuration);
         } else {
             return "";
         }
