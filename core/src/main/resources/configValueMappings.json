@@ -105,6 +105,7 @@
     "--trello-sso",
     "--disable-login",
     "--bugzilla-test-bug",
+    "--use-rb-api-token",
     "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
@@ -127,6 +128,7 @@
   ],
   "LoadReviewPatch": [
     "--username",
+    "--use-rb-api-token",
     "--latest-diff",
     "--review-request-id"
   ],
@@ -174,6 +176,7 @@
   ],
   "CreateReviewIfNeeded": [
     "--username",
+    "--use-rb-api-token",
     "--review-board-repo"
   ],
   "UpdateTaskEstimates": [
@@ -358,6 +361,7 @@
     "--regex"
   ],
   "BaseBatchBugzillaAction": [
+    "--bugzilla-test-bug",
     "--username",
     "--default-jira-component",
     "--disable-bugzilla"
@@ -427,6 +431,7 @@
     "--trivial-reviewer-label"
   ],
   "MarkBugAsResolved": [
+    "--bugzilla-test-bug",
     "--username"
   ],
   "ExecuteSshCommand": [
@@ -457,6 +462,7 @@
   ],
   "CreateReview": [
     "--username",
+    "--use-rb-api-token",
     "--review-board-repo"
   ],
   "SubmitToDepot": [
@@ -495,6 +501,9 @@
   ],
   "PostApprovalRequest": [
     "--approver"
+  ],
+  "HardSubmitOldSoftSubmittedReviews": [
+    "--old-submit"
   ],
   "CreateSelfSignedCertForUrl": [
     "--file-data",
@@ -607,7 +616,8 @@
     "--disable-jira"
   ],
   "SetReviewId": [
-    "--username"
+    "--username",
+    "--use-rb-api-token"
   ],
   "ExecuteSelectSqlStatementAsJson": [
     "--database-driver-class",
@@ -749,10 +759,12 @@
   ],
   "SetCommitDetailsFromReview": [
     "--username",
+    "--use-rb-api-token",
     "--review-request-id"
   ],
   "BaseCommitUsingReviewBoardAction": [
-    "--username"
+    "--username",
+    "--use-rb-api-token"
   ],
   "UpdateVappLease": [
     "--sso-headless",
@@ -798,6 +810,9 @@
   "BaseCommitAmendAction": [
     "--no-verify"
   ],
+  "HardSubmitOldShipItReviews": [
+    "--old-ship-it"
+  ],
   "FindJobsContainingTest": [
     "--database-url",
     "--database-driver-class",
@@ -826,6 +841,7 @@
     "--input-text"
   ],
   "SetBugNumbers": [
+    "--bugzilla-test-bug",
     "--username",
     "--use-linked-bugzilla-id",
     "--disable-bugzilla",
@@ -835,7 +851,8 @@
     "--file-data"
   ],
   "BaseReviewBoardAction": [
-    "--username"
+    "--username",
+    "--use-rb-api-token"
   ],
   "CreateTrelloBoardIfNeeded": [
     "--own-boards-only"
@@ -851,9 +868,11 @@
     "--sso-email"
   ],
   "DiscardUnpublishedReviews": [
-    "--username"
+    "--username",
+    "--use-rb-api-token"
   ],
   "BaseBatchCloseReviews": [
+    "--use-rb-api-token",
     "--username"
   ],
   "BaseAction": [
@@ -896,6 +915,7 @@
     "--vcd-site-index"
   ],
   "BaseSetUsersList": [
+    "--use-rb-api-token",
     "--search-by-usernames-only",
     "--username",
     "--trivial-reviewer-label"

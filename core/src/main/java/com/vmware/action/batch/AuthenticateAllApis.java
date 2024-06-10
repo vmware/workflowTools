@@ -6,6 +6,7 @@ import com.vmware.bugzilla.Bugzilla;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.gitlab.Gitlab;
+import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.jenkins.Jenkins;
 import com.vmware.jira.Jira;
 import com.vmware.reviewboard.ReviewBoard;
@@ -27,7 +28,8 @@ public class AuthenticateAllApis extends BaseAction {
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
                 ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig));
 
-        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username, serviceLocator.reviewBoardCredentialsType()));
+        ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
+        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
         checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides));

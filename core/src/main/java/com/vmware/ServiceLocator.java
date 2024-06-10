@@ -78,7 +78,8 @@ public class ServiceLocator {
         }
         if (reviewBoard == null) {
             try {
-                reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType());
+                ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
+                reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType);
                 if (reviewBoard.isConnectionAuthenticated()) {
                     reviewBoard.updateClientTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
                 }
@@ -166,7 +167,4 @@ public class ServiceLocator {
         return reviewBoardException;
     }
 
-    public ApiAuthentication reviewBoardCredentialsType() {
-        return config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
-    }
 }

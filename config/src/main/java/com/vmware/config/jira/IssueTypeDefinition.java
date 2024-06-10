@@ -25,6 +25,7 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     QETask(16),
     UXTask(17),
     DocTask(18),
+    StoryTask(11803),
     Other(19),
     CustomerIssue(20),
     CodeBug(22),
@@ -32,7 +33,7 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     TechComm(24),
     UnknownValue(-1);
 
-    private int code;
+    private final int code;
 
     private IssueTypeDefinition(int code) {
         this.code = code;
@@ -57,7 +58,7 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
             }
             definitionList.add(fromValue(Integer.parseInt(value)));
         }
-        return definitionList.toArray(new IssueTypeDefinition[definitionList.size()]);
+        return definitionList.toArray(new IssueTypeDefinition[0]);
     }
 
     public static IssueTypeDefinition fromValue(int value) {
@@ -71,13 +72,13 @@ public enum IssueTypeDefinition implements ComplexEnum<Integer> {
     }
 
     private static String typesWithIntValues() {
-        String value = "";
+        StringBuilder value = new StringBuilder();
         for (IssueTypeDefinition definition : IssueTypeDefinition.values()) {
-            if (!value.isEmpty()) {
-                value += ",";
+            if (value.length() > 0) {
+                value.append(",");
             }
-            value += definition.name() + "[" + definition.getValue() + "]";
+            value.append(definition.name()).append("[").append(definition.getValue()).append("]");
         }
-        return value;
+        return value.toString();
     }
 }

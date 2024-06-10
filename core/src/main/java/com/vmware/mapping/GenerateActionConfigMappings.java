@@ -74,7 +74,6 @@ public class GenerateActionConfigMappings {
 
     private File outputFile;
 
-
     public GenerateActionConfigMappings(String actionDirectory, String outputFile, File serviceLocatorFile) {
         this.serviceLocatorFile = serviceLocatorFile;
         this.actionDirectory = new File(actionDirectory);
@@ -90,7 +89,7 @@ public class GenerateActionConfigMappings {
             return;
         }
 
-        configValuePattern = createConfigValuesPattern();
+        createConfigValuesPattern();
 
         Map<String, String[]> mappings = new HashMap<>();
         populateLocatorMethodArguments();
@@ -219,13 +218,13 @@ public class GenerateActionConfigMappings {
         List<String> currentArguments = null;
         for (String line : lines) {
             String matchedMethodName = MatcherUtils.singleMatch(line, "public \\w+ (\\w+)\\(");
-            if (matchedMethodName != null) {
-                if (currentMethodName != null) {
+            if (StringUtils.isNotBlank(matchedMethodName)) {
+                if (StringUtils.isNotBlank(currentMethodName)) {
                     locatorMethodArguments.put(currentMethodName, currentArguments);
                 }
                 currentMethodName = matchedMethodName;
                 currentArguments = new ArrayList<>();
-            } else if (currentMethodName != null) {
+            } else if (StringUtils.isNotBlank(currentMethodName)) {
                 Matcher configValueMatcher = configValuePattern.matcher(line);
                 while (configValueMatcher.find()) {
                     currentArguments.add(configValueMatcher.group(1));
@@ -237,12 +236,15 @@ public class GenerateActionConfigMappings {
         }
     }
 
-    private Pattern createConfigValuesPattern() {
+    private void createConfigValuesPattern() {
         List<String> sectionConfigFields = Arrays.stream(WorkflowConfig.class.getFields())
                 .filter(field -> field.getAnnotation(SectionConfig.class) != null)
                 .map(Field::getName).collect(Collectors.toList());
-        String configValuesPattern = StringUtils.appendWithDelimiter("config", sectionConfigFields, "|");
-        return Pattern.compile("[^\\.](?:" + configValuesPattern + ")\\.(\\w+)");
+        List<String> sectionMatcherValues = sectionConfigFields.stream().map(value -> "config." + value).collect(Collectors.toList());
+        sectionMatcherValues.addAll(sectionConfigFields);
+
+        String configValuesPattern = String.join("|", sectionMatcherValues) + "|config";
+        configValuePattern = Pattern.compile("[^.](?:" + configValuesPattern + ")\\.(\\w+)");
     }
 
     private static void validateAllActionsCanBeInstantiated() {

@@ -288,7 +288,7 @@ public class FindTestFailures extends BaseAction {
         }
     }
 
-    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, List<String> consistentFailuresJobsHtml,
+    private String createTestResultsHtmlPage(HomePage.View view, boolean includeViewsLink, List<String> jobsWithFailuresHtml,
                                              List<String> failingJobsWithNoFailuresHtml, List<String> jobsPassingHtml) {
         String resultsPage;
         String footer = "";
@@ -303,7 +303,7 @@ public class FindTestFailures extends BaseAction {
         double passingRate = view.totalTestMethodsCount > 0 ? ((view.totalTestMethodsCount - view.failingTestMethodsCount) / (double) view.totalTestMethodsCount) * 100 : 0;
         footer +=  String.format("Generated at %s - %.2f%% pass rate (%,d tests not passing out of %,d test methods)",
                 generationDate, passingRate, view.failingTestMethodsCount, view.totalTestMethodsCount);
-        if (consistentFailuresJobsHtml.isEmpty() && failingJobsWithNoFailuresHtml.isEmpty()) {
+        if (jobsWithFailuresHtml.isEmpty() && failingJobsWithNoFailuresHtml.isEmpty()) {
             String allPassedPage = new ClasspathResource("/testFailuresTemplate/noTestFailures.html", this.getClass()).getText();
             resultsPage = allPassedPage.replace("#viewName", view.name);
             resultsPage = resultsPage.replace("#viewUrl", view.url);
@@ -314,9 +314,9 @@ public class FindTestFailures extends BaseAction {
             resultsPage = resultsPage.replace("#viewUrl", view.url);
             resultsPage = resultsPage.replace("#viewTotalFailures", String.valueOf(view.failureCount));
             resultsPage = resultsPage.replace("#viewTotalSkips", String.valueOf(view.skipCount));
-            resultsPage = resultsPage.replace("#consistentFailuresJobsCount", String.valueOf(consistentFailuresJobsHtml.size()));
+            resultsPage = resultsPage.replace("#jobsWithFailuresCount", String.valueOf(jobsWithFailuresHtml.size()));
 
-            resultsPage = resultsPage.replace("#body", String.join("\n", consistentFailuresJobsHtml));
+            resultsPage = resultsPage.replace("#body", String.join("\n", jobsWithFailuresHtml));
 
             resultsPage = resultsPage.replace("#failingJobsWithNoFailuresCount", String.valueOf(failingJobsWithNoFailuresHtml.size()));
             String failingJobsWithNoFailuresStyle = failingJobsWithNoFailuresHtml.isEmpty() ? "style=\"display: none\"" : "";
@@ -374,10 +374,10 @@ public class FindTestFailures extends BaseAction {
         jobsToCheckForFailingTests.forEach(job -> {
             List<TestResult> failingTests = job.createFailingTestsList(jenkinsConfig.maxJenkinsBuildsToCheck, jenkinsConfig.numberOfFailuresNeededToBeConsistentlyFailing);
             if (failingTests.isEmpty()) {
-                log.info("No consistently failing tests found for {}", job.name);
+                log.info("No failing tests found for {}", job.name);
                 jobView.addFailingTests(job, failingTests);
             } else {
-                log.info("Found {} for {}", pluralize(failingTests.size(), "consistently failing test"), job.name);
+                log.info("Found {} for {}", pluralize(failingTests.size(), "failing test"), job.name);
                 jobView.addFailingTests(job, failingTests);
             }
         });
