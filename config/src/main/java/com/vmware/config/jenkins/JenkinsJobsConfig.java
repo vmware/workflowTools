@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 
 import static com.vmware.jenkins.domain.JobParameter.NO_USERNAME_PARAMETER;
 import static com.vmware.jenkins.domain.JobParameter.USERNAME_PARAM;

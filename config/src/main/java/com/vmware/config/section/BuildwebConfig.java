@@ -2,6 +2,7 @@ package com.vmware.config.section;
 
 import java.util.Map;
 
+import com.google.gson.annotations.Expose;
 import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 public class BuildwebConfig {
 
+    @Expose(serialize = false, deserialize = false)
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    @Expose(serialize = false, deserialize = false)
     private final Git git = new Git();
 
     @ConfigurableProperty(help = "Url for buildweb server")

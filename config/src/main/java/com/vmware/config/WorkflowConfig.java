@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.vmware.config.jenkins.JenkinsJobsConfig;
 import com.vmware.config.section.BugzillaConfig;
 import com.vmware.config.section.BuildwebConfig;
@@ -67,6 +68,7 @@ import static com.vmware.util.StringUtils.isNotBlank;
  */
 public class WorkflowConfig {
 
+    @Expose(serialize = false, deserialize = false)
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private static final String COMMAND_LINE_SOURCE = "Command Line";
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");

@@ -1,5 +1,6 @@
 package com.vmware.config.section;
 
+import com.google.gson.annotations.Expose;
 import com.vmware.config.CalculatedProperty;
 import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
@@ -12,7 +13,9 @@ import java.util.TreeMap;
 
 public class GitRepoConfig {
 
+    @Expose(serialize = false, deserialize = false)
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+    @Expose(serialize = false, deserialize = false)
     private final Git git = new Git();
 
     @ConfigurableProperty(commandLine = "-tb,--tracking-branch",
