@@ -130,7 +130,7 @@ public class Vcd extends AbstractRestService {
     }
 
     public TaskType deleteResource(LinkType deleteLink, boolean force) {
-        return connection.delete(deleteLink.href, TaskType.class, taskAcceptHeader(), forceParam(force));
+        return connection.delete(deleteLink.href, null, TaskType.class, taskAcceptHeader(), forceParam(force));
     }
 
     public TaskType updateResource(LinkType link, ResourceType resourceType) {

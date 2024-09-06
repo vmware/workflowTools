@@ -151,11 +151,11 @@ public class HttpConnection {
     }
 
     public <T> T delete(String url, RequestParam... params) {
-        return delete(url, null, params);
+        return delete(url, null, null, params);
     }
 
-    public <T> T delete(String url, Class<T> responseConversionClass, RequestParam... params) {
-        return executeApiRequest(DELETE, url, responseConversionClass, null, params);
+    public <T> T delete(String url, Object requestObject, Class<T> responseConversionClass, RequestParam... params) {
+        return executeApiRequest(DELETE, url, responseConversionClass, requestObject, params);
     }
 
     public boolean isUriTrusted(URI uri) {

@@ -6,7 +6,6 @@
 package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
-import com.vmware.http.exception.InternalServerException;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Repository;
 import com.vmware.util.StringUtils;
@@ -52,8 +51,8 @@ public abstract class BaseCommitUsingReviewBoardAction extends BaseCommitWithRev
     }
 
     protected String determineSubmittedDescription() {
-        if (draft.hasMergeRequest()) {
-            return "Merged via merge request " + draft.mergeRequestUrl;
+        if (draft.hasMergeOrPullRequest()) {
+            return "Merged via request " + draft.requestUrl;
         } else if (StringUtils.isEmpty(draft.perforceChangelistId)) {
             return "Submitted as ref " + git.revParse("head");
         } else {

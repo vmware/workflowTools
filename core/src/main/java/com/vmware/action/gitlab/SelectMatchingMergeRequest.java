@@ -27,7 +27,7 @@ public class SelectMatchingMergeRequest extends BaseCommitUsingGitlabAction {
             log.info("Found matching merge request {}", matchingRequest.get().webUrl);
             draft.setGitlabMergeRequest(matchingRequest.get());
         } else {
-            if (gitlabConfig.failIfNoMergeRequestFound) {
+            if (gitRepoConfig.failIfNoRequestFound) {
                 cancelWithMessage("no matching merge request was found");
             } else {
                 log.info("Failed to find matching merge request");

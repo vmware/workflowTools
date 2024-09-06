@@ -13,7 +13,7 @@ public class AcceptMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        log.info("Accepting merge request {}", draft.mergeRequestUrl);
+        log.info("Accepting merge request {}", draft.requestUrl);
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
         gitlab.acceptMergeRequest(mergeRequest);
     }
