@@ -114,13 +114,13 @@ public abstract class AbstractRestService extends AbstractService {
     }
 
     protected <T> T delete(String url, RequestParam... params) {
-        return delete(url, Collections.emptyList(), params);
+        return delete(url, null, Collections.emptyList(), params);
     }
 
-    protected <T> T delete(String url,
+    protected <T> T delete(String url, Object requestBody,
                            List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
         try {
-            return connection.delete(url, params);
+            return connection.delete(url, requestBody, null, params);
         } catch (NotAuthorizedException e) {
             if (allowedExceptionTypes.contains(e.getClass())) {
                 throw e;

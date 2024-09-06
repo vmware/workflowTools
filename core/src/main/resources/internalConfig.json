@@ -52,7 +52,7 @@
     "precommit": "topic/$USERNAME/pre-commit",
     "update": "topic/$USERNAME/update"
   },
-  "gitlabMergeBranchFormat": "topic/$USERNAME/$BRANCH_NAME",
+  "gitMergeBranchFormat": "topic/$USERNAME/$BRANCH_NAME",
   "remoteBranchToUse": "precommit",
   "trackingBranch": "master",
   "parentBranch": "head~1",
@@ -454,13 +454,23 @@
       "FormatCommitText",
       "AmendCommitWithoutJobResults"
     ],
-    "prepareCommitForMerge": [
+    "prepareCommitForGitlabMerge": [
       "selectMergeRequest",
       "ExitIfCommitFailsCheckstyle",
       "ExitIfReviewHasNoShipIts",
       "SetReviewedByAsShipItsList",
       "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
       "SetReviewedByAsApproverList",
+      "FormatCommitText",
+      "AmendCommitWithoutJobResults"
+    ],
+    "prepareCommitForGithub": [
+      "selectPullRequest",
+      "ExitIfCommitFailsCheckstyle",
+      "ExitIfReviewHasNoShipIts",
+      "SetReviewedByAsShipItsList",
+      "ExitIfPullRequestDoesNotHaveRequiredApprovals",
+      "SetReviewedByAsApprovedReviewersList",
       "FormatCommitText",
       "AmendCommitWithoutJobResults"
     ],
@@ -552,7 +562,7 @@
       "DisplayBuildOutputForBuildwebBuilds",
       "AmendCommit",
       "CheckCommitForCheckstyleErrors",
-      "SelectMatchingMergeRequest&&--fail-if-no-merge-request-found",
+      "SelectMatchingMergeRequest&&--fail-if-no-request-found",
       "CheckStatusOfMergeRequestApprovals",
       "DisplayOpenDiffNotes"
     ],
@@ -682,7 +692,7 @@
       "--disable-merge-to"
     ],
     "merge": [
-      "prepareCommitForMerge",
+      "prepareCommitForGitlabMerge",
       "syncMergeRequestFromCommit&&--mark-as-draft=false",
       "WaitForMergeRequestToBeUpdated",
       "ApproveMergeRequest",
@@ -702,12 +712,12 @@
       "pushCommitToMergeBranch",
       "CreateMergeRequestIfNeeded",
       "UpdateMergeRequestDetails",
-      "CopyMergeUrlToClipboard"
+      "CopyRequestUrlToClipboard"
     ],
     "updateMergeRequestDetails" : [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "selectMergeRequest&&--fail-if-no-request-found",
       "UpdateMergeRequestDetails",
-      "CopyMergeUrlToClipboard"
+      "CopyRequestUrlToClipboard"
     ],
     "pushToMergeBranch" : [
       "ReadLastCommit",
@@ -719,33 +729,33 @@
       "PushToMergeBranch"
     ],
     "openMerge": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
-      "OpenMergeRequest"
+      "selectMergeRequest&&--fail-if-no-request-found",
+      "OpenRequest"
     ],
-    "copyMergeUrl": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
-      "CopyMergeUrlToClipboard"
+    "copyMergeRequestUrl": [
+      "selectMergeRequest&&--fail-if-no-request-found",
+      "CopyRequestUrlToClipboard"
     ],
     "closeMergeRequest": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "selectMergeRequest&&--fail-if-no-request-found",
       "CloseMergeRequest",
       "DeleteMergeBranch"
     ],
     "approveMergeRequest": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "selectMergeRequest&&--fail-if-no-request-found",
       "ApproveMergeRequest"
     ],
     "assignMergeRequestToBot": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "selectMergeRequest&&--fail-if-no-request-found",
       "AssignMergeRequestToBot",
       "HardSubmitReview"
     ],
     "rebaseMergeRequest": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "selectMergeRequest&&--fail-if-no-request-found",
       "RebaseMergeRequest"
     ],
     "acceptMergeRequest": [
-      "selectMergeRequest&&--fail-if-no-merge-request-found",
+      "selectMergeRequest&&--fail-if-no-request-found",
       "AcceptMergeRequest"
     ],
     "selectMergeRequest": [
@@ -756,6 +766,41 @@
       "createMergeRequest",
       "AcceptMergeRequest"
     ],
+    "mergePullRequest": [
+      "prepareCommitForGithub",
+      "syncPullRequestFromCommit&&--mark-as-draft=false",
+      "WaitForPullRequestToBeUpdated",
+      "ExitIfPullRequestDoesNotHaveRequiredApprovals",
+      "MergePullRequest",
+      "HardSubmitReview"
+    ],
+    "createPullRequest": [
+      "selectPullRequest",
+      "syncPullRequestFromCommit"
+    ],
+    "updatePullRequest" : [
+      "updatePullRequestDetails",
+      "pushCommitToMergeBranch"
+    ],
+    "openPullRequest": [
+      "selectPullRequest&&--fail-if-no-request-found",
+      "OpenRequest"
+    ],
+    "syncPullRequestFromCommit": [
+      "pushCommitToMergeBranch",
+      "CreatePullRequestIfNeeded",
+      "UpdatePullRequestDetails",
+      "CopyRequestUrlToClipboard"
+    ],
+    "updatePullRequestDetails" : [
+      "selectPullRequest&&--fail-if-no-request-found",
+      "UpdatePullRequestDetails",
+      "CopyRequestUrlToClipboard"
+    ],
+    "selectPullRequest": [
+      "ReadLastCommit",
+      "SelectMatchingMergeRequest"
+    ],    
     "reopenAndResolveIssues": [
       "LoadCompletedIssuesWithoutResolution",
       "ExitIfThereAreNoIssuesToProcess",
@@ -1120,7 +1165,8 @@
     "setCommitDetailsWithoutConfirmation",
     "selectAndConvertBoard",
     "prepareCommitForPush",
-    "prepareCommitForMerge",
+    "prepareCommitForGitlabMerge",
+    "prepareCommitForGithubMerge",
     "syncMergeRequestFromCommit",
     "setCommitDetails",
     "setCommitDetailsOffline",
@@ -1131,6 +1177,7 @@
     "selectVcdCell",
     "selectVcdSite",
     "selectMergeRequest",
+    "selectPullRequest",
     "pushCommitToMergeBranch",
     "testEncryption"
   ]

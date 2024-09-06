@@ -1,4 +1,4 @@
-package com.vmware.action.gitlab;
+package com.vmware.action.github;
 
 import com.vmware.action.base.BaseCommitWithMergeRequestAction;
 import com.vmware.config.ActionDescription;

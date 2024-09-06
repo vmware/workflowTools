@@ -14,13 +14,13 @@ public class CreateMergeRequestIfNeeded extends BaseCommitUsingGitlabAction {
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        super.skipActionIfTrue(draft.hasMergeRequest(), "merge request with url " + draft.mergeRequestUrl + " has already been created");
+        super.skipActionIfTrue(draft.hasMergeOrPullRequest(), "merge request with url " + draft.requestUrl + " has already been created");
     }
 
     @Override
     public void process() {
         MergeRequest mergeRequest = new MergeRequest();
-        mergeRequest.title = gitlabConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
+        mergeRequest.title = gitRepoConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
         mergeRequest.targetProjectId = gitlabConfig.gitlabProjectId;
         mergeRequest.sourceBranch = determineSourceMergeBranch();
         mergeRequest.targetBranch = determineTargetMergeBranch();
