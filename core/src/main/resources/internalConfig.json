@@ -702,12 +702,12 @@
       "pushCommitToMergeBranch",
       "CreateMergeRequestIfNeeded",
       "UpdateMergeRequestDetails",
-      "CopyMergeUrlToClipboard"
+      "CopyRequestUrlToClipboard"
     ],
     "updateMergeRequestDetails" : [
       "selectMergeRequest&&--fail-if-no-merge-request-found",
       "UpdateMergeRequestDetails",
-      "CopyMergeUrlToClipboard"
+      "CopyRequestUrlToClipboard"
     ],
     "pushToMergeBranch" : [
       "ReadLastCommit",
@@ -722,9 +722,9 @@
       "selectMergeRequest&&--fail-if-no-merge-request-found",
       "OpenMergeRequest"
     ],
-    "copyMergeUrl": [
+    "copyRequestUrl": [
       "selectMergeRequest&&--fail-if-no-merge-request-found",
-      "CopyMergeUrlToClipboard"
+      "CopyRequestUrlToClipboard"
     ],
     "closeMergeRequest": [
       "selectMergeRequest&&--fail-if-no-merge-request-found",

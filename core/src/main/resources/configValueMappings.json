@@ -238,10 +238,7 @@
     "--tail-follow"
   ],
   "BaseCommitUsingGitlabAction": [
-    "--tracking-branch",
-    "--target-merge-branch",
-    "--username",
-    "--source-merge-branch"
+    "--username"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -568,6 +565,9 @@
   "LoadGitPatchFile": [
     "--diff-file"
   ],
+  "CreatePullRequestIfNeeded": [
+    "--mark-as-draft"
+  ],
   "CheckStatusOfLatestBuilds": [
     "--max-builds",
     "--username",
@@ -712,6 +712,9 @@
     "--include-issue-types",
     "--include-all-issue-types"
   ],
+  "BaseCommitUsingGithubAction": [
+    "--username"
+  ],
   "SelectVappIfNeeded": [
     "--use-vapp-json"
   ],
@@ -722,7 +725,10 @@
     "--skip-pipeline"
   ],
   "BaseCommitAction": [
+    "--tracking-branch",
+    "--target-merge-branch",
     "--username",
+    "--source-merge-branch",
     "--job-display-names",
     "--job-with-artifact",
     "--changelist-id"

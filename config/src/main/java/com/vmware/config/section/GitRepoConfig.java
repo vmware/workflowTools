@@ -53,6 +53,15 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "--no-precommit", help = "Skip running of pre-commit file by workflow tools setting commit details")
     public boolean noPreCommit;
 
+    @ConfigurableProperty(commandLine = "--source-merge-branch", help = "Specify custom source branch for a request")
+    public String sourceMergeBranch;
+
+    @ConfigurableProperty(commandLine = "--target-merge-branch", help = "Specify custom target branch for a request")
+    public String targetMergeBranch;
+
+    @ConfigurableProperty(help = "Format for source branch for a request")
+    public String gitMergeBranchFormat;
+
     public String trackingBranchPath() {
         return String.valueOf(determineTrackingBranchPath().getValue());
     }

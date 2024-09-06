@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import com.vmware.BuildStatus;
 import com.vmware.IssueInfo;
 import com.vmware.config.section.CommitConfig;
+import com.vmware.github.domain.PullRequest;
 import com.vmware.gitlab.domain.MergeRequest;
 import com.vmware.jenkins.domain.Job;
 import com.vmware.jenkins.domain.JobBuild;
@@ -146,10 +147,13 @@ public class ReviewRequestDraft extends BaseEntity {
     public int lineDeletions;
 
     @Expose(serialize = false, deserialize = false)
-    public String mergeRequestUrl;
+    public String requestUrl;
 
     @Expose(serialize = false, deserialize = false)
     private MergeRequest gitlabMergeRequest;
+
+    @Expose(serialize = false, deserialize = false)
+    private PullRequest githubPullRequest;
 
     public ReviewRequestDraft() {}
 
@@ -537,19 +541,28 @@ public class ReviewRequestDraft extends BaseEntity {
 
     public void setGitlabMergeRequest(MergeRequest mergeRequest) {
         this.gitlabMergeRequest = mergeRequest;
-        this.mergeRequestUrl = mergeRequest.webUrl;
+        this.requestUrl = mergeRequest.webUrl;
     }
 
     public MergeRequest getGitlabMergeRequest() {
         return gitlabMergeRequest;
     }
 
-    public boolean hasMergeRequest() {
-        return StringUtils.isNotBlank(mergeRequestUrl);
+    public boolean hasMergeOrPullRequest() {
+        return StringUtils.isNotBlank(requestUrl);
+    }
+
+    public PullRequest getGithubPullRequest() {
+        return githubPullRequest;
+    }
+
+    public void setGithubPullRequest(PullRequest githubPullRequest) {
+        this.githubPullRequest = githubPullRequest;
+        this.requestUrl = githubPullRequest.url;
     }
 
     public Integer mergeRequestId() {
-        return hasMergeRequest() ? Integer.parseInt(StringUtils.substringAfterLast(mergeRequestUrl, "/")) : null;
+        return hasMergeOrPullRequest() ? Integer.parseInt(StringUtils.substringAfterLast(requestUrl, "/")) : null;
     }
 
     private int totalLineChanges() {
