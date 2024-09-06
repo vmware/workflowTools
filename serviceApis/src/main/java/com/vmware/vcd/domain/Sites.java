@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.gson.annotations.Expose;
 import com.vmware.util.CollectionUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.input.InputListSelection;

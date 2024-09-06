@@ -226,6 +226,7 @@ public class WorkflowConfig {
         addLogHandlerIfNeeded(globalLogger, loggingConfig.outputLogFile, LogLevel.INFO);
         addLogHandlerIfNeeded(globalLogger, loggingConfig.outputDebugLogFile, LogLevel.DEBUG);
 
+        LogLevel logLevelToUse = loggingConfig.determineLogLevel();
         Handler[] handlers = globalLogger.getHandlers();
         Optional<Handler> consoleHandler = Arrays.stream(handlers)
                 .filter(handler -> ConsoleHandler.class.isAssignableFrom(handler.getClass())).findFirst();
@@ -234,9 +235,8 @@ public class WorkflowConfig {
             workflowConsoleHandler.setRedirectErrorOutputToSystemOut(scriptMode);
         }
 
-        LogLevel logLevelToUse = loggingConfig.determineLogLevel();
         if (logLevelToUse == LogLevel.TRACE) {
-            globalLogger.setLevel(logLevelToUse.getLevel());
+            globalLogger.setLevel(LogLevel.TRACE.getLevel());
         } else if (logLevelToUse == LogLevel.DEBUG || StringUtils.isNotBlank(loggingConfig.outputDebugLogFile)) {
             globalLogger.setLevel(LogLevel.DEBUG.getLevel());
         } else {
@@ -247,6 +247,7 @@ public class WorkflowConfig {
         if (consoleHandler.isPresent()) {
             existingLevel = consoleHandler.get().getLevel();
             consoleHandler.get().setLevel(logLevelToUse.getLevel());
+            log.debug("Found console handler, log level was set to {}", logLevelToUse.name());
         }
 
         if (loggingConfig.silent && consoleHandler.isPresent()) {

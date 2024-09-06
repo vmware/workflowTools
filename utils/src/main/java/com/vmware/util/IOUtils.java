@@ -82,13 +82,13 @@ public class IOUtils {
         }
     }
 
-    public static void write(File outputFile, List<String> lines) {
+    public static void write(File outputFile, Collection<String> lines) {
         try (FileWriter writer = new FileWriter(outputFile)) {
             for (String line : lines) {
                 writer.write(line + "\n");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeIOException(e);
         }
     }
 

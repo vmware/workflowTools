@@ -9,15 +9,12 @@ import com.vmware.gitlab.domain.MergeRequest;
 public class CloseMergeRequest extends BaseCommitWithMergeRequestAction {
 
     public CloseMergeRequest(WorkflowConfig config) {
-        super(config);
+        super(config, true);
     }
 
     @Override
     public void process() {
-        log.info("Closing merge request {}", draft.mergeRequestUrl);
-        if (draft.getGitlabMergeRequest() == null) {
-            draft.setGitlabMergeRequest(gitlab.getMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId()));
-        }
+        log.info("Closing merge request {}", draft.requestUrl);
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
         mergeRequest.stateEvent = "close";
         gitlab.updateMergeRequest(mergeRequest);

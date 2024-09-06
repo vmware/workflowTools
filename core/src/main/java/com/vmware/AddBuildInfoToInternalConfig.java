@@ -44,7 +44,7 @@ public class AddBuildInfoToInternalConfig {
 
 
         if (!Git.isGitInstalled()) {
-            System.out.println("Git is not installed, cannot add git version info");
+            log.warn("Git is not installed, cannot add git version info");
             return;
         }
 

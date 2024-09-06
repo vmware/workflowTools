@@ -237,11 +237,11 @@
     "--ssh-command",
     "--tail-follow"
   ],
+  "WaitForPullRequestToBeUpdated": [
+    "--wait-time"
+  ],
   "BaseCommitUsingGitlabAction": [
-    "--tracking-branch",
-    "--target-merge-branch",
-    "--username",
-    "--source-merge-branch"
+    "--username"
   ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
@@ -283,6 +283,9 @@
     "--job-build-number",
     "--vapp-json-file",
     "--use-owned-vapps-only"
+  ],
+  "SelectMatchingPullRequest": [
+    "--fail-if-no-request-found"
   ],
   "LoadVapps": [
     "--query-filter",
@@ -333,7 +336,7 @@
     "--no-verify"
   ],
   "SelectMatchingMergeRequest": [
-    "--fail-if-no-merge-request-found"
+    "--fail-if-no-request-found"
   ],
   "ExitIfMergeRequestDoesNotHaveRequiredApprovals": [
     "--trivial-reviewer-label"
@@ -546,6 +549,9 @@
     "--line-count-before",
     "--ssh-command"
   ],
+  "ExitIfPullRequestDoesNotHaveRequiredApprovals": [
+    "--trivial-reviewer-label"
+  ],
   "GenerateAutoCompleteValues": [
     "--autocomplete-workflow"
   ],
@@ -567,6 +573,9 @@
   ],
   "LoadGitPatchFile": [
     "--diff-file"
+  ],
+  "CreatePullRequestIfNeeded": [
+    "--mark-as-draft"
   ],
   "CheckStatusOfLatestBuilds": [
     "--max-builds",
@@ -712,6 +721,9 @@
     "--include-issue-types",
     "--include-all-issue-types"
   ],
+  "BaseCommitUsingGithubAction": [
+    "--username"
+  ],
   "SelectVappIfNeeded": [
     "--use-vapp-json"
   ],
@@ -722,7 +734,10 @@
     "--skip-pipeline"
   ],
   "BaseCommitAction": [
+    "--tracking-branch",
+    "--target-merge-branch",
     "--username",
+    "--source-merge-branch",
     "--job-display-names",
     "--job-with-artifact",
     "--changelist-id"
@@ -849,6 +864,9 @@
   ],
   "CopyFileData": [
     "--file-data"
+  ],
+  "UpdatePullRequestDetails": [
+    "--trivial-reviewer-label"
   ],
   "BaseReviewBoardAction": [
     "--username",

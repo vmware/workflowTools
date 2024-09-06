@@ -21,6 +21,7 @@ public class Padder {
     public Padder(String title, Object... args) {
         this(DEFAULT_PADDING_LENGTH, title, args);
     }
+
     public Padder(int paddingLength, String title, Object... args) {
         title = title.trim();
         for (Object arg : args) {

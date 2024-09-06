@@ -49,14 +49,7 @@ public abstract class AbstractRestService extends AbstractService {
                          List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
         try {
             return connection.post(url, responseConversionClass, requestBody, params);
-        } catch (NotAuthorizedException e) {
-            if (allowedExceptionTypes.contains(e.getClass())) {
-                throw e;
-            }
-            connectionIsAuthenticated = false;
-            setupAuthenticatedConnection();
-            return connection.post(url, requestBody, params);
-        } catch (ForbiddenException e) {
+        } catch (NotAuthorizedException | ForbiddenException e) {
             if (allowedExceptionTypes.contains(e.getClass())) {
                 throw e;
             }
@@ -73,11 +66,7 @@ public abstract class AbstractRestService extends AbstractService {
     protected <T> T get(String url, Class<T> responseConversionClass, RequestParam... params) {
         try {
             return connection.get(url, responseConversionClass, params);
-        } catch (NotAuthorizedException e) {
-            connectionIsAuthenticated = false;
-            setupAuthenticatedConnection();
-            return connection.get(url, responseConversionClass, params);
-        } catch (ForbiddenException e) {
+        } catch (NotAuthorizedException | ForbiddenException e) {
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
             return connection.get(url, responseConversionClass, params);
@@ -96,39 +85,39 @@ public abstract class AbstractRestService extends AbstractService {
                         RequestParam... params) {
         try {
             return connection.put(url, responseConversionClass, requestBody, params);
-        } catch (NotAuthorizedException e) {
+        } catch (NotAuthorizedException | ForbiddenException e) {
             if (allowedExceptions.contains(e.getClass())) {
                 throw e;
             }
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
-            return connection.put(url, requestBody, params);
-        } catch (ForbiddenException e) {
+            return connection.put(url, responseConversionClass, requestBody, params);
+        }
+    }
+
+    protected <T> T patch(String url, Class<T> responseConversionClass, Object requestBody, List<Class<? extends ApiException>> allowedExceptions,
+                        RequestParam... params) {
+        try {
+            return connection.patch(url, responseConversionClass, requestBody, params);
+        } catch (NotAuthorizedException | ForbiddenException e) {
             if (allowedExceptions.contains(e.getClass())) {
                 throw e;
             }
             connectionIsAuthenticated = false;
             setupAuthenticatedConnection();
-            return connection.put(url, requestBody, params);
+            return connection.patch(url, responseConversionClass, requestBody, params);
         }
     }
 
     protected <T> T delete(String url, RequestParam... params) {
-        return delete(url, Collections.emptyList(), params);
+        return delete(url, null, Collections.emptyList(), params);
     }
 
-    protected <T> T delete(String url,
+    protected <T> T delete(String url, Object requestBody,
                            List<Class<? extends ApiException>> allowedExceptionTypes, RequestParam... params) {
         try {
-            return connection.delete(url, params);
-        } catch (NotAuthorizedException e) {
-            if (allowedExceptionTypes.contains(e.getClass())) {
-                throw e;
-            }
-            connectionIsAuthenticated = false;
-            setupAuthenticatedConnection();
-            return connection.delete(url, params);
-        } catch (ForbiddenException e) {
+            return connection.delete(url, requestBody, null, params);
+        } catch (NotAuthorizedException | ForbiddenException e) {
             if (allowedExceptionTypes.contains(e.getClass())) {
                 throw e;
             }

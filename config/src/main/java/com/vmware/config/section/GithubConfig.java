@@ -9,4 +9,13 @@ public class GithubConfig {
 
     @ConfigurableProperty(help = "Github release url for workflow tools")
     public String workflowGithubReleasePath;
+
+    @ConfigurableProperty(help = "Format for source branch for a merge request")
+    public String githubMergeBranchFormat;
+
+    @ConfigurableProperty(help = "Name for github repo owner")
+    public String githubRepoOwnerName;
+
+    @ConfigurableProperty(help = "Name for github repo")
+    public String githubRepoName;
 }

@@ -151,11 +151,11 @@ public class HttpConnection {
     }
 
     public <T> T delete(String url, RequestParam... params) {
-        return delete(url, null, params);
+        return delete(url, null, null, params);
     }
 
-    public <T> T delete(String url, Class<T> responseConversionClass, RequestParam... params) {
-        return executeApiRequest(DELETE, url, responseConversionClass, null, params);
+    public <T> T delete(String url, Object requestObject, Class<T> responseConversionClass, RequestParam... params) {
+        return executeApiRequest(DELETE, url, responseConversionClass, requestObject, params);
     }
 
     public boolean isUriTrusted(URI uri) {
@@ -214,7 +214,7 @@ public class HttpConnection {
         requestParams.addAllStatelessParams(statelessParamsList);
         String fullUrl = requestParams.buildUrl(requestUrl);
         URI uri = URI.create(fullUrl);
-        log.debug("{}: {}", methodType.name(), uri.toString());
+        log.debug("{}: {}", methodType.name(), uri);
 
         try {
             activeConnection = (HttpURLConnection) uri.toURL().openConnection();
@@ -230,7 +230,12 @@ public class HttpConnection {
             ((HttpsURLConnection) activeConnection).setHostnameVerifier((s, sslSession) -> true);
         }
         try {
-            activeConnection.setRequestMethod(methodType.name());
+            if (methodType == PATCH) {
+                activeConnection.setRequestMethod(POST.name());
+                activeConnection.setRequestProperty("X-HTTP-Method-Override", PATCH.name());
+            } else {
+                activeConnection.setRequestMethod(methodType.name());
+            }
         } catch (ProtocolException e) {
             throw new RuntimeIOException(e);
         }
@@ -283,7 +288,7 @@ public class HttpConnection {
     private String getResponseText(int retryCount, HttpMethodType methodType, RequestParam... params) {
         String responseText = "";
         try {
-            responseText = parseResponseText();
+            responseText = parseResponseText(methodType);
             cookieFileStore.addCookiesFromResponse(activeConnection);
         } catch (SSLException e) {
             String urlText = activeConnection.getURL().toString();
@@ -359,11 +364,10 @@ public class HttpConnection {
                 + "\nFailed to access host " + activeConnection.getURL().getHost());
     }
 
-    private String parseResponseText() throws IOException {
-        String requestMethod = activeConnection.getRequestMethod();
+    private String parseResponseText(HttpMethodType methodType) throws IOException {
         String currentUrl = activeConnection.getURL().toString();
         int responseCode = activeConnection.getResponseCode();
-        log.debug("{}: {} {}", requestMethod, currentUrl, responseCode);
+        log.debug("{}: {} {}", methodType.name(), currentUrl, responseCode);
         String responseText;
         try {
             if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {
@@ -381,7 +385,7 @@ public class HttpConnection {
 
 
         log.trace("Response\n{}", responseText);
-        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, requestMethod, responseText);
+        ExceptionChecker.throwExceptionIfStatusIsNotValid(currentUrl, responseCode, methodType.name(), responseText);
         return responseText;
     }
 }

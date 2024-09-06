@@ -12,7 +12,7 @@ public class RebaseMergeRequest extends BaseCommitWithMergeRequestAction {
 
     @Override
     public void process() {
-        log.info("Rebasing merge request {}", draft.mergeRequestUrl);
+        log.info("Rebasing merge request {}", draft.requestUrl);
         gitlab.rebaseMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId());
     }
 }
