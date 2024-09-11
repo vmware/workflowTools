@@ -737,7 +737,6 @@
       "pushCommitToMergeBranch"
     ],
     "pushCommitToMergeBranch" : [
-      "SetEmptyReviewUrlIfNeeded",
       "AmendCommitWithoutJobResults",
       "PushToMergeBranch"
     ],
