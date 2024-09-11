@@ -784,7 +784,8 @@
       "WaitForPullRequestToBeUpdated",
       "ExitIfPullRequestDoesNotHaveRequiredApprovals",
       "MergePullRequest",
-      "HardSubmitReview"
+      "HardSubmitReview",
+      "DeleteRequestBranch"
     ],
     "createPullRequest": [
       "selectPullRequest",
