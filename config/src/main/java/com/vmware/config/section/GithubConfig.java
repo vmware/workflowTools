@@ -18,4 +18,7 @@ public class GithubConfig {
 
     @ConfigurableProperty(help = "Name for github repo")
     public String githubRepoName;
+
+    @ConfigurableProperty(commandLine = "--merge-method", help = "Method to use for merging, can be merge, squash or rebase")
+    public String mergeMethod;
 }

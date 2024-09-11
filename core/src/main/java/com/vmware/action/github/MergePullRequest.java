@@ -15,6 +15,6 @@ public class MergePullRequest extends BaseCommitWithPullRequestAction {
     public void process() {
         log.info("Merging pull request {}", draft.requestUrl);
         PullRequest pullRequest = draft.getGithubPullRequest();
-        github.mergePullRequest(pullRequest);
+        github.mergePullRequest(pullRequest, githubConfig.mergeMethod);
     }
 }
