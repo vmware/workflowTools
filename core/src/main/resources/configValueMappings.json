@@ -147,6 +147,9 @@
     "--jenkins-jobs",
     "--job-build-number"
   ],
+  "MergePullRequest": [
+    "--merge-method"
+  ],
   "BaseCommitReadAction": [
     "--set-empty-only"
   ],

@@ -78,10 +78,10 @@ public class Github extends AbstractRestService {
         return get(pullRequestUrl(ownerName, repoName, pullNumber), PullRequest.class);
     }
 
-    public void mergePullRequest(PullRequest pullRequest) {
+    public void mergePullRequest(PullRequest pullRequest, String mergeMethod) {
         setupAuthenticatedConnection();
         PullMergeRequest pullMergeRequest = new PullMergeRequest();
-        pullMergeRequest.mergeMethod = "merge";
+        pullMergeRequest.mergeMethod = mergeMethod;
         PullMergeResult result = put(pullRequestUrl(pullRequest) + "/merge", PullMergeResult.class, pullMergeRequest);
         log.debug("Merge result: {} Sha: {}", result.message, result.sha);
         if (!result.merged) {
