@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.google.gson.FieldNamingPolicy;
 import com.vmware.AbstractRestService;
 import com.vmware.github.domain.GraphqlRequest;
+import com.vmware.github.domain.PullMergeResult;
 import com.vmware.github.domain.PullRequestForUpdate;
 import com.vmware.github.domain.PullMergeRequest;
 import com.vmware.github.domain.PullRequest;
@@ -28,6 +29,7 @@ import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
 
 public class Github extends AbstractRestService {
@@ -80,7 +82,10 @@ public class Github extends AbstractRestService {
         setupAuthenticatedConnection();
         PullMergeRequest pullMergeRequest = new PullMergeRequest();
         pullMergeRequest.mergeMethod = "merge";
-        post(pullRequestUrl(pullRequest) + "/merge", PullMergeRequest.class, pullMergeRequest);
+        PullMergeResult result = put(pullRequestUrl(pullRequest) + "/merge", PullMergeResult.class, pullMergeRequest);
+        if (!result.merged) {
+            throw new FatalException("Failed to merge pull request {}. Message: {}", pullRequest.number, result.message);
+        }
     }
 
     public PullRequest updatePullRequest(PullRequestForUpdate pullRequest) {
