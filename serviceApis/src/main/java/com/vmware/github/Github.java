@@ -83,6 +83,7 @@ public class Github extends AbstractRestService {
         PullMergeRequest pullMergeRequest = new PullMergeRequest();
         pullMergeRequest.mergeMethod = "merge";
         PullMergeResult result = put(pullRequestUrl(pullRequest) + "/merge", PullMergeResult.class, pullMergeRequest);
+        log.debug("Merge result: {} Sha: {}", result.message, result.sha);
         if (!result.merged) {
             throw new FatalException("Failed to merge pull request {}. Message: {}", pullRequest.number, result.message);
         }
