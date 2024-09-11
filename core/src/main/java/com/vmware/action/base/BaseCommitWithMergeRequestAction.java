@@ -3,8 +3,8 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 
 public abstract class BaseCommitWithMergeRequestAction extends BaseCommitUsingGitlabAction {
-    private boolean loadMergeRequest;
-    private boolean skipIfNoMergeRequest;
+    private final boolean loadMergeRequest;
+    private final boolean skipIfNoMergeRequest;
 
     public BaseCommitWithMergeRequestAction(WorkflowConfig config) {
         this(config, false, false);
@@ -25,7 +25,7 @@ public abstract class BaseCommitWithMergeRequestAction extends BaseCommitUsingGi
     protected void failWorkflowIfConditionNotMet() {
         super.failWorkflowIfConditionNotMet();
         if (!skipIfNoMergeRequest) {
-            super.failIfTrue(!draft.hasMergeRequest(), "no git lab merge request associated with commit");
+            super.failIfTrue(!draft.hasMergeOrPullRequest(), "no git lab merge request associated with commit");
         }
     }
 
@@ -33,7 +33,7 @@ public abstract class BaseCommitWithMergeRequestAction extends BaseCommitUsingGi
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
         if (skipIfNoMergeRequest) {
-            super.skipActionIfTrue(!draft.hasMergeRequest(), "no git lab merge request associated with commit");
+            super.skipActionIfTrue(!draft.hasMergeOrPullRequest(), "no git lab merge request associated with commit");
         }
     }
 

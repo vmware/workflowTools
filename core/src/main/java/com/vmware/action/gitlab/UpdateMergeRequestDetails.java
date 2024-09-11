@@ -27,7 +27,7 @@ public class UpdateMergeRequestDetails extends BaseCommitWithMergeRequestAction 
     public void process() {
         MergeRequest mergeRequest = draft.getGitlabMergeRequest();
         log.info("Updating details for merge request {}", mergeRequest.iid);
-        mergeRequest.title = gitlabConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
+        mergeRequest.title = gitRepoConfig.markAsDraft ? gitlabConfig.draftMergeRequestPrefix + " " + draft.summary : draft.summary;
         mergeRequest.description = replaceLineBreakWithHtmlBrTag(draft.description) + "\n\n" + commitConfig.testingDoneLabel
                 + " " + replaceLineBreakWithHtmlBrTag(draft.testingDone);
         if (draft.hasReviewNumber()) {

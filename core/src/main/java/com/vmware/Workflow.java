@@ -160,7 +160,7 @@ public class Workflow {
         } else if (!workflowJarFile.canWrite()) {
             log.debug("Marking jar file {} as writable as it is only {} days old",
                     workflowJarFile.getAbsolutePath(), daysOld);
-            log.debug("Writable: " + workflowJarFile.setWritable(true));
+            log.debug("Writable: {}", workflowJarFile.setWritable(true));
             return;
         }
         if (daysOld >= config.updateCheckInterval) {

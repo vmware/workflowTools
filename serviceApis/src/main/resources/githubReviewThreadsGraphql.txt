@@ -1,0 +1,27 @@
+query GetReviewThreads {
+  repository(owner: "${repoOwnerName}", name: "${repoName}") {
+    pullRequest(number: ${pullRequestNumber}) {
+      reviewThreads(first: 30) {
+         nodes {
+            id,
+            __typename,
+            path,
+            comments (first: 30) {
+              nodes {
+                  id,
+                  author {
+                    login
+                  },
+                  body,
+                  createdAt,
+                  diffHunk
+              }
+            },
+            isResolved
+          }
+
+      }
+
+    }
+  }
+}

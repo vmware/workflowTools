@@ -80,7 +80,9 @@ public class QueryResultVappType extends ResourceType implements InputListSelect
 
     public void parseJson(String jsonData) {
         Gson gson = new ConfiguredGsonBuilder().build();
-        Sites sites = gson.fromJson(jsonData, Sites.class);
+        // Gson fails to parse a script that has [ ] characters
+        String jsonDataWithoutScript = jsonData.replaceAll("\"customizationScript\" : \\[.+\\]", "\"customizationScript\" : null");
+        Sites sites = gson.fromJson(jsonDataWithoutScript, Sites.class);
         if (sites.sites == null || sites.sites.isEmpty()) {
             throw new FatalException("No sites defined for vapp {}", name);
         }

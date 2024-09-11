@@ -258,7 +258,7 @@ public class Git extends BaseScmWrapper {
     }
 
     public void commit(String msg, boolean noVerify) {
-        executeCommitCommand("commit", msg, noVerify);
+        executeCommitCommand("commit", msg, noVerify, LogLevel.INFO);
     }
 
     public void addChangesToDefaultChangelist(String origin) {
@@ -270,17 +270,18 @@ public class Git extends BaseScmWrapper {
     }
 
     public void commitWithAllFileChanges(String msg, boolean noVerify) {
-        executeCommitCommand("commit --all", msg, noVerify);
+        executeCommitCommand("commit --all", msg, noVerify, LogLevel.INFO);
     }
 
     public void amendCommit(String msg, boolean noVerify) {
         checkIfLastCommitHasSameAuthor();
-        executeCommitCommand("commit --amend", msg, noVerify);
+        executeCommitCommand("commit --amend", msg, noVerify, LogLevel.DEBUG);
     }
 
     public void amendCommitWithAllFileChanges(String msg, boolean noVerify) {
         checkIfLastCommitHasSameAuthor();
-        executeCommitCommand("commit --amend --all", msg, noVerify);
+        LogLevel logLevel = !getAllChanges().isEmpty() ? LogLevel.INFO : LogLevel.DEBUG;
+        executeCommitCommand("commit --amend --all", msg, noVerify, logLevel);
     }
 
     public byte[] diffAsByteArray(String parentRef, String commitRef, boolean supportsRenames) {
@@ -585,10 +586,9 @@ public class Git extends BaseScmWrapper {
         }
     }
 
-    private void executeCommitCommand(String commitCommand, String msg, boolean noVerify) {
+    private void executeCommitCommand(String commitCommand, String msg, boolean noVerify, LogLevel logLevel) {
         String noVerifyText = noVerify ? " --no-verify" : "";
         String fileText = StringUtils.isNotBlank(msg) ? " --file=-" : "";
-        LogLevel logLevel = !getAllChanges().isEmpty() ? LogLevel.INFO : LogLevel.DEBUG;
         executeScmCommand(commitCommand + noVerifyText + fileText, msg, logLevel);
     }
 

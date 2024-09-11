@@ -18,6 +18,7 @@ import com.vmware.config.section.CommitConfig;
 import com.vmware.config.section.CommitStatsConfig;
 import com.vmware.config.section.FileSystemConfig;
 import com.vmware.config.section.GitRepoConfig;
+import com.vmware.config.section.GithubConfig;
 import com.vmware.config.section.GitlabConfig;
 import com.vmware.config.section.JenkinsConfig;
 import com.vmware.config.section.JiraConfig;
@@ -46,6 +47,7 @@ public abstract class BaseAction implements Action {
 
     protected final GitRepoConfig gitRepoConfig;
     protected final GitlabConfig gitlabConfig;
+    protected final GithubConfig githubConfig;
     protected final PerforceClientConfig perforceClientConfig;
     protected final CommitConfig commitConfig;
     protected final CommitStatsConfig statsConfig;
@@ -86,6 +88,7 @@ public abstract class BaseAction implements Action {
         this.statsConfig = config.statsConfig;
         this.gitRepoConfig = config.gitRepoConfig;
         this.gitlabConfig = config.gitlabConfig;
+        this.githubConfig = config.githubConfig;
         this.perforceClientConfig = config.perforceClientConfig;
         this.reviewBoardConfig = config.reviewBoardConfig;
         this.jiraConfig = config.jiraConfig;
