@@ -58,13 +58,12 @@ public class SetBugNumbers extends BaseCommitReadAction {
             String bugNumbers = InputUtils.readData("Bug Numbers: (leave blank if none)", true, 30);
             issues = getBugsAndIssues(bugNumbers);
             waitingForBugNumbers = false;
-            if (listHasNoBugNumbers(issues)) {
-                draft.bugNumbers = commitConfig.noBugNumberLabel;
-            } else if (!allIssuesWereFound(issues)) {
+            if (!allIssuesWereFound(issues)) {
                 String reenterBugNumber = InputUtils.readValue("One or more issues not found, reenter bug numbers? [y/n]");
                 waitingForBugNumbers = reenterBugNumber.equalsIgnoreCase("y");
             }
         }
+
         draft.setIssues(issues, commitConfig.noBugNumberLabel, commitConfig.useLinkedBugzillaId);
         log.info("Bug numbers for commit: {}", draft.bugNumbers);
     }
@@ -199,14 +198,5 @@ public class SetBugNumbers extends BaseCommitReadAction {
         }
         issuePadder.infoTitle();
         return allFound;
-    }
-
-    private boolean listHasNoBugNumbers(List<IssueInfo> jiraIssues) {
-        for (IssueInfo jiraIssue: jiraIssues) {
-            if (jiraIssue == Issue.noBugNumber) {
-                return true;
-            }
-        }
-        return false;
     }
 }

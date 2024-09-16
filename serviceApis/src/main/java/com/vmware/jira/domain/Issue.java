@@ -112,6 +112,9 @@ public class Issue implements IssueInfo {
 
     @Override
     public String getLinkedBugNumber() {
+        if (fields == null) {
+            return null;
+        }
         return StringUtils.isNotBlank(fields.bugzillaUrl) ? MatcherUtils.singleMatchExpected(fields.bugzillaUrl, "id=(\\d+)") : null;
     }
 
