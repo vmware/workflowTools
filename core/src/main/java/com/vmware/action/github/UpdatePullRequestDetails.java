@@ -1,6 +1,5 @@
 package com.vmware.action.github;
 
-import com.vmware.action.base.BaseCommitWithMergeRequestAction;
 import com.vmware.action.base.BaseCommitWithPullRequestAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
@@ -17,8 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.vmware.util.StringUtils.replaceLineBreakWithHtmlBrTag;
 
 @ActionDescription("Updates the title, description and reviewers for a pull request")
 public class UpdatePullRequestDetails extends BaseCommitWithPullRequestAction {

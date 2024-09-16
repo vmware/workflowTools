@@ -465,7 +465,7 @@
       "FormatCommitText",
       "AmendCommitWithoutJobResults"
     ],
-    "prepareCommitForGithub": [
+    "prepareCommitForGithubMerge": [
       "selectPullRequest",
       "ExitIfCommitFailsCheckstyle",
       "ExitIfReviewHasNoShipIts",
@@ -715,7 +715,9 @@
     ],
     "createMergeRequest": [
       "selectMergeRequest",
-      "syncMergeRequestFromCommit"
+      "pushCommitToMergeBranch",
+      "CreateMergeRequestIfNeeded",
+      "CopyRequestUrlToClipboard"
     ],
     "updateMergeRequest" : [
       "updateMergeRequestDetails",
@@ -779,7 +781,7 @@
       "AcceptMergeRequest"
     ],
     "mergePullRequest": [
-      "prepareCommitForGithub",
+      "prepareCommitForGithubMerge",
       "syncPullRequestFromCommit&&--mark-as-draft=false",
       "WaitForPullRequestToBeUpdated",
       "ExitIfPullRequestDoesNotHaveRequiredApprovals",
@@ -789,7 +791,9 @@
     ],
     "createPullRequest": [
       "selectPullRequest",
-      "syncPullRequestFromCommit"
+      "pushCommitToMergeBranch",
+      "CreatePullRequestIfNeeded",
+      "CopyRequestUrlToClipboard"
     ],
     "updatePullRequest" : [
       "updatePullRequestDetails",
@@ -1186,6 +1190,7 @@
     "prepareCommitForGitlabMerge",
     "prepareCommitForGithubMerge",
     "syncMergeRequestFromCommit",
+    "syncPullRequestFromCommit",
     "setCommitDetails",
     "setCommitDetailsOffline",
     "setReviewDetails",
