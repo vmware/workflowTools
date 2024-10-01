@@ -35,7 +35,7 @@
   "defaultBuildwebBranch": "sp-main",
   "buildType": "opt",
   "refreshTokenName": "WorkflowTools",
-  "vcdApiVersion": "36.1",
+  "vcdApiVersion": "37.1",
   "vcdSysAdminUser": "administrator",
   "vcdVmQuota": 40,
   "testbedParameter": "TESTBED_DESCRIPTOR_NAME",
