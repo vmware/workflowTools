@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.vmware.config.commandLine.CommandLineArgumentsParser;
 import com.vmware.config.section.PerforceClientConfig;
+import com.vmware.http.HttpConnection;
 import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.util.ClasspathResource;
 import com.vmware.util.StringUtils;
@@ -70,6 +71,7 @@ public class WorkflowConfigParser {
 
         log.debug("Loaded config files: {}", config.getConfigurableFields().loadedConfigFilesText());
 
+        HttpConnection.alwaysDisableHostnameVerification = config.disableHostnameVerification;
         parseUsernameIfBlank(config);
 
         config.applyReplacementVariables();

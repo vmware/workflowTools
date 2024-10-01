@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Cookie {
     private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -27,6 +28,16 @@ public class Cookie {
     private String path;
 
     private boolean secure;
+
+    public Cookie(String domain, String cookieText, String path) {
+        String[] cookiePieces = cookieText.split("=");
+        this.domain = domain;
+        this.name = cookiePieces[0].trim();
+        this.value = cookiePieces.length > 1 ? cookiePieces[1].trim() : null;
+        this.expiryDate = new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(365));
+        this.path = path;
+        this.secure = false;
+    }
 
     public Cookie(String name, String value) {
         this.name = name;

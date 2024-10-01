@@ -209,6 +209,9 @@ public class WorkflowConfig {
     @ConfigurableProperty(commandLine = "--script-mode", help = "Flag to set minimize logging in script mode")
     public boolean scriptMode;
 
+    @ConfigurableProperty(commandLine = "--disable-hostname-verification", help = "Disable checking the hostname for ssl uri addresses")
+    public boolean disableHostnameVerification;
+
     @ConfigurableProperty(commandLine = QUERY_STRING_COMMAND_LINE, help = "Runtime arguments in HTML query string format")
     public String queryString;
 

@@ -121,7 +121,12 @@ public class Jira extends AbstractRestService {
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee=%s",
                 issueTypesToGet, allowedStatuses, escapeUsername(getUsername()));
         IssuesResponse response = get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
-        log.debug("{} tasks found", response.issues.length);
+        if (response == null) {
+            log.debug("No issues parsed from jira response");
+        } else {
+            log.debug("{} tasks found", response.issues.length);
+        }
+
         return response;
     }
 

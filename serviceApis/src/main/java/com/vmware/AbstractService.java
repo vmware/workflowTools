@@ -73,6 +73,10 @@ public abstract class AbstractService {
         },this.getClass().getSimpleName() + " login", MAX_LOGIN_RETRIES);
     }
 
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
     public abstract boolean isBaseUriTrusted();
 
     public String getUsername() {

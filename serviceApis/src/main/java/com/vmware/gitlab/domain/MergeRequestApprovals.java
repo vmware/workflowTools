@@ -24,7 +24,7 @@ public class MergeRequestApprovals {
 
     public String approvalInfo() {
         String approvalString = approvedBy == null ? "" :
-                Arrays.stream(approvedBy).map(approvalUser -> approvalUser.user.username).collect(Collectors.joining(","));
+                Arrays.stream(approvedBy).map(approvalUser -> approvalUser.user.name).collect(Collectors.joining(","));
         if (StringUtils.isNotBlank(approvalString)) {
             approvalString = ", already approved by: " + approvalString;
         }
@@ -32,7 +32,7 @@ public class MergeRequestApprovals {
             return "No approvals needed" + approvalString;
         }
         String suggestedApproversString = suggestedApprovers == null ? "" :
-                Arrays.stream(suggestedApprovers).map(user -> user.username).collect(Collectors.joining(","));
+                Arrays.stream(suggestedApprovers).map(user -> user.name).collect(Collectors.joining(","));
         if (StringUtils.isNotBlank(suggestedApproversString)) {
             suggestedApproversString = ", suggested approvers: " + suggestedApproversString;
         }

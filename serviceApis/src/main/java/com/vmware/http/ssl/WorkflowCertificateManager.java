@@ -20,6 +20,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -113,6 +114,10 @@ public class WorkflowCertificateManager {
         }
     }
 
+    public boolean isLastServerTrusted() {
+        return workflowTrustManager.isLastServerTrusted();
+    }
+
     public String getKeyStore() {
         return keyStoreFile.getPath();
     }
@@ -157,11 +162,11 @@ public class WorkflowCertificateManager {
         X509KeyManager customKeyManager = getKeyManager("SunX509", workflowKeystore, PASS_PHRASE);
         X509KeyManager jvmKeyManager = getKeyManager(defaultAlgorithm, null, null);
         X509TrustManager customTrustManager = getTrustManager("SunX509", workflowKeystore);
-        workflowTrustManager = new SavingTrustManager(customTrustManager);
         X509TrustManager jvmTrustManager = getTrustManager(defaultAlgorithm, null);
+        workflowTrustManager = new SavingTrustManager(Arrays.asList(jvmTrustManager, customTrustManager));
 
         KeyManager[] keyManagers = { new CompositeX509KeyManager(Arrays.asList(jvmKeyManager, customKeyManager)) };
-        TrustManager[] trustManagers = { new CompositeX509TrustManager(Arrays.asList(jvmTrustManager, workflowTrustManager)) };
+        TrustManager[] trustManagers = { workflowTrustManager };
 
         SSLContext context = SSLContext.getInstance("SSL");
         context.init(keyManagers, trustManagers, null);
@@ -214,27 +219,29 @@ public class WorkflowCertificateManager {
         return null;
     }
 
-    private static class SavingTrustManager implements X509TrustManager {
-
-        private final X509TrustManager tm;
+    private static class SavingTrustManager extends CompositeX509TrustManager {
         private X509Certificate[] chain;
+        private boolean lastServerTrusted;
 
-        SavingTrustManager(X509TrustManager tm) {
-            this.tm = tm;
+        SavingTrustManager(List<X509TrustManager> trustManagers) {
+            super(trustManagers);
         }
 
-        public X509Certificate[] getAcceptedIssuers() {
-            return tm.getAcceptedIssuers();
+        public boolean isLastServerTrusted() {
+            return lastServerTrusted;
         }
 
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
+            this.lastServerTrusted = false;
             this.chain = chain;
-            tm.checkServerTrusted(chain, authType);
+            super.checkServerTrusted(chain, authType);
+            this.lastServerTrusted = true;
         }
     }
 

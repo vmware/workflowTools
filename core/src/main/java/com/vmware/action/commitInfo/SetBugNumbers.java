@@ -7,6 +7,7 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.jira.Jira;
 import com.vmware.jira.domain.Issue;
+import com.vmware.jira.domain.IssuesResponse;
 import com.vmware.reviewboard.domain.ReviewRequestDraft;
 import com.vmware.util.input.InputUtils;
 import com.vmware.util.logging.Padder;
@@ -50,7 +51,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
         List<IssueInfo> issues = null;
         if (StringUtils.isNotEmpty(draft.bugNumbers) && !draft.bugNumbers.equals(commitConfig.noBugNumberLabel)) {
             log.info("");
-            log.info("Existing bug numbers: " + draft.bugNumbers);
+            log.info("Existing bug numbers: {}", draft.bugNumbers);
         }
 
         boolean waitingForBugNumbers = true;
@@ -74,7 +75,10 @@ public class SetBugNumbers extends BaseCommitReadAction {
             return;
         }
 
-        loadedIssues.addAll(Arrays.asList(jira.getOpenTasksForUser().issues));
+        IssuesResponse openTasks = jira.getOpenTasksForUser();
+        if (openTasks != null && openTasks.issues != null) {
+            loadedIssues.addAll(Arrays.asList(openTasks.issues));
+        }
         jiraIssuesLoaded = true;
     }
 

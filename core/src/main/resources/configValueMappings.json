@@ -104,6 +104,9 @@
   "AuthenticateAllApis": [
     "--trello-sso",
     "--disable-login",
+    "--jira-url",
+    "--bugzilla-sso-login-id",
+    "--bugzilla-sso",
     "--bugzilla-test-bug",
     "--use-rb-api-token",
     "--sso-headless",
@@ -184,6 +187,7 @@
   ],
   "UpdateTaskEstimates": [
     "--username",
+    "--jira-url",
     "--estimate"
   ],
   "RsyncCommand": [
@@ -194,6 +198,7 @@
   ],
   "BaseBatchJiraAction": [
     "--username",
+    "--jira-url",
     "--disable-jira"
   ],
   "PowerOnVapp": [
@@ -367,6 +372,8 @@
     "--regex"
   ],
   "BaseBatchBugzillaAction": [
+    "--bugzilla-sso-login-id",
+    "--bugzilla-sso",
     "--bugzilla-test-bug",
     "--username",
     "--default-jira-component",
@@ -437,6 +444,8 @@
     "--trivial-reviewer-label"
   ],
   "MarkBugAsResolved": [
+    "--bugzilla-sso-login-id",
+    "--bugzilla-sso",
     "--bugzilla-test-bug",
     "--username"
   ],
@@ -586,13 +595,15 @@
     "--jenkins-jobs"
   ],
   "BaseTransitionJiraIssue": [
+    "--jira-url",
     "--username",
     "--disable-jira"
   ],
   "ConvertCardsToJiraIssues": [
     "--trello-sso",
     "--username",
-    "--sso-email"
+    "--sso-email",
+    "--jira-url"
   ],
   "PowerOffVm": [
     "--sso-headless",
@@ -625,6 +636,7 @@
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
     "--username",
+    "--jira-url",
     "--disable-jira"
   ],
   "SetReviewId": [
@@ -853,14 +865,18 @@
     "--trello-sso",
     "--username",
     "--sso-email",
+    "--jira-url",
     "--keep-missing-cards"
   ],
   "DisplayInfo": [
     "--input-text"
   ],
   "SetBugNumbers": [
+    "--bugzilla-sso-login-id",
+    "--bugzilla-sso",
     "--bugzilla-test-bug",
     "--username",
+    "--jira-url",
     "--use-linked-bugzilla-id",
     "--disable-bugzilla",
     "--disable-jira"

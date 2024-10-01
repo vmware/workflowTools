@@ -21,6 +21,12 @@ public class BugzillaConfig {
     @ConfigurableProperty(help = "Represents a bug in bugzilla, only the number part will be stored")
     public String bugzillaPrefix;
 
+    @ConfigurableProperty(commandLine = "--bugzilla-sso", help = "Whether to use sso for bugzilla login")
+    public boolean bugzillaSso;
+
+    @ConfigurableProperty(commandLine = "--bugzilla-sso-login-id", help = "Id of button to click for bugzilla sso login")
+    public String bugzillaSsoLoginId;
+
     public Integer parseBugzillaBugNumber(String bugNumber) {
         if (StringUtils.isInteger(bugNumber)) {
             return Integer.parseInt(bugNumber);

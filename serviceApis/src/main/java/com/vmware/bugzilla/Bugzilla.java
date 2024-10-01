@@ -4,26 +4,41 @@ import com.vmware.AbstractService;
 import com.vmware.bugzilla.domain.Bug;
 import com.vmware.bugzilla.domain.BugKnobType;
 import com.vmware.bugzilla.domain.BugResolutionType;
+import com.vmware.chrome.ChromeDevTools;
+import com.vmware.chrome.SsoClient;
+import com.vmware.chrome.domain.ApiRequest;
+import com.vmware.chrome.domain.ApiResponse;
+import com.vmware.config.section.SsoConfig;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.cookie.Cookie;
 import com.vmware.http.credentials.UsernamePasswordAsker;
 import com.vmware.http.credentials.UsernamePasswordCredentials;
 import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.body.RequestBodyHandling;
+import com.vmware.util.ThreadUtils;
+import com.vmware.util.UrlUtils;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapObjectConverter;
 import com.vmware.xmlrpc.RuntimeXmlRpcException;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
+import static com.vmware.http.cookie.ApiAuthentication.trello;
 import static java.lang.String.format;
 
 
@@ -34,16 +49,22 @@ import static java.lang.String.format;
 public class Bugzilla extends AbstractService {
 
     private final HttpConnection connection;
-    private CookieAwareXmlRpcClient xmlRpcClient;
-    private MapObjectConverter mapConverter;
-    private int testBugNumber;
+    private final CookieAwareXmlRpcClient xmlRpcClient;
+    private final MapObjectConverter mapConverter;
+    private final int testBugNumber;
+    private final boolean bugzillaSso;
+    private final SsoConfig ssoConfig;
+    private final String ssoButtonId;
 
-    public Bugzilla(String bugzillaUrl, String username, int testBugNumber) {
+    public Bugzilla(String bugzillaUrl, String username, int testBugNumber, boolean bugzillaSso, SsoConfig ssoConfig, String ssoButtonId) {
         super(bugzillaUrl, "xmlrpc.cgi", ApiAuthentication.bugzilla_cookie, username);
         this.testBugNumber = testBugNumber;
-        xmlRpcClient = new CookieAwareXmlRpcClient(apiUrl);
+        this.bugzillaSso = bugzillaSso;
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
+        xmlRpcClient = new CookieAwareXmlRpcClient(apiUrl, connection.getCookieFileStore());
         mapConverter = new MapObjectConverter();
+        this.ssoConfig = ssoConfig;
+        this.ssoButtonId = ssoButtonId;
     }
 
     public List<Bug> getBugsForQuery(String savedQueryToRun) {
@@ -131,16 +152,32 @@ public class Bugzilla extends AbstractService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType, getUsername());
-        try {
-            Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
-            Integer sessionId = (Integer) result.get("id");
-            log.debug("Session id {}", String.valueOf(sessionId));
-        } catch (RuntimeXmlRpcException e) {
-            if (e.getMessage() != null && e.getMessage().contains("The username or password you entered is not valid")) {
-                throw new NotAuthorizedException(e.getMessage(), e);
-            } else {
-                throw e;
+        if (bugzillaSso) {
+            Consumer<ChromeDevTools> ssoNavigateFunction = devTools -> {
+            };
+
+            Function<ChromeDevTools, String> apiTokenGenerator = devTools -> {
+                return devTools.evaluate("document.cookie").getValue();
+            };
+
+            SsoClient ssoClient = new SsoClient(ssoConfig, getUsername(), "dbiggs@vmware.com");
+            Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck = new AbstractMap.SimpleEntry<>(ApiRequest.evaluate("document.cookie"),
+                    apiResponse -> apiResponse.getValue().contains(ApiAuthentication.bugzilla_cookie.getCookieName()));
+            String cookies = ssoClient.loginAndGetApiToken(loggedInCheck, baseUrl, ssoButtonId, ssoNavigateFunction, apiTokenGenerator);
+            String[] cookieTexts = cookies.split(";");
+            Arrays.stream(cookieTexts).forEach(cookie -> connection.addCookie(new Cookie(URI.create(baseUrl).getHost(), cookie, "/")));
+        } else {
+            UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType, getUsername());
+            try {
+                Map result = xmlRpcClient.executeCall("User.login", credentials.toBugzillaLogin());
+                Integer sessionId = (Integer) result.get("id");
+                log.debug("Session id {}", sessionId);
+            } catch (RuntimeXmlRpcException e) {
+                if (e.getMessage() != null && e.getMessage().contains("The username or password you entered is not valid")) {
+                    throw new NotAuthorizedException(e.getMessage(), e);
+                } else {
+                    throw e;
+                }
             }
         }
     }

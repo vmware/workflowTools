@@ -34,10 +34,10 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
     private final URL apiURL;
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-	private CookieFileStore cookieFileStore;
+	private final CookieFileStore cookieFileStore;
     private WorkflowCertificateManager workflowCertificateManager = null;
 
-	public CookieAwareXmlRpcClient(String url) {
+	public CookieAwareXmlRpcClient(String url, CookieFileStore cookieFileStore) {
 		super();
 
         try {
@@ -45,8 +45,8 @@ public class CookieAwareXmlRpcClient extends XmlRpcClient {
         } catch (MalformedURLException e) {
             throw new RuntimeIOException(e);
         }
+        this.cookieFileStore = cookieFileStore;
         String homeFolder = System.getProperty("user.home");
-        cookieFileStore = new CookieFileStore(homeFolder);
         workflowCertificateManager = new WorkflowCertificateManager(homeFolder + "/.workflowTool.keystore");
 
 		final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();

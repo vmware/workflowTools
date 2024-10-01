@@ -30,7 +30,7 @@ public class AuthenticateAllApis extends BaseAction {
 
         ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
         checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType));
-        checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug));
+        checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug, bugzillaConfig.bugzillaSso, ssoConfig, bugzillaConfig.bugzillaSsoLoginId));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
         checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides));
         checkAuthentication(new Trello(trelloConfig.trelloUrl, config.username, trelloConfig.trelloSso, ssoEmail, ssoConfig));

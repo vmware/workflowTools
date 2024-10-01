@@ -66,7 +66,8 @@ public class ServiceLocator {
 
     public Bugzilla getBugzilla() {
         if (bugzilla == null) {
-            bugzilla = new Bugzilla(config.bugzillaConfig.bugzillaUrl, config.username, config.bugzillaConfig.bugzillaTestBug);
+            bugzilla = new Bugzilla(config.bugzillaConfig.bugzillaUrl, config.username,
+                    config.bugzillaConfig.bugzillaTestBug, config.bugzillaConfig.bugzillaSso, config.ssoConfig, config.bugzillaConfig.bugzillaSsoLoginId);
         }
         return bugzilla;
     }

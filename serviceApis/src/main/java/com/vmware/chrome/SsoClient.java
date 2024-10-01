@@ -1,5 +1,6 @@
 package com.vmware.chrome;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,18 +40,25 @@ public class SsoClient {
 
     public String loginAndGetApiToken(String siteUrl, String siteLoginUrl, String ssoLoginButtonId, Consumer<ChromeDevTools> ssoNavigateConsumer,
                                       Function<ChromeDevTools, String> authenticationTokenFunction) {
+        Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck = new AbstractMap.SimpleEntry<>(ApiRequest.evaluate("window.location.href"),
+                response -> response.matchesUrl(siteUrl));
+        return loginAndGetApiToken(loggedInCheck, siteLoginUrl, ssoLoginButtonId, ssoNavigateConsumer, authenticationTokenFunction);
+    }
+
+    public String loginAndGetApiToken(Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck, String siteLoginUrl, String ssoLoginButtonId, Consumer<ChromeDevTools> ssoNavigateConsumer,
+                                      Function<ChromeDevTools, String> authenticationTokenFunction) {
         ChromeDevTools devTools = ChromeDevTools.devTools(ssoConfig.chromePath, ssoConfig.ssoHeadless, ssoConfig.chromeDebugPort);
         devTools.sendMessage(new ApiRequest("Page.enable"));
         devTools.sendMessage(ApiRequest.navigate(siteLoginUrl));
         devTools.waitForDomContentEvent();
         ThreadUtils.sleep(2, TimeUnit.SECONDS);
-        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
+        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
 
         if (response.matchesElementId(ssoLoginButtonId)) {
             log.info("Clicking SSO sign in element {}", ssoLoginButtonId);
             devTools.clickById(ssoLoginButtonId);
             ssoNavigateConsumer.accept(devTools);
-            response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoConfig.ssoSignInButtonId, "userNameFormSubmit");
+            response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoConfig.ssoSignInButtonId, "userNameFormSubmit");
 
             if (response.matchesElementId("userNameFormSubmit")) {
                 if (StringUtils.isEmpty(email)) {
@@ -60,11 +68,11 @@ public class SsoClient {
                 devTools.setValueById(ssoConfig.emailAddressInputId, email);
                 devTools.clickById(ssoConfig.emailAddressSubmitButtonId);
                 devTools.waitForDomContentEvent();
-                response = waitForSiteUrlOrSignInElements(devTools, siteUrl, ssoConfig.ssoSignInButtonId);
+                response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoConfig.ssoSignInButtonId);
             }
         }
 
-        if (response.matchesUrl(siteUrl)) {
+        if (loggedInCheck.getValue().test(response)) {
             log.info("Retrieving api token after successful login using SSO");
             String apiAuthentication = authenticationTokenFunction.apply(devTools);
             devTools.close();
@@ -76,12 +84,13 @@ public class SsoClient {
         }
 
         log.info("Logging in via SSO login page");
-        String apiToken = loginWithUsernameAndPassword(siteUrl, authenticationTokenFunction, devTools, 0);
+        String apiToken = loginWithUsernameAndPassword(loggedInCheck, authenticationTokenFunction, devTools, 0);
         devTools.close();
         return apiToken;
     }
 
-    private String loginWithUsernameAndPassword(String siteUrl, Function<ChromeDevTools, String> apiAuthenticationFunction, ChromeDevTools devTools, int retry) {
+    private String loginWithUsernameAndPassword(Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck,
+                                                Function<ChromeDevTools, String> apiAuthenticationFunction, ChromeDevTools devTools, int retry) {
         devTools.waitForAnyElementId(ssoConfig.ssoUsernameInputId);
 
         String passwordId = devTools.waitForAnyElementId(ssoConfig.ssoPasswordInputId, ssoConfig.ssoPasscodeInputId);
@@ -101,7 +110,7 @@ public class SsoClient {
         List<String> elementsToClickAfterPasscodeSubmit = new ArrayList<>(Arrays.asList(ssoConfig.elementsToClickAfterSignIn));
         List<String> elementsToCheck = new ArrayList<>(elementsToClickAfterPasscodeSubmit);
         elementsToCheck.addAll(Arrays.asList(ssoConfig.ssoSignInButtonId, ssoConfig.ssoPasscodeSignInButtonId));
-        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, siteUrl, elementsToCheck);
+        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, elementsToCheck);
 
         Optional<String> elementToClickAfterSubmit = elementsToClickAfterPasscodeSubmit.stream().filter(response::matchesElementId).findFirst();
         while (elementToClickAfterSubmit.isPresent()) {
@@ -110,11 +119,11 @@ public class SsoClient {
             devTools.clickById(elementToClickAfterSubmit.get());
             ThreadUtils.sleep(1, TimeUnit.SECONDS);
             elementsToCheck.remove(elementToClickAfterSubmit.get());
-            response = waitForSiteUrlOrSignInElements(devTools, siteUrl, elementsToCheck);
+            response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, elementsToCheck);
             elementToClickAfterSubmit = elementsToClickAfterPasscodeSubmit.stream().filter(response::matchesElementId).findFirst();
         }
 
-        if (response.matchesUrl(siteUrl)) {
+        if (loggedInCheck.getValue().test(response)) {
             log.info("Retrieving api token after successful login");
             return apiAuthenticationFunction.apply(devTools);
         } else {
@@ -122,25 +131,24 @@ public class SsoClient {
                 throw new RuntimeException("Failed to login via SSO after " + retry + " retries");
             } else {
                 log.info("Failed to login, retry {} of 3 times", retry + 1);
-                return loginWithUsernameAndPassword(siteUrl, apiAuthenticationFunction, devTools, retry + 1);
+                return loginWithUsernameAndPassword(loggedInCheck, apiAuthenticationFunction, devTools, retry + 1);
             }
         }
 
     }
 
-    private ApiResponse waitForSiteUrlOrSignInElements(ChromeDevTools devTools, String siteUrl, String... elementIds) {
-        return waitForSiteUrlOrSignInElements(devTools, siteUrl, Arrays.asList(elementIds));
+    private ApiResponse waitForSiteUrlOrSignInElements(ChromeDevTools devTools, Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck, String... elementIds) {
+        return waitForSiteUrlOrSignInElements(devTools, loggedInCheck, Arrays.asList(elementIds));
     }
 
-    private ApiResponse waitForSiteUrlOrSignInElements(ChromeDevTools devTools, String siteUrl, List<String> elementIds) {
-        Map<ApiRequest, Predicate<ApiResponse>> signInButtonOrSiteUrlMap = new HashMap<>();
+    private ApiResponse waitForSiteUrlOrSignInElements(ChromeDevTools devTools, Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck, List<String> elementIds) {
+        Map<ApiRequest, Predicate<ApiResponse>> signInButtonOrLoggedInCheckMap = new HashMap<>();
         elementIds.stream().filter(Objects::nonNull).forEach(elementId -> {
-            signInButtonOrSiteUrlMap.put(ApiRequest.elementById(elementId),
+            signInButtonOrLoggedInCheckMap.put(ApiRequest.elementById(elementId),
                     response -> response.matchesElementId(elementId));
         });
-        signInButtonOrSiteUrlMap.put(ApiRequest.evaluate("window.location.href"),
-                response -> response.matchesUrl(siteUrl));
+        signInButtonOrLoggedInCheckMap.put(loggedInCheck.getKey(), loggedInCheck.getValue());
 
-        return devTools.waitForAnyPredicate(signInButtonOrSiteUrlMap, 0, elementIds + " or " + siteUrl);
+        return devTools.waitForAnyPredicate(signInButtonOrLoggedInCheckMap, 0, elementIds + " or " + loggedInCheck);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class JiraConfig {
 
-    @ConfigurableProperty(help = "Url for jira server")
+    @ConfigurableProperty(commandLine = "--jira-url", help = "Url for jira server")
     public String jiraUrl;
 
     @ConfigurableProperty(commandLine = "-disableJira,--disable-jira", help = "Don't use Jira when checking bug numbers")

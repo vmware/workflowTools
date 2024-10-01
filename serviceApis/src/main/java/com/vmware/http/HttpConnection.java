@@ -60,6 +60,8 @@ public class HttpConnection {
     private static final int CONNECTION_TIMEOUT = (int) TimeUnit.MILLISECONDS.convert(25, TimeUnit.SECONDS);
     public static final int MAX_REQUEST_RETRIES = 3;
 
+    public static boolean alwaysDisableHostnameVerification;
+
     private final CookieFileStore cookieFileStore;
     private WorkflowCertificateManager workflowCertificateManager = null;
     private Gson gson;
@@ -89,6 +91,10 @@ public class HttpConnection {
 
     public void setupBasicAuthHeader(final UsernamePasswordCredentials credentials) {
         requestParams.addStatefulParam(aBasicAuthHeader(credentials));
+    }
+
+    public CookieFileStore getCookieFileStore() {
+        return cookieFileStore;
     }
 
     public void addStatefulParams(List<? extends RequestParam> params) {
@@ -225,7 +231,7 @@ public class HttpConnection {
         activeConnection.setConnectTimeout(CONNECTION_TIMEOUT);
         activeConnection.setReadTimeout(CONNECTION_TIMEOUT);
         activeConnection.setInstanceFollowRedirects(false);
-        if (activeConnection instanceof HttpsURLConnection && disableHostnameVerification) {
+        if (activeConnection instanceof HttpsURLConnection && (disableHostnameVerification || alwaysDisableHostnameVerification)) {
             // allow all host names
             ((HttpsURLConnection) activeConnection).setHostnameVerifier((s, sslSession) -> true);
         }
@@ -294,6 +300,10 @@ public class HttpConnection {
             String urlText = activeConnection.getURL().toString();
             log.error("Ssl error for {} {}", activeConnection.getRequestMethod(), urlText);
             log.error("Error [{}]" ,e.getMessage());
+            if (workflowCertificateManager.isLastServerTrusted()) {
+                log.info("Last server certificate was trusted, try using --disable-hostname-verification to workaround errors due to subject alternative name");
+                System.exit(1);
+            }
             askIfSslCertShouldBeSaved();
             exitIfMaxRetriesReached(retryCount);
 

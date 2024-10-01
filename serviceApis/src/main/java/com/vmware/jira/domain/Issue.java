@@ -8,6 +8,7 @@ import com.vmware.util.StringUtils;
 import com.google.gson.annotations.Expose;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Issue implements IssueInfo {
 
@@ -87,9 +88,7 @@ public class Issue implements IssueInfo {
 
         Issue issue = (Issue) o;
 
-        if (key != null ? !key.equals(issue.key) : issue.key != null) return false;
-
-        return true;
+        return Objects.equals(key, issue.key);
     }
 
     @Override
@@ -133,12 +132,12 @@ public class Issue implements IssueInfo {
 
     @Override
     public String getSummary() {
-        return fields.summary;
+        return fields != null ? fields.summary : null;
     }
 
     @Override
     public String getDescription() {
-        return fields.description;
+        return fields != null ? fields.description : null;
     }
 
     public IssueResolutionDefinition getResolution() {
