@@ -8,7 +8,7 @@ import com.vmware.util.input.InputUtils;
 @ActionDescription("Set the approved by users offline for a commit.")
 public class SetApprovedByOffline extends BaseSetUsersList {
     public SetApprovedByOffline(WorkflowConfig config) {
-        super(config, "approvedBy", true, false);
+        super(config, "approvedBy", CandidateSearchType.none, false);
     }
 
     @Override

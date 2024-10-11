@@ -1,8 +1,10 @@
 package com.vmware.gitlab.domain;
 
+import com.vmware.AutocompleteUser;
+
 import java.util.Objects;
 
-public class User {
+public class User implements AutocompleteUser {
     public long id;
     public String username;
     public String name;
@@ -25,5 +27,15 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(username);
+    }
+
+    @Override
+    public String username() {
+        return username;
+    }
+
+    @Override
+    public String fullName() {
+        return name;
     }
 }

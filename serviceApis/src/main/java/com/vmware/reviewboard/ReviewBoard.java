@@ -3,6 +3,7 @@ package com.vmware.reviewboard;
 import com.vmware.AbstractRestService;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
+import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.RequestHeader;
 import com.vmware.http.request.RequestParam;
@@ -38,6 +39,7 @@ import com.vmware.reviewboard.domain.UserReview;
 import com.vmware.reviewboard.domain.UserReviewsResponse;
 import com.vmware.util.IOUtils;
 import com.vmware.util.UrlUtils;
+import com.vmware.util.input.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -267,9 +269,16 @@ public class ReviewBoard extends AbstractRestService {
 
         if (credentialsType == reviewBoard_token) {
             String tokenUrl = UrlUtils.addRelativePaths(apiUrl, "users", getUsername(), "api-tokens/");
-            ApiToken apiToken = connection.post(tokenUrl, ApiTokenResponseEntity.class, new ApiTokenRequest()).apiToken;
-            saveApiToken(apiToken.token, credentialsType);
-            connection.addStatefulParam(new RequestHeader(AUTHORIZATION, "token " + apiToken.token));
+            String tokenValue;
+            try {
+                ApiToken apiToken = connection.post(tokenUrl, ApiTokenResponseEntity.class, new ApiTokenRequest()).apiToken;
+                tokenValue = apiToken.token;
+            } catch (NotAuthorizedException nae) {
+                log.info("Failed to login with username and password, enter API token manually");
+                tokenValue = InputUtils.readValue("Enter API token (Create in UI under My Account -> Authentication -> API Tokens");
+            }
+            saveApiToken(tokenValue, credentialsType);
+            connection.addStatefulParam(new RequestHeader(AUTHORIZATION, "token " + tokenValue));
         }
     }
 

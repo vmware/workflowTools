@@ -21,9 +21,6 @@ public class ReviewBoardConfig {
     @ConfigurableProperty(commandLine = "--always-include-review-url", help = "Include review url for trivial commits as well")
     public boolean alwaysIncludeReviewUrl;
 
-    @ConfigurableProperty(help = "Map of reviewer groups to select from for reviewed by section. E.g. create a techDebt group and list relevant reviewers")
-    public LinkedHashMap<String, SortedSet<String>> reviewerGroups;
-
     @ConfigurableProperty(commandLine = "--disable-markdown", help = "Treat description and testing done as plain text")
     public boolean disableMarkdown;
 

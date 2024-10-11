@@ -8,6 +8,6 @@ import com.vmware.config.WorkflowConfig;
 public class SetReviewedByOffline extends BaseSetReviewersList {
 
     public SetReviewedByOffline(WorkflowConfig config) {
-        super(config, false, false);
+        super(config, CandidateSearchType.none, false);
     }
 }

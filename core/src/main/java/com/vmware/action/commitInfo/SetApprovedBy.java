@@ -9,7 +9,7 @@ import java.util.Collections;
 @ActionDescription("Set the approved by users for a commit.")
 public class SetApprovedBy extends BaseSetUsersList {
     public SetApprovedBy(WorkflowConfig config) {
-        super(config, "approvedBy", true, false);
+        super(config, "approvedBy", CandidateSearchType.gitlab, false);
     }
 
     @Override

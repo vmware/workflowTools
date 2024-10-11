@@ -16,7 +16,7 @@ import com.vmware.github.domain.PullRequestForUpdate;
 import com.vmware.github.domain.PullMergeRequest;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.ReleaseAsset;
-import com.vmware.github.domain.GraphqlRepositoryResponse;
+import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.Review;
 import com.vmware.github.domain.ReviewThread;
 import com.vmware.github.domain.User;
@@ -45,6 +45,16 @@ public class Github extends AbstractRestService {
         }
     }
 
+    public List<User> searchUsers(String companyName, String query) {
+        String searchUsersQuery = new ClasspathResource("/githubSearchUsersGraphql.txt", this.getClass()).getText();
+        GraphqlRequest request = new GraphqlRequest();
+
+        request.query = searchUsersQuery.replace("${query}", query).replace("${companyName}", companyName);
+        String responseTest = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), String.class, request);
+        GraphqlResponse response = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlResponse.class, request);
+        return response.data.search.usersForCompany(companyName);
+    }
+
     public PullRequest createPullRequest(PullRequestForUpdate pullRequest) {
         setupAuthenticatedConnection();
         return post(pullRequestsUrl(pullRequest.repoOwner, pullRequest.repoName), PullRequest.class, pullRequest);
@@ -69,7 +79,7 @@ public class Github extends AbstractRestService {
 
         request.query = reviewThreadsQuery.replace("${repoOwnerName}", pullRequest.repoOwnerName())
                 .replace("${repoName}", pullRequest.repoName()).replace("${pullRequestNumber}", String.valueOf(pullRequest.number));
-        GraphqlRepositoryResponse repository = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlRepositoryResponse.class, request);
+        GraphqlResponse repository = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlResponse.class, request);
         return repository.data.repository.pullRequest.reviewThreads.nodes;
     }
 

@@ -619,6 +619,11 @@
       "SetReviewedBy",
       "AmendCommit"
     ],
+    "setReviewedByUsingGitlab": [
+      "ReadLastCommit",
+      "SetReviewedByUsingGitlab",
+      "AmendCommit"
+    ],
     "setReviewNumber": [
       "ReadLastCommit",
       "SetReviewId",

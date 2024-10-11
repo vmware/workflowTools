@@ -7,22 +7,22 @@ import java.util.Set;
 
 public abstract class BaseSetReviewersList extends BaseSetUsersList {
 
-    public BaseSetReviewersList(WorkflowConfig config, boolean searchReviewBoardForUsers, boolean addToReviewerList) {
-        super(config, "reviewedBy", searchReviewBoardForUsers, addToReviewerList);
+    public BaseSetReviewersList(WorkflowConfig config, CandidateSearchType searchType, boolean addToReviewerList) {
+        super(config, "reviewedBy", searchType, addToReviewerList);
     }
 
     @Override
     public void process() {
         Set<String> autocompleteOptions = new HashSet<>();
-        if (reviewBoardConfig.reviewerGroups != null && !reviewBoardConfig.reviewerGroups.isEmpty()) {
-            autocompleteOptions.addAll(reviewBoardConfig.reviewerGroups.keySet());
-            for (String groupName : reviewBoardConfig.reviewerGroups.keySet()) {
-                autocompleteOptions.addAll(reviewBoardConfig.reviewerGroups.get(groupName));
+        if (commitConfig.reviewerGroups != null && !commitConfig.reviewerGroups.isEmpty()) {
+            autocompleteOptions.addAll(commitConfig.reviewerGroups.keySet());
+            for (String groupName : commitConfig.reviewerGroups.keySet()) {
+                autocompleteOptions.addAll(commitConfig.reviewerGroups.get(groupName));
             }
             log.info("Enter group name or list number as a reviewer to add entire review group");
             int count = 1;
-            for (String reviewerGroupName : reviewBoardConfig.reviewerGroups.keySet()) {
-                log.info("[{}] {}: {}",count++,reviewerGroupName, reviewBoardConfig.reviewerGroups.get(reviewerGroupName).toString());
+            for (String reviewerGroupName : commitConfig.reviewerGroups.keySet()) {
+                log.info("[{}] {}: {}",count++,reviewerGroupName, commitConfig.reviewerGroups.get(reviewerGroupName).toString());
             }
         } else {
             log.info("Reviewer groups can be added by setting the reviewerGroups property in an external config file");

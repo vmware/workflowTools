@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.vmware.config.jira.IssueTypeDefinition.SubTask;
 import static com.vmware.http.cookie.ApiAuthentication.jira;
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
 import static com.vmware.jira.domain.IssueStatusDefinition.InReview;

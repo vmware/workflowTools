@@ -79,6 +79,10 @@ public abstract class AbstractService {
 
     public abstract boolean isBaseUriTrusted();
 
+    public void saveApiToken(String token) {
+        saveApiToken(token, ApiAuthentication.reviewBoard_token);
+    }
+
     public String getUsername() {
         if (StringUtils.isEmpty(username)) {
             throw new RuntimeException("Username is empty, please set workflow config value username or git config --global user.email [your email address]");

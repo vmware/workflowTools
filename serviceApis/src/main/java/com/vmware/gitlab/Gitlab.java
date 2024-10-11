@@ -2,6 +2,7 @@ package com.vmware.gitlab;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import com.vmware.gitlab.domain.MergeRequestApprovalRule;
 import com.vmware.gitlab.domain.MergeRequestApprovals;
 import com.vmware.gitlab.domain.MergeRequestCommitVersion;
 import com.vmware.gitlab.domain.MergeRequestDiscussion;
+import com.vmware.gitlab.domain.User;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.exception.ForbiddenException;
@@ -38,6 +40,10 @@ public class Gitlab extends AbstractRestService {
         if (StringUtils.isNotBlank(apiToken)) {
             connection.addStatefulParam(new RequestHeader(PRIVATE_TOKEN_HEADER, apiToken));
         }
+    }
+
+    public List<User> searchUsers(String query) {
+        return Arrays.asList(get(apiUrl+ "/search?scope=users&search=" + StringUtils.urlEncode(query), User[].class));
     }
 
     public MergeRequest[] getMergeRequests(String state) {

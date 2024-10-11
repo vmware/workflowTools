@@ -1,0 +1,20 @@
+{
+  search(query: "${query}", type: USER, first: 100) {
+    userCount
+    edges {
+      node {
+        ... on User {
+          login
+          name
+          location
+          email
+          company
+          organization(login:"${companyName}") {
+             login
+             name
+          }
+        }
+      }
+    }
+  }
+}

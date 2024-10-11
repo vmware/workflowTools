@@ -4,6 +4,8 @@ import com.vmware.config.ConfigurableProperty;
 import com.vmware.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.SortedSet;
 
 /**
  * Configuration information for a commit. Used as a transport class for a review request draft;
@@ -99,6 +101,9 @@ public class CommitConfig {
 
     @ConfigurableProperty(commandLine = "--commit-topics-to-ignore", help = "Commit summaries to ignore from stats")
     public String[] commitTopicsToIgnore;
+
+    @ConfigurableProperty(help = "Map of reviewer groups to select from for reviewed by section. E.g. create a techDebt group and list relevant reviewers")
+    public LinkedHashMap<String, SortedSet<String>> reviewerGroups;
 
     public CommitConfig() {}
 

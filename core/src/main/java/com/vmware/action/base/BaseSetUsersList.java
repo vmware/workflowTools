@@ -1,9 +1,10 @@
 package com.vmware.action.base;
 
+import com.vmware.AutocompleteUser;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.gitlab.Gitlab;
 import com.vmware.reviewboard.ReviewBoard;
 import com.vmware.reviewboard.domain.Link;
-import com.vmware.reviewboard.domain.ReviewUser;
 import com.vmware.util.StringUtils;
 import com.vmware.util.collection.OverwritableSet;
 import com.vmware.util.input.CommaArgumentDelimeter;
@@ -11,6 +12,8 @@ import com.vmware.util.input.ImprovedStringsCompleter;
 import com.vmware.util.input.InputUtils;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,31 +21,36 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.vmware.util.StringUtils.isInteger;
 
 public abstract class BaseSetUsersList extends BaseCommitReadAction {
-    private boolean searchReviewBoardForUsers;
-    private boolean addToReviewerList;
-    private ReviewBoard reviewboard;
+    protected final CandidateSearchType searchType;
+    private final boolean addToReviewerList;
 
-    public BaseSetUsersList(WorkflowConfig config, String propertyName, boolean searchReviewBoardForUsers, boolean addToUserList) {
+    private Link usersLink;
+
+    public BaseSetUsersList(WorkflowConfig config, String propertyName, CandidateSearchType searchType, boolean addToUserList) {
         super(config, propertyName);
-        this.searchReviewBoardForUsers = searchReviewBoardForUsers;
+        this.searchType = searchType;
         this.addToReviewerList = addToUserList;
     }
 
     @Override
     public void asyncSetup() {
-        if (searchReviewBoardForUsers) {
-            this.reviewboard = serviceLocator.getReviewBoard();
-        }
     }
 
     @Override
     public void preprocess() {
-        if (searchReviewBoardForUsers) {
-            this.reviewboard.setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
+        if (searchType == CandidateSearchType.reviewboard) {
+            serviceLocator.getReviewBoard().setupAuthenticatedConnectionWithLocalTimezone(reviewBoardConfig.reviewBoardDateFormat);
+        } else if (searchType == CandidateSearchType.gitlab) {
+            serviceLocator.getGitlab().setupAuthenticatedConnection();
+        } else if (searchType == CandidateSearchType.github) {
+            serviceLocator.getGithub().setupAuthenticatedConnection();
         }
     }
 
@@ -51,9 +59,9 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
         ArgumentCompleter argumentCompleter = new ArgumentCompleter(new CommaArgumentDelimeter(), userCompleter);
         argumentCompleter.setStrict(false);
 
-        if (searchReviewBoardForUsers) {
+        if (searchType != CandidateSearchType.none) {
             log.info("Tab can be used to autocomplete names");
-            log.info("After entering 3 characters, reviewboard is searched for a user");
+            log.info("After entering 3 characters, {} is searched for a user", searchType.name());
         }
         String users = InputUtils.readValue(userDescription, argumentCompleter);
         String existingUsers = addToReviewerList && StringUtils.isNotEmpty(draft.reviewedBy) ? existingUserTest + "," : "";
@@ -61,12 +69,31 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
     }
 
     private Completer createUserCompleter(Set<String> autocompleteOptions) {
-        if (searchReviewBoardForUsers) {
-            return new ReviewboardUserCompleter(serviceLocator.getReviewBoard(), autocompleteOptions);
+        if (searchType != CandidateSearchType.none) {
+            Function<String, List<? extends AutocompleteUser>> searchFunction = createSearchFunction();
+            return new UserCompleter(searchFunction, autocompleteOptions);
         } else {
             ImprovedStringsCompleter completer = new ImprovedStringsCompleter(autocompleteOptions);
             completer.setDelimeterText("");
             return completer;
+        }
+    }
+
+    private Function<String, List<? extends AutocompleteUser>> createSearchFunction() {
+        if (searchType == CandidateSearchType.reviewboard) {
+            return (buffer) -> {
+                if (usersLink == null) {
+                    usersLink = serviceLocator.getReviewBoard().getRootLinkList().getUsersLink();
+                }
+                return serviceLocator.getReviewBoard().searchUsersMatchingText(usersLink, buffer,
+                        reviewBoardConfig.searchByUsernamesOnly);
+            };
+        } else if (searchType == CandidateSearchType.gitlab) {
+            return (buffer) -> serviceLocator.getGitlab().searchUsers(buffer);
+        } else if (searchType == CandidateSearchType.github) {
+            return (buffer) -> serviceLocator.getGithub().searchUsers(githubConfig.githubRepoOwnerName, buffer);
+        } else {
+            return null;
         }
     }
 
@@ -102,7 +129,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
     }
 
     private Set<String> getReviewersInGroup(String fragment) {
-        LinkedHashMap<String, SortedSet<String>> reviewerGroups = reviewBoardConfig.reviewerGroups;
+        LinkedHashMap<String, SortedSet<String>> reviewerGroups = commitConfig.reviewerGroups;
         if (reviewerGroups == null) {
             return null;
         }
@@ -131,16 +158,14 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
         parsedReviewers.add(fragment);
     }
 
-    private class ReviewboardUserCompleter extends ImprovedStringsCompleter {
+    private class UserCompleter extends ImprovedStringsCompleter {
 
-        private Set<String> searchedValues = new HashSet<>();
+        private final Set<String> searchedValues = new HashSet<>();
 
-        ReviewBoard reviewBoard;
+        private final Function<String, List<? extends AutocompleteUser>> userSearchFunction;
 
-        Link usersLink;
-
-        ReviewboardUserCompleter(ReviewBoard reviewBoard, Collection<String> valuesShownWhenNoBuffer) {
-            this.reviewBoard = reviewBoard;
+        UserCompleter(Function<String, List<? extends AutocompleteUser>> userSearchFunction, Collection<String> valuesShownWhenNoBuffer) {
+            this.userSearchFunction = userSearchFunction;
             this.valuesShownWhenNoBuffer.addAll(valuesShownWhenNoBuffer);
             super.setDelimeterText("");
             super.setCaseInsensitiveMatching(true);
@@ -157,13 +182,11 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
             }
             if (!searchedValues.contains(buffer)) {
                 searchedValues.add(buffer);
-                if (usersLink == null) {
-                    usersLink = reviewBoard.getRootLinkList().getUsersLink();
-                }
-                List<ReviewUser> users = reviewBoard.searchUsersMatchingText(usersLink, buffer,
-                        reviewBoardConfig.searchByUsernamesOnly);
-                for (ReviewUser user : users) {
-                    values.add(user.toString());
+                if (userSearchFunction != null) {
+                    List<? extends AutocompleteUser> users = userSearchFunction.apply(buffer);
+                    for (AutocompleteUser user : users) {
+                        values.add(String.format("%s (%s)", user.username(), user.fullName()));
+                    }
                 }
             }
 
@@ -175,7 +198,7 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
             boolean addValue = true;
             for (int i = candidates.size() -1; i >= 0; i--) {
                 String candidateAsString = candidates.get(i).toString();
-                // prevent dupes of local usernames with reviewboard users
+                // prevent dupes of local usernames with remote users
                 if (candidateAsString.startsWith(value + " (")) {
                     addValue = false;
                     break;
@@ -196,15 +219,55 @@ public abstract class BaseSetUsersList extends BaseCommitReadAction {
             if (!value.contains("(")) {
                 return super.bufferMatchesValue(buffer, value);
             }
-            ReviewUser reviewUser = ReviewUser.fromText(value);
-            if (reviewUser == null) {
-                log.info("Null user for value " + value);
+            CandidateUser candidateUser = CandidateUser.fromText(value);
+            if (candidateUser == null) {
+                log.debug("Null user for value " + value);
                 return super.bufferMatchesValue(buffer, value);
             }
-            return super.bufferMatchesValue(buffer, value) || super.bufferMatchesValue(buffer, reviewUser.username)
-                    || super.bufferMatchesValue(buffer, reviewUser.fullName())
-                    || super.bufferMatchesValue(buffer, reviewUser.firstName) || super.bufferMatchesValue(buffer, reviewUser.lastName);
+            return super.bufferMatchesValue(buffer, value) || super.bufferMatchesValue(buffer, candidateUser.username)
+                    || super.bufferMatchesValue(buffer, candidateUser.fullName())
+                    || super.bufferMatchesValue(buffer, candidateUser.firstName) || super.bufferMatchesValue(buffer, candidateUser.lastName);
+        }
+    }
+
+    public enum CandidateSearchType {
+        none,
+        reviewboard,
+        gitlab,
+        github
+    }
+
+    private static class CandidateUser implements AutocompleteUser {
+        private static final Logger log = LoggerFactory.getLogger(CandidateUser.class);
+        private static final Pattern userPattern = Pattern.compile("(\\w+)\\s+\\((.+?)\\s+(.+?)\\)");
+
+        private final String username;
+        private final String firstName;
+        private final String lastName;
+
+        public CandidateUser(String username, String firstName, String lastName) {
+            this.username = username;
+            this.firstName = firstName;
+            this.lastName = lastName;
         }
 
+        @Override
+        public String username() {
+            return username;
+        }
+
+        @Override
+        public String fullName() {
+            return firstName + " " + lastName;
+        }
+
+        public static CandidateUser fromText(String sourceText) {
+            Matcher userMatcher = userPattern.matcher(sourceText);
+            if (!userMatcher.find()) {
+                log.debug("Failed to match user value {} with pattern {}", sourceText, userPattern.pattern());
+                return null;
+            }
+            return new CandidateUser(userMatcher.group(1), userMatcher.group(2), userMatcher.group(3));
+        }
     }
 }

@@ -8,6 +8,6 @@ import com.vmware.config.WorkflowConfig;
 public class SetReviewedBy extends BaseSetReviewersList {
 
     public SetReviewedBy(WorkflowConfig config) {
-        super(config, true, false);
+        super(config, CandidateSearchType.reviewboard, false);
     }
 }

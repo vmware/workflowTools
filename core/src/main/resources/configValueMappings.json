@@ -871,6 +871,10 @@
   "DisplayInfo": [
     "--input-text"
   ],
+  "SaveReviewboardApiToken": [
+    "--username",
+    "--use-rb-api-token"
+  ],
   "SetBugNumbers": [
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
@@ -953,9 +957,9 @@
   ],
   "BaseSetUsersList": [
     "--use-rb-api-token",
-    "--search-by-usernames-only",
     "--username",
-    "--trivial-reviewer-label"
+    "--trivial-reviewer-label",
+    "--search-by-usernames-only"
   ],
   "PushToTrackingBranch": [
     "--tracking-branch"
