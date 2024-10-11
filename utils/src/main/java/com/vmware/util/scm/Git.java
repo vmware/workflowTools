@@ -33,6 +33,11 @@ import static com.vmware.util.CommandLineUtils.isCommandAvailable;
  * Exposes git functionality needed for workflows.
  */
 public class Git extends BaseScmWrapper {
+    public static final String COMMIT_DATE = "Commit Date";
+    public static final String SUMMARY = "Summary";
+    public static final String AUTHOR = "Author";
+
+
     private static String trackingBranch;
     private static String currentBranch;
     private static String rootDirectoryCommandOutput;
@@ -52,7 +57,6 @@ public class Git extends BaseScmWrapper {
     public Git() {
         super(ScmType.git);
         super.setWorkingDirectory(System.getProperty("user.dir"));
-        determineRootDirectory();
     }
 
     public Git(File rootDirectory) {
@@ -68,7 +72,10 @@ public class Git extends BaseScmWrapper {
     /**
      * @return The root directory for this repo. Null if this is not a repo
      */
-    public File getRootDirectory() {
+    public synchronized File getRootDirectory() {
+        if (rootDirectory == null) {
+            rootDirectory = determineRootDirectory();
+        }
         return rootDirectory;
     }
 
@@ -476,7 +483,7 @@ public class Git extends BaseScmWrapper {
 
     @Override
     protected String scmExecutablePath() {
-        if (rootDirectory != null && workingDirectory.getPath().contains(rootDirectory.getPath())) {
+        if (getRootDirectory() != null && workingDirectory.getPath().contains(getRootDirectory().getPath())) {
             return "git";
         } else {
             return "git -C " + workingDirectory.getPath();
@@ -566,9 +573,9 @@ public class Git extends BaseScmWrapper {
         if (summary.contains("\n")) {
             summary = summary.substring(0, summary.indexOf('\n'));
         }
-        commitInfo.put("Commit Date", MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)"));
-        commitInfo.put("Summary", summary);
-        commitInfo.put("Author", MatcherUtils.singleMatchExpected(commitText, "Author:\\s+(.+)"));
+        commitInfo.put(COMMIT_DATE, MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)"));
+        commitInfo.put(SUMMARY, summary);
+        commitInfo.put(AUTHOR, MatcherUtils.singleMatchExpected(commitText, "Author:\\s+(.+)"));
         return commitInfo;
     }
 
@@ -592,17 +599,18 @@ public class Git extends BaseScmWrapper {
         executeScmCommand(commitCommand + noVerifyText + fileText, msg, logLevel);
     }
 
-    private void determineRootDirectory() {
+    private File determineRootDirectory() {
         if (Git.rootDirectoryCommandOutput != null) {
-            rootDirectory = StringUtils.isEmpty(Git.rootDirectoryCommandOutput) ? null : new File(rootDirectoryCommandOutput);
+            return StringUtils.isEmpty(Git.rootDirectoryCommandOutput) ? null : new File(rootDirectoryCommandOutput);
         } else if (isGitInstalled()) {
             try {
                 Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
                 log.trace("Git root directory {}", Git.rootDirectoryCommandOutput);
-                rootDirectory = new File(rootDirectoryCommandOutput);
+                return new File(rootDirectoryCommandOutput);
             } catch (FatalException fe) {
                 Git.rootDirectoryCommandOutput = "";
             }
         }
+        return null;
     }
 }

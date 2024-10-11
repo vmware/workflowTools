@@ -30,7 +30,7 @@ public class CommandLineArgumentsParser {
     private StringBuilder argumentsText;
 
     public void generateArgumentMap(final List<String> args) {
-        log.debug("Command line arguments; {}", args);
+        log.debug("Command line arguments: {}", args);
         argumentsText = new StringBuilder();
 
         argumentMap.clear();

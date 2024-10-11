@@ -24,7 +24,7 @@ public class WorkflowRunner implements AppLauncher {
             LogManager.getLogManager().reset();
             globalLogger.addHandler(new WorkflowConsoleHandler());
         } else {
-            LoggerFactory.getLogger(this.getClass()).debug("{} already added as handler", WorkflowConsoleHandler.class.getSimpleName());
+            LoggerFactory.getLogger(this.getClass()).trace("{} already added as handler", WorkflowConsoleHandler.class.getSimpleName());
         }
 
         Workflow workflow = new Workflow(appClassLoader, args);

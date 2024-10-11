@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.vmware.AddBuildInfoToInternalConfig;
 import com.vmware.config.commandLine.CommandLineArgumentsParser;
 import com.vmware.config.section.PerforceClientConfig;
 import com.vmware.http.HttpConnection;
@@ -46,21 +47,16 @@ public class WorkflowConfigParser {
             config.username = username;
         }
 
-        Git git = new Git();
-        if (git.workingDirectoryIsInGitRepo()) {
-            config.replacementVariables.addVariable(ReplacementVariables.VariableName.REPO_DIR, git.getRootDirectory().getAbsolutePath());
-            config.replacementVariables.addVariable(ReplacementVariables.VariableName.BRANCH_NAME, git.currentBranch());
-        }
-
         config.addGeneratedVariables();
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
         config.setupLogging();
 
-        Padder buildInfoPadder = new Padder("Built from commit");
-        buildInfoPadder.debugTitle();
-        config.buildInfo.forEach((key, value) -> log.debug("{} {}", key, value));
-        buildInfoPadder.debugTitle();
+        log.debug("Built from commit [{} ({})]", config.buildInfo.get(Git.SUMMARY), config.buildInfo.get(Git.COMMIT_DATE));
+        if (git.workingDirectoryIsInGitRepo()) {
+            config.replacementVariables.addVariable(ReplacementVariables.VariableName.REPO_DIR, git.getRootDirectory().getAbsolutePath());
+            config.replacementVariables.addVariable(ReplacementVariables.VariableName.BRANCH_NAME, git.currentBranch());
+        }
 
         String gitRemoteValue = git.configValue(String.format("remote.%s.url", config.gitRepoConfig.defaultGitRemote));
         config.setGitRemoteUrlAsReviewBoardRepo(gitRemoteValue);

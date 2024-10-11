@@ -249,7 +249,7 @@ public class WorkflowConfig {
         if (consoleHandler.isPresent()) {
             existingLevel = consoleHandler.get().getLevel();
             consoleHandler.get().setLevel(logLevelToUse.getLevel());
-            log.debug("Found console handler, log level was set to {}", logLevelToUse.name());
+            log.debug("Console handler was set to {}", logLevelToUse.name());
         }
 
         if (loggingConfig.silent && consoleHandler.isPresent()) {

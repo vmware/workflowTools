@@ -85,11 +85,11 @@ public class WorkflowAppLoader {
     }
 
     public void downloadJarFileIfNeeded() {
-        logger.fine("Expected release jar is " + releaseJar.getAbsolutePath());
+        logger.finest("Expected release jar is " + releaseJar.getAbsolutePath());
         if (releaseJar.exists() && !releaseJar.canWrite()) {
             logger.info("Auto updating workflow tools");
         } else if (releaseJar.exists() && !update) {
-            logger.fine(() -> String.format("Jar file %s already exists", releaseJar.getPath()));
+            logger.finest(() -> String.format("Jar file %s already exists", releaseJar.getPath()));
             return;
         }
         deleteOldReleasesIfNeeded();
@@ -167,7 +167,7 @@ public class WorkflowAppLoader {
             Attributes mainAttributes = manifest.getMainAttributes();
             Set<Object> attributeKeys = mainAttributes.keySet();
             Map<String, String> attributeValues = attributeKeys.stream().collect(Collectors.toMap(String::valueOf, key -> mainAttributes.getValue((Attributes.Name) key)));
-            logger.fine("Manifest Attribute values " + attributeValues);
+            logger.finest("Manifest Attribute values " + attributeValues);
             return attributeValues;
         } catch (IOException e) {
             throw new RuntimeException(e);
