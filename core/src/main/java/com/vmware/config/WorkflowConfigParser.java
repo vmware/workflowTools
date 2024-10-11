@@ -18,6 +18,7 @@ import com.vmware.util.ClasspathResource;
 import com.vmware.util.StringUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.exception.RuntimeIOException;
+import com.vmware.util.logging.Padder;
 import com.vmware.util.scm.Git;
 import com.vmware.util.scm.Perforce;
 
@@ -55,7 +56,11 @@ public class WorkflowConfigParser {
         // apply twice so that setting a debug log level can be detected earlier
         applyRuntimeArguments(config);
         config.setupLogging();
-        log.debug("Runtime arguments: {}", args);
+
+        Padder buildInfoPadder = new Padder("Built from commit");
+        buildInfoPadder.debugTitle();
+        config.buildInfo.forEach((key, value) -> log.debug("{} {}", key, value));
+        buildInfoPadder.debugTitle();
 
         String gitRemoteValue = git.configValue(String.format("remote.%s.url", config.gitRepoConfig.defaultGitRemote));
         config.setGitRemoteUrlAsReviewBoardRepo(gitRemoteValue);

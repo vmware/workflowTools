@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CommandLineUtils {
 
-    private static Logger log = LoggerFactory.getLogger(CommandLineUtils.class);
-    private static DynamicLogger dynamicLogger = new DynamicLogger(log);
+    private static final Logger log = LoggerFactory.getLogger(CommandLineUtils.class);
+    private static final DynamicLogger dynamicLogger = new DynamicLogger(log);
 
     public static boolean isOsxCommandAvailable(String command) {
         String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
@@ -75,7 +75,9 @@ public class CommandLineUtils {
 
     public static String executeCommand(File workingDirectory, Map<String, String> environmentVariables,
                                         String command, String inputText, LogLevel logLevel) {
-        log.debug("Executing command {}", command);
+        if (logLevel.isDebug()) {
+            dynamicLogger.log(logLevel, "Executing command {}", command);
+        }
         ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).directory(workingDirectory)
                 .redirectErrorStream(true);
         if (environmentVariables != null) {

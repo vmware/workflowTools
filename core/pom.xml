@@ -41,7 +41,7 @@
                 <executions>
                     <execution>
                         <id>addLastCommitInfo</id>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -52,7 +52,7 @@
                     </execution>
                     <execution>
                         <id>generateActionMappings</id>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>

@@ -64,15 +64,15 @@ public class GenerateActionConfigMappings {
 
     private Gson gson = new ConfiguredGsonBuilder().setPrettyPrinting().build();
 
-    private Map<String, List<String>> locatorMethodArguments = new HashMap<>();
+    private final Map<String, List<String>> locatorMethodArguments = new HashMap<>();
 
     private Pattern configValuePattern;
 
-    private File actionDirectory;
+    private final File actionDirectory;
 
-    private File serviceLocatorFile;
+    private final File serviceLocatorFile;
 
-    private File outputFile;
+    private final File outputFile;
 
     public GenerateActionConfigMappings(String actionDirectory, String outputFile, File serviceLocatorFile) {
         this.serviceLocatorFile = serviceLocatorFile;
@@ -206,7 +206,6 @@ public class GenerateActionConfigMappings {
         GenerateActionConfigMappings generateActionConfigMappings =
                 new GenerateActionConfigMappings(actionsDirectory, mappingsFile, new File(locatorFilePath));
         generateActionConfigMappings.run();
-        log.info("Created mappings file");
         log.info("Copying to target directory {}", targetDirectory);
         FileUtils.copyFile(new File(mappingsFile),
                 new File(targetDirectory + File.separator + "configValueMappings.json"));
