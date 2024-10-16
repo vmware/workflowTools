@@ -71,7 +71,7 @@ public class TestReviewBoardApi extends BaseTests {
     public void retrieveUserSessionToken() throws IOException {
         String userHome = System.getProperty( "user.home" );
         CookieFileStore cookieFileStore = new CookieFileStore(userHome);
-        assertNotNull("SessionId should not be null", cookieFileStore.getCookie(ApiAuthentication.reviewBoard));
+        assertNotNull("SessionId should not be null", cookieFileStore.getCookie(ApiAuthentication.reviewBoard_cookie));
     }
 
     @Test

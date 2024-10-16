@@ -40,6 +40,7 @@ import com.vmware.util.exception.RuntimeIOException;
 import com.vmware.util.exception.RuntimeURISyntaxException;
 import com.vmware.util.input.InputUtils;
 
+import com.vmware.util.logging.Padder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class HttpConnection {
     private WorkflowCertificateManager workflowCertificateManager = null;
     private Gson gson;
     private RequestBodyHandling requestBodyHandling;
-    private RequestParams requestParams;
+    private final RequestParams requestParams;
     private HttpURLConnection activeConnection;
     private boolean useSessionCookies;
     private boolean disableHostnameVerification;
@@ -126,9 +127,13 @@ public class HttpConnection {
     }
 
     public <T> T executeApiRequest(HttpMethodType methodType, String url, Class<T> responseConversionClass, Object requestObject, RequestParam[] params) {
+        Padder requestPadder = new Padder("{} {}", methodType.name(), url);
+        requestPadder.debugTitle();
         setupConnection(url, methodType, params);
         RequestBodyFactory.setRequestDataForConnection(this, requestObject);
-        return handleServerResponse(url, responseConversionClass, methodType, params);
+        T response = handleServerResponse(url, responseConversionClass, methodType, params);
+        requestPadder.debugTitle();;
+        return response;
     }
 
 
@@ -377,7 +382,7 @@ public class HttpConnection {
     private String parseResponseText(HttpMethodType methodType) throws IOException {
         String currentUrl = activeConnection.getURL().toString();
         int responseCode = activeConnection.getResponseCode();
-        log.debug("{}: {} {}", methodType.name(), currentUrl, responseCode);
+        log.debug("{}: {} Response code {}", methodType.name(), currentUrl, responseCode);
         String responseText;
         try {
             if (ExceptionChecker.isStatusValid(responseCode) || activeConnection.getErrorStream() == null) {

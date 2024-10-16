@@ -28,8 +28,9 @@ public class AuthenticateAllApis extends BaseAction {
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
                 ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig));
 
-        ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
-        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType));
+        ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard_cookie;
+        String rbUsername = StringUtils.isNotBlank(reviewBoardConfig.rbUsername) ? reviewBoardConfig.rbUsername : config.username;
+        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, rbUsername, reviewBoardCredentialsType));
         checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug, bugzillaConfig.bugzillaSso, ssoConfig, bugzillaConfig.bugzillaSsoLoginId));
         checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
         checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides));

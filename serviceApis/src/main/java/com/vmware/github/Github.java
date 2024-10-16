@@ -35,11 +35,11 @@ import com.vmware.util.input.InputUtils;
 public class Github extends AbstractRestService {
 
     public Github(String baseUrl, String username) {
-        super(baseUrl, "", ApiAuthentication.github, username);
+        super(baseUrl, "", ApiAuthentication.github_token, username);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss")
                         .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
-        String apiToken = readExistingApiToken(ApiAuthentication.github);
+        String apiToken = readExistingApiToken(ApiAuthentication.github_token);
         if (StringUtils.isNotBlank(apiToken)) {
             connection.addStatefulParam(RequestHeader.aBearerAuthHeader(apiToken));
         }
@@ -134,7 +134,7 @@ public class Github extends AbstractRestService {
         log.info("Github uses personal access tokens for third party API access.");
         log.info("On the UI, go to Settings -> Developer Setting and create a new personal access token");
         String privateToken = InputUtils.readValueUntilNotBlank("Enter Personal Access Token");
-        saveApiToken(privateToken, ApiAuthentication.github);
+        saveApiToken(privateToken, ApiAuthentication.github_token);
         connection.addStatefulParam(RequestHeader.aBearerAuthHeader(privateToken));
     }
 

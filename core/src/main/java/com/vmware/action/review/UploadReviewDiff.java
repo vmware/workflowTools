@@ -68,7 +68,7 @@ public class UploadReviewDiff extends BaseCommitUsingReviewBoardAction {
     }
 
     private void runRbtCommand(File workingDirectory, String command) {
-        String output = CommandLineUtils.executeCommand(workingDirectory, command, null, LogLevel.INFO);
+        String output = CommandLineUtils.executeCommand(workingDirectory, command, null, false, LogLevel.INFO);
         if (!output.contains("Review request #" + draft.id + " posted")) {
             throw new RuntimeException("Failed to upload diff successfully\n" + output);
         }

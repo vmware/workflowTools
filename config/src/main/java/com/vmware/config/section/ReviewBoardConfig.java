@@ -42,6 +42,9 @@ public class ReviewBoardConfig {
     @ConfigurableProperty(commandLine = "--use-rb-api-token", help = "Use api login for authentication. Workflow tools will create an api token if one doesn't exist")
     public boolean useRbApiToken;
 
+    @ConfigurableProperty(commandLine = "--rb-username", help = "Username for reviewboard if different to default username")
+    public String rbUsername;
+
     @ConfigurableProperty(help = "Adds review groups if a commit has file changes that match a file mapping")
     public Map<String, String> reviewGroupFileMappings = new TreeMap<>();
 }

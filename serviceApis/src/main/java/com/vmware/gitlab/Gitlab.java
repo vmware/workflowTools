@@ -32,11 +32,11 @@ public class Gitlab extends AbstractRestService {
     private static final String PRIVATE_TOKEN_HEADER = "Private-Token";
 
     public Gitlab(String baseUrl, String username) {
-        super(baseUrl, "api/v4", ApiAuthentication.gitlab, username);
+        super(baseUrl, "api/v4", ApiAuthentication.gitlab_token, username);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS")
                         .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
-        String apiToken = readExistingApiToken(ApiAuthentication.gitlab);
+        String apiToken = readExistingApiToken(ApiAuthentication.gitlab_token);
         if (StringUtils.isNotBlank(apiToken)) {
             connection.addStatefulParam(new RequestHeader(PRIVATE_TOKEN_HEADER, apiToken));
         }
@@ -133,7 +133,7 @@ public class Gitlab extends AbstractRestService {
         log.info("Gitlab uses personal access tokens for third party API access.");
         log.info("On the UI, go to Settings -> Access Tokens and create a new personal access token");
         String privateToken = InputUtils.readValueUntilNotBlank("Enter Personal Access Token");
-        saveApiToken(privateToken, ApiAuthentication.gitlab);
+        saveApiToken(privateToken, ApiAuthentication.gitlab_token);
         connection.addStatefulParam(new RequestHeader(PRIVATE_TOKEN_HEADER, privateToken));
     }
 

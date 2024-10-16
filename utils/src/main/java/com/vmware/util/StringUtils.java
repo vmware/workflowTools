@@ -82,10 +82,7 @@ public class StringUtils {
     }
 
     public static String appendWithDelimiter(String existingValue, Collection valuesToAdd, String delimiter) {
-        for (Object valueToAdd : valuesToAdd) {
-            existingValue = appendWithDelimiter(existingValue, valueToAdd.toString(), delimiter);
-        }
-        return existingValue;
+        return existingValue + valuesToAdd.stream().map(Object::toString).collect(Collectors.joining(delimiter));
     }
 
     public static String appendWithDelimiter(String existingValue, String valueToAdd, String delimiter) {
@@ -176,9 +173,6 @@ public class StringUtils {
     }
 
     public static String addArgumentsToValue(String value, Object... arguments) {
-        if (arguments.length == 0) {
-            return value;
-        }
         for (Object argument : arguments) {
             if (argument == null) {
                 argument = "";

@@ -39,8 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.vmware.config.jira.IssueTypeDefinition.SubTask;
-import static com.vmware.http.cookie.ApiAuthentication.jira;
+import static com.vmware.http.cookie.ApiAuthentication.jira_token;
 import static com.vmware.jira.domain.IssueStatusDefinition.InProgress;
 import static com.vmware.jira.domain.IssueStatusDefinition.InReview;
 import static com.vmware.jira.domain.IssueStatusDefinition.Open;
@@ -60,7 +59,7 @@ public class Jira extends AbstractRestService {
     private final String greenhopperUrl;
 
     public Jira(String jiraUrl, String username, Map<String, String> customFieldNames) {
-        super(jiraUrl, "rest/api/2/", ApiAuthentication.jira, username);
+        super(jiraUrl, "rest/api/2/", ApiAuthentication.jira_token, username);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity, new ConfiguredGsonBuilder(customFieldNames).build());
         this.loginUrl = baseUrl + "login.jsp";
         this.searchUrl = apiUrl + "search";
@@ -68,7 +67,7 @@ public class Jira extends AbstractRestService {
         this.agileUrl = baseUrl + "rest/agile/1.0/";
         this.greenhopperUrl = baseUrl + "rest/greenhopper/1.0/";
 
-        File accessTokenFile = new File(System.getProperty("user.home") + File.separator + ApiAuthentication.jira.getFileName());
+        File accessTokenFile = new File(System.getProperty("user.home") + File.separator + ApiAuthentication.jira_token.getFileName());
         if (accessTokenFile.exists()) {
             log.debug("Using jira access token file {}", accessTokenFile.getAbsolutePath());
             connection.addStatefulParam(RequestHeader.aBearerAuthHeader(IOUtils.read(accessTokenFile)));
@@ -204,11 +203,11 @@ public class Jira extends AbstractRestService {
 
     @Override
     protected void loginManually() {
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(jira, getUsername());
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(jira_token, getUsername());
         connection.setupBasicAuthHeader(credentials);
         AccessToken token = connection.post(UrlUtils.addRelativePaths(baseUrl, "/rest/pat/latest/tokens"), AccessToken.class, new AccessToken("WorkflowTools"));
         connection.addStatefulParam(RequestHeader.aBearerAuthHeader(token.rawToken));
-        saveApiToken(token.rawToken, jira);
+        saveApiToken(token.rawToken, jira_token);
     }
 
     @Override

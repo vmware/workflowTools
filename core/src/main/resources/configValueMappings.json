@@ -25,16 +25,6 @@
     "--vcd-username",
     "--source-url"
   ],
-  "SaveVcdRefreshToken": [
-    "--sso-headless",
-    "--disable-vcd-refresh",
-    "--vcd-refresh-token-name",
-    "--vcd-sso",
-    "--vcd-org",
-    "--username",
-    "--vcd-url",
-    "--sso-email"
-  ],
   "WaitForMergeRequestToBeUpdated": [
     "--wait-time"
   ],
@@ -108,6 +98,7 @@
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
     "--bugzilla-test-bug",
+    "--rb-username",
     "--use-rb-api-token",
     "--sso-headless",
     "--disable-vcd-refresh",
@@ -131,6 +122,7 @@
   ],
   "LoadReviewPatch": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token",
     "--latest-diff",
     "--review-request-id"
@@ -182,6 +174,7 @@
   ],
   "CreateReviewIfNeeded": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token",
     "--review-board-repo"
   ],
@@ -477,6 +470,7 @@
   ],
   "CreateReview": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token",
     "--review-board-repo"
   ],
@@ -641,6 +635,7 @@
   ],
   "SetReviewId": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token"
   ],
   "ExecuteSelectSqlStatementAsJson": [
@@ -760,6 +755,18 @@
   "SelectVappVm": [
     "--vm-name"
   ],
+  "SaveApiToken": [
+    "--sso-headless",
+    "--disable-vcd-refresh",
+    "--vcd-refresh-token-name",
+    "--vcd-sso",
+    "--vcd-org",
+    "--username",
+    "--vcd-url",
+    "--sso-email",
+    "--input-text",
+    "--property-name"
+  ],
   "ScpFileFromRemote": [
     "--file-data",
     "--ssh-strict-host-checking",
@@ -789,11 +796,13 @@
   ],
   "SetCommitDetailsFromReview": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token",
     "--review-request-id"
   ],
   "BaseCommitUsingReviewBoardAction": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token"
   ],
   "UpdateVappLease": [
@@ -871,10 +880,6 @@
   "DisplayInfo": [
     "--input-text"
   ],
-  "SaveReviewboardApiToken": [
-    "--username",
-    "--use-rb-api-token"
-  ],
   "SetBugNumbers": [
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
@@ -893,6 +898,7 @@
   ],
   "BaseReviewBoardAction": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token"
   ],
   "CreateTrelloBoardIfNeeded": [
@@ -910,9 +916,11 @@
   ],
   "DiscardUnpublishedReviews": [
     "--username",
+    "--rb-username",
     "--use-rb-api-token"
   ],
   "BaseBatchCloseReviews": [
+    "--rb-username",
     "--use-rb-api-token",
     "--username"
   ],
@@ -956,6 +964,7 @@
     "--vcd-site-index"
   ],
   "BaseSetUsersList": [
+    "--rb-username",
     "--use-rb-api-token",
     "--username",
     "--trivial-reviewer-label",

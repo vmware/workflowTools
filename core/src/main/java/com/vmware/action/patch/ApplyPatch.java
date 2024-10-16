@@ -171,7 +171,7 @@ public class ApplyPatch extends BaseCommitAction {
             command += " --dry-run";
         }
         LogLevel logLevel = dryRun ? LogLevel.DEBUG : LogLevel.INFO;
-        return CommandLineUtils.executeCommand(null, command, IOUtils.read(patchFile) + "\n", logLevel);
+        return CommandLineUtils.executeCommand(null, command, IOUtils.read(patchFile) + "\n", false, logLevel);
     }
 
     private enum PatchCheckResult {

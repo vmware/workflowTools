@@ -191,16 +191,10 @@ public class GenerateActionConfigMappings {
         validateAllActionsCanBeInstantiated();
 
         String moduleBaseDirectory = args[0];
-        String actionsDirectory = moduleBaseDirectory + "/src/main/java/com/vmware/action";
-        String locatorFilePath = moduleBaseDirectory + "/src/main/java/com/vmware/ServiceLocator.java";
-        String mappingsFile = moduleBaseDirectory + "/src/main/resources/configValueMappings.json";
-        String targetDirectory = moduleBaseDirectory + "/target/classes";
-
-        actionsDirectory = actionsDirectory.replaceAll("/", File.separator);
-        locatorFilePath = locatorFilePath.replaceAll("/", File.separator);
-        mappingsFile = mappingsFile.replaceAll("/", File.separator);
-        targetDirectory = targetDirectory.replaceAll("/", File.separator);
-
+        String actionsDirectory =  platformIndependentPath(moduleBaseDirectory, "/src/main/java/com/vmware/action");
+        String locatorFilePath = platformIndependentPath(moduleBaseDirectory, "/src/main/java/com/vmware/ServiceLocator.java");
+        String mappingsFile = platformIndependentPath(moduleBaseDirectory, "/src/main/resources/configValueMappings.json");
+        String targetDirectory = platformIndependentPath(moduleBaseDirectory, "/target/classes");
         log.info("Creating mappings file {} from folder {}", mappingsFile, actionsDirectory);
 
         GenerateActionConfigMappings generateActionConfigMappings =
@@ -209,6 +203,10 @@ public class GenerateActionConfigMappings {
         log.info("Copying to target directory {}", targetDirectory);
         FileUtils.copyFile(new File(mappingsFile),
                 new File(targetDirectory + File.separator + "configValueMappings.json"));
+    }
+
+    private static String platformIndependentPath(String moduleBaseDirectory, String path) {
+        return (moduleBaseDirectory + path).replaceAll("/", File.separator);
     }
 
     private void populateLocatorMethodArguments() {

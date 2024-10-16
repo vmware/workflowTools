@@ -23,7 +23,7 @@ public class UploadReviewDiffFromChangelist extends BaseLinkedPerforceCommitActi
     public void process() {
         File clientDirectory = serviceLocator.getPerforce().getWorkingDirectory();
         String command = format("rbt post -r %s %s", draft.id, draft.perforceChangelistId);
-        String output = CommandLineUtils.executeCommand(clientDirectory, command, null, LogLevel.INFO);
+        String output = CommandLineUtils.executeCommand(clientDirectory, command, null, false, LogLevel.INFO);
         if (!output.contains("Review request #" + draft.id + " posted")) {
             log.error("Failed to upload diff successfully\n{}", output);
         }

@@ -52,7 +52,9 @@ public class WorkflowConfigParser {
         applyRuntimeArguments(config);
         config.setupLogging();
 
-        log.debug("Built from commit [{} ({})]", config.buildInfo.get(Git.SUMMARY), config.buildInfo.get(Git.COMMIT_DATE));
+        if (config.buildInfo != null) {
+            log.debug("Built from commit [{} ({})]", config.buildInfo.get(Git.SUMMARY), config.buildInfo.get(Git.COMMIT_DATE));
+        }
         if (git.workingDirectoryIsInGitRepo()) {
             config.replacementVariables.addVariable(ReplacementVariables.VariableName.REPO_DIR, git.getRootDirectory().getAbsolutePath());
             config.replacementVariables.addVariable(ReplacementVariables.VariableName.BRANCH_NAME, git.currentBranch());

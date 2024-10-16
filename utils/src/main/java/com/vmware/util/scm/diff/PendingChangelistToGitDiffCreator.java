@@ -212,7 +212,7 @@ public class PendingChangelistToGitDiffCreator {
     private String gitDiff(String firstFile, String secondFile, boolean binaryPatch) {
         String binaryFlag = binaryPatch ? " --binary" : "";
         return CommandLineUtils.executeCommand(null, format("git diff --full-index%s %s %s", binaryFlag,
-                firstFile, secondFile), null, LogLevel.TRACE);
+                firstFile, secondFile), null, false, LogLevel.TRACE);
     }
 
 }

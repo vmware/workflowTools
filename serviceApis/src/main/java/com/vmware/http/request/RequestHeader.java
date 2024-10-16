@@ -32,6 +32,10 @@ public class RequestHeader extends RequestParam {
         return new RequestHeader(AUTHORIZATION, "Bearer " + authValue);
     }
 
+    public static RequestHeader aTokenAuthHeader(String authValue) {
+        return new RequestHeader(AUTHORIZATION, "token " + authValue);
+    }
+
     public static RequestHeader aRefererHeader(String value) {
         return new RequestHeader("Referer", value);
     }

@@ -308,7 +308,7 @@ public class Perforce extends BaseScmWrapper {
         Map<String, String> environmentVariables = new HashMap<>();
         String binaryFlag = binaryPatch ? " --binary" : "";
         environmentVariables.put("P4DIFF", "git diff --full-index" + binaryFlag);
-        return executeScmCommand(environmentVariables, "diff -du " + filesToDiff, null, level);
+        return executeScmCommand(environmentVariables, "diff -du " + filesToDiff, null, level, false);
     }
 
     private void mergeMoveDeleteAndAdds(List<FileChange> fileChanges) {

@@ -50,7 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import static com.vmware.http.cookie.ApiAuthentication.reviewBoard;
+import static com.vmware.http.cookie.ApiAuthentication.reviewBoard_cookie;
 import static com.vmware.http.cookie.ApiAuthentication.reviewBoard_token;
 import static com.vmware.http.request.RequestHeader.AUTHORIZATION;
 import static com.vmware.http.request.RequestHeader.anAcceptHeader;
@@ -68,11 +68,11 @@ public class ReviewBoard extends AbstractRestService {
         super(reviewboardUrl, "api/", credentialsType, username);
         connection = new HttpConnection(RequestBodyHandling.AsUrlEncodedFormEntity);
         if (credentialsType == reviewBoard_token) {
-            connection.removeCookie(reviewBoard.getCookieName());
             File tokenFile = new File(System.getProperty("user.home") + File.separator + credentialsType.getFileName());
             if (tokenFile.exists()) {
                 log.debug("Using reviewboard access token file {}", tokenFile.getAbsolutePath());
-                connection.addStatefulParam(new RequestHeader(AUTHORIZATION, "token " + IOUtils.read(tokenFile)));
+                connection.removeCookie(reviewBoard_cookie.getCookieName());
+                connection.addStatefulParam(RequestHeader.aTokenAuthHeader(IOUtils.read(tokenFile)));
             }
         }
     }
@@ -284,9 +284,18 @@ public class ReviewBoard extends AbstractRestService {
 
     @Override
     public void checkAuthenticationAgainstServer() {
-        getServerInfo();
-        if (credentialsType == reviewBoard && !connection.hasCookie(reviewBoard)) {
-            log.warn("Cookie {} should have been retrieved from reviewboard login!", reviewBoard.getCookieName());
+        File tokenFile = new File(System.getProperty("user.home") + File.separator + credentialsType.getFileName());
+        if (credentialsType == reviewBoard_token && !tokenFile.exists() && connection.hasCookie(reviewBoard_cookie)) {
+            String tokenUrl = UrlUtils.addRelativePaths(apiUrl, "users", getUsername(), "api-tokens/");
+            ApiToken apiToken = connection.post(tokenUrl, ApiTokenResponseEntity.class, new ApiTokenRequest()).apiToken;
+            saveApiToken(apiToken.token, credentialsType);
+            connection.addStatefulParam(RequestHeader.aTokenAuthHeader(apiToken.token));
+            connection.removeCookie(reviewBoard_cookie.getCookieName());
+        } else {
+            getServerInfo();
+        }
+        if (credentialsType == reviewBoard_cookie && !connection.hasCookie(reviewBoard_cookie)) {
+            log.warn("Cookie {} should have been retrieved from reviewboard login!", reviewBoard_cookie.getCookieName());
         }
     }
 

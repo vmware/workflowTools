@@ -62,17 +62,25 @@ public abstract class BaseScmWrapper {
         return executeScmCommand(command, LogLevel.DEBUG, arguments);
     }
 
+    String executeShortScmCommand(String command, String... arguments) {
+        return executeScmCommand(command, null, LogLevel.DEBUG, true, arguments);
+    }
+
     String executeScmCommand(String command, LogLevel logLevel, String... commandArguments) {
         return executeScmCommand(command, null, logLevel, commandArguments);
     }
 
     String executeScmCommand(String command, String inputText, LogLevel level, String... commandArguments) {
-        return executeScmCommand(null, command, inputText, level, commandArguments);
+        return executeScmCommand(null, command, inputText, level, false, commandArguments);
     }
 
-    String executeScmCommand(Map<String, String> environmentVariables, String command, String inputText, LogLevel level, String... commandArguments) {
-        String expandedCommand = scmExecutablePath() + " " + addArgumentsToValue(command, commandArguments);
-        String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, level);
+    String executeScmCommand(String command, String inputText, LogLevel level, boolean logResultOnly, String... commandArguments) {
+        return executeScmCommand(null, command, inputText, level, logResultOnly, commandArguments);
+    }
+
+    String executeScmCommand(Map<String, String> environmentVariables, String command, String inputText, LogLevel level, boolean logResultOnly, String... commandArguments) {
+        String expandedCommand = scmExecutablePath() + " " + addArgumentsToValue(command, (Object[]) commandArguments);
+        String output = executeCommand(workingDirectory, environmentVariables, expandedCommand, inputText, logResultOnly, level);
         String commandCheckOutput = checkIfCommandFailed(output);
         if (commandCheckOutput != null) {
             log.error(commandCheckOutput);

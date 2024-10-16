@@ -45,7 +45,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.vmware.http.cookie.ApiAuthentication.trello;
+import static com.vmware.http.cookie.ApiAuthentication.trello_token;
 import static com.vmware.http.credentials.UsernamePasswordAsker.askUserForUsernameAndPassword;
 import static com.vmware.http.request.RequestHeader.aRefererHeader;
 import static java.lang.String.format;
@@ -63,7 +63,7 @@ public class Trello extends AbstractRestService {
     private final SsoConfig ssoConfig;
 
     public Trello(String trelloUrl, String username, boolean trelloSso, String ssoEmail, SsoConfig ssoConfig) {
-        super(createApiUrl(trelloUrl), "1/", trello, username);
+        super(createApiUrl(trelloUrl), "1/", trello_token, username);
         webUrl = UrlUtils.addTrailingSlash(trelloUrl);
         this.trelloSso = trelloSso;
         this.ssoEmail = ssoEmail;
@@ -212,9 +212,9 @@ public class Trello extends AbstractRestService {
             SsoClient ssoClient = new SsoClient(ssoConfig, getUsername(), ssoEmail);
             String keyAndToken = ssoClient.loginAndGetApiToken(webUrl + ".+?/boards", loginUrl, SSO_LOGIN_BUTTON, ssoNavigateFunction, apiTokenGenerator);
             connection.addStatefulParamsFromUrlFragment(keyAndToken);
-            saveApiToken(keyAndToken, trello);
+            saveApiToken(keyAndToken, trello_token);
         } else {
-            UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello, getUsername());
+            UsernamePasswordCredentials credentials = askUserForUsernameAndPassword(trello_token, getUsername());
             connection.setRequestBodyHandling(RequestBodyHandling.AsUrlEncodedFormEntity);
             connection.setUseSessionCookies(true);
             // Trello seems to be particular over what is used as a dsc value, this one is copied from the browser
@@ -228,7 +228,7 @@ public class Trello extends AbstractRestService {
             connection.setUseSessionCookies(false);
 
             connection.addStatefulParams(authQueryParams);
-            saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello);
+            saveApiToken(StringUtils.appendWithDelimiter("", authQueryParams, "&"), trello_token);
         }
 
     }

@@ -5,6 +5,7 @@ import com.vmware.buildweb.Buildweb;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.config.section.BuildwebConfig;
 import com.vmware.config.section.JenkinsConfig;
+import com.vmware.config.section.ReviewBoardConfig;
 import com.vmware.config.section.SsoConfig;
 import com.vmware.config.section.TrelloConfig;
 import com.vmware.config.section.VcdConfig;
@@ -79,10 +80,12 @@ public class ServiceLocator {
         }
         if (reviewBoard == null) {
             try {
-                ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard;
-                reviewBoard = new ReviewBoard(config.reviewBoardConfig.reviewboardUrl, config.username, reviewBoardCredentialsType);
+                ReviewBoardConfig reviewBoardConfig = config.reviewBoardConfig;
+                ApiAuthentication reviewBoardCredentialsType = reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard_cookie;
+                String rbUsername = StringUtils.isNotBlank(reviewBoardConfig.rbUsername) ? reviewBoardConfig.rbUsername : config.username;
+                reviewBoard = new ReviewBoard(reviewBoardConfig.reviewboardUrl, rbUsername, reviewBoardCredentialsType);
                 if (reviewBoard.isConnectionAuthenticated()) {
-                    reviewBoard.updateClientTimeZone(config.reviewBoardConfig.reviewBoardDateFormat);
+                    reviewBoard.updateClientTimeZone(reviewBoardConfig.reviewBoardDateFormat);
                 }
             } catch (RuntimeException re) {
                 this.reviewBoardException = re;

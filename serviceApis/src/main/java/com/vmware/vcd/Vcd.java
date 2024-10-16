@@ -48,7 +48,7 @@ import com.vmware.vcd.domain.UserSession;
 import com.vmware.vcd.domain.UserType;
 import com.vmware.vcd.domain.VcdMediaType;
 
-import static com.vmware.http.cookie.ApiAuthentication.vcd;
+import static com.vmware.http.cookie.ApiAuthentication.vcd_token;
 import static com.vmware.http.request.RequestHeader.aBasicAuthHeader;
 import static com.vmware.http.request.RequestHeader.aBearerAuthHeader;
 import static com.vmware.http.request.RequestHeader.aContentTypeHeader;
@@ -90,7 +90,7 @@ public class Vcd extends AbstractRestService {
     }
 
     public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoEmail, String refreshTokenName, boolean disableRefreshToken, boolean ssoHeadless, SsoConfig ssoConfig) {
-        super(vcdUrl, "api", ApiAuthentication.vcd, username);
+        super(vcdUrl, "api", ApiAuthentication.vcd_token, username);
         this.useVcdSso = useVcdSso;
         this.ssoEmail = ssoEmail;
         this.refreshTokenName = refreshTokenName;
@@ -102,7 +102,7 @@ public class Vcd extends AbstractRestService {
         this.ssoConfig = ssoConfig;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         this.connection.updateTimezoneAndFormat(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS");
-        apiToken = readExistingApiToken(ApiAuthentication.vcd);
+        apiToken = readExistingApiToken(ApiAuthentication.vcd_token);
         if (StringUtils.isNotEmpty(apiToken)) {
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
         }
@@ -275,7 +275,7 @@ public class Vcd extends AbstractRestService {
             log.info("Using refresh token from {}", refreshTokenFile.getPath());
             try {
                 apiToken = createAccessTokenUsingRefreshToken(refreshToken);
-                saveApiToken(apiToken, ApiAuthentication.vcd);
+                saveApiToken(apiToken, ApiAuthentication.vcd_token);
                 connection.addStatefulParam(aBearerAuthHeader(apiToken));
                 return;
             } catch (BadRequestException bre) {
@@ -303,7 +303,7 @@ public class Vcd extends AbstractRestService {
                 log.info("Failed to get api token via SSO, please enter api token");
                 apiToken = InputUtils.readValueUntilNotBlank("Bearer Api Token");
             }
-            saveApiToken(apiToken, vcd);
+            saveApiToken(apiToken, vcd_token);
             connection.addStatefulParam(aBearerAuthHeader(apiToken));
             createRefreshTokenIfNeeded();
             return;
@@ -313,7 +313,7 @@ public class Vcd extends AbstractRestService {
         } else {
             log.info("Enter username as username@[org name]");
         }
-        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(vcd, getUsername());
+        UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(vcd_token, getUsername());
         if (StringUtils.isNotEmpty(vcdOrg) && !credentials.getUsername().contains("@")) {
             log.info("Appending org name {} to username {}", vcdOrg, credentials.getUsername());
             credentials = new UsernamePasswordCredentials(credentials.getUsername() + "@" + vcdOrg, credentials.getPassword());
@@ -323,7 +323,7 @@ public class Vcd extends AbstractRestService {
         }
 
         apiToken = loginWithCredentials(credentials);
-        saveApiToken(apiToken, vcd);
+        saveApiToken(apiToken, vcd_token);
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
         createRefreshTokenIfNeeded();
     }

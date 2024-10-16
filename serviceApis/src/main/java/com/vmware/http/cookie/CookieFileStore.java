@@ -12,15 +12,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.vmware.util.StringUtils.appendWithDelimiter;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CookieFileStore {
+    private static final List<String> USEFUL_RESPONSE_HEADERS = Arrays.asList("Set-Cookie", "Content-Type", "Content-Length");
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final String homeFolder;
@@ -87,7 +90,7 @@ public class CookieFileStore {
     }
 
     public void addCookieIfUseful(Cookie cookieToCheck) {
-        ApiAuthentication apiAuthentication = ApiAuthentication.loadByName(cookieToCheck.getName());
+        ApiAuthentication apiAuthentication = ApiAuthentication.loadByCookieName(cookieToCheck.getName());
         if (apiAuthentication == null) {
             log.debug("Adding session cookie {}:{}", cookieToCheck.getName(), cookieToCheck.getValue());
             sessionCookies.add(cookieToCheck);
@@ -95,15 +98,16 @@ public class CookieFileStore {
         }
 
         Cookie existingCookie = getCookieByName(cookieToCheck.getName());
-        if (existingCookie == null || cookieToCheck.getExpiryDate().after(existingCookie.getExpiryDate())
-                || !cookieToCheck.getValue().equals(existingCookie.getValue())) {
+        if (existingCookie == null || !cookieToCheck.getValue().equals(existingCookie.getValue())) {
 
             if (existingCookie != null) {
-                log.debug("Removing existing auth cookie {}", cookieToCheck.getName());
+                log.debug("Replacing existing auth cookie {} value {} with {}", cookieToCheck.getName(), existingCookie.getValue(), cookieToCheck.getValue());
                 authCookies.remove(existingCookie);
+                authCookies.add(cookieToCheck);
+            } else {
+                log.debug("Adding auth cookie {}:{}", cookieToCheck.getName(), cookieToCheck.getValue());
+                authCookies.add(cookieToCheck);
             }
-            log.debug("Adding auth cookie {}:{}", cookieToCheck.getName(), cookieToCheck.getValue());
-            authCookies.add(cookieToCheck);
             try {
                 writeCookieToFile(existingCookie, cookieToCheck, apiAuthentication.getFileName());
             } catch (IOException ioe) {
@@ -120,7 +124,12 @@ public class CookieFileStore {
                 log.debug("No value for response header {}", key);
                 continue;
             }
-            log.debug("Response Header {}={}", key, headerText);
+            if (log.isTraceEnabled()) {
+                log.trace("Response Header {}={}", key, headerText);
+            } else if (log.isDebugEnabled() && USEFUL_RESPONSE_HEADERS.contains(key)) {
+                log.debug("Response Header {}={}", key, headerText);
+            }
+
             if (!key.equals("Set-Cookie")) {
                 continue;
             }
@@ -135,11 +144,12 @@ public class CookieFileStore {
 
     public String toCookieRequestText(String host, boolean useSessionCookies) {
         List<Cookie> matchingAuthCookies = getMatchingAuthCookiesForHost(host);
-        String cookieText = appendWithDelimiter("", matchingAuthCookies, ";");
         if (useSessionCookies) {
-            cookieText = appendWithDelimiter(cookieText, sessionCookies, ";");
+            return Stream.of(matchingAuthCookies, sessionCookies).flatMap(Collection::stream).map(Cookie::toString)
+                    .collect(Collectors.joining(";"));
+        } else {
+            return matchingAuthCookies.stream().map(Cookie::toString).collect(Collectors.joining(";"));
         }
-        return cookieText;
     }
 
     private void writeCookieToFile(Cookie existingCookie, Cookie updatedCookie, String cookieFileName) throws IOException {

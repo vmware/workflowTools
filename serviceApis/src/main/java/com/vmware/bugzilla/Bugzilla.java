@@ -18,8 +18,6 @@ import com.vmware.http.exception.InternalServerException;
 import com.vmware.http.exception.NotAuthorizedException;
 import com.vmware.http.exception.NotFoundException;
 import com.vmware.http.request.body.RequestBodyHandling;
-import com.vmware.util.ThreadUtils;
-import com.vmware.util.UrlUtils;
 import com.vmware.xmlrpc.CookieAwareXmlRpcClient;
 import com.vmware.xmlrpc.MapObjectConverter;
 import com.vmware.xmlrpc.RuntimeXmlRpcException;
@@ -32,13 +30,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.vmware.http.cookie.ApiAuthentication.trello;
 import static java.lang.String.format;
 
 

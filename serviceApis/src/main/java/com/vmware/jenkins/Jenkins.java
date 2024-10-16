@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.vmware.http.cookie.ApiAuthentication.jenkins;
+import static com.vmware.http.cookie.ApiAuthentication.jenkins_token;
 import static com.vmware.util.StringUtils.humanReadableSize;
 import static com.vmware.util.ThreadUtils.retryFunctionUntilSucceeds;
 
@@ -53,7 +53,7 @@ public class Jenkins extends AbstractRestBuildService {
     private HomePage homePage = null;
 
     public Jenkins(String serverUrl, final String username, boolean usesCsrf, boolean disableLogin, Map<String, String> testReportUrlOverrides) {
-        super(serverUrl, "api/json", jenkins, username);
+        super(serverUrl, "api/json", jenkins_token, username);
         this.usesCsrf = usesCsrf;
         this.disableLogin = disableLogin;
         this.testReportUrlOverrides = testReportUrlOverrides;
@@ -273,7 +273,7 @@ public class Jenkins extends AbstractRestBuildService {
             apiTokenUsedForLogin = true;
             connection.setupBasicAuthHeader(new UsernamePasswordCredentials(getUsername(), apiToken));
             connection.get(UrlUtils.addRelativePaths(baseUrl, "me/api/json"), User.class);
-            saveApiToken(apiToken, jenkins);
+            saveApiToken(apiToken, jenkins_token);
         } else {
             UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(credentialsType, getUsername());
             connection.setupBasicAuthHeader(credentials);

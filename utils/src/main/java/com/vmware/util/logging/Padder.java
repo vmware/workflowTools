@@ -29,7 +29,7 @@ public class Padder {
         }
         int fullTitleLength = title.length() + 4;
         int paddingCount = (paddingLength - fullTitleLength) / 2;
-        if (fullTitleLength > paddingLength) {
+        if (fullTitleLength > (paddingLength - 7)) {
             title = title.substring(0, paddingLength - 7) + "...";
             paddingCount = 1;
         }

@@ -200,7 +200,7 @@ public class Git extends BaseScmWrapper {
         if (currentBranch != null) {
             return currentBranch;
         }
-        currentBranch = executeScmCommand("rev-parse --abbrev-ref HEAD");
+        currentBranch = executeShortScmCommand("rev-parse --abbrev-ref HEAD");
         return currentBranch;
     }
 
@@ -341,11 +341,11 @@ public class Git extends BaseScmWrapper {
 
     public String mergeBase(String upstreamBranch, String commitRef) {
         checkRefsAreValid(upstreamBranch, commitRef);
-        return executeScmCommand("merge-base " + upstreamBranch + " " + commitRef);
+        return executeShortScmCommand("merge-base " + upstreamBranch + " " + commitRef);
     }
 
     public String revParseWithoutException(String commitRef) {
-        return executeScmCommand("rev-parse " + commitRef);
+        return executeShortScmCommand("rev-parse " + commitRef);
     }
 
     public String revParse(String commitRef) {
@@ -409,11 +409,11 @@ public class Git extends BaseScmWrapper {
 
     public String getTrackingBranch() {
         if (Git.trackingBranch != null) {
-            return Git.trackingBranch.equals("") ? null : Git.trackingBranch;
+            return Git.trackingBranch.isEmpty() ? null : Git.trackingBranch;
         }
         String branchName = currentBranch();
         try {
-            Git.trackingBranch = executeScmCommand("rev-parse --abbrev-ref " + branchName + "@{upstream}");
+            Git.trackingBranch = executeShortScmCommand("rev-parse --abbrev-ref " + branchName + "@{upstream}");
         } catch (FatalException fe) {
             Git.trackingBranch = "";
         }
@@ -604,7 +604,7 @@ public class Git extends BaseScmWrapper {
             return StringUtils.isEmpty(Git.rootDirectoryCommandOutput) ? null : new File(rootDirectoryCommandOutput);
         } else if (isGitInstalled()) {
             try {
-                Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand("git rev-parse --show-toplevel", LogLevel.DEBUG);
+                Git.rootDirectoryCommandOutput = CommandLineUtils.executeCommand(null, "git rev-parse --show-toplevel", null, true, LogLevel.DEBUG);
                 log.trace("Git root directory {}", Git.rootDirectoryCommandOutput);
                 return new File(rootDirectoryCommandOutput);
             } catch (FatalException fe) {

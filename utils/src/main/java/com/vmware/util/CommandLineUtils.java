@@ -45,7 +45,7 @@ public class CommandLineUtils {
 
     private static boolean checkForCommandUsingWhere(String command) {
         try {
-            String whereCheck = executeCommand(null, "where " + command, null, LogLevel.TRACE);
+            String whereCheck = executeCommand(null, "where " + command, null, true, LogLevel.TRACE);
             log.debug("{} where check [{}]", command, whereCheck);
             return !whereCheck.contains("Could not find files");
         } catch (FatalException fe) {
@@ -56,7 +56,7 @@ public class CommandLineUtils {
 
     private static boolean checkForCommandUsingWhich(String command) {
         try {
-            String whichCheck = executeCommand(null, "which " + command, null, LogLevel.TRACE);
+            String whichCheck = executeCommand(null, "which " + command, null, true, LogLevel.TRACE);
             log.debug("{} which check [{}]", command, whichCheck);
             return !whichCheck.trim().isEmpty() && !whichCheck.contains("no " + command + " in");
         } catch (FatalException fe) {
@@ -66,16 +66,16 @@ public class CommandLineUtils {
     }
 
     public static String executeCommand(String command, LogLevel logLevel) {
-        return executeCommand(null, command, null, logLevel);
+        return executeCommand(null, command, null, false, logLevel);
     }
 
-    public static String executeCommand(File workingDirectory, String command, String inputText, LogLevel logLevel) {
-        return executeCommand(workingDirectory, null, command, inputText, logLevel);
+    public static String executeCommand(File workingDirectory, String command, String inputText, boolean logResultOnly, LogLevel logLevel) {
+        return executeCommand(workingDirectory, null, command, inputText, logResultOnly, logLevel);
     }
 
     public static String executeCommand(File workingDirectory, Map<String, String> environmentVariables,
-                                        String command, String inputText, LogLevel logLevel) {
-        if (logLevel.isDebug()) {
+                                        String command, String inputText, boolean logResultOnly, LogLevel logLevel) {
+        if (!logLevel.isDebug()) {
             dynamicLogger.log(logLevel, "Executing command {}", command);
         }
         ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).directory(workingDirectory)
@@ -85,10 +85,17 @@ public class CommandLineUtils {
         }
         StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
         Padder titlePadder = new Padder(command);
-        titlePadder.logTitle(logLevel);
+        if (!logResultOnly) {
+            titlePadder.logTitle(logLevel);
+        }
         Process statusProcess = executeCommand(workingDirectory, environmentVariables, command, inputText);
 
-        String output = IOUtils.read(statusProcess.getInputStream(), logLevel);
+        String output = IOUtils.read(statusProcess.getInputStream(), logResultOnly ? null : logLevel);
+        if (logResultOnly && StringUtils.isNotBlank(output)) {
+            dynamicLogger.log(logLevel, "Executed command [{}] Output [{}]", command, output);
+        } else if (logResultOnly) {
+            dynamicLogger.log(logLevel, "Executed command {}", command);
+        }
         long elapsedMilliseconds = stopwatch.elapsedTime();
         if (elapsedMilliseconds > 50 && elapsedMilliseconds < 2000) {
             dynamicLogger.log(LogLevel.DEBUG, "Execution time {} milliseconds", elapsedMilliseconds);
@@ -97,7 +104,9 @@ public class CommandLineUtils {
             dynamicLogger.log(LogLevel.INFO, "Execution time {} seconds for command {}", elapsedTimeInSeconds, command);
         }
 
-        titlePadder.logTitle(logLevel);
+        if (!logResultOnly) {
+            titlePadder.logTitle(logLevel);
+        }
         try {
             statusProcess.waitFor(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {

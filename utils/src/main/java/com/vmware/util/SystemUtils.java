@@ -25,7 +25,7 @@ public class SystemUtils {
         log.info("Opening url {}", url);
         if (CommandLineUtils.isOsxCommandAvailable("open")) {
             log.debug("Opening url using osx open command");
-            CommandLineUtils.executeCommand(null, "open " + url, null, LogLevel.DEBUG);
+            CommandLineUtils.executeCommand(null, "open " + url, null, true, LogLevel.DEBUG);
         } else if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             log.debug("Opening url using java desktop support");
             try {
@@ -40,8 +40,8 @@ public class SystemUtils {
 
     public static void copyTextToClipboard(String text) {
         if (CommandLineUtils.isOsxCommandAvailable("pbcopy")) {
-            log.debug("Using osx pbcopy command to copy text to clipboard as it doesn't cause terminal in full screen mode to jump back to the desktop view");
-            CommandLineUtils.executeCommand(null, "pbcopy", text, LogLevel.DEBUG);
+            log.trace("Using osx pbcopy command to copy text to clipboard as it doesn't cause terminal in full screen mode to jump back to the desktop view");
+            CommandLineUtils.executeCommand(null, "pbcopy", text, true, LogLevel.DEBUG);
         } else {
             log.debug("Using Java clipboard support to copy text");
             StringSelection stringSelection = new StringSelection(text);

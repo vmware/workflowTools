@@ -95,12 +95,12 @@ public class SsoClient {
 
         String passwordId = devTools.waitForAnyElementId(ssoConfig.ssoPasswordInputId, ssoConfig.ssoPasscodeInputId);
         if (passwordId.equals(ssoConfig.ssoPasscodeInputId)) {
-            UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.vcd, username,
+            UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.vcd_token, username,
                     "RSA Passcode");
             devTools.setValueById(ssoConfig.ssoUsernameInputId, credentials.getUsername());
             devTools.setValueById(ssoConfig.ssoPasscodeInputId, credentials.getPassword());
         } else {
-            UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.vcd, username);
+            UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.vcd_token, username);
             devTools.setValueById(ssoConfig.ssoUsernameInputId, credentials.getUsername());
             devTools.setValueById(ssoConfig.ssoPasswordInputId, credentials.getPassword());
         }
