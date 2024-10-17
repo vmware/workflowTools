@@ -121,11 +121,7 @@ public class Jira extends AbstractRestService {
         String jql = String.format("issuetype in (%s,subTaskIssueTypes()) AND status in (%s) AND assignee=%s",
                 issueTypesToGet, allowedStatuses, escapeUsername(getUsername()));
         IssuesResponse response = get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
-        if (response == null) {
-            log.debug("No issues parsed from jira response");
-        } else {
-            log.debug("{} tasks found", response.issues.length);
-        }
+        logInfoAboutResponse(response);
 
         return response;
     }
@@ -134,7 +130,7 @@ public class Jira extends AbstractRestService {
         String jql = String.format("status=%s AND resolution=%s AND assignee=%s",
                 status.getValue(), resolution != null ? resolution.getValue() : null, escapeUsername(getUsername()));
         IssuesResponse response = get(searchUrl, IssuesResponse.class, new UrlParam("jql", jql));
-        log.debug("{} tasks found", response.issues.length);
+        logInfoAboutResponse(response);
         return response;
     }
 
@@ -221,6 +217,17 @@ public class Jira extends AbstractRestService {
 
     private String generateNumericalEnumListAsInts(ComplexEnum... complexEnums) {
         return Arrays.stream(complexEnums).map(ComplexEnum::getValue).map(String::valueOf).collect(Collectors.joining(","));
+    }
+
+    private void logInfoAboutResponse(IssuesResponse response) {
+        if (response == null) {
+            log.debug("No issues parsed from jira response");
+        } else {
+            log.debug("{} tasks found", response.issues.length);
+            if (response.total == 0 && response.warningMessages != null && response.warningMessages.length > 0) {
+                log.warn("Failed to load tasks for user {}: {}", getUsername(), Arrays.toString(response.warningMessages));
+            }
+        }
     }
 
     private String escapeUsername(String username) {

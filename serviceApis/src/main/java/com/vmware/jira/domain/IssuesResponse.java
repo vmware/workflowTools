@@ -8,4 +8,6 @@ public class IssuesResponse {
     public int maxResults;
 
     public Issue[] issues;
+
+    public String[] warningMessages;
 }

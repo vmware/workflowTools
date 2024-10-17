@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 public class CookieFileStore {
     private static final List<String> USEFUL_RESPONSE_HEADERS = Arrays.asList("Set-Cookie", "Content-Type", "Content-Length");
@@ -143,17 +145,16 @@ public class CookieFileStore {
     }
 
     public String toCookieRequestText(String host, boolean useSessionCookies) {
-        List<Cookie> matchingAuthCookies = getMatchingAuthCookiesForHost(host);
+        List<Cookie> matchingAuthCookies = authCookies.stream().filter(cookie -> cookie.isValidForHost(host)).collect(toList());
         if (useSessionCookies) {
             return Stream.of(matchingAuthCookies, sessionCookies).flatMap(Collection::stream).map(Cookie::toString)
-                    .collect(Collectors.joining(";"));
+                    .collect(joining(";"));
         } else {
-            return matchingAuthCookies.stream().map(Cookie::toString).collect(Collectors.joining(";"));
+            return matchingAuthCookies.stream().map(Cookie::toString).collect(joining(";"));
         }
     }
 
     private void writeCookieToFile(Cookie existingCookie, Cookie updatedCookie, String cookieFileName) throws IOException {
-
         String updatedCookieText = convertCookieToString(updatedCookie);
 
         File cookieFile = new File(homeFolder + "/" + cookieFileName);
@@ -169,16 +170,6 @@ public class CookieFileStore {
         String existingFileText = IOUtils.read(cookieFile);
         String updatedFileText = existingFileText.replace(existingCookieText, updatedCookieText);
         IOUtils.write(cookieFile, updatedFileText);
-    }
-
-    private List<Cookie> getMatchingAuthCookiesForHost(String host) {
-        List<Cookie> matchingCookies = new ArrayList<Cookie>();
-        for (Cookie authCookie : authCookies) {
-            if (authCookie.isValidForHost(host)) {
-                matchingCookies.add(authCookie);
-            }
-        }
-        return matchingCookies;
     }
 
     private String convertCookieToString(Cookie cookie) {
