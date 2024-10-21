@@ -13,6 +13,8 @@ public class Padder {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final DynamicLogger dynamicLogger = new DynamicLogger(log);
     private static final int DEFAULT_PADDING_LENGTH = 80;
+    private static final int TITLE_SPACING_LENGTH = 4;
+    private static final int MIN_PADDING_LENGTH = 2;
 
     private final String title;
     private final String padding;
@@ -27,12 +29,9 @@ public class Padder {
         for (Object arg : args) {
             title = title.replaceFirst("\\{}", String.valueOf(arg));
         }
-        int fullTitleLength = title.length() + 4;
-        int paddingCount = (paddingLength - fullTitleLength) / 2;
-        if (fullTitleLength > (paddingLength - 7)) {
-            title = title.substring(0, paddingLength - 11) + "...";
-            paddingCount = 1;
-        }
+        title = StringUtils.truncateStringIfNeeded(title, paddingLength - (TITLE_SPACING_LENGTH + MIN_PADDING_LENGTH));
+
+        int paddingCount = (paddingLength - (title.length() + TITLE_SPACING_LENGTH)) / 2;
         this.padding = StringUtils.repeat(paddingCount, "*");
         this.title = title;
     }
