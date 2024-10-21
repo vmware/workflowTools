@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
  */
 public class Padder {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-    private DynamicLogger dynamicLogger = new DynamicLogger(log);
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final DynamicLogger dynamicLogger = new DynamicLogger(log);
     private static final int DEFAULT_PADDING_LENGTH = 80;
 
     private final String title;
-    private String padding;
+    private final String padding;
     private boolean isFirstExecution = true;
 
     public Padder(String title, Object... args) {
@@ -30,7 +30,7 @@ public class Padder {
         int fullTitleLength = title.length() + 4;
         int paddingCount = (paddingLength - fullTitleLength) / 2;
         if (fullTitleLength > (paddingLength - 7)) {
-            title = title.substring(0, paddingLength - 7) + "...";
+            title = title.substring(0, paddingLength - 11) + "...";
             paddingCount = 1;
         }
         this.padding = StringUtils.repeat(paddingCount, "*");
