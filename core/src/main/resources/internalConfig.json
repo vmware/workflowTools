@@ -798,6 +798,10 @@
       "updatePullRequestDetails",
       "pushCommitToMergeBranch"
     ],
+    "approvePullRequest": [
+      "selectPullRequest&&--fail-if-no-request-found",
+      "ApprovePullRequest"
+    ],
     "openPullRequest": [
       "selectPullRequest&&--fail-if-no-request-found",
       "OpenRequest"

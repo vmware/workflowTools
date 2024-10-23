@@ -1,39 +1,38 @@
 package com.vmware.action.github;
 
 import com.vmware.action.base.BaseCommitWithMergeRequestAction;
+import com.vmware.action.base.BaseCommitWithPullRequestAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.github.domain.PullRequest;
+import com.vmware.github.domain.Review;
 import com.vmware.gitlab.domain.MergeRequestApprovals;
 import com.vmware.util.exception.FatalException;
 
+import java.util.Collections;
+import java.util.List;
+
+import static com.vmware.action.base.BaseSetUsersList.CandidateSearchType.gitlab;
+
 @ActionDescription("Approve pull request in Github.")
-public class ApprovePullRequest extends BaseCommitWithMergeRequestAction {
+public class ApprovePullRequest extends BaseCommitWithPullRequestAction {
     public ApprovePullRequest(WorkflowConfig config) {
         super(config, true);
     }
 
     @Override
     public void process() {
-        MergeRequestApprovals approvals = gitlab.getMergeRequestApprovals(gitlabConfig.gitlabProjectId, draft.mergeRequestId());
-        if (approvals.approvalsRequired != null && approvals.approvalsRequired == 0) {
-            log.info("No approvals required for pull request {}", draft.requestUrl);
-            return;
-        }
-
-        if (approvals.userHasApproved) {
+        PullRequest pullRequest = draft.getGithubPullRequest();
+        List<Review> approvals = github.getApprovedReviewsForPullRequest(pullRequest);
+        if (approvals.stream().anyMatch(approval -> approval.user.login.equals(github.getUsername()))) {
             log.info("Pull request {} has already been self approved", draft.requestUrl);
             return;
         }
 
-        if (!approvals.userCanApprove) {
-            throw new FatalException("Pull request {} cannot be self approved", draft.requestUrl);
-        }
-
         log.info("Self approving pull request {}", draft.requestUrl);
-        MergeRequestApprovals updatedApprovals = gitlab.approveMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId());
-        if (!updatedApprovals.userHasApproved) {
+        Review review = github.approvePullRequest(pullRequest);
+        if (!review.isApproved()) {
             throw new FatalException("Pull request {} is not self approved", draft.requestUrl);
         }
-        draft.setGitlabMergeRequest(gitlab.getMergeRequest(gitlabConfig.gitlabProjectId, draft.mergeRequestId()));
     }
 }

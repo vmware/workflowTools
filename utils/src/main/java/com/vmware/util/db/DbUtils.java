@@ -112,10 +112,10 @@ public class DbUtils {
             ResultSet results = statement.executeQuery();
 
             ResultSetMetaData resultMetaData = results.getMetaData();
+            List<T> resultObjects = new ArrayList<>();
             if (BaseDbClass.class.isAssignableFrom(recordClass)) {
-                return createRecordList(recordClass, stopwatch, results);
+                populateResultObjects(recordClass, results, resultObjects);
             } else if (Map.class.isAssignableFrom(recordClass)) {
-                List<T> values = new ArrayList<>();
                 while (results.next()) {
                     Map record = new LinkedHashMap();
                     for (int i = 1; i <= resultMetaData.getColumnCount(); i++) {
@@ -127,22 +127,17 @@ public class DbUtils {
                             record.put(name, value);
                         }
                     }
-                    values.add((T) record);
+                    resultObjects.add((T) record);
                 }
-                log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
-                return values;
             } else if (resultMetaData.getColumnCount() == 1) {
-                List<T> values = new ArrayList<>();
                 while (results.next()) {
-                    values.add((T) results.getObject(1));
+                    resultObjects.add((T) results.getObject(1));
                 }
-                log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
-                return values;
-            }
-            else {
+            } else {
                throw new RuntimeException("Cannot query for multiple values without using a class that extends " + BaseDbClass.class.getSimpleName());
             }
-
+            log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
+            return resultObjects;
         } catch (SQLException se) {
             throw new RuntimeException(se);
         }
@@ -324,7 +319,7 @@ public class DbUtils {
         return driver;
     }
 
-    private <T> List<T> createRecordList(Class<T> recordClass, StopwatchUtils.Stopwatch stopwatch, ResultSet results) throws SQLException {
+    private <T> void populateResultObjects(Class<T> recordClass, ResultSet results, List<T> values) throws SQLException {
         List<Field> fieldsForClass = ReflectionUtils.getAllFieldsWithoutAnnotation(recordClass, null);
 
         Map<Field, Integer> fieldColumnMappings = new HashMap<>();
@@ -337,7 +332,6 @@ public class DbUtils {
             }
         }
 
-        List<T> records = new ArrayList<>();
         while (results.next()) {
             T record = (T) ReflectionUtils.newInstance(recordClass);
             fieldColumnMappings.forEach((key, value) -> {
@@ -352,9 +346,7 @@ public class DbUtils {
                 }
             });
             ReflectionUtils.invokeAllMethodsWithAnnotation(record, AfterDbLoad.class);
-            records.add(record);
+            values.add(record);
         }
-        log.trace("Query execution time {}", StringUtils.pluralize(stopwatch.elapsedTime(), "millisecond"));
-        return records;
     }
 }

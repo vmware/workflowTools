@@ -62,7 +62,7 @@ public class ReflectionUtils {
         while (clazzToFetch != Object.class) {
             List<Method> matchingMethods = Arrays.stream(clazzToFetch.getMethods())
                     .filter(method -> method.getAnnotation(annotation) != null).collect(Collectors.toList());
-            annotatedMethods.addAll(matchingMethods);
+            annotatedMethods.addAll(0, matchingMethods);
             clazzToFetch = clazzToFetch.getSuperclass();
         }
         annotatedMethods.forEach(method -> {

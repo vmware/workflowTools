@@ -20,6 +20,7 @@ import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.Review;
 import com.vmware.github.domain.ReviewThread;
 import com.vmware.github.domain.User;
+import com.vmware.gitlab.domain.MergeRequestApprovals;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
 import com.vmware.http.json.ConfiguredGsonBuilder;
@@ -50,7 +51,6 @@ public class Github extends AbstractRestService {
         GraphqlRequest request = new GraphqlRequest();
 
         request.query = searchUsersQuery.replace("${query}", query).replace("${companyName}", companyName);
-        String responseTest = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), String.class, request);
         GraphqlResponse response = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlResponse.class, request);
         return response.data.search.usersForCompany(companyName);
     }
@@ -68,6 +68,8 @@ public class Github extends AbstractRestService {
     public List<Review> getApprovedReviewsForPullRequest(PullRequest pullRequest) {
         return Arrays.stream(getReviewsForPullRequest(pullRequest)).filter(Review::isApproved).collect(Collectors.toList());
     }
+
+    public
 
     public Review[] getReviewsForPullRequest(PullRequest pullRequest) {
         return get(pullRequestUrl(pullRequest) + "/reviews", Review[].class);
@@ -117,6 +119,12 @@ public class Github extends AbstractRestService {
             return;
         }
         delete(pullRequestUrl(pullRequest) + "/requested_reviewers", pullRequest, Collections.emptyList());
+    }
+
+    public Review approvePullRequest(PullRequest pullRequest) {
+        Review review = new Review();
+        review.state = "APPROVED";
+        return post(pullRequestUrl(pullRequest) + "/reviews", Review.class, review);
     }
 
     public ReleaseAsset[] getReleaseAssets(String releasePath) {
