@@ -25,13 +25,15 @@ public class UrlUtils {
         }
         String urlWithoutTrailingSlash = removeTrailingSlash(url);
         StringBuilder urlBuilder = new StringBuilder(urlWithoutTrailingSlash);
+        boolean lastPathEndedWithSlash = false;
         for (Object path : paths) {
             String pathAsString = String.valueOf(path);
-            if (pathAsString.startsWith("/")) {
+            if (pathAsString.startsWith("/") || lastPathEndedWithSlash) {
                 urlBuilder.append(pathAsString);
             } else {
                 urlBuilder.append("/").append(pathAsString);
             }
+            lastPathEndedWithSlash = pathAsString.endsWith("/");
         }
         return urlBuilder.toString();
     }

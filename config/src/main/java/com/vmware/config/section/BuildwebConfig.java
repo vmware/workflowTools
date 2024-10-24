@@ -21,6 +21,9 @@ public class BuildwebConfig {
     @ConfigurableProperty(help = "Url for buildweb server")
     public String buildwebUrl;
 
+    @ConfigurableProperty(help = "Optional hostname suffix for build machine, used for retrieving logs for a running build")
+    public String buildwebBuildMachineHostNameSuffix;
+
     @ConfigurableProperty(help = "Path to gobuild bin file, this is a VMware specific tool")
     public String goBuildBinPath;
 

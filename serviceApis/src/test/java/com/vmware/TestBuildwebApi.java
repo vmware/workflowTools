@@ -21,7 +21,7 @@ public class TestBuildwebApi extends BaseTests {
         String apiUrl = testProperties.getProperty("buildweb.api.url");
         String logFileName = testProperties.getProperty("buildweb.log.file.name");
         String username = testProperties.getProperty("buildweb.username");
-        buildweb = new Buildweb(url, apiUrl, logFileName, username);
+        buildweb = new Buildweb(url, apiUrl, logFileName, ".lvn.broadcom.net", username);
     }
 
     @Test

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Used to generate consistent titles.
- * Output looks like ********** TITLE **********
+ * Output looks like **********  TITLE  **********
  */
 public class Padder {
 
@@ -24,20 +24,15 @@ public class Padder {
         this(DEFAULT_PADDING_LENGTH, title, args);
     }
 
-    public Padder(int paddingLength, String title, Object... args) {
-        title = title.trim();
+    public Padder(int paddingLength, String rawTitle, Object... args) {
+        String fullTitle = rawTitle.trim();
         for (Object arg : args) {
-            title = title.replaceFirst("\\{}", String.valueOf(arg));
+            fullTitle = fullTitle.replaceFirst("\\{}", String.valueOf(arg));
         }
-        title = StringUtils.truncateStringIfNeeded(title, paddingLength - (TITLE_SPACING_LENGTH + MIN_PADDING_LENGTH));
 
+        this.title = StringUtils.truncateStringIfNeeded(fullTitle, paddingLength - (TITLE_SPACING_LENGTH + MIN_PADDING_LENGTH));
         int paddingCount = (paddingLength - (title.length() + TITLE_SPACING_LENGTH)) / 2;
         this.padding = StringUtils.repeat(paddingCount, "*");
-        this.title = title;
-    }
-
-    public void traceTitle() {
-        logTitle(LogLevel.TRACE);
     }
 
     public void debugTitle() {

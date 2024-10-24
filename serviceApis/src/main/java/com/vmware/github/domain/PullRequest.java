@@ -18,6 +18,7 @@ public class PullRequest {
     public Date createdAt;
     public Date mergedAt;
     public String htmlUrl;
+    public String url;
 
     public String repoOwnerName() {
         return head != null ? head.repo.owner.login : null;

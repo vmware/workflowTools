@@ -50,7 +50,6 @@ public class Github extends AbstractRestService {
         GraphqlRequest request = new GraphqlRequest();
 
         request.query = searchUsersQuery.replace("${query}", query).replace("${companyName}", companyName);
-        String responseTest = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), String.class, request);
         GraphqlResponse response = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlResponse.class, request);
         return response.data.search.usersForCompany(companyName);
     }

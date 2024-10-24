@@ -26,11 +26,13 @@ public class Buildweb extends AbstractRestBuildService {
 
     private final String buildwebUrl;
     private final String buildwebLogFileName;
+    private final String buildMachineHostNameSuffix;
 
-    public Buildweb(String buildwebUrl, String buildwebApiUrl, String buildwebLogFileName, String username) {
+    public Buildweb(String buildwebUrl, String buildwebApiUrl, String buildwebLogFileName, String buildMachineHostNameSuffix, String username) {
         super(buildwebApiUrl, "/", ApiAuthentication.none, username);
         this.buildwebUrl = buildwebUrl;
         this.buildwebLogFileName = buildwebLogFileName;
+        this.buildMachineHostNameSuffix = buildMachineHostNameSuffix;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
     }
 
@@ -68,7 +70,8 @@ public class Buildweb extends AbstractRestBuildService {
         BuildMachine buildMachine = machines.realBuildMachine();
         String logsUrl;
         if (build.buildStatus == BuildStatus.BUILDING) {
-            logsUrl = addRelativePaths("http://" + buildMachine.hostName, build.relativeBuildTreePath(), "logs", buildwebLogFileName);
+            String suffix = buildMachineHostNameSuffix != null ? buildMachineHostNameSuffix : "";
+            logsUrl = addRelativePaths("http://" + buildMachine.hostName + suffix, build.relativeBuildTreePath(), "logs", buildwebLogFileName);
         } else {
             logsUrl = addRelativePaths(build.buildTreeUrl, "logs", buildMachine.hostType, buildwebLogFileName);
         }

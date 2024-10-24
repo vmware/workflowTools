@@ -7,7 +7,7 @@ package com.vmware.util.complexenum;
  */
 public interface ComplexEnum<T> {
 
-    public static final String UNKNOWN_VALUE_NAME = "UnknownValue";
+    String UNKNOWN_VALUE_NAME = "UnknownValue";
 
-    public T getValue();
+    T getValue();
 }
