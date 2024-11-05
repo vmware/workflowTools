@@ -73,7 +73,7 @@ public class UpdatePullRequestDetails extends BaseCommitWithPullRequestAction {
         return reviewersToCheck.stream().filter(reviewer -> {
             Optional<String> matchingUser = usernames.stream()
                     .filter(username -> username.equals(reviewer.login)).findFirst();
-            return matchingUser.isPresent();
+            return !matchingUser.isPresent();
         }).collect(Collectors.toSet());
     }
 

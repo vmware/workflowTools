@@ -4,7 +4,7 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.MatcherUtils;
 import com.vmware.util.StringUtils;
-import com.vmware.util.exception.FatalException;
+import com.vmware.util.exception.SkipActionException;
 import com.vmware.util.logging.LogLevel;
 import com.vmware.util.logging.Padder;
 import com.vmware.util.scm.FileChange;
@@ -98,10 +98,10 @@ public abstract class BaseCheckstyleAction extends BaseCommitAction {
         } else if (reasonPerforceClientCannotBeUsed() == null) {
             fullPath = getLoggedInPerforceClient().fullPath(relativePath);
         } else {
-            throw new FatalException("File path " + relativePath + " does not exist");
+            throw new SkipActionException("File path {} does not exist", relativePath);
         }
         if (!new File(fullPath).exists()) {
-            throw new FatalException("File path " + fullPath + " does not exist");
+            throw new SkipActionException("File path {} does not exist", fullPath);
         }
         return fullPath;
     }

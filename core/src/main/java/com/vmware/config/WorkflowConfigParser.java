@@ -158,6 +158,10 @@ public class WorkflowConfigParser {
         String[] configFiles = configFilePaths.split(",");
         for (String configFilePath : configFiles) {
             File configFile = new File(configFilePath);
+            if (!configFile.exists() && git.workingDirectoryIsInGitRepo()) {
+                log.debug("Prepending git root directory {} to path {}", git.getRootDirectory().getAbsolutePath(), configFile.getPath());
+                configFile = new File(git.getRootDirectory().getAbsolutePath() + File.separator + configFile.getPath());
+            }
             WorkflowConfig overriddenConfig = readExternalWorkflowConfig(configFile);
             fields.overrideValues(overriddenConfig, configFile.getPath());
         }

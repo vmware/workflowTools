@@ -162,7 +162,7 @@ public class ServiceLocator {
 
     public Github getGithub() {
         if (github == null) {
-            github = new Github(config.githubConfig.githubUrl, config.username);
+            github = new Github(config.githubConfig.githubUrl, config.githubConfig.githubGraphqlUrl, config.username);
         }
         return github;
     }

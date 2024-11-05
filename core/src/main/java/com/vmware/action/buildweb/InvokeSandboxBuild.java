@@ -55,9 +55,8 @@ public class InvokeSandboxBuild extends BaseCommitAction {
                 syncToParameter, buildwebConfig.determineBuildwebBranch().getValue(),
                 changelistId, storeTreesParamter, componentBuildsParameter);
 
-        String output = null;
         log.info("Invoking build {}", command);
-        output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
+        String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);
         checkIfOutputContainsP4PasswordError(output);
         addBuildNumberInOutputToTestingDone(output);
     }

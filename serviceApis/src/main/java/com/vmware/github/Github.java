@@ -17,6 +17,7 @@ import com.vmware.github.domain.PullMergeRequest;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.ReleaseAsset;
 import com.vmware.github.domain.GraphqlResponse;
+import com.vmware.github.domain.RequestedReviewers;
 import com.vmware.github.domain.Review;
 import com.vmware.github.domain.ReviewThread;
 import com.vmware.github.domain.User;
@@ -34,8 +35,11 @@ import com.vmware.util.input.InputUtils;
 
 public class Github extends AbstractRestService {
 
-    public Github(String baseUrl, String username) {
+    private final String graphqlUrl;
+
+    public Github(String baseUrl, String graphqlUrl, String username) {
         super(baseUrl, "", ApiAuthentication.github_token, username);
+        this.graphqlUrl = graphqlUrl;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss")
                         .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
@@ -50,7 +54,7 @@ public class Github extends AbstractRestService {
         GraphqlRequest request = new GraphqlRequest();
 
         request.query = searchUsersQuery.replace("${query}", query).replace("${companyName}", companyName);
-        GraphqlResponse response = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlResponse.class, request);
+        GraphqlResponse response = post(graphqlUrl, GraphqlResponse.class, request);
         return response.data.search.usersForCompany(companyName);
     }
 
@@ -78,7 +82,7 @@ public class Github extends AbstractRestService {
 
         request.query = reviewThreadsQuery.replace("${repoOwnerName}", pullRequest.repoOwnerName())
                 .replace("${repoName}", pullRequest.repoName()).replace("${pullRequestNumber}", String.valueOf(pullRequest.number));
-        GraphqlResponse repository = post(UrlUtils.addRelativePaths(apiUrl, "graphql"), GraphqlResponse.class, request);
+        GraphqlResponse repository = post(graphqlUrl, GraphqlResponse.class, request);
         return repository.data.repository.pullRequest.reviewThreads.nodes;
     }
 
@@ -108,14 +112,18 @@ public class Github extends AbstractRestService {
         if (users.isEmpty()) {
             return;
         }
-        post(pullRequestUrl(pullRequest) + "/requested_reviewers", String.class, pullRequest);
+        RequestedReviewers requestedReviewers = new RequestedReviewers();
+        requestedReviewers.reviewers = users.stream().map(user -> user.login).toArray(String[]::new);
+        post(pullRequestUrl(pullRequest) + "/requested_reviewers", String.class, requestedReviewers);
     }
 
     public void removeReviewersFromPullRequest(PullRequest pullRequest, Set<User> users) {
         if (users.isEmpty()) {
             return;
         }
-        delete(pullRequestUrl(pullRequest) + "/requested_reviewers", pullRequest, Collections.emptyList());
+        RequestedReviewers requestedReviewers = new RequestedReviewers();
+        requestedReviewers.reviewers = users.stream().map(user -> user.login).toArray(String[]::new);
+        delete(pullRequestUrl(pullRequest) + "/requested_reviewers", requestedReviewers, Collections.emptyList());
     }
 
     public ReleaseAsset[] getReleaseAssets(String releasePath) {

@@ -18,14 +18,14 @@ public class TestGitHubApi {
 
     @Test
     public void getReleaseAsset() throws IOException {
-        Github github = new Github("https://api.github.com", "damienbiggs");
+        Github github = new Github("https://api.github.com", "https://api.github.com/graphql", "damienbiggs");
         ReleaseAsset[] assets = github.getReleaseAssets("repos/vmware/workflowTools/releases/43387689");
         assertEquals("workflowTools.jar", assets[0].name);
     }
 
     @Test
     public void getReviewThreads() {
-        Github github = new Github("https://api.github.com", "damienbiggs");
+        Github github = new Github("https://api.github.com", "https://api.github.com/graphql", "damienbiggs");
         github.setupAuthenticatedConnection();
         PullRequest pullRequest = github.getPullRequest("vmware", "workflowTools", 12);
         ReviewThread[] threads = github.getReviewThreadsForPullRequest(pullRequest);
@@ -34,7 +34,7 @@ public class TestGitHubApi {
 
     @Test
     public void searchUsers() {
-        Github github = new Github("https://api.github.com", "damienbiggs");
+        Github github = new Github("https://api.github.com", "https://api.github.com/graphql", "damienbiggs");
         github.setupAuthenticatedConnection();
         List<User> users = github.searchUsers("VMware", "damienbigg");
         assertEquals(1, users.size());

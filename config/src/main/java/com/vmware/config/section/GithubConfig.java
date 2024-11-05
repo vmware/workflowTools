@@ -7,11 +7,11 @@ public class GithubConfig {
     @ConfigurableProperty(help = "Api url for github site")
     public String githubUrl;
 
+    @ConfigurableProperty(help = "Api url for github site")
+    public String githubGraphqlUrl;
+
     @ConfigurableProperty(help = "Github release url for workflow tools")
     public String workflowGithubReleasePath;
-
-    @ConfigurableProperty(help = "Format for source branch for a merge request")
-    public String githubMergeBranchFormat;
 
     @ConfigurableProperty(help = "Name for github repo owner")
     public String githubRepoOwnerName;
