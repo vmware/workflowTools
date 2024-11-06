@@ -5,6 +5,8 @@ import com.vmware.AutocompleteUser;
 public class User implements AutocompleteUser {
     public String login;
     public String name;
+    public String slug;
+    public String url;
     public String company;
     public String location;
     public Organization organization;

@@ -12,6 +12,7 @@ public class PullRequest {
     public String body;
     public User user;
     public User[] requestedReviewers;
+    public Team[] requestedTeams;
     public CommitRef head;
     public CommitRef base;
     public boolean draft;

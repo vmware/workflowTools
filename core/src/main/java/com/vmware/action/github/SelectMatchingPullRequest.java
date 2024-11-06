@@ -19,8 +19,8 @@ public class SelectMatchingPullRequest extends BaseCommitUsingGithubAction {
         String targetMergeBranch = determineTargetMergeBranch();
         log.info("Checking pull requests for request matching source branch {} and target branch {}", sourceMergeBranch, targetMergeBranch);
 
-        Optional<PullRequest> matchingRequest = github.getPullRequestForSourceAndTargetBranch(githubConfig.githubRepoOwnerName,
-                githubConfig.githubRepoName, sourceMergeBranch, targetMergeBranch);
+        Optional<PullRequest> matchingRequest = github.getPullRequestForSourceBranch(githubConfig.githubRepoOwnerName,
+                githubConfig.githubRepoName, sourceMergeBranch);
         if (matchingRequest.isPresent()) {
             log.info("Found matching pull request {}", matchingRequest.get().htmlUrl);
             draft.setGithubPullRequest(matchingRequest.get());

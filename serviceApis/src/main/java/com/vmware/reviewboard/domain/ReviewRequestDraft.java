@@ -216,7 +216,7 @@ public class ReviewRequestDraft extends BaseEntity {
         int summaryIndex = commitText.contains("\n") ? commitText.indexOf("\n") : commitText.length() - 1;
         String summary = commitText.substring(0, summaryIndex);
         description = description.length() < summary.length() + 1 ? "" : description.substring(summary.length() + 1);
-        if (description.length() > 0 && description.charAt(0) == '\n') {
+        if (!description.isEmpty() && description.charAt(0) == '\n') {
             description = description.substring(1);
         }
         String testingDoneSection = parseMultilineFromText(commitText, commitConfig.generateTestingDonePattern(), "Testing Done");

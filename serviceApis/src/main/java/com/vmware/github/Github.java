@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.gson.FieldNamingPolicy;
 import com.vmware.AbstractRestService;
+import com.vmware.AutocompleteUser;
 import com.vmware.github.domain.GraphqlRequest;
 import com.vmware.github.domain.PullMergeResult;
 import com.vmware.github.domain.PullRequestForUpdate;
@@ -20,6 +21,7 @@ import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.RequestedReviewers;
 import com.vmware.github.domain.Review;
 import com.vmware.github.domain.ReviewThread;
+import com.vmware.github.domain.Team;
 import com.vmware.github.domain.User;
 import com.vmware.http.HttpConnection;
 import com.vmware.http.cookie.ApiAuthentication;
@@ -63,9 +65,10 @@ public class Github extends AbstractRestService {
         return post(pullRequestsUrl(pullRequest.repoOwner, pullRequest.repoName), PullRequest.class, pullRequest);
     }
 
-    public Optional<PullRequest> getPullRequestForSourceAndTargetBranch(String ownerName, String repoName, String sourceBranch, String targetBranch) {
-        PullRequest[] pullRequests = get(pullRequestsUrl(ownerName, repoName), PullRequest[].class, new UrlParam("base", targetBranch));
-        return Arrays.stream(pullRequests).filter(pullRequest -> pullRequest.head.ref.equals(sourceBranch)).findFirst();
+    public Optional<PullRequest> getPullRequestForSourceBranch(String ownerName, String repoName, String sourceBranch) {
+        PullRequest[] pullRequests = get(pullRequestsUrl(ownerName, repoName), PullRequest[].class,
+                new UrlParam("head", ownerName + ":" + sourceBranch));
+        return Optional.ofNullable(pullRequests.length > 0 ? pullRequests[0] : null);
     }
 
     public List<Review> getApprovedReviewsForPullRequest(PullRequest pullRequest) {
@@ -108,21 +111,27 @@ public class Github extends AbstractRestService {
                 pullRequest, Collections.emptyList());
     }
 
-    public void addReviewersToPullRequest(PullRequest pullRequest, Set<User> users) {
+    public void addReviewersToPullRequest(PullRequest pullRequest, Set<AutocompleteUser> users) {
         if (users.isEmpty()) {
             return;
         }
         RequestedReviewers requestedReviewers = new RequestedReviewers();
-        requestedReviewers.reviewers = users.stream().map(user -> user.login).toArray(String[]::new);
+        requestedReviewers.reviewers = users.stream().filter(user -> user instanceof User)
+                .map(user -> ((User) user).login).toArray(String[]::new);
+        requestedReviewers.teamReviewers = users.stream().filter(team -> team instanceof Team)
+                .map(team -> ((Team) team).slug).toArray(String[]::new);
         post(pullRequestUrl(pullRequest) + "/requested_reviewers", String.class, requestedReviewers);
     }
 
-    public void removeReviewersFromPullRequest(PullRequest pullRequest, Set<User> users) {
+    public void removeReviewersFromPullRequest(PullRequest pullRequest, Set<AutocompleteUser> users) {
         if (users.isEmpty()) {
             return;
         }
         RequestedReviewers requestedReviewers = new RequestedReviewers();
-        requestedReviewers.reviewers = users.stream().map(user -> user.login).toArray(String[]::new);
+        requestedReviewers.reviewers = users.stream().filter(user -> user instanceof User)
+                .map(user -> ((User) user).login).toArray(String[]::new);
+        requestedReviewers.teamReviewers = users.stream().filter(team -> team instanceof Team)
+                .map(team -> ((Team) team).slug).toArray(String[]::new);
         delete(pullRequestUrl(pullRequest) + "/requested_reviewers", requestedReviewers, Collections.emptyList());
     }
 

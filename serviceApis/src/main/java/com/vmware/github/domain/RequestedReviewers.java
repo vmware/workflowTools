@@ -4,6 +4,7 @@ import java.util.Collection;
 
 public class RequestedReviewers {
     public String[] reviewers;
+    public String[] teamReviewers;
 
     public RequestedReviewers() {
     }

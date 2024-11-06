@@ -157,7 +157,7 @@ public class CommitConfig {
     }
 
     public String generateReviewedByPattern() {
-        return reviewedByLabel.trim() + "\\s*([\\w,\\s]+)$";
+        return reviewedByLabel.trim() + "\\s*(.+)$";
     }
 
     public String generateBugNumberPattern() {
