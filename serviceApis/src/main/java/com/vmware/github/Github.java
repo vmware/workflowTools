@@ -1,5 +1,7 @@
 package com.vmware.github;
 
+import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -152,6 +154,19 @@ public class Github extends AbstractRestService {
         String privateToken = InputUtils.readValueUntilNotBlank("Enter Personal Access Token");
         saveApiToken(privateToken, ApiAuthentication.github_token);
         connection.addStatefulParam(RequestHeader.aBearerAuthHeader(privateToken));
+    }
+
+    @Override
+    protected File determineApiTokenFile(ApiAuthentication apiAuthentication) {
+        String homeFolder = System.getProperty("user.home");
+        File apiHostTokenFile = new File(homeFolder + File.separator +
+                "." + URI.create(baseUrl).getHost() + "-" + apiAuthentication.getFileName().substring(1));
+        if (apiHostTokenFile.exists()) {
+            return apiHostTokenFile;
+        } else {
+            log.debug("Api token file {} does not exist", apiHostTokenFile.getPath());
+        }
+        return super.determineApiTokenFile(apiAuthentication);
     }
 
     private String pullRequestUrl(PullRequest pullRequest) {

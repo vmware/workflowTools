@@ -337,6 +337,8 @@ public class Vcd extends AbstractRestService {
         if (apiOrgTokenFile.exists() || useSiteSpecificToken) {
             useSiteSpecificToken = true;
             return apiOrgTokenFile;
+        } else {
+            log.debug("Api token file {} does not exist", apiOrgTokenFile.getPath());
         }
         return new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-" + apiAuthentication.getFileName().substring(1));
     }
