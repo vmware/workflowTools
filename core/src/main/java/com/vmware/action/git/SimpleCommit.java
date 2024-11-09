@@ -18,7 +18,7 @@ public class SimpleCommit extends BaseAction {
     public void process() {
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd HH:mm:ss zzz");
         String commitMessage = StringUtils.isNotBlank(fileSystemConfig.inputText) ? fileSystemConfig.inputText :
-                "Latest Commit at " + formatter.format(new Date());
+                "Commit created at " + formatter.format(new Date());
         git.commit(commitMessage, gitRepoConfig.noVerify);
     }
 }
