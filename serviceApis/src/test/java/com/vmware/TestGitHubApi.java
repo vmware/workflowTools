@@ -1,20 +1,35 @@
 package com.vmware;
 
 import com.vmware.github.Github;
+import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.ReleaseAsset;
 import com.vmware.github.domain.ReviewThread;
 import com.vmware.github.domain.User;
+import com.vmware.xmlrpc.MapObjectConverter;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestGitHubApi {
+
+    @Test
+    public void testConversion() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("number", 55D);
+        response.put("isDraft", true);
+        GraphqlResponse.PullRequestNode pullRequestNode = new MapObjectConverter().fromMap(response, GraphqlResponse.PullRequestNode.class);
+        assertEquals(55d, pullRequestNode.number, 0d);
+        assertTrue(pullRequestNode.isDraft);
+    }
 
     @Test
     public void getReleaseAsset() throws IOException {

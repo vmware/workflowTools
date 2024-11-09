@@ -633,6 +633,10 @@
     "--jira-url",
     "--disable-jira"
   ],
+  "SimpleCommitAll": [
+    "--no-verify",
+    "--input-text"
+  ],
   "SetReviewId": [
     "--username",
     "--rb-username",
@@ -732,7 +736,8 @@
     "--include-all-issue-types"
   ],
   "BaseCommitUsingGithubAction": [
-    "--username"
+    "--username",
+    "--trivial-reviewer-label"
   ],
   "SelectVappIfNeeded": [
     "--use-vapp-json"
@@ -779,6 +784,10 @@
     "--trello-sso",
     "--username",
     "--sso-email"
+  ],
+  "SimpleCommit": [
+    "--no-verify",
+    "--input-text"
   ],
   "StartDummyHttpServer": [
     "--http-server-status-code",
@@ -892,9 +901,6 @@
   ],
   "CopyFileData": [
     "--file-data"
-  ],
-  "UpdatePullRequestDetails": [
-    "--trivial-reviewer-label"
   ],
   "BaseReviewBoardAction": [
     "--username",

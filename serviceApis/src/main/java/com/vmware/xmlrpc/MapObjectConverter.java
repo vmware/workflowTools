@@ -51,7 +51,7 @@ public class MapObjectConverter {
         return valuesToWrite;
     }
 
-    public <T> T fromMap(Map values, Class<T> objectClass) {
+    public <T> T fromMap(Map<String, Object> values, Class<T> objectClass) {
         Object createdObject = ReflectionUtils.newInstance(objectClass);
         for (Field field : objectClass.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
@@ -64,13 +64,11 @@ public class MapObjectConverter {
             }
 
             String nameToUse = determineNameToUseForField(field);
-
             if (!values.containsKey(nameToUse)) {
                 continue;
             }
 
             Object valueToConvert = values.get(nameToUse);
-
             setFieldValue(createdObject, field, valueToConvert);
         }
 
@@ -93,9 +91,7 @@ public class MapObjectConverter {
         Class fieldType = field.getType();
         field.setAccessible(true);
 
-        if (valueToConvert.getClass() == fieldType) {
-            ReflectionUtils.setValue(field, createdObject, valueToConvert);
-        } else if (fieldType == String.class) {
+        if (fieldType == String.class) {
             ReflectionUtils.setValue(field, createdObject, convertObjectToString(valueToConvert));
         } else if (ComplexEnum.class.isAssignableFrom(fieldType)) {
             ReflectionUtils.setValue(field, createdObject, ComplexEnumSelector.findByValue(fieldType, String.valueOf(valueToConvert)));
@@ -111,9 +107,7 @@ public class MapObjectConverter {
         } else if (valueToConvert instanceof Map) {
             ReflectionUtils.setValue(field, createdObject, fromMap((Map) valueToConvert, fieldType));
         } else {
-            field.setAccessible(false);
-            throw new RuntimeReflectiveOperationException("Cannot set value of type {} for field of type {}",
-                    valueToConvert.getClass().getSimpleName(), fieldType.getSimpleName());
+            ReflectionUtils.setValue(field, createdObject, valueToConvert);
         }
         field.setAccessible(false);
     }

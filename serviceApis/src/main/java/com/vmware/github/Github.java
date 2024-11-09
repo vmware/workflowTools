@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
@@ -36,6 +37,7 @@ import com.vmware.util.StringUtils;
 import com.vmware.util.UrlUtils;
 import com.vmware.util.exception.FatalException;
 import com.vmware.util.input.InputUtils;
+import com.vmware.xmlrpc.MapObjectConverter;
 
 public class Github extends AbstractRestService {
 
@@ -111,6 +113,25 @@ public class Github extends AbstractRestService {
         setupAuthenticatedConnection();
         return patch(pullRequestUrl(pullRequest.repoOwner, pullRequest.repoName, pullRequest.number), PullRequest.class,
                 pullRequest, Collections.emptyList());
+    }
+
+    public void updatePullRequestDraftState(PullRequest pullRequest, boolean isDraft) {
+        log.info("Marking pull request {} draft status as {}", pullRequest.number, isDraft);
+        String graphqlText = new ClasspathResource("/githubDraftPullRequestGraphql.txt", this.getClass()).getText();
+        String mutationName = isDraft ? "convertPullRequestToDraft" : "markPullRequestReadyForReview";
+        GraphqlRequest request = new GraphqlRequest();
+
+        request.query = graphqlText.replace("${mutationName}", mutationName).replace("${pullRequestId}", pullRequest.nodeId);
+        Map<String, Map<String, Map<String, Map<String, Object>>>> response = post(graphqlUrl, Map.class, request);
+
+        GraphqlResponse.PullRequestNode updatedPullRequest = new MapObjectConverter()
+                .fromMap(response.get("data").get(mutationName).get("pullRequest"), GraphqlResponse.PullRequestNode.class);
+        if (updatedPullRequest.number != pullRequest.number) {
+            throw new FatalException("Wrong pull request {} was updated", updatedPullRequest.number);
+        }
+        if (updatedPullRequest.isDraft != isDraft) {
+            throw new FatalException("Pull request {} draft status was not set to {}", updatedPullRequest.number, isDraft);
+        }
     }
 
     public void addReviewersToPullRequest(PullRequest pullRequest, Set<AutocompleteUser> users) {

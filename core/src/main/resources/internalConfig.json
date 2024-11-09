@@ -792,13 +792,20 @@
     "createPullRequest": [
       "selectPullRequest",
       "pushCommitToMergeBranch",
-      "CreatePullRequestIfNeeded",
-      "UpdatePullRequestDetails",
+      "CreatePullRequestIfNeeded&&--mark-as-draft=true",
       "CopyRequestUrlToClipboard"
     ],
     "updatePullRequest" : [
       "updatePullRequestDetails",
       "pushCommitToMergeBranch"
+    ],
+    "publishPullRequest": [
+      "selectPullRequest&&--fail-if-no-request-found",
+      "MarkPullRequestAsReadyForReview"
+    ],
+    "convertPullRequestToDraft": [
+      "selectPullRequest&&--fail-if-no-request-found",
+      "ConvertPullRequestToDraft"
     ],
     "openPullRequest": [
       "selectPullRequest&&--fail-if-no-request-found",

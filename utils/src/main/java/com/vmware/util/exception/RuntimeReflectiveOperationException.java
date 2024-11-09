@@ -5,10 +5,6 @@ package com.vmware.util.exception;
  */
 public class RuntimeReflectiveOperationException extends WorkflowRuntimeException {
 
-    public RuntimeReflectiveOperationException(String message, String... arguments) {
-        super(message, arguments);
-    }
-
     public RuntimeReflectiveOperationException(ReflectiveOperationException cause) {
         super(cause);
     }

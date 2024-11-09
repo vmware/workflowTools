@@ -10,12 +10,13 @@ import java.util.stream.Collectors;
 public class GraphqlResponse {
     public ResponseData data;
 
-    public class ResponseData {
+    public static class ResponseData {
         public Repository repository;
+        public PullRequestNode pullRequest;
         public Search search;
     }
 
-    public class Search {
+    public static class Search {
         @SerializedName("userCount")
         public int userCount;
         public UserNode[] edges;
@@ -33,17 +34,20 @@ public class GraphqlResponse {
         }
     }
 
-    public class Repository {
+    public static class Repository {
         @SerializedName("pullRequest")
         public PullRequestNode pullRequest;
     }
 
-    public class PullRequestNode {
+    public static class PullRequestNode {
         @SerializedName("reviewThreads")
         public ReviewThreadNodes reviewThreads;
+        public double number;
+        @SerializedName("isDraft")
+        public boolean isDraft;
     }
 
-    public class UserNode {
+    public static class UserNode {
         public User node;
     }
 }

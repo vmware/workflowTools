@@ -1,0 +1,5 @@
+ mutation {
+    ${mutationName}(input:{pullRequestId: "${pullRequestId}"}) {
+        pullRequest{number, isDraft}
+  	}
+}

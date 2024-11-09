@@ -108,7 +108,6 @@ public class ReflectionUtils {
         try {
             Object instanceToUse = determineInstanceForField(field, instance);
             if (field.getType().isArray() && value != null && value.getClass() == Object[].class && field.getType() != Object[].class) {
-
                 Object[] objectValues = (Object[]) value;
                 Object typedArray = Array.newInstance(field.getType().getComponentType(), objectValues.length);
                 System.arraycopy(objectValues, 0, typedArray, 0, objectValues.length);

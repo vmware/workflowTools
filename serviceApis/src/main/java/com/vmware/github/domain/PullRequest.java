@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class PullRequest {
     public long id;
+    public String nodeId;
     public long number;
     public String state;
     public boolean locked;
