@@ -48,6 +48,6 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
             return true;
         }
 
-        return !includeAllChangesInCommit || git.getStagedChanges().isEmpty();
+        return !includeAllChangesInCommit && git.getStagedChanges().isEmpty();
     }
 }

@@ -180,8 +180,8 @@ public class InputUtils {
         }
 
         boolean nextLine = true;
-        String data = "";
-        ConsoleReader consoleReader = null;
+        StringBuilder data = new StringBuilder();
+        ConsoleReader consoleReader;
         try {
             consoleReader = new ConsoleReader();
         } catch (IOException e) {
@@ -191,7 +191,7 @@ public class InputUtils {
         addHistoryValues(consoleReader, historyValues);
         int numberOfTrailingCharsToDiscard = 0;
         while (nextLine) {
-            String line = null;
+            String line;
             try {
                 line = consoleReader.readLine();
             } catch (IOException e) {
@@ -201,19 +201,19 @@ public class InputUtils {
 
             // if they are not the same then an end of text character was entered
             if (usableLineLength < line.length()) {
-                data += line;
+                data.append(line);
                 numberOfTrailingCharsToDiscard = line.length() - usableLineLength;
                 nextLine = false;
             } else {
-                data += line + "\n";
+                data.append(line).append("\n");
             }
         }
-        data = data.substring(0, data.length() - numberOfTrailingCharsToDiscard);
-        return data;
+        data = new StringBuilder(data.substring(0, data.length() - numberOfTrailingCharsToDiscard));
+        return data.toString();
     }
 
     private static int determineLineLength(String line) {
-        if (line.length() >= 1 && line.endsWith("/")) {
+        if (line.endsWith("/")) {
             return line.length() - 1;
         } else {
             return line.length();
