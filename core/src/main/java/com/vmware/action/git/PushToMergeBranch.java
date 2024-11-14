@@ -1,11 +1,10 @@
 package com.vmware.action.git;
 
 import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseCommitUsingGitlabAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
-@ActionDescription("Performs a force git push to the remote branch used for the gitlab merge request.")
+@ActionDescription("Performs a force git push to the remote branch used for the merge or pull request.")
 public class PushToMergeBranch extends BaseCommitAction {
 
     public PushToMergeBranch(WorkflowConfig config) {
@@ -15,8 +14,8 @@ public class PushToMergeBranch extends BaseCommitAction {
     @Override
     public void process() {
         String remoteBranch = determineSourceMergeBranch();
-        log.info("Pushing to {}/{} for merge request", gitRepoConfig.defaultGitRemote, remoteBranch);
+        log.info("Pushing to {}/{} for request", gitRepoConfig.defaultGitRemote, remoteBranch);
 
-        git.forcePushToRemoteBranch(gitRepoConfig.defaultGitRemote, remoteBranch);
+        git.pushToRemoteBranch(gitRepoConfig.defaultGitRemote, remoteBranch, gitRepoConfig.forcePush);
     }
 }

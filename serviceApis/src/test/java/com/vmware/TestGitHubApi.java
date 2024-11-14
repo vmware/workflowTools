@@ -32,6 +32,13 @@ public class TestGitHubApi {
     }
 
     @Test
+    public void getPullRequest() {
+        Github github = new Github("https://api.github.com", "https://api.github.com/graphql", "damienbiggs");
+        PullRequest pullRequest = github.getPullRequest("vmware", "workflowTools", 18);
+        assertEquals(18, pullRequest.number);
+    }
+
+    @Test
     public void getReleaseAsset() throws IOException {
         Github github = new Github("https://api.github.com", "https://api.github.com/graphql", "damienbiggs");
         ReleaseAsset[] assets = github.getReleaseAssets("repos/vmware/workflowTools/releases/43387689");

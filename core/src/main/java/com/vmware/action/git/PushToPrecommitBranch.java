@@ -22,6 +22,6 @@ public class PushToPrecommitBranch extends BaseAction {
 
         remoteBranchPath = remoteBranchPath.replace("$USERNAME", config.username);
 
-        git.forcePushToRemoteBranch(gitRepoConfig.defaultGitRemote, remoteBranchPath);
+        git.pushToRemoteBranch(gitRepoConfig.defaultGitRemote, remoteBranchPath, gitRepoConfig.forcePush);
     }
 }

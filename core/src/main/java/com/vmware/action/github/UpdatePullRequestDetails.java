@@ -22,7 +22,7 @@ public class UpdatePullRequestDetails extends BaseCommitWithPullRequestAction {
         }
         log.info("Updating details for pull request {}", pullRequest.htmlUrl);
         pullRequestForUpdate.title = draft.summary;
-        pullRequestForUpdate.body = draft.description + "\n" + commitConfig.getTestingDoneLabel() + draft.testingDone;
+        pullRequestForUpdate.body = draft.toText(commitConfig, false, false);
         if (draft.hasReviewNumber()) {
             log.debug("Not setting reviewer ids as pull request is already associated with a reviewboard review");
         } else if (draft.hasReviewers()) {

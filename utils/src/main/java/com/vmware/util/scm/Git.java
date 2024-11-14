@@ -280,15 +280,15 @@ public class Git extends BaseScmWrapper {
         executeCommitCommand("commit --all", msg, noVerify, LogLevel.INFO);
     }
 
-    public void amendCommit(String msg, boolean noVerify) {
-        checkIfLastCommitHasSameAuthor();
-        executeCommitCommand("commit --amend", msg, noVerify, LogLevel.DEBUG);
+    public void amendCommitAll(String msg, boolean noVerify) {
+        amendCommit(msg, true, noVerify);
     }
 
-    public void amendCommitWithAllFileChanges(String msg, boolean noVerify) {
+    public void amendCommit(String msg, boolean allFileChanges, boolean noVerify) {
         checkIfLastCommitHasSameAuthor();
+        String allChanges = allFileChanges ? " --all" : "";
         LogLevel logLevel = !getAllChanges().isEmpty() ? LogLevel.INFO : LogLevel.DEBUG;
-        executeCommitCommand("commit --amend --all", msg, noVerify, logLevel);
+        executeCommitCommand("commit --amend" + allChanges, msg, noVerify, logLevel);
     }
 
     public byte[] diffAsByteArray(String parentRef, String commitRef, boolean supportsRenames) {
@@ -302,7 +302,7 @@ public class Git extends BaseScmWrapper {
         String diffCommand = "diff %s--no-color --full-index --no-ext-diff --ignore-submodules %s..%s";
         diffCommand = String.format(diffCommand, renamesFlag, parentRef, commitRef);
         String diffOutput = executeScmCommand(diffCommand, LogLevel.TRACE);
-        return diffOutput.length() > 0 ? diffOutput : null;
+        return !diffOutput.isEmpty() ? diffOutput : null;
     }
 
     public String diff(String commitRef, boolean supportsRenames) {
@@ -331,12 +331,40 @@ public class Git extends BaseScmWrapper {
         executeScmCommand(pushCommand, LogLevel.INFO);
     }
 
-    public void pushToRemoteBranch(String remote, String remoteBranch) {
-        pushToRemoteBranch(remote, remoteBranch, false);
+    public void pushToRemoteBranch(String remote, String remoteBranch, boolean forceUpdate) {
+        String currentHeadRef = revParse("HEAD");
+        log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
+
+        String forceUpdateString = forceUpdate ? " -f" : "";
+        String pushCommand = String.format("push %s head:%s%s --porcelain", remote, remoteBranch, forceUpdateString);
+
+        String pushOutput = executeScmCommand(pushCommand, LogLevel.INFO);
+
+        if (pushOutput.contains("[up to date]")) {
+            log.info("Remote branch is already up to date");
+            return;
+        } else if (pushOutput.contains("[new branch]")) {
+            return;
+        } else if (pushOutput.contains("[rejected]")) {
+            log.error("Git push was rejected!");
+            System.exit(1);
+        }
+
+        String updatedRemoteHeadRef = MatcherUtils.singleMatch(pushOutput, "\\w\\.\\.\\.*(\\w+)");
+        if (updatedRemoteHeadRef == null) {
+            log.error("Could not parse updated remote branch ref from push output, assuming failure");
+            System.exit(1);
+        }
+
+        if (!currentHeadRef.startsWith(updatedRemoteHeadRef)) {
+            throw new FatalException("Git push failed, remote branch ref of {} does not match local head ref",
+                    updatedRemoteHeadRef, currentHeadRef);
+        }
+        log.info("Remote branch was successfully updated");
     }
 
-    public void forcePushToRemoteBranch(String remote, String remoteBranch) {
-        pushToRemoteBranch(remote, remoteBranch, true);
+    public String merge(String commitRef) {
+        return executeScmCommand(String.format("merge %s -m \"Merge of %s into %s\"", commitRef, commitRef, currentBranch()), null, LogLevel.INFO);
     }
 
     public String mergeBase(String upstreamBranch, String commitRef) {
@@ -497,38 +525,6 @@ public class Git extends BaseScmWrapper {
             throw new FatalException("Last commit has author of {}. Can only amend commits for current author {}",
                     lastCommitAuthor, authorEmail);
         }
-    }
-
-    private void pushToRemoteBranch(String remote, String remoteBranch, boolean forceUpdate) {
-        String currentHeadRef = revParse("HEAD");
-        log.info("Pushing commit {} to {}", currentHeadRef, remoteBranch);
-
-        String forceUpdateString = forceUpdate ? " -f" : "";
-        String pushCommand = String.format("push %s head:%s%s --porcelain", remote, remoteBranch, forceUpdateString);
-
-        String pushOutput = executeScmCommand(pushCommand, LogLevel.INFO);
-
-        if (pushOutput.contains("[up to date]")) {
-            log.info("Remote branch is already up to date");
-            return;
-        } else if (pushOutput.contains("[new branch]")) {
-            return;
-        } else if (pushOutput.contains("[rejected]")) {
-            log.error("Git push was rejected!");
-            System.exit(1);
-        }
-
-        String updatedRemoteHeadRef = MatcherUtils.singleMatch(pushOutput, "\\w\\.\\.\\.*(\\w+)");
-        if (updatedRemoteHeadRef == null) {
-            log.error("Could not parse updated remote branch ref from push output, assuming failure");
-            System.exit(1);
-        }
-
-        if (!currentHeadRef.startsWith(updatedRemoteHeadRef)) {
-            throw new FatalException("Git push failed, remote branch ref of {} does not match local head ref",
-                    updatedRemoteHeadRef, currentHeadRef);
-        }
-        log.info("Remote branch was successfully updated");
     }
 
     private List<FileChange> getChanges(boolean includeUnStagedChanges) {

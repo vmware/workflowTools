@@ -19,6 +19,8 @@ import com.vmware.github.domain.PullMergeResult;
 import com.vmware.github.domain.PullRequestForUpdate;
 import com.vmware.github.domain.PullMergeRequest;
 import com.vmware.github.domain.PullRequest;
+import com.vmware.github.domain.PullRequestUpdateBranchRequest;
+import com.vmware.github.domain.PullRequestUpdateBranchResponse;
 import com.vmware.github.domain.ReleaseAsset;
 import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.RequestedReviewers;
@@ -67,6 +69,12 @@ public class Github extends AbstractRestService {
     public PullRequest createPullRequest(PullRequestForUpdate pullRequest) {
         setupAuthenticatedConnection();
         return post(pullRequestsUrl(pullRequest.repoOwner, pullRequest.repoName), PullRequest.class, pullRequest);
+    }
+
+    public PullRequestUpdateBranchResponse updatePullRequestBranch(PullRequest pullRequest) {
+        PullRequestUpdateBranchRequest request = new PullRequestUpdateBranchRequest();
+        request.expectedHeadSha = pullRequest.head.sha;
+        return put(pullRequestUrl(pullRequest) + "/update-branch", PullRequestUpdateBranchResponse.class, request);
     }
 
     public Optional<PullRequest> getPullRequestForSourceBranch(String ownerName, String repoName, String sourceBranch) {

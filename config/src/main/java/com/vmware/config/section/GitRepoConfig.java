@@ -68,6 +68,9 @@ public class GitRepoConfig {
     @ConfigurableProperty(commandLine = "--fail-if-no-request-found", help = "Fail workflow if no request found")
     public boolean failIfNoRequestFound;
 
+    @ConfigurableProperty(commandLine = "--force-push", help = "Force pushes a commit to the remote branch")
+    public boolean forcePush;
+
     public String trackingBranchPath() {
         return String.valueOf(determineTrackingBranchPath().getValue());
     }

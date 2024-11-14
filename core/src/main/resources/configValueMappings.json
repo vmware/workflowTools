@@ -1,5 +1,6 @@
 {
   "PushToRemoteBranch": [
+    "--force-push",
     "--username",
     "--remote-branch"
   ],
@@ -73,6 +74,7 @@
     "--build-type",
     "--buildweb-project",
     "--exclude-sync-to",
+    "--site",
     "--store-trees",
     "--changelist-id"
   ],
@@ -359,6 +361,9 @@
   "ExitIfTrivialCommit": [
     "--trivial-reviewer-label"
   ],
+  "PushToMergeBranch": [
+    "--force-push"
+  ],
   "ParseText": [
     "--output-variable-name",
     "--input-text",
@@ -478,6 +483,7 @@
     "--tracking-branch"
   ],
   "PushToPrecommitBranch": [
+    "--force-push",
     "--username"
   ],
   "ExitIfVariableIsUnset": [
@@ -977,7 +983,8 @@
     "--search-by-usernames-only"
   ],
   "PushToTrackingBranch": [
-    "--tracking-branch"
+    "--tracking-branch",
+    "--force-push"
   ],
   "SetProperty": [
     "--property-name",

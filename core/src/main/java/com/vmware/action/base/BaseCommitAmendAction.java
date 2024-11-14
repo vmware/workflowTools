@@ -31,7 +31,7 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     @Override
     protected void commitUsingGit(String description) {
         String existingHeadRef = git.revParse("head");
-        git.amendCommit(updatedCommitText(includeJobResultsInCommit), gitRepoConfig.noVerify);
+        git.amendCommit(updatedCommitText(includeJobResultsInCommit), includeAllChangesInCommit, gitRepoConfig.noVerify);
         git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 

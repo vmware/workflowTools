@@ -28,6 +28,6 @@ public class PushToTrackingBranch extends BaseAction {
         }
         String remote = pieces[0];
         String branch = pieces[1];
-        git.pushToRemoteBranch(remote, branch);
+        git.pushToRemoteBranch(remote, branch, gitRepoConfig.forcePush);
     }
 }

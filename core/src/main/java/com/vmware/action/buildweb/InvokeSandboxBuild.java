@@ -37,7 +37,8 @@ public class InvokeSandboxBuild extends BaseCommitAction {
             changelistId = InputUtils.readValueUntilNotBlank("Changelist id for sandbox");
         }
         String syncToParameter = " --syncto latest";
-        String storeTreesParamter = buildwebConfig.storeTrees ? " --store-trees" : "";
+        String storeTreesParameter = buildwebConfig.storeTrees ? " --store-trees" : " --no-store-trees";
+        String siteParameter = StringUtils.isNotBlank(buildwebConfig.buildwebSite) ? " --site=" + buildwebConfig.buildwebSite : "";
         String componentBuildsParameter = createComponentBuildsParameter();
 
         if (changelistId.toLowerCase().contains("head")) {
@@ -50,10 +51,10 @@ public class InvokeSandboxBuild extends BaseCommitAction {
                 syncToParameter = ""; // rely on --accept-defaults to handle it correctly
             }
         }
-        String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s%s%s --accept-defaults",
+        String command = format("%s sandbox queue %s --buildtype=%s%s --branch=%s --override-branch --changeset=%s%s%s%s --accept-defaults",
                 buildwebConfig.goBuildBinPath, buildwebConfig.buildwebProject, buildwebConfig.buildType,
                 syncToParameter, buildwebConfig.determineBuildwebBranch().getValue(),
-                changelistId, storeTreesParamter, componentBuildsParameter);
+                changelistId, storeTreesParameter, siteParameter, componentBuildsParameter);
 
         log.info("Invoking build {}", command);
         String output = CommandLineUtils.executeCommand(command, LogLevel.INFO);

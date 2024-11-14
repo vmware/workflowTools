@@ -25,10 +25,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import static com.vmware.util.StringUtils.appendCsvValue;
 import static com.vmware.util.StringUtils.isEmpty;
@@ -425,12 +427,18 @@ public class ReviewRequestDraft extends BaseEntity {
     }
 
     public String toText(CommitConfig commitConfig) {
-        return toText(commitConfig, true);
+        return toText(commitConfig, true, true);
     }
 
     public String toText(CommitConfig commitConfig, boolean includeJobResults) {
+        return toText(commitConfig, true, includeJobResults);
+    }
+
+    public String toText(CommitConfig commitConfig, boolean includeSummary, boolean includeJobResults) {
         StringBuilder builder = new StringBuilder();
-        builder.append(summary).append("\n\n");
+        if (includeSummary) {
+            builder.append(summary).append("\n\n");
+        }
 
         if (isNotEmpty(description)) {
             builder.append(description).append("\n");
@@ -510,14 +518,9 @@ public class ReviewRequestDraft extends BaseEntity {
             log.trace("Using pattern {} against text\n[{}]", pattern, text);
             return "";
         }
-        // get first non null group match
-        for (int i = 1; i <= matcher.groupCount(); i ++) {
-            String groupValue = matcher.group(i);
-            if (groupValue != null) {
-                return groupValue.trim();
-            }
-        }
-        throw new RuntimeException("No non null group value for text [" + text + "] with pattern [" + pattern + "]");
+        // get first non-null group match
+        return IntStream.rangeClosed(1, matcher.groupCount()).mapToObj(matcher::group).filter(Objects::nonNull).map(String::trim)
+                .findFirst().orElseThrow(() -> new RuntimeException("No non null group value for text [" + text + "] with pattern [" + pattern + "]"));
     }
 
     public boolean isCommitSmallerThan(int maxFileCount, int maxLineCount) {

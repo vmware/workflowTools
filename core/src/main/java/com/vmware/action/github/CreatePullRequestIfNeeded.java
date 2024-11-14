@@ -23,7 +23,7 @@ public class CreatePullRequestIfNeeded extends BaseCommitUsingGithubAction {
         PullRequestForUpdate pullRequest = new PullRequestForUpdate();
         pullRequest.repoOwner = githubConfig.githubRepoOwnerName;
         pullRequest.title = draft.summary;
-        pullRequest.body = draft.description;
+        pullRequest.body = draft.toText(commitConfig, false, false);
         pullRequest.repoName = githubConfig.githubRepoName;
         pullRequest.head = determineSourceMergeBranch();
         pullRequest.base = determineTargetMergeBranch();

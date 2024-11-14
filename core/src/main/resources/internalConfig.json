@@ -742,6 +742,9 @@
       "AmendCommitWithoutJobResults",
       "PushToMergeBranch"
     ],
+    "mergeFromTrackingBranch" : [
+      "MergeFromTrackingBranch"
+    ],
     "openMerge": [
       "selectMergeRequest&&--fail-if-no-request-found",
       "OpenRequest"
@@ -806,6 +809,11 @@
     "convertPullRequestToDraft": [
       "selectPullRequest&&--fail-if-no-request-found",
       "ConvertPullRequestToDraft"
+    ],
+    "syncPullRequest": [
+      "selectPullRequest&&--fail-if-no-request-found",
+      "UpdatePullRequestBranch",
+      "MergeChangesFromPullRequest"
     ],
     "openPullRequest": [
       "selectPullRequest&&--fail-if-no-request-found",

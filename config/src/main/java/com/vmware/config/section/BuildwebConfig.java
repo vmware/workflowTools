@@ -27,7 +27,7 @@ public class BuildwebConfig {
     @ConfigurableProperty(help = "Path to gobuild bin file, this is a VMware specific tool")
     public String goBuildBinPath;
 
-    @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox buikd, this is for a VMware specific tool")
+    @ConfigurableProperty(commandLine = "-buildwebProject,--buildweb-project", help = "Which buildweb project to use for a gobuild sandbox build, this is for a VMware specific tool")
     public String buildwebProject;
 
     @ConfigurableProperty(help = "Default buildweb branch to use")
@@ -37,6 +37,9 @@ public class BuildwebConfig {
             help = "Which branch on buildweb to use for a gobuild sandbox build, this is for a VMware specific tool",
             methodNameForValueCalculation = "determineBuildwebBranch")
     public String buildwebBranch;
+
+    @ConfigurableProperty(commandLine = "--site", help = "Buildweb site to use, this is for a VMware specific tool")
+    public String buildwebSite;
 
     @ConfigurableProperty(commandLine = "--build-type", help = "Buildweb build type to use, this is for a VMware specific tool")
     public String buildType;
