@@ -275,6 +275,16 @@ public class StringUtils {
         return value.substring(0, value.indexOf(valueToCheckFor));
     }
 
+    public static String substringAfter(String value, String valueToCheckFor) {
+        if (value == null) {
+            return null;
+        }
+        if (!value.contains(valueToCheckFor)) {
+            return value;
+        }
+        return value.substring(value.indexOf(valueToCheckFor) + valueToCheckFor.length());
+    }
+
     public static String substringAfterLast(String value, String valueToCheckFor) {
         if (value == null) {
             return null;

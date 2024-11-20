@@ -12,10 +12,10 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.vmware.util.scm.FileChangeType.deleted;
 import static com.vmware.util.scm.FileChangeType.modified;
@@ -64,10 +64,17 @@ public class TestGit {
     }
 
     @Test
+    public void parseLastCommit() {
+        Map<String, String> values = git.getLastCommitInfo();
+        String summary = values.get(Git.SUMMARY);
+        assertTrue(StringUtils.isNotEmpty(summary));
+    }
+
+    @Test
     public void diffBetweenLastCommit() {
         String first = "";
         String second = "second";
-        assertEquals(Arrays.asList(first, second).stream().filter(StringUtils::isNotBlank).collect(Collectors.joining(",")), "second");
+        assertEquals(Stream.of(first, second).filter(StringUtils::isNotBlank).collect(Collectors.joining(",")), "second");
         byte[] diff = git.diffAsByteArray("HEAD~1", "HEAD", false);
         assertNotNull(diff);
         List<FileChange> changes = git.getChangesInDiff("HEAD~1", "HEAD");
@@ -83,7 +90,7 @@ public class TestGit {
     @Test
     public void listConfigValues() {
         Map<String, String> values = git.configValues();
-        assertTrue(values.size() > 0);
+        assertFalse(values.isEmpty());
     }
 
     @Test

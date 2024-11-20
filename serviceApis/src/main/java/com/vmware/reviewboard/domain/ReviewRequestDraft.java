@@ -206,7 +206,7 @@ public class ReviewRequestDraft extends BaseEntity {
         this.authorEmail = parseSingleLineFromText(commitText, "^Author:.+<(.+)>", "Git Commit Author Email", DEBUG);
         String commitDateAsString = parseSingleLineFromText(commitText, "^Date:\\s+(.+)", "Git Commit Date", DEBUG);
         if (isNotEmpty(commitDateAsString)) {
-            commitText = commitText.substring(commitText.indexOf(commitDateAsString) + commitDateAsString.length());
+            commitText = StringUtils.substringAfter(commitText, commitDateAsString);
             this.commitDate = DateUtils.parseDate(commitDateAsString);
         }
 

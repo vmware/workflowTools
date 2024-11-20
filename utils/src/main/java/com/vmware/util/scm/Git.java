@@ -33,6 +33,7 @@ import static com.vmware.util.CommandLineUtils.isCommandAvailable;
  * Exposes git functionality needed for workflows.
  */
 public class Git extends BaseScmWrapper {
+    public static final String SHA = "Sha";
     public static final String COMMIT_DATE = "Commit Date";
     public static final String SUMMARY = "Summary";
     public static final String AUTHOR = "Author";
@@ -576,11 +577,13 @@ public class Git extends BaseScmWrapper {
     public Map<String, String> getLastCommitInfo() {
         Map<String, String> commitInfo = new LinkedHashMap<>();
         String commitText = lastCommitText();
-        String summary = lastCommitBody();
-        if (summary.contains("\n")) {
-            summary = summary.substring(0, summary.indexOf('\n'));
+        String dateValue = MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)");
+        String summary = StringUtils.substringAfter(commitText, dateValue).trim();
+        if (summary.contains(System.lineSeparator())) {
+            summary = summary.substring(0, summary.indexOf(System.lineSeparator()));
         }
-        commitInfo.put(COMMIT_DATE, MatcherUtils.singleMatchExpected(commitText, "Date:\\s+(.+)"));
+        commitInfo.put(SHA, MatcherUtils.singleMatchExpected(commitText, "commit\\s+(.+)"));
+        commitInfo.put(COMMIT_DATE, dateValue);
         commitInfo.put(SUMMARY, summary);
         commitInfo.put(AUTHOR, MatcherUtils.singleMatchExpected(commitText, "Author:\\s+(.+)"));
         return commitInfo;
