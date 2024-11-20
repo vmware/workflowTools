@@ -499,6 +499,17 @@ public class Git extends BaseScmWrapper {
         return fileChanges;
     }
 
+    public int getCommitCountSinceRef(String ref) {
+        int counter = 0;
+        String shaToMatch = revParse(ref);
+        String shaToCheck = revParse("head");
+        while (!shaToCheck.equals(shaToMatch) && counter < 100) {
+            counter++;
+            shaToCheck = revParse("head~" + counter);
+        }
+        return counter;
+    }
+
     @Override
     public String fullPath(String pathWithinScm) {
         return getRootDirectory() + File.separator + pathWithinScm;

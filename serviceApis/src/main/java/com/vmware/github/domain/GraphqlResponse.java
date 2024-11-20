@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GraphqlResponse {
+    public enum PullRequestReviewDecision {
+        APPROVED, CHANGES_REQUEST, REVIEW_REQUIRED
+    }
     public ResponseData data;
 
     public static class ResponseData {
@@ -40,6 +43,8 @@ public class GraphqlResponse {
     }
 
     public static class PullRequestNode {
+        @SerializedName("reviewDecision")
+        public PullRequestReviewDecision reviewDecision;
         @SerializedName("reviewThreads")
         public ReviewThreadNodes reviewThreads;
         public double number;

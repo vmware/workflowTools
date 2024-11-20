@@ -3,6 +3,7 @@ package com.vmware.action.conditional;
 import com.vmware.action.base.BaseCommitWithPullRequestAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.Review;
 import com.vmware.util.StringUtils;
@@ -33,7 +34,11 @@ public class ExitIfPullRequestDoesNotHaveRequiredApprovals extends BaseCommitWit
             cancelWithMessage("no approved reviews found for pull request {}", pullRequest.htmlUrl);
         } else {
             draft.shipItReviewers = approvedReviews.stream().map(review -> review.user.login).collect(Collectors.joining(","));
-            log.info("Set reviewers to {}", draft.shipItReviewers);
+            GraphqlResponse.PullRequestNode pullRequestNode = github.getPullRequestViaGraphql(pullRequest);
+            if (pullRequestNode.reviewDecision == GraphqlResponse.PullRequestReviewDecision.REVIEW_REQUIRED) {
+                cancelWithMessage("still need more approvals, already approved by {}", draft.shipItReviewers);
+            }
+            log.info("Approved by {}", draft.shipItReviewers);
         }
     }
 }

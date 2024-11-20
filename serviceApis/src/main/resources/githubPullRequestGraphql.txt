@@ -1,6 +1,7 @@
 query GetReviewThreads {
   repository(owner: "${repoOwnerName}", name: "${repoName}") {
     pullRequest(number: ${pullRequestNumber}) {
+      reviewDecision,
       reviewThreads(first: 30) {
          nodes {
             id,

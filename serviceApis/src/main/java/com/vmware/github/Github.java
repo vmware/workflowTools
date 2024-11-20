@@ -91,14 +91,14 @@ public class Github extends AbstractRestService {
         return get(pullRequestUrl(pullRequest) + "/reviews", Review[].class);
     }
 
-    public ReviewThread[] getReviewThreadsForPullRequest(PullRequest pullRequest) {
-        String reviewThreadsQuery = new ClasspathResource("/githubReviewThreadsGraphql.txt", this.getClass()).getText();
+    public GraphqlResponse.PullRequestNode getPullRequestViaGraphql(PullRequest pullRequest) {
+        String reviewThreadsQuery = new ClasspathResource("/githubPullRequestGraphql.txt", this.getClass()).getText();
         GraphqlRequest request = new GraphqlRequest();
 
         request.query = reviewThreadsQuery.replace("${repoOwnerName}", pullRequest.repoOwnerName())
                 .replace("${repoName}", pullRequest.repoName()).replace("${pullRequestNumber}", String.valueOf(pullRequest.number));
         GraphqlResponse repository = post(graphqlUrl, GraphqlResponse.class, request);
-        return repository.data.repository.pullRequest.reviewThreads.nodes;
+        return repository.data.repository.pullRequest;
     }
 
 
@@ -106,10 +106,13 @@ public class Github extends AbstractRestService {
         return get(pullRequestUrl(ownerName, repoName, pullNumber), PullRequest.class);
     }
 
-    public void mergePullRequest(PullRequest pullRequest, String mergeMethod) {
+    public void mergePullRequest(PullRequest pullRequest, String mergeMethod, String commitTitle, String commitMessage) {
         setupAuthenticatedConnection();
         PullMergeRequest pullMergeRequest = new PullMergeRequest();
         pullMergeRequest.mergeMethod = mergeMethod;
+        pullMergeRequest.commitTitle = commitTitle;
+        pullMergeRequest.commitMessage = commitMessage;
+        pullMergeRequest.sha = pullRequest.head.sha;
         PullMergeResult result = put(pullRequestUrl(pullRequest) + "/merge", PullMergeResult.class, pullMergeRequest);
         log.debug("Merge result: {} Sha: {}", result.message, result.sha);
         if (!result.merged) {

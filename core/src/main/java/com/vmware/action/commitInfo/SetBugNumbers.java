@@ -59,7 +59,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
             String bugNumbers = InputUtils.readData("Bug Numbers: (leave blank if none)", true, 30);
             issues = getBugsAndIssues(bugNumbers);
             waitingForBugNumbers = false;
-            if (!allIssuesWereFound(issues)) {
+            if (!issues.contains(Issue.noBugNumber) && !allIssuesWereFound(issues)) {
                 String reenterBugNumber = InputUtils.readValue("One or more issues not found, reenter bug numbers? [y/n]");
                 waitingForBugNumbers = reenterBugNumber.equalsIgnoreCase("y");
             }
@@ -140,7 +140,7 @@ public class SetBugNumbers extends BaseCommitReadAction {
             if (trimmedBugNumber.isEmpty()) {
                 continue;
             }
-            issues.add(getIssue(bugNumber.trim()));
+            issues.add(getIssue(trimmedBugNumber));
         }
         if (issues.contains(Issue.noBugNumber)) {
             issues.retainAll(Collections.singletonList(Issue.noBugNumber));

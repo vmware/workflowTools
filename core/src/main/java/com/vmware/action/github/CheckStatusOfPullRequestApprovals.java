@@ -1,13 +1,10 @@
 package com.vmware.action.github;
 
-import com.vmware.action.base.BaseCommitWithMergeRequestAction;
 import com.vmware.action.base.BaseCommitWithPullRequestAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.Review;
-import com.vmware.gitlab.domain.MergeRequest;
-import com.vmware.gitlab.domain.MergeRequestApprovals;
 
 import java.util.List;
 import java.util.stream.Collectors;

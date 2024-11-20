@@ -10,7 +10,6 @@ import com.vmware.xmlrpc.MapObjectConverter;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +49,8 @@ public class TestGitHubApi {
         Github github = new Github("https://api.github.com", "https://api.github.com/graphql", "damienbiggs");
         github.setupAuthenticatedConnection();
         PullRequest pullRequest = github.getPullRequest("vmware", "workflowTools", 12);
-        ReviewThread[] threads = github.getReviewThreadsForPullRequest(pullRequest);
-        assertTrue(threads.length > 0);
+        GraphqlResponse.PullRequestNode pullRequestNode = github.getPullRequestViaGraphql(pullRequest);
+        assertTrue(pullRequestNode.reviewThreads.nodes.length > 0);
     }
 
     @Test

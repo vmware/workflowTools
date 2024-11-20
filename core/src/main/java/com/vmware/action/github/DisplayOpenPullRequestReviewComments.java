@@ -3,6 +3,7 @@ package com.vmware.action.github;
 import com.vmware.action.base.BaseCommitWithPullRequestAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.ReviewComment;
 import com.vmware.github.domain.ReviewThread;
@@ -31,8 +32,8 @@ public class DisplayOpenPullRequestReviewComments extends BaseCommitWithPullRequ
         log.debug("Head sha for pull request {}", pullRequest.head.sha);
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd hh:mm:ss");
         Map<String, List<ReviewComment>> commentsPerAuthor = new LinkedHashMap<>();
-        ReviewThread[] reviewThreads = github.getReviewThreadsForPullRequest(pullRequest);
-        for (ReviewThread reviewThread : reviewThreads) {
+        GraphqlResponse.PullRequestNode pullRequestNode = github.getPullRequestViaGraphql(pullRequest);
+        for (ReviewThread reviewThread : pullRequestNode.reviewThreads.nodes) {
             if (reviewThread.isResolved) {
                 continue;
             }
@@ -60,6 +61,7 @@ public class DisplayOpenPullRequestReviewComments extends BaseCommitWithPullRequ
             }
             authorPadder.infoTitle();
         }
+        log.info("Pull request approval status: {}", pullRequestNode.reviewDecision);
     }
 
 }

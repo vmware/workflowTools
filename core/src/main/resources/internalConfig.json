@@ -5,7 +5,7 @@
   "reviewBoardDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
   "githubUrl": "https://api.github.com",
   "githubGraphUrl": "https://api.github.com",
-  "mergeMethod": "rebase",
+  "mergeMethod": "squash",
   "bugzillaQuery": "My Assigned",
   "bugzillaTestBug": 10001,
   "trelloUrl": "https://trello.com",
@@ -460,16 +460,6 @@
       "FormatCommitText",
       "AmendCommitWithoutJobResults"
     ],
-    "prepareCommitForGithubMerge": [
-      "selectPullRequest",
-      "ExitIfCommitFailsCheckstyle",
-      "ExitIfReviewHasNoShipIts",
-      "SetReviewedByAsShipItsList",
-      "ExitIfPullRequestDoesNotHaveRequiredApprovals",
-      "SetReviewedByAsApprovedReviewersList",
-      "FormatCommitText",
-      "AmendCommitWithoutJobResults"
-    ],
     "push": [
       "pushHarder"
     ],
@@ -784,13 +774,9 @@
       "AcceptMergeRequest"
     ],
     "mergePullRequest": [
-      "prepareCommitForGithubMerge",
-      "syncPullRequestFromCommit&&--mark-as-draft=false",
-      "WaitForPullRequestToBeUpdated",
+      "selectPullRequest&&--fail-if-no-request-found",
       "ExitIfPullRequestDoesNotHaveRequiredApprovals",
-      "MergePullRequest",
-      "HardSubmitReview",
-      "DeleteRequestBranch"
+      "MergePullRequest"
     ],
     "createPullRequest": [
       "selectPullRequest",
@@ -1210,7 +1196,6 @@
     "selectAndConvertBoard",
     "prepareCommitForPush",
     "prepareCommitForGitlabMerge",
-    "prepareCommitForGithubMerge",
     "syncMergeRequestFromCommit",
     "syncPullRequestFromCommit",
     "setCommitDetails",
