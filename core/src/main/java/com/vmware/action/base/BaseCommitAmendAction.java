@@ -12,14 +12,11 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     protected static final boolean INCLUDE_JOB_RESULTS = true;
     protected static final boolean EXCLUDE_JOB_RESULTS = false;
 
-    private final boolean includeJobResultsInCommit;
     private final boolean includeAllChangesInCommit;
 
-    public BaseCommitAmendAction(WorkflowConfig config, boolean includeAllChangesInCommit,
-                                 boolean includeJobResultsInCommit) {
+    public BaseCommitAmendAction(WorkflowConfig config, boolean includeAllChangesInCommit) {
         super(config);
         this.includeAllChangesInCommit = includeAllChangesInCommit;
-        this.includeJobResultsInCommit = includeJobResultsInCommit;
     }
 
     @Override
@@ -31,12 +28,12 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     @Override
     protected void commitUsingGit(String description) {
         String existingHeadRef = git.revParse("head");
-        git.amendCommit(updatedCommitText(includeJobResultsInCommit), includeAllChangesInCommit, gitRepoConfig.noVerify);
+        git.amendCommit(updatedCommitText(commitConfig.includeJobResults), includeAllChangesInCommit, gitRepoConfig.noVerify);
         git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 
     private boolean commitHasNoChanges() {
-        if (commitTextHasChanges(includeJobResultsInCommit)) {
+        if (commitTextHasChanges(commitConfig.includeJobResults)) {
             return false;
         }
 

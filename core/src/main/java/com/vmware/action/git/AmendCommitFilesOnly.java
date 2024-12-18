@@ -9,7 +9,7 @@ import com.vmware.util.logging.LogLevel;
 public class AmendCommitFilesOnly extends BaseCommitAmendAction {
 
     public AmendCommitFilesOnly(WorkflowConfig config) {
-        super(config, true, false);
+        super(config, false);
     }
 
     @Override // always run

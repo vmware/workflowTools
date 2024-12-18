@@ -9,7 +9,7 @@ import com.vmware.util.logging.LogLevel;
 public class AmendCommitAll extends BaseCommitAmendAction {
 
     public AmendCommitAll(WorkflowConfig config) {
-        super(config, INCLUDE_ALL_CHANGES, INCLUDE_JOB_RESULTS);
+        super(config, INCLUDE_ALL_CHANGES);
     }
 
     @Override

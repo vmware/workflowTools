@@ -3,7 +3,7 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.gitlab.Gitlab;
 
-public abstract class BaseCommitUsingGitlabAction extends BaseCommitAction {
+public abstract class BaseCommitUsingGitlabAction extends BaseCommitUsingGitServerAction {
     protected Gitlab gitlab;
 
     public BaseCommitUsingGitlabAction(WorkflowConfig config) {

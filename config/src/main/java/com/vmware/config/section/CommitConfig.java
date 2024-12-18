@@ -99,6 +99,9 @@ public class CommitConfig {
     @ConfigurableProperty(commandLine = "--use-linked-bugzilla-id", help = "Use bugzilla id linked to the Jira issue instead of the issue key")
     public boolean useLinkedBugzillaId;
 
+    @ConfigurableProperty(commandLine = "--include-job-results", help = "Include job results in commit message")
+    public boolean includeJobResults;
+
     @ConfigurableProperty(commandLine = "--commit-topics-to-ignore", help = "Commit summaries to ignore from stats")
     public String[] commitTopicsToIgnore;
 

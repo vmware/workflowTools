@@ -2,6 +2,7 @@ package com.vmware.action.base;
 
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.CollectionUtils;
+import com.vmware.util.StringUtils;
 import com.vmware.vcd.domain.VappData;
 
 public abstract class BaseVappAction extends BaseCommitAction {
@@ -36,6 +37,13 @@ public abstract class BaseVappAction extends BaseCommitAction {
 
     public void setVappData(VappData vappData) {
         this.vappData = vappData;
+    }
+
+    protected String jobWithArtifactName() {
+        if (!jenkinsConfig.hasConfiguredArtifactWithoutBuildNumber()) {
+            return null;
+        }
+        return StringUtils.isNotEmpty(jenkinsConfig.jobWithArtifact) ? jenkinsConfig.jobWithArtifact : jenkinsConfig.jobsDisplayNames[0];
     }
 
 }

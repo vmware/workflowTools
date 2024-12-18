@@ -81,6 +81,11 @@ public class WorkflowConfigParser {
         return config;
     }
 
+    public WorkflowConfig readInternalConfig() {
+        Reader reader = new ClasspathResource("/internalConfig.json", this.getClass()).getReader();
+        return gson.fromJson(reader, WorkflowConfig.class);
+    }
+
     private void applyGitConfigValuesAsWorkflowConfigValues(WorkflowConfig config) {
         if (!git.workingDirectoryIsInGitRepo()) {
             return;
@@ -208,11 +213,6 @@ public class WorkflowConfigParser {
         } catch (FileNotFoundException e) {
             throw new RuntimeIOException(e);
         }
-    }
-
-    private WorkflowConfig readInternalConfig() {
-        Reader reader = new ClasspathResource("/internalConfig.json", this.getClass()).getReader();
-        return gson.fromJson(reader, WorkflowConfig.class);
     }
 
     private Map<String, Map<String, String>> workflowHelpMessages() {

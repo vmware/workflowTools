@@ -32,6 +32,8 @@ import com.vmware.config.WorkflowConfigParser;
 import com.vmware.config.WorkflowField;
 import com.vmware.config.WorkflowFields;
 import com.vmware.config.WorkflowParameter;
+import com.vmware.config.section.GithubConfig;
+import com.vmware.github.Github;
 import com.vmware.github.domain.ReleaseAsset;
 import com.vmware.http.exception.ApiException;
 import com.vmware.mapping.ConfigMappings;
@@ -164,7 +166,9 @@ public class Workflow {
             return;
         }
         if (daysOld >= config.updateCheckInterval) {
-            ReleaseAsset[] releaseAssets = serviceLocator.getGithub().getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
+            GithubConfig internalConfig = configParser.readInternalConfig().githubConfig;
+            ReleaseAsset[] releaseAssets = new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl, config.username)
+                    .getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
             if (releaseAssets != null && releaseAssets.length > 0) {
                 ReleaseAsset asset = releaseAssets[0];
                 if (asset.updatedAt.getTime() > workflowJarFile.lastModified()) {
@@ -173,7 +177,7 @@ public class Workflow {
                     log.debug("Marking as read only so that it can be inferred that it needs to be updated");
                     log.debug("Read only: " + workflowJarFile.setReadOnly());
                 } else {
-                    log.debug("workflow jar {} is older than {} days. Last new version was on {}", jarFilePath, daysOld, asset.updatedAt);
+                    log.debug("workflow jar {} is older than {} days. Last new version was on {} so updating is not needed", jarFilePath, daysOld, asset.updatedAt);
                     log.debug("Updated last modified time: {}", workflowJarFile.setLastModified(new Date().getTime()));
                 }
             }

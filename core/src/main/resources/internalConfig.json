@@ -48,6 +48,7 @@
     "precommit": "topic/$USERNAME/pre-commit",
     "update": "topic/$USERNAME/update"
   },
+  "includeJobResults": true,
   "gitMergeBranchFormat": "topic/$USERNAME/$BRANCH_NAME",
   "remoteBranchToUse": "precommit",
   "trackingBranch": "master",
@@ -448,7 +449,7 @@
       "ExitIfReviewHasNoShipIts",
       "SetReviewedByAsShipItsList",
       "FormatCommitText",
-      "AmendCommitWithoutJobResults"
+      "AmendCommit&&--include-job-results=false"
     ],
     "prepareCommitForGitlabMerge": [
       "selectMergeRequest",
@@ -458,7 +459,7 @@
       "ExitIfMergeRequestDoesNotHaveRequiredApprovals",
       "SetReviewedByAsApproverList",
       "FormatCommitText",
-      "AmendCommitWithoutJobResults"
+      "AmendCommit&&--include-job-results=false"
     ],
     "push": [
       "pushHarder"

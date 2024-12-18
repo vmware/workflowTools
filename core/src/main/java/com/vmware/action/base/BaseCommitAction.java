@@ -132,33 +132,6 @@ public abstract class BaseCommitAction extends BaseAction {
         return buildId;
     }
 
-    protected String jobWithArtifactName() {
-        if (!jenkinsConfig.hasConfiguredArtifactWithoutBuildNumber()) {
-            return null;
-        }
-        return StringUtils.isNotEmpty(jenkinsConfig.jobWithArtifact) ? jenkinsConfig.jobWithArtifact : jenkinsConfig.jobsDisplayNames[0];
-    }
-
-    protected String determineSourceMergeBranch() {
-        if (StringUtils.isNotBlank(gitRepoConfig.sourceMergeBranch)) {
-            return gitRepoConfig.sourceMergeBranch;
-        } else {
-            String sourceBranch = gitRepoConfig.gitMergeBranchFormat.replace("$USERNAME", config.username);
-            String branchName = git.currentBranch();
-            sourceBranch = sourceBranch.replace("$BRANCH_NAME", branchName);
-            return sourceBranch;
-        }
-    }
-
-    protected String determineTargetMergeBranch() {
-        if (StringUtils.isNotBlank(gitRepoConfig.targetMergeBranch)) {
-            return gitRepoConfig.targetMergeBranch;
-        } else {
-            String trackingBranchPath = gitRepoConfig.trackingBranchPath();
-            return trackingBranchPath.contains("/") ? trackingBranchPath.split("/") [1] : trackingBranchPath;
-        }
-    }
-
     private String readPendingChangelistText() {
         String changelistId = determineChangelistIdToUse();
         String changelistText = serviceLocator.getPerforce().readChangelist(changelistId);
