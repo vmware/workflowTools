@@ -84,7 +84,12 @@ public abstract class BaseCommitAction extends BaseAction {
         String existingCommitText = existingDraft.toText(commitConfig);
         String updatedCommitText = updatedCommitText(includeJobResultsInCommit);
 
-        return !existingCommitText.equals(updatedCommitText);
+        if (!existingCommitText.equals(updatedCommitText)) {
+            log.debug("Existing: {}\nUpdated: {}", existingCommitText, updatedCommitText);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected String updatedCommitText(boolean includeJobResultsInCommit) {

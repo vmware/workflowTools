@@ -31,8 +31,8 @@ public class Gitlab extends AbstractRestService {
 
     private static final String PRIVATE_TOKEN_HEADER = "Private-Token";
 
-    public Gitlab(String baseUrl, String username) {
-        super(baseUrl, "api/v4", ApiAuthentication.gitlab_token, username);
+    public Gitlab(String baseUrl) {
+        super(baseUrl, "api/v4", ApiAuthentication.gitlab_token, NULL_USERNAME);
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss.SSS")
                         .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());

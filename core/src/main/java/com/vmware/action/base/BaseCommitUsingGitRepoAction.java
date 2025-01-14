@@ -4,10 +4,10 @@ import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.StringUtils;
 
-@ActionDescription("Common base class for github and gitlab actions")
-public abstract class BaseCommitUsingGitServerAction extends BaseCommitAction {
+@ActionDescription("Common base class for git repo actions")
+public abstract class BaseCommitUsingGitRepoAction extends BaseCommitAction {
 
-    public BaseCommitUsingGitServerAction(WorkflowConfig config) {
+    public BaseCommitUsingGitRepoAction(WorkflowConfig config) {
         super(config);
     }
 

@@ -3,6 +3,8 @@ package com.vmware.action.base;
 import com.vmware.config.WorkflowConfig;
 import com.vmware.util.logging.LogLevel;
 
+import java.util.Optional;
+
 /**
  * Common functionality for actions that amend a commit.
  */
@@ -22,7 +24,9 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
     @Override
     public void checkIfActionShouldBeSkipped() {
         super.checkIfActionShouldBeSkipped();
-        super.skipActionIfTrue(commitHasNoChanges(), "no changes detected");
+        Optional<String> commitHasChangesReason = commitHasChanges();
+        commitHasChangesReason.ifPresent(reason -> log.debug("Amending commit as {}", reason));
+        super.skipActionIfTrue(!commitHasChangesReason.isPresent(), "no changes detected");
     }
 
     @Override
@@ -32,19 +36,25 @@ public abstract class BaseCommitAmendAction extends BaseCommitCreateAction {
         git.updateGitChangesetTagsMatchingRevision(existingHeadRef, LogLevel.INFO);
     }
 
-    private boolean commitHasNoChanges() {
+    private Optional<String> commitHasChanges() {
         if (commitTextHasChanges(commitConfig.includeJobResults)) {
-            return false;
+            return Optional.of("commit text has changes");
         }
 
         if (!git.workingDirectoryIsInGitRepo()) {
-            return true;
+            return Optional.empty();
         }
 
         if (git.getAllChanges().isEmpty()) {
-            return true;
+            return Optional.empty();
         }
 
-        return !includeAllChangesInCommit && git.getStagedChanges().isEmpty();
+        if (!git.getStagedChanges().isEmpty()) {
+            return Optional.of("has staged changes");
+        } else if (includeAllChangesInCommit) {
+            return Optional.of("has changes");
+        } else {
+            return Optional.empty();
+        }
     }
 }

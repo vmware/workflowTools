@@ -45,8 +45,8 @@ public class Github extends AbstractRestService {
 
     private final String graphqlUrl;
 
-    public Github(String baseUrl, String graphqlUrl, String username) {
-        super(baseUrl, "", ApiAuthentication.github_token, username);
+    public Github(String baseUrl, String graphqlUrl) {
+        super(baseUrl, "", ApiAuthentication.github_token, NULL_USERNAME);
         this.graphqlUrl = graphqlUrl;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss")
@@ -127,7 +127,7 @@ public class Github extends AbstractRestService {
     }
 
     public void updatePullRequestDraftState(PullRequest pullRequest, boolean isDraft) {
-        log.info("Marking pull request {} draft status as {}", pullRequest.number, isDraft);
+        log.info("Marking pull request {} as {}", pullRequest.number, isDraft ? "draft" : "ready");
         String graphqlText = new ClasspathResource("/githubDraftPullRequestGraphql.txt", this.getClass()).getText();
         String mutationName = isDraft ? "convertPullRequestToDraft" : "markPullRequestReadyForReview";
         GraphqlRequest request = new GraphqlRequest();
@@ -146,27 +146,17 @@ public class Github extends AbstractRestService {
     }
 
     public void addReviewersToPullRequest(PullRequest pullRequest, Set<AutocompleteUser> users) {
-        if (users.isEmpty()) {
-            return;
+        RequestedReviewers requestedReviewers = generateReviewers(users);
+        if (requestedReviewers.reviewers.length > 0 || requestedReviewers.teamReviewers.length > 0) {
+            post(pullRequestUrl(pullRequest) + "/requested_reviewers", String.class, requestedReviewers);
         }
-        RequestedReviewers requestedReviewers = new RequestedReviewers();
-        requestedReviewers.reviewers = users.stream().filter(user -> user instanceof User)
-                .map(user -> ((User) user).login).toArray(String[]::new);
-        requestedReviewers.teamReviewers = users.stream().filter(team -> team instanceof Team)
-                .map(team -> ((Team) team).slug).toArray(String[]::new);
-        post(pullRequestUrl(pullRequest) + "/requested_reviewers", String.class, requestedReviewers);
     }
 
     public void removeReviewersFromPullRequest(PullRequest pullRequest, Set<AutocompleteUser> users) {
-        if (users.isEmpty()) {
-            return;
+        RequestedReviewers requestedReviewers = generateReviewers(users);
+        if (requestedReviewers.reviewers.length > 0 || requestedReviewers.teamReviewers.length > 0) {
+            delete(pullRequestUrl(pullRequest) + "/requested_reviewers", requestedReviewers, Collections.emptyList());
         }
-        RequestedReviewers requestedReviewers = new RequestedReviewers();
-        requestedReviewers.reviewers = users.stream().filter(user -> user instanceof User)
-                .map(user -> ((User) user).login).toArray(String[]::new);
-        requestedReviewers.teamReviewers = users.stream().filter(team -> team instanceof Team)
-                .map(team -> ((Team) team).slug).toArray(String[]::new);
-        delete(pullRequestUrl(pullRequest) + "/requested_reviewers", requestedReviewers, Collections.emptyList());
     }
 
     public ReleaseAsset[] getReleaseAssets(String releasePath) {
@@ -199,6 +189,15 @@ public class Github extends AbstractRestService {
             log.debug("Api token file {} does not exist", apiHostTokenFile.getPath());
         }
         return super.determineApiTokenFile(apiAuthentication);
+    }
+
+    private RequestedReviewers generateReviewers(Set<AutocompleteUser> users) {
+        RequestedReviewers requestedReviewers = new RequestedReviewers();
+        requestedReviewers.reviewers = users.stream().filter(user -> user instanceof User)
+                .map(user -> ((User) user).login).toArray(String[]::new);
+        requestedReviewers.teamReviewers = users.stream().filter(team -> team instanceof Team)
+                .map(team -> ((Team) team).slug).toArray(String[]::new);
+        return requestedReviewers;
     }
 
     private String pullRequestUrl(PullRequest pullRequest) {

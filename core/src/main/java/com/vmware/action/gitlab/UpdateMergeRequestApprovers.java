@@ -40,8 +40,9 @@ public class UpdateMergeRequestApprovers extends BaseCommitWithMergeRequestActio
                 Arrays.stream(draft.reviewedBy.split(",")).filter(value -> !StringUtils.isLong(value))
                         .map(String::trim).collect(Collectors.toSet());
         if (gitlabConfig.allowSelfApproval) {
-            log.debug("Adding {} as an approver", gitlab.getUsername());
-            reviewersFromDraft.add(gitlab.getUsername());
+            String username = StringUtils.firstNonEmpty(gitlabConfig.gitlabUsername, config.username);
+            log.debug("Adding {} as an approver", username);
+            reviewersFromDraft.add(username);
         }
         Set<String> groupsFromDraft = StringUtils.isEmpty(draft.reviewedBy) ? Collections.emptySet() :
                 Arrays.stream(draft.reviewedBy.split(",")).filter(StringUtils::isLong)

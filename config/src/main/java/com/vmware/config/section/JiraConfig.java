@@ -53,6 +53,9 @@ public class JiraConfig {
     @ConfigurableProperty(commandLine = "--use-epics", help = "Whether to use parent epics when loading Jira issues")
     public boolean useEpics;
 
+    @ConfigurableProperty(commandLine = "--jira-username", help = "Username for Jira if not using the default username")
+    public String jiraUsername;
+
     public String issueUrl(String bugNumber) {
         return UrlUtils.addRelativePaths(jiraUrl, "browse", bugNumber);
     }

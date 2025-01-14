@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -396,6 +397,11 @@ public class StringUtils {
         } else {
             return new String[] {value.substring(0, firstIndex), value.substring(firstIndex + 1)};
         }
+    }
+
+    public static String firstNonEmpty(String... values) {
+        return Arrays.stream(values).filter(StringUtils::isNotEmpty).findFirst()
+                .orElseThrow(() -> new RuntimeException("No non empty value in " + values));
     }
 
     public static String trim(String value) {

@@ -1,12 +1,11 @@
 package com.vmware.action.git;
 
-import com.vmware.action.base.BaseCommitAction;
-import com.vmware.action.base.BaseCommitUsingGitServerAction;
+import com.vmware.action.base.BaseCommitUsingGitRepoAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
 
 @ActionDescription("Performs a force git push to the remote branch used for the merge or pull request.")
-public class PushToMergeBranch extends BaseCommitUsingGitServerAction {
+public class PushToMergeBranch extends BaseCommitUsingGitRepoAction {
 
     public PushToMergeBranch(WorkflowConfig config) {
         super(config);

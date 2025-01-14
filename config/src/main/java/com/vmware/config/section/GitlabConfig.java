@@ -24,4 +24,7 @@ public class GitlabConfig {
 
     @ConfigurableProperty(help = "Prefix for draft merge request")
     public String draftMergeRequestPrefix;
+
+    @ConfigurableProperty(commandLine = "--gitlab-username", help = "Username for gitlab if not the default username")
+    public String gitlabUsername;
 }

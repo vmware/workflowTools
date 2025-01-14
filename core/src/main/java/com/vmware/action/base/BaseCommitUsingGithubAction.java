@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class BaseCommitUsingGithubAction extends BaseCommitUsingGitServerAction {
+public abstract class BaseCommitUsingGithubAction extends BaseCommitUsingGitRepoAction {
     protected Github github;
 
     public BaseCommitUsingGithubAction(WorkflowConfig config) {

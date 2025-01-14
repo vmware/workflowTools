@@ -20,4 +20,7 @@ public class TrelloConfig {
 
     @ConfigurableProperty(commandLine = "--trello-sso", help = "Use SSO to sign in for Trello")
     public boolean trelloSso;
+
+    @ConfigurableProperty(commandLine = "--trello-username", help = "Username for Trello if not using the default username")
+    public String trelloUsername;
 }

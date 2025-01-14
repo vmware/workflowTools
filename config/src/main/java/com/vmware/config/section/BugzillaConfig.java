@@ -27,6 +27,9 @@ public class BugzillaConfig {
     @ConfigurableProperty(commandLine = "--bugzilla-sso-login-id", help = "Id of button to click for bugzilla sso login")
     public String bugzillaSsoLoginId;
 
+    @ConfigurableProperty(commandLine = "--bugzilla-username", help = "Username for bugzilla if not using the default username")
+    public String bugzillaUsername;
+
     public Integer parseBugzillaBugNumber(String bugNumber) {
         if (StringUtils.isInteger(bugNumber)) {
             return Integer.parseInt(bugNumber);

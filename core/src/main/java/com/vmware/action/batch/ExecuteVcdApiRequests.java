@@ -24,13 +24,13 @@ import java.util.stream.IntStream;
 public class ExecuteVcdApiRequests extends BaseAction {
     public ExecuteVcdApiRequests(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("fileData", "sourceUrl", "vcdApiVersion", "vcdUsername", "vcdUserPassword");
+        super.addFailWorkflowIfBlankProperties("fileData", "sourceUrl", "vcdApiVersion", "vcdAdminUsername", "vcdAdminUserPassword");
     }
 
     @Override
     public void process() {
         String vcdOrg = StringUtils.isNotEmpty(vcdConfig.defaultVcdOrg) ? vcdConfig.defaultVcdOrg : "System";
-        Vcd vcdClient = new Vcd(fileSystemConfig.sourceUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdUsername, vcdConfig.vcdUserPassword, vcdOrg);
+        Vcd vcdClient = new Vcd(fileSystemConfig.sourceUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdAdminUsername, vcdConfig.vcdAdminUserPassword, vcdOrg);
 
         Gson gson = new ConfiguredGsonBuilder().build();
 

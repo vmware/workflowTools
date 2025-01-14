@@ -12,11 +12,14 @@ public class VcdConfig {
     @ConfigurableProperty(commandLine = "--vcd-org", help = "Default Org to use for user login if none specified")
     public String defaultVcdOrg;
 
-    @ConfigurableProperty(commandLine = "--vcd-username", help = "Username for the vcd sys admin user")
+    @ConfigurableProperty(commandLine = "--vcd-username", help = "Username for the vcd if not using the defualt username")
     public String vcdUsername;
 
-    @ConfigurableProperty(commandLine = "--vcd-password", help = "Password for the vcd sys admin user")
-    public String vcdUserPassword;
+    @ConfigurableProperty(commandLine = "--vcd-admin-username", help = "Username for the vcd sys admin user")
+    public String vcdAdminUsername;
+
+    @ConfigurableProperty(commandLine = "--vcd-admin-password", help = "Password for the vcd sys admin user")
+    public String vcdAdminUserPassword;
 
     @ConfigurableProperty(help = "Api version to use for Vcloud Director")
     public String vcdApiVersion;

@@ -17,13 +17,19 @@
     "--property-value",
     "--input-text"
   ],
+  "BaseCommitUsingGitRepoAction": [
+    "--tracking-branch",
+    "--target-merge-branch",
+    "--username",
+    "--source-merge-branch"
+  ],
   "ExitIfGitDiffDoesNotMatchRbtDiff": [
     "--parent"
   ],
   "UpdateVcdPublicCerts": [
     "--file-data",
-    "--vcd-password",
-    "--vcd-username",
+    "--vcd-admin-password",
+    "--vcd-admin-username",
     "--source-url"
   ],
   "WaitForMergeRequestToBeUpdated": [
@@ -57,7 +63,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--file-data",
@@ -100,6 +106,7 @@
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
     "--bugzilla-test-bug",
+    "--username",
     "--rb-username",
     "--use-rb-api-token",
     "--sso-headless",
@@ -108,8 +115,7 @@
     "--vcd-sso",
     "--vcd-org",
     "--vcd-url",
-    "--sso-email",
-    "--username"
+    "--sso-email"
   ],
   "AbortJenkinsBuilds": [
     "--jenkins-jobs"
@@ -123,7 +129,6 @@
     "--source-file"
   ],
   "LoadReviewPatch": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token",
     "--latest-diff",
@@ -175,13 +180,12 @@
     "--keystore-password"
   ],
   "CreateReviewIfNeeded": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token",
     "--review-board-repo"
   ],
   "UpdateTaskEstimates": [
-    "--username",
+    "--jira-username",
     "--jira-url",
     "--estimate"
   ],
@@ -192,7 +196,7 @@
     "--rsync-source"
   ],
   "BaseBatchJiraAction": [
-    "--username",
+    "--jira-username",
     "--jira-url",
     "--disable-jira"
   ],
@@ -202,7 +206,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--wait-time",
@@ -214,7 +218,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email"
   ],
@@ -243,9 +247,6 @@
   "WaitForPullRequestToBeUpdated": [
     "--wait-time"
   ],
-  "BaseCommitUsingGitlabAction": [
-    "--username"
-  ],
   "SyncChangelistWithGitDiff": [
     "--tracking-branch",
     "--sync-to-branch-latest"
@@ -259,7 +260,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--file-data",
@@ -297,7 +298,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--vapp-json-file",
@@ -324,7 +325,7 @@
     "--output-file"
   ],
   "BaseCommitWithBuildwebBuildsAction": [
-    "--username",
+    "--buildweb-username",
     "--buildweb-log-file-name",
     "--buildweb-api-url"
   ],
@@ -374,7 +375,7 @@
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
     "--bugzilla-test-bug",
-    "--username",
+    "--bugzilla-username",
     "--default-jira-component",
     "--disable-bugzilla"
   ],
@@ -401,7 +402,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--vapp-metadata-name"
@@ -412,7 +413,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--wait-time"
@@ -433,7 +434,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--wait-time",
@@ -446,7 +447,7 @@
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
     "--bugzilla-test-bug",
-    "--username"
+    "--bugzilla-username"
   ],
   "ExecuteSshCommand": [
     "--output-file",
@@ -461,7 +462,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--file-data"
@@ -475,7 +476,6 @@
     "--include-alias-autocomplete"
   ],
   "CreateReview": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token",
     "--review-board-repo"
@@ -537,7 +537,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email"
   ],
@@ -574,7 +574,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--vcd-check-quota",
@@ -596,13 +596,14 @@
     "--jenkins-jobs"
   ],
   "BaseTransitionJiraIssue": [
+    "--jira-username",
     "--jira-url",
     "--username",
     "--disable-jira"
   ],
   "ConvertCardsToJiraIssues": [
     "--trello-sso",
-    "--username",
+    "--trello-username",
     "--sso-email",
     "--jira-url"
   ],
@@ -612,7 +613,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--wait-time",
@@ -634,13 +635,13 @@
     "--file-data",
     "--check-point",
     "--repeat--count",
-    "--vcd-password",
-    "--vcd-username",
+    "--vcd-admin-password",
+    "--vcd-admin-username",
     "--source-url",
     "--vcd-org"
   ],
   "ResolveBugsWithResolvedTrackingIssues": [
-    "--username",
+    "--jira-username",
     "--jira-url",
     "--disable-jira"
   ],
@@ -649,7 +650,6 @@
     "--input-text"
   ],
   "SetReviewId": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token"
   ],
@@ -667,17 +667,11 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--wait-time",
     "--wait-for-action"
-  ],
-  "BaseCommitUsingGitServerAction": [
-    "--tracking-branch",
-    "--target-merge-branch",
-    "--username",
-    "--source-merge-branch"
   ],
   "SelectBackup": [
     "--output-variable-name",
@@ -704,6 +698,8 @@
   "UpdateMergeRequestApprovers": [
     "--trivial-reviewer-label",
     "--approvals-required",
+    "--username",
+    "--gitlab-username",
     "--allow-self-approval",
     "--approval-rule-name"
   ],
@@ -720,7 +716,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--wait-time",
@@ -753,7 +749,6 @@
     "--include-all-issue-types"
   ],
   "BaseCommitUsingGithubAction": [
-    "--username",
     "--trivial-reviewer-label"
   ],
   "SelectVappIfNeeded": [
@@ -778,7 +773,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--input-text",
@@ -794,7 +789,7 @@
   ],
   "BaseTrelloAction": [
     "--trello-sso",
-    "--username",
+    "--trello-username",
     "--sso-email"
   ],
   "SimpleCommit": [
@@ -811,12 +806,11 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email"
   ],
   "SetCommitDetailsFromReview": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token",
     "--review-request-id"
@@ -832,7 +826,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--vapp-lease",
@@ -867,6 +861,9 @@
     "--database-url-pattern",
     "--database-url"
   ],
+  "BaseSetShipItReviewersList": [
+    "--username"
+  ],
   "BaseCommitAmendAction": [
     "--no-verify",
     "--include-job-results"
@@ -888,13 +885,13 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email"
   ],
   "SyncCardsWithJiraIssues": [
     "--trello-sso",
-    "--username",
+    "--trello-username",
     "--sso-email",
     "--jira-url",
     "--keep-missing-cards"
@@ -906,7 +903,8 @@
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
     "--bugzilla-test-bug",
-    "--username",
+    "--bugzilla-username",
+    "--jira-username",
     "--jira-url",
     "--use-linked-bugzilla-id",
     "--disable-bugzilla",
@@ -916,7 +914,6 @@
     "--file-data"
   ],
   "BaseReviewBoardAction": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token"
   ],
@@ -929,12 +926,11 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email"
   ],
   "DiscardUnpublishedReviews": [
-    "--username",
     "--rb-username",
     "--use-rb-api-token"
   ],
@@ -968,7 +964,7 @@
     "--vcd-refresh-token-name",
     "--vcd-sso",
     "--vcd-org",
-    "--username",
+    "--vcd-username",
     "--vcd-url",
     "--sso-email",
     "--job-with-artifact",

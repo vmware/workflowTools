@@ -437,11 +437,11 @@ public class ReviewRequestDraft extends BaseEntity {
     public String toText(CommitConfig commitConfig, boolean includeSummary, boolean includeJobResults) {
         StringBuilder builder = new StringBuilder();
         if (includeSummary) {
-            builder.append(summary).append("\n\n");
+            builder.append(summary);
         }
 
         if (isNotEmpty(description)) {
-            builder.append(description).append("\n");
+            builder.append("\n\n").append(description).append("\n");
         }
         String testingDoneSection = fullTestingDoneSection(includeJobResults);
         if (isNotEmpty(testingDoneSection)) {

@@ -23,7 +23,7 @@ public class AuthenticateAllApis extends BaseAction {
 
     @Override
     public void process() {
-        checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl, config.username));
+        checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl));
         String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
                 ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig));

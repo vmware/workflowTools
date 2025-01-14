@@ -13,12 +13,12 @@ import com.vmware.vcd.Vcd;
 public class UpdateVcdPublicCerts extends BaseAction {
     public UpdateVcdPublicCerts(WorkflowConfig config) {
         super(config);
-        super.addFailWorkflowIfBlankProperties("fileData", "sourceUrl", "vcdApiVersion", "vcdUsername", "vcdUserPassword");
+        super.addFailWorkflowIfBlankProperties("fileData", "sourceUrl", "vcdApiVersion", "vcdAdminUsername", "vcdAdminUserPassword");
     }
 
     @Override
     public void process() {
-        Vcd vcdClientForSystemOrg = new Vcd(fileSystemConfig.sourceUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdUsername, vcdConfig.vcdUserPassword, "System");
+        Vcd vcdClientForSystemOrg = new Vcd(fileSystemConfig.sourceUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdAdminUsername, vcdConfig.vcdAdminUserPassword, "System");
         final String resourceType = "application/vnd.vmware.admin.generalsettings";
         Map generalSettings = vcdClientForSystemOrg
                 .getResourceAsMap("admin/extension/settings/general", resourceType);

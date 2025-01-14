@@ -22,6 +22,8 @@ import com.vmware.trello.Trello;
 import com.vmware.vcd.Vcd;
 import org.slf4j.LoggerFactory;
 
+import static com.vmware.util.StringUtils.firstNonEmpty;
+
 /**
  * Centralized locator for git, perforce, jenkins, jira, reviewboard and trello instances.
  * Ensures that the above classes are singletons.
@@ -60,14 +62,14 @@ public class ServiceLocator {
 
     public Jira getJira() {
         if (jira == null) {
-            jira = new Jira(config.jiraConfig.jiraUrl, config.username, config.jiraConfig.jiraCustomFieldNames);
+            jira = new Jira(config.jiraConfig.jiraUrl, determineUsername(config.jiraConfig.jiraUsername), config.jiraConfig.jiraCustomFieldNames);
         }
         return jira;
     }
 
     public Bugzilla getBugzilla() {
         if (bugzilla == null) {
-            bugzilla = new Bugzilla(config.bugzillaConfig.bugzillaUrl, config.username,
+            bugzilla = new Bugzilla(config.bugzillaConfig.bugzillaUrl, determineUsername(config.bugzillaConfig.bugzillaUsername),
                     config.bugzillaConfig.bugzillaTestBug, config.bugzillaConfig.bugzillaSso, config.ssoConfig, config.bugzillaConfig.bugzillaSsoLoginId);
         }
         return bugzilla;
@@ -82,8 +84,7 @@ public class ServiceLocator {
             try {
                 ReviewBoardConfig reviewBoardConfig = config.reviewBoardConfig;
                 ApiAuthentication reviewBoardCredentialsType = reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard_cookie;
-                String rbUsername = StringUtils.isNotBlank(reviewBoardConfig.rbUsername) ? reviewBoardConfig.rbUsername : config.username;
-                reviewBoard = new ReviewBoard(reviewBoardConfig.reviewboardUrl, rbUsername, reviewBoardCredentialsType);
+                reviewBoard = new ReviewBoard(reviewBoardConfig.reviewboardUrl, determineUsername(reviewBoardConfig.rbUsername), reviewBoardCredentialsType);
                 if (reviewBoard.isConnectionAuthenticated()) {
                     reviewBoard.updateClientTimeZone(reviewBoardConfig.reviewBoardDateFormat);
                 }
@@ -112,7 +113,7 @@ public class ServiceLocator {
         if (buildweb == null) {
             BuildwebConfig buildwebConfig = config.buildwebConfig;
             buildweb = new Buildweb(buildwebConfig.buildwebUrl, buildwebConfig.buildwebApiUrl,
-                    buildwebConfig.buildwebLogFileName, buildwebConfig.buildwebBuildMachineHostNameSuffix, config.username);
+                    buildwebConfig.buildwebLogFileName, buildwebConfig.buildwebBuildMachineHostNameSuffix, determineUsername(buildwebConfig.buildwebUsername));
         }
         return buildweb;
     }
@@ -122,7 +123,7 @@ public class ServiceLocator {
             VcdConfig vcdConfig = config.vcdConfig;
             SsoConfig ssoConfig = config.ssoConfig;
             String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
-            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, config.username, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, ssoEmail,
+            vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, determineUsername(vcdConfig.vcdUsername), vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, ssoEmail,
                     vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig);
         }
         return vcd;
@@ -133,7 +134,7 @@ public class ServiceLocator {
             SsoConfig ssoConfig = config.ssoConfig;
             TrelloConfig trelloConfig = config.trelloConfig;
             String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
-            trello = new Trello(trelloConfig.trelloUrl, config.username, trelloConfig.trelloSso, ssoEmail, ssoConfig);
+            trello = new Trello(trelloConfig.trelloUrl, determineUsername(trelloConfig.trelloUsername), trelloConfig.trelloSso, ssoEmail, ssoConfig);
         }
         return trello;
     }
@@ -155,20 +156,24 @@ public class ServiceLocator {
 
     public Gitlab getGitlab() {
         if (gitlab == null) {
-            gitlab = new Gitlab(config.gitlabConfig.gitlabUrl, config.username);
+            gitlab = new Gitlab(config.gitlabConfig.gitlabUrl);
         }
         return gitlab;
     }
 
     public Github getGithub() {
         if (github == null) {
-            github = new Github(config.githubConfig.githubUrl, config.githubConfig.githubGraphqlUrl, config.username);
+            github = new Github(config.githubConfig.githubUrl, config.githubConfig.githubGraphqlUrl);
         }
         return github;
     }
 
     public RuntimeException getReviewBoardException() {
         return reviewBoardException;
+    }
+
+    private String determineUsername(String overrideValue) {
+        return firstNonEmpty(overrideValue, config.username);
     }
 
 }

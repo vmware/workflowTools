@@ -80,6 +80,9 @@ public class BuildwebConfig {
     @ConfigurableProperty(commandLine = "--use-git-tracking-branch", help = "Use git tracking branch as tracking branch for review")
     public boolean useGitTrackingBranch;
 
+    @ConfigurableProperty(commandLine = "--buildweb-username", help = "Username to use for buildweb if not using the default username")
+    public String buildwebUsername;
+
     public CalculatedProperty determineBuildwebBranch() {
         if (StringUtils.isNotBlank(buildwebBranch)) {
             return new CalculatedProperty(buildwebBranch, "buildwebBranch");

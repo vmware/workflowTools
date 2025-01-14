@@ -21,6 +21,7 @@ import java.io.File;
 public abstract class AbstractService {
 
     private final static int MAX_LOGIN_RETRIES = 3;
+    protected final static String NULL_USERNAME = null;
 
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 

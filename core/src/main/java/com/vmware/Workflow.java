@@ -167,7 +167,7 @@ public class Workflow {
         }
         if (daysOld >= config.updateCheckInterval) {
             GithubConfig internalConfig = configParser.readInternalConfig().githubConfig;
-            ReleaseAsset[] releaseAssets = new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl, config.username)
+            ReleaseAsset[] releaseAssets = new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl)
                     .getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
             if (releaseAssets != null && releaseAssets.length > 0) {
                 ReleaseAsset asset = releaseAssets[0];

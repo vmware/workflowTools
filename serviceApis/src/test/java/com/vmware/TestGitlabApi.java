@@ -25,8 +25,7 @@ public class TestGitlabApi extends BaseTests {
     @Before
     public void init() {
         String url = testProperties.getProperty("gitlab.url");
-        username = testProperties.getProperty("gitlab.username");
-        gitlab = new Gitlab(url, username);
+        gitlab = new Gitlab(url);
     }
 
     @Test
