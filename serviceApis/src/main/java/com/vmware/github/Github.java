@@ -2,14 +2,12 @@ package com.vmware.github;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import com.google.gson.FieldNamingPolicy;
 import com.vmware.AbstractRestService;
@@ -24,8 +22,6 @@ import com.vmware.github.domain.PullRequestUpdateBranchResponse;
 import com.vmware.github.domain.ReleaseAsset;
 import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.RequestedReviewers;
-import com.vmware.github.domain.Review;
-import com.vmware.github.domain.ReviewThread;
 import com.vmware.github.domain.Team;
 import com.vmware.github.domain.User;
 import com.vmware.http.HttpConnection;
@@ -46,14 +42,20 @@ public class Github extends AbstractRestService {
     private final String graphqlUrl;
 
     public Github(String baseUrl, String graphqlUrl) {
+        this(baseUrl, graphqlUrl, true);
+    }
+
+    public Github(String baseUrl, String graphqlUrl, boolean loadApiToken) {
         super(baseUrl, "", ApiAuthentication.github_token, NULL_USERNAME);
         this.graphqlUrl = graphqlUrl;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss")
                         .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
-        String apiToken = readExistingApiToken(ApiAuthentication.github_token);
-        if (StringUtils.isNotBlank(apiToken)) {
-            connection.addStatefulParam(RequestHeader.aBearerAuthHeader(apiToken));
+        if (loadApiToken) {
+            String apiToken = readExistingApiToken(ApiAuthentication.github_token);
+            if (StringUtils.isNotBlank(apiToken)) {
+                connection.addStatefulParam(RequestHeader.aBearerAuthHeader(apiToken));
+            }
         }
     }
 
@@ -81,14 +83,6 @@ public class Github extends AbstractRestService {
         PullRequest[] pullRequests = get(pullRequestsUrl(ownerName, repoName), PullRequest[].class,
                 new UrlParam("head", ownerName + ":" + sourceBranch));
         return Optional.ofNullable(pullRequests.length > 0 ? pullRequests[0] : null);
-    }
-
-    public List<Review> getApprovedReviewsForPullRequest(PullRequest pullRequest) {
-        return Arrays.stream(getReviewsForPullRequest(pullRequest)).filter(Review::isApproved).collect(Collectors.toList());
-    }
-
-    public Review[] getReviewsForPullRequest(PullRequest pullRequest) {
-        return get(pullRequestUrl(pullRequest) + "/reviews", Review[].class);
     }
 
     public GraphqlResponse.PullRequestNode getPullRequestViaGraphql(PullRequest pullRequest) {
@@ -126,22 +120,28 @@ public class Github extends AbstractRestService {
                 pullRequest, Collections.emptyList());
     }
 
-    public void updatePullRequestDraftState(PullRequest pullRequest, boolean isDraft) {
-        log.info("Marking pull request {} as {}", pullRequest.number, isDraft ? "draft" : "ready");
-        String graphqlText = new ClasspathResource("/githubDraftPullRequestGraphql.txt", this.getClass()).getText();
-        String mutationName = isDraft ? "convertPullRequestToDraft" : "markPullRequestReadyForReview";
-        GraphqlRequest request = new GraphqlRequest();
-
-        request.query = graphqlText.replace("${mutationName}", mutationName).replace("${pullRequestId}", pullRequest.nodeId);
-        Map<String, Map<String, Map<String, Map<String, Object>>>> response = post(graphqlUrl, Map.class, request);
-
-        GraphqlResponse.PullRequestNode updatedPullRequest = new MapObjectConverter()
-                .fromMap(response.get("data").get(mutationName).get("pullRequest"), GraphqlResponse.PullRequestNode.class);
-        if (updatedPullRequest.number != pullRequest.number) {
-            throw new FatalException("Wrong pull request {} was updated", updatedPullRequest.number);
+    public void closePullRequest(PullRequest pullRequest) {
+        GraphqlResponse.PullRequestNode updatedPullRequest = executePullRequestGraphql(pullRequest, "closePullRequest");
+        if (!updatedPullRequest.closed) {
+            throw new FatalException("Failed to close pull request {}", pullRequest.number);
         }
-        if (updatedPullRequest.isDraft != isDraft) {
-            throw new FatalException("Pull request {} draft status was not set to {}", updatedPullRequest.number, isDraft);
+    }
+
+    public void markPullRequestAsDraft(PullRequest pullRequest) {
+        log.info("Marking pull request {} as a draft", pullRequest.number);
+
+        GraphqlResponse.PullRequestNode updatedPullRequest = executePullRequestGraphql(pullRequest, "convertPullRequestToDraft");
+        if (!updatedPullRequest.isDraft) {
+            throw new FatalException("Pull request {} draft status was not marked as a draft", updatedPullRequest.number);
+        }
+    }
+
+    public void markPullRequestAsReadyForReview(PullRequest pullRequest) {
+        log.info("Marking pull request {} as ready for review", pullRequest.number);
+
+        GraphqlResponse.PullRequestNode updatedPullRequest = executePullRequestGraphql(pullRequest, "markPullRequestReadyForReview");
+        if (updatedPullRequest.isDraft) {
+            throw new FatalException("Pull request {} draft status was not marked as ready for review", updatedPullRequest.number);
         }
     }
 
@@ -191,6 +191,19 @@ public class Github extends AbstractRestService {
         return super.determineApiTokenFile(apiAuthentication);
     }
 
+    private GraphqlResponse.PullRequestNode executePullRequestGraphql(PullRequest pullRequest, String mutationName) {
+        String graphqlText = new ClasspathResource("/githubMutatePullRequestGraphql.txt", this.getClass()).getText();
+        String query = graphqlText.replace("${mutationName}", mutationName).replace("${pullRequestId}", pullRequest.nodeId);
+        Map<String, Map<String, Map<String, Map<String, Object>>>> response = post(graphqlUrl, Map.class, new GraphqlRequest(query));
+
+        GraphqlResponse.PullRequestNode updatedPullRequest = new MapObjectConverter()
+                .fromMap(response.get("data").get(mutationName).get("pullRequest"), GraphqlResponse.PullRequestNode.class);
+        if (updatedPullRequest.number != pullRequest.number) {
+            throw new FatalException("Wrong pull request {} was updated", updatedPullRequest.number);
+        }
+        return updatedPullRequest;
+    }
+
     private RequestedReviewers generateReviewers(Set<AutocompleteUser> users) {
         RequestedReviewers requestedReviewers = new RequestedReviewers();
         requestedReviewers.reviewers = users.stream().filter(user -> user instanceof User)
@@ -205,7 +218,7 @@ public class Github extends AbstractRestService {
     }
 
     private String pullRequestUrl(String ownerName, String repoName, long pullNumber) {
-        return repoUrl(ownerName, repoName) + "/pulls" + "/" + pullNumber;
+        return UrlUtils.addRelativePaths(repoUrl(ownerName, repoName), "pulls", pullNumber);
     }
 
     private String pullRequestsUrl(String ownerName, String repoName) {

@@ -47,9 +47,17 @@ public class GraphqlResponse {
         public PullRequestReviewDecision reviewDecision;
         @SerializedName("reviewThreads")
         public ReviewThreadNodes reviewThreads;
+        @SerializedName("reviews")
+        public ReviewNodes approvedReviews;
+
         public double number;
         @SerializedName("isDraft")
         public boolean isDraft;
+        public boolean closed;
+
+        public List<String> approvers() {
+            return Arrays.stream(approvedReviews.nodes).map(node -> node.author.login).collect(Collectors.toList());
+        }
     }
 
     public static class UserNode {

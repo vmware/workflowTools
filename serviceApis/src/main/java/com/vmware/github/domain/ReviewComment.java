@@ -16,8 +16,4 @@ public class ReviewComment {
     public Date getCreatedAt() {
         return createdAt;
     }
-
-    public class Actor {
-        public String login;
-    }
 }

@@ -15,6 +15,6 @@ public class ConvertPullRequestToDraft extends BaseCommitWithPullRequestAction {
     public void process() {
         PullRequest pullRequest = draft.getGithubPullRequest();
         skipActionIfTrue(pullRequest.draft, "pull request is a draft");
-        github.updatePullRequestDraftState(pullRequest, true);
+        github.markPullRequestAsDraft(pullRequest);
     }
 }

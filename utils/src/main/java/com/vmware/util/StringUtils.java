@@ -134,7 +134,7 @@ public class StringUtils {
             return value;
         }
         String newValue = value.substring(0, maxLength -3) + "...";
-        log.debug("Truncating string \n{}\nto\n{}", value, newValue);
+        log.trace("Truncating string \n{}\nto\n{}", value, newValue);
         return newValue;
     }
 

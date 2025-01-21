@@ -3,8 +3,11 @@ package com.vmware.action.github;
 import com.vmware.action.base.BaseCommitWithPullRequestAction;
 import com.vmware.config.ActionDescription;
 import com.vmware.config.WorkflowConfig;
+import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.Review;
+import com.vmware.github.domain.ReviewNode;
+import com.vmware.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,12 +21,13 @@ public class CheckStatusOfPullRequestApprovals extends BaseCommitWithPullRequest
     @Override
     public void process() {
         PullRequest pullRequest = draft.getGithubPullRequest();
-        List<Review> approvedReviews = github.getApprovedReviewsForPullRequest(pullRequest);
-        if (approvedReviews.isEmpty()) {
+        GraphqlResponse.PullRequestNode pullRequestNode = github.getPullRequestViaGraphql(pullRequest);
+        log.info("Pull request approval status: {}", pullRequestNode.reviewDecision);
+        List<String> approvers = pullRequestNode.approvers();
+        if (approvers.isEmpty()) {
             log.info("Not approved by any reviewers yet");
         } else {
-            String approvedReviewers = approvedReviews.stream().map(review -> review.user.login).collect(Collectors.joining(","));
-            log.info("Pull request {} approved by {}", pullRequest.number, approvedReviewers);
+            log.info("Pull request {} approved by {}", pullRequest.number, StringUtils.join(approvers));
         }
     }
 }

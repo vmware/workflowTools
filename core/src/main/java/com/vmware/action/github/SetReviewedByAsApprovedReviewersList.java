@@ -32,12 +32,12 @@ public class SetReviewedByAsApprovedReviewersList extends BaseCommitWithPullRequ
         }
 
         PullRequest pullRequest = draft.getGithubPullRequest();
-        List<Review> approvedReviews = github.getApprovedReviewsForPullRequest(pullRequest);
-        if (approvedReviews.isEmpty()) {
+        List<String> approvers = github.getPullRequestViaGraphql(pullRequest).approvers();
+        if (approvers.isEmpty()) {
             log.info("No approved reviews found for pull request");
             return;
         }
 
-        draft.reviewedBy = approvedReviews.stream().map(approvalUser -> approvalUser.user.login).collect(Collectors.joining(","));
+        draft.reviewedBy = StringUtils.join(approvers);
     }
 }

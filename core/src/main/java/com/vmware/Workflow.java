@@ -139,16 +139,18 @@ public class Workflow {
         if (config.scriptMode) {
             return;
         }
+        log.debug("Update check interval: {}, github release path {}", config.updateCheckInterval, config.githubConfig.workflowGithubReleasePath);
         if (config.updateCheckInterval < 0 || StringUtils.isEmpty(config.githubConfig.workflowGithubReleasePath)) {
             return;
         }
 
         String jarFilePath = System.getProperty(WORKFLOW_JAR);
-        log.debug("Loaded Workflow Jar Path {}", jarFilePath);
         if (StringUtils.isEmpty(jarFilePath)) {
+            log.debug("No value set for system property {}", WORKFLOW_JAR);
             return;
         }
         File workflowJarFile = new File(jarFilePath);
+        log.debug("Loaded Workflow Jar Path {}, exists {}", jarFilePath, workflowJarFile.exists());
         if (!workflowJarFile.exists()) {
             return;
         }
@@ -167,7 +169,7 @@ public class Workflow {
         }
         if (daysOld >= config.updateCheckInterval) {
             GithubConfig internalConfig = configParser.readInternalConfig().githubConfig;
-            ReleaseAsset[] releaseAssets = new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl)
+            ReleaseAsset[] releaseAssets = new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl, false)
                     .getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
             if (releaseAssets != null && releaseAssets.length > 0) {
                 ReleaseAsset asset = releaseAssets[0];

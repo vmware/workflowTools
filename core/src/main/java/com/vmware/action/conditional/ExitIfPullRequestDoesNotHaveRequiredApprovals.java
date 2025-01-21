@@ -6,8 +6,10 @@ import com.vmware.config.WorkflowConfig;
 import com.vmware.github.domain.GraphqlResponse;
 import com.vmware.github.domain.PullRequest;
 import com.vmware.github.domain.Review;
+import com.vmware.github.domain.ReviewNode;
 import com.vmware.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,12 +31,12 @@ public class ExitIfPullRequestDoesNotHaveRequiredApprovals extends BaseCommitWit
             return;
         }
         PullRequest pullRequest = draft.getGithubPullRequest();
-        List<Review> approvedReviews = github.getApprovedReviewsForPullRequest(pullRequest);
-        if (approvedReviews.isEmpty()) {
+        GraphqlResponse.PullRequestNode pullRequestNode = github.getPullRequestViaGraphql(pullRequest);
+        List<String> approvers = pullRequestNode.approvers();
+        if (approvers.isEmpty()) {
             cancelWithMessage("no approved reviews found for pull request {}", pullRequest.htmlUrl);
         } else {
-            draft.shipItReviewers = approvedReviews.stream().map(review -> review.user.login).collect(Collectors.joining(","));
-            GraphqlResponse.PullRequestNode pullRequestNode = github.getPullRequestViaGraphql(pullRequest);
+            draft.shipItReviewers = StringUtils.join(approvers);
             if (pullRequestNode.reviewDecision == GraphqlResponse.PullRequestReviewDecision.REVIEW_REQUIRED) {
                 cancelWithMessage("still need more approvals, already approved by {}", draft.shipItReviewers);
             }

@@ -168,13 +168,12 @@ public class ReviewBoard extends AbstractRestService {
         }
     }
 
-    public ReviewRequestDraft updateReviewRequestDraft(Link draftLink, ReviewRequestDraft draft) {
+    public void updateReviewRequestDraft(Link draftLink, ReviewRequestDraft draft) {
         String existingTestingDone = draft.testingDone;
         draft.testingDone = draft.fullTestingDoneSectionWithoutJobResults();
 
-        ReviewRequestDraft updatedDraft = connection.put(draftLink.getHref(), ReviewRequestDraftResponse.class, draft).draft;
+        connection.put(draftLink.getHref(), ReviewRequestDraftResponse.class, draft);
         draft.testingDone = existingTestingDone;
-        return updatedDraft;
     }
 
     public void publishReview(Link draftLink, String changeDescription, boolean trivial) {

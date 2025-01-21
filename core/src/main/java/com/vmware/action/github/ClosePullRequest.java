@@ -15,8 +15,6 @@ public class ClosePullRequest extends BaseCommitWithPullRequestAction {
     @Override
     public void process() {
         log.info("Closing pull request {}", draft.requestUrl);
-        PullRequestForUpdate pullRequest = draft.getGithubPullRequest().pullRequestForUpdate();
-        pullRequest.state = "closed";
-        github.updatePullRequest(pullRequest);
+        github.closePullRequest(draft.getGithubPullRequest());
     }
 }
