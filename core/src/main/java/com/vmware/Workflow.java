@@ -172,12 +172,12 @@ public class Workflow {
             if (releaseAssets != null && releaseAssets.length > 0) {
                 ReleaseAsset asset = releaseAssets[0];
                 if (asset.updatedAt.getTime() > workflowJarFile.lastModified()) {
-                    log.warn("workflow jar {} is {} days old and a new version exists. It is recommended to run workflow --update to update it",
+                    log.warn("Workflow jar {} is {} days old and a new version exists. It is recommended to run workflow --update to update it",
                             jarFilePath, daysOld);
                     log.debug("Marking as read only so that it can be inferred that it needs to be updated");
                     log.debug("Read only: " + workflowJarFile.setReadOnly());
                 } else {
-                    log.debug("workflow jar {} is older than {} days. Last new version was on {} so updating is not needed", jarFilePath, daysOld, asset.updatedAt);
+                    log.debug("Workflow jar {} is older than {} days. Last new version was on {} so updating is not needed", jarFilePath, daysOld, asset.updatedAt);
                     log.debug("Updated last modified time: {}", workflowJarFile.setLastModified(new Date().getTime()));
                 }
             }
@@ -189,10 +189,10 @@ public class Workflow {
     private ReleaseAsset[] getReleaseAssets() {
         GithubConfig internalConfig = configParser.readInternalConfig().githubConfig;
         try {
-            return new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl, false)
+            return new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl)
                     .getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
-        } catch (Exception e) {
-            log.debug("Failed to load release assets {}, skipping auto update", e.getMessage());
+        } catch (ApiException ae) {
+            log.debug("Failed to load release assets due to response code {}, skipping auto update", ae.getStatusCode());
             return null;
         }
     }

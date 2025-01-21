@@ -136,7 +136,7 @@ public abstract class AbstractService {
         String homeFolder = System.getProperty("user.home");
         File apiTokenFile = new File(homeFolder + "/" + apiAuthentication.getFileName());
         if (!apiTokenFile.exists()) {
-            log.debug("Api token file {} does not exist", apiTokenFile.getPath());
+            log.debug("Default api token file {} does not exist", apiTokenFile.getPath());
         }
         return apiTokenFile;
     }

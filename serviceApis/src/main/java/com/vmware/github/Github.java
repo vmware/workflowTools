@@ -42,20 +42,15 @@ public class Github extends AbstractRestService {
     private final String graphqlUrl;
 
     public Github(String baseUrl, String graphqlUrl) {
-        this(baseUrl, graphqlUrl, true);
-    }
-
-    public Github(String baseUrl, String graphqlUrl, boolean loadApiToken) {
         super(baseUrl, "", ApiAuthentication.github_token, NULL_USERNAME);
         this.graphqlUrl = graphqlUrl;
         this.connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity,
                 new ConfiguredGsonBuilder(TimeZone.getDefault(), "yyyy-MM-dd'T'HH:mm:ss")
                         .namingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).build());
-        if (loadApiToken) {
-            String apiToken = readExistingApiToken(ApiAuthentication.github_token);
-            if (StringUtils.isNotBlank(apiToken)) {
-                connection.addStatefulParam(RequestHeader.aBearerAuthHeader(apiToken));
-            }
+
+        String apiToken = readExistingApiToken(ApiAuthentication.github_token);
+        if (StringUtils.isNotBlank(apiToken)) {
+            connection.addStatefulParam(RequestHeader.aBearerAuthHeader(apiToken));
         }
     }
 
@@ -186,7 +181,7 @@ public class Github extends AbstractRestService {
         if (apiHostTokenFile.exists()) {
             return apiHostTokenFile;
         } else {
-            log.debug("Api token file {} does not exist", apiHostTokenFile.getPath());
+            log.debug("Host api token file {} does not exist", apiHostTokenFile.getPath());
         }
         return super.determineApiTokenFile(apiAuthentication);
     }
