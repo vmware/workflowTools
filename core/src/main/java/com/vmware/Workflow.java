@@ -162,15 +162,13 @@ public class Workflow {
                     jarFilePath, daysOld);
             return;
         } else if (!workflowJarFile.canWrite()) {
-            log.debug("Marking jar file {} as writable as it is only {} days old",
-                    workflowJarFile.getAbsolutePath(), daysOld);
+            log.debug("Marking jar file {} as writable to prevent auto update as it is only {} days old", workflowJarFile.getAbsolutePath(), daysOld);
             log.debug("Writable: {}", workflowJarFile.setWritable(true));
             return;
         }
         if (daysOld >= config.updateCheckInterval) {
-            GithubConfig internalConfig = configParser.readInternalConfig().githubConfig;
-            ReleaseAsset[] releaseAssets = new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl, false)
-                    .getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
+            ReleaseAsset[] releaseAssets = getReleaseAssets();
+
             if (releaseAssets != null && releaseAssets.length > 0) {
                 ReleaseAsset asset = releaseAssets[0];
                 if (asset.updatedAt.getTime() > workflowJarFile.lastModified()) {
@@ -185,6 +183,17 @@ public class Workflow {
             }
         } else {
             log.debug("Not checking for update to workflow jar {} as it is only {} days old, checking after {} days", jarFilePath, daysOld, config.updateCheckInterval);
+        }
+    }
+
+    private ReleaseAsset[] getReleaseAssets() {
+        GithubConfig internalConfig = configParser.readInternalConfig().githubConfig;
+        try {
+            return new Github(internalConfig.githubUrl, internalConfig.githubGraphqlUrl, false)
+                    .getReleaseAssets(config.githubConfig.workflowGithubReleasePath);
+        } catch (Exception e) {
+            log.debug("Failed to load release assets {}, skipping auto update", e.getMessage());
+            return null;
         }
     }
 

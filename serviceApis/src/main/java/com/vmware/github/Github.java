@@ -160,7 +160,7 @@ public class Github extends AbstractRestService {
     }
 
     public ReleaseAsset[] getReleaseAssets(String releasePath) {
-        return get(UrlUtils.addRelativePaths(apiUrl, releasePath, "assets"), ReleaseAsset[].class);
+        return connection.get(UrlUtils.addRelativePaths(apiUrl, releasePath, "assets"), ReleaseAsset[].class);
     }
 
     @Override
