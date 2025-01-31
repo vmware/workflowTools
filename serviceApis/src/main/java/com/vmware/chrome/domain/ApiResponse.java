@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 
 public class ApiResponse {
+    public ApiRequest sourceRequest;
+
     public int id;
 
     public String method;
@@ -46,6 +48,18 @@ public class ApiResponse {
 
     public boolean matchesUrl(String url) {
         return getValue() != null && (getValue().equalsIgnoreCase(url) || getValue().matches(url));
+    }
+
+    public boolean hasObjectId() {
+        return getValueMap().get("objectId") != null;
+    }
+
+    public boolean matchesRequestSource(String source) {
+        return sourceRequest.getSource() != null && sourceRequest.getSource().equalsIgnoreCase(source);
+    }
+
+    public String getRequestExpression() {
+        return sourceRequest.getExpression();
     }
 
     private Map getValueMap() {

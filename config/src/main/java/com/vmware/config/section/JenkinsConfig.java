@@ -136,6 +136,9 @@ public class JenkinsConfig {
     @ConfigurableProperty(help = "Regex pattern to match after config methods if they ran at the same time as say skipped methods")
     public String afterConfigMethodPattern;
 
+    @ConfigurableProperty(commandLine = "--jenkins-username", help = "Username for Jenkins if not using the default username")
+    public String jenkinsUsername;
+
     public boolean hasConfiguredArtifact() {
         return hasConfiguredArtifactWithoutBuildNumber() && jobBuildNumber != null;
     }

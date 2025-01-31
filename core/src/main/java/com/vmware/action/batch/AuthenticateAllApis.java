@@ -14,6 +14,8 @@ import com.vmware.trello.Trello;
 import com.vmware.util.StringUtils;
 import com.vmware.vcd.Vcd;
 
+import static com.vmware.util.StringUtils.firstNonEmpty;
+
 @ActionDescription("Ensures that all apis have a valid token / cookie. Primarily for testing.")
 public class AuthenticateAllApis extends BaseAction {
 
@@ -26,15 +28,14 @@ public class AuthenticateAllApis extends BaseAction {
         checkAuthentication(new Gitlab(gitlabConfig.gitlabUrl));
         String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
         checkAuthentication(new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, vcdConfig.vcdApiVersion, vcdConfig.defaultVcdOrg, vcdConfig.vcdSso,
-                ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig));
+                ssoEmail, vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, vcdConfig.vcdSsoButtonId, ssoConfig));
 
         ApiAuthentication reviewBoardCredentialsType = config.reviewBoardConfig.useRbApiToken ? ApiAuthentication.reviewBoard_token : ApiAuthentication.reviewBoard_cookie;
-        String rbUsername = StringUtils.isNotBlank(reviewBoardConfig.rbUsername) ? reviewBoardConfig.rbUsername : config.username;
-        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, rbUsername, reviewBoardCredentialsType));
-        checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, config.username, bugzillaConfig.bugzillaTestBug, bugzillaConfig.bugzillaSso, ssoConfig, bugzillaConfig.bugzillaSsoLoginId));
-        checkAuthentication(new Jira(jiraConfig.jiraUrl, config.username, jiraConfig.jiraCustomFieldNames));
-        checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides));
-        checkAuthentication(new Trello(trelloConfig.trelloUrl, config.username, trelloConfig.trelloSso, ssoEmail, ssoConfig));
+        checkAuthentication(new ReviewBoard(reviewBoardConfig.reviewboardUrl, determineUsername(reviewBoardConfig.rbUsername), reviewBoardCredentialsType));
+        checkAuthentication(new Bugzilla(bugzillaConfig.bugzillaUrl, determineUsername(bugzillaConfig.bugzillaUsername), bugzillaConfig.bugzillaTestBug, bugzillaConfig.bugzillaSso, ssoConfig, bugzillaConfig.bugzillaSsoLoginId));
+        checkAuthentication(new Jira(jiraConfig.jiraUrl, determineUsername(jiraConfig.jiraUsername), jiraConfig.jiraCustomFieldNames));
+        checkAuthentication(new Jenkins(jenkinsConfig.jenkinsUrl, determineUsername(jenkinsConfig.jenkinsUsername), jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides));
+        checkAuthentication(new Trello(trelloConfig.trelloUrl, determineUsername(trelloConfig.trelloUsername), trelloConfig.trelloSso, ssoEmail, ssoConfig));
     }
 
     private void checkAuthentication(AbstractService restService) {
@@ -45,5 +46,9 @@ public class AuthenticateAllApis extends BaseAction {
         log.info("Checking authentication for service {}", serviceName);
         restService.setupAuthenticatedConnection();
         log.info("Finished checking authentication for service {}", serviceName);
+    }
+
+    private String determineUsername(String overrideValue) {
+        return firstNonEmpty(overrideValue, config.username);
     }
 }

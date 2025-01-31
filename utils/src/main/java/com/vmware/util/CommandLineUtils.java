@@ -75,7 +75,10 @@ public class CommandLineUtils {
 
     public static String executeCommand(File workingDirectory, Map<String, String> environmentVariables,
                                         String command, String inputText, boolean logResultOnly, LogLevel logLevel) {
+        Padder titlePadder = new Padder(command);
         if (!logLevel.isDebug()) {
+            dynamicLogger.log(logLevel, "Executing command {}", command);
+        } else if (command.length() > titlePadder.getMaxTitleLength()) {
             dynamicLogger.log(logLevel, "Executing command {}", command);
         }
         ProcessBuilder builder = new ProcessBuilder(splitCommand(command)).directory(workingDirectory)
@@ -84,7 +87,6 @@ public class CommandLineUtils {
             builder.environment().putAll(environmentVariables);
         }
         StopwatchUtils.Stopwatch stopwatch = StopwatchUtils.start();
-        Padder titlePadder = new Padder(command);
         if (!logResultOnly) {
             titlePadder.logTitle(logLevel);
         }

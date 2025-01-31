@@ -45,28 +45,35 @@ public class SsoClient {
         return loginAndGetApiToken(loggedInCheck, siteLoginUrl, ssoLoginButtonId, ssoNavigateConsumer, authenticationTokenFunction);
     }
 
-    public String loginAndGetApiToken(Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck, String siteLoginUrl, String ssoLoginButtonId, Consumer<ChromeDevTools> ssoNavigateConsumer,
+    public String loginAndGetApiToken(Map.Entry<ApiRequest, Predicate<ApiResponse>> loggedInCheck, String siteLoginUrl, String ssoInitButtonId, Consumer<ChromeDevTools> ssoNavigateConsumer,
                                       Function<ChromeDevTools, String> authenticationTokenFunction) {
         ChromeDevTools devTools = ChromeDevTools.devTools(ssoConfig.chromePath, ssoConfig.ssoHeadless, ssoConfig.chromeDebugPort);
         devTools.sendMessage(new ApiRequest("Page.enable"));
         devTools.sendMessage(ApiRequest.navigate(siteLoginUrl));
         devTools.waitForDomContentEvent();
         ThreadUtils.sleep(2, TimeUnit.SECONDS);
-        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoLoginButtonId, ssoConfig.ssoSignInButtonId);
+        ApiResponse response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoInitButtonId, ssoConfig.ssoSignInButtonId);
 
-        if (response.matchesElementId(ssoLoginButtonId)) {
-            log.info("Clicking SSO sign in element {}", ssoLoginButtonId);
-            devTools.clickById(ssoLoginButtonId);
+        if (response.matchesRequestSource(ssoInitButtonId)) {
+            log.info("Clicking element {} for starting SSO", ssoInitButtonId);
+            devTools.clickByLocator(ssoInitButtonId);
             ssoNavigateConsumer.accept(devTools);
-            response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoConfig.ssoSignInButtonId, "userNameFormSubmit");
+            response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoConfig.ssoSignInButtonId, ssoConfig.emailAddressSubmitButtonId, ssoConfig.ssoExternalAuthButtonId);
 
-            if (response.matchesElementId("userNameFormSubmit")) {
+            if (response.matchesRequestSource(ssoConfig.ssoExternalAuthButtonId)) {
+                log.info("Clicking element {} to use external auth for SSO", ssoConfig.ssoExternalAuthButtonId);
+                devTools.clickByLocator(response.getRequestExpression());
+                devTools.waitForDomContentEvent();
+                response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoConfig.emailAddressSubmitButtonId);
+            }
+
+            if (response.matchesRequestSource(ssoConfig.emailAddressSubmitButtonId)) {
                 if (StringUtils.isEmpty(email)) {
                     throw new FatalException("No email specified for sso, specify --sso-email property or set a value for git user.email");
                 }
                 log.info("Using email {} for SSO", email);
-                devTools.setValueById(ssoConfig.emailAddressInputId, email);
-                devTools.clickById(ssoConfig.emailAddressSubmitButtonId);
+                devTools.setValueByLocator(response.getRequestExpression(), email);
+                devTools.clickByLocator(ssoConfig.emailAddressSubmitButtonId);
                 devTools.waitForDomContentEvent();
                 response = waitForSiteUrlOrSignInElements(devTools, loggedInCheck, ssoConfig.ssoSignInButtonId);
             }
@@ -93,20 +100,20 @@ public class SsoClient {
                                                 Function<ChromeDevTools, String> apiAuthenticationFunction, ChromeDevTools devTools, int retry) {
         devTools.waitForAnyElementId(ssoConfig.ssoUsernameInputId);
 
-        String passwordId = devTools.waitForAnyElementId(ssoConfig.ssoPasswordInputId, ssoConfig.ssoPasscodeInputId);
-        if (passwordId.equals(ssoConfig.ssoPasscodeInputId)) {
+        ApiResponse passwordIdResponse = devTools.waitForAnyElementId(ssoConfig.ssoPasswordInputId, ssoConfig.ssoPasscodeInputId);
+        if (passwordIdResponse.matchesRequestSource(ssoConfig.ssoPasscodeInputId)) {
             UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.vcd_token, username,
                     "RSA Passcode");
-            devTools.setValueById(ssoConfig.ssoUsernameInputId, credentials.getUsername());
-            devTools.setValueById(ssoConfig.ssoPasscodeInputId, credentials.getPassword());
+            devTools.setValueByLocator(ssoConfig.ssoUsernameInputId, credentials.getUsername());
+            devTools.setValueByLocator(ssoConfig.ssoPasscodeInputId, credentials.getPassword());
         } else {
             UsernamePasswordCredentials credentials = UsernamePasswordAsker.askUserForUsernameAndPassword(ApiAuthentication.vcd_token, username);
             devTools.setValueById(ssoConfig.ssoUsernameInputId, credentials.getUsername());
             devTools.setValueById(ssoConfig.ssoPasswordInputId, credentials.getPassword());
         }
 
-        String signInButtonId = devTools.waitForAnyElementId(ssoConfig.ssoSignInButtonId, ssoConfig.ssoPasscodeSignInButtonId);
-        devTools.clickById(signInButtonId);
+        ApiResponse signInButtonResponse = devTools.waitForAnyElementId(ssoConfig.ssoSignInButtonId, ssoConfig.ssoPasscodeSignInButtonId);
+        devTools.clickByLocator(signInButtonResponse.getRequestExpression());
         List<String> elementsToClickAfterPasscodeSubmit = new ArrayList<>(Arrays.asList(ssoConfig.elementsToClickAfterSignIn));
         List<String> elementsToCheck = new ArrayList<>(elementsToClickAfterPasscodeSubmit);
         elementsToCheck.addAll(Arrays.asList(ssoConfig.ssoSignInButtonId, ssoConfig.ssoPasscodeSignInButtonId));
@@ -146,6 +153,8 @@ public class SsoClient {
         elementIds.stream().filter(Objects::nonNull).forEach(elementId -> {
             signInButtonOrLoggedInCheckMap.put(ApiRequest.elementById(elementId),
                     response -> response.matchesElementId(elementId));
+            signInButtonOrLoggedInCheckMap.put(ApiRequest.elementByXpath(elementId),
+                    ApiResponse::hasObjectId);
         });
         signInButtonOrLoggedInCheckMap.put(loggedInCheck.getKey(), loggedInCheck.getValue());
 

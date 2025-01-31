@@ -17,6 +17,7 @@ public class Padder {
     private static final int MIN_PADDING_LENGTH = 2;
 
     private final String title;
+    private final int maxTitleLength;
     private final String padding;
     private boolean isFirstExecution = true;
 
@@ -30,7 +31,8 @@ public class Padder {
             fullTitle = fullTitle.replaceFirst("\\{}", String.valueOf(arg));
         }
 
-        this.title = StringUtils.truncateStringIfNeeded(fullTitle, paddingLength - (TITLE_SPACING_LENGTH + MIN_PADDING_LENGTH));
+        this.maxTitleLength = paddingLength - (TITLE_SPACING_LENGTH + MIN_PADDING_LENGTH);
+        this.title = StringUtils.truncateStringIfNeeded(fullTitle, maxTitleLength);
         int paddingCount = (paddingLength - (title.length() + TITLE_SPACING_LENGTH)) / 2;
         this.padding = StringUtils.repeat(paddingCount, "*");
     }
@@ -64,5 +66,9 @@ public class Padder {
 
     public String getTitle() {
         return title;
+    }
+
+    public int getMaxTitleLength() {
+        return maxTitleLength;
     }
 }

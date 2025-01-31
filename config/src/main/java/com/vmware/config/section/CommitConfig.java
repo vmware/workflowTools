@@ -150,7 +150,7 @@ public class CommitConfig {
         appendLabelToPattern(builder, mergeToLabel);
         appendLabelToPattern(builder, approvedByLabel);
         appendLabelToPattern(builder, pipelineLabel);
-        appendLabelToPattern(builder, "\\s+\\d+\\s+ file\\w*\\s+changed");
+        appendLabelToPattern(builder, "\\s+\\d+\\s+file\\w*\\s+changed");
         builder.append("($))");
         return builder.toString();
     }

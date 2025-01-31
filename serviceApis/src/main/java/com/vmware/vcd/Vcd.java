@@ -60,7 +60,6 @@ import static com.vmware.http.request.UrlParam.forceParam;
  */
 public class Vcd extends AbstractRestService {
     public static final String ACCESS_TOKEN_HEADER = "X-VMWARE-VCLOUD-ACCESS-TOKEN";
-    private static final String SSO_LOGIN_BUTTON = "ssoLoginButton";
     private final String apiVersion;
     private final String cloudapiUrl;
     private final String oauthUrl;
@@ -68,6 +67,7 @@ public class Vcd extends AbstractRestService {
     private final String ssoEmail;
     private String refreshTokenName;
     private boolean disableRefreshToken;
+    private String vcdSsoButtonId;
     private boolean useSiteSpecificToken;
     private final SsoConfig ssoConfig;
     private String vcdOrg;
@@ -89,12 +89,13 @@ public class Vcd extends AbstractRestService {
         connection.addStatefulParam(aBearerAuthHeader(apiToken));
     }
 
-    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoEmail, String refreshTokenName, boolean disableRefreshToken, boolean ssoHeadless, SsoConfig ssoConfig) {
+    public Vcd(String vcdUrl, String apiVersion, String username, String vcdOrg, boolean useVcdSso, String ssoEmail, String refreshTokenName, boolean disableRefreshToken, String vcdSsoButtonId, SsoConfig ssoConfig) {
         super(vcdUrl, "api", ApiAuthentication.vcd_token, username);
         this.useVcdSso = useVcdSso;
         this.ssoEmail = ssoEmail;
         this.refreshTokenName = refreshTokenName;
         this.disableRefreshToken = disableRefreshToken;
+        this.vcdSsoButtonId = vcdSsoButtonId;
         this.cloudapiUrl = baseUrl + "cloudapi/1.0.0";
         this.oauthUrl = baseUrl + "oauth/tenant";
         this.apiVersion = apiVersion;
@@ -234,7 +235,7 @@ public class Vcd extends AbstractRestService {
         }
         HttpResponse sessionResponse = get(cloudapiUrl + "/sessions/current", HttpResponse.class, acceptHeader(UserSession.class));
         if (!sessionResponse.containsLink("add", "OAuthToken")) {
-            log.info("Logged in user doesn't have link for rel add with model OAuthToken");
+            log.info("Logged in user cannot create refresh token as it doesn't have the add link for the model OAuthToken");
             return;
         }
 
@@ -295,7 +296,7 @@ public class Vcd extends AbstractRestService {
             try {
                 Consumer<ChromeDevTools> ssoNavigateFunction = ChromeDevTools::waitForDomContentEvent;
                 String siteUrl = UrlUtils.addRelativePaths(baseUrl, "tenant", vcdOrg.toLowerCase(), "vdcs");
-                apiToken = client.loginAndGetApiToken(siteUrl, siteUrl, SSO_LOGIN_BUTTON,
+                apiToken = client.loginAndGetApiToken(siteUrl, siteUrl, vcdSsoButtonId,
                         ssoNavigateFunction, (devTools) -> devTools.getValue("this.localStorage.getItem('jwt')"));
             } catch (RuntimeException e) {
                 log.debug(String.valueOf(e.getMessage()), e);
@@ -332,7 +333,7 @@ public class Vcd extends AbstractRestService {
     protected File determineApiTokenFile(ApiAuthentication apiAuthentication) {
         String homeFolder = System.getProperty("user.home");
 
-        File apiOrgTokenFile = new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-" + URI.create(baseUrl).getHost()
+        File apiOrgTokenFile = new File(homeFolder + "/." + vcdOrg.toLowerCase().replace("/", "_") + "-" + URI.create(baseUrl).getHost()
                 + "-" + apiAuthentication.getFileName().substring(1));
         if (apiOrgTokenFile.exists() || useSiteSpecificToken) {
             useSiteSpecificToken = true;
@@ -340,7 +341,7 @@ public class Vcd extends AbstractRestService {
         } else {
             log.debug("Org api token file {} does not exist", apiOrgTokenFile.getPath());
         }
-        return new File(homeFolder + "/." + vcdOrg.toLowerCase() + "-" + apiAuthentication.getFileName().substring(1));
+        return new File(homeFolder + "/." + vcdOrg.toLowerCase().replace("/", "_") + "-" + apiAuthentication.getFileName().substring(1));
     }
 
     private RequestHeader taskAcceptHeader() {

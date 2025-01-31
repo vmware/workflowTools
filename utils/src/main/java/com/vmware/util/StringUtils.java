@@ -423,6 +423,10 @@ public class StringUtils {
         return Arrays.stream(spltValues).filter(StringUtils::isNotEmpty).map(String::trim).collect(Collectors.toList());
     }
 
+    public static boolean contains(String value, String valueToCheck) {
+        return value != null && value.contains(valueToCheck);
+    }
+
     public static String convertToPem(final Certificate certificate) throws CertificateEncodingException {
         return convertToPem(certificate.getEncoded(), BEGIN_CERT, END_CERT);
     }

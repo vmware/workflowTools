@@ -106,7 +106,7 @@ public class ServiceLocator {
 
     public Jenkins newJenkins() {
         JenkinsConfig jenkinsConfig = config.jenkinsConfig;
-        return new Jenkins(jenkinsConfig.jenkinsUrl, config.username, jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides);
+        return new Jenkins(jenkinsConfig.jenkinsUrl, determineUsername(jenkinsConfig.jenkinsUsername), jenkinsConfig.jenkinsUsesCsrf, jenkinsConfig.disableJenkinsLogin, jenkinsConfig.testReportsUrlOverrides);
     }
 
     public Buildweb getBuildweb() {
@@ -124,7 +124,7 @@ public class ServiceLocator {
             SsoConfig ssoConfig = config.ssoConfig;
             String ssoEmail = StringUtils.isNotBlank(ssoConfig.ssoEmail) ? ssoConfig.ssoEmail : git.configValue("user.email");
             vcd = new Vcd(vcdConfig.vcdUrl, vcdConfig.vcdApiVersion, determineUsername(vcdConfig.vcdUsername), vcdConfig.defaultVcdOrg, vcdConfig.vcdSso, ssoEmail,
-                    vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, ssoConfig.ssoHeadless, ssoConfig);
+                    vcdConfig.refreshTokenName, vcdConfig.disableVcdRefreshToken, vcdConfig.vcdSsoButtonId, ssoConfig);
         }
         return vcd;
     }

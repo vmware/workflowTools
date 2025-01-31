@@ -1,6 +1,5 @@
 package com.vmware.action.base;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +100,7 @@ public abstract class BaseSingleVappJsonAction extends BaseSingleVappAction {
 
         devTools.setValueById(vm.getUsernameInputId(), vm.getLoginCredentials().username);
         devTools.setValueById(vm.getPasswordInputId(), vm.getLoginCredentials().password);
-        devTools.clickById(vm.getLoginButtonLocator(), vm.getLoginButtonTestDescription());
+        devTools.clickByLocator(vm.getLoginButtonLocator(), vm.getLoginButtonTestDescription());
         devTools.closeDevToolsOnly();
     }
 }

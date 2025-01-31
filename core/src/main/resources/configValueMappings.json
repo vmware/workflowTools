@@ -58,7 +58,6 @@
     "--sync-to-branch-latest"
   ],
   "LoadVappMetadataIfFound": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -100,16 +99,19 @@
     "--destination-file"
   ],
   "AuthenticateAllApis": [
+    "--username",
     "--trello-sso",
+    "--trello-username",
     "--disable-login",
+    "--jenkins-username",
+    "--jira-username",
     "--jira-url",
     "--bugzilla-sso-login-id",
     "--bugzilla-sso",
     "--bugzilla-test-bug",
-    "--username",
+    "--bugzilla-username",
     "--rb-username",
     "--use-rb-api-token",
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -201,7 +203,6 @@
     "--disable-jira"
   ],
   "PowerOnVapp": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -213,7 +214,6 @@
     "--wait-for-action"
   ],
   "ShowLoggedInUserDetails": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -255,7 +255,6 @@
     "--parent"
   ],
   "SetVappMetadataIfNeeded": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -293,7 +292,6 @@
   ],
   "LoadVapps": [
     "--query-filter",
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -360,6 +358,9 @@
     "--tracking-branch",
     "--parent"
   ],
+  "OpenUrl": [
+    "--source-url"
+  ],
   "ExitIfTrivialCommit": [
     "--trivial-reviewer-label"
   ],
@@ -381,7 +382,7 @@
   ],
   "FindTestFailures": [
     "--disable-login",
-    "--username",
+    "--jenkins-username",
     "--database-size-query",
     "--database-url",
     "--database-driver-class",
@@ -397,7 +398,6 @@
     "--create-test-failures-database"
   ],
   "DeleteVappMetadataIfNeeded": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -408,7 +408,6 @@
     "--vapp-metadata-name"
   ],
   "RenameVapp": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -429,7 +428,6 @@
     "--wait-time"
   ],
   "DeleteVapp": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -457,7 +455,6 @@
     "--ssh-command"
   ],
   "LoadVappJson": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -532,7 +529,6 @@
     "--no-verify"
   ],
   "ShowVappVmsStatus": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -569,7 +565,6 @@
     "--autocomplete-workflow"
   ],
   "ExitIfVcdVmQuotaExceeded": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -608,7 +603,6 @@
     "--jira-url"
   ],
   "PowerOffVm": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -662,7 +656,6 @@
     "--database-url"
   ],
   "PowerOffVapp": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -711,7 +704,6 @@
     "--vcd-check-quota"
   ],
   "PowerOnVm": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -754,9 +746,6 @@
   "SelectVappIfNeeded": [
     "--use-vapp-json"
   ],
-  "OpenFile": [
-    "--source-file"
-  ],
   "SkipPipelineIfSet": [
     "--skip-pipeline"
   ],
@@ -768,7 +757,6 @@
     "--vm-name"
   ],
   "SaveApiToken": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -801,7 +789,6 @@
     "--http-server-port"
   ],
   "BaseSingleVappAction": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -821,7 +808,6 @@
     "--use-rb-api-token"
   ],
   "UpdateVappLease": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -880,7 +866,6 @@
   ],
   "DeleteVMs": [
     "--query-filter",
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -921,7 +906,6 @@
     "--own-boards-only"
   ],
   "DisplayVappMetadataKeys": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",
@@ -959,7 +943,6 @@
     "--database-schema-name"
   ],
   "DownloadBuildArtifact": [
-    "--sso-headless",
     "--disable-vcd-refresh",
     "--vcd-refresh-token-name",
     "--vcd-sso",

@@ -22,6 +22,7 @@ import com.vmware.chrome.domain.ApiRequest;
 import com.vmware.chrome.domain.ApiResponse;
 import com.vmware.chrome.domain.ChromeTab;
 import com.vmware.http.HttpConnection;
+import com.vmware.http.json.ConfiguredGsonBuilder;
 import com.vmware.http.request.body.RequestBodyHandling;
 import com.vmware.util.CommandLineUtils;
 import com.vmware.util.IOUtils;
@@ -39,19 +40,19 @@ import static com.vmware.util.FileUtils.createTempDirectory;
 
 public class ChromeDevTools extends WebSocketClient {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-    private AtomicInteger screenShotCounter = new AtomicInteger(1);
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final AtomicInteger screenShotCounter = new AtomicInteger(1);
 
-    private Gson gson = new Gson();
+    private final Gson gson = new ConfiguredGsonBuilder().build();
     private CompletableFuture<ApiResponse> eventFuture;
     private CompletableFuture<ApiResponse> domContentEventFuture;
-    private int currentRequestId;
-    private Process chromeProcess;
+    private ApiRequest currentRequest;
+    private final Process chromeProcess;
 
     public static ChromeDevTools devTools(String chromePath, boolean ssoHeadless, int chromeDebugPort) {
         HttpConnection connection = new HttpConnection(RequestBodyHandling.AsStringJsonEntity);
         Process chromeProcess = null;
-        ChromeTab chromeTab = null;
+        ChromeTab chromeTab;
         try {
             chromeTab = connection.put("http://127.0.0.1:" + chromeDebugPort + "/json/new?about:blank", ChromeTab.class, (Object) null);
         } catch (FatalException uhe) {
@@ -90,7 +91,8 @@ public class ChromeDevTools extends WebSocketClient {
             IOUtils.write(screencastFile, Base64.getDecoder().decode(response.getParamsData()));
         } else if (response.getData() != null) {
             log.debug("Response: id {} data response", response.id);
-            if (eventFuture != null && currentRequestId == response.id) {
+            if (eventFuture != null && currentRequest.getId() == response.id) {
+                response.sourceRequest = currentRequest;
                 eventFuture.complete(response);
             }
         } else if (response.method != null) {
@@ -99,10 +101,11 @@ public class ChromeDevTools extends WebSocketClient {
             }
         } else {
             log.debug("Response: {}", message);
-            if (eventFuture != null && currentRequestId == response.id) {
+            if (eventFuture != null && currentRequest.getId() == response.id) {
+                response.sourceRequest = currentRequest;
                 eventFuture.complete(response);
             } else if (eventFuture != null) {
-                log.info("Failed to find matching response for id {}\n{}", currentRequestId, message);
+                log.info("Failed to find matching response for id {}\n{}", currentRequest.getId(), message);
             }
         }
     }
@@ -142,10 +145,14 @@ public class ChromeDevTools extends WebSocketClient {
     }
 
     public ApiResponse clickById(String elementId) {
-        return clickById(String.format("document.getElementById('%s')", elementId), "#" + elementId);
+        return clickByLocator(String.format("document.getElementById('%s')", elementId), "#" + elementId);
     }
 
-    public ApiResponse clickById(String locator, String testDescription) {
+    public ApiResponse clickByLocator(String locator) {
+        return clickByLocator(locator, "");
+    }
+
+    public ApiResponse clickByLocator(String locator, String testDescription) {
         evaluate(locator, ".disabled = false",testDescription);
         return evaluate(locator, ".click()",testDescription);
     }
@@ -155,13 +162,18 @@ public class ChromeDevTools extends WebSocketClient {
         evaluate(String.format("document.getElementById('%s')", elementId), ".dispatchEvent(new Event('input', {bubbles: true}))","#" + elementId);
     }
 
+    public void setValueByLocator(String locator, String value) {
+        evaluate(locator, ".value = '" + value + "'", "");
+        evaluate(locator, ".dispatchEvent(new Event('input', {bubbles: true}))","");
+    }
+
     public String getValue(String elementScript) {
         return waitForPredicate(ApiRequest.evaluate(elementScript), apiResponse -> StringUtils.isNotBlank(apiResponse.getValue()), 0, elementScript).getValue();
     }
 
     public ApiResponse evaluate(String locator, String operation, String testDescription) {
         waitForPredicate(ApiRequest.evaluate(locator),
-                response -> response.getDescription() != null && response.getDescription().contains(testDescription), 0, "element " + testDescription);
+                response -> response.hasObjectId() && (testDescription == null || StringUtils.contains(response.getDescription(), testDescription)), 0, "element " + testDescription);
         return sendMessage(ApiRequest.evaluate(locator + operation));
     }
 
@@ -174,7 +186,7 @@ public class ChromeDevTools extends WebSocketClient {
         String request = gson.toJson(message);
         log.debug("Request: {}", request);
         super.send(request);
-        this.currentRequestId = message.getId();
+        this.currentRequest = message;
         this.eventFuture = new CompletableFuture<>();
         try {
             ApiResponse response = this.eventFuture.get();
@@ -191,13 +203,15 @@ public class ChromeDevTools extends WebSocketClient {
         return waitForAnyPredicate(Collections.singletonMap(apiRequest, predicate), retry, description);
     }
 
-    public String waitForAnyElementId(String... elementIds) {
+    public ApiResponse waitForAnyElementId(String... elementIds) {
         Map<ApiRequest, Predicate<ApiResponse>> requestPredicateMap = Arrays.stream(elementIds)
                 .filter(Objects::nonNull).collect(Collectors.toMap(ApiRequest::elementById,
                         value -> response -> response.getDescription() != null && response.getDescription().contains("#" + value)));
         ApiResponse response = waitForAnyPredicate(requestPredicateMap, 0, Arrays.toString(elementIds));
-        return Arrays.stream(elementIds).filter(elementId -> response.getDescription() != null && response.getDescription().contains("#" + elementId)).findFirst()
-                .orElseThrow(() -> new RuntimeException("No element found matching " + Arrays.toString(elementIds)));
+        if (Arrays.stream(elementIds).noneMatch(response::matchesRequestSource)) {
+            throw new RuntimeException("No element found matching " + Arrays.toString(elementIds));
+        }
+        return response;
     }
 
     public ApiResponse waitForAnyPredicate(Map<ApiRequest, Predicate<ApiResponse>> requestPredicateMap, int retry, String description) {
@@ -207,7 +221,7 @@ public class ChromeDevTools extends WebSocketClient {
         }).filter(Objects::nonNull).findFirst();
 
         if (!apiResponse.isPresent()) {
-            if (retry > 10) {
+            if (retry > 20) {
                 log.info("Current url {}", evaluate("window.location.href").getValue());
                 saveScreenshot();
                 throw new RuntimeTimeoutException("Failed to wait for " + description + " in " + retry + " retries");

@@ -19,25 +19,28 @@ public class SsoConfig {
     @ConfigurableProperty(commandLine = "--sso-headless", help = "Run chrome in headless mode for SSO. Certificates will not be used.")
     public boolean ssoHeadless;
 
-    @ConfigurableProperty(help = "Id of input field for username when signing in with SSO")
+    @ConfigurableProperty(help = "Id / XPath of input field for username when signing in with SSO")
     public String ssoUsernameInputId;
 
-    @ConfigurableProperty(help = "Id of input field for password when signing in with SSO")
+    @ConfigurableProperty(help = "Id / XPath of input field for password when signing in with SSO")
     public String ssoPasswordInputId;
 
-    @ConfigurableProperty(help = "Id of input field for sign in button when signing in with SSO")
+    @ConfigurableProperty(help = "Id / XPath of input field for sign in button when signing in with SSO")
     public String ssoSignInButtonId;
 
-    @ConfigurableProperty(help = "Id of input field for email address when signing in with SSO")
+    @ConfigurableProperty(help = "Id / XPath of input field for email address when signing in with SSO")
     public String emailAddressInputId;
 
-    @ConfigurableProperty(help = "Id of input field for submitting email address when signing in with SSO")
+    @ConfigurableProperty(help = "Id / XPath of input field for submitting email address when signing in with SSO")
     public String emailAddressSubmitButtonId;
 
-    @ConfigurableProperty(help = "Id of input field for RSA passcode when signing in with SSO")
+    @ConfigurableProperty(help = "Id / XPath of input field for external auth when signing in with SSO")
+    public String ssoExternalAuthButtonId;
+
+    @ConfigurableProperty(help = "Id / XPath of input field for RSA passcode when signing in with SSO")
     public String ssoPasscodeInputId;
 
-    @ConfigurableProperty(help = "Id of input field for sign in button when signing in with SSO using a RSA passcode")
+    @ConfigurableProperty(help = "Id / XPath of input field for sign in button when signing in with SSO using a RSA passcode")
     public String ssoPasscodeSignInButtonId;
 
     @ConfigurableProperty(help = "Elements to click to complete signing in with SSO")
